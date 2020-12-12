@@ -5,6 +5,7 @@
 
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
+#include <cmajor/symbols/SourceFileModuleMap.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -32,6 +33,7 @@
 namespace cmajor { namespace symbols {
 
 // #define RESOURCE_DEBUG
+
 
 using namespace soulng::unicode;
 using namespace soulng::util;
@@ -228,18 +230,18 @@ void ModuleDependency::Dump(CodeFormatter& formatter)
     formatter.DecIndent();
 }
 
-int16_t FileTable::RegisterFilePath(const std::string& filePath)
+int32_t FileTable::RegisterFilePath(const std::string& filePath)
 {
-    int16_t fileId = filePaths.size();
+    int32_t fileIndex = filePaths.size();
     filePaths.push_back(filePath);
-    return fileId;
+    return fileIndex;
 }
 
-std::string FileTable::GetFilePath(int16_t fileId) const
+std::string FileTable::GetFilePath(int32_t fileIndex) const
 {
-    if (fileId >= 0 && fileId < filePaths.size())
+    if (fileIndex >= 0 && fileIndex < filePaths.size())
     {
-        return filePaths[fileId];
+        return filePaths[fileIndex];
     }
     return std::string();
 }
@@ -335,113 +337,13 @@ const std::u32string& SourceFileCache::GetFileContent(const std::string& filePat
     }
 }
 
-class ModuleMap
+cmajor::debug::SourceSpan MakeSourceSpan(const Span& span, const boost::uuids::uuid& sourceModuleId)
 {
-public:
-    static void Init();
-    static void Done();
-    static ModuleMap& Instance() { return *instance; }
-    Module* GetModule(const boost::uuids::uuid& moduleId);
-    void PutModule(Module* module);
-    void RemoveModule(Module* module);
-private:
-    std::recursive_mutex mtx;
-    static std::unique_ptr<ModuleMap> instance;
-    std::unordered_map<boost::uuids::uuid, Module*, boost::hash<boost::uuids::uuid>> moduleMap;
-    std::unordered_map<boost::uuids::uuid, std::string, boost::hash<boost::uuids::uuid>> moduleFilePathMap;
-    std::vector<std::unique_ptr<Module>> modules;
-};
-
-std::unique_ptr<ModuleMap> ModuleMap::instance;
-
-void ModuleMap::Init()
-{
-    instance.reset(new ModuleMap());
-}
-
-void ModuleMap::Done()
-{
-    instance.reset();
-}
-
-Module* ModuleMap::GetModule(const boost::uuids::uuid& moduleId)
-{
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-    auto it = moduleMap.find(moduleId);
-    if (it != moduleMap.cend())
-    {
-        return it->second;
-    }
-    else
-    {
-        auto it2 = moduleFilePathMap.find(moduleId);
-        if (it2 != moduleFilePathMap.cend())
-        {
-            std::unique_ptr<Module> module(new Module(it2->second));
-            module->SetFlag(ModuleFlags::dontRemoveFromModuleMap);
-            Module* modulePtr = module.get();
-            PutModule(modulePtr);
-            modules.push_back(std::move(module));
-            return modulePtr;
-        }
-        else
-        {
-            throw std::runtime_error("module id '" + boost::uuids::to_string(moduleId) + "' not in module map");
-        }
-    }
-}
-
-void ModuleMap::PutModule(Module* module)
-{
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-    moduleMap[module->Id()] = module;
-}
-
-void ModuleMap::RemoveModule(Module* module)
-{
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-    moduleMap.erase(module->Id());
-    moduleFilePathMap[module->Id()] = module->OriginalFilePath();
-}
-
-SpanMapper::SpanMapper() : currentRootModule(GetRootModuleForCurrentThread())
-{
-}
-
-Span SpanMapper::MapSpan(const Span& span, const boost::uuids::uuid& rootModuleId)
-{
-    if (span.fileIndex == -1) return span;
-    if (rootModuleId.is_nil()) return span;
-    if (rootModuleId == currentRootModule->Id()) return span;
-    Module* rm = ModuleMap::Instance().GetModule(rootModuleId);
-    if (!rm)
-    {
-        return Span();
-    }
-    int16_t moduleId = GetModuleId(span.fileIndex);
-    int16_t fileId = GetFileId(span.fileIndex);
-    std::unordered_map<int16_t, std::string>* moduleNameTable = rm->GetModuleNameTable();
-    auto it = moduleNameTable->find(moduleId);
-    if (it != moduleNameTable->cend())
-    {
-        std::unordered_map<std::string, int16_t>* moduleIdMap = currentRootModule->GetModuleIdMap();
-        auto it2 = moduleIdMap->find(it->second);
-        if (it2 != moduleIdMap->cend())
-        {
-            moduleId = it2->second;
-        }
-        else
-        {
-            throw std::runtime_error("could not find module name '" + it->second + "' from module id table of module '" + ToUtf8(currentRootModule->Name()) + "'");
-        }
-    }
-    else
-    {
-        throw std::runtime_error("could not find module id " + std::to_string(moduleId) + " from module name table of module '" + ToUtf8(rm->Name()) + "'");
-    }
-    Span s = span;
-    s.fileIndex = MakeFileIndex(moduleId, fileId);
-    return s;
+    if (!span.Valid()) return cmajor::debug::SourceSpan();
+    if (sourceModuleId.is_nil()) return cmajor::debug::SourceSpan();
+    Module* module = GetModuleById(sourceModuleId);
+    if (!module) return cmajor::debug::SourceSpan();
+    return module->SpanToSourceSpan(span);
 }
 
 void Visit(std::vector<Module*>& finishReadOrder, Module* module, std::unordered_set<Module*>& visited, std::unordered_set<Module*>& tempVisit,
@@ -784,7 +686,7 @@ Module::Module() :
     format(currentModuleFormat), flags(ModuleFlags::none), name(), id(boost::uuids::random_generator()()),
     originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
     symbolTable(nullptr), directoryPath(), objectFileDirectoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0), index(-1),
-    buildStartMs(0), buildStopMs(0), preparing(false)
+    buildStartMs(0), buildStopMs(0), preparing(false), backend(sngcm::ast::BackEnd::llvm), config(sngcm::ast::Config::debug), functionIndex(this)
 {
 }
 
@@ -792,11 +694,11 @@ Module::Module(const std::string& filePath) : Module(filePath, false)
 {
 }
 
-Module::Module(const std::string& filePath, bool readRoot)  :
+Module::Module(const std::string& filePath, bool readRoot) :
     format(currentModuleFormat), flags(ModuleFlags::none), name(), id(boost::uuids::random_generator()()),
     originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
     symbolTable(new SymbolTable(this)), directoryPath(), objectFileDirectoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
-    index(-1), buildStartMs(0), buildStopMs(0), preparing(false)
+    index(-1), buildStartMs(0), buildStopMs(0), preparing(false), backend(sngcm::ast::BackEnd::llvm), config(sngcm::ast::Config::debug), functionIndex(this)
 {
     SymbolReader reader(filePath);
     ModuleTag expectedTag;
@@ -817,7 +719,9 @@ Module::Module(const std::string& filePath, bool readRoot)  :
     flags = ModuleFlags(reader.GetBinaryReader().ReadByte());
     name = reader.GetBinaryReader().ReadUtf32String();
     reader.GetBinaryReader().ReadUuid(id);
-    ModuleMap::Instance().PutModule(this);
+    MapModule(this);
+    backend = static_cast<sngcm::ast::BackEnd>(reader.GetBinaryReader().ReadSByte());
+    config = static_cast<sngcm::ast::Config>(reader.GetBinaryReader().ReadSByte());
     std::unordered_set<std::string> importSet;
     Module* rootModule = this;
     if (!HasRootModuleForCurrentThread())
@@ -901,7 +805,7 @@ Module::Module(const std::u32string& name_, const std::string& filePath_, sngcm:
     format(currentModuleFormat), flags(ModuleFlags::none), name(name_), id(boost::uuids::random_generator()()),
     originalFilePath(filePath_), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0),
     symbolTable(new SymbolTable(this)), directoryPath(), objectFileDirectoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
-    index(-1), buildStartMs(0), buildStopMs(0), preparing(false)
+    index(-1), buildStartMs(0), buildStopMs(0), preparing(false), backend(sngcm::ast::BackEnd::llvm), config(sngcm::ast::Config::debug), functionIndex(this)
 {
     if (SystemModuleSet::Instance().IsSystemModule(name))
     {
@@ -915,8 +819,6 @@ Module::Module(const std::u32string& name_, const std::string& filePath_, sngcm:
 
 Module::~Module()
 {
-    if (GetFlag(ModuleFlags::dontRemoveFromModuleMap)) return;
-    ModuleMap::Instance().RemoveModule(this);
 }
 
 void Module::SetResourceFilePath(const std::string& resourceFilePath_)
@@ -926,7 +828,38 @@ void Module::SetResourceFilePath(const std::string& resourceFilePath_)
 
 void Module::PrepareForCompilation(const std::vector<std::string>& references, sngcm::ast::Target target)
 {
-    ModuleMap::Instance().PutModule(this);
+    MapModule(this);
+    switch (GetBackEnd())
+    {
+        case BackEnd::llvm:
+        {
+            backend = sngcm::ast::BackEnd::llvm;
+            break;
+        }
+        case BackEnd::cmsx:
+        {
+            backend = sngcm::ast::BackEnd::cmsx;
+            break;
+        }
+        case BackEnd::cmcpp:
+        {
+            backend = sngcm::ast::BackEnd::cppcm;
+            break;
+        }
+    }
+    std::string configStr = GetConfig();
+    if (configStr == "debug")
+    {
+        config = sngcm::ast::Config::debug;
+    }
+    else if (configStr == "release")
+    {
+        config = sngcm::ast::Config::release;
+    }
+    else if (configStr == "profile")
+    {
+        config = sngcm::ast::Config::profile;
+    }
     boost::filesystem::path mfd = originalFilePath;
     mfd.remove_filename();
     boost::filesystem::create_directories(mfd);
@@ -1041,15 +974,11 @@ void Module::MakeFilePathFileIndexMap()
 {
     if (GetFlag(ModuleFlags::fileIndexFilePathMapBuilt)) return;
     SetFlag(ModuleFlags::fileIndexFilePathMapBuilt);
-    int16_t n = fileTables.size();
-    for (int16_t moduleId = 0; moduleId < n; ++moduleId)
+    int16_t n = fileTable.NumFilePaths();
+    for (int16_t i = 0; i < n; ++i)
     {
-        FileTable* fileTable = fileTables[moduleId];
-        for (int16_t fileId = 0; fileId < fileTable->NumFilePaths(); ++fileId)
-        {
-            int32_t fileIndex = MakeFileIndex(moduleId, fileId);
-            filePathFileIndexMap[fileTable->GetFilePath(fileId)] = fileIndex;
-        }
+        int32_t fileIndex = i;
+        filePathFileIndexMap[fileTable.GetFilePath(i)] = fileIndex;
     }
 }
 
@@ -1073,27 +1002,18 @@ std::string Module::GetFilePath(int32_t fileIndex) const
     {
         return std::string();
     }
-    int16_t moduleId = sngcm::ast::GetModuleId(fileIndex);
-    int16_t fileId = sngcm::ast::GetFileId(fileIndex);
-    if (moduleId >= 0 && moduleId < fileTables.size())
-    {
-        FileTable* fileTable = fileTables[moduleId];
-        return fileTable->GetFilePath(fileId);
-    }
-    return std::string();
+    return fileTable.GetFilePath(fileIndex);
 }
 
 std::u32string Module::GetErrorLines(const Span& span) const
 {
     if (span.fileIndex >= 0)
     {
-        int16_t moduleId = sngcm::ast::GetModuleId(span.fileIndex);
-        if (moduleId == 0 && GetFlag(ModuleFlags::compiling))
+        if (GetFlag(ModuleFlags::compiling))
         {
-            int16_t fileId = sngcm::ast::GetFileId(span.fileIndex);
-            if (fileId < lexers.size())
+            if (span.fileIndex < lexers.size())
             {
-                return lexers[fileId]->ErrorLines(span);
+                return lexers[span.fileIndex]->ErrorLines(span);
             }
         }
         else
@@ -1114,13 +1034,11 @@ void Module::GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) co
 {
     if (span.fileIndex >= 0)
     {
-        int16_t moduleId = sngcm::ast::GetModuleId(span.fileIndex);
-        if (moduleId == 0 && GetFlag(ModuleFlags::compiling))
+        if (GetFlag(ModuleFlags::compiling))
         {
-            int16_t fileId = sngcm::ast::GetFileId(span.fileIndex);
-            if (fileId < lexers.size())
+            if (span.fileIndex < lexers.size())
             {
-                return lexers[fileId]->GetColumns(span, startCol, endCol);
+                return lexers[span.fileIndex]->GetColumns(span, startCol, endCol);
             }
         }
         else
@@ -1140,10 +1058,12 @@ void Module::Write(SymbolWriter& writer)
 {
     ModuleTag tag;
     tag.Write(writer);
-    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~(ModuleFlags::root | ModuleFlags::immutable | ModuleFlags::compiling | ModuleFlags::dontRemoveFromModuleMap | 
-        ModuleFlags::fileIndexFilePathMapBuilt | ModuleFlags::readFromModuleFile)));
+    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~(ModuleFlags::root | ModuleFlags::immutable | ModuleFlags::compiling | ModuleFlags::fileIndexFilePathMapBuilt | 
+        ModuleFlags::readFromModuleFile)));
     writer.GetBinaryWriter().Write(name);
     writer.GetBinaryWriter().Write(id);
+    writer.GetBinaryWriter().Write(static_cast<int8_t>(backend));
+    writer.GetBinaryWriter().Write(static_cast<int8_t>(config));
     std::string cmajorRootRelativeFilePath = MakeCmajorRootRelativeFilePath(originalFilePath);
     writer.GetBinaryWriter().Write(cmajorRootRelativeFilePath);
     uint32_t nr = referencedModules.size();
@@ -1275,11 +1195,12 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         throw std::runtime_error("Cmajor module format version mismatch reading from file '" + reader.GetBinaryReader().FileName() + 
             "': format " + std::string(1, expectedTag.bytes[3]) + " expected, format " + std::string(1, tag.bytes[3]) + " read, please rebuild module from sources");
     }
-
     flags = ModuleFlags(reader.GetBinaryReader().ReadByte());
     name = reader.GetBinaryReader().ReadUtf32String();
     reader.GetBinaryReader().ReadUuid(id);
-    ModuleMap::Instance().PutModule(this);
+    MapModule(this);
+    backend = static_cast<sngcm::ast::BackEnd>(reader.GetBinaryReader().ReadSByte());
+    config = static_cast<sngcm::ast::Config>(reader.GetBinaryReader().ReadSByte());
     rootModule->RegisterFileTable(&fileTable, this);
     if (this != rootModule)
     {
@@ -1306,6 +1227,10 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         referenceFilePaths.push_back(referenceFilePath);
     }
     fileTable.Read(reader.GetBinaryReader(), IsSystemModule());
+    if (GetGlobalFlag(GlobalFlags::updateSourceFileModuleMap))
+    {
+        UpdateSourceFileModuleMap();
+    }
     if (!fileTable.IsEmpty())
     {
 #ifdef _WIN32
@@ -1614,7 +1539,6 @@ void Module::CheckUpToDate()
                 {
                     Warning warning(name, "source file '" + GetFullPath(sfp.generic_string()) + "' is more recent than object file '" +
                         GetFullPath(objectFilePath.generic_string()) + "'");
-                    warning.SetModule(GetRootModuleForCurrentThread());
                     bool found = false;
                     for (const Warning& prev : warnings.Warnings())
                     {
@@ -1632,16 +1556,6 @@ void Module::CheckUpToDate()
             }
         }
     }
-}
-
-int16_t Module::GetModuleId(Module* module) 
-{
-    auto it = moduleIdMap.find(ToUtf8(module->Name()));
-    if (it != moduleIdMap.cend())
-    {
-        return it->second;
-    }
-    return -1;
 }
 
 void Module::SetCurrentProjectName(const std::u32string& currentProjectName_)
@@ -1799,13 +1713,21 @@ void Module::WriteProjectDebugInfoFile(const std::string& projectDebufInfoFilePa
 {
     BinaryWriter writer(projectDebufInfoFilePath);
     int32_t numCompileUnits = fileTable.NumFilePaths();
-    cmajor::debug::WriteProjectTableHeader(writer, ToUtf8(name), Path::GetDirectoryName(originalFilePath), numCompileUnits, functionIndex.GetMainFunctionId());
+    cmajor::debug::WriteProjectTableHeader(writer, ToUtf8(name), Path::GetDirectoryName(originalFilePath), Id(), numCompileUnits, functionIndex.GetMainFunctionId());
     for (int32_t i = 0; i < numCompileUnits; ++i)
     {
         std::string compileUnitBaseName = Path::GetFileNameWithoutExtension(fileTable.GetFilePath(i));
         cmajor::debug::WriteProjectTableRecord(writer, compileUnitBaseName);
     }
-    fileIndex.Write(writer);
+    int32_t n = fileTable.NumFilePaths();
+    cmajor::debug::WriteNumberOfFileIndexRecords(writer, n);
+    for (int32_t i = 0; i < n; ++i)
+    {
+        int32_t fileIndex = i;
+        std::string filePath = fileTable.GetFilePath(fileIndex);
+        Assert(!filePath.empty(), "source file path is empty");
+        cmajor::debug::WriteFileIndexRecord(writer, fileIndex, filePath);
+    }
     functionIndex.Write(writer);
     typeIndex.Write(writer);
 }
@@ -1836,10 +1758,11 @@ void Module::WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Modu
     BinaryReader pdiReader(pdiFilePath);
     std::string projectName;
     std::string projectDirectoryPath;
+    boost::uuids::uuid moduleId;
     int32_t numCompileUnits;
     boost::uuids::uuid mainFunctionId;
-    cmajor::debug::ReadProjectTableHeader(pdiReader, projectName, projectDirectoryPath, numCompileUnits, mainFunctionId);
-    cmajor::debug::WriteProjectTableHeader(cmdbWriter, projectName, projectDirectoryPath, numCompileUnits, mainFunctionId);
+    cmajor::debug::ReadProjectTableHeader(pdiReader, projectName, projectDirectoryPath, moduleId, numCompileUnits, mainFunctionId);
+    cmajor::debug::WriteProjectTableHeader(cmdbWriter, projectName, projectDirectoryPath, moduleId, numCompileUnits, mainFunctionId);
     for (int32_t i = 0; i < numCompileUnits; ++i)
     {
         std::string compileUnitBaseName;
@@ -1853,9 +1776,10 @@ void Module::WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Modu
         for (int32_t i = 0; i < numFunctionRecords; ++i)
         {
             int32_t fileIndex;
+            boost::uuids::uuid sourceModuleId;
             boost::uuids::uuid functionId;
-            cmajor::debug::ReadCompileUnitFunctionRecord(cudiReader, fileIndex, functionId);
-            cmajor::debug::WriteCompileUnitFunctionRecord(cmdbWriter, fileIndex, functionId);
+            cmajor::debug::ReadCompileUnitFunctionRecord(cudiReader, fileIndex, sourceModuleId, functionId);
+            cmajor::debug::WriteCompileUnitFunctionRecord(cmdbWriter, fileIndex, sourceModuleId, functionId);
             int32_t numInstructionRecords;
             cmajor::debug::ReadNumberOfInstructionRecords(cudiReader, numInstructionRecords);
             cmajor::debug::WriteNumberOfInstructionRecords(cmdbWriter, numInstructionRecords);
@@ -1945,11 +1869,9 @@ cmajor::debug::SourceSpan Module::SpanToSourceSpan(const Span& span)
     if (!span.Valid()) return cmajor::debug::SourceSpan();
     cmajor::debug::SourceSpan sourceSpan;
     sourceSpan.line = span.line;
-    int16_t moduleId = sngcm::ast::GetModuleId(span.fileIndex);
-    int16_t fileId = sngcm::ast::GetFileId(span.fileIndex);
-    if (moduleId == 0)
+    if (GetFlag(ModuleFlags::compiling))
     {
-        CmajorLexer* lexer = lexers[fileId].get();
+        CmajorLexer* lexer = lexers[span.fileIndex].get();
         int32_t startCol = 0;
         int32_t endCol = 0;
         lexer->GetColumns(span, startCol, endCol);
@@ -1958,6 +1880,7 @@ cmajor::debug::SourceSpan Module::SpanToSourceSpan(const Span& span)
     }
     else
     {
+        std::lock_guard<std::recursive_mutex> lck(lock);
         std::string filePath = GetFilePath(span.fileIndex);
         const std::u32string& content = sourceFileCache.GetFileContent(filePath);
         int32_t startCol = 0;
@@ -1982,11 +1905,46 @@ int32_t Module::GetFileIndexForFilePath(const std::string& filePath) const
     }
 }
 
+void Module::UpdateSourceFileModuleMap()
+{
+    int16_t n = fileTable.NumFilePaths();
+    for (int16_t i = 0; i < n; ++i)
+    {
+        MapSourceFileToModuleId(backend, config, fileTable.GetFilePath(i), Id());
+    }
+}
+
 #ifdef _WIN32
     __declspec(thread) Module* rootModule = nullptr;
 #else
     __thread Module* rootModule = nullptr;
 #endif
+
+std::string GetSourceFilePath(int32_t fileIndex, const boost::uuids::uuid& moduleId)
+{
+    if (fileIndex == -1)
+    {
+        return std::string();
+    }
+    Module* module = rootModule;
+    if (!moduleId.is_nil())
+    {
+        Module* m = GetModuleById(moduleId);
+        if (m)
+        {
+            module = m;
+        }
+    }
+    if (module)
+    {
+        std::string sourceFilePath = module->GetFilePath(fileIndex);
+        return sourceFilePath;
+    }
+    else
+    {
+        return std::string();
+    }
+}
 
 bool HasRootModuleForCurrentThread()
 {
@@ -2040,12 +1998,10 @@ void InitModule()
     sngcm::ast::SetModuleVersionTagVerifier(&verifier);
     SystemModuleSet::Init();
     ContainerClassTemplateMap::Init();
-    ModuleMap::Init();
 }
 
 void DoneModule()
 {
-    ModuleMap::Done();
     ContainerClassTemplateMap::Done();
     SystemModuleSet::Done();
 }

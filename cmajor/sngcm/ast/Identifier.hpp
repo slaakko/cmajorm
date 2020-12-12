@@ -13,11 +13,11 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API IdentifierNode : public Node
 {
 public:
-    IdentifierNode(const Span& span_);
-    IdentifierNode(const Span& span_, NodeType nodeType_);
-    IdentifierNode(const Span& span_, const std::u32string& identifier_);
-    IdentifierNode(const Span& span_, NodeType nodeType_, const std::u32string& identifier_);
-    IdentifierNode(const Span& span_, const soulng::lexer::Token& token);
+    IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_, NodeType nodeType_);
+    IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& identifier_);
+    IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_, NodeType nodeType_, const std::u32string& identifier_);
+    IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_, const soulng::lexer::Token& token);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -33,8 +33,8 @@ private:
 class SNGCM_AST_API CursorIdNode : public IdentifierNode
 {
 public:
-    CursorIdNode(const Span& span_);
-    CursorIdNode(const Span& span_, const std::u32string& identifier_);
+    CursorIdNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    CursorIdNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& identifier_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

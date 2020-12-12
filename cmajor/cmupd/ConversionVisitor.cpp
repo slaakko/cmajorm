@@ -73,7 +73,7 @@ IdentifierNode* ChangeId(const std::u32string& str)
     auto it = idMap.find(str);
     if (it != idMap.cend())
     {
-        return new IdentifierNode(Span(), it->second);
+        return new IdentifierNode(Span(), boost::uuids::nil_uuid(), it->second);
     }
     auto rit = removedIds.find(str);
     if (rit != removedIds.cend())
@@ -100,7 +100,6 @@ std::u32string MapGroupId(const std::u32string& groupId, bool& changed)
 
 ConversionVisitor::ConversionVisitor() : changed(false), baseClassId(false), derivesFromXmlContentHandler(false)
 {
-    ctx.SetSpanMapper(&spanMapper);
 }
 
 std::unique_ptr<CompileUnitNode> ConversionVisitor::GetConvertedCompileUnit()
@@ -289,7 +288,7 @@ void ConversionVisitor::Visit(NullLiteralNode& nullLiteralNode)
 
 void ConversionVisitor::Visit(ArrayLiteralNode& arrayLiteralNode)
 {
-    std::unique_ptr<ArrayLiteralNode> clone(new ArrayLiteralNode(Span()));
+    std::unique_ptr<ArrayLiteralNode> clone(new ArrayLiteralNode(Span(), boost::uuids::nil_uuid()));
     int n = arrayLiteralNode.Values().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -302,7 +301,7 @@ void ConversionVisitor::Visit(ArrayLiteralNode& arrayLiteralNode)
 
 void ConversionVisitor::Visit(StructuredLiteralNode& structuredLiteralNode)
 {
-    std::unique_ptr<StructuredLiteralNode> clone(new StructuredLiteralNode(Span()));
+    std::unique_ptr<StructuredLiteralNode> clone(new StructuredLiteralNode(Span(), boost::uuids::nil_uuid()));
     int n = structuredLiteralNode.Members().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -320,7 +319,7 @@ void ConversionVisitor::Visit(UuidLiteralNode& uuidLiteralNode)
 
 void ConversionVisitor::Visit(CompileUnitNode& compileUnitNode)
 {
-    std::unique_ptr<CompileUnitNode> clone(new CompileUnitNode(Span(), compileUnitNode.FilePath()));
+    std::unique_ptr<CompileUnitNode> clone(new CompileUnitNode(Span(), boost::uuids::nil_uuid(), compileUnitNode.FilePath()));
     compileUnitNode.GlobalNs()->Accept(*this);
     clone->ResetGlobalNs(static_cast<NamespaceNode*>(node.release()));
     node.reset(clone.release());
@@ -330,7 +329,7 @@ void ConversionVisitor::Visit(NamespaceNode& namespaceNode)
 {
     namespaceNode.Id()->Accept(*this);
     IdentifierNode* id = static_cast<IdentifierNode*>(node.release());
-    std::unique_ptr<NamespaceNode> clone(new NamespaceNode(Span(), id));
+    std::unique_ptr<NamespaceNode> clone(new NamespaceNode(Span(), boost::uuids::nil_uuid(), id));
     int n = namespaceNode.Members().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -346,14 +345,14 @@ void ConversionVisitor::Visit(AliasNode& aliasNode)
     IdentifierNode* id = static_cast<IdentifierNode*>(node.release());
     aliasNode.Qid()->Accept(*this);
     IdentifierNode* qid = static_cast<IdentifierNode*>(node.release());
-    node.reset(new AliasNode(Span(), id, qid));
+    node.reset(new AliasNode(Span(), boost::uuids::nil_uuid(), id, qid));
 }
 
 void ConversionVisitor::Visit(NamespaceImportNode& namespaceImportNode)
 {
     namespaceImportNode.Ns()->Accept(*this);
     IdentifierNode* ns = static_cast<IdentifierNode*>(node.release());
-    node.reset(new NamespaceImportNode(Span(), ns));
+    node.reset(new NamespaceImportNode(Span(), boost::uuids::nil_uuid(), ns));
 }
 
 void ConversionVisitor::Visit(IdentifierNode& identifierNode)
@@ -374,20 +373,20 @@ void ConversionVisitor::Visit(IdentifierNode& identifierNode)
     }
     else
     {
-        node.reset(new IdentifierNode(Span(), str));
+        node.reset(new IdentifierNode(Span(), boost::uuids::nil_uuid(), str));
     }
 }
 
 void ConversionVisitor::Visit(CursorIdNode& cursorIdNode)
 {
     std::u32string str = cursorIdNode.Str();
-    node.reset(new CursorIdNode(Span(), str));
+    node.reset(new CursorIdNode(Span(), boost::uuids::nil_uuid(), str));
 }
 
 void ConversionVisitor::Visit(TemplateIdNode& templateIdNode)
 {
     templateIdNode.Primary()->Accept(*this);
-    std::unique_ptr<TemplateIdNode> clone(new TemplateIdNode(Span(), node.release()));
+    std::unique_ptr<TemplateIdNode> clone(new TemplateIdNode(Span(), boost::uuids::nil_uuid(), node.release()));
     int n = templateIdNode.TemplateArguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -406,7 +405,7 @@ void ConversionVisitor::Visit(FunctionNode& functionNode)
     {
         attributes.reset(functionNode.GetAttributes()->Clone());
     }
-    std::unique_ptr<FunctionNode> clone(new FunctionNode(Span(), functionNode.GetSpecifiers(), returnTypeExpr.release(), functionNode.GroupId(), attributes.release()));
+    std::unique_ptr<FunctionNode> clone(new FunctionNode(Span(), boost::uuids::nil_uuid(), functionNode.GetSpecifiers(), returnTypeExpr.release(), functionNode.GroupId(), attributes.release()));
     int n = functionNode.TemplateParameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -443,7 +442,7 @@ void ConversionVisitor::Visit(ClassNode& classNode)
     {
         attributes.reset(classNode.GetAttributes()->Clone());
     }
-    std::unique_ptr<ClassNode> clone(new ClassNode(Span(), classNode.GetSpecifiers(), id.release(), attributes.release()));
+    std::unique_ptr<ClassNode> clone(new ClassNode(Span(), boost::uuids::nil_uuid(), classNode.GetSpecifiers(), id.release(), attributes.release()));
     int nt = classNode.TemplateParameters().Count();
     for (int i = 0; i < nt; ++i)
     {
@@ -476,7 +475,7 @@ void ConversionVisitor::Visit(ClassNode& classNode)
 
 void ConversionVisitor::Visit(ThisInitializerNode& thisInitializerNode)
 {
-    std::unique_ptr<ThisInitializerNode> clone(new ThisInitializerNode(Span()));
+    std::unique_ptr<ThisInitializerNode> clone(new ThisInitializerNode(Span(), boost::uuids::nil_uuid()));
     int n = thisInitializerNode.Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -488,7 +487,7 @@ void ConversionVisitor::Visit(ThisInitializerNode& thisInitializerNode)
 
 void ConversionVisitor::Visit(BaseInitializerNode& baseInitializerNode)
 {
-    std::unique_ptr<BaseInitializerNode> clone(new BaseInitializerNode(Span()));
+    std::unique_ptr<BaseInitializerNode> clone(new BaseInitializerNode(Span(), boost::uuids::nil_uuid()));
     int n = baseInitializerNode.Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -502,7 +501,7 @@ void ConversionVisitor::Visit(MemberInitializerNode& memberInitializerNode)
 {
     memberInitializerNode.MemberId()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<MemberInitializerNode> clone(new MemberInitializerNode(Span(), id.release()));
+    std::unique_ptr<MemberInitializerNode> clone(new MemberInitializerNode(Span(), boost::uuids::nil_uuid(), id.release()));
     int n = memberInitializerNode.Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -519,7 +518,7 @@ void ConversionVisitor::Visit(StaticConstructorNode& staticConstructorNode)
     {
         attributes.reset(staticConstructorNode.GetAttributes()->Clone());
     }
-    std::unique_ptr<StaticConstructorNode> clone(new StaticConstructorNode(Span(), staticConstructorNode.GetSpecifiers(), attributes.release()));
+    std::unique_ptr<StaticConstructorNode> clone(new StaticConstructorNode(Span(), boost::uuids::nil_uuid(), staticConstructorNode.GetSpecifiers(), attributes.release()));
     int ni = staticConstructorNode.Initializers().Count();
     for (int i = 0; i < ni; ++i)
     {
@@ -548,7 +547,7 @@ void ConversionVisitor::Visit(ConstructorNode& constructorNode)
     {
         attributes.reset(constructorNode.GetAttributes()->Clone());
     }
-    std::unique_ptr<ConstructorNode> clone(new ConstructorNode(Span(), constructorNode.GetSpecifiers(), attributes.release()));
+    std::unique_ptr<ConstructorNode> clone(new ConstructorNode(Span(), boost::uuids::nil_uuid(), constructorNode.GetSpecifiers(), attributes.release()));
     int ni = constructorNode.Initializers().Count();
     for (int i = 0; i < ni; ++i)
     {
@@ -583,7 +582,7 @@ void ConversionVisitor::Visit(DestructorNode& destructorNode)
     {
         attributes.reset(destructorNode.GetAttributes()->Clone());
     }
-    std::unique_ptr<DestructorNode> clone(new DestructorNode(Span(), destructorNode.GetSpecifiers(), attributes.release()));
+    std::unique_ptr<DestructorNode> clone(new DestructorNode(Span(), boost::uuids::nil_uuid(), destructorNode.GetSpecifiers(), attributes.release()));
     if (destructorNode.WhereConstraint())
     {
         destructorNode.WhereConstraint()->Accept(*this);
@@ -613,7 +612,7 @@ void ConversionVisitor::Visit(MemberFunctionNode& memberFunctionNode)
     {
         groupId = MapGroupId(groupId, changed);
     }
-    std::unique_ptr<MemberFunctionNode> clone(new MemberFunctionNode(Span(), memberFunctionNode.GetSpecifiers(), returnTypeExpr.release(), groupId, attributes.release()));
+    std::unique_ptr<MemberFunctionNode> clone(new MemberFunctionNode(Span(), boost::uuids::nil_uuid(), memberFunctionNode.GetSpecifiers(), returnTypeExpr.release(), groupId, attributes.release()));
     if (memberFunctionNode.WhereConstraint())
     {
         memberFunctionNode.WhereConstraint()->Accept(*this);
@@ -646,7 +645,7 @@ void ConversionVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
     }
     conversionFunctionNode.ReturnTypeExpr()->Accept(*this);
     std::unique_ptr<Node> returnTypeExpr(node.release());
-    std::unique_ptr<ConversionFunctionNode> clone(new ConversionFunctionNode(Span(), conversionFunctionNode.GetSpecifiers(), returnTypeExpr.release(), attributes.release()));
+    std::unique_ptr<ConversionFunctionNode> clone(new ConversionFunctionNode(Span(), boost::uuids::nil_uuid(), conversionFunctionNode.GetSpecifiers(), returnTypeExpr.release(), attributes.release()));
     if (conversionFunctionNode.WhereConstraint())
     {
         conversionFunctionNode.WhereConstraint()->Accept(*this);
@@ -681,7 +680,7 @@ void ConversionVisitor::Visit(MemberVariableNode& memberVariableNode)
     std::unique_ptr<Node> typeExpr(node.release());
     memberVariableNode.Id()->Accept(*this);
     std::unique_ptr <IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<MemberVariableNode> clone(new MemberVariableNode(Span(), memberVariableNode.GetSpecifiers(), typeExpr.release(), id.release(), attributes.release()));
+    std::unique_ptr<MemberVariableNode> clone(new MemberVariableNode(Span(), boost::uuids::nil_uuid(), memberVariableNode.GetSpecifiers(), typeExpr.release(), id.release(), attributes.release()));
     node.reset(clone.release());
 }
 
@@ -694,7 +693,7 @@ void ConversionVisitor::Visit(InterfaceNode& interfaceNode)
     }
     interfaceNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<InterfaceNode> clone(new InterfaceNode(Span(), interfaceNode.GetSpecifiers(), id.release(), attributes.release()));
+    std::unique_ptr<InterfaceNode> clone(new InterfaceNode(Span(), boost::uuids::nil_uuid(), interfaceNode.GetSpecifiers(), id.release(), attributes.release()));
     int n = interfaceNode.Members().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -710,7 +709,7 @@ void ConversionVisitor::Visit(DelegateNode& delegateNode)
     std::unique_ptr<Node> returnTypeExpr(node.release());
     delegateNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<DelegateNode> clone(new DelegateNode(Span(), delegateNode.GetSpecifiers(), returnTypeExpr.release(), id.release()));
+    std::unique_ptr<DelegateNode> clone(new DelegateNode(Span(), boost::uuids::nil_uuid(), delegateNode.GetSpecifiers(), returnTypeExpr.release(), id.release()));
     int np = delegateNode.Parameters().Count();
     for (int i = 0; i < np; ++i)
     {
@@ -726,7 +725,7 @@ void ConversionVisitor::Visit(ClassDelegateNode& classDelegateNode)
     std::unique_ptr<Node> returnTypeExpr(node.release());
     classDelegateNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<ClassDelegateNode> clone(new ClassDelegateNode(Span(), classDelegateNode.GetSpecifiers(), returnTypeExpr.release(), id.release()));
+    std::unique_ptr<ClassDelegateNode> clone(new ClassDelegateNode(Span(), boost::uuids::nil_uuid(), classDelegateNode.GetSpecifiers(), returnTypeExpr.release(), id.release()));
     int np = classDelegateNode.Parameters().Count();
     for (int i = 0; i < np; ++i)
     {
@@ -740,7 +739,7 @@ void ConversionVisitor::Visit(ParenthesizedConstraintNode& parenthesizedConstrai
 {
     parenthesizedConstraintNode.Constraint()->Accept(*this);
     std::unique_ptr<ConstraintNode> constraint(static_cast<ConstraintNode*>(node.release()));
-    std::unique_ptr<ParenthesizedConstraintNode> clone(new ParenthesizedConstraintNode(Span(), constraint.release()));
+    std::unique_ptr<ParenthesizedConstraintNode> clone(new ParenthesizedConstraintNode(Span(), boost::uuids::nil_uuid(), constraint.release()));
     node.reset(clone.release());
 }
 
@@ -750,7 +749,7 @@ void ConversionVisitor::Visit(DisjunctiveConstraintNode& disjunctiveConstraintNo
     std::unique_ptr<ConstraintNode> left(static_cast<ConstraintNode*>(node.release()));
     disjunctiveConstraintNode.Right()->Accept(*this);
     std::unique_ptr<ConstraintNode> right(static_cast<ConstraintNode*>(node.release()));
-    std::unique_ptr<DisjunctiveConstraintNode> clone(new DisjunctiveConstraintNode(Span(), left.release(), right.release()));
+    std::unique_ptr<DisjunctiveConstraintNode> clone(new DisjunctiveConstraintNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -760,7 +759,7 @@ void ConversionVisitor::Visit(ConjunctiveConstraintNode& conjunctiveConstraintNo
     std::unique_ptr<ConstraintNode> left(static_cast<ConstraintNode*>(node.release()));
     conjunctiveConstraintNode.Right()->Accept(*this);
     std::unique_ptr<ConstraintNode> right(static_cast<ConstraintNode*>(node.release()));
-    std::unique_ptr<ConjunctiveConstraintNode> clone(new ConjunctiveConstraintNode(Span(), left.release(), right.release()));
+    std::unique_ptr<ConjunctiveConstraintNode> clone(new ConjunctiveConstraintNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -768,7 +767,7 @@ void ConversionVisitor::Visit(WhereConstraintNode& whereConstraintNode)
 {
     whereConstraintNode.Constraint()->Accept(*this);
     std::unique_ptr<ConstraintNode> constraint(static_cast<ConstraintNode*>(node.release()));
-    std::unique_ptr<WhereConstraintNode> clone(new WhereConstraintNode(Span(), constraint.release()));
+    std::unique_ptr<WhereConstraintNode> clone(new WhereConstraintNode(Span(), boost::uuids::nil_uuid(), constraint.release()));
     if (whereConstraintNode.Semicolon())
     {
         clone->SetSemicolon();
@@ -783,7 +782,7 @@ void ConversionVisitor::Visit(WhereConstraintNode& whereConstraintNode)
 void ConversionVisitor::Visit(PredicateConstraintNode& predicateConstraintNode)
 {
     predicateConstraintNode.InvokeExpr()->Accept(*this);
-    std::unique_ptr<PredicateConstraintNode> clone(new PredicateConstraintNode(Span(), node.release()));
+    std::unique_ptr<PredicateConstraintNode> clone(new PredicateConstraintNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
@@ -793,7 +792,7 @@ void ConversionVisitor::Visit(IsConstraintNode& isConstraintNode)
     std::unique_ptr<Node> typeExpr(node.release());
     isConstraintNode.ConceptOrTypeName()->Accept(*this);
     std::unique_ptr<Node> conceptOrTypeName(node.release());
-    std::unique_ptr<IsConstraintNode> clone(new IsConstraintNode(Span(), typeExpr.release(), conceptOrTypeName.release()));
+    std::unique_ptr<IsConstraintNode> clone(new IsConstraintNode(Span(), boost::uuids::nil_uuid(), typeExpr.release(), conceptOrTypeName.release()));
     node.reset(clone.release());
 }
 
@@ -801,7 +800,7 @@ void ConversionVisitor::Visit(MultiParamConstraintNode& multiParamConstraintNode
 {
     multiParamConstraintNode.ConceptId()->Accept(*this);
     std::unique_ptr<IdentifierNode> conceptId(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<MultiParamConstraintNode> clone(new MultiParamConstraintNode(Span(), conceptId.release()));
+    std::unique_ptr<MultiParamConstraintNode> clone(new MultiParamConstraintNode(Span(), boost::uuids::nil_uuid(), conceptId.release()));
     int n = multiParamConstraintNode.TypeExprs().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -814,14 +813,14 @@ void ConversionVisitor::Visit(MultiParamConstraintNode& multiParamConstraintNode
 void ConversionVisitor::Visit(TypeNameConstraintNode& typeNameConstraintNode)
 {
     typeNameConstraintNode.TypeId()->Accept(*this);
-    node.reset(new TypeNameConstraintNode(Span(), node.release()));
+    node.reset(new TypeNameConstraintNode(Span(), boost::uuids::nil_uuid(), node.release()));
 }
 
 void ConversionVisitor::Visit(ConstructorConstraintNode& constructorConstraintNode)
 {
     constructorConstraintNode.TypeParamId()->Accept(*this);
     std::unique_ptr<IdentifierNode> typeParamId(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr< ConstructorConstraintNode> clone(new ConstructorConstraintNode(Span(), typeParamId.release()));
+    std::unique_ptr< ConstructorConstraintNode> clone(new ConstructorConstraintNode(Span(), boost::uuids::nil_uuid(), typeParamId.release()));
     int n = constructorConstraintNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -835,7 +834,7 @@ void ConversionVisitor::Visit(DestructorConstraintNode& destructorConstraintNode
 {
     destructorConstraintNode.TypeParamId()->Accept(*this);
     std::unique_ptr<IdentifierNode> typeParamId(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<DestructorConstraintNode> clone(new DestructorConstraintNode(Span(), typeParamId.release()));
+    std::unique_ptr<DestructorConstraintNode> clone(new DestructorConstraintNode(Span(), boost::uuids::nil_uuid(), typeParamId.release()));
     node.reset(clone.release());
 }
 
@@ -845,7 +844,7 @@ void ConversionVisitor::Visit(MemberFunctionConstraintNode& memberFunctionConstr
     std::unique_ptr<Node> returnTypeExpr(node.release());
     memberFunctionConstraintNode.TypeParamId()->Accept(*this);
     std::unique_ptr<IdentifierNode> typeParamId(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<MemberFunctionConstraintNode> clone(new MemberFunctionConstraintNode(Span(), returnTypeExpr.release(), typeParamId.release(), memberFunctionConstraintNode.GroupId()));
+    std::unique_ptr<MemberFunctionConstraintNode> clone(new MemberFunctionConstraintNode(Span(), boost::uuids::nil_uuid(), returnTypeExpr.release(), typeParamId.release(), memberFunctionConstraintNode.GroupId()));
     int n = memberFunctionConstraintNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -859,7 +858,7 @@ void ConversionVisitor::Visit(FunctionConstraintNode& functionConstraintNode)
 {
     functionConstraintNode.ReturnTypeExpr()->Accept(*this);
     std::unique_ptr<Node> returnTypeExpr(node.release());
-    std::unique_ptr<FunctionConstraintNode> clone(new FunctionConstraintNode(Span(), returnTypeExpr.release(), functionConstraintNode.GroupId()));
+    std::unique_ptr<FunctionConstraintNode> clone(new FunctionConstraintNode(Span(), boost::uuids::nil_uuid(), returnTypeExpr.release(), functionConstraintNode.GroupId()));
     int n = functionConstraintNode.Parameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -877,7 +876,7 @@ void ConversionVisitor::Visit(AxiomStatementNode& axiomStatementNode)
         axiomStatementNode.Expression()->Accept(*this);
         expression.reset(node.release());
     }
-    std::unique_ptr<AxiomStatementNode> clone(new AxiomStatementNode(Span(), expression.release(), axiomStatementNode.Text()));
+    std::unique_ptr<AxiomStatementNode> clone(new AxiomStatementNode(Span(), boost::uuids::nil_uuid(), expression.release(), axiomStatementNode.Text()));
     node.reset(clone.release());
 }
 
@@ -885,7 +884,7 @@ void ConversionVisitor::Visit(AxiomNode& axiomNode)
 {
     axiomNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<AxiomNode> clone(new AxiomNode(Span(), id.release()));
+    std::unique_ptr<AxiomNode> clone(new AxiomNode(Span(), boost::uuids::nil_uuid(), id.release()));
     int np = axiomNode.Parameters().Count();
     for (int i = 0; i < np; ++i)
     {
@@ -905,7 +904,7 @@ void ConversionVisitor::Visit(ConceptIdNode& conceptIdNode)
 {
     conceptIdNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<ConceptIdNode> clone(new ConceptIdNode(Span(), id.release()));
+    std::unique_ptr<ConceptIdNode> clone(new ConceptIdNode(Span(), boost::uuids::nil_uuid(), id.release()));
     int n = conceptIdNode.TypeParameters().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -919,7 +918,7 @@ void ConversionVisitor::Visit(ConceptNode& conceptNode)
 {
     conceptNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<ConceptNode> clone(new ConceptNode(Span(), conceptNode.GetSpecifiers(), id.release()));
+    std::unique_ptr<ConceptNode> clone(new ConceptNode(Span(), boost::uuids::nil_uuid(), conceptNode.GetSpecifiers(), id.release()));
     int nt = conceptNode.TypeParameters().Count();
     for (int i = 0; i < nt; ++i)
     {
@@ -948,7 +947,7 @@ void ConversionVisitor::Visit(ConceptNode& conceptNode)
 
 void ConversionVisitor::Visit(LabelNode& labelNode)
 {
-    node.reset(new LabelNode(Span(), labelNode.Label()));
+    node.reset(new LabelNode(Span(), boost::uuids::nil_uuid(), labelNode.Label()));
 }
 
 void ConversionVisitor::Visit(LabeledStatementNode& labeledStatementNode)
@@ -957,14 +956,14 @@ void ConversionVisitor::Visit(LabeledStatementNode& labeledStatementNode)
     std::unique_ptr<LabelNode> labelNode(static_cast<LabelNode*>(node.release()));
     labeledStatementNode.Stmt()->Accept(*this);
     std::unique_ptr<StatementNode> stmt(static_cast<StatementNode*>(node.release()));
-    std::unique_ptr<LabeledStatementNode> clone(new LabeledStatementNode(Span(), stmt.release()));
+    std::unique_ptr<LabeledStatementNode> clone(new LabeledStatementNode(Span(), boost::uuids::nil_uuid(), stmt.release()));
     clone->SetLabelNode(labelNode.release());
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(CompoundStatementNode& compoundStatementNode)
 {
-    std::unique_ptr<CompoundStatementNode> clone(new CompoundStatementNode(Span()));
+    std::unique_ptr<CompoundStatementNode> clone(new CompoundStatementNode(Span(), boost::uuids::nil_uuid()));
     int n = compoundStatementNode.Statements().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -982,7 +981,7 @@ void ConversionVisitor::Visit(ReturnStatementNode& returnStatementNode)
         returnStatementNode.Expression()->Accept(*this);
         exprNode.reset(node.release());
     }
-    std::unique_ptr<ReturnStatementNode> clone(new ReturnStatementNode(Span(), exprNode.release()));
+    std::unique_ptr<ReturnStatementNode> clone(new ReturnStatementNode(Span(), boost::uuids::nil_uuid(), exprNode.release()));
     node.reset(clone.release());
 }
 
@@ -998,7 +997,7 @@ void ConversionVisitor::Visit(IfStatementNode& ifStatementNode)
         ifStatementNode.ElseS()->Accept(*this);
         elseS.reset(static_cast<StatementNode*>(node.release()));
     }
-    std::unique_ptr<IfStatementNode> clone(new IfStatementNode(Span(), condition.release(), thenS.release(), elseS.release()));
+    std::unique_ptr<IfStatementNode> clone(new IfStatementNode(Span(), boost::uuids::nil_uuid(), condition.release(), thenS.release(), elseS.release()));
     node.reset(clone.release());
 }
 
@@ -1008,7 +1007,7 @@ void ConversionVisitor::Visit(WhileStatementNode& whileStatementNode)
     std::unique_ptr<Node> condition(node.release());
     whileStatementNode.Statement()->Accept(*this);
     std::unique_ptr<StatementNode> statement(static_cast<StatementNode*>(node.release()));
-    std::unique_ptr<WhileStatementNode> clone(new WhileStatementNode(Span(), condition.release(), statement.release()));
+    std::unique_ptr<WhileStatementNode> clone(new WhileStatementNode(Span(), boost::uuids::nil_uuid(), condition.release(), statement.release()));
     node.reset(clone.release());
 }
 
@@ -1018,7 +1017,7 @@ void ConversionVisitor::Visit(DoStatementNode& doStatementNode)
     std::unique_ptr<Node> condition(node.release());
     doStatementNode.Statement()->Accept(*this);
     std::unique_ptr<StatementNode> statement(static_cast<StatementNode*>(node.release()));
-    std::unique_ptr<DoStatementNode> clone(new DoStatementNode(Span(), statement.release(), condition.release()));
+    std::unique_ptr<DoStatementNode> clone(new DoStatementNode(Span(), boost::uuids::nil_uuid(), statement.release(), condition.release()));
     node.reset(clone.release());
 }
 
@@ -1045,7 +1044,7 @@ void ConversionVisitor::Visit(ForStatementNode& forStatementNode)
     std::unique_ptr<StatementNode> actionS;
     forStatementNode.ActionS()->Accept(*this);
     actionS.reset(static_cast<StatementNode*>(node.release()));
-    std::unique_ptr<ForStatementNode> clone(new ForStatementNode(Span(), initS.release(), condition.release(), loopS.release(), actionS.release()));
+    std::unique_ptr<ForStatementNode> clone(new ForStatementNode(Span(), boost::uuids::nil_uuid(), initS.release(), condition.release(), loopS.release(), actionS.release()));
     node.reset(clone.release());
 }
 
@@ -1072,7 +1071,7 @@ void ConversionVisitor::Visit(ConstructionStatementNode& constructionStatementNo
     std::unique_ptr<IdentifierNode> id;
     constructionStatementNode.Id()->Accept(*this);
     id.reset(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<ConstructionStatementNode> clone(new ConstructionStatementNode(Span(), typeExpr.release(), id.release()));
+    std::unique_ptr<ConstructionStatementNode> clone(new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), typeExpr.release(), id.release()));
     int n = constructionStatementNode.Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1093,14 +1092,14 @@ void ConversionVisitor::Visit(ConstructionStatementNode& constructionStatementNo
 void ConversionVisitor::Visit(DeleteStatementNode& deleteStatementNode)
 {
     deleteStatementNode.Expression()->Accept(*this);
-    std::unique_ptr<DeleteStatementNode> clone(new DeleteStatementNode(Span(), node.release()));
+    std::unique_ptr<DeleteStatementNode> clone(new DeleteStatementNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(DestroyStatementNode& destroyStatementNode)
 {
     destroyStatementNode.Expression()->Accept(*this);
-    std::unique_ptr<DestroyStatementNode> clone(new DestroyStatementNode(Span(), node.release()));
+    std::unique_ptr<DestroyStatementNode> clone(new DestroyStatementNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
@@ -1110,14 +1109,14 @@ void ConversionVisitor::Visit(AssignmentStatementNode& assignmentStatementNode)
     std::unique_ptr<Node> targetExpr(node.release());
     assignmentStatementNode.SourceExpr()->Accept(*this);
     std::unique_ptr<Node> sourceExpr(node.release());
-    std::unique_ptr<AssignmentStatementNode> clone(new AssignmentStatementNode(Span(), targetExpr.release(), sourceExpr.release()));
+    std::unique_ptr<AssignmentStatementNode> clone(new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), targetExpr.release(), sourceExpr.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(ExpressionStatementNode& expressionStatementNode)
 {
     expressionStatementNode.Expression()->Accept(*this);
-    std::unique_ptr<ExpressionStatementNode> clone(new ExpressionStatementNode(Span(), node.release()));
+    std::unique_ptr<ExpressionStatementNode> clone(new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
@@ -1136,7 +1135,7 @@ void ConversionVisitor::Visit(RangeForStatementNode& rangeForStatementNode)
     std::unique_ptr<Node> container(node.release());
     rangeForStatementNode.Action()->Accept(*this);
     std::unique_ptr<StatementNode> action(static_cast<StatementNode*>(node.release()));
-    std::unique_ptr<RangeForStatementNode> clone(new RangeForStatementNode(Span(), typeExpr.release(), id.release(), container.release(), action.release()));
+    std::unique_ptr<RangeForStatementNode> clone(new RangeForStatementNode(Span(), boost::uuids::nil_uuid(), typeExpr.release(), id.release(), container.release(), action.release()));
     node.reset(clone.release());
 }
 
@@ -1144,7 +1143,7 @@ void ConversionVisitor::Visit(SwitchStatementNode& switchStatementNode)
 {
     switchStatementNode.Condition()->Accept(*this);
     std::unique_ptr<Node> condition(node.release());
-    std::unique_ptr<SwitchStatementNode> clone(new SwitchStatementNode(Span(), condition.release()));
+    std::unique_ptr<SwitchStatementNode> clone(new SwitchStatementNode(Span(), boost::uuids::nil_uuid(), condition.release()));
     int n = switchStatementNode.Cases().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1161,7 +1160,7 @@ void ConversionVisitor::Visit(SwitchStatementNode& switchStatementNode)
 
 void ConversionVisitor::Visit(CaseStatementNode& caseStatementNode)
 {
-    std::unique_ptr<CaseStatementNode> clone(new CaseStatementNode(Span()));
+    std::unique_ptr<CaseStatementNode> clone(new CaseStatementNode(Span(), boost::uuids::nil_uuid()));
     int n = caseStatementNode.CaseExprs().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1179,7 +1178,7 @@ void ConversionVisitor::Visit(CaseStatementNode& caseStatementNode)
 
 void ConversionVisitor::Visit(DefaultStatementNode& defaultStatementNode)
 {
-    std::unique_ptr<DefaultStatementNode> clone(new DefaultStatementNode(Span()));
+    std::unique_ptr<DefaultStatementNode> clone(new DefaultStatementNode(Span(), boost::uuids::nil_uuid()));
     int ns = defaultStatementNode.Statements().Count();
     for (int i = 0; i < ns; ++i)
     {
@@ -1192,7 +1191,7 @@ void ConversionVisitor::Visit(DefaultStatementNode& defaultStatementNode)
 void ConversionVisitor::Visit(GotoCaseStatementNode& gotoCaseStatementNode)
 {
     gotoCaseStatementNode.CaseExpr()->Accept(*this);
-    std::unique_ptr<GotoCaseStatementNode> clone(new GotoCaseStatementNode(Span(), node.release()));
+    std::unique_ptr<GotoCaseStatementNode> clone(new GotoCaseStatementNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
@@ -1209,14 +1208,14 @@ void ConversionVisitor::Visit(ThrowStatementNode& throwStatementNode)
         throwStatementNode.Expression()->Accept(*this);
         exception.reset(node.release());
     }
-    std::unique_ptr<ThrowStatementNode> clone(new ThrowStatementNode(Span(), exception.release()));
+    std::unique_ptr<ThrowStatementNode> clone(new ThrowStatementNode(Span(), boost::uuids::nil_uuid(), exception.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(TryStatementNode& tryStatementNode)
 {
     tryStatementNode.TryBlock()->Accept(*this);
-    std::unique_ptr<TryStatementNode> clone(new TryStatementNode(Span(), static_cast<CompoundStatementNode*>(node.release())));
+    std::unique_ptr<TryStatementNode> clone(new TryStatementNode(Span(), boost::uuids::nil_uuid(), static_cast<CompoundStatementNode*>(node.release())));
     int n = tryStatementNode.Catches().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1237,14 +1236,14 @@ void ConversionVisitor::Visit(CatchNode& catchNode)
         id.reset(static_cast<IdentifierNode*>(node.release()));
     }
     catchNode.CatchBlock()->Accept(*this);
-    std::unique_ptr<CatchNode> clone(new CatchNode(Span(), typeExpr.release(), id.release(), static_cast<CompoundStatementNode*>(node.release())));
+    std::unique_ptr<CatchNode> clone(new CatchNode(Span(), boost::uuids::nil_uuid(), typeExpr.release(), id.release(), static_cast<CompoundStatementNode*>(node.release())));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(AssertStatementNode& assertStatementNode)
 {
     assertStatementNode.AssertExpr()->Accept(*this);
-    std::unique_ptr<AssertStatementNode> clone(new AssertStatementNode(Span(), node.release()));
+    std::unique_ptr<AssertStatementNode> clone(new AssertStatementNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
@@ -1256,7 +1255,7 @@ void ConversionVisitor::Visit(ConditionalCompilationPartNode& conditionalCompila
         conditionalCompilationPartNode.Expr()->Accept(*this);
         expr.reset(static_cast<ConditionalCompilationExpressionNode*>(node.release()));
     }
-    std::unique_ptr<ConditionalCompilationPartNode> clone(new ConditionalCompilationPartNode(Span(), expr.release()));
+    std::unique_ptr<ConditionalCompilationPartNode> clone(new ConditionalCompilationPartNode(Span(), boost::uuids::nil_uuid(), expr.release()));
     int n = conditionalCompilationPartNode.Statements().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1272,7 +1271,7 @@ void ConversionVisitor::Visit(ConditionalCompilationDisjunctionNode& conditional
     std::unique_ptr<ConditionalCompilationExpressionNode> left(static_cast<ConditionalCompilationExpressionNode*>(node.release()));
     conditionalCompilationDisjunctionNode.Right()->Accept(*this);
     std::unique_ptr<ConditionalCompilationExpressionNode> right(static_cast<ConditionalCompilationExpressionNode*>(node.release()));
-    std::unique_ptr<ConditionalCompilationDisjunctionNode> clone(new ConditionalCompilationDisjunctionNode(Span(), left.release(), right.release()));
+    std::unique_ptr<ConditionalCompilationDisjunctionNode> clone(new ConditionalCompilationDisjunctionNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1282,14 +1281,14 @@ void ConversionVisitor::Visit(ConditionalCompilationConjunctionNode& conditional
     std::unique_ptr<ConditionalCompilationExpressionNode> left(static_cast<ConditionalCompilationExpressionNode*>(node.release()));
     conditionalCompilationConjunctionNode.Right()->Accept(*this);
     std::unique_ptr<ConditionalCompilationExpressionNode> right(static_cast<ConditionalCompilationExpressionNode*>(node.release()));
-    std::unique_ptr<ConditionalCompilationConjunctionNode> clone(new ConditionalCompilationConjunctionNode(Span(), left.release(), right.release()));
+    std::unique_ptr<ConditionalCompilationConjunctionNode> clone(new ConditionalCompilationConjunctionNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode)
 {
     conditionalCompilationNotNode.Expr()->Accept(*this);
-    std::unique_ptr<ConditionalCompilationNotNode> clone(new ConditionalCompilationNotNode(Span(), static_cast<ConditionalCompilationExpressionNode*>(node.release())));
+    std::unique_ptr<ConditionalCompilationNotNode> clone(new ConditionalCompilationNotNode(Span(), boost::uuids::nil_uuid(), static_cast<ConditionalCompilationExpressionNode*>(node.release())));
     node.reset(clone.release());
 }
 
@@ -1301,7 +1300,7 @@ void ConversionVisitor::Visit(ConditionalCompilationPrimaryNode& conditionalComp
 void ConversionVisitor::Visit(ParenthesizedConditionalCompilationExpressionNode& parenthesizeCondCompExprNode)
 {
     parenthesizeCondCompExprNode.Expr()->Accept(*this);
-    std::unique_ptr<ParenthesizedConditionalCompilationExpressionNode> clone(new ParenthesizedConditionalCompilationExpressionNode(Span(),
+    std::unique_ptr<ParenthesizedConditionalCompilationExpressionNode> clone(new ParenthesizedConditionalCompilationExpressionNode(Span(), boost::uuids::nil_uuid(),
         static_cast<ConditionalCompilationExpressionNode*>(node.release())));
     node.reset(clone.release());
 }
@@ -1309,7 +1308,7 @@ void ConversionVisitor::Visit(ParenthesizedConditionalCompilationExpressionNode&
 void ConversionVisitor::Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
 {
     conditionalCompilationStatementNode.IfPart()->Accept(*this);
-    std::unique_ptr<ConditionalCompilationStatementNode> clone(new ConditionalCompilationStatementNode(Span()));
+    std::unique_ptr<ConditionalCompilationStatementNode> clone(new ConditionalCompilationStatementNode(Span(), boost::uuids::nil_uuid()));
     clone->SetIfPart(static_cast<ConditionalCompilationPartNode*>(node.release()));
     int n = conditionalCompilationStatementNode.ElifParts().Count();
     for (int i = 0; i < n; ++i)
@@ -1331,7 +1330,7 @@ void ConversionVisitor::Visit(TypedefNode& typedefNode)
     std::unique_ptr<Node> typeExpr(node.release());
     typedefNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<TypedefNode> clone(new TypedefNode(Span(), typedefNode.GetSpecifiers(), typeExpr.release(), id.release()));
+    std::unique_ptr<TypedefNode> clone(new TypedefNode(Span(), boost::uuids::nil_uuid(), typedefNode.GetSpecifiers(), typeExpr.release(), id.release()));
     node.reset(clone.release());
 }
 
@@ -1342,7 +1341,7 @@ void ConversionVisitor::Visit(ConstantNode& constantNode)
     constantNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
     constantNode.Value()->Accept(*this);
-    std::unique_ptr<ConstantNode> clone(new ConstantNode(Span(), constantNode.GetSpecifiers(), typeExpr.release(), id.release(), node.release()));
+    std::unique_ptr<ConstantNode> clone(new ConstantNode(Span(), boost::uuids::nil_uuid(), constantNode.GetSpecifiers(), typeExpr.release(), id.release(), node.release()));
     clone->SetStrValue(constantNode.StrValue());
     node.reset(clone.release());
 }
@@ -1357,7 +1356,7 @@ void ConversionVisitor::Visit(EnumTypeNode& enumTypeNode)
         enumTypeNode.GetUnderlyingType()->Accept(*this);
         underlyingType.reset(node.release());
     }
-    std::unique_ptr<EnumTypeNode> clone(new EnumTypeNode(Span(), enumTypeNode.GetSpecifiers(), id.release()));
+    std::unique_ptr<EnumTypeNode> clone(new EnumTypeNode(Span(), boost::uuids::nil_uuid(), enumTypeNode.GetSpecifiers(), id.release()));
     int n = enumTypeNode.Constants().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1381,7 +1380,7 @@ void ConversionVisitor::Visit(EnumConstantNode& enumConstantNode)
         enumConstantNode.GetValue()->Accept(*this);
         value.reset(node.release());
     }
-    std::unique_ptr<EnumConstantNode> clone(new EnumConstantNode(Span(), id.release(), value.release()));
+    std::unique_ptr<EnumConstantNode> clone(new EnumConstantNode(Span(), boost::uuids::nil_uuid(), id.release(), value.release()));
     if (enumConstantNode.HasValue())
     {
         clone->SetHasValue();
@@ -1400,7 +1399,7 @@ void ConversionVisitor::Visit(ParameterNode& parameterNode)
         parameterNode.Id()->Accept(*this);
         id.reset(static_cast<IdentifierNode*>(node.release()));
     }
-    std::unique_ptr<ParameterNode> clone(new ParameterNode(Span(), typeExpr.release(), id.release()));
+    std::unique_ptr<ParameterNode> clone(new ParameterNode(Span(), boost::uuids::nil_uuid(), typeExpr.release(), id.release()));
     node.reset(clone.release());
 }
 
@@ -1414,35 +1413,35 @@ void ConversionVisitor::Visit(TemplateParameterNode& templateParameterNode)
         templateParameterNode.DefaultTemplateArgument()->Accept(*this);
         defaultTemplateArg.reset(node.release());
     }
-    std::unique_ptr<TemplateParameterNode> clone(new TemplateParameterNode(Span(), id.release(), defaultTemplateArg.release()));
+    std::unique_ptr<TemplateParameterNode> clone(new TemplateParameterNode(Span(), boost::uuids::nil_uuid(), id.release(), defaultTemplateArg.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(ConstNode& constNode)
 {
     constNode.Subject()->Accept(*this);
-    std::unique_ptr<ConstNode> clone(new ConstNode(Span(), node.release()));
+    std::unique_ptr<ConstNode> clone(new ConstNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(LValueRefNode& lvalueRefNode)
 {
     lvalueRefNode.Subject()->Accept(*this);
-    std::unique_ptr<LValueRefNode> clone(new LValueRefNode(Span(), node.release()));
+    std::unique_ptr<LValueRefNode> clone(new LValueRefNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(RValueRefNode& rvalueRefNode)
 {
     rvalueRefNode.Subject()->Accept(*this);
-    std::unique_ptr<RValueRefNode> clone(new RValueRefNode(Span(), node.release()));
+    std::unique_ptr<RValueRefNode> clone(new RValueRefNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(PointerNode& pointerNode)
 {
     pointerNode.Subject()->Accept(*this);
-    std::unique_ptr<PointerNode> clone(new PointerNode(Span(), node.release()));
+    std::unique_ptr<PointerNode> clone(new PointerNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
@@ -1455,7 +1454,7 @@ void ConversionVisitor::Visit(ArrayNode& arrayNode)
         size.reset(node.release());
     }
     arrayNode.Subject()->Accept(*this);
-    std::unique_ptr<ArrayNode> clone(new ArrayNode(Span(), node.release(), size.release()));
+    std::unique_ptr<ArrayNode> clone(new ArrayNode(Span(), boost::uuids::nil_uuid(), node.release(), size.release()));
     node.reset(clone.release());
 }
 
@@ -1465,7 +1464,7 @@ void ConversionVisitor::Visit(DotNode& dotNode)
     std::unique_ptr<Node> subject(node.release());
     dotNode.MemberId()->Accept(*this);
     std::unique_ptr<IdentifierNode> memberId(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<DotNode> clone(new DotNode(Span(), subject.release(), memberId.release()));
+    std::unique_ptr<DotNode> clone(new DotNode(Span(), boost::uuids::nil_uuid(), subject.release(), memberId.release()));
     node.reset(clone.release());
 }
 
@@ -1475,7 +1474,7 @@ void ConversionVisitor::Visit(ArrowNode& arrowNode)
     std::unique_ptr<Node> subject(node.release());
     arrowNode.MemberId()->Accept(*this);
     std::unique_ptr<IdentifierNode> memberId(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<ArrowNode> clone(new ArrowNode(Span(), subject.release(), memberId.release()));
+    std::unique_ptr<ArrowNode> clone(new ArrowNode(Span(), boost::uuids::nil_uuid(), subject.release(), memberId.release()));
     node.reset(clone.release());
 }
 
@@ -1485,7 +1484,7 @@ void ConversionVisitor::Visit(EquivalenceNode& equivalenceNode)
     std::unique_ptr<Node> left(node.release());
     equivalenceNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<EquivalenceNode> clone(new EquivalenceNode(Span(), left.release(), right.release()));
+    std::unique_ptr<EquivalenceNode> clone(new EquivalenceNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1495,7 +1494,7 @@ void ConversionVisitor::Visit(ImplicationNode& implicationNode)
     std::unique_ptr<Node> left(node.release());
     implicationNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<ImplicationNode> clone(new ImplicationNode(Span(), left.release(), right.release()));
+    std::unique_ptr<ImplicationNode> clone(new ImplicationNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1505,7 +1504,7 @@ void ConversionVisitor::Visit(DisjunctionNode& disjunctionNode)
     std::unique_ptr<Node> left(node.release());
     disjunctionNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<DisjunctionNode> clone(new DisjunctionNode(Span(), left.release(), right.release()));
+    std::unique_ptr<DisjunctionNode> clone(new DisjunctionNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1515,7 +1514,7 @@ void ConversionVisitor::Visit(ConjunctionNode& conjunctionNode)
     std::unique_ptr<Node> left(node.release());
     conjunctionNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<ConjunctionNode> clone(new ConjunctionNode(Span(), left.release(), right.release()));
+    std::unique_ptr<ConjunctionNode> clone(new ConjunctionNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1525,7 +1524,7 @@ void ConversionVisitor::Visit(BitOrNode& bitOrNode)
     std::unique_ptr<Node> left(node.release());
     bitOrNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<BitOrNode> clone(new BitOrNode(Span(), left.release(), right.release()));
+    std::unique_ptr<BitOrNode> clone(new BitOrNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1535,7 +1534,7 @@ void ConversionVisitor::Visit(BitXorNode& bitXorNode)
     std::unique_ptr<Node> left(node.release());
     bitXorNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<BitXorNode> clone(new BitXorNode(Span(), left.release(), right.release()));
+    std::unique_ptr<BitXorNode> clone(new BitXorNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1545,7 +1544,7 @@ void ConversionVisitor::Visit(BitAndNode& bitAndNode)
     std::unique_ptr<Node> left(node.release());
     bitAndNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<BitAndNode> clone(new BitAndNode(Span(), left.release(), right.release()));
+    std::unique_ptr<BitAndNode> clone(new BitAndNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1555,7 +1554,7 @@ void ConversionVisitor::Visit(EqualNode& equalNode)
     std::unique_ptr<Node> left(node.release());
     equalNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<EqualNode> clone(new EqualNode(Span(), left.release(), right.release()));
+    std::unique_ptr<EqualNode> clone(new EqualNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1565,7 +1564,7 @@ void ConversionVisitor::Visit(NotEqualNode& notEqualNode)
     std::unique_ptr<Node> left(node.release());
     notEqualNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<NotEqualNode> clone(new NotEqualNode(Span(), left.release(), right.release()));
+    std::unique_ptr<NotEqualNode> clone(new NotEqualNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1575,7 +1574,7 @@ void ConversionVisitor::Visit(LessNode& lessNode)
     std::unique_ptr<Node> left(node.release());
     lessNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<LessNode> clone(new LessNode(Span(), left.release(), right.release()));
+    std::unique_ptr<LessNode> clone(new LessNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1585,7 +1584,7 @@ void ConversionVisitor::Visit(GreaterNode& greaterNode)
     std::unique_ptr<Node> left(node.release());
     greaterNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<GreaterNode> clone(new GreaterNode(Span(), left.release(), right.release()));
+    std::unique_ptr<GreaterNode> clone(new GreaterNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1595,7 +1594,7 @@ void ConversionVisitor::Visit(LessOrEqualNode& lessOrEqualNode)
     std::unique_ptr<Node> left(node.release());
     lessOrEqualNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<LessOrEqualNode> clone(new LessOrEqualNode(Span(), left.release(), right.release()));
+    std::unique_ptr<LessOrEqualNode> clone(new LessOrEqualNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1605,7 +1604,7 @@ void ConversionVisitor::Visit(GreaterOrEqualNode& greaterOrEqualNode)
     std::unique_ptr<Node> left(node.release());
     greaterOrEqualNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<GreaterOrEqualNode> clone(new GreaterOrEqualNode(Span(), left.release(), right.release()));
+    std::unique_ptr<GreaterOrEqualNode> clone(new GreaterOrEqualNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1615,7 +1614,7 @@ void ConversionVisitor::Visit(ShiftLeftNode& shiftLeftNode)
     std::unique_ptr<Node> left(node.release());
     shiftLeftNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<ShiftLeftNode> clone(new ShiftLeftNode(Span(), left.release(), right.release()));
+    std::unique_ptr<ShiftLeftNode> clone(new ShiftLeftNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1625,7 +1624,7 @@ void ConversionVisitor::Visit(ShiftRightNode& shiftRightNode)
     std::unique_ptr<Node> left(node.release());
     shiftRightNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<ShiftRightNode> clone(new ShiftRightNode(Span(), left.release(), right.release()));
+    std::unique_ptr<ShiftRightNode> clone(new ShiftRightNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1635,7 +1634,7 @@ void ConversionVisitor::Visit(AddNode& addNode)
     std::unique_ptr<Node> left(node.release());
     addNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<AddNode> clone(new AddNode(Span(), left.release(), right.release()));
+    std::unique_ptr<AddNode> clone(new AddNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1645,7 +1644,7 @@ void ConversionVisitor::Visit(SubNode& subNode)
     std::unique_ptr<Node> left(node.release());
     subNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<SubNode> clone(new SubNode(Span(), left.release(), right.release()));
+    std::unique_ptr<SubNode> clone(new SubNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1655,7 +1654,7 @@ void ConversionVisitor::Visit(MulNode& mulNode)
     std::unique_ptr<Node> left(node.release());
     mulNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<MulNode> clone(new MulNode(Span(), left.release(), right.release()));
+    std::unique_ptr<MulNode> clone(new MulNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1665,7 +1664,7 @@ void ConversionVisitor::Visit(DivNode& divNode)
     std::unique_ptr<Node> left(node.release());
     divNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<DivNode> clone(new DivNode(Span(), left.release(), right.release()));
+    std::unique_ptr<DivNode> clone(new DivNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
@@ -1675,63 +1674,63 @@ void ConversionVisitor::Visit(RemNode& remNode)
     std::unique_ptr<Node> left(node.release());
     remNode.Right()->Accept(*this);
     std::unique_ptr<Node> right(node.release());
-    std::unique_ptr<RemNode> clone(new RemNode(Span(), left.release(), right.release()));
+    std::unique_ptr<RemNode> clone(new RemNode(Span(), boost::uuids::nil_uuid(), left.release(), right.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(NotNode& notNode)
 {
     notNode.Subject()->Accept(*this);
-    std::unique_ptr<NotNode> clone(new NotNode(Span(), node.release()));
+    std::unique_ptr<NotNode> clone(new NotNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(UnaryPlusNode& unaryPlusNode)
 {
     unaryPlusNode.Subject()->Accept(*this);
-    std::unique_ptr<UnaryPlusNode> clone(new UnaryPlusNode(Span(), node.release()));
+    std::unique_ptr<UnaryPlusNode> clone(new UnaryPlusNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(UnaryMinusNode& unaryMinusNode)
 {
     unaryMinusNode.Subject()->Accept(*this);
-    std::unique_ptr<UnaryMinusNode> clone(new UnaryMinusNode(Span(), node.release()));
+    std::unique_ptr<UnaryMinusNode> clone(new UnaryMinusNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(PrefixIncrementNode& prefixIncrementNode)
 {
     prefixIncrementNode.Subject()->Accept(*this);
-    std::unique_ptr<PrefixIncrementNode> clone(new PrefixIncrementNode(Span(), node.release()));
+    std::unique_ptr<PrefixIncrementNode> clone(new PrefixIncrementNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(PrefixDecrementNode& prefixDecrementNode)
 {
     prefixDecrementNode.Subject()->Accept(*this);
-    std::unique_ptr<PrefixDecrementNode> clone(new PrefixDecrementNode(Span(), node.release()));
+    std::unique_ptr<PrefixDecrementNode> clone(new PrefixDecrementNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(DerefNode& derefNode)
 {
     derefNode.Subject()->Accept(*this);
-    std::unique_ptr<DerefNode> clone(new DerefNode(Span(), node.release()));
+    std::unique_ptr<DerefNode> clone(new DerefNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(AddrOfNode& addrOfNode)
 {
     addrOfNode.Subject()->Accept(*this);
-    std::unique_ptr<AddrOfNode> clone(new AddrOfNode(Span(), node.release()));
+    std::unique_ptr<AddrOfNode> clone(new AddrOfNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(ComplementNode& complementNode)
 {
     complementNode.Subject()->Accept(*this);
-    std::unique_ptr<ComplementNode> clone(new ComplementNode(Span(), node.release()));
+    std::unique_ptr<ComplementNode> clone(new ComplementNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
@@ -1741,7 +1740,7 @@ void ConversionVisitor::Visit(IsNode& isNode)
     std::unique_ptr<Node> expr(node.release());
     isNode.TargetTypeExpr()->Accept(*this);
     std::unique_ptr<Node> targetTypeExpr(node.release());
-    std::unique_ptr<IsNode> clone(new IsNode(Span(), expr.release(), targetTypeExpr.release()));
+    std::unique_ptr<IsNode> clone(new IsNode(Span(), boost::uuids::nil_uuid(), expr.release(), targetTypeExpr.release()));
     node.reset(clone.release());
 }
 
@@ -1751,7 +1750,7 @@ void ConversionVisitor::Visit(AsNode& asNode)
     std::unique_ptr<Node> expr(node.release());
     asNode.TargetTypeExpr()->Accept(*this);
     std::unique_ptr<Node> targetTypeExpr(node.release());
-    std::unique_ptr<AsNode> clone(new AsNode(Span(), expr.release(), targetTypeExpr.release()));
+    std::unique_ptr<AsNode> clone(new AsNode(Span(), boost::uuids::nil_uuid(), expr.release(), targetTypeExpr.release()));
     node.reset(clone.release());
 }
 
@@ -1761,7 +1760,7 @@ void ConversionVisitor::Visit(IndexingNode& indexingNode)
     std::unique_ptr<Node> subject(node.release());
     indexingNode.Index()->Accept(*this);
     std::unique_ptr<Node> index(node.release());
-    std::unique_ptr<IndexingNode> clone(new IndexingNode(Span(), subject.release(), index.release()));
+    std::unique_ptr<IndexingNode> clone(new IndexingNode(Span(), boost::uuids::nil_uuid(), subject.release(), index.release()));
     node.reset(clone.release());
 }
 
@@ -1769,7 +1768,7 @@ void ConversionVisitor::Visit(InvokeNode& invokeNode)
 {
     invokeNode.Subject()->Accept(*this);
     std::unique_ptr<Node> subject(node.release());
-    std::unique_ptr<InvokeNode> clone(new InvokeNode(Span(), subject.release()));
+    std::unique_ptr<InvokeNode> clone(new InvokeNode(Span(), boost::uuids::nil_uuid(), subject.release()));
     int n = invokeNode.Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1783,7 +1782,7 @@ void ConversionVisitor::Visit(PostfixIncrementNode& postfixIncrementNode)
 {
     postfixIncrementNode.Subject()->Accept(*this);
     std::unique_ptr<Node> subject(node.release());
-    std::unique_ptr<PostfixIncrementNode> clone(new PostfixIncrementNode(Span(), subject.release()));
+    std::unique_ptr<PostfixIncrementNode> clone(new PostfixIncrementNode(Span(), boost::uuids::nil_uuid(), subject.release()));
     node.reset(clone.release());
 }
 
@@ -1791,28 +1790,28 @@ void ConversionVisitor::Visit(PostfixDecrementNode& postfixDecrementNode)
 {
     postfixDecrementNode.Subject()->Accept(*this);
     std::unique_ptr<Node> subject(node.release());
-    std::unique_ptr<PostfixDecrementNode> clone(new PostfixDecrementNode(Span(), subject.release()));
+    std::unique_ptr<PostfixDecrementNode> clone(new PostfixDecrementNode(Span(), boost::uuids::nil_uuid(), subject.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(SizeOfNode& sizeOfNode)
 {
     sizeOfNode.Expression()->Accept(*this);
-    std::unique_ptr<SizeOfNode> clone(new SizeOfNode(Span(), node.release()));
+    std::unique_ptr<SizeOfNode> clone(new SizeOfNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(TypeNameNode& typeNameNode)
 {
     typeNameNode.Expression()->Accept(*this);
-    std::unique_ptr<TypeNameNode> clone(new TypeNameNode(Span(), node.release()));
+    std::unique_ptr<TypeNameNode> clone(new TypeNameNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
 void ConversionVisitor::Visit(TypeIdNode& typeIdNode)
 {
     typeIdNode.Expression()->Accept(*this);
-    std::unique_ptr<TypeIdNode> clone(new TypeIdNode(Span(), node.release()));
+    std::unique_ptr<TypeIdNode> clone(new TypeIdNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
@@ -1822,7 +1821,7 @@ void ConversionVisitor::Visit(CastNode& castNode)
     std::unique_ptr<Node> targetTypeExpr(node.release());
     castNode.SourceExpr()->Accept(*this);
     std::unique_ptr<Node> sourceExpr(node.release());
-    std::unique_ptr<CastNode> clone(new CastNode(Span(), targetTypeExpr.release(), sourceExpr.release()));
+    std::unique_ptr<CastNode> clone(new CastNode(Span(), boost::uuids::nil_uuid(), targetTypeExpr.release(), sourceExpr.release()));
     node.reset(clone.release());
 }
 
@@ -1830,7 +1829,7 @@ void ConversionVisitor::Visit(ConstructNode& constructNode)
 {
     constructNode.TypeExpr()->Accept(*this);
     std::unique_ptr<Node> typeExpr(node.release());
-    std::unique_ptr<ConstructNode> clone(new ConstructNode(Span(), typeExpr.release()));
+    std::unique_ptr<ConstructNode> clone(new ConstructNode(Span(), boost::uuids::nil_uuid(), typeExpr.release()));
     int n = constructNode.Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1844,7 +1843,7 @@ void ConversionVisitor::Visit(NewNode& newNode)
 {
     newNode.TypeExpr()->Accept(*this);
     std::unique_ptr<Node> typeExpr(node.release());
-    std::unique_ptr<NewNode> clone(new NewNode(Span(), typeExpr.release()));
+    std::unique_ptr<NewNode> clone(new NewNode(Span(), boost::uuids::nil_uuid(), typeExpr.release()));
     int n = newNode.Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1867,7 +1866,7 @@ void ConversionVisitor::Visit(BaseNode& baseNode)
 void ConversionVisitor::Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
 {
     parenthesizedExpressionNode.Subject()->Accept(*this);
-    std::unique_ptr<ParenthesizedExpressionNode> clone(new ParenthesizedExpressionNode(Span(), node.release()));
+    std::unique_ptr<ParenthesizedExpressionNode> clone(new ParenthesizedExpressionNode(Span(), boost::uuids::nil_uuid(), node.release()));
     node.reset(clone.release());
 }
 
@@ -1883,7 +1882,7 @@ void ConversionVisitor::Visit(GlobalVariableNode& globalVariableNode)
         globalVariableNode.Initializer()->Accept(*this);
         initializer.reset(node.release());
     }
-    std::unique_ptr<GlobalVariableNode> clone(new GlobalVariableNode(Span(), globalVariableNode.GetSpecifiers(), typeExpr.release(), id.release(), nullptr));
+    std::unique_ptr<GlobalVariableNode> clone(new GlobalVariableNode(Span(), boost::uuids::nil_uuid(), globalVariableNode.GetSpecifiers(), typeExpr.release(), id.release(), nullptr));
     if (initializer)
     {
         clone->SetInitializer(initializer.release());

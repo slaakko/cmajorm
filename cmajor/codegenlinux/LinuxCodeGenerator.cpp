@@ -78,7 +78,7 @@ void LinuxCodeGenerator::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
     }
     else
     {
-        throw Exception(symbolsModule, "case not found", boundGotoCaseStatement.GetSpan());
+        throw Exception("case not found", boundGotoCaseStatement.GetSpan(), boundGotoCaseStatement.ModuleId());
     }
 }
 
@@ -97,7 +97,7 @@ void LinuxCodeGenerator::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatem
     }
     else
     {
-        throw Exception(symbolsModule, "no default destination", boundGotoDefaultStatement.GetSpan());
+        throw Exception("no default destination", boundGotoDefaultStatement.GetSpan(), boundGotoDefaultStatement.ModuleId());
     }
 }
 
@@ -147,7 +147,7 @@ void LinuxCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
     }
     else
     {
-        throw Exception(symbolsModule, "goto target not found", boundGotoStatement.GetSpan());
+        throw Exception("goto target not found", boundGotoStatement.GetSpan(), boundGotoStatement.ModuleId());
     }
     void* nextBlock = emitter->CreateBasicBlock("next");
     emitter->SetCurrentBasicBlock(nextBlock);
@@ -225,7 +225,7 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         handleExceptionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
         void* handleExceptionFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForBool(), handleExceptionParamTypes);
         std::vector<void*> handleExceptionArgs;
-        UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->CatchedTypeUuidId());
+        UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->ModuleId(), boundCatchStatement->CatchedTypeUuidId());
         void* catchTypeIdValue = uuidValue.IrValue(*emitter);
         handleExceptionArgs.push_back(catchTypeIdValue);
         void* handleException = emitter->GetOrInsertFunction("RtHandleException", handleExceptionFunctionType, true);

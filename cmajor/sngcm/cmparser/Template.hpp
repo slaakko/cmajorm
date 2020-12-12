@@ -9,15 +9,15 @@
 #include <soulng/parser/Match.hpp>
 #include <soulng/parser/Value.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Template.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Template.parser' using soulng parser generator spg version 3.0.0
 
 class CmajorLexer;
 
 struct SNGCM_PARSER_API TemplateParser
 {
-    static soulng::parser::Match TemplateId(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match TemplateParameter(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match TemplateParameterList(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::Node* owner);
+    static soulng::parser::Match TemplateId(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match TemplateParameter(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match TemplateParameterList(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::Node* owner);
 };
 
 #endif // TEMPLATE_HPP

@@ -16,11 +16,11 @@ namespace sngcm { namespace ast {
 using namespace soulng::unicode;
 using namespace soulng::util;
 
-NamespaceNode::NamespaceNode(const Span& span_) : Node(NodeType::namespaceNode, span_), id(), flags()
+NamespaceNode::NamespaceNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::namespaceNode, span_, moduleId_), id(), flags()
 {
 }
 
-NamespaceNode::NamespaceNode(const Span& span_, IdentifierNode* id_) : Node(NodeType::namespaceNode, span_), id(id_), flags()
+NamespaceNode::NamespaceNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_) : Node(NodeType::namespaceNode, span_, moduleId_), id(id_), flags()
 {
     if (id == nullptr)
     {
@@ -31,7 +31,7 @@ NamespaceNode::NamespaceNode(const Span& span_, IdentifierNode* id_) : Node(Node
         {
             sha1.Process(x);
         }
-        id.reset(new IdentifierNode(span_, U"unnamed_ns_" + ToUtf32(sha1.GetDigest())));
+        id.reset(new IdentifierNode(span_, moduleId_, U"unnamed_ns_" + ToUtf32(sha1.GetDigest())));
     }
     id->SetParent(this);
 }
@@ -46,11 +46,11 @@ Node* NamespaceNode::Clone(CloneContext& cloneContext) const
     NamespaceNode* clone = nullptr;
     if (IsUnnamedNs())
     {
-        clone = new NamespaceNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), nullptr);
+        clone = new NamespaceNode(GetSpan(), ModuleId(), nullptr);
     }
     else
     {
-        clone = new NamespaceNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+        clone = new NamespaceNode(GetSpan(), ModuleId(), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     }
     clone->flags = flags;
     int n = members.Count();
@@ -108,11 +108,11 @@ void NamespaceNode::AddMember(Node* member)
     }
 }
 
-AliasNode::AliasNode(const Span& span_) : Node(NodeType::aliasNode, span_), id(), qid()
+AliasNode::AliasNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::aliasNode, span_, moduleId_), id(), qid()
 {
 }
 
-AliasNode::AliasNode(const Span& span_, IdentifierNode* id_, IdentifierNode* qid_) : Node(NodeType::aliasNode, span_), id(id_), qid(qid_)
+AliasNode::AliasNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_, IdentifierNode* qid_) : Node(NodeType::aliasNode, span_, moduleId_), id(id_), qid(qid_)
 {
     id->SetParent(this);
     qid->SetParent(this);
@@ -120,7 +120,8 @@ AliasNode::AliasNode(const Span& span_, IdentifierNode* id_, IdentifierNode* qid
 
 Node* AliasNode::Clone(CloneContext& cloneContext) const
 {
-    return new AliasNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)), static_cast<IdentifierNode*>(qid->Clone(cloneContext)));
+    AliasNode* clone = new AliasNode(GetSpan(), ModuleId(), static_cast<IdentifierNode*>(id->Clone(cloneContext)), static_cast<IdentifierNode*>(qid->Clone(cloneContext)));
+    return clone;
 }
 
 void AliasNode::Accept(Visitor& visitor)
@@ -154,18 +155,19 @@ IdentifierNode* AliasNode::Qid() const
     return qid.get();
 }
 
-NamespaceImportNode::NamespaceImportNode(const Span& span_) : Node(NodeType::namespaceImportNode, span_), ns()
+NamespaceImportNode::NamespaceImportNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::namespaceImportNode, span_, moduleId_), ns()
 {
 }
 
-NamespaceImportNode::NamespaceImportNode(const Span& span_, IdentifierNode* ns_) : Node(NodeType::namespaceImportNode, span_), ns(ns_)
+NamespaceImportNode::NamespaceImportNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* ns_) : Node(NodeType::namespaceImportNode, span_, moduleId_), ns(ns_)
 {
     ns->SetParent(this);
 }
 
 Node* NamespaceImportNode::Clone(CloneContext& cloneContext) const
 {
-    return new NamespaceImportNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(ns->Clone(cloneContext)));
+    NamespaceImportNode* clone = new NamespaceImportNode(GetSpan(), ModuleId(), static_cast<IdentifierNode*>(ns->Clone(cloneContext)));
+    return clone;
 }
 
 void NamespaceImportNode::Accept(Visitor& visitor)

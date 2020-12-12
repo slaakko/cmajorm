@@ -11,12 +11,12 @@
 
 namespace sngcm { namespace ast {
 
-ConstantNode::ConstantNode(const Span& span_) : Node(NodeType::constantNode, span_), specifiers(Specifiers::none)
+ConstantNode::ConstantNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::constantNode, span_, moduleId_), specifiers(Specifiers::none)
 {
 }
 
-ConstantNode::ConstantNode(const Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Node* value_) :
-    Node(NodeType::constantNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), value(value_)
+ConstantNode::ConstantNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Node* value_) :
+    Node(NodeType::constantNode, span_, moduleId_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), value(value_)
 {
     typeExpr->SetParent(this);
     id->SetParent(this);
@@ -33,7 +33,8 @@ Node* ConstantNode::Clone(CloneContext& cloneContext) const
     {
         clonedValue = value->Clone(cloneContext);
     }
-    return new ConstantNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedValue);
+    ConstantNode* clone = new ConstantNode(GetSpan(), ModuleId(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedValue);
+    return clone;
 }
 
 void ConstantNode::Accept(Visitor& visitor)

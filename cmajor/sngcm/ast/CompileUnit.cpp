@@ -14,18 +14,18 @@
 
 namespace sngcm { namespace ast {
 
-CompileUnitNode::CompileUnitNode(const Span& span_) : Node(NodeType::compileUnitNode, span_), globalNs(), isSynthesizedUnit(false), isProgramMainUnit(false)
+CompileUnitNode::CompileUnitNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::compileUnitNode, span_, moduleId_), globalNs(), isSynthesizedUnit(false), isProgramMainUnit(false)
 {
 }
 
-CompileUnitNode::CompileUnitNode(const Span& span_, const std::string& filePath_) : 
-    Node(NodeType::compileUnitNode, span_), filePath(filePath_), globalNs(new NamespaceNode(span_, new IdentifierNode(span_, U""))), isSynthesizedUnit(false), isProgramMainUnit(false)
+CompileUnitNode::CompileUnitNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::string& filePath_) :
+    Node(NodeType::compileUnitNode, span_, moduleId_), filePath(filePath_), globalNs(new NamespaceNode(span_, moduleId_, new IdentifierNode(span_, moduleId_, U""))), isSynthesizedUnit(false), isProgramMainUnit(false)
 {
 }
 
 Node* CompileUnitNode::Clone(CloneContext& cloneContext) const
 {
-    CompileUnitNode* clone = new CompileUnitNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), filePath);
+    CompileUnitNode* clone = new CompileUnitNode(GetSpan(), ModuleId(), filePath);
     clone->globalNs.reset(static_cast<NamespaceNode*>(globalNs->Clone(cloneContext)));
     return clone;
 }
@@ -196,7 +196,7 @@ void UnnamedNamespaceProcessor::Visit(CompileUnitNode& compileUnitNode)
     {
         CloneContext cloneContext;
         IdentifierNode* unnamedNsId = static_cast<IdentifierNode*>(unnamedNs->Id()->Clone(cloneContext));
-        NamespaceImportNode* import = new NamespaceImportNode(compileUnitNode.GetSpan(), unnamedNsId);
+        NamespaceImportNode* import = new NamespaceImportNode(compileUnitNode.GetSpan(), compileUnitNode.ModuleId(), unnamedNsId);
         compileUnitNode.GlobalNs()->Members().Insert(index, import);
         ++index;
     }

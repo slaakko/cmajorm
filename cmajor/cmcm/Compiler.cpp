@@ -162,13 +162,14 @@ void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, cmajor::symbols::Mo
                 diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
             }
             diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
-            for (const soulng::lexer::Span& span : warning.References())
+            for (const std::pair<soulng::lexer::Span, boost::uuids::uuid>& spanModuleId : warning.References())
             {
-                if (!span.Valid()) continue;
+                if (!spanModuleId.first.Valid()) continue;
                 std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
                 diagnosticElement->SetAttribute(U"category", U"info");
                 diagnosticElement->SetAttribute(U"message", ToUtf32("see reference to"));
-                std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(module, span);
+                cmajor::symbols::Module* mod = cmajor::symbols::GetModuleById(spanModuleId.second);
+                std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(mod, spanModuleId.first);
                 if (spanElement)
                 {
                     diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
@@ -322,26 +323,27 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
     catch (const cmajor::symbols::Exception& ex)
     {
         LogMessage(-1, ex.What());
-        module = ex.GetModule();
+        cmajor::symbols::Module* module = cmajor::symbols::GetModuleById(ex.DefinedModuleId());
         compileResultElement->SetAttribute(U"success", U"false");
         std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
         diagnosticElement->SetAttribute(U"category", U"error");
         diagnosticElement->SetAttribute(U"message", ToUtf32(ex.Message()));
-        diagnosticElement->SetAttribute(U"tool", ex.GetModule()->GetCurrentToolName());
-        diagnosticElement->SetAttribute(U"project", ex.GetModule()->GetCurrentProjectName());
-        std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(ex.GetModule(), ex.Defined());
+        diagnosticElement->SetAttribute(U"tool", module->GetCurrentToolName());
+        diagnosticElement->SetAttribute(U"project", module->GetCurrentProjectName());
+        std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(module, ex.Defined());
         if (spanElement)
         {
             diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
         }
         diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
-        for (const soulng::lexer::Span& span : ex.References())
+        for (const std::pair<soulng::lexer::Span, boost::uuids::uuid>& spanModuleId : ex.References())
         {
-            if (!span.Valid()) continue;
+            if (!spanModuleId.first.Valid()) continue;
             std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
             diagnosticElement->SetAttribute(U"category", U"info");
             diagnosticElement->SetAttribute(U"message", ToUtf32("see reference to"));
-            std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(ex.GetModule(), span);
+            cmajor::symbols::Module* mod = cmajor::symbols::GetModuleById(spanModuleId.second);
+            std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(mod, spanModuleId.first);
             if (spanElement)
             {
                 diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));

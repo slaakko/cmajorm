@@ -8,13 +8,13 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Interface.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Interface.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -84,7 +84,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, ParsingCont
                                             int64_t save = lexer.GetPos();
                                             soulng::parser::Match* parentMatch11 = &match;
                                             {
-                                                soulng::parser::Match match = AttributeParser::Attributes(lexer);
+                                                soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
                                                 attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
                                                 if (match.hit)
                                                 {
@@ -156,7 +156,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, ParsingCont
                                     soulng::parser::Match* parentMatch17 = &match;
                                     {
                                         soulng::lexer::Span span = lexer.GetSpan();
-                                        soulng::parser::Match match = IdentifierParser::Identifier(lexer);
+                                        soulng::parser::Match match = IdentifierParser::Identifier(lexer, moduleId);
                                         id.reset(static_cast<IdentifierNode*>(match.value));
                                         if (match.hit)
                                         {
@@ -170,7 +170,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, ParsingCont
                                     if (match.hit)
                                     {
                                         s.end = span.end;
-                                        intf.reset(new InterfaceNode(s, specifiers->value, id.release(), attrs.release()));
+                                        intf.reset(new InterfaceNode(s, *moduleId, specifiers->value, id.release(), attrs.release()));
                                         intf->SetSpecifierSpan(specifierSpan);
                                     }
                                     *parentMatch16 = match;
@@ -227,7 +227,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, ParsingCont
                     soulng::parser::Match match(false);
                     soulng::parser::Match* parentMatch21 = &match;
                     {
-                        soulng::parser::Match match = InterfaceParser::InterfaceContent(lexer, ctx, intf.get());
+                        soulng::parser::Match match = InterfaceParser::InterfaceContent(lexer, moduleId, ctx, intf.get());
                         *parentMatch21 = match;
                     }
                     *parentMatch3 = match;
@@ -302,7 +302,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, ParsingCont
     return match;
 }
 
-soulng::parser::Match InterfaceParser::InterfaceContent(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::InterfaceNode* intf)
+soulng::parser::Match InterfaceParser::InterfaceContent(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::InterfaceNode* intf)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -328,7 +328,7 @@ soulng::parser::Match InterfaceParser::InterfaceContent(CmajorLexer& lexer, Pars
                     soulng::parser::Match* parentMatch2 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = InterfaceParser::InterfaceMemFun(lexer, ctx);
+                        soulng::parser::Match match = InterfaceParser::InterfaceMemFun(lexer, moduleId, ctx);
                         intfMemFun.reset(static_cast<Node*>(match.value));
                         if (match.hit)
                         {
@@ -364,7 +364,7 @@ soulng::parser::Match InterfaceParser::InterfaceContent(CmajorLexer& lexer, Pars
     return match;
 }
 
-soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -418,7 +418,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, Parsi
                             int64_t save = lexer.GetPos();
                             soulng::parser::Match* parentMatch7 = &match;
                             {
-                                soulng::parser::Match match = AttributeParser::Attributes(lexer);
+                                soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
                                 attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
                                 if (match.hit)
                                 {
@@ -440,7 +440,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, Parsi
                     soulng::parser::Match match(false);
                     soulng::parser::Match* parentMatch8 = &match;
                     {
-                        soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                        soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                         returnType.reset(static_cast<sngcm::ast::Node*>(match.value));
                         *parentMatch8 = match;
                     }
@@ -476,7 +476,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, Parsi
                         if (match.hit)
                         {
                             s.end = span.end;
-                            memFun.reset(new MemberFunctionNode(s, Specifiers(), returnType.release(), groupId->value, attrs.release()));
+                            memFun.reset(new MemberFunctionNode(s, *moduleId, Specifiers(), returnType.release(), groupId->value, attrs.release()));
                         }
                         *parentMatch10 = match;
                     }
@@ -495,7 +495,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, Parsi
                 soulng::parser::Match* parentMatch13 = &match;
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = ParameterParser::ParameterList(lexer, ctx, memFun.get());
+                    soulng::parser::Match match = ParameterParser::ParameterList(lexer, moduleId, ctx, memFun.get());
                     if (match.hit)
                     {
                         *parentMatch13 = match;

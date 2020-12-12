@@ -13,25 +13,26 @@
 
 namespace sngcm { namespace ast {
 
-EnumTypeNode::EnumTypeNode(const Span& span_) : Node(NodeType::enumTypeNode, span_)
+EnumTypeNode::EnumTypeNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::enumTypeNode, span_, moduleId_)
 {
 }
 
-EnumTypeNode::EnumTypeNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_) : Node(NodeType::enumTypeNode, span_), specifiers(specifiers_), id(id_)
+EnumTypeNode::EnumTypeNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_) : 
+    Node(NodeType::enumTypeNode, span_, moduleId_), specifiers(specifiers_), id(id_)
 {
     id->SetParent(this);
 }
 
 Node* EnumTypeNode::Clone(CloneContext& cloneContext) const
 {
-    EnumTypeNode* clone = new EnumTypeNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    EnumTypeNode* clone = new EnumTypeNode(GetSpan(), ModuleId(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int n = constants.Count();
     for (int i = 0; i < n; ++i)
     {
         clone->AddConstant(static_cast<EnumConstantNode*>(constants[i]->Clone(cloneContext)));
     }
-    clone->SetBeginBraceSpan(cloneContext.MapSpan(beginBraceSpan, RootModuleId()));
-    clone->SetEndBraceSpan(cloneContext.MapSpan(endBraceSpan, RootModuleId()));
+    clone->SetBeginBraceSpan(beginBraceSpan);
+    clone->SetEndBraceSpan(endBraceSpan);
     return clone;
 }
 
@@ -52,8 +53,9 @@ void EnumTypeNode::Write(AstWriter& writer)
         writer.Write(underlyingType.get());
     }
     constants.Write(writer);
-    writer.Write(beginBraceSpan);
-    writer.Write(endBraceSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(beginBraceSpan, convertExternal);
+    writer.Write(endBraceSpan, convertExternal);
 }
 
 void EnumTypeNode::Read(AstReader& reader)
@@ -93,11 +95,13 @@ void EnumTypeNode::SetUnderlyingType(Node* underlyingType_)
     underlyingType->SetParent(this);
 }
 
-EnumConstantNode::EnumConstantNode(const Span& span_) : Node(NodeType::enumConstantNode, span_), hasValue(false)
+EnumConstantNode::EnumConstantNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    Node(NodeType::enumConstantNode, span_, moduleId_), hasValue(false)
 {
 }
 
-EnumConstantNode::EnumConstantNode(const Span& span_, IdentifierNode* id_, Node* value_) : Node(NodeType::enumConstantNode, span_), id(id_), value(value_), hasValue(false)
+EnumConstantNode::EnumConstantNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_, Node* value_) : 
+    Node(NodeType::enumConstantNode, span_, moduleId_), id(id_), value(value_), hasValue(false)
 {
     id->SetParent(this);
     if (value)
@@ -108,7 +112,7 @@ EnumConstantNode::EnumConstantNode(const Span& span_, IdentifierNode* id_, Node*
 
 Node* EnumConstantNode::Clone(CloneContext& cloneContext) const
 {
-    EnumConstantNode* clone = new EnumConstantNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)), value->Clone(cloneContext));
+    EnumConstantNode* clone = new EnumConstantNode(GetSpan(), ModuleId(), static_cast<IdentifierNode*>(id->Clone(cloneContext)), value->Clone(cloneContext));
     if (hasValue)
     {
         clone->SetHasValue();
@@ -141,7 +145,7 @@ void EnumConstantNode::Read(AstReader& reader)
     strValue = reader.GetBinaryReader().ReadUtf32String();
 }
 
-Node* MakeNextEnumConstantValue(const Span& span, EnumTypeNode* enumType)
+Node* MakeNextEnumConstantValue(const Span& span, const boost::uuids::uuid& moduleId, EnumTypeNode* enumType)
 {
     EnumConstantNode* lastConstant = enumType->GetLastConstant();
     if (lastConstant)
@@ -155,10 +159,10 @@ Node* MakeNextEnumConstantValue(const Span& span, EnumTypeNode* enumType)
             {
                 if (enumType->GetUnderlyingType()->IsUnsignedTypeNode())
                 {
-                    return new AddNode(span, clonedValue, new ByteLiteralNode(span, 1u));
+                    return new AddNode(span, moduleId, clonedValue, new ByteLiteralNode(span, moduleId, 1u));
                 }
             }
-            return new AddNode(span, clonedValue, new SByteLiteralNode(span, 1));
+            return new AddNode(span, moduleId, clonedValue, new SByteLiteralNode(span, moduleId, 1));
         }
         else
         {
@@ -171,10 +175,10 @@ Node* MakeNextEnumConstantValue(const Span& span, EnumTypeNode* enumType)
         {
             if (enumType->GetUnderlyingType()->IsUnsignedTypeNode())
             {
-                return new ByteLiteralNode(span, 0u);
+                return new ByteLiteralNode(span, moduleId, 0u);
             }
         }
-        return new SByteLiteralNode(span, 0);
+        return new SByteLiteralNode(span, moduleId, 0);
     }
 }
 

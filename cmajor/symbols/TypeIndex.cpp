@@ -219,7 +219,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     DerivedTypeSymbol* derivedType = static_cast<DerivedTypeSymbol*>(typeSymbol);
                     if (derivedType->IsConstType())
                     {
-                        TypeSymbol* nonConstType = derivedType->RemoveConst(derivedType->GetSpan());
+                        TypeSymbol* nonConstType = derivedType->RemoveConst(derivedType->GetSpan(), derivedType->SourceModuleId());
                         cmajor::debug::DIConstType* type = new cmajor::debug::DIConstType();
                         type->SetId(typeSymbol->TypeId());
                         type->SetName(ToUtf8(typeSymbol->FullName()));
@@ -231,7 +231,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     }
                     else if (derivedType->IsReferenceType())
                     {
-                        TypeSymbol* nonReferenceType = derivedType->RemoveReference(derivedType->GetSpan());
+                        TypeSymbol* nonReferenceType = derivedType->RemoveReference(derivedType->GetSpan(), derivedType->SourceModuleId());
                         cmajor::debug::DIReferenceType* type = new cmajor::debug::DIReferenceType();
                         type->SetId(typeSymbol->TypeId());
                         type->SetName(ToUtf8(typeSymbol->FullName()));
@@ -243,7 +243,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     }
                     else if (derivedType->IsPointerType())
                     {
-                        TypeSymbol* pointedToType = derivedType->RemovePointer(derivedType->GetSpan());
+                        TypeSymbol* pointedToType = derivedType->RemovePointer(derivedType->GetSpan(), derivedType->SourceModuleId());
                         cmajor::debug::DIPointerType* pointerType = new cmajor::debug::DIPointerType();
                         pointerType->SetPointedTypeId(pointedToType->TypeId());
                         pointerType->SetId(typeSymbol->TypeId());

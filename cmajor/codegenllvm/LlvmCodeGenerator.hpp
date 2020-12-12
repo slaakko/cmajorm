@@ -88,7 +88,7 @@ public:
     void* HandlerBlock() override;
     void* CleanupBlock() override;
     bool NewCleanupNeeded() override;
-    std::string GetSourceFilePath(int32_t fileIndex) override;
+    std::string GetSourceFilePath(const Span& span, const boost::uuids::uuid& moduleId) override;
     cmajor::ir::Pad* CurrentPad() override;
     void* CreateClassDIType(void* classPtr) override;
     void CreateExitFunctionCall();

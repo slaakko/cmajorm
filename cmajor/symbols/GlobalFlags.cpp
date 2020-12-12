@@ -25,17 +25,17 @@ BackEnd GetBackEnd()
 
 inline GlobalFlags operator|(GlobalFlags flags, GlobalFlags flag)
 {
-    return GlobalFlags(uint32_t(flags) | uint32_t(flag));
+    return GlobalFlags(uint64_t(flags) | uint64_t(flag));
 }
 
 inline GlobalFlags operator&(GlobalFlags flags, GlobalFlags flag)
 {
-    return GlobalFlags(uint32_t(flags) & uint32_t(flag));
+    return GlobalFlags(uint64_t(flags) & uint64_t(flag));
 }
 
 inline GlobalFlags operator~(GlobalFlags flags)
 {
-    return GlobalFlags(~uint32_t(flags));
+    return GlobalFlags(~uint64_t(flags));
 }
 
 void SetGlobalFlag(GlobalFlags flag)

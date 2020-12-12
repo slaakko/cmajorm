@@ -24,7 +24,7 @@ class ClassTemplateSpecializationSymbol;
 class SYMBOLS_API ClassGroupTypeSymbol : public TypeSymbol
 {
 public:
-    ClassGroupTypeSymbol(const Span& span_, const std::u32string& name_);
+    ClassGroupTypeSymbol(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& name_);
     bool IsExportSymbol() const override { return false; }
     std::string TypeString() const override { return "class_group"; }
     bool IsInComplete() const override { return true; }
@@ -89,8 +89,8 @@ const int32_t functionVmtIndexOffset = 6;   // virtual method table
 class SYMBOLS_API ClassTypeSymbol : public TypeSymbol
 {
 public:
-    ClassTypeSymbol(const Span& span_, const std::u32string& name_);
-    ClassTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
+    ClassTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    ClassTypeSymbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     const NodeList<Node>& UsingNodes() const { return usingNodes; }

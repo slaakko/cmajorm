@@ -16,7 +16,7 @@ namespace sngcm { namespace ast {
 
 using namespace soulng::unicode;
 
-LiteralNode::LiteralNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_)
+LiteralNode::LiteralNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : Node(nodeType_, span_, moduleId_)
 {
 }
 
@@ -37,93 +37,95 @@ void LiteralNode::SetText(const std::u32string& text_)
     text = text_;
 }
 
-LiteralNode* CreateIntegerLiteralNode(const Span& span, uint64_t value, bool unsignedSuffix)
+LiteralNode* CreateIntegerLiteralNode(const Span& span, const boost::uuids::uuid& moduleId, uint64_t value, bool unsignedSuffix)
 {
     if (unsignedSuffix)
     {
-        if (value <= std::numeric_limits<uint8_t>::max()) return new ByteLiteralNode(span, static_cast<uint8_t>(value));
-        if (value <= std::numeric_limits<uint16_t>::max()) return new UShortLiteralNode(span, static_cast<uint16_t>(value));
-        if (value <= std::numeric_limits<uint32_t>::max()) return new UIntLiteralNode(span, static_cast<uint32_t>(value));
-        return new ULongLiteralNode(span, value);
+        if (value <= std::numeric_limits<uint8_t>::max()) return new ByteLiteralNode(span, moduleId, static_cast<uint8_t>(value));
+        if (value <= std::numeric_limits<uint16_t>::max()) return new UShortLiteralNode(span, moduleId, static_cast<uint16_t>(value));
+        if (value <= std::numeric_limits<uint32_t>::max()) return new UIntLiteralNode(span, moduleId, static_cast<uint32_t>(value));
+        return new ULongLiteralNode(span, moduleId, value);
     }
     else
     {
-        if (value <= std::numeric_limits<int8_t>::max()) return new SByteLiteralNode(span, static_cast<int8_t>(value));
-        if (value <= std::numeric_limits<uint8_t>::max()) return new ByteLiteralNode(span, static_cast<uint8_t>(value));
-        if (value <= std::numeric_limits<int16_t>::max()) return new ShortLiteralNode(span, static_cast<int16_t>(value));
-        if (value <= std::numeric_limits<uint16_t>::max()) return new UShortLiteralNode(span, static_cast<uint16_t>(value));
-        if (value <= std::numeric_limits<int32_t>::max()) return new IntLiteralNode(span, static_cast<int32_t>(value));
-        if (value <= std::numeric_limits<uint32_t>::max()) return new UIntLiteralNode(span, static_cast<uint32_t>(value));
+        if (value <= std::numeric_limits<int8_t>::max()) return new SByteLiteralNode(span, moduleId, static_cast<int8_t>(value));
+        if (value <= std::numeric_limits<uint8_t>::max()) return new ByteLiteralNode(span, moduleId, static_cast<uint8_t>(value));
+        if (value <= std::numeric_limits<int16_t>::max()) return new ShortLiteralNode(span, moduleId, static_cast<int16_t>(value));
+        if (value <= std::numeric_limits<uint16_t>::max()) return new UShortLiteralNode(span, moduleId, static_cast<uint16_t>(value));
+        if (value <= std::numeric_limits<int32_t>::max()) return new IntLiteralNode(span, moduleId, static_cast<int32_t>(value));
+        if (value <= std::numeric_limits<uint32_t>::max()) return new UIntLiteralNode(span, moduleId, static_cast<uint32_t>(value));
 #pragma warning(disable : 4018)
-        if (value <= std::numeric_limits<int64_t>::max()) return new LongLiteralNode(span, static_cast<int64_t>(value));
+        if (value <= std::numeric_limits<int64_t>::max()) return new LongLiteralNode(span, moduleId, static_cast<int64_t>(value));
 #pragma warning(default : 4018)
-        return new ULongLiteralNode(span, value);
+        return new ULongLiteralNode(span, moduleId, value);
     }
 }
 
-LiteralNode* CreateFloatingLiteralNode(const Span& span, double value, bool float_)
+LiteralNode* CreateFloatingLiteralNode(const Span& span, const boost::uuids::uuid& moduleId, double value, bool float_)
 {
     if (float_)
     {
-        return new FloatLiteralNode(span, static_cast<float>(value));
+        return new FloatLiteralNode(span, moduleId, static_cast<float>(value));
     }
     else
     {
-        return new DoubleLiteralNode(span, value);
+        return new DoubleLiteralNode(span, moduleId, value);
     }
 }
 
-SNGCM_AST_API LiteralNode* CreateCharacterLiteralNode(const Span& span, char32_t value, int chrLitPrefix)
+SNGCM_AST_API LiteralNode* CreateCharacterLiteralNode(const Span& span, const boost::uuids::uuid& moduleId, char32_t value, int chrLitPrefix)
 {
     switch (chrLitPrefix)
     {
         case 0:
         {
-            return new CharLiteralNode(span, static_cast<char>(value));
+            return new CharLiteralNode(span, moduleId, static_cast<char>(value));
         }
         case 1:
         {
-            return new WCharLiteralNode(span, static_cast<char16_t>(value));
+            return new WCharLiteralNode(span, moduleId, static_cast<char16_t>(value));
         }
         case 2:
         {
-            return new UCharLiteralNode(span, value);
+            return new UCharLiteralNode(span, moduleId, value);
         }
     }
     return nullptr;
 }
 
-SNGCM_AST_API LiteralNode* CreateStringLiteralNode(const Span& span, const std::u32string& value, int strLitPrefix)
+SNGCM_AST_API LiteralNode* CreateStringLiteralNode(const Span& span, const boost::uuids::uuid& moduleId, const std::u32string& value, int strLitPrefix)
 {
     switch (strLitPrefix)
     {
         case 0:
         {
-            return new StringLiteralNode(span, ToUtf8(value));
+            return new StringLiteralNode(span, moduleId, ToUtf8(value));
         }
         case 1:
         {
-            return new WStringLiteralNode(span, ToUtf16(value));
+            return new WStringLiteralNode(span, moduleId, ToUtf16(value));
         }
         case 2:
         {
-            return new UStringLiteralNode(span, value);
+            return new UStringLiteralNode(span, moduleId, value);
         }
     }
     return nullptr;
 }
 
-BooleanLiteralNode::BooleanLiteralNode(const Span& span_) : LiteralNode(NodeType::booleanLiteralNode, span_), value(false)
+BooleanLiteralNode::BooleanLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : LiteralNode(NodeType::booleanLiteralNode, span_, moduleId_), value(false)
 {
 }
 
-BooleanLiteralNode::BooleanLiteralNode(const Span& span_, bool value_) : LiteralNode(NodeType::booleanLiteralNode, span_), value(value_)
+BooleanLiteralNode::BooleanLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, bool value_) : 
+    LiteralNode(NodeType::booleanLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* BooleanLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new BooleanLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    BooleanLiteralNode* clone = new BooleanLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void BooleanLiteralNode::Accept(Visitor& visitor)
@@ -148,17 +150,20 @@ std::string BooleanLiteralNode::ToString() const
     if (value) return "true"; else return "false";
 }
 
-SByteLiteralNode::SByteLiteralNode(const Span& span_) : LiteralNode(NodeType::sbyteLiteralNode, span_), value(0)
+SByteLiteralNode::SByteLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::sbyteLiteralNode, span_, moduleId_), value(0)
 {
 }
 
-SByteLiteralNode::SByteLiteralNode(const Span& span_, int8_t value_) : LiteralNode(NodeType::sbyteLiteralNode, span_), value(value_)
+SByteLiteralNode::SByteLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, int8_t value_) : 
+    LiteralNode(NodeType::sbyteLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* SByteLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new SByteLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    SByteLiteralNode* clone = new SByteLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void SByteLiteralNode::Accept(Visitor& visitor)
@@ -183,17 +188,20 @@ std::string SByteLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-ByteLiteralNode::ByteLiteralNode(const Span& span_) : LiteralNode(NodeType::byteLiteralNode, span_), value(0u)
+ByteLiteralNode::ByteLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::byteLiteralNode, span_, moduleId_), value(0u)
 {
 }
 
-ByteLiteralNode::ByteLiteralNode(const Span& span_, uint8_t value_) : LiteralNode(NodeType::byteLiteralNode, span_), value(value_)
+ByteLiteralNode::ByteLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, uint8_t value_) : 
+    LiteralNode(NodeType::byteLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* ByteLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new ByteLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    ByteLiteralNode* clone = new ByteLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void ByteLiteralNode::Accept(Visitor& visitor)
@@ -218,17 +226,20 @@ std::string ByteLiteralNode::ToString() const
     return std::to_string(value) + "u";
 }
 
-ShortLiteralNode::ShortLiteralNode(const Span& span_) : LiteralNode(NodeType::shortLiteralNode, span_), value(0)
+ShortLiteralNode::ShortLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::shortLiteralNode, span_, moduleId_), value(0)
 {
 }
 
-ShortLiteralNode::ShortLiteralNode(const Span& span_, int16_t value_) : LiteralNode(NodeType::shortLiteralNode, span_), value(value_)
+ShortLiteralNode::ShortLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, int16_t value_) : 
+    LiteralNode(NodeType::shortLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* ShortLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new ShortLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    ShortLiteralNode* clone = new ShortLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void ShortLiteralNode::Accept(Visitor& visitor)
@@ -253,17 +264,19 @@ std::string ShortLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-UShortLiteralNode::UShortLiteralNode(const Span& span_) : LiteralNode(NodeType::ushortLiteralNode, span_), value(0u)
+UShortLiteralNode::UShortLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : LiteralNode(NodeType::ushortLiteralNode, span_, moduleId_), value(0u)
 {
 }
 
-UShortLiteralNode::UShortLiteralNode(const Span& span_, uint16_t value_) : LiteralNode(NodeType::ushortLiteralNode, span_), value(value_)
+UShortLiteralNode::UShortLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, uint16_t value_) : 
+    LiteralNode(NodeType::ushortLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* UShortLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new UShortLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    UShortLiteralNode* clone = new UShortLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void UShortLiteralNode::Accept(Visitor& visitor)
@@ -288,17 +301,20 @@ std::string UShortLiteralNode::ToString() const
     return std::to_string(value) + "u";
 }
 
-IntLiteralNode::IntLiteralNode(const Span& span_) : LiteralNode(NodeType::intLiteralNode, span_), value(0)
+IntLiteralNode::IntLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::intLiteralNode, span_, moduleId_), value(0)
 {
 }
 
-IntLiteralNode::IntLiteralNode(const Span& span_, int32_t value_) : LiteralNode(NodeType::intLiteralNode, span_), value(value_)
+IntLiteralNode::IntLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, int32_t value_) : 
+    LiteralNode(NodeType::intLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* IntLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new IntLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    IntLiteralNode* clone = new IntLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void IntLiteralNode::Accept(Visitor& visitor)
@@ -323,17 +339,20 @@ std::string IntLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-UIntLiteralNode::UIntLiteralNode(const Span& span_) : LiteralNode(NodeType::uintLiteralNode, span_), value(0u)
+UIntLiteralNode::UIntLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::uintLiteralNode, span_, moduleId_), value(0u)
 {
 }
 
-UIntLiteralNode::UIntLiteralNode(const Span& span_, uint32_t value_) : LiteralNode(NodeType::uintLiteralNode, span_), value(value_)
+UIntLiteralNode::UIntLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, uint32_t value_) : 
+    LiteralNode(NodeType::uintLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* UIntLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new UIntLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    UIntLiteralNode* clone = new UIntLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void UIntLiteralNode::Accept(Visitor& visitor)
@@ -358,17 +377,20 @@ std::string UIntLiteralNode::ToString() const
     return std::to_string(value) + "u";
 }
 
-LongLiteralNode::LongLiteralNode(const Span& span_) : LiteralNode(NodeType::longLiteralNode, span_), value(0)
+LongLiteralNode::LongLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::longLiteralNode, span_, moduleId_), value(0)
 {
 }
 
-LongLiteralNode::LongLiteralNode(const Span& span_, int64_t value_) : LiteralNode(NodeType::longLiteralNode, span_), value(value_)
+LongLiteralNode::LongLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, int64_t value_) : 
+    LiteralNode(NodeType::longLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* LongLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new LongLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    LongLiteralNode* clone = new LongLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void LongLiteralNode::Accept(Visitor& visitor)
@@ -393,17 +415,19 @@ std::string LongLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-ULongLiteralNode::ULongLiteralNode(const Span& span_) : LiteralNode(NodeType::ulongLiteralNode, span_), value(0u)
+ULongLiteralNode::ULongLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : LiteralNode(NodeType::ulongLiteralNode, span_, moduleId_), value(0u)
 {
 }
 
-ULongLiteralNode::ULongLiteralNode(const Span& span_, uint64_t value_) : LiteralNode(NodeType::ulongLiteralNode, span_), value(value_)
+ULongLiteralNode::ULongLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, uint64_t value_) : 
+    LiteralNode(NodeType::ulongLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* ULongLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new ULongLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    ULongLiteralNode* clone = new ULongLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void ULongLiteralNode::Accept(Visitor& visitor)
@@ -428,17 +452,20 @@ std::string ULongLiteralNode::ToString() const
     return std::to_string(value) + "u";
 }
 
-FloatLiteralNode::FloatLiteralNode(const Span& span_) : LiteralNode(NodeType::floatLiteralNode, span_), value(0)
+FloatLiteralNode::FloatLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::floatLiteralNode, span_, moduleId_), value(0)
 {
 }
 
-FloatLiteralNode::FloatLiteralNode(const Span& span_, float value_) : LiteralNode(NodeType::floatLiteralNode, span_), value(value_)
+FloatLiteralNode::FloatLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, float value_) : 
+    LiteralNode(NodeType::floatLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* FloatLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new FloatLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    FloatLiteralNode* clone = new FloatLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void FloatLiteralNode::Accept(Visitor& visitor)
@@ -463,17 +490,20 @@ std::string FloatLiteralNode::ToString() const
     return std::to_string(value) + "f";
 }
 
-DoubleLiteralNode::DoubleLiteralNode(const Span& span_) : LiteralNode(NodeType::doubleLiteralNode, span_), value(0)
+DoubleLiteralNode::DoubleLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::doubleLiteralNode, span_, moduleId_), value(0)
 {
 }
 
-DoubleLiteralNode::DoubleLiteralNode(const Span& span_, double value_) : LiteralNode(NodeType::doubleLiteralNode, span_), value(value_)
+DoubleLiteralNode::DoubleLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, double value_) : 
+    LiteralNode(NodeType::doubleLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* DoubleLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new DoubleLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    DoubleLiteralNode* clone = new DoubleLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void DoubleLiteralNode::Accept(Visitor& visitor)
@@ -498,17 +528,19 @@ std::string DoubleLiteralNode::ToString() const
     return std::to_string(value);
 }
 
-CharLiteralNode::CharLiteralNode(const Span& span_) : LiteralNode(NodeType::charLiteralNode, span_), value('\0')
+CharLiteralNode::CharLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : LiteralNode(NodeType::charLiteralNode, span_, moduleId_), value('\0')
 {
 }
 
-CharLiteralNode::CharLiteralNode(const Span& span_, char value_) : LiteralNode(NodeType::charLiteralNode, span_), value(value_)
+CharLiteralNode::CharLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, char value_) : 
+    LiteralNode(NodeType::charLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* CharLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new CharLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    CharLiteralNode* clone = new CharLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void CharLiteralNode::Accept(Visitor& visitor)
@@ -533,17 +565,20 @@ std::string CharLiteralNode::ToString() const
     return "'" + CharStr(value) + "'";
 }
 
-WCharLiteralNode::WCharLiteralNode(const Span& span_) : LiteralNode(NodeType::wcharLiteralNode, span_), value('\0')
+WCharLiteralNode::WCharLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::wcharLiteralNode, span_, moduleId_), value('\0')
 {
 }
 
-WCharLiteralNode::WCharLiteralNode(const Span& span_, char16_t value_) : LiteralNode(NodeType::wcharLiteralNode, span_), value(value_)
+WCharLiteralNode::WCharLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, char16_t value_) : 
+    LiteralNode(NodeType::wcharLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* WCharLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new WCharLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    WCharLiteralNode* clone = new WCharLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void WCharLiteralNode::Accept(Visitor& visitor)
@@ -568,17 +603,20 @@ std::string WCharLiteralNode::ToString() const
     return "w'" + ToUtf8(CharStr(char32_t(value))) + "'";
 }
 
-UCharLiteralNode::UCharLiteralNode(const Span& span_) : LiteralNode(NodeType::ucharLiteralNode, span_), value('\0')
+UCharLiteralNode::UCharLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::ucharLiteralNode, span_, moduleId_), value('\0')
 {
 }
 
-UCharLiteralNode::UCharLiteralNode(const Span& span_, char32_t value_) : LiteralNode(NodeType::ucharLiteralNode, span_), value(value_)
+UCharLiteralNode::UCharLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, char32_t value_) : 
+    LiteralNode(NodeType::ucharLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* UCharLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new UCharLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    UCharLiteralNode* clone = new UCharLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void UCharLiteralNode::Accept(Visitor& visitor)
@@ -603,17 +641,20 @@ std::string UCharLiteralNode::ToString() const
     return "u'" + ToUtf8(CharStr(value)) + "'";
 }
 
-StringLiteralNode::StringLiteralNode(const Span& span_) : LiteralNode(NodeType::stringLiteralNode, span_), value()
+StringLiteralNode::StringLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::stringLiteralNode, span_, moduleId_), value()
 {
 }
 
-StringLiteralNode::StringLiteralNode(const Span& span_, const std::string& value_) : LiteralNode(NodeType::stringLiteralNode, span_), value(value_)
+StringLiteralNode::StringLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::string& value_) : 
+    LiteralNode(NodeType::stringLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* StringLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new StringLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    StringLiteralNode* clone = new StringLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void StringLiteralNode::Accept(Visitor& visitor)
@@ -638,17 +679,20 @@ std::string StringLiteralNode::ToString() const
     return "\"" + StringStr(value) + "\"";
 }
 
-WStringLiteralNode::WStringLiteralNode(const Span& span_) : LiteralNode(NodeType::wstringLiteralNode, span_), value()
+WStringLiteralNode::WStringLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::wstringLiteralNode, span_, moduleId_), value()
 {
 }
 
-WStringLiteralNode::WStringLiteralNode(const Span& span_, const std::u16string& value_) : LiteralNode(NodeType::wstringLiteralNode, span_), value(value_)
+WStringLiteralNode::WStringLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u16string& value_) : 
+    LiteralNode(NodeType::wstringLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* WStringLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new WStringLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    WStringLiteralNode* clone = new WStringLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void WStringLiteralNode::Accept(Visitor& visitor)
@@ -673,17 +717,20 @@ std::string WStringLiteralNode::ToString() const
     return "\"" + StringStr(ToUtf8(value)) + "\"";
 }
 
-UStringLiteralNode::UStringLiteralNode(const Span& span_) : LiteralNode(NodeType::ustringLiteralNode, span_), value()
+UStringLiteralNode::UStringLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::ustringLiteralNode, span_, moduleId_), value()
 {
 }
 
-UStringLiteralNode::UStringLiteralNode(const Span& span_, const std::u32string& value_) : LiteralNode(NodeType::ustringLiteralNode, span_), value(value_)
+UStringLiteralNode::UStringLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& value_) : 
+    LiteralNode(NodeType::ustringLiteralNode, span_, moduleId_), value(value_)
 {
 }
 
 Node* UStringLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new UStringLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), value);
+    UStringLiteralNode* clone = new UStringLiteralNode(GetSpan(), ModuleId(), value);
+    return clone;
 }
 
 void UStringLiteralNode::Accept(Visitor& visitor)
@@ -708,13 +755,15 @@ std::string UStringLiteralNode::ToString() const
     return "\"" + StringStr(ToUtf8(value)) + "\"";
 }
 
-NullLiteralNode::NullLiteralNode(const Span& span_) : LiteralNode(NodeType::nullLiteralNode, span_)
+NullLiteralNode::NullLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::nullLiteralNode, span_, moduleId_)
 {
 }
 
 Node* NullLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new NullLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    NullLiteralNode* clone = new NullLiteralNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void NullLiteralNode::Accept(Visitor& visitor)
@@ -722,13 +771,14 @@ void NullLiteralNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-ArrayLiteralNode::ArrayLiteralNode(const Span& span_) : LiteralNode(NodeType::arrayLiteralNode, span_)
+ArrayLiteralNode::ArrayLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::arrayLiteralNode, span_, moduleId_)
 {
 }
 
 Node* ArrayLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    ArrayLiteralNode* clone = new ArrayLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    ArrayLiteralNode* clone = new ArrayLiteralNode(GetSpan(), ModuleId());
     int n = values.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -760,13 +810,14 @@ void ArrayLiteralNode::AddValue(Node* value)
     values.Add(value);
 }
 
-StructuredLiteralNode::StructuredLiteralNode(const Span& span_) : LiteralNode(NodeType::structuredLiteralNode, span_)
+StructuredLiteralNode::StructuredLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::structuredLiteralNode, span_, moduleId_)
 {
 }
 
 Node* StructuredLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    StructuredLiteralNode* clone = new StructuredLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    StructuredLiteralNode* clone = new StructuredLiteralNode(GetSpan(), ModuleId());
     int n = members.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -798,17 +849,20 @@ void StructuredLiteralNode::AddMember(Node* member)
     members.Add(member);
 }
 
-UuidLiteralNode::UuidLiteralNode(const Span& span_) : LiteralNode(NodeType::uuidLiteralNode, span_), uuid(boost::uuids::nil_uuid())
+UuidLiteralNode::UuidLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    LiteralNode(NodeType::uuidLiteralNode, span_, moduleId_), uuid(boost::uuids::nil_uuid())
 {
 }
 
-UuidLiteralNode::UuidLiteralNode(const Span& span_, const boost::uuids::uuid& uuid_): LiteralNode(NodeType::uuidLiteralNode, span_), uuid(uuid_)
+UuidLiteralNode::UuidLiteralNode(const Span& span_, const boost::uuids::uuid& moduleId_, const boost::uuids::uuid& uuid_): 
+    LiteralNode(NodeType::uuidLiteralNode, span_, moduleId_), uuid(uuid_)
 {
 }
 
 Node* UuidLiteralNode::Clone(CloneContext& cloneContext) const
 {
-    return new UuidLiteralNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), uuid);
+    UuidLiteralNode* clone = new UuidLiteralNode(GetSpan(), ModuleId(), uuid);
+    return clone;
 }
 
 void UuidLiteralNode::Accept(Visitor& visitor)

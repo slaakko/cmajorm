@@ -6,13 +6,13 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Statement.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Statement.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -83,7 +83,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                                                 soulng::parser::Match* parentMatch11 = &match;
                                                 {
                                                     int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = StatementParser::LabeledStatement(lexer, ctx);
+                                                    soulng::parser::Match match = StatementParser::LabeledStatement(lexer, moduleId, ctx);
                                                     labeledStatement.reset(static_cast<StatementNode*>(match.value));
                                                     if (match.hit)
                                                     {
@@ -107,7 +107,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                                                         soulng::parser::Match* parentMatch13 = &match;
                                                         {
                                                             int64_t pos = lexer.GetPos();
-                                                            soulng::parser::Match match = StatementParser::ControlStatement(lexer, ctx);
+                                                            soulng::parser::Match match = StatementParser::ControlStatement(lexer, moduleId, ctx);
                                                             controlStatement.reset(static_cast<StatementNode*>(match.value));
                                                             if (match.hit)
                                                             {
@@ -136,7 +136,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                                                     soulng::parser::Match* parentMatch15 = &match;
                                                     {
                                                         int64_t pos = lexer.GetPos();
-                                                        soulng::parser::Match match = StatementParser::ExpressionStatement(lexer, ctx);
+                                                        soulng::parser::Match match = StatementParser::ExpressionStatement(lexer, moduleId, ctx);
                                                         expressionStatement.reset(static_cast<StatementNode*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -165,7 +165,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                                                 soulng::parser::Match* parentMatch17 = &match;
                                                 {
                                                     int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = StatementParser::AssignmentStatement(lexer, ctx);
+                                                    soulng::parser::Match match = StatementParser::AssignmentStatement(lexer, moduleId, ctx);
                                                     assignmentStatement.reset(static_cast<StatementNode*>(match.value));
                                                     if (match.hit)
                                                     {
@@ -194,7 +194,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                                             soulng::parser::Match* parentMatch19 = &match;
                                             {
                                                 int64_t pos = lexer.GetPos();
-                                                soulng::parser::Match match = StatementParser::ConstructionStatement(lexer, ctx);
+                                                soulng::parser::Match match = StatementParser::ConstructionStatement(lexer, moduleId, ctx);
                                                 constructionStatement.reset(static_cast<ConstructionStatementNode*>(match.value));
                                                 if (match.hit)
                                                 {
@@ -223,7 +223,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                                         soulng::parser::Match* parentMatch21 = &match;
                                         {
                                             int64_t pos = lexer.GetPos();
-                                            soulng::parser::Match match = StatementParser::DeleteStatement(lexer, ctx);
+                                            soulng::parser::Match match = StatementParser::DeleteStatement(lexer, moduleId, ctx);
                                             deleteStatement.reset(static_cast<StatementNode*>(match.value));
                                             if (match.hit)
                                             {
@@ -252,7 +252,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                                     soulng::parser::Match* parentMatch23 = &match;
                                     {
                                         int64_t pos = lexer.GetPos();
-                                        soulng::parser::Match match = StatementParser::DestroyStatement(lexer, ctx);
+                                        soulng::parser::Match match = StatementParser::DestroyStatement(lexer, moduleId, ctx);
                                         destroyStatement.reset(static_cast<StatementNode*>(match.value));
                                         if (match.hit)
                                         {
@@ -281,7 +281,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                                 soulng::parser::Match* parentMatch25 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
-                                    soulng::parser::Match match = StatementParser::EmptyStatement(lexer, ctx);
+                                    soulng::parser::Match match = StatementParser::EmptyStatement(lexer, moduleId, ctx);
                                     emptyStatement.reset(static_cast<StatementNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -310,7 +310,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                             soulng::parser::Match* parentMatch27 = &match;
                             {
                                 int64_t pos = lexer.GetPos();
-                                soulng::parser::Match match = StatementParser::ThrowStatement(lexer, ctx);
+                                soulng::parser::Match match = StatementParser::ThrowStatement(lexer, moduleId, ctx);
                                 throwStatement.reset(static_cast<StatementNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -339,7 +339,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                         soulng::parser::Match* parentMatch29 = &match;
                         {
                             int64_t pos = lexer.GetPos();
-                            soulng::parser::Match match = StatementParser::TryStatement(lexer, ctx);
+                            soulng::parser::Match match = StatementParser::TryStatement(lexer, moduleId, ctx);
                             tryStatement.reset(static_cast<TryStatementNode*>(match.value));
                             if (match.hit)
                             {
@@ -368,7 +368,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                     soulng::parser::Match* parentMatch31 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = StatementParser::AssertStatement(lexer, ctx);
+                        soulng::parser::Match match = StatementParser::AssertStatement(lexer, moduleId, ctx);
                         assertStatement.reset(static_cast<StatementNode*>(match.value));
                         if (match.hit)
                         {
@@ -397,7 +397,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
                 soulng::parser::Match* parentMatch33 = &match;
                 {
                     int64_t pos = lexer.GetPos();
-                    soulng::parser::Match match = StatementParser::ConditionalCompilationStatement(lexer, ctx);
+                    soulng::parser::Match match = StatementParser::ConditionalCompilationStatement(lexer, moduleId, ctx);
                     condCompStatement.reset(static_cast<ConditionalCompilationStatementNode*>(match.value));
                     if (match.hit)
                     {
@@ -429,7 +429,7 @@ soulng::parser::Match StatementParser::Statement(CmajorLexer& lexer, ParsingCont
     return match;
 }
 
-soulng::parser::Match StatementParser::Label(CmajorLexer& lexer)
+soulng::parser::Match StatementParser::Label(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -506,7 +506,7 @@ soulng::parser::Match StatementParser::Label(CmajorLexer& lexer)
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Label"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new LabelNode(s, label));
+                return soulng::parser::Match(true, new LabelNode(s, *moduleId, label));
             }
         }
         *parentMatch0 = match;
@@ -525,7 +525,7 @@ soulng::parser::Match StatementParser::Label(CmajorLexer& lexer)
     return match;
 }
 
-soulng::parser::Match StatementParser::LabeledStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::LabeledStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -542,7 +542,7 @@ soulng::parser::Match StatementParser::LabeledStatement(CmajorLexer& lexer, Pars
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
-        soulng::parser::Match match = StatementParser::Label(lexer);
+        soulng::parser::Match match = StatementParser::Label(lexer, moduleId);
         lbl.reset(static_cast<LabelNode*>(match.value));
         *parentMatch0 = match;
     }
@@ -556,11 +556,11 @@ soulng::parser::Match StatementParser::LabeledStatement(CmajorLexer& lexer, Pars
             {
                 int64_t pos = lexer.GetPos();
                 soulng::lexer::Span span = lexer.GetSpan();
-                soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                 s.reset(static_cast<StatementNode*>(match.value));
                 if (match.hit)
                 {
-                    stmt.reset(new LabeledStatementNode(span, s.release()));
+                    stmt.reset(new LabeledStatementNode(span, *moduleId, s.release()));
                     stmt->SetLabelNode(lbl.release());
                     {
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
@@ -589,7 +589,7 @@ soulng::parser::Match StatementParser::LabeledStatement(CmajorLexer& lexer, Pars
     return match;
 }
 
-soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -665,7 +665,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                                                     soulng::parser::Match* parentMatch12 = &match;
                                                     {
                                                         int64_t pos = lexer.GetPos();
-                                                        soulng::parser::Match match = StatementParser::CompoundStatement(lexer, ctx);
+                                                        soulng::parser::Match match = StatementParser::CompoundStatement(lexer, moduleId, ctx);
                                                         compoundStatement.reset(static_cast<CompoundStatementNode*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -689,7 +689,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                                                             soulng::parser::Match* parentMatch14 = &match;
                                                             {
                                                                 int64_t pos = lexer.GetPos();
-                                                                soulng::parser::Match match = StatementParser::ReturnStatement(lexer, ctx);
+                                                                soulng::parser::Match match = StatementParser::ReturnStatement(lexer, moduleId, ctx);
                                                                 returnStatement.reset(static_cast<StatementNode*>(match.value));
                                                                 if (match.hit)
                                                                 {
@@ -718,7 +718,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                                                         soulng::parser::Match* parentMatch16 = &match;
                                                         {
                                                             int64_t pos = lexer.GetPos();
-                                                            soulng::parser::Match match = StatementParser::IfStatement(lexer, ctx);
+                                                            soulng::parser::Match match = StatementParser::IfStatement(lexer, moduleId, ctx);
                                                             ifStatement.reset(static_cast<IfStatementNode*>(match.value));
                                                             if (match.hit)
                                                             {
@@ -747,7 +747,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                                                     soulng::parser::Match* parentMatch18 = &match;
                                                     {
                                                         int64_t pos = lexer.GetPos();
-                                                        soulng::parser::Match match = StatementParser::WhileStatement(lexer, ctx);
+                                                        soulng::parser::Match match = StatementParser::WhileStatement(lexer, moduleId, ctx);
                                                         whileStatement.reset(static_cast<WhileStatementNode*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -776,7 +776,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                                                 soulng::parser::Match* parentMatch20 = &match;
                                                 {
                                                     int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = StatementParser::DoStatement(lexer, ctx);
+                                                    soulng::parser::Match match = StatementParser::DoStatement(lexer, moduleId, ctx);
                                                     doStatement.reset(static_cast<DoStatementNode*>(match.value));
                                                     if (match.hit)
                                                     {
@@ -805,7 +805,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                                             soulng::parser::Match* parentMatch22 = &match;
                                             {
                                                 int64_t pos = lexer.GetPos();
-                                                soulng::parser::Match match = StatementParser::RangeForStatement(lexer, ctx);
+                                                soulng::parser::Match match = StatementParser::RangeForStatement(lexer, moduleId, ctx);
                                                 rangeForStatement.reset(static_cast<RangeForStatementNode*>(match.value));
                                                 if (match.hit)
                                                 {
@@ -834,7 +834,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                                         soulng::parser::Match* parentMatch24 = &match;
                                         {
                                             int64_t pos = lexer.GetPos();
-                                            soulng::parser::Match match = StatementParser::ForStatement(lexer, ctx);
+                                            soulng::parser::Match match = StatementParser::ForStatement(lexer, moduleId, ctx);
                                             forStatement.reset(static_cast<ForStatementNode*>(match.value));
                                             if (match.hit)
                                             {
@@ -863,7 +863,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                                     soulng::parser::Match* parentMatch26 = &match;
                                     {
                                         int64_t pos = lexer.GetPos();
-                                        soulng::parser::Match match = StatementParser::BreakStatement(lexer, ctx);
+                                        soulng::parser::Match match = StatementParser::BreakStatement(lexer, moduleId, ctx);
                                         breakStatement.reset(static_cast<StatementNode*>(match.value));
                                         if (match.hit)
                                         {
@@ -892,7 +892,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                                 soulng::parser::Match* parentMatch28 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
-                                    soulng::parser::Match match = StatementParser::ContinueStatement(lexer, ctx);
+                                    soulng::parser::Match match = StatementParser::ContinueStatement(lexer, moduleId, ctx);
                                     continueStatement.reset(static_cast<StatementNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -921,7 +921,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                             soulng::parser::Match* parentMatch30 = &match;
                             {
                                 int64_t pos = lexer.GetPos();
-                                soulng::parser::Match match = StatementParser::GotoStatement(lexer, ctx);
+                                soulng::parser::Match match = StatementParser::GotoStatement(lexer, moduleId, ctx);
                                 gotoStatement.reset(static_cast<StatementNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -950,7 +950,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                         soulng::parser::Match* parentMatch32 = &match;
                         {
                             int64_t pos = lexer.GetPos();
-                            soulng::parser::Match match = StatementParser::SwitchStatement(lexer, ctx);
+                            soulng::parser::Match match = StatementParser::SwitchStatement(lexer, moduleId, ctx);
                             switchStatement.reset(static_cast<SwitchStatementNode*>(match.value));
                             if (match.hit)
                             {
@@ -979,7 +979,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                     soulng::parser::Match* parentMatch34 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = StatementParser::GotoCaseStatement(lexer, ctx);
+                        soulng::parser::Match match = StatementParser::GotoCaseStatement(lexer, moduleId, ctx);
                         gotoCaseStatement.reset(static_cast<StatementNode*>(match.value));
                         if (match.hit)
                         {
@@ -1008,7 +1008,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
                 soulng::parser::Match* parentMatch36 = &match;
                 {
                     int64_t pos = lexer.GetPos();
-                    soulng::parser::Match match = StatementParser::GotoDefaultStatement(lexer, ctx);
+                    soulng::parser::Match match = StatementParser::GotoDefaultStatement(lexer, moduleId, ctx);
                     gotoDefaultStatement.reset(static_cast<StatementNode*>(match.value));
                     if (match.hit)
                     {
@@ -1040,7 +1040,7 @@ soulng::parser::Match StatementParser::ControlStatement(CmajorLexer& lexer, Pars
     return match;
 }
 
-soulng::parser::Match StatementParser::CompoundStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::CompoundStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -1072,7 +1072,7 @@ soulng::parser::Match StatementParser::CompoundStatement(CmajorLexer& lexer, Par
                 }
                 if (match.hit)
                 {
-                    compoundStatement.reset(new CompoundStatementNode(span));
+                    compoundStatement.reset(new CompoundStatementNode(span, *moduleId));
                     compoundStatement->SetBeginBraceSpan(span);
                 }
                 *parentMatch2 = match;
@@ -1098,7 +1098,7 @@ soulng::parser::Match StatementParser::CompoundStatement(CmajorLexer& lexer, Par
                                 soulng::parser::Match* parentMatch6 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
-                                    soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                                    soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                                     stmt.reset(static_cast<StatementNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -1186,7 +1186,7 @@ soulng::parser::Match StatementParser::CompoundStatement(CmajorLexer& lexer, Par
     return match;
 }
 
-soulng::parser::Match StatementParser::ReturnStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ReturnStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -1233,7 +1233,7 @@ soulng::parser::Match StatementParser::ReturnStatement(CmajorLexer& lexer, Parsi
                 int64_t save = lexer.GetPos();
                 soulng::parser::Match* parentMatch4 = &match;
                 {
-                    soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                    soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                     expr.reset(static_cast<Node*>(match.value));
                     if (match.hit)
                     {
@@ -1286,7 +1286,7 @@ soulng::parser::Match StatementParser::ReturnStatement(CmajorLexer& lexer, Parsi
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ReturnStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new ReturnStatementNode(s, expr.release()));
+                        return soulng::parser::Match(true, new ReturnStatementNode(s, *moduleId, expr.release()));
                     }
                 }
                 *parentMatch6 = match;
@@ -1309,7 +1309,7 @@ soulng::parser::Match StatementParser::ReturnStatement(CmajorLexer& lexer, Parsi
     return match;
 }
 
-soulng::parser::Match StatementParser::IfStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::IfStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -1406,7 +1406,7 @@ soulng::parser::Match StatementParser::IfStatement(CmajorLexer& lexer, ParsingCo
                                 soulng::parser::Match* parentMatch11 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
-                                    soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                    soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                     cond.reset(static_cast<Node*>(match.value));
                                     if (match.hit)
                                     {
@@ -1455,7 +1455,7 @@ soulng::parser::Match StatementParser::IfStatement(CmajorLexer& lexer, ParsingCo
                     soulng::parser::Match match(false);
                     soulng::parser::Match* parentMatch14 = &match;
                     {
-                        soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                        soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                         thenS.reset(static_cast<StatementNode*>(match.value));
                         *parentMatch14 = match;
                     }
@@ -1502,7 +1502,7 @@ soulng::parser::Match StatementParser::IfStatement(CmajorLexer& lexer, ParsingCo
                                 soulng::parser::Match match(false);
                                 soulng::parser::Match* parentMatch20 = &match;
                                 {
-                                    soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                                    soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                                     elseS.reset(static_cast<StatementNode*>(match.value));
                                     *parentMatch20 = match;
                                 }
@@ -1527,7 +1527,7 @@ soulng::parser::Match StatementParser::IfStatement(CmajorLexer& lexer, ParsingCo
         }
         if (match.hit)
         {
-            IfStatementNode * value = new IfStatementNode(s, condNode.release(), thenS.release(), elseS.release());
+            IfStatementNode * value = new IfStatementNode(s, *moduleId, condNode.release(), thenS.release(), elseS.release());
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
             value->SetElseSpan(elseSpan);
@@ -1554,7 +1554,7 @@ soulng::parser::Match StatementParser::IfStatement(CmajorLexer& lexer, ParsingCo
     return match;
 }
 
-soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -1658,7 +1658,7 @@ soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, Parsin
                             soulng::parser::Match* parentMatch11 = &match;
                             {
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                 cond.reset(static_cast<Node*>(match.value));
                                 if (match.hit)
                                 {
@@ -1730,7 +1730,7 @@ soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, Parsin
                         soulng::parser::Match* parentMatch17 = &match;
                         {
                             soulng::lexer::Span span = lexer.GetSpan();
-                            soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                            soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                             stmt.reset(static_cast<StatementNode*>(match.value));
                             if (match.hit)
                             {
@@ -1755,7 +1755,7 @@ soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, Parsin
         }
         if (match.hit)
         {
-            WhileStatementNode * value = new WhileStatementNode(s, cond.release(), stmt.release());
+            WhileStatementNode * value = new WhileStatementNode(s, *moduleId, cond.release(), stmt.release());
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
             {
@@ -1781,7 +1781,7 @@ soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, Parsin
     return match;
 }
 
-soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -1851,7 +1851,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, ParsingCo
                                         soulng::parser::Match* parentMatch10 = &match;
                                         {
                                             soulng::lexer::Span span = lexer.GetSpan();
-                                            soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                                            soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                                             stmt.reset(static_cast<StatementNode*>(match.value));
                                             if (match.hit)
                                             {
@@ -1959,7 +1959,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, ParsingCo
                             soulng::parser::Match* parentMatch18 = &match;
                             {
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                 cond.reset(static_cast<Node*>(match.value));
                                 if (match.hit)
                                 {
@@ -2060,7 +2060,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, ParsingCo
         }
         if (match.hit)
         {
-            DoStatementNode * value = new DoStatementNode(s, stmt.release(), cond.release());
+            DoStatementNode * value = new DoStatementNode(s, *moduleId, stmt.release(), cond.release());
             value->SetWhileSpan(whileSpan);
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
@@ -2087,7 +2087,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, ParsingCo
     return match;
 }
 
-soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -2189,7 +2189,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, ParsingC
                                         soulng::parser::Match* parentMatch13 = &match;
                                         {
                                             soulng::lexer::Span span = lexer.GetSpan();
-                                            soulng::parser::Match match = StatementParser::ForInitStatement(lexer, ctx);
+                                            soulng::parser::Match match = StatementParser::ForInitStatement(lexer, moduleId, ctx);
                                             init.reset(static_cast<StatementNode*>(match.value));
                                             if (match.hit)
                                             {
@@ -2215,7 +2215,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, ParsingC
                                     int64_t save = lexer.GetPos();
                                     soulng::parser::Match* parentMatch15 = &match;
                                     {
-                                        soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                        soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                         cond.reset(static_cast<Node*>(match.value));
                                         if (match.hit)
                                         {
@@ -2271,7 +2271,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, ParsingC
                             soulng::parser::Match* parentMatch19 = &match;
                             {
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = StatementParser::ForLoopStatementExpr(lexer, ctx);
+                                soulng::parser::Match match = StatementParser::ForLoopStatementExpr(lexer, moduleId, ctx);
                                 loop.reset(static_cast<StatementNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -2343,7 +2343,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, ParsingC
                         soulng::parser::Match* parentMatch25 = &match;
                         {
                             soulng::lexer::Span span = lexer.GetSpan();
-                            soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                            soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                             stmt.reset(static_cast<StatementNode*>(match.value));
                             if (match.hit)
                             {
@@ -2368,7 +2368,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, ParsingC
         }
         if (match.hit)
         {
-            ForStatementNode * value = new ForStatementNode(s, init.release(), cond.release(), loop.release(), stmt.release());
+            ForStatementNode * value = new ForStatementNode(s, *moduleId, init.release(), cond.release(), loop.release(), stmt.release());
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
             {
@@ -2394,7 +2394,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, ParsingC
     return match;
 }
 
-soulng::parser::Match StatementParser::ForInitStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ForInitStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -2420,7 +2420,7 @@ soulng::parser::Match StatementParser::ForInitStatement(CmajorLexer& lexer, Pars
             soulng::parser::Match* parentMatch2 = &match;
             {
                 int64_t pos = lexer.GetPos();
-                soulng::parser::Match match = StatementParser::AssignmentStatement(lexer, ctx);
+                soulng::parser::Match match = StatementParser::AssignmentStatement(lexer, moduleId, ctx);
                 assignmentStatement.reset(static_cast<StatementNode*>(match.value));
                 if (match.hit)
                 {
@@ -2444,7 +2444,7 @@ soulng::parser::Match StatementParser::ForInitStatement(CmajorLexer& lexer, Pars
                     soulng::parser::Match* parentMatch4 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = StatementParser::ConstructionStatement(lexer, ctx);
+                        soulng::parser::Match match = StatementParser::ConstructionStatement(lexer, moduleId, ctx);
                         constructionStatement.reset(static_cast<ConstructionStatementNode*>(match.value));
                         if (match.hit)
                         {
@@ -2473,7 +2473,7 @@ soulng::parser::Match StatementParser::ForInitStatement(CmajorLexer& lexer, Pars
                 soulng::parser::Match* parentMatch6 = &match;
                 {
                     int64_t pos = lexer.GetPos();
-                    soulng::parser::Match match = StatementParser::EmptyStatement(lexer, ctx);
+                    soulng::parser::Match match = StatementParser::EmptyStatement(lexer, moduleId, ctx);
                     emptyStatement.reset(static_cast<StatementNode*>(match.value));
                     if (match.hit)
                     {
@@ -2505,7 +2505,7 @@ soulng::parser::Match StatementParser::ForInitStatement(CmajorLexer& lexer, Pars
     return match;
 }
 
-soulng::parser::Match StatementParser::ForLoopStatementExpr(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ForLoopStatementExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -2531,7 +2531,7 @@ soulng::parser::Match StatementParser::ForLoopStatementExpr(CmajorLexer& lexer, 
             soulng::parser::Match* parentMatch2 = &match;
             {
                 int64_t pos = lexer.GetPos();
-                soulng::parser::Match match = StatementParser::AssignmentStatementExpr(lexer, ctx);
+                soulng::parser::Match match = StatementParser::AssignmentStatementExpr(lexer, moduleId, ctx);
                 assignmentStatementExpr.reset(static_cast<StatementNode*>(match.value));
                 if (match.hit)
                 {
@@ -2555,13 +2555,13 @@ soulng::parser::Match StatementParser::ForLoopStatementExpr(CmajorLexer& lexer, 
                     soulng::parser::Match* parentMatch4 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                        soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                         expr.reset(static_cast<Node*>(match.value));
                         if (match.hit)
                         {
                             exprNode.reset(expr.release());
                             Span s = exprNode->GetSpan();
-                            ExpressionStatementNode * expressionStatementNode = new ExpressionStatementNode(s, exprNode.release());
+                            ExpressionStatementNode * expressionStatementNode = new ExpressionStatementNode(s, *moduleId, exprNode.release());
                             {
                                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ForLoopStatementExpr"));
@@ -2591,7 +2591,7 @@ soulng::parser::Match StatementParser::ForLoopStatementExpr(CmajorLexer& lexer, 
                     soulng::parser::Match match(true);
                     if (match.hit)
                     {
-                        EmptyStatementNode * emptyStatementNode = new EmptyStatementNode(span);
+                        EmptyStatementNode * emptyStatementNode = new EmptyStatementNode(span, *moduleId);
                         {
                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ForLoopStatementExpr"));
@@ -2620,7 +2620,7 @@ soulng::parser::Match StatementParser::ForLoopStatementExpr(CmajorLexer& lexer, 
     return match;
 }
 
-soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -2719,7 +2719,7 @@ soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, Par
                                     soulng::parser::Match match(false);
                                     soulng::parser::Match* parentMatch12 = &match;
                                     {
-                                        soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                                        soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                                         type.reset(static_cast<sngcm::ast::Node*>(match.value));
                                         *parentMatch12 = match;
                                     }
@@ -2732,7 +2732,7 @@ soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, Par
                                 soulng::parser::Match match(false);
                                 soulng::parser::Match* parentMatch13 = &match;
                                 {
-                                    soulng::parser::Match match = IdentifierParser::Identifier(lexer);
+                                    soulng::parser::Match match = IdentifierParser::Identifier(lexer, moduleId);
                                     id.reset(static_cast<IdentifierNode*>(match.value));
                                     *parentMatch13 = match;
                                 }
@@ -2777,7 +2777,7 @@ soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, Par
                             soulng::parser::Match* parentMatch17 = &match;
                             {
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                 container.reset(static_cast<Node*>(match.value));
                                 if (match.hit)
                                 {
@@ -2845,7 +2845,7 @@ soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, Par
                     {
                         int64_t pos = lexer.GetPos();
                         soulng::lexer::Span span = lexer.GetSpan();
-                        soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                        soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                         action.reset(static_cast<StatementNode*>(match.value));
                         if (match.hit)
                         {
@@ -2861,7 +2861,7 @@ soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, Par
         }
         if (match.hit)
         {
-            RangeForStatementNode * value = new RangeForStatementNode(s, type.release(), id.release(), container.release(), action.release());
+            RangeForStatementNode * value = new RangeForStatementNode(s, *moduleId, type.release(), id.release(), container.release(), action.release());
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
             value->SetColonSpan(colonSpan);
@@ -2888,7 +2888,7 @@ soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, Par
     return match;
 }
 
-soulng::parser::Match StatementParser::BreakStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::BreakStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -2958,7 +2958,7 @@ soulng::parser::Match StatementParser::BreakStatement(CmajorLexer& lexer, Parsin
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BreakStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new BreakStatementNode(s));
+                        return soulng::parser::Match(true, new BreakStatementNode(s, *moduleId));
                     }
                 }
                 *parentMatch3 = match;
@@ -2981,7 +2981,7 @@ soulng::parser::Match StatementParser::BreakStatement(CmajorLexer& lexer, Parsin
     return match;
 }
 
-soulng::parser::Match StatementParser::ContinueStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ContinueStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -3051,7 +3051,7 @@ soulng::parser::Match StatementParser::ContinueStatement(CmajorLexer& lexer, Par
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ContinueStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new ContinueStatementNode(s));
+                        return soulng::parser::Match(true, new ContinueStatementNode(s, *moduleId));
                     }
                 }
                 *parentMatch3 = match;
@@ -3074,7 +3074,7 @@ soulng::parser::Match StatementParser::ContinueStatement(CmajorLexer& lexer, Par
     return match;
 }
 
-soulng::parser::Match StatementParser::GotoStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::GotoStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -3176,7 +3176,7 @@ soulng::parser::Match StatementParser::GotoStatement(CmajorLexer& lexer, Parsing
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("GotoStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new GotoStatementNode(s, label));
+                        return soulng::parser::Match(true, new GotoStatementNode(s, *moduleId, label));
                     }
                 }
                 *parentMatch6 = match;
@@ -3199,7 +3199,7 @@ soulng::parser::Match StatementParser::GotoStatement(CmajorLexer& lexer, Parsing
     return match;
 }
 
-soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -3302,7 +3302,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, Parsi
                                     soulng::parser::Match* parentMatch12 = &match;
                                     {
                                         soulng::lexer::Span span = lexer.GetSpan();
-                                        soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                        soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                         cond.reset(static_cast<Node*>(match.value));
                                         if (match.hit)
                                         {
@@ -3352,7 +3352,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, Parsi
                     if (match.hit)
                     {
                         rightParenSpan = span;
-                        switchStatement.reset(new SwitchStatementNode(span, cond.release()));
+                        switchStatement.reset(new SwitchStatementNode(span, *moduleId, cond.release()));
                         switchStatement->SetLeftParenSpan(leftParenSpan);
                         switchStatement->SetRightParenSpan(rightParenSpan);
                     }
@@ -3424,7 +3424,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, Parsi
                                     soulng::parser::Match* parentMatch22 = &match;
                                     {
                                         int64_t pos = lexer.GetPos();
-                                        soulng::parser::Match match = StatementParser::CaseStatement(lexer, ctx);
+                                        soulng::parser::Match match = StatementParser::CaseStatement(lexer, moduleId, ctx);
                                         caseStatement.reset(static_cast<CaseStatementNode*>(match.value));
                                         if (match.hit)
                                         {
@@ -3443,7 +3443,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, Parsi
                                             soulng::parser::Match* parentMatch24 = &match;
                                             {
                                                 int64_t pos = lexer.GetPos();
-                                                soulng::parser::Match match = StatementParser::DefaultStatement(lexer, ctx);
+                                                soulng::parser::Match match = StatementParser::DefaultStatement(lexer, moduleId, ctx);
                                                 defaultStatement.reset(static_cast<DefaultStatementNode*>(match.value));
                                                 if (match.hit)
                                                 {
@@ -3537,7 +3537,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, Parsi
     return match;
 }
 
-soulng::parser::Match StatementParser::CaseStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::CaseStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -3564,7 +3564,7 @@ soulng::parser::Match StatementParser::CaseStatement(CmajorLexer& lexer, Parsing
             soulng::parser::Match match(true);
             if (match.hit)
             {
-                caseS.reset(new CaseStatementNode(span));
+                caseS.reset(new CaseStatementNode(span, *moduleId));
                 s = span;
             }
             *parentMatch1 = match;
@@ -3634,7 +3634,7 @@ soulng::parser::Match StatementParser::CaseStatement(CmajorLexer& lexer, Parsing
                                                     soulng::parser::Match* parentMatch14 = &match;
                                                     {
                                                         int64_t pos = lexer.GetPos();
-                                                        soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                                        soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                                         caseExpr.reset(static_cast<Node*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -3726,7 +3726,7 @@ soulng::parser::Match StatementParser::CaseStatement(CmajorLexer& lexer, Parsing
                                                             soulng::parser::Match* parentMatch23 = &match;
                                                             {
                                                                 int64_t pos = lexer.GetPos();
-                                                                soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                                                soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                                                 caseExpr.reset(static_cast<Node*>(match.value));
                                                                 if (match.hit)
                                                                 {
@@ -3813,7 +3813,7 @@ soulng::parser::Match StatementParser::CaseStatement(CmajorLexer& lexer, Parsing
                                             soulng::parser::Match* parentMatch29 = &match;
                                             {
                                                 int64_t pos = lexer.GetPos();
-                                                soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                                                soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                                                 stmt.reset(static_cast<StatementNode*>(match.value));
                                                 if (match.hit)
                                                 {
@@ -3870,7 +3870,7 @@ soulng::parser::Match StatementParser::CaseStatement(CmajorLexer& lexer, Parsing
     return match;
 }
 
-soulng::parser::Match StatementParser::DefaultStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::DefaultStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -3948,7 +3948,7 @@ soulng::parser::Match StatementParser::DefaultStatement(CmajorLexer& lexer, Pars
                             if (match.hit)
                             {
                                 s.end = span.end;
-                                defaultS.reset(new DefaultStatementNode(s));
+                                defaultS.reset(new DefaultStatementNode(s, *moduleId));
                             }
                             *parentMatch6 = match;
                         }
@@ -3977,7 +3977,7 @@ soulng::parser::Match StatementParser::DefaultStatement(CmajorLexer& lexer, Pars
                                     soulng::parser::Match* parentMatch11 = &match;
                                     {
                                         int64_t pos = lexer.GetPos();
-                                        soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                                        soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                                         stmt.reset(static_cast<StatementNode*>(match.value));
                                         if (match.hit)
                                         {
@@ -4030,7 +4030,7 @@ soulng::parser::Match StatementParser::DefaultStatement(CmajorLexer& lexer, Pars
     return match;
 }
 
-soulng::parser::Match StatementParser::GotoCaseStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::GotoCaseStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -4093,7 +4093,7 @@ soulng::parser::Match StatementParser::GotoCaseStatement(CmajorLexer& lexer, Par
             soulng::parser::Match match(false);
             soulng::parser::Match* parentMatch5 = &match;
             {
-                soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                 caseExpr.reset(static_cast<Node*>(match.value));
                 *parentMatch5 = match;
             }
@@ -4137,7 +4137,7 @@ soulng::parser::Match StatementParser::GotoCaseStatement(CmajorLexer& lexer, Par
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("GotoCaseStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new GotoCaseStatementNode(s, caseExpr.release()));
+                        return soulng::parser::Match(true, new GotoCaseStatementNode(s, *moduleId, caseExpr.release()));
                     }
                 }
                 *parentMatch7 = match;
@@ -4160,7 +4160,7 @@ soulng::parser::Match StatementParser::GotoCaseStatement(CmajorLexer& lexer, Par
     return match;
 }
 
-soulng::parser::Match StatementParser::GotoDefaultStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::GotoDefaultStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -4250,7 +4250,7 @@ soulng::parser::Match StatementParser::GotoDefaultStatement(CmajorLexer& lexer, 
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("GotoDefaultStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new GotoDefaultStatementNode(s));
+                        return soulng::parser::Match(true, new GotoDefaultStatementNode(s, *moduleId));
                     }
                 }
                 *parentMatch5 = match;
@@ -4273,7 +4273,7 @@ soulng::parser::Match StatementParser::GotoDefaultStatement(CmajorLexer& lexer, 
     return match;
 }
 
-soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -4319,7 +4319,7 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
                     soulng::parser::Match* parentMatch5 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                        soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                         tgt.reset(static_cast<Node*>(match.value));
                         if (match.hit)
                         {
@@ -4366,7 +4366,7 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
             {
                 int64_t pos = lexer.GetPos();
                 soulng::lexer::Span span = lexer.GetSpan();
-                soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                 source.reset(static_cast<Node*>(match.value));
                 if (match.hit)
                 {
@@ -4375,7 +4375,7 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AssignmentStatementExpr"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new AssignmentStatementNode(s, target.release(), source.release()));
+                        return soulng::parser::Match(true, new AssignmentStatementNode(s, *moduleId, target.release(), source.release()));
                     }
                 }
                 *parentMatch8 = match;
@@ -4398,7 +4398,7 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
     return match;
 }
 
-soulng::parser::Match StatementParser::AssignmentStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::AssignmentStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -4414,7 +4414,7 @@ soulng::parser::Match StatementParser::AssignmentStatement(CmajorLexer& lexer, P
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
-        soulng::parser::Match match = StatementParser::AssignmentStatementExpr(lexer, ctx);
+        soulng::parser::Match match = StatementParser::AssignmentStatementExpr(lexer, moduleId, ctx);
         stmt.reset(static_cast<StatementNode*>(match.value));
         *parentMatch0 = match;
     }
@@ -4465,7 +4465,7 @@ soulng::parser::Match StatementParser::AssignmentStatement(CmajorLexer& lexer, P
     return match;
 }
 
-soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -4497,7 +4497,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
                     soulng::parser::Match match(false);
                     soulng::parser::Match* parentMatch4 = &match;
                     {
-                        soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                        soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                         type.reset(static_cast<sngcm::ast::Node*>(match.value));
                         *parentMatch4 = match;
                     }
@@ -4510,7 +4510,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
                             soulng::parser::Match* parentMatch6 = &match;
                             {
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = IdentifierParser::Identifier(lexer);
+                                soulng::parser::Match match = IdentifierParser::Identifier(lexer, moduleId);
                                 id.reset(static_cast<IdentifierNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -4529,7 +4529,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
                 }
                 if (match.hit)
                 {
-                    constructionStatement.reset(new ConstructionStatementNode(span, type.release(), id.release()));
+                    constructionStatement.reset(new ConstructionStatementNode(span, *moduleId, type.release(), id.release()));
                 }
                 *parentMatch2 = match;
             }
@@ -4575,7 +4575,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
                                         soulng::parser::Match* parentMatch14 = &match;
                                         {
                                             soulng::lexer::Span span = lexer.GetSpan();
-                                            soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                            soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                             value.reset(static_cast<Node*>(match.value));
                                             if (match.hit)
                                             {
@@ -4623,7 +4623,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
                                             soulng::parser::Match match(false);
                                             soulng::parser::Match* parentMatch18 = &match;
                                             {
-                                                soulng::parser::Match match = ExpressionParser::ArgumentList(lexer, ctx, constructionStatement.get());
+                                                soulng::parser::Match match = ExpressionParser::ArgumentList(lexer, moduleId, ctx, constructionStatement.get());
                                                 *parentMatch18 = match;
                                             }
                                             *parentMatch17 = match;
@@ -4753,7 +4753,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
     return match;
 }
 
-soulng::parser::Match StatementParser::DeleteStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::DeleteStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -4800,7 +4800,7 @@ soulng::parser::Match StatementParser::DeleteStatement(CmajorLexer& lexer, Parsi
                 soulng::parser::Match* parentMatch4 = &match;
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                    soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                     ptr.reset(static_cast<Node*>(match.value));
                     if (match.hit)
                     {
@@ -4853,7 +4853,7 @@ soulng::parser::Match StatementParser::DeleteStatement(CmajorLexer& lexer, Parsi
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DeleteStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new DeleteStatementNode(s, ptr.release()));
+                        return soulng::parser::Match(true, new DeleteStatementNode(s, *moduleId, ptr.release()));
                     }
                 }
                 *parentMatch6 = match;
@@ -4876,7 +4876,7 @@ soulng::parser::Match StatementParser::DeleteStatement(CmajorLexer& lexer, Parsi
     return match;
 }
 
-soulng::parser::Match StatementParser::DestroyStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::DestroyStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -4923,7 +4923,7 @@ soulng::parser::Match StatementParser::DestroyStatement(CmajorLexer& lexer, Pars
                 soulng::parser::Match* parentMatch4 = &match;
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                    soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                     ptr.reset(static_cast<Node*>(match.value));
                     if (match.hit)
                     {
@@ -4976,7 +4976,7 @@ soulng::parser::Match StatementParser::DestroyStatement(CmajorLexer& lexer, Pars
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DestroyStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new DestroyStatementNode(s, ptr.release()));
+                        return soulng::parser::Match(true, new DestroyStatementNode(s, *moduleId, ptr.release()));
                     }
                 }
                 *parentMatch6 = match;
@@ -4999,7 +4999,7 @@ soulng::parser::Match StatementParser::DestroyStatement(CmajorLexer& lexer, Pars
     return match;
 }
 
-soulng::parser::Match StatementParser::ExpressionStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ExpressionStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -5049,7 +5049,7 @@ soulng::parser::Match StatementParser::ExpressionStatement(CmajorLexer& lexer, P
                         {
                             int64_t pos = lexer.GetPos();
                             soulng::lexer::Span span = lexer.GetSpan();
-                            soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                            soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                             expr.reset(static_cast<Node*>(match.value));
                             if (match.hit)
                             {
@@ -5096,7 +5096,7 @@ soulng::parser::Match StatementParser::ExpressionStatement(CmajorLexer& lexer, P
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ExpressionStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new ExpressionStatementNode(s, exprNode.release()));
+                        return soulng::parser::Match(true, new ExpressionStatementNode(s, *moduleId, exprNode.release()));
                     }
                 }
                 else
@@ -5123,7 +5123,7 @@ soulng::parser::Match StatementParser::ExpressionStatement(CmajorLexer& lexer, P
     return match;
 }
 
-soulng::parser::Match StatementParser::EmptyStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::EmptyStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -5151,7 +5151,7 @@ soulng::parser::Match StatementParser::EmptyStatement(CmajorLexer& lexer, Parsin
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("EmptyStatement"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new EmptyStatementNode(span));
+                return soulng::parser::Match(true, new EmptyStatementNode(span, *moduleId));
             }
         }
         *parentMatch0 = match;
@@ -5170,7 +5170,7 @@ soulng::parser::Match StatementParser::EmptyStatement(CmajorLexer& lexer, Parsin
     return match;
 }
 
-soulng::parser::Match StatementParser::ThrowStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ThrowStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -5217,7 +5217,7 @@ soulng::parser::Match StatementParser::ThrowStatement(CmajorLexer& lexer, Parsin
                 int64_t save = lexer.GetPos();
                 soulng::parser::Match* parentMatch4 = &match;
                 {
-                    soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                    soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                     exception.reset(static_cast<Node*>(match.value));
                     if (match.hit)
                     {
@@ -5270,7 +5270,7 @@ soulng::parser::Match StatementParser::ThrowStatement(CmajorLexer& lexer, Parsin
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ThrowStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new ThrowStatementNode(s, exception.release()));
+                        return soulng::parser::Match(true, new ThrowStatementNode(s, *moduleId, exception.release()));
                     }
                 }
                 *parentMatch6 = match;
@@ -5293,7 +5293,7 @@ soulng::parser::Match StatementParser::ThrowStatement(CmajorLexer& lexer, Parsin
     return match;
 }
 
-soulng::parser::Match StatementParser::TryStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::TryStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -5341,7 +5341,7 @@ soulng::parser::Match StatementParser::TryStatement(CmajorLexer& lexer, ParsingC
                             soulng::parser::Match match(false);
                             soulng::parser::Match* parentMatch6 = &match;
                             {
-                                soulng::parser::Match match = StatementParser::CompoundStatement(lexer, ctx);
+                                soulng::parser::Match match = StatementParser::CompoundStatement(lexer, moduleId, ctx);
                                 tryBlock.reset(static_cast<CompoundStatementNode*>(match.value));
                                 *parentMatch6 = match;
                             }
@@ -5351,7 +5351,7 @@ soulng::parser::Match StatementParser::TryStatement(CmajorLexer& lexer, ParsingC
                     }
                     if (match.hit)
                     {
-                        tryStatement.reset(new TryStatementNode(span, tryBlock.release()));
+                        tryStatement.reset(new TryStatementNode(span, *moduleId, tryBlock.release()));
                     }
                     *parentMatch3 = match;
                 }
@@ -5372,7 +5372,7 @@ soulng::parser::Match StatementParser::TryStatement(CmajorLexer& lexer, ParsingC
                             soulng::parser::Match* parentMatch10 = &match;
                             {
                                 int64_t pos = lexer.GetPos();
-                                soulng::parser::Match match = StatementParser::Catch(lexer, ctx);
+                                soulng::parser::Match match = StatementParser::Catch(lexer, moduleId, ctx);
                                 ctch.reset(static_cast<CatchNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -5399,7 +5399,7 @@ soulng::parser::Match StatementParser::TryStatement(CmajorLexer& lexer, ParsingC
                                     soulng::parser::Match* parentMatch13 = &match;
                                     {
                                         int64_t pos = lexer.GetPos();
-                                        soulng::parser::Match match = StatementParser::Catch(lexer, ctx);
+                                        soulng::parser::Match match = StatementParser::Catch(lexer, moduleId, ctx);
                                         ctch.reset(static_cast<CatchNode*>(match.value));
                                         if (match.hit)
                                         {
@@ -5452,7 +5452,7 @@ soulng::parser::Match StatementParser::TryStatement(CmajorLexer& lexer, ParsingC
     return match;
 }
 
-soulng::parser::Match StatementParser::Catch(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::Catch(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -5553,7 +5553,7 @@ soulng::parser::Match StatementParser::Catch(CmajorLexer& lexer, ParsingContext*
                         soulng::parser::Match* parentMatch10 = &match;
                         {
                             soulng::lexer::Span span = lexer.GetSpan();
-                            soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                            soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                             catchType.reset(static_cast<sngcm::ast::Node*>(match.value));
                             if (match.hit)
                             {
@@ -5579,7 +5579,7 @@ soulng::parser::Match StatementParser::Catch(CmajorLexer& lexer, ParsingContext*
                     int64_t save = lexer.GetPos();
                     soulng::parser::Match* parentMatch12 = &match;
                     {
-                        soulng::parser::Match match = IdentifierParser::Identifier(lexer);
+                        soulng::parser::Match match = IdentifierParser::Identifier(lexer, moduleId);
                         catchId.reset(static_cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
@@ -5647,12 +5647,12 @@ soulng::parser::Match StatementParser::Catch(CmajorLexer& lexer, ParsingContext*
             {
                 int64_t pos = lexer.GetPos();
                 soulng::lexer::Span span = lexer.GetSpan();
-                soulng::parser::Match match = StatementParser::CompoundStatement(lexer, ctx);
+                soulng::parser::Match match = StatementParser::CompoundStatement(lexer, moduleId, ctx);
                 catchBlock.reset(static_cast<CompoundStatementNode*>(match.value));
                 if (match.hit)
                 {
                     s.end = span.end;
-                    CatchNode * value = new CatchNode(s, catchType.release(), catchId.release(), catchBlock.release());
+                    CatchNode * value = new CatchNode(s, *moduleId, catchType.release(), catchId.release(), catchBlock.release());
                     value->SetLeftParenSpan(leftParenSpan);
                     value->SetRightParenSpan(rightParenSpan);
                     {
@@ -5682,7 +5682,7 @@ soulng::parser::Match StatementParser::Catch(CmajorLexer& lexer, ParsingContext*
     return match;
 }
 
-soulng::parser::Match StatementParser::AssertStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::AssertStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -5749,7 +5749,7 @@ soulng::parser::Match StatementParser::AssertStatement(CmajorLexer& lexer, Parsi
                 soulng::parser::Match* parentMatch6 = &match;
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                    soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                     expr.reset(static_cast<Node*>(match.value));
                     if (match.hit)
                     {
@@ -5802,7 +5802,7 @@ soulng::parser::Match StatementParser::AssertStatement(CmajorLexer& lexer, Parsi
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AssertStatement"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new AssertStatementNode(s, expr.release()));
+                        return soulng::parser::Match(true, new AssertStatementNode(s, *moduleId, expr.release()));
                     }
                 }
                 *parentMatch8 = match;
@@ -5825,7 +5825,7 @@ soulng::parser::Match StatementParser::AssertStatement(CmajorLexer& lexer, Parsi
     return match;
 }
 
-soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -5972,12 +5972,12 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                                     {
                                         int64_t pos = lexer.GetPos();
                                         soulng::lexer::Span span = lexer.GetSpan();
-                                        soulng::parser::Match match = StatementParser::ConditionalCompilationExpression(lexer);
+                                        soulng::parser::Match match = StatementParser::ConditionalCompilationExpression(lexer, moduleId);
                                         ifExpr.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                                         if (match.hit)
                                         {
                                             s.end = span.end;
-                                            condCompStmt.reset(new ConditionalCompilationStatementNode(s, ifExpr.release()));
+                                            condCompStmt.reset(new ConditionalCompilationStatementNode(s, *moduleId, ifExpr.release()));
                                             condCompStmt->IfPart()->SetKeywordSpan(keywordSpan);
                                         }
                                         *parentMatch16 = match;
@@ -6050,7 +6050,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                                             soulng::parser::Match* parentMatch23 = &match;
                                             {
                                                 int64_t pos = lexer.GetPos();
-                                                soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                                                soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                                                 ifS.reset(static_cast<StatementNode*>(match.value));
                                                 if (match.hit)
                                                 {
@@ -6206,11 +6206,11 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                                                         {
                                                             int64_t pos = lexer.GetPos();
                                                             soulng::lexer::Span span = lexer.GetSpan();
-                                                            soulng::parser::Match match = StatementParser::ConditionalCompilationExpression(lexer);
+                                                            soulng::parser::Match match = StatementParser::ConditionalCompilationExpression(lexer, moduleId);
                                                             elifExpr.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                                                             if (match.hit)
                                                             {
-                                                                condCompStmt->AddElifExpr(span, elifExpr.release());
+                                                                condCompStmt->AddElifExpr(span, *moduleId, elifExpr.release());
                                                             }
                                                             *parentMatch39 = match;
                                                         }
@@ -6283,7 +6283,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                                                                 soulng::parser::Match* parentMatch46 = &match;
                                                                 {
                                                                     int64_t pos = lexer.GetPos();
-                                                                    soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                                                                    soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                                                                     elifS.reset(static_cast<StatementNode*>(match.value));
                                                                     if (match.hit)
                                                                     {
@@ -6406,11 +6406,11 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                                                         {
                                                             int64_t pos = lexer.GetPos();
                                                             soulng::lexer::Span span = lexer.GetSpan();
-                                                            soulng::parser::Match match = StatementParser::Statement(lexer, ctx);
+                                                            soulng::parser::Match match = StatementParser::Statement(lexer, moduleId, ctx);
                                                             elseS.reset(static_cast<StatementNode*>(match.value));
                                                             if (match.hit)
                                                             {
-                                                                condCompStmt->AddElseStatement(span, elseS.release());
+                                                                condCompStmt->AddElseStatement(span, *moduleId, elseS.release());
                                                             }
                                                             *parentMatch58 = match;
                                                         }
@@ -6559,7 +6559,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
     return match;
 }
 
-soulng::parser::Match StatementParser::ConditionalCompilationExpression(CmajorLexer& lexer)
+soulng::parser::Match StatementParser::ConditionalCompilationExpression(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -6575,7 +6575,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationExpression(CmajorLe
     soulng::parser::Match* parentMatch0 = &match;
     {
         int64_t pos = lexer.GetPos();
-        soulng::parser::Match match = StatementParser::ConditionalCompilationDisjunction(lexer);
+        soulng::parser::Match match = StatementParser::ConditionalCompilationDisjunction(lexer, moduleId);
         disjunction.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
         if (match.hit)
         {
@@ -6602,7 +6602,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationExpression(CmajorLe
     return match;
 }
 
-soulng::parser::Match StatementParser::ConditionalCompilationDisjunction(CmajorLexer& lexer)
+soulng::parser::Match StatementParser::ConditionalCompilationDisjunction(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -6632,7 +6632,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationDisjunction(CmajorL
                 {
                     int64_t pos = lexer.GetPos();
                     soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = StatementParser::ConditionalCompilationConjunction(lexer);
+                    soulng::parser::Match match = StatementParser::ConditionalCompilationConjunction(lexer, moduleId);
                     left.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                     if (match.hit)
                     {
@@ -6679,12 +6679,12 @@ soulng::parser::Match StatementParser::ConditionalCompilationDisjunction(CmajorL
                                             {
                                                 int64_t pos = lexer.GetPos();
                                                 soulng::lexer::Span span = lexer.GetSpan();
-                                                soulng::parser::Match match = StatementParser::ConditionalCompilationConjunction(lexer);
+                                                soulng::parser::Match match = StatementParser::ConditionalCompilationConjunction(lexer, moduleId);
                                                 right.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                                                 if (match.hit)
                                                 {
                                                     s.end = span.end;
-                                                    condCompExpr.reset(new ConditionalCompilationDisjunctionNode(s, condCompExpr.release(), right.release()));
+                                                    condCompExpr.reset(new ConditionalCompilationDisjunctionNode(s, *moduleId, condCompExpr.release(), right.release()));
                                                 }
                                                 *parentMatch9 = match;
                                             }
@@ -6737,7 +6737,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationDisjunction(CmajorL
     return match;
 }
 
-soulng::parser::Match StatementParser::ConditionalCompilationConjunction(CmajorLexer& lexer)
+soulng::parser::Match StatementParser::ConditionalCompilationConjunction(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -6767,7 +6767,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationConjunction(CmajorL
                 {
                     int64_t pos = lexer.GetPos();
                     soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = StatementParser::ConditionalCompilationPrefix(lexer);
+                    soulng::parser::Match match = StatementParser::ConditionalCompilationPrefix(lexer, moduleId);
                     left.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                     if (match.hit)
                     {
@@ -6814,12 +6814,12 @@ soulng::parser::Match StatementParser::ConditionalCompilationConjunction(CmajorL
                                             {
                                                 int64_t pos = lexer.GetPos();
                                                 soulng::lexer::Span span = lexer.GetSpan();
-                                                soulng::parser::Match match = StatementParser::ConditionalCompilationPrefix(lexer);
+                                                soulng::parser::Match match = StatementParser::ConditionalCompilationPrefix(lexer, moduleId);
                                                 right.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                                                 if (match.hit)
                                                 {
                                                     s.end = span.end;
-                                                    condCompExpr.reset(new ConditionalCompilationConjunctionNode(s, condCompExpr.release(), right.release()));
+                                                    condCompExpr.reset(new ConditionalCompilationConjunctionNode(s, *moduleId, condCompExpr.release(), right.release()));
                                                 }
                                                 *parentMatch9 = match;
                                             }
@@ -6872,7 +6872,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationConjunction(CmajorL
     return match;
 }
 
-soulng::parser::Match StatementParser::ConditionalCompilationPrefix(CmajorLexer& lexer)
+soulng::parser::Match StatementParser::ConditionalCompilationPrefix(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -6930,12 +6930,12 @@ soulng::parser::Match StatementParser::ConditionalCompilationPrefix(CmajorLexer&
                         {
                             int64_t pos = lexer.GetPos();
                             soulng::lexer::Span span = lexer.GetSpan();
-                            soulng::parser::Match match = StatementParser::ConditionalCompilationPrefix(lexer);
+                            soulng::parser::Match match = StatementParser::ConditionalCompilationPrefix(lexer, moduleId);
                             prefix.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                             if (match.hit)
                             {
                                 s.end = span.end;
-                                condCompExpr.reset(new ConditionalCompilationNotNode(s, prefix.release()));
+                                condCompExpr.reset(new ConditionalCompilationNotNode(s, *moduleId, prefix.release()));
                             }
                             *parentMatch6 = match;
                         }
@@ -6958,7 +6958,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationPrefix(CmajorLexer&
                             soulng::parser::Match* parentMatch9 = &match;
                             {
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = StatementParser::ConditionalCompilationPrimary(lexer);
+                                soulng::parser::Match match = StatementParser::ConditionalCompilationPrimary(lexer, moduleId);
                                 primary.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -7007,7 +7007,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationPrefix(CmajorLexer&
     return match;
 }
 
-soulng::parser::Match StatementParser::ConditionalCompilationPrimary(CmajorLexer& lexer)
+soulng::parser::Match StatementParser::ConditionalCompilationPrimary(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -7042,7 +7042,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationPrimary(CmajorLexer
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ConditionalCompilationPrimary"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new ConditionalCompilationPrimaryNode(span, symbol));
+                    return soulng::parser::Match(true, new ConditionalCompilationPrimaryNode(span, *moduleId, symbol));
                 }
             }
             *parentMatch1 = match;
@@ -7073,7 +7073,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationPrimary(CmajorLexer
                         soulng::parser::Match match(false);
                         soulng::parser::Match* parentMatch5 = &match;
                         {
-                            soulng::parser::Match match = StatementParser::ConditionalCompilationExpression(lexer);
+                            soulng::parser::Match match = StatementParser::ConditionalCompilationExpression(lexer, moduleId);
                             expr.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                             *parentMatch5 = match;
                         }
@@ -7116,7 +7116,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationPrimary(CmajorLexer
                                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ConditionalCompilationPrimary"));
                                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                    return soulng::parser::Match(true, new ParenthesizedConditionalCompilationExpressionNode(span, expr.release()));
+                                    return soulng::parser::Match(true, new ParenthesizedConditionalCompilationExpressionNode(span, *moduleId, expr.release()));
                                 }
                             }
                             *parentMatch7 = match;

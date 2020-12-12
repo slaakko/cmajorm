@@ -193,7 +193,6 @@ public:
     void Visit(GlobalVariableNode& globalVariableNode);
 private:
     std::unique_ptr<Node> node;
-    cmajor::symbols::SpanMapper spanMapper;
     CloneContext ctx;
     bool changed;
     bool baseClassId;

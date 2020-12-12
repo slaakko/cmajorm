@@ -105,7 +105,7 @@ void ConstraintBinderVisitor::Visit(ConceptIdNode& conceptIdNode)
             if (boundCompileUnit.GetLatestIdentifier())
             {
                 symbolTable.MapSymbol(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
-                symbolTable.MapIdentifierToSymbolDefinition(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
+                MapIdentifierToSymbolDefinition(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
             }
         }
     }
@@ -128,7 +128,7 @@ void ConstraintBinderVisitor::Visit(IsConstraintNode& isConstraintNode)
             if (boundCompileUnit.GetLatestIdentifier())
             {
                 symbolTable.MapSymbol(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
-                symbolTable.MapIdentifierToSymbolDefinition(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
+                MapIdentifierToSymbolDefinition(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
             }
         }
     }
@@ -146,7 +146,7 @@ void ConstraintBinderVisitor::Visit(MultiParamConstraintNode& multiParamConstrai
             if (boundCompileUnit.GetLatestIdentifier())
             {
                 symbolTable.MapSymbol(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
-                symbolTable.MapIdentifierToSymbolDefinition(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
+                MapIdentifierToSymbolDefinition(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
             }
         }
     }
@@ -189,7 +189,7 @@ void ConstraintBinderVisitor::Visit(IdentifierNode& identifierNode)
                 symbol = boundTemplateParam->GetType();
             }
             symbolTable.MapSymbol(&identifierNode, symbol);
-            symbolTable.MapIdentifierToSymbolDefinition(&identifierNode, symbol);
+            MapIdentifierToSymbolDefinition(&identifierNode, symbol);
         }
     }
 }

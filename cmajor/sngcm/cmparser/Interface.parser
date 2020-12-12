@@ -28,32 +28,32 @@ parser api(SNGCM_PARSER_API) InterfaceParser
     using TypeExprParser.TypeExpr;
     using ParameterParser.ParameterList;
 
-    Interface(ParsingContext* ctx, var std::unique_ptr<InterfaceNode> intf, var Span s, var Span specifierSpan, var Span beginBraceSpan, var Span endBraceSpan) : InterfaceNode*
+    Interface(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<InterfaceNode> intf, var Span s, var Span specifierSpan, var Span beginBraceSpan, var Span endBraceSpan) : InterfaceNode*
         ::=
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } INTERFACE Identifier:id!
+        (   empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } INTERFACE Identifier(moduleId):id!
             {
                 s.end = span.end;
-                intf.reset(new InterfaceNode(s, specifiers, id, attrs));
+                intf.reset(new InterfaceNode(s, *moduleId, specifiers, id, attrs));
                 intf->SetSpecifierSpan(specifierSpan);
             }
-            LBRACE!{ beginBraceSpan = span; } InterfaceContent(ctx, intf.get()):content RBRACE!{ endBraceSpan = span; intf->SetBeginBraceSpan(beginBraceSpan); intf->SetEndBraceSpan(endBraceSpan); }
+            LBRACE!{ beginBraceSpan = span; } InterfaceContent(moduleId, ctx, intf.get()):content RBRACE!{ endBraceSpan = span; intf->SetBeginBraceSpan(beginBraceSpan); intf->SetEndBraceSpan(endBraceSpan); }
         )
         {
             return intf.release();
         }
         ;
 
-    InterfaceContent(ParsingContext* ctx, sngcm::ast::InterfaceNode* intf)
-        ::= (InterfaceMemFun(ctx):intfMemFun{ intf->AddMember(intfMemFun); })*
+    InterfaceContent(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::InterfaceNode* intf)
+        ::= (InterfaceMemFun(moduleId, ctx):intfMemFun{ intf->AddMember(intfMemFun); })*
         ;
 
-    InterfaceMemFun(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var Span s) : Node*
-        ::= empty{ s = span; } Attributes:attrs? TypeExpr(ctx):returnType InterfaceFunctionGroupId:groupId!
+    InterfaceMemFun(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var Span s) : Node*
+        ::= empty{ s = span; } Attributes(moduleId):attrs? TypeExpr(moduleId, ctx):returnType InterfaceFunctionGroupId:groupId!
         {
             s.end = span.end;
-            memFun.reset(new MemberFunctionNode(s, Specifiers(), returnType, groupId, attrs));
+            memFun.reset(new MemberFunctionNode(s, *moduleId, Specifiers(), returnType, groupId, attrs));
         }
-        ParameterList(ctx, memFun.get()):paramList! SEMICOLON!
+        ParameterList(moduleId, ctx, memFun.get()):paramList! SEMICOLON!
         {
             return memFun.release();
         }

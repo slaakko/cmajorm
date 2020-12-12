@@ -3,13 +3,13 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Identifier.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Identifier.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-soulng::parser::Match IdentifierParser::Identifier(CmajorLexer& lexer)
+soulng::parser::Match IdentifierParser::Identifier(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -37,7 +37,7 @@ soulng::parser::Match IdentifierParser::Identifier(CmajorLexer& lexer)
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Identifier"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new IdentifierNode(span, lexer.GetToken(pos)));
+                return soulng::parser::Match(true, new IdentifierNode(span, *moduleId, lexer.GetToken(pos)));
             }
         }
         *parentMatch0 = match;
@@ -56,7 +56,7 @@ soulng::parser::Match IdentifierParser::Identifier(CmajorLexer& lexer)
     return match;
 }
 
-soulng::parser::Match IdentifierParser::QualifiedId(CmajorLexer& lexer)
+soulng::parser::Match IdentifierParser::QualifiedId(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -181,7 +181,7 @@ soulng::parser::Match IdentifierParser::QualifiedId(CmajorLexer& lexer)
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("QualifiedId"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new IdentifierNode(s, value));
+                return soulng::parser::Match(true, new IdentifierNode(s, *moduleId, value));
             }
         }
         *parentMatch0 = match;

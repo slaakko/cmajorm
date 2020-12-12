@@ -8,6 +8,7 @@
 #include <cmajor/symbols/SymbolsApi.hpp>
 #include <soulng/util/Json.hpp>
 #include <soulng/lexer/Span.hpp>
+#include <boost/uuid/uuid.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -22,18 +23,16 @@ public:
     const std::u32string& Project() const { return project; }
     const std::string& Message() const { return message; }
     const Span& Defined() const { return defined; }
-    void SetDefined(const Span& defined_) { defined = defined_; }
-    const std::vector<Span>& References() const { return references; }
-    void SetReferences(const std::vector<Span>& references_);
-    std::unique_ptr<JsonValue> ToJson(Module* module) const;
-    Module* GetModule() { return module; }
-    void SetModule(Module* module_) { module = module_; }
+    void SetDefined(const Span& defined_, const boost::uuids::uuid& definedModuleId_) { defined = defined_; definedModuleId = definedModuleId_; }
+    const std::vector<std::pair<Span, boost::uuids::uuid>>& References() const { return references; }
+    void SetReferences(const std::vector<std::pair<Span, boost::uuids::uuid>>& references_);
+    //std::unique_ptr<JsonValue> ToJson() const;
 private:
     std::u32string project;
     std::string message;
     Span defined;
-    std::vector<Span> references;
-    Module* module;
+    boost::uuids::uuid definedModuleId;
+    std::vector<std::pair<Span, boost::uuids::uuid>> references;
 };
 
 class SYMBOLS_API CompileWarningCollection

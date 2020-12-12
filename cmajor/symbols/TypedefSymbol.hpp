@@ -12,7 +12,7 @@ namespace cmajor { namespace symbols {
 class SYMBOLS_API TypedefSymbol : public Symbol
 {
 public:
-    TypedefSymbol(const Span& span_, const std::u32string& name_);
+    TypedefSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;

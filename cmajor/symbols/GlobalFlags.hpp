@@ -13,7 +13,7 @@
 
 namespace cmajor { namespace symbols {
 
-enum class GlobalFlags : uint32_t
+enum class GlobalFlags : uint64_t
 {
     none = 0,
     verbose = 1 << 0,
@@ -46,7 +46,8 @@ enum class GlobalFlags : uint32_t
     justMyCodeDebugging =  1 << 27,
     buildAll = 1 << 28,
     printDebugMessages = 1 << 29,
-    repository = 1 << 30
+    repository = 1 << 30,
+    updateSourceFileModuleMap = 1 << 31
 };
 
 enum class BackEnd : int

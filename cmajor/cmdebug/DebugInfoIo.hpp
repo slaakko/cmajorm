@@ -17,7 +17,8 @@ namespace cmajor { namespace debug {
 using namespace soulng::util;
 
 const uint8_t debugInfoFormat_1 = uint8_t('1');
-const uint8_t currentDebugInfoFormat = debugInfoFormat_1;
+const uint8_t debugInfoFormat_2 = uint8_t('2');
+const uint8_t currentDebugInfoFormat = debugInfoFormat_2;
 
 DEBUG_API void WriteCmdbFileTag(BinaryWriter& writer);
 DEBUG_API void ReadCmdbFileTag(BinaryReader& reader);
@@ -25,17 +26,16 @@ DEBUG_API void WriteMainProjectName(BinaryWriter& writer, const std::string& mai
 DEBUG_API void ReadMainProjectName(BinaryReader& reader, std::string& mainProjectName);
 DEBUG_API void WriteNumberOfProjects(BinaryWriter& writer, int32_t numProjects);
 DEBUG_API void ReadNumberOfProjects(BinaryReader& reader, int32_t& numProjects);
-
-DEBUG_API void WriteProjectTableHeader(BinaryWriter& writer, const std::string& projectName, const std::string& projectDirectoryPath, int32_t numCompileUnits,
+DEBUG_API void WriteProjectTableHeader(BinaryWriter& writer, const std::string& projectName, const std::string& projectDirectoryPath, const boost::uuids::uuid& moduleId, int32_t numCompileUnits,
     const boost::uuids::uuid& mainFunctionId);
-DEBUG_API void ReadProjectTableHeader(BinaryReader& reader, std::string& projectName, std::string& projectDirectoryPath, int32_t& numCompileUnits,
+DEBUG_API void ReadProjectTableHeader(BinaryReader& reader, std::string& projectName, std::string& projectDirectoryPath, boost::uuids::uuid& moduleId, int32_t& numCompileUnits,
     boost::uuids::uuid& mainFunctionId);
 DEBUG_API void WriteProjectTableRecord(BinaryWriter& writer, const std::string& compileUnitBaseName);
 DEBUG_API void ReadProjectTableRecord(BinaryReader& reader, std::string& compileUnitBaseName);
 DEBUG_API void WriteNumberOfCompileUnitFunctionRecords(BinaryWriter& writer, int32_t numFunctionRecords);
 DEBUG_API void ReadNumberOfCompileUnitFunctionRecords(BinaryReader& reader, int32_t& numFunctionRecords);
-DEBUG_API void WriteCompileUnitFunctionRecord(BinaryWriter& writer, int32_t fileIndex, const boost::uuids::uuid& functionId);
-DEBUG_API void ReadCompileUnitFunctionRecord(BinaryReader& reader, int32_t& fileIndex, boost::uuids::uuid& functionId);
+DEBUG_API void WriteCompileUnitFunctionRecord(BinaryWriter& writer, int32_t fileIndex, const boost::uuids::uuid& sourceModuleId, const boost::uuids::uuid& functionId);
+DEBUG_API void ReadCompileUnitFunctionRecord(BinaryReader& reader, int32_t& fileIndex, boost::uuids::uuid& sourceModuleId, boost::uuids::uuid& functionId);
 DEBUG_API void WriteNumberOfInstructionRecords(BinaryWriter& writer, int32_t numInstructionRecords);
 DEBUG_API void ReadNumberOfInstructionRecords(BinaryReader& reader, int32_t& numInstructionRecods);
 DEBUG_API void WriteInstructionRecord(BinaryWriter& writer, int32_t cppLineNumber, const SourceSpan& span, int32_t cppLineIndex, int16_t scopeId, int16_t flags);

@@ -26,7 +26,8 @@ AttributeProcessor::~AttributeProcessor()
 
 void AttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
 {
-    throw Exception(symbol->GetModule(), "attribute '" + ToUtf8(attribute->Name()) + "' for symbol type '" + symbol->TypeString() + "' not supported", attribute->GetSpan(), symbol->GetSpan());
+    throw Exception("attribute '" + ToUtf8(attribute->Name()) + "' for symbol type '" + symbol->TypeString() + "' not supported", attribute->GetSpan(), attribute->ModuleId(), 
+        symbol->GetSpan(), symbol->SourceModuleId());
 }
 
 void AttributeProcessor::GenerateSymbols(Attribute* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
@@ -41,9 +42,9 @@ AttributeBinder::AttributeBinder(Module* module)
 {
     AttributeProcessor* jsonAttributeProcessor = new JsonAttributeProcessor(module);
     attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(jsonAttributeProcessor));
-    JsonFieldNameAttributeProcessor* jsonFieldNameAttributeProcessor = new JsonFieldNameAttributeProcessor(module);
+    JsonFieldNameAttributeProcessor* jsonFieldNameAttributeProcessor = new JsonFieldNameAttributeProcessor();
     attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(jsonFieldNameAttributeProcessor));
-    AttributeProcessor* systemDefaultAttributeProcessor = new SystemDefaultAttributeProcessor(module);
+    AttributeProcessor* systemDefaultAttributeProcessor = new SystemDefaultAttributeProcessor();
     attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(systemDefaultAttributeProcessor));
     for (const std::unique_ptr<AttributeProcessor>& attributeProcessor : attributeProcessors)
     {
@@ -67,7 +68,7 @@ void AttributeBinder::BindAttributes(Attributes* attrs, Symbol* symbol, BoundCom
         }
         else
         {
-            throw Exception(&boundCompileUnit.GetModule(), "unknown attribute '" + ToUtf8(attrName) + "'", attribute->GetSpan());
+            throw Exception("unknown attribute '" + ToUtf8(attrName) + "'", attribute->GetSpan(), attribute->ModuleId());
         }
     }
     symbol->SetAttributes(std::unique_ptr<Attributes>(attrs->Clone()));
@@ -88,7 +89,7 @@ void AttributeBinder::GenerateImplementation(Attributes* attrs, Symbol* symbol, 
         }
         else
         {
-            throw Exception(&statementBinder->GetBoundCompileUnit().GetModule(), "unknown attribute '" + ToUtf8(attrName) + "'", attribute->GetSpan());
+            throw Exception("unknown attribute '" + ToUtf8(attrName) + "'", attribute->GetSpan(), attribute->ModuleId());
         }
     }
 }

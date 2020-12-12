@@ -16,10 +16,10 @@ class EnumConstantSymbol;
 class SYMBOLS_API EnumTypeSymbol : public TypeSymbol
 {
 public:
-    EnumTypeSymbol(const Span& span_, const std::u32string& name_);
+    EnumTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override; 
     std::string TypeString() const override { return "enumerated_type"; }
     std::string Syntax() const override;
     bool IsEnumeratedType() const override { return true; }
@@ -49,7 +49,7 @@ private:
 class SYMBOLS_API EnumConstantSymbol : public Symbol
 {
 public:
-    EnumConstantSymbol(const Span& span_, const std::u32string& name_);
+    EnumConstantSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     std::string TypeString() const override { return "enumeration_constant"; }
     void Accept(SymbolCollector* collector) override;
@@ -77,12 +77,12 @@ private:
 class SYMBOLS_API EnumTypeDefaultConstructor : public FunctionSymbol
 {
 public:
-    EnumTypeDefaultConstructor(const Span& span_, const std::u32string& name_);
+    EnumTypeDefaultConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     EnumTypeDefaultConstructor(EnumTypeSymbol* enumType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeDefaultConstructor"; }
     void Check() override;
@@ -93,12 +93,12 @@ private:
 class SYMBOLS_API EnumTypeCopyConstructor : public FunctionSymbol
 {
 public:
-    EnumTypeCopyConstructor(const Span& span_, const std::u32string& name_);
+    EnumTypeCopyConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     EnumTypeCopyConstructor(EnumTypeSymbol* enumType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeCopyConstructor"; }
     void Check() override;
@@ -109,12 +109,12 @@ private:
 class SYMBOLS_API EnumTypeMoveConstructor : public FunctionSymbol
 {
 public:
-    EnumTypeMoveConstructor(const Span& span_, const std::u32string& name_);
+    EnumTypeMoveConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     EnumTypeMoveConstructor(EnumTypeSymbol* enumType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeMoveConstructor"; }
     void Check() override;
@@ -125,12 +125,12 @@ private:
 class SYMBOLS_API EnumTypeCopyAssignment : public FunctionSymbol
 {
 public:
-    EnumTypeCopyAssignment(const Span& span_, const std::u32string& name_);
+    EnumTypeCopyAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     EnumTypeCopyAssignment(EnumTypeSymbol* enumType_, TypeSymbol* voidType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeCopyAssignment"; }
     void Check() override;
@@ -141,12 +141,12 @@ private:
 class SYMBOLS_API EnumTypeMoveAssignment : public FunctionSymbol
 {
 public:
-    EnumTypeMoveAssignment(const Span& span_, const std::u32string& name_);
+    EnumTypeMoveAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     EnumTypeMoveAssignment(EnumTypeSymbol* enumType_, TypeSymbol* voidType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeMoveAssignment"; }
     void Check() override;
@@ -157,12 +157,12 @@ private:
 class SYMBOLS_API EnumTypeReturn : public FunctionSymbol
 {
 public:
-    EnumTypeReturn(const Span& span_, const std::u32string& name_);
+    EnumTypeReturn(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     EnumTypeReturn(EnumTypeSymbol* enumType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeReturn"; }
     void Check() override;
@@ -173,12 +173,12 @@ private:
 class SYMBOLS_API EnumTypeEqualityOp : public FunctionSymbol
 {
 public:
-    EnumTypeEqualityOp(const Span& span_, const std::u32string& name_);
+    EnumTypeEqualityOp(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     EnumTypeEqualityOp(EnumTypeSymbol* enumType_, TypeSymbol* boolType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "EnumTypeEqualityOp"; }
     void Check() override;
@@ -189,18 +189,16 @@ private:
 class SYMBOLS_API EnumTypeToUnderlyingTypeConversion : public FunctionSymbol
 {
 public:
-    EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_);
-    EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_);
+    EnumTypeToUnderlyingTypeConversion(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    EnumTypeToUnderlyingTypeConversion(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
-    TypeSymbol* ConversionSourceType() const override { return sourceType; }
-    TypeSymbol* ConversionTargetType() const override { return targetType; }
     const char* ClassName() const override { return "EnumTypeToUnderlyingTypeConversion"; }
     void Check() override;
 private:
@@ -211,18 +209,16 @@ private:
 class SYMBOLS_API UnderlyingTypeToEnumTypeConversion : public FunctionSymbol
 {
 public:
-    UnderlyingTypeToEnumTypeConversion(const Span& span_, const std::u32string& name_);
-    UnderlyingTypeToEnumTypeConversion(const Span& span_, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_);
+    UnderlyingTypeToEnumTypeConversion(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    UnderlyingTypeToEnumTypeConversion(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_, TypeSymbol* sourceType_, TypeSymbol* targetType_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     ConversionType GetConversionType() const override { return ConversionType::explicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const override { return sourceType; }
-    TypeSymbol* ConversionTargetType() const override { return targetType; }
     const char* ClassName() const override { return "UnderlyingTypeToEnumTypeConversion"; }
     void Check() override;
 private:

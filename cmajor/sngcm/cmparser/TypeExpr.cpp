@@ -6,13 +6,13 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/TypeExpr.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/TypeExpr.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-std::unique_ptr<sngcm::ast::Node> TypeExprParser::Parse(CmajorLexer& lexer, ParsingContext* ctx)
+std::unique_ptr<sngcm::ast::Node> TypeExprParser::Parse(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     std::unique_ptr<sngcm::ast::Node> value;
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
@@ -24,7 +24,7 @@ std::unique_ptr<sngcm::ast::Node> TypeExprParser::Parse(CmajorLexer& lexer, Pars
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     ++lexer;
     soulng::lexer::Span span = lexer.GetSpan();
-    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
     value.reset(static_cast<sngcm::ast::Node*>(match.value));
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     if (lexer.Log())
@@ -51,7 +51,7 @@ std::unique_ptr<sngcm::ast::Node> TypeExprParser::Parse(CmajorLexer& lexer, Pars
     return value;
 }
 
-soulng::parser::Match TypeExprParser::TypeExpr(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match TypeExprParser::TypeExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -67,7 +67,7 @@ soulng::parser::Match TypeExprParser::TypeExpr(CmajorLexer& lexer, ParsingContex
     soulng::parser::Match* parentMatch0 = &match;
     {
         int64_t pos = lexer.GetPos();
-        soulng::parser::Match match = TypeExprParser::PrefixTypeExpr(lexer, ctx);
+        soulng::parser::Match match = TypeExprParser::PrefixTypeExpr(lexer, moduleId, ctx);
         prefixTypeExpr.reset(static_cast<sngcm::ast::Node*>(match.value));
         if (match.hit)
         {
@@ -94,7 +94,7 @@ soulng::parser::Match TypeExprParser::TypeExpr(CmajorLexer& lexer, ParsingContex
     return match;
 }
 
-soulng::parser::Match TypeExprParser::PrefixTypeExpr(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match TypeExprParser::PrefixTypeExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -144,7 +144,7 @@ soulng::parser::Match TypeExprParser::PrefixTypeExpr(CmajorLexer& lexer, Parsing
                 {
                     int64_t pos = lexer.GetPos();
                     soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = TypeExprParser::PostfixTypeExpr(lexer, ctx);
+                    soulng::parser::Match match = TypeExprParser::PostfixTypeExpr(lexer, moduleId, ctx);
                     constTypeExpr.reset(static_cast<sngcm::ast::Node*>(match.value));
                     if (match.hit)
                     {
@@ -153,7 +153,7 @@ soulng::parser::Match TypeExprParser::PrefixTypeExpr(CmajorLexer& lexer, Parsing
                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("PrefixTypeExpr"));
                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                            return soulng::parser::Match(true, new ConstNode(s, constTypeExpr.release()));
+                            return soulng::parser::Match(true, new ConstNode(s, *moduleId, constTypeExpr.release()));
                         }
                     }
                     *parentMatch4 = match;
@@ -173,7 +173,7 @@ soulng::parser::Match TypeExprParser::PrefixTypeExpr(CmajorLexer& lexer, Parsing
                 soulng::parser::Match* parentMatch6 = &match;
                 {
                     int64_t pos = lexer.GetPos();
-                    soulng::parser::Match match = TypeExprParser::PostfixTypeExpr(lexer, ctx);
+                    soulng::parser::Match match = TypeExprParser::PostfixTypeExpr(lexer, moduleId, ctx);
                     postfixTypeExpr.reset(static_cast<sngcm::ast::Node*>(match.value));
                     if (match.hit)
                     {
@@ -205,7 +205,7 @@ soulng::parser::Match TypeExprParser::PrefixTypeExpr(CmajorLexer& lexer, Parsing
     return match;
 }
 
-soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -235,7 +235,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, Parsin
                 {
                     int64_t pos = lexer.GetPos();
                     soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = TypeExprParser::PrimaryTypeExpr(lexer, ctx);
+                    soulng::parser::Match match = TypeExprParser::PrimaryTypeExpr(lexer, moduleId, ctx);
                     primaryTypeExpr.reset(static_cast<sngcm::ast::Node*>(match.value));
                     if (match.hit)
                     {
@@ -320,7 +320,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, Parsin
                                                                 if (match.hit)
                                                                 {
                                                                     s.end = span.end;
-                                                                    typeExpr.reset(new DotNode(s, typeExpr.release(), new IdentifierNode(span, lexer.GetToken(pos))));
+                                                                    typeExpr.reset(new DotNode(s, *moduleId, typeExpr.release(), new IdentifierNode(span, *moduleId, lexer.GetToken(pos))));
                                                                 }
                                                                 *parentMatch13 = match;
                                                             }
@@ -349,7 +349,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, Parsin
                                                                 if (match.hit)
                                                                 {
                                                                     s.end = span.end;
-                                                                    typeExpr.reset(new PointerNode(s, typeExpr.release()));
+                                                                    typeExpr.reset(new PointerNode(s, *moduleId, typeExpr.release()));
                                                                 }
                                                                 *parentMatch16 = match;
                                                             }
@@ -379,7 +379,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, Parsin
                                                             if (match.hit)
                                                             {
                                                                 s.end = span.end;
-                                                                typeExpr.reset(new RValueRefNode(s, typeExpr.release()));
+                                                                typeExpr.reset(new RValueRefNode(s, *moduleId, typeExpr.release()));
                                                             }
                                                             *parentMatch18 = match;
                                                         }
@@ -409,7 +409,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, Parsin
                                                         if (match.hit)
                                                         {
                                                             s.end = span.end;
-                                                            typeExpr.reset(new LValueRefNode(s, typeExpr.release()));
+                                                            typeExpr.reset(new LValueRefNode(s, *moduleId, typeExpr.release()));
                                                         }
                                                         *parentMatch20 = match;
                                                     }
@@ -448,7 +448,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, Parsin
                                                             int64_t save = lexer.GetPos();
                                                             soulng::parser::Match* parentMatch25 = &match;
                                                             {
-                                                                soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                                                soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                                                 size.reset(static_cast<Node*>(match.value));
                                                                 if (match.hit)
                                                                 {
@@ -497,7 +497,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, Parsin
                                                             if (match.hit)
                                                             {
                                                                 s.end = span.end;
-                                                                typeExpr.reset(new ArrayNode(s, typeExpr.release(), size.release()));
+                                                                typeExpr.reset(new ArrayNode(s, *moduleId, typeExpr.release(), size.release()));
                                                             }
                                                             *parentMatch27 = match;
                                                         }
@@ -555,7 +555,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, Parsin
     return match;
 }
 
-soulng::parser::Match TypeExprParser::PrimaryTypeExpr(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match TypeExprParser::PrimaryTypeExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -580,7 +580,7 @@ soulng::parser::Match TypeExprParser::PrimaryTypeExpr(CmajorLexer& lexer, Parsin
             soulng::parser::Match* parentMatch2 = &match;
             {
                 int64_t pos = lexer.GetPos();
-                soulng::parser::Match match = BasicTypeParser::BasicType(lexer);
+                soulng::parser::Match match = BasicTypeParser::BasicType(lexer, moduleId);
                 basicType.reset(static_cast<Node*>(match.value));
                 if (match.hit)
                 {
@@ -604,7 +604,7 @@ soulng::parser::Match TypeExprParser::PrimaryTypeExpr(CmajorLexer& lexer, Parsin
                     soulng::parser::Match* parentMatch4 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = TemplateParser::TemplateId(lexer, ctx);
+                        soulng::parser::Match match = TemplateParser::TemplateId(lexer, moduleId, ctx);
                         templateId.reset(static_cast<Node*>(match.value));
                         if (match.hit)
                         {
@@ -646,7 +646,7 @@ soulng::parser::Match TypeExprParser::PrimaryTypeExpr(CmajorLexer& lexer, Parsin
                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("PrimaryTypeExpr"));
                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                            return soulng::parser::Match(true, new IdentifierNode(span, lexer.GetToken(pos)));
+                            return soulng::parser::Match(true, new IdentifierNode(span, *moduleId, lexer.GetToken(pos)));
                         }
                     }
                     *parentMatch6 = match;

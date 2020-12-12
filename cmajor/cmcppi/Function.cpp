@@ -164,7 +164,7 @@ void Function::Write(CodeFormatter& formatter, Context& context, BinaryWriter& w
     bool writeDebugInfoRecords = false;
     if (fileIndex != -1 && !functionId.is_nil())
     {
-        cmajor::debug::WriteCompileUnitFunctionRecord(writer, fileIndex, functionId);
+        cmajor::debug::WriteCompileUnitFunctionRecord(writer, fileIndex, sourceModuleId, functionId);
         numInstsPos = writer.Pos();
         cmajor::debug::WriteNumberOfInstructionRecords(writer, numInsts);
         StartFunctionInstruction startInst;
@@ -258,6 +258,11 @@ void Function::AddResultInstruction(Instruction* instruction)
 void Function::SetFileIndex(int32_t fileIndex_)
 {
     fileIndex = fileIndex_;
+}
+
+void Function::SetSourceModuleId(const boost::uuids::uuid& sourceModuleId_)
+{
+    sourceModuleId = sourceModuleId_;
 }
 
 void Function::SetFunctionId(const boost::uuids::uuid& functionId_)

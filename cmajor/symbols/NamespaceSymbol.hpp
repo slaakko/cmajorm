@@ -12,7 +12,7 @@ namespace cmajor { namespace symbols {
 class SYMBOLS_API NamespaceSymbol : public ContainerSymbol
 {
 public:   
-    NamespaceSymbol(const Span& span_, const std::u32string& name_);
+    NamespaceSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "namespace"; }
     std::u32string Id() const override { return U"ns_" + FullName(); }
     bool IsParentSymbol() const override { return true; }

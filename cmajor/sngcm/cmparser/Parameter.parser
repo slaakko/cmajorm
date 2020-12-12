@@ -21,12 +21,12 @@ parser api(SNGCM_PARSER_API) ParameterParser
     using TypeExprParser.TypeExpr;
     using IdentifierParser.Identifier;
 
-    ParameterList(ParsingContext* ctx, sngcm::ast::Node* owner) 
-        ::= LPAREN (Parameter(ctx):param{ owner->AddParameter(param); } % COMMA)? RPAREN!
+    ParameterList(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::Node* owner) 
+        ::= LPAREN (Parameter(moduleId, ctx):param{ owner->AddParameter(param); } % COMMA)? RPAREN!
         ;
 
-    Parameter(ParsingContext* ctx, var Span s) : ParameterNode*
-        ::= (TypeExpr(ctx):type{ s = span; } (Identifier:id{ s.end = span.end; })?){ return new ParameterNode(s, type, id); }
+    Parameter(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : ParameterNode*
+        ::= (TypeExpr(moduleId, ctx):type{ s = span; } (Identifier(moduleId):id{ s.end = span.end; })?){ return new ParameterNode(s, *moduleId, type, id); }
         ;
 
     ruleinfo

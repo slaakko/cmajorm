@@ -9,17 +9,17 @@
 #include <soulng/parser/Match.hpp>
 #include <soulng/parser/Value.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/TypeExpr.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/TypeExpr.parser' using soulng parser generator spg version 3.0.0
 
 class CmajorLexer;
 
 struct SNGCM_PARSER_API TypeExprParser
 {
-    static std::unique_ptr<sngcm::ast::Node> Parse(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match TypeExpr(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match PrefixTypeExpr(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match PostfixTypeExpr(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match PrimaryTypeExpr(CmajorLexer& lexer, ParsingContext* ctx);
+    static std::unique_ptr<sngcm::ast::Node> Parse(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match TypeExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match PrefixTypeExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match PostfixTypeExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match PrimaryTypeExpr(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
 };
 
 #endif // TYPEEXPR_HPP

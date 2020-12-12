@@ -6,6 +6,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/ModuleCache.hpp>
 #include <sngxml/dom/CharacterData.hpp>
 #include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -16,60 +17,63 @@ namespace cmajor { namespace symbols {
 using namespace soulng::util;
 using namespace soulng::unicode;
 
-std::string Expand(Module* module, const std::string& errorMessage, const Span& span)
+std::string Expand(const std::string& errorMessage, const Span& span, const boost::uuids::uuid& moduleId)
 {
-    std::vector<Span> references;
-    return Expand(module, errorMessage, span, references);
+    std::vector<std::pair<Span, boost::uuids::uuid>> references;
+    return Expand(errorMessage, span, moduleId, references);
 }
 
-std::string Expand(Module* module, const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan)
+std::string Expand(const std::string& errorMessage, const Span& primarySpan, const boost::uuids::uuid& primaryModuleId, 
+    const Span& referenceSpan, const boost::uuids::uuid& referenceModuleId)
 {
-    std::vector<Span> references(1, referenceSpan);
-    return Expand(module, errorMessage, primarySpan, references, "Error");
+    std::vector<std::pair<Span, boost::uuids::uuid>> references(1, std::make_pair(referenceSpan, referenceModuleId));
+    return Expand(errorMessage, primarySpan, primaryModuleId, references, "Error");
 }
 
-std::string Expand(Module* module, const std::string& errorMessage, const Span& primarySpan, const Span& referenceSpan, const std::string& title)
+std::string Expand(const std::string& errorMessage, const Span& primarySpan, const boost::uuids::uuid& primaryModuleId, 
+    const Span& referenceSpan, const boost::uuids::uuid& referenceModuleId, const std::string& title)
 {
-    std::vector<Span> references(1, referenceSpan);
-    return Expand(module, errorMessage, primarySpan, references, title);
+    std::vector<std::pair<Span, boost::uuids::uuid>> references(1, std::make_pair(referenceSpan, referenceModuleId));
+    return Expand(errorMessage, primarySpan, primaryModuleId, references, title);
 }
 
-std::string Expand(Module* module, const std::string& errorMessage, const Span& span, const std::vector<Span>& references)
+std::string Expand(const std::string& errorMessage, const Span& span, const boost::uuids::uuid& moduleId, const std::vector<std::pair<Span, boost::uuids::uuid>>& references)
 {
-    return Expand(module, errorMessage, span, references, "Error");
+    return Expand(errorMessage, span, moduleId, references, "Error");
 }
 
-std::string Expand(Module* module, const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title)
+std::string Expand(const std::string& errorMessage, const Span& span, const boost::uuids::uuid& moduleId, const std::vector<std::pair<Span, boost::uuids::uuid>>& references, 
+    const std::string& title)
 {
-    std::vector<Span> referenceSpans = references;
+    std::vector<std::pair<Span, boost::uuids::uuid>> referenceSpans = references;
     referenceSpans.erase(std::unique(referenceSpans.begin(), referenceSpans.end()), referenceSpans.end());
     std::string expandedMessage = title + ": " + errorMessage;
     if (span.Valid())
     {
-        if (!module)
+        Module* module = GetModuleById(moduleId);
+        if (module)
         {
-            throw std::runtime_error("module not set");
-        }
-        std::string fileName = module->GetFilePath(span.fileIndex);
-        if (!fileName.empty())
-        {
-            expandedMessage.append(" (file '" + fileName + "', line " + std::to_string(span.line) + ")");
-            expandedMessage.append(":\n").append(ToUtf8(module->GetErrorLines(span)));
+            std::string fileName = module->GetFilePath(span.fileIndex);
+            if (!fileName.empty())
+            {
+                expandedMessage.append(" (file '" + fileName + "', line " + std::to_string(span.line) + ")");
+                expandedMessage.append(":\n").append(ToUtf8(module->GetErrorLines(span)));
+            }
         }
     }
-    for (const Span& referenceSpan : referenceSpans)
+    for (const std::pair<Span, boost::uuids::uuid>& referenceSpan : referenceSpans)
     {
-        if (!referenceSpan.Valid()) continue;
-        if (referenceSpan == span) continue;
-        if (!module)
+        if (!referenceSpan.first.Valid()) continue;
+        if (referenceSpan.first == span && referenceSpan.second == moduleId) continue;
+        Module* module = GetModuleById(referenceSpan.second);
+        if (module)
         {
-            throw std::runtime_error("module not set");
-        }
-        std::string fileName = module->GetFilePath(referenceSpan.fileIndex);
-        if (!fileName.empty())
-        {
-            expandedMessage.append("\nsee reference to file '" + fileName + "', line " + std::to_string(referenceSpan.line));
-            expandedMessage.append(":\n").append(ToUtf8(module->GetErrorLines(referenceSpan)));
+            std::string fileName = module->GetFilePath(referenceSpan.first.fileIndex);
+            if (!fileName.empty())
+            {
+                expandedMessage.append("\nsee reference to file '" + fileName + "', line " + std::to_string(referenceSpan.first.line));
+                expandedMessage.append(":\n").append(ToUtf8(module->GetErrorLines(referenceSpan.first)));
+            }
         }
     }
     return expandedMessage;
@@ -134,17 +138,19 @@ std::unique_ptr<sngxml::dom::Element> SpanToDomElement(Module* module, const Spa
     return spanElement;
 }
 
-Exception::Exception(Module* module_, const std::string& message_, const Span& defined_) : module(module_), what(Expand(module, message_, defined_)), message(message_), defined(defined_)
+Exception::Exception(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_) : 
+    what(Expand(message_, defined_, definedModuleId_)), message(message_), defined(defined_), definedModuleId(definedModuleId_)
 {
 }
 
-Exception::Exception(Module* module_, const std::string& message_, const Span& defined_, const Span& referenced_) : module(module_), what(Expand(module, message_, defined_, referenced_)), message(message_), defined(defined_)
+Exception::Exception(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_, const Span& referenced_, const boost::uuids::uuid& referencedModuleId_) :
+    what(Expand(message_, defined_, definedModuleId_, referenced_, referencedModuleId_)), message(message_), defined(defined_), definedModuleId(definedModuleId_)
 {
-    references.push_back(referenced_);
+    references.push_back(std::make_pair(referenced_, referencedModuleId_));
 }
 
-Exception::Exception(Module* module_, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
-    module(module_), what(Expand(module, message_, defined_, references_)), message(message_), defined(defined_), references(references_)
+Exception::Exception(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_, const std::vector<std::pair<Span, boost::uuids::uuid>>& references_) :
+    what(Expand(message_, defined_, definedModuleId_, references_)), message(message_), defined(defined_), definedModuleId(definedModuleId_), references(references_)
 {
 }
 
@@ -154,6 +160,7 @@ Exception::~Exception()
 
 std::unique_ptr<JsonValue> Exception::ToJson() const
 {
+    Module* module = cmajor::symbols::GetModuleById(definedModuleId);
     std::unique_ptr<JsonObject> json(new JsonObject());
     json->AddField(U"tool", std::unique_ptr<JsonValue>(new JsonString(module->GetCurrentToolName())));
     json->AddField(U"kind", std::unique_ptr<JsonValue>(new JsonString(U"error")));
@@ -165,13 +172,14 @@ std::unique_ptr<JsonValue> Exception::ToJson() const
     {
         refs->AddItem(std::move(ref));
     }
-    std::vector<Span> referenceSpans = references;
+    std::vector<std::pair<Span, boost::uuids::uuid>> referenceSpans = references;
     referenceSpans.erase(std::unique(referenceSpans.begin(), referenceSpans.end()), referenceSpans.end());
-    for (const Span& referenceSpan : referenceSpans)
+    for (const std::pair<Span, boost::uuids::uuid>& referenceSpanModuleId : referenceSpans)
     {
-        if (!referenceSpan.Valid()) continue;
-        if (referenceSpan == defined) continue;
-        std::unique_ptr<JsonObject> ref = SpanToJson(module, referenceSpan);
+        if (!referenceSpanModuleId.first.Valid()) continue;
+        if (referenceSpanModuleId.first == defined && referenceSpanModuleId.second == definedModuleId) continue;
+        Module* mod = cmajor::symbols::GetModuleById(referenceSpanModuleId.second);
+        std::unique_ptr<JsonObject> ref = SpanToJson(mod, referenceSpanModuleId.first);
         if (ref)
         {
             refs->AddItem(std::move(ref));
@@ -179,6 +187,7 @@ std::unique_ptr<JsonValue> Exception::ToJson() const
     }
     json->AddField(U"references", std::move(refs));
     return std::unique_ptr<JsonValue>(json.release());
+    return std::unique_ptr<JsonValue>();
 }
 
 void Exception::AddToDiagnosticsElement(sngxml::dom::Element* diagnosticsElement) const
@@ -196,15 +205,17 @@ void Exception::AddToDiagnosticsElement(sngxml::dom::Element* diagnosticsElement
     diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryElement.release()));
     diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(subcategoryElement.release()));
     diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageElement.release()));
+    Module* module = cmajor::symbols::GetModuleById(definedModuleId);
     std::unique_ptr<sngxml::dom::Element> spanElement = SpanToDomElement(module, defined);
     if (spanElement)
     {
         diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
     }
     diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
-    for (const Span& span : references)
+    for (const std::pair<Span, boost::uuids::uuid>& spanModuleId : references)
     {
-        if (!span.Valid()) continue;
+        if (!spanModuleId.first.Valid()) continue;
+        Module* mod = cmajor::symbols::GetModuleById(spanModuleId.second);
         std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
         std::unique_ptr<sngxml::dom::Element> categoryElement(new sngxml::dom::Element(U"category"));
         std::unique_ptr<sngxml::dom::Text> categoryText(new sngxml::dom::Text(U"info"));
@@ -214,76 +225,87 @@ void Exception::AddToDiagnosticsElement(sngxml::dom::Element* diagnosticsElement
         messageElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageText.release()));
         diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryElement.release()));
         diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageElement.release()));
-        std::unique_ptr<sngxml::dom::Element> spanElement = SpanToDomElement(module, span);
+        std::unique_ptr<sngxml::dom::Element> spanElement = SpanToDomElement(mod, spanModuleId.first);
         if (spanElement)
         {
             diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
             diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
         }
     }
-
 }
 
 ModuleImmutableException::ModuleImmutableException(Module* module_, Module* immutableModule, const Span& defined_, const Span& referenced_) :
-    Exception(module_, "attempt to add a symbol to an immutable module' " + ToUtf8(immutableModule->Name()) + "'", defined_, referenced_)
+    Exception("attempt to add a symbol to an immutable module' " + ToUtf8(immutableModule->Name()) + "'", defined_, module_->Id(), referenced_, immutableModule->Id())
 {
 }
 
-SymbolCheckException::SymbolCheckException(Module* module_, const std::string& message_, const Span& defined_) : Exception(module_, message_, defined_)
+SymbolCheckException::SymbolCheckException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& moduleId_) : Exception(message_, defined_, moduleId_)
 {
 }
 
-CastOverloadException::CastOverloadException(Module* module, const std::string& message_, const Span& defined_) : Exception(module, message_, defined_)
+CastOverloadException::CastOverloadException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_) : Exception(message_, defined_, definedModuleId_)
 {
 }
 
-CastOverloadException::CastOverloadException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_) : Exception(module, message_, defined_, referenced_)
+CastOverloadException::CastOverloadException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_, 
+    const Span& referenced_, const boost::uuids::uuid& referencedModuleId_) : 
+    Exception(message_, defined_, definedModuleId_, referenced_, referencedModuleId_)
 {
 }
 
-CastOverloadException::CastOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) : Exception(module, message_, defined_, references_)
+CastOverloadException::CastOverloadException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_, 
+    const std::vector<std::pair<Span, boost::uuids::uuid>>& references_) : Exception(message_, defined_, definedModuleId_, references_)
 {
 }
 
-CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_) : Exception(module, message_, defined_)
+CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_) : 
+    Exception(message_, defined_, definedModuleId_)
 {
 }
 
-CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_) :
-    Exception(module, message_, defined_, referenced_)
+CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_, 
+    const Span& referenced_, const boost::uuids::uuid& referencedModuleId_) :
+    Exception(message_, defined_, definedModuleId_, referenced_, referencedModuleId_)
 {
 }
 
-CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
-    Exception(module, message_, defined_, references_)
+CannotBindConstToNonconstOverloadException::CannotBindConstToNonconstOverloadException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_,
+    const std::vector<std::pair<Span, boost::uuids::uuid>>& references_) :
+    Exception(message_, defined_, definedModuleId_, references_)
 {
 }
 
-CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_) : Exception(module, message_, defined_)
+CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_) : 
+    Exception(message_, defined_, definedModuleId_)
 {
 }
 
-CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_) :
-    Exception(module, message_, defined_, referenced_)
+CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_, 
+    const Span& referenced_, const boost::uuids::uuid& referencedModuleId_) :
+    Exception(message_, defined_, definedModuleId_, referenced_, referencedModuleId_)
 {
 }
 
-CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
-    Exception(module, message_, defined_, references_)
+CannotAssignToConstOverloadException::CannotAssignToConstOverloadException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_, 
+    const std::vector<std::pair<Span, boost::uuids::uuid>>& references_) :
+    Exception(message_, defined_, definedModuleId_, references_)
 {
 }
 
-NoViableFunctionException::NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_) : Exception(module, message_, defined_)
+NoViableFunctionException::NoViableFunctionException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_) : 
+    Exception(message_, defined_, definedModuleId_)
 {
 }
 
-NoViableFunctionException::NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_, const Span& referenced_) :
-    Exception(module, message_, defined_, referenced_)
+NoViableFunctionException::NoViableFunctionException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_, 
+    const Span& referenced_, const boost::uuids::uuid& referencedModuleId_) :
+    Exception(message_, defined_, definedModuleId_, referenced_, referencedModuleId_)
 {
 }
 
-NoViableFunctionException::NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_) :
-    Exception(module, message_, defined_, references_)
+NoViableFunctionException::NoViableFunctionException(const std::string& message_, const Span& defined_, const boost::uuids::uuid& definedModuleId_, 
+    const std::vector<std::pair<Span, boost::uuids::uuid>>& references_) :
+    Exception(message_, defined_, definedModuleId_, references_)
 {
 }
 

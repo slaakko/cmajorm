@@ -3,13 +3,13 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Template.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Template.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-soulng::parser::Match TemplateParser::TemplateId(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match TemplateParser::TemplateId(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -63,11 +63,11 @@ soulng::parser::Match TemplateParser::TemplateId(CmajorLexer& lexer, ParsingCont
                             {
                                 int64_t pos = lexer.GetPos();
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = IdentifierParser::QualifiedId(lexer);
+                                soulng::parser::Match match = IdentifierParser::QualifiedId(lexer, moduleId);
                                 primary.reset(static_cast<IdentifierNode*>(match.value));
                                 if (match.hit)
                                 {
-                                    templateId.reset(new TemplateIdNode(span, primary.release()));
+                                    templateId.reset(new TemplateIdNode(span, *moduleId, primary.release()));
                                 }
                                 *parentMatch7 = match;
                             }
@@ -125,7 +125,7 @@ soulng::parser::Match TemplateParser::TemplateId(CmajorLexer& lexer, ParsingCont
                                                 soulng::parser::Match* parentMatch16 = &match;
                                                 {
                                                     int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                                                    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                                                     templateArg.reset(static_cast<sngcm::ast::Node*>(match.value));
                                                     if (match.hit)
                                                     {
@@ -167,7 +167,7 @@ soulng::parser::Match TemplateParser::TemplateId(CmajorLexer& lexer, ParsingCont
                                                                         soulng::parser::Match* parentMatch21 = &match;
                                                                         {
                                                                             int64_t pos = lexer.GetPos();
-                                                                            soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                                                                            soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                                                                             templateArg.reset(static_cast<sngcm::ast::Node*>(match.value));
                                                                             if (match.hit)
                                                                             {
@@ -278,7 +278,7 @@ soulng::parser::Match TemplateParser::TemplateId(CmajorLexer& lexer, ParsingCont
     return match;
 }
 
-soulng::parser::Match TemplateParser::TemplateParameter(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match TemplateParser::TemplateParameter(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -302,7 +302,7 @@ soulng::parser::Match TemplateParser::TemplateParameter(CmajorLexer& lexer, Pars
             soulng::parser::Match match(false);
             soulng::parser::Match* parentMatch2 = &match;
             {
-                soulng::parser::Match match = IdentifierParser::Identifier(lexer);
+                soulng::parser::Match match = IdentifierParser::Identifier(lexer, moduleId);
                 id.reset(static_cast<IdentifierNode*>(match.value));
                 *parentMatch2 = match;
             }
@@ -334,7 +334,7 @@ soulng::parser::Match TemplateParser::TemplateParameter(CmajorLexer& lexer, Pars
                                 soulng::parser::Match match(false);
                                 soulng::parser::Match* parentMatch7 = &match;
                                 {
-                                    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                                    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                                     type.reset(static_cast<sngcm::ast::Node*>(match.value));
                                     *parentMatch7 = match;
                                 }
@@ -363,7 +363,7 @@ soulng::parser::Match TemplateParser::TemplateParameter(CmajorLexer& lexer, Pars
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("TemplateParameter"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new TemplateParameterNode(span, id.release(), type.release()));
+                return soulng::parser::Match(true, new TemplateParameterNode(span, *moduleId, id.release(), type.release()));
             }
         }
         *parentMatch0 = match;
@@ -382,7 +382,7 @@ soulng::parser::Match TemplateParser::TemplateParameter(CmajorLexer& lexer, Pars
     return match;
 }
 
-soulng::parser::Match TemplateParser::TemplateParameterList(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::Node* owner)
+soulng::parser::Match TemplateParser::TemplateParameterList(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::Node* owner)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -423,7 +423,7 @@ soulng::parser::Match TemplateParser::TemplateParameterList(CmajorLexer& lexer, 
                         soulng::parser::Match* parentMatch5 = &match;
                         {
                             int64_t pos = lexer.GetPos();
-                            soulng::parser::Match match = TemplateParser::TemplateParameter(lexer, ctx);
+                            soulng::parser::Match match = TemplateParser::TemplateParameter(lexer, moduleId, ctx);
                             tp.reset(static_cast<TemplateParameterNode*>(match.value));
                             if (match.hit)
                             {
@@ -465,7 +465,7 @@ soulng::parser::Match TemplateParser::TemplateParameterList(CmajorLexer& lexer, 
                                                 soulng::parser::Match* parentMatch10 = &match;
                                                 {
                                                     int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = TemplateParser::TemplateParameter(lexer, ctx);
+                                                    soulng::parser::Match match = TemplateParser::TemplateParameter(lexer, moduleId, ctx);
                                                     tp.reset(static_cast<TemplateParameterNode*>(match.value));
                                                     if (match.hit)
                                                     {

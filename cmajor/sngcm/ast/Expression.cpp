@@ -9,18 +9,19 @@
 
 namespace sngcm { namespace ast {
 
-DotNode::DotNode(const Span& span_) : UnaryNode(NodeType::dotNode, span_), memberId()
+DotNode::DotNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::dotNode, span_, moduleId_), memberId()
 {
 }
 
-DotNode::DotNode(const Span& span_, Node* subject_, IdentifierNode* memberId_) : UnaryNode(NodeType::dotNode, span_, subject_), memberId(memberId_)
+DotNode::DotNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_, IdentifierNode* memberId_) : UnaryNode(NodeType::dotNode, span_, moduleId_, subject_), memberId(memberId_)
 {
     memberId->SetParent(this);
 }
 
 Node* DotNode::Clone(CloneContext& cloneContext) const
 {
-    return new DotNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
+    DotNode* clone = new DotNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
+    return clone;
 }
 
 void DotNode::Accept(Visitor& visitor)
@@ -46,18 +47,20 @@ std::string DotNode::ToString() const
     return Subject()->ToString() + "." + memberId->ToString();
 }
 
-ArrowNode::ArrowNode(const Span& span_) : UnaryNode(NodeType::arrowNode, span_), memberId()
+ArrowNode::ArrowNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::arrowNode, span_, moduleId_), memberId()
 {
 }
 
-ArrowNode::ArrowNode(const Span& span_, Node* subject_, IdentifierNode* memberId_) : UnaryNode(NodeType::arrowNode, span_, subject_), memberId(memberId_)
+ArrowNode::ArrowNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_, IdentifierNode* memberId_) : 
+    UnaryNode(NodeType::arrowNode, span_, moduleId_, subject_), memberId(memberId_)
 {
     memberId->SetParent(this);
 }
 
 Node* ArrowNode::Clone(CloneContext& cloneContext) const
 {
-    return new ArrowNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
+    ArrowNode* clone = new ArrowNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
+    return clone;
 }
 
 void ArrowNode::Accept(Visitor& visitor)
@@ -83,17 +86,19 @@ std::string ArrowNode::ToString() const
     return Subject()->ToString() + "->" + memberId->ToString();
 }
 
-EquivalenceNode::EquivalenceNode(const Span& span_) : BinaryNode(NodeType::equivalenceNode, span_)
+EquivalenceNode::EquivalenceNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::equivalenceNode, span_, moduleId_)
 {
 }
 
-EquivalenceNode::EquivalenceNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::equivalenceNode, span_, left_, right_)
+EquivalenceNode::EquivalenceNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::equivalenceNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* EquivalenceNode::Clone(CloneContext& cloneContext) const
 {
-    return new EquivalenceNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    EquivalenceNode* clone = new EquivalenceNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void EquivalenceNode::Accept(Visitor& visitor)
@@ -106,17 +111,19 @@ std::string EquivalenceNode::ToString() const
     return Left()->ToString() + "<=>" + Right()->ToString();
 }
 
-ImplicationNode::ImplicationNode(const Span& span_) : BinaryNode(NodeType::implicationNode, span_)
+ImplicationNode::ImplicationNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::implicationNode, span_, moduleId_)
 {
 }
 
-ImplicationNode::ImplicationNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::implicationNode, span_, left_, right_)
+ImplicationNode::ImplicationNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::implicationNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* ImplicationNode::Clone(CloneContext& cloneContext) const
 {
-    return new ImplicationNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    ImplicationNode* clone = new ImplicationNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void ImplicationNode::Accept(Visitor& visitor)
@@ -129,17 +136,19 @@ std::string ImplicationNode::ToString() const
     return Left()->ToString() + "=>" + Right()->ToString();
 }
 
-DisjunctionNode::DisjunctionNode(const Span& span_) : BinaryNode(NodeType::disjunctionNode, span_)
+DisjunctionNode::DisjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::disjunctionNode, span_, moduleId_)
 {
 }
 
-DisjunctionNode::DisjunctionNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::disjunctionNode, span_, left_, right_)
+DisjunctionNode::DisjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::disjunctionNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* DisjunctionNode::Clone(CloneContext& cloneContext) const
 {
-    return new DisjunctionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    DisjunctionNode* clone = new DisjunctionNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void DisjunctionNode::Accept(Visitor& visitor)
@@ -152,17 +161,19 @@ std::string DisjunctionNode::ToString() const
     return Left()->ToString() + " || " + Right()->ToString();
 }
 
-ConjunctionNode::ConjunctionNode(const Span& span_) : BinaryNode(NodeType::conjunctionNode, span_)
+ConjunctionNode::ConjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::conjunctionNode, span_, moduleId_)
 {
 }
 
-ConjunctionNode::ConjunctionNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::conjunctionNode, span_, left_, right_)
+ConjunctionNode::ConjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::conjunctionNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* ConjunctionNode::Clone(CloneContext& cloneContext) const
 {
-    return new ConjunctionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    ConjunctionNode* clone = new ConjunctionNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void ConjunctionNode::Accept(Visitor& visitor)
@@ -175,17 +186,18 @@ std::string ConjunctionNode::ToString() const
     return Left()->ToString() + " && " + Right()->ToString();
 }
 
-BitOrNode::BitOrNode(const Span& span_) : BinaryNode(NodeType::bitOrNode, span_)
+BitOrNode::BitOrNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::bitOrNode, span_, moduleId_)
 {
 }
 
-BitOrNode::BitOrNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::bitOrNode, span_, left_, right_)
+BitOrNode::BitOrNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : BinaryNode(NodeType::bitOrNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* BitOrNode::Clone(CloneContext& cloneContext) const
 {
-    return new BitOrNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    BitOrNode* clone = new BitOrNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void BitOrNode::Accept(Visitor& visitor)
@@ -198,17 +210,19 @@ std::string BitOrNode::ToString() const
     return Left()->ToString() + " | " + Right()->ToString();
 }
 
-BitXorNode::BitXorNode(const Span& span_) : BinaryNode(NodeType::bitXorNode, span_)
+BitXorNode::BitXorNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::bitXorNode, span_, moduleId_)
 {
 }
 
-BitXorNode::BitXorNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::bitXorNode, span_, left_, right_)
+BitXorNode::BitXorNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::bitXorNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* BitXorNode::Clone(CloneContext& cloneContext) const
 {
-    return new BitXorNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    BitXorNode* clone = new BitXorNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void BitXorNode::Accept(Visitor& visitor)
@@ -221,17 +235,19 @@ std::string BitXorNode::ToString() const
     return Left()->ToString() + " ^ " + Right()->ToString();
 }
 
-BitAndNode::BitAndNode(const Span& span_) : BinaryNode(NodeType::bitAndNode, span_)
+BitAndNode::BitAndNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::bitAndNode, span_, moduleId_)
 {
 }
 
-BitAndNode::BitAndNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::bitAndNode, span_, left_, right_)
+BitAndNode::BitAndNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::bitAndNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* BitAndNode::Clone(CloneContext& cloneContext) const
 {
-    return new BitAndNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    BitAndNode* clone = new BitAndNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void BitAndNode::Accept(Visitor& visitor)
@@ -244,17 +260,19 @@ std::string BitAndNode::ToString() const
     return Left()->ToString() + " & " + Right()->ToString();
 }
 
-EqualNode::EqualNode(const Span& span_) : BinaryNode(NodeType::equalNode, span_)
+EqualNode::EqualNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::equalNode, span_, moduleId_)
 {
 }
 
-EqualNode::EqualNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::equalNode, span_, left_, right_)
+EqualNode::EqualNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::equalNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* EqualNode::Clone(CloneContext& cloneContext) const
 {
-    return new EqualNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    EqualNode* clone = new EqualNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void EqualNode::Accept(Visitor& visitor)
@@ -267,17 +285,18 @@ std::string EqualNode::ToString() const
     return Left()->ToString() + " == " + Right()->ToString();
 }
 
-NotEqualNode::NotEqualNode(const Span& span_) : BinaryNode(NodeType::notEqualNode, span_)
+NotEqualNode::NotEqualNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::notEqualNode, span_, moduleId_)
 {
 }
 
-NotEqualNode::NotEqualNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::notEqualNode, span_, left_, right_)
+NotEqualNode::NotEqualNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : BinaryNode(NodeType::notEqualNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* NotEqualNode::Clone(CloneContext& cloneContext) const
 {
-    return new NotEqualNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    NotEqualNode* clone = new NotEqualNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void NotEqualNode::Accept(Visitor& visitor)
@@ -290,17 +309,18 @@ std::string NotEqualNode::ToString() const
     return Left()->ToString() + " != " + Right()->ToString();
 }
 
-LessNode::LessNode(const Span& span_) : BinaryNode(NodeType::lessNode, span_)
+LessNode::LessNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::lessNode, span_, moduleId_)
 {
 }
 
-LessNode::LessNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::lessNode, span_, left_, right_)
+LessNode::LessNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : BinaryNode(NodeType::lessNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* LessNode::Clone(CloneContext& cloneContext) const
 {
-    return new LessNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    LessNode* clone = new LessNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void LessNode::Accept(Visitor& visitor)
@@ -313,17 +333,18 @@ std::string LessNode::ToString() const
     return Left()->ToString() + " < " + Right()->ToString();
 }
 
-GreaterNode::GreaterNode(const Span& span_) : BinaryNode(NodeType::greaterNode, span_)
+GreaterNode::GreaterNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::greaterNode, span_, moduleId_)
 {
 }
 
-GreaterNode::GreaterNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::greaterNode, span_, left_, right_)
+GreaterNode::GreaterNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : BinaryNode(NodeType::greaterNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* GreaterNode::Clone(CloneContext& cloneContext) const
 {
-    return new GreaterNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    GreaterNode* clone = new GreaterNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void GreaterNode::Accept(Visitor& visitor)
@@ -336,17 +357,19 @@ std::string GreaterNode::ToString() const
     return Left()->ToString() + " > " + Right()->ToString();
 }
 
-LessOrEqualNode::LessOrEqualNode(const Span& span_) : BinaryNode(NodeType::lessOrEqualNode, span_)
+LessOrEqualNode::LessOrEqualNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::lessOrEqualNode, span_, moduleId_)
 {
 }
 
-LessOrEqualNode::LessOrEqualNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::lessOrEqualNode, span_, left_, right_)
+LessOrEqualNode::LessOrEqualNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) :
+    BinaryNode(NodeType::lessOrEqualNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* LessOrEqualNode::Clone(CloneContext& cloneContext) const
 {
-    return new LessOrEqualNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    LessOrEqualNode* clone = new LessOrEqualNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void LessOrEqualNode::Accept(Visitor& visitor)
@@ -359,17 +382,19 @@ std::string LessOrEqualNode::ToString() const
     return Left()->ToString() + " <= " + Right()->ToString();
 }
 
-GreaterOrEqualNode::GreaterOrEqualNode(const Span& span_) : BinaryNode(NodeType::greaterOrEqualNode, span_)
+GreaterOrEqualNode::GreaterOrEqualNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::greaterOrEqualNode, span_, moduleId_)
 {
 }
 
-GreaterOrEqualNode::GreaterOrEqualNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::greaterOrEqualNode, span_, left_, right_)
+GreaterOrEqualNode::GreaterOrEqualNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::greaterOrEqualNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* GreaterOrEqualNode::Clone(CloneContext& cloneContext) const
 {
-    return new GreaterOrEqualNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    GreaterOrEqualNode* clone = new GreaterOrEqualNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void GreaterOrEqualNode::Accept(Visitor& visitor)
@@ -382,17 +407,19 @@ std::string GreaterOrEqualNode::ToString() const
     return Left()->ToString() + " >= " + Right()->ToString();
 }
 
-ShiftLeftNode::ShiftLeftNode(const Span& span_) : BinaryNode(NodeType::shiftLeftNode, span_)
+ShiftLeftNode::ShiftLeftNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::shiftLeftNode, span_, moduleId_)
 {
 }
 
-ShiftLeftNode::ShiftLeftNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::shiftLeftNode, span_, left_, right_)
+ShiftLeftNode::ShiftLeftNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::shiftLeftNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* ShiftLeftNode::Clone(CloneContext& cloneContext) const
 {
-    return new ShiftLeftNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    ShiftLeftNode* clone = new ShiftLeftNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void ShiftLeftNode::Accept(Visitor& visitor)
@@ -405,17 +432,19 @@ std::string ShiftLeftNode::ToString() const
     return Left()->ToString() + " << " + Right()->ToString();
 }
 
-ShiftRightNode::ShiftRightNode(const Span& span_) : BinaryNode(NodeType::shiftRightNode, span_)
+ShiftRightNode::ShiftRightNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::shiftRightNode, span_, moduleId_)
 {
 }
 
-ShiftRightNode::ShiftRightNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::shiftRightNode, span_, left_, right_)
+ShiftRightNode::ShiftRightNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::shiftRightNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* ShiftRightNode::Clone(CloneContext& cloneContext) const
 {
-    return new ShiftRightNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    ShiftRightNode* clone = new ShiftRightNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void ShiftRightNode::Accept(Visitor& visitor)
@@ -428,17 +457,18 @@ std::string ShiftRightNode::ToString() const
     return Left()->ToString() + " >> " + Right()->ToString();
 }
 
-AddNode::AddNode(const Span& span_) : BinaryNode(NodeType::addNode, span_)
+AddNode::AddNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::addNode, span_, moduleId_)
 {
 }
 
-AddNode::AddNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::addNode, span_, left_, right_)
+AddNode::AddNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : BinaryNode(NodeType::addNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* AddNode::Clone(CloneContext& cloneContext) const
 {
-    return new AddNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    AddNode* clone = new AddNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void AddNode::Accept(Visitor& visitor)
@@ -451,17 +481,19 @@ std::string AddNode::ToString() const
     return Left()->ToString() + " + " + Right()->ToString();
 }
 
-SubNode::SubNode(const Span& span_) : BinaryNode(NodeType::subNode, span_)
+SubNode::SubNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::subNode, span_, moduleId_)
 {
 }
 
-SubNode::SubNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::subNode, span_, left_, right_)
+SubNode::SubNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::subNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* SubNode::Clone(CloneContext& cloneContext) const
 {
-    return new SubNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    SubNode* clone = new SubNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void SubNode::Accept(Visitor& visitor)
@@ -474,17 +506,19 @@ std::string SubNode::ToString() const
     return Left()->ToString() + " - " + Right()->ToString();
 }
 
-MulNode::MulNode(const Span& span_) : BinaryNode(NodeType::mulNode, span_)
+MulNode::MulNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::mulNode, span_, moduleId_)
 {
 }
 
-MulNode::MulNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::mulNode, span_, left_, right_)
+MulNode::MulNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::mulNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* MulNode::Clone(CloneContext& cloneContext) const
 {
-    return new MulNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    MulNode* clone = new MulNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void MulNode::Accept(Visitor& visitor)
@@ -497,17 +531,19 @@ std::string MulNode::ToString() const
     return Left()->ToString() + " * " + Right()->ToString();
 }
 
-DivNode::DivNode(const Span& span_) : BinaryNode(NodeType::divNode, span_)
+DivNode::DivNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::divNode, span_, moduleId_)
 {
 }
 
-DivNode::DivNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::divNode, span_, left_, right_)
+DivNode::DivNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : 
+    BinaryNode(NodeType::divNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* DivNode::Clone(CloneContext& cloneContext) const
 {
-    return new DivNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    DivNode* clone = new DivNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void DivNode::Accept(Visitor& visitor)
@@ -520,17 +556,18 @@ std::string DivNode::ToString() const
     return Left()->ToString() + " / " + Right()->ToString();
 }
 
-RemNode::RemNode(const Span& span_) : BinaryNode(NodeType::remNode, span_)
+RemNode::RemNode(const Span& span_, const boost::uuids::uuid& moduleId_) : BinaryNode(NodeType::remNode, span_, moduleId_)
 {
 }
 
-RemNode::RemNode(const Span& span_, Node* left_, Node* right_) : BinaryNode(NodeType::remNode, span_, left_, right_)
+RemNode::RemNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : BinaryNode(NodeType::remNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* RemNode::Clone(CloneContext& cloneContext) const
 {
-    return new RemNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    RemNode* clone = new RemNode(GetSpan(), ModuleId(), Left()->Clone(cloneContext), Right()->Clone(cloneContext));
+    return clone;
 }
 
 void RemNode::Accept(Visitor& visitor)
@@ -543,17 +580,18 @@ std::string RemNode::ToString() const
     return Left()->ToString() + " % " + Right()->ToString();
 }
 
-NotNode::NotNode(const Span& span_) : UnaryNode(NodeType::notNode, span_)
+NotNode::NotNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::notNode, span_, moduleId_)
 {
 }
 
-NotNode::NotNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::notNode, span_, subject_)
+NotNode::NotNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : UnaryNode(NodeType::notNode, span_, moduleId_, subject_)
 {
 }
 
 Node* NotNode::Clone(CloneContext& cloneContext) const
 {
-    return new NotNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    NotNode* clone = new NotNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void NotNode::Accept(Visitor& visitor)
@@ -566,17 +604,18 @@ std::string NotNode::ToString() const
     return "!" + Subject()->ToString();
 }
 
-UnaryPlusNode::UnaryPlusNode(const Span& span_) : UnaryNode(NodeType::unaryPlusNode, span_)
+UnaryPlusNode::UnaryPlusNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::unaryPlusNode, span_, moduleId_)
 {
 }
 
-UnaryPlusNode::UnaryPlusNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::unaryPlusNode, span_, subject_)
+UnaryPlusNode::UnaryPlusNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : UnaryNode(NodeType::unaryPlusNode, span_, moduleId_, subject_)
 {
 }
 
 Node* UnaryPlusNode::Clone(CloneContext& cloneContext) const
 {
-    return new UnaryPlusNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    UnaryPlusNode* clone = new UnaryPlusNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void UnaryPlusNode::Accept(Visitor& visitor)
@@ -589,17 +628,18 @@ std::string UnaryPlusNode::ToString() const
     return "+" + Subject()->ToString();
 }
 
-UnaryMinusNode::UnaryMinusNode(const Span& span_) : UnaryNode(NodeType::unaryMinusNode, span_)
+UnaryMinusNode::UnaryMinusNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::unaryMinusNode, span_, moduleId_)
 {
 }
 
-UnaryMinusNode::UnaryMinusNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::unaryMinusNode, span_, subject_)
+UnaryMinusNode::UnaryMinusNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : UnaryNode(NodeType::unaryMinusNode, span_, moduleId_, subject_)
 {
 }
 
 Node* UnaryMinusNode::Clone(CloneContext& cloneContext) const
 {
-    return new UnaryMinusNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    UnaryMinusNode* clone = new UnaryMinusNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void UnaryMinusNode::Accept(Visitor& visitor)
@@ -612,17 +652,19 @@ std::string UnaryMinusNode::ToString() const
     return "-" + Subject()->ToString();
 }
 
-PrefixIncrementNode::PrefixIncrementNode(const Span& span_) : UnaryNode(NodeType::prefixIncrementNode, span_)
+PrefixIncrementNode::PrefixIncrementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::prefixIncrementNode, span_, moduleId_)
 {
 }
 
-PrefixIncrementNode::PrefixIncrementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::prefixIncrementNode, span_, subject_)
+PrefixIncrementNode::PrefixIncrementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : 
+    UnaryNode(NodeType::prefixIncrementNode, span_, moduleId_, subject_)
 {
 }
 
 Node* PrefixIncrementNode::Clone(CloneContext& cloneContext) const
 {
-    return new PrefixIncrementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    PrefixIncrementNode* clone = new PrefixIncrementNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void PrefixIncrementNode::Accept(Visitor& visitor)
@@ -635,17 +677,19 @@ std::string PrefixIncrementNode::ToString() const
     return "++" + Subject()->ToString();
 }
 
-PrefixDecrementNode::PrefixDecrementNode(const Span& span_) : UnaryNode(NodeType::prefixDecrementNode, span_)
+PrefixDecrementNode::PrefixDecrementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::prefixDecrementNode, span_, moduleId_)
 {
 }
 
-PrefixDecrementNode::PrefixDecrementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::prefixDecrementNode, span_, subject_)
+PrefixDecrementNode::PrefixDecrementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : 
+    UnaryNode(NodeType::prefixDecrementNode, span_, moduleId_, subject_)
 {
 }
 
 Node* PrefixDecrementNode::Clone(CloneContext& cloneContext) const
 {
-    return new PrefixDecrementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    PrefixDecrementNode* clone = new PrefixDecrementNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void PrefixDecrementNode::Accept(Visitor& visitor)
@@ -658,17 +702,18 @@ std::string PrefixDecrementNode::ToString() const
     return "--" + Subject()->ToString();
 }
 
-ComplementNode::ComplementNode(const Span& span_) : UnaryNode(NodeType::complementNode, span_)
+ComplementNode::ComplementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::complementNode, span_, moduleId_)
 {
 }
 
-ComplementNode::ComplementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::complementNode, span_, subject_)
+ComplementNode::ComplementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : UnaryNode(NodeType::complementNode, span_, moduleId_, subject_)
 {
 }
 
 Node* ComplementNode::Clone(CloneContext& cloneContext) const
 {
-    return new ComplementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    ComplementNode* clone = new ComplementNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void ComplementNode::Accept(Visitor& visitor)
@@ -681,17 +726,18 @@ std::string ComplementNode::ToString() const
     return "~" + Subject()->ToString();
 }
 
-DerefNode::DerefNode(const Span& span_) : UnaryNode(NodeType::derefNode, span_)
+DerefNode::DerefNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::derefNode, span_, moduleId_)
 {
 }
 
-DerefNode::DerefNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::derefNode, span_, subject_)
+DerefNode::DerefNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : UnaryNode(NodeType::derefNode, span_, moduleId_, subject_)
 {
 }
 
 Node* DerefNode::Clone(CloneContext& cloneContext) const
 {
-    return new DerefNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    DerefNode* clone = new DerefNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void DerefNode::Accept(Visitor& visitor)
@@ -704,17 +750,19 @@ std::string DerefNode::ToString() const
     return "*" + Subject()->ToString();
 }
 
-AddrOfNode::AddrOfNode(const Span& span_) : UnaryNode(NodeType::addrOfNode, span_)
+AddrOfNode::AddrOfNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::addrOfNode, span_, moduleId_)
 {
 }
 
-AddrOfNode::AddrOfNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::addrOfNode , span_, subject_)
+AddrOfNode::AddrOfNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : 
+    UnaryNode(NodeType::addrOfNode , span_, moduleId_, subject_)
 {
 }
 
 Node* AddrOfNode::Clone(CloneContext& cloneContext) const
 {
-    return new AddrOfNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    AddrOfNode* clone = new AddrOfNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void AddrOfNode::Accept(Visitor& visitor)
@@ -727,11 +775,12 @@ std::string AddrOfNode::ToString() const
     return "&" + Subject()->ToString();
 }
 
-IsNode::IsNode(const Span& span_) : Node(NodeType::isNode, span_), expr(), targetTypeExpr()
+IsNode::IsNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::isNode, span_, moduleId_), expr(), targetTypeExpr()
 {
 }
 
-IsNode::IsNode(const Span& span_, Node* expr_, Node* targetTypeExpr_) : Node(NodeType::isNode, span_), expr(expr_), targetTypeExpr(targetTypeExpr_)
+IsNode::IsNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expr_, Node* targetTypeExpr_) : 
+    Node(NodeType::isNode, span_, moduleId_), expr(expr_), targetTypeExpr(targetTypeExpr_)
 {
     expr->SetParent(this);
     targetTypeExpr->SetParent(this);
@@ -739,7 +788,8 @@ IsNode::IsNode(const Span& span_, Node* expr_, Node* targetTypeExpr_) : Node(Nod
 
 Node* IsNode::Clone(CloneContext& cloneContext) const
 {
-    return new IsNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), expr->Clone(cloneContext), targetTypeExpr->Clone(cloneContext));
+    IsNode* clone = new IsNode(GetSpan(), ModuleId(), expr->Clone(cloneContext), targetTypeExpr->Clone(cloneContext));
+    return clone;
 }
 
 void IsNode::Accept(Visitor& visitor)
@@ -768,11 +818,11 @@ std::string IsNode::ToString() const
     return expr->ToString() + " is " + targetTypeExpr->ToString();
 }
 
-AsNode::AsNode(const Span& span_) : Node(NodeType::asNode, span_), expr(), targetTypeExpr()
+AsNode::AsNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::asNode, span_, moduleId_), expr(), targetTypeExpr()
 {
 }
 
-AsNode::AsNode(const Span& span_, Node* expr_, Node* targetTypeExpr_) : Node(NodeType::asNode, span_), expr(expr_), targetTypeExpr(targetTypeExpr_)
+AsNode::AsNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expr_, Node* targetTypeExpr_) : Node(NodeType::asNode, span_, moduleId_), expr(expr_), targetTypeExpr(targetTypeExpr_)
 {
     expr->SetParent(this);
     targetTypeExpr->SetParent(this);
@@ -780,7 +830,8 @@ AsNode::AsNode(const Span& span_, Node* expr_, Node* targetTypeExpr_) : Node(Nod
 
 Node* AsNode::Clone(CloneContext& cloneContext) const
 {
-    return new AsNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), expr->Clone(cloneContext), targetTypeExpr->Clone(cloneContext));
+    AsNode* clone = new AsNode(GetSpan(), ModuleId(), expr->Clone(cloneContext), targetTypeExpr->Clone(cloneContext));
+    return clone;
 }
 
 void AsNode::Accept(Visitor& visitor)
@@ -809,11 +860,12 @@ std::string AsNode::ToString() const
     return expr->ToString() + " as " + targetTypeExpr->ToString();
 }
 
-IndexingNode::IndexingNode(const Span& span_) : Node(NodeType::indexingNode, span_), subject(), index()
+IndexingNode::IndexingNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::indexingNode, span_, moduleId_), subject(), index()
 {
 }
 
-IndexingNode::IndexingNode(const Span& span_, Node* subject_, Node* index_) : Node(NodeType::indexingNode, span_), subject(subject_), index(index_)
+IndexingNode::IndexingNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_, Node* index_) : 
+    Node(NodeType::indexingNode, span_, moduleId_), subject(subject_), index(index_)
 {
     subject->SetParent(this);
     index->SetParent(this);
@@ -821,7 +873,8 @@ IndexingNode::IndexingNode(const Span& span_, Node* subject_, Node* index_) : No
 
 Node* IndexingNode::Clone(CloneContext& cloneContext) const
 {
-    return new IndexingNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext), index->Clone(cloneContext));
+    IndexingNode* clone = new IndexingNode(GetSpan(), ModuleId(), subject->Clone(cloneContext), index->Clone(cloneContext));
+    return clone;
 }
 
 void IndexingNode::Accept(Visitor& visitor)
@@ -850,18 +903,19 @@ std::string IndexingNode::ToString() const
     return subject->ToString() + "[" + index->ToString() + "]";
 }
 
-InvokeNode::InvokeNode(const Span& span_) : Node(NodeType::invokeNode, span_), subject(), arguments()
+InvokeNode::InvokeNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::invokeNode, span_, moduleId_), subject(), arguments()
 {
 }
 
-InvokeNode::InvokeNode(const Span& span_, Node* subject_) : Node(NodeType::invokeNode, span_), subject(subject_), arguments()
+InvokeNode::InvokeNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : 
+    Node(NodeType::invokeNode, span_, moduleId_), subject(subject_), arguments()
 {
     subject->SetParent(this);
 }
 
 Node* InvokeNode::Clone(CloneContext& cloneContext) const
 {
-    InvokeNode* clone = new InvokeNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext));
+    InvokeNode* clone = new InvokeNode(GetSpan(), ModuleId(), subject->Clone(cloneContext));
     int n = arguments.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -915,17 +969,19 @@ std::string InvokeNode::ToString() const
     return s;
 }
 
-PostfixIncrementNode::PostfixIncrementNode(const Span& span_) : UnaryNode(NodeType::postfixIncrementNode, span_)
+PostfixIncrementNode::PostfixIncrementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::postfixIncrementNode, span_, moduleId_)
 {
 }
 
-PostfixIncrementNode::PostfixIncrementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::postfixIncrementNode, span_, subject_)
+PostfixIncrementNode::PostfixIncrementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : 
+    UnaryNode(NodeType::postfixIncrementNode, span_, moduleId_, subject_)
 {
 }
 
 Node* PostfixIncrementNode::Clone(CloneContext& cloneContext) const
 {
-    return new PostfixIncrementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    PostfixIncrementNode* clone = new PostfixIncrementNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void PostfixIncrementNode::Accept(Visitor& visitor)
@@ -938,17 +994,18 @@ std::string PostfixIncrementNode::ToString() const
     return Subject()->ToString() + "++";
 }
 
-PostfixDecrementNode::PostfixDecrementNode(const Span& span_) : UnaryNode(NodeType::postfixDecrementNode, span_)
+PostfixDecrementNode::PostfixDecrementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : UnaryNode(NodeType::postfixDecrementNode, span_, moduleId_)
 {
 }
 
-PostfixDecrementNode::PostfixDecrementNode(const Span& span_, Node* subject_) : UnaryNode(NodeType::postfixDecrementNode, span_, subject_)
+PostfixDecrementNode::PostfixDecrementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : UnaryNode(NodeType::postfixDecrementNode, span_, moduleId_, subject_)
 {
 }
 
 Node* PostfixDecrementNode::Clone(CloneContext& cloneContext) const
 {
-    return new PostfixDecrementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    PostfixDecrementNode* clone = new PostfixDecrementNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
+    return clone;
 }
 
 void PostfixDecrementNode::Accept(Visitor& visitor)
@@ -961,18 +1018,20 @@ std::string PostfixDecrementNode::ToString() const
     return Subject()->ToString() + "--";
 }
 
-SizeOfNode::SizeOfNode(const Span& span_) : Node(NodeType::sizeOfNode, span_), expression()
+SizeOfNode::SizeOfNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::sizeOfNode, span_, moduleId_), expression()
 {
 }
 
-SizeOfNode::SizeOfNode(const Span& span_, Node* expression_) : Node(NodeType::sizeOfNode, span_), expression(expression_)
+SizeOfNode::SizeOfNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_) : 
+    Node(NodeType::sizeOfNode, span_, moduleId_), expression(expression_)
 {
     expression->SetParent(this);
 }
 
 Node* SizeOfNode::Clone(CloneContext& cloneContext) const
 {
-    return new SizeOfNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), expression->Clone(cloneContext));
+    SizeOfNode* clone = new SizeOfNode(GetSpan(), ModuleId(), expression->Clone(cloneContext));
+    return clone;
 }
 
 void SizeOfNode::Accept(Visitor& visitor)
@@ -998,23 +1057,24 @@ std::string SizeOfNode::ToString() const
     return "sizeof(" + expression->ToString() + ")";
 }
 
-TypeNameNode::TypeNameNode(const Span& span_) : Node(NodeType::typeNameNode, span_), expression(), static_(false)
+TypeNameNode::TypeNameNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::typeNameNode, span_, moduleId_), expression(), static_(false)
 {
 }
 
-TypeNameNode::TypeNameNode(const Span& span_, Node* expression_) : Node(NodeType::typeNameNode, span_), expression(expression_), static_(false)
+TypeNameNode::TypeNameNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_) : 
+    Node(NodeType::typeNameNode, span_, moduleId_), expression(expression_), static_(false)
 {
     expression->SetParent(this);
 }
 
 Node* TypeNameNode::Clone(CloneContext& cloneContext) const
 {
-    TypeNameNode* typeNameNode = new TypeNameNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), expression->Clone(cloneContext));
+    TypeNameNode* clone = new TypeNameNode(GetSpan(), ModuleId(), expression->Clone(cloneContext));
     if (static_)
     {
-        typeNameNode->SetStatic();
+        clone->SetStatic();
     }
-    return typeNameNode;
+    return clone;
 }
 
 void TypeNameNode::Accept(Visitor& visitor)
@@ -1042,18 +1102,19 @@ std::string TypeNameNode::ToString() const
     return "typename(" + expression->ToString() + ")";
 }
 
-TypeIdNode::TypeIdNode(const Span& span_) : Node(NodeType::typeIdNode, span_), expression()
+TypeIdNode::TypeIdNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::typeIdNode, span_, moduleId_), expression()
 {
 }
 
-TypeIdNode::TypeIdNode(const Span& span_, Node* expression_) : Node(NodeType::typeIdNode, span_), expression(expression_)
+TypeIdNode::TypeIdNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_) : Node(NodeType::typeIdNode, span_, moduleId_), expression(expression_)
 {
     expression->SetParent(this);
 }
 
 Node* TypeIdNode::Clone(CloneContext& cloneContext) const
 {
-    return new TypeIdNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), expression->Clone(cloneContext));
+    TypeIdNode* clone = new TypeIdNode(GetSpan(), ModuleId(), expression->Clone(cloneContext));
+    return clone;
 }
 
 void TypeIdNode::Accept(Visitor& visitor)
@@ -1079,11 +1140,12 @@ std::string TypeIdNode::ToString() const
     return "typeid(" + expression->ToString() + ")";
 }
 
-CastNode::CastNode(const Span& span_) : Node(NodeType::castNode, span_), targetTypeExpr(), sourceExpr()
+CastNode::CastNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::castNode, span_, moduleId_), targetTypeExpr(), sourceExpr()
 {
 }
 
-CastNode::CastNode(const Span& span_, Node* targetTypeExpr_, Node* sourceExpr_) : Node(NodeType::castNode, span_), targetTypeExpr(targetTypeExpr_), sourceExpr(sourceExpr_)
+CastNode::CastNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* targetTypeExpr_, Node* sourceExpr_) : 
+    Node(NodeType::castNode, span_, moduleId_), targetTypeExpr(targetTypeExpr_), sourceExpr(sourceExpr_)
 {
     targetTypeExpr->SetParent(this);
     sourceExpr->SetParent(this);
@@ -1091,7 +1153,8 @@ CastNode::CastNode(const Span& span_, Node* targetTypeExpr_, Node* sourceExpr_) 
 
 Node* CastNode::Clone(CloneContext& cloneContext) const
 {
-    return new CastNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), targetTypeExpr->Clone(cloneContext), sourceExpr->Clone(cloneContext));
+    CastNode* clone = new CastNode(GetSpan(), ModuleId(), targetTypeExpr->Clone(cloneContext), sourceExpr->Clone(cloneContext));
+    return clone;
 }
 
 void CastNode::Accept(Visitor& visitor)
@@ -1120,18 +1183,19 @@ std::string CastNode::ToString() const
     return "cast<" + targetTypeExpr->ToString() + ">(" + sourceExpr->ToString() + ")";
 }
 
-ConstructNode::ConstructNode(const Span& span_) : Node(NodeType::constructNode, span_), typeExpr(), arguments()
+ConstructNode::ConstructNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::constructNode, span_, moduleId_), typeExpr(), arguments()
 {
 }
 
-ConstructNode::ConstructNode(const Span& span_, Node* typeExpr_) : Node(NodeType::constructNode, span_), typeExpr(typeExpr_), arguments()
+ConstructNode::ConstructNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_) : 
+    Node(NodeType::constructNode, span_, moduleId_), typeExpr(typeExpr_), arguments()
 {
     typeExpr->SetParent(this);
 }
 
 Node* ConstructNode::Clone(CloneContext& cloneContext) const
 {
-    ConstructNode* clone = new ConstructNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), typeExpr->Clone(cloneContext));
+    ConstructNode* clone = new ConstructNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext));
     int n = arguments.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1184,18 +1248,19 @@ std::string ConstructNode::ToString() const
     return s;
 }
 
-NewNode::NewNode(const Span& span_) : Node(NodeType::newNode, span_), typeExpr(), arguments()
+NewNode::NewNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::newNode, span_, moduleId_), typeExpr(), arguments()
 {
 }
 
-NewNode::NewNode(const Span& span_, Node* typeExpr_) : Node(NodeType::newNode, span_), typeExpr(typeExpr_), arguments()
+NewNode::NewNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_) : 
+    Node(NodeType::newNode, span_, moduleId_), typeExpr(typeExpr_), arguments()
 {
     typeExpr->SetParent(this);
 }
 
 Node* NewNode::Clone(CloneContext& cloneContext) const
 {
-    NewNode* clone = new NewNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), typeExpr->Clone(cloneContext));
+    NewNode* clone = new NewNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext));
     int n = arguments.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1249,13 +1314,14 @@ std::string NewNode::ToString() const
     return s;
 }
 
-ThisNode::ThisNode(const Span& span_) : Node(NodeType::thisNode, span_)
+ThisNode::ThisNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::thisNode, span_, moduleId_)
 {
 }
 
 Node* ThisNode::Clone(CloneContext& cloneContext) const
 {
-    return new ThisNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    ThisNode* clone = new ThisNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void ThisNode::Accept(Visitor& visitor)
@@ -1268,13 +1334,14 @@ std::string ThisNode::ToString() const
     return "this";
 }
 
-BaseNode::BaseNode(const Span& span_) : Node(NodeType::baseNode, span_)
+BaseNode::BaseNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::baseNode, span_, moduleId_)
 {
 }
 
 Node* BaseNode::Clone(CloneContext& cloneContext) const
 {
-    return new BaseNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    BaseNode* clone = new BaseNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void BaseNode::Accept(Visitor& visitor)
@@ -1287,17 +1354,19 @@ std::string BaseNode::ToString() const
     return "base";
 }
 
-ParenthesizedExpressionNode::ParenthesizedExpressionNode(const Span& span_) : UnaryNode(NodeType::parenthesizedExpressionNode, span_)
+ParenthesizedExpressionNode::ParenthesizedExpressionNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    UnaryNode(NodeType::parenthesizedExpressionNode, span_, moduleId_)
 {
 }
 
-ParenthesizedExpressionNode::ParenthesizedExpressionNode(const Span& span_, Node* child_) : UnaryNode(NodeType::parenthesizedExpressionNode, span_, child_)
+ParenthesizedExpressionNode::ParenthesizedExpressionNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* child_) : 
+    UnaryNode(NodeType::parenthesizedExpressionNode, span_, moduleId_, child_)
 {
 }
 
 Node* ParenthesizedExpressionNode::Clone(CloneContext& cloneContext) const
 {
-    ParenthesizedExpressionNode* clone = new ParenthesizedExpressionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Subject()->Clone(cloneContext));
+    ParenthesizedExpressionNode* clone = new ParenthesizedExpressionNode(GetSpan(), ModuleId(), Subject()->Clone(cloneContext));
     return clone;
 }
 

@@ -8,6 +8,7 @@
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
+#include <cmajor/symbols/SourceFileModuleMap.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 
 namespace cmajor { namespace symbols {
@@ -19,10 +20,12 @@ void Init()
     InitModule();
     InitModuleCache();
     InitSymbolTable();
+    InitSourceFileModuleMap();
 }
 
 void Done()
 {
+    DoneSourceFileModuleMap();
     DoneSymbolTable();
     DoneModuleCache();
     DoneModule();

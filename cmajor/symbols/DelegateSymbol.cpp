@@ -19,7 +19,8 @@ namespace cmajor { namespace symbols {
 
 using namespace soulng::unicode;
 
-DelegateTypeSymbol::DelegateTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::delegateTypeSymbol, span_, name_), returnType(), parameters()
+DelegateTypeSymbol::DelegateTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    TypeSymbol(SymbolType::delegateTypeSymbol, span_, sourceModuleId_, name_), returnType(), parameters()
 {
 }
 
@@ -153,47 +154,47 @@ void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be static", GetSpan());
+        throw Exception("delegate cannot be static", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be virtual", GetSpan());
+        throw Exception("delegate cannot be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be override", GetSpan());
+        throw Exception("delegate cannot be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be abstract", GetSpan());
+        throw Exception("delegate cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be inline", GetSpan());
+        throw Exception("delegate cannot be inline", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be explicit", GetSpan());
+        throw Exception("delegate cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be external", GetSpan());
+        throw Exception("delegate cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be suppressed", GetSpan());
+        throw Exception("delegate cannot be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be default", GetSpan());
+        throw Exception("delegate cannot be default", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be constexpr", GetSpan());
+        throw Exception("delegate cannot be constexpr", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be cdecl", GetSpan());
+        throw Exception("delegate cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -203,20 +204,20 @@ void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception("delegate cannot be throw and nothrow at the same time", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be new", GetSpan());
+        throw Exception("delegate cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be const", GetSpan());
+        throw Exception("delegate cannot be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "delegate cannot be unit_test", GetSpan());
+        throw Exception("delegate cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
@@ -230,7 +231,7 @@ void DelegateTypeSymbol::SetReturnParam(ParameterSymbol* returnParam_)
     returnParam.reset(returnParam_);
 }
 
-void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     void* callee = nullptr;
     int na = genObjects.size();
@@ -364,22 +365,23 @@ void DelegateTypeSymbol::Check()
     TypeSymbol::Check();
     if (!returnType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "delegate type symbol has no return type", GetSpan());
+        throw SymbolCheckException("delegate type symbol has no return type", GetSpan(), SourceModuleId());
     }
 
 }
 
-DelegateTypeDefaultConstructor::DelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::delegateTypeDefaultConstructor, span_, name_)
+DelegateTypeDefaultConstructor::DelegateTypeDefaultConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::delegateTypeDefaultConstructor, span_, sourceModuleId_, name_)
 {
 }
 
 DelegateTypeDefaultConstructor::DelegateTypeDefaultConstructor(DelegateTypeSymbol* delegateType_) : 
-    FunctionSymbol(SymbolType::delegateTypeDefaultConstructor, Span(), U"@constructor"), delegateType(delegateType_)
+    FunctionSymbol(SymbolType::delegateTypeDefaultConstructor, delegateType_->GetSpan(), delegateType_->SourceModuleId(), U"@constructor"), delegateType(delegateType_)
 {
     SetGroupName(U"@constructor");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(delegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"this");
+    thisParam->SetType(delegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
     ComputeName();
 }
@@ -411,7 +413,7 @@ void DelegateTypeDefaultConstructor::EmplaceType(TypeSymbol* typeSymbol, int ind
     }
 }
 
-void DelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void DelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     emitter.Stack().Push(delegateType->CreateDefaultIrValue(emitter));
@@ -423,52 +425,56 @@ void DelegateTypeDefaultConstructor::Check()
     FunctionSymbol::Check();
     if (!delegateType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "delegate type default constructor has no delegate type", GetSpan());
+        throw SymbolCheckException("delegate type default constructor has no delegate type", GetSpan(), SourceModuleId());
     }
 }
 
-DelegateTypeCopyConstructor::DelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::delegateTypeCopyConstructor, span_, name_)
+DelegateTypeCopyConstructor::DelegateTypeCopyConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::delegateTypeCopyConstructor, span_, sourceModuleId_, name_)
 {
 }
 
-DelegateTypeCopyConstructor::DelegateTypeCopyConstructor(DelegateTypeSymbol* delegateType) : FunctionSymbol(SymbolType::delegateTypeCopyConstructor, Span(), U"@constructor")
+DelegateTypeCopyConstructor::DelegateTypeCopyConstructor(DelegateTypeSymbol* delegateType) : FunctionSymbol(SymbolType::delegateTypeCopyConstructor, 
+    delegateType->GetSpan(), delegateType->SourceModuleId(), U"@constructor")
 {
     SetGroupName(U"@constructor");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(delegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"this");
+    thisParam->SetType(delegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
-    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    ParameterSymbol* thatParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"that");
     thatParam->SetType(delegateType);
     AddMember(thatParam);
     ComputeName();
 }
 
-void DelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void DelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 2, "copy constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
-DelegateTypeMoveConstructor::DelegateTypeMoveConstructor(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::delegateTypeMoveConstructor, span_, name_)
+DelegateTypeMoveConstructor::DelegateTypeMoveConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::delegateTypeMoveConstructor, span_, sourceModuleId_, name_)
 {
 }
 
-DelegateTypeMoveConstructor::DelegateTypeMoveConstructor(DelegateTypeSymbol* delegateType) : FunctionSymbol(SymbolType::delegateTypeMoveConstructor, Span(), U"@constructor")
+DelegateTypeMoveConstructor::DelegateTypeMoveConstructor(DelegateTypeSymbol* delegateType) : 
+    FunctionSymbol(SymbolType::delegateTypeMoveConstructor, delegateType->GetSpan(), delegateType->SourceModuleId(), U"@constructor")
 {
     SetGroupName(U"@constructor");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(delegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"this");
+    thisParam->SetType(delegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
-    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
-    thatParam->SetType(delegateType->AddRvalueReference(Span()));
+    ParameterSymbol* thatParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"that");
+    thatParam->SetType(delegateType->AddRvalueReference(Span(), boost::uuids::nil_uuid()));
     AddMember(thatParam);
     ComputeName();
 }
 
-void DelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void DelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 2, "move constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -477,50 +483,54 @@ void DelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<Gen
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
-DelegateTypeCopyAssignment::DelegateTypeCopyAssignment(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::delegateTypeCopyAssignment, span_, name_)
+DelegateTypeCopyAssignment::DelegateTypeCopyAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::delegateTypeCopyAssignment, span_, sourceModuleId_, name_)
 {
 }
 
-DelegateTypeCopyAssignment::DelegateTypeCopyAssignment(DelegateTypeSymbol* delegateType, TypeSymbol* voidType) : FunctionSymbol(SymbolType::delegateTypeCopyAssignment, Span(), U"operator=")
+DelegateTypeCopyAssignment::DelegateTypeCopyAssignment(DelegateTypeSymbol* delegateType, TypeSymbol* voidType) : 
+    FunctionSymbol(SymbolType::delegateTypeCopyAssignment, delegateType->GetSpan(), delegateType->SourceModuleId(), U"operator=")
 {
     SetGroupName(U"operator=");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(delegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"this");
+    thisParam->SetType(delegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
-    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
+    ParameterSymbol* thatParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"that");
     thatParam->SetType(delegateType);
     AddMember(thatParam);
     SetReturnType(voidType);
     ComputeName();
 }
 
-void DelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void DelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
-DelegateTypeMoveAssignment::DelegateTypeMoveAssignment(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::delegateTypeMoveAssignment, span_, name_)
+DelegateTypeMoveAssignment::DelegateTypeMoveAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::delegateTypeMoveAssignment, span_, sourceModuleId_, name_)
 {
 }
 
-DelegateTypeMoveAssignment::DelegateTypeMoveAssignment(DelegateTypeSymbol* delegateType, TypeSymbol* voidType) : FunctionSymbol(SymbolType::delegateTypeMoveAssignment, Span(), U"operator=")
+DelegateTypeMoveAssignment::DelegateTypeMoveAssignment(DelegateTypeSymbol* delegateType, TypeSymbol* voidType) : 
+    FunctionSymbol(SymbolType::delegateTypeMoveAssignment, delegateType->GetSpan(), delegateType->SourceModuleId(), U"operator=")
 {
     SetGroupName(U"operator=");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(delegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"this");
+    thisParam->SetType(delegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
-    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
-    thatParam->SetType(delegateType->AddRvalueReference(Span()));
+    ParameterSymbol* thatParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"that");
+    thatParam->SetType(delegateType->AddRvalueReference(Span(), boost::uuids::nil_uuid()));
     AddMember(thatParam);
     SetReturnType(voidType);
     ComputeName();
 }
 
-void DelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void DelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 2, "move assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
@@ -529,45 +539,48 @@ void DelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenO
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
-DelegateTypeReturn::DelegateTypeReturn(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::delegateTypeReturn, span_, name_)
+DelegateTypeReturn::DelegateTypeReturn(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::delegateTypeReturn, span_, sourceModuleId_, name_)
 {
 }
 
-DelegateTypeReturn::DelegateTypeReturn(DelegateTypeSymbol* delegateType) : FunctionSymbol(SymbolType::delegateTypeReturn, Span(), U"@return")
+DelegateTypeReturn::DelegateTypeReturn(DelegateTypeSymbol* delegateType) : FunctionSymbol(SymbolType::delegateTypeReturn, delegateType->GetSpan(), delegateType->SourceModuleId(), U"@return")
 {
     SetGroupName(U"@return");
-    ParameterSymbol* valueParam = new ParameterSymbol(Span(), U"value");
+    ParameterSymbol* valueParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"value");
     valueParam->SetType(delegateType);
     AddMember(valueParam);
     SetReturnType(delegateType);
     ComputeName();
 }
 
-void DelegateTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void DelegateTypeReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 1, "return needs one object");
     genObjects[0]->Load(emitter, OperationFlags::none);
 }
 
-DelegateTypeEquality::DelegateTypeEquality(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::delegateTypeEquality, span_, name_)
+DelegateTypeEquality::DelegateTypeEquality(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::delegateTypeEquality, span_, sourceModuleId_, name_)
 {
 }
 
-DelegateTypeEquality::DelegateTypeEquality(DelegateTypeSymbol* delegateType, TypeSymbol* boolType) : FunctionSymbol(SymbolType::delegateTypeEquality, Span(), U"operator==")
+DelegateTypeEquality::DelegateTypeEquality(DelegateTypeSymbol* delegateType, TypeSymbol* boolType) 
+    : FunctionSymbol(SymbolType::delegateTypeEquality, delegateType->GetSpan(), delegateType->SourceModuleId(), U"operator==")
 {
     SetGroupName(U"operator==");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* leftParam = new ParameterSymbol(Span(), U"left");
+    ParameterSymbol* leftParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"left");
     leftParam->SetType(delegateType);
     AddMember(leftParam);
-    ParameterSymbol* rightParam = new ParameterSymbol(Span(), U"right");
+    ParameterSymbol* rightParam = new ParameterSymbol(delegateType->GetSpan(), delegateType->SourceModuleId(), U"right");
     rightParam->SetType(delegateType);
     AddMember(rightParam);
     SetReturnType(boolType);
     ComputeName();
 }
 
-void DelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void DelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 2, "operator== needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -577,17 +590,20 @@ void DelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*
     emitter.Stack().Push(emitter.CreateICmpEQ(left, right));
 }
 
-FunctionToDelegateConversion::FunctionToDelegateConversion(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::functionToDelegateSymbol, span_, name_)
+FunctionToDelegateConversion::FunctionToDelegateConversion(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::functionToDelegateSymbol, span_, sourceModuleId_, name_), sourceType(nullptr), targetType(nullptr), function(nullptr)
 {
 }
 
 FunctionToDelegateConversion::FunctionToDelegateConversion(TypeSymbol* sourceType_, TypeSymbol* targetType_, FunctionSymbol* function_) :
-    FunctionSymbol(SymbolType::functionToDelegateSymbol, Span(), U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_)
+    FunctionSymbol(SymbolType::functionToDelegateSymbol, function_->GetSpan(), function_->SourceModuleId(), U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_)
 {
     SetConversion();
+    SetConversionSourceType(sourceType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(targetType->PlainType(GetSpan(), SourceModuleId()));
 }
 
-void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     emitter.Stack().Pop();
     emitter.Stack().Push(emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter), function->DontThrow()));
@@ -598,27 +614,29 @@ void FunctionToDelegateConversion::Check()
     FunctionSymbol::Check();
     if (!sourceType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "function to delegate conversion has no source type", GetSpan());
+        throw SymbolCheckException("function to delegate conversion has no source type", GetSpan(), SourceModuleId());
     }
     if (!targetType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "function to delegate conversion has no target type", GetSpan());
+        throw SymbolCheckException("function to delegate conversion has no target type", GetSpan(), SourceModuleId());
     }
     if (!function)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "function to delegate conversion has no function", GetSpan());
+        throw SymbolCheckException("function to delegate conversion has no function", GetSpan(), SourceModuleId());
     }
 }
 
 DelegateToVoidPtrConversion::DelegateToVoidPtrConversion(TypeSymbol* delegateType_, TypeSymbol* voidPtrType_) :
-    FunctionSymbol(Span(), U"dlg2voidptr"), delegateType(delegateType_), voidPtrType(voidPtrType_)
+    FunctionSymbol(delegateType_->GetSpan(), delegateType_->SourceModuleId(), U"dlg2voidptr"), delegateType(delegateType_), voidPtrType(voidPtrType_)
 {
     SetConversion();
     SetGroupName(U"@conversion");
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(delegateType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(voidPtrType->PlainType(GetSpan(), SourceModuleId()));
 }
 
-void DelegateToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void DelegateToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     emitter.SetCurrentDebugLocation(span);
     void* value = emitter.Stack().Pop();
@@ -626,14 +644,16 @@ void DelegateToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<Gen
 }
 
 VoidPtrToDelegateConversion::VoidPtrToDelegateConversion(TypeSymbol* voidPtrType_, TypeSymbol* delegateType_, TypeSymbol* ulongType_) :
-    FunctionSymbol(Span(), U"voidptr2dlg"), voidPtrType(voidPtrType_), delegateType(delegateType_), ulongType(ulongType_)
+    FunctionSymbol(delegateType_->GetSpan(), delegateType_->SourceModuleId(), U"voidptr2dlg"), voidPtrType(voidPtrType_), delegateType(delegateType_), ulongType(ulongType_)
 {
     SetConversion();
     SetGroupName(U"@conversion");
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(delegateType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(voidPtrType->PlainType(GetSpan(), SourceModuleId()));
 }
 
-void VoidPtrToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void VoidPtrToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     emitter.SetCurrentDebugLocation(span);
     void* value = emitter.Stack().Pop();
@@ -641,8 +661,8 @@ void VoidPtrToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<Gen
     emitter.Stack().Push(emitter.CreateIntToPtr(ulongValue, delegateType->IrType(emitter)));
 }
 
-ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_) : 
-    TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, name_), returnType(nullptr), parameters(), delegateType(nullptr), objectDelegatePairType(nullptr), 
+ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    TypeSymbol(SymbolType::classDelegateTypeSymbol, span_, sourceModuleId_, name_), returnType(nullptr), parameters(), delegateType(nullptr), objectDelegatePairType(nullptr), 
     copyConstructor(nullptr)
 {
 }
@@ -788,47 +808,47 @@ void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be static", GetSpan());
+        throw Exception("class delegate cannot be static", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be virtual", GetSpan());
+        throw Exception("class delegate cannot be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be override", GetSpan());
+        throw Exception("class delegate cannot be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be abstract", GetSpan());
+        throw Exception("class delegate cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be inline", GetSpan());
+        throw Exception("class delegate cannot be inline", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be explicit", GetSpan());
+        throw Exception("class delegate cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be external", GetSpan());
+        throw Exception("class delegate cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be suppressed", GetSpan());
+        throw Exception("class delegate cannot be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be default", GetSpan());
+        throw Exception("class delegate cannot be default", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be constexpr", GetSpan());
+        throw Exception("class delegate cannot be constexpr", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be cdecl", GetSpan());
+        throw Exception("class delegate cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -838,24 +858,24 @@ void ClassDelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception("class delegate cannot be throw and nothrow at the same time", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be new", GetSpan());
+        throw Exception("class delegate cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be const", GetSpan());
+        throw Exception("class delegate cannot be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class delegate cannot be unit_test", GetSpan());
+        throw Exception("class delegate cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
-void ClassDelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void ClassDelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(!genObjects.empty(), "gen objects is empty");
     genObjects[0]->Load(emitter, flags);
@@ -875,7 +895,7 @@ void ClassDelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObje
         GenObject* genObject = genObjects[i];
         classDelegateCallObjects.push_back(genObject);
     }
-    delegateType->GenerateCall(emitter, classDelegateCallObjects, flags, span);
+    delegateType->GenerateCall(emitter, classDelegateCallObjects, flags, span, moduleId);
 }
 
 void ClassDelegateTypeSymbol::Check()
@@ -883,34 +903,34 @@ void ClassDelegateTypeSymbol::Check()
     TypeSymbol::Check();
     if (!returnType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type symbol has no return type", GetSpan());
+        throw SymbolCheckException("class delegate type symbol has no return type", GetSpan(), SourceModuleId());
     }
     if (!delegateType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type symbol has no delegate type", GetSpan());
+        throw SymbolCheckException("class delegate type symbol has no delegate type", GetSpan(), SourceModuleId());
     }
     if (!objectDelegatePairType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type symbol has no object delegate pair type", GetSpan());
+        throw SymbolCheckException("class delegate type symbol has no object delegate pair type", GetSpan(), SourceModuleId());
     }
     if (!copyConstructor)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type symbol has no copy constructor", GetSpan());
+        throw SymbolCheckException("class delegate type symbol has no copy constructor", GetSpan(), SourceModuleId());
     }
 }
 
-ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_) : 
-    FunctionSymbol(SymbolType::classDelegateTypeDefaultConstructor, span_, name_)
+ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeDefaultConstructor, span_, sourceModuleId_, name_)
 {
 }
 
 ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(ClassDelegateTypeSymbol* classDelegateType_) : 
-    FunctionSymbol(SymbolType::classDelegateTypeDefaultConstructor, Span(), U"@constructor"), classDelegateType(classDelegateType_)
+    FunctionSymbol(SymbolType::classDelegateTypeDefaultConstructor, classDelegateType_->GetSpan(), classDelegateType_->SourceModuleId(), U"@constructor"), classDelegateType(classDelegateType_)
 {
     SetGroupName(U"@constructor");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(classDelegateType_->GetSpan(), classDelegateType_->SourceModuleId(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
     ComputeName();
 }
@@ -942,7 +962,7 @@ void ClassDelegateTypeDefaultConstructor::EmplaceType(TypeSymbol* typeSymbol, in
     }
 }
 
-void ClassDelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void ClassDelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     void* objectValue = emitter.CreateDefaultIrValueForVoidPtrType();
@@ -960,30 +980,30 @@ void ClassDelegateTypeDefaultConstructor::Check()
     FunctionSymbol::Check();
     if (!classDelegateType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class delegate type default constructor has no class delegate type", GetSpan());
+        throw SymbolCheckException("class delegate type default constructor has no class delegate type", GetSpan(), SourceModuleId());
     }
 }
 
-ClassDelegateTypeCopyConstructor::ClassDelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_) :
-    FunctionSymbol(SymbolType::classDelegateTypeCopyConstructor, span_, name_)
+ClassDelegateTypeCopyConstructor::ClassDelegateTypeCopyConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeCopyConstructor, span_, sourceModuleId_, name_)
 {
 }
 
 ClassDelegateTypeCopyConstructor::ClassDelegateTypeCopyConstructor(ClassDelegateTypeSymbol* classDelegateType) :
-    FunctionSymbol(SymbolType::classDelegateTypeCopyConstructor, Span(), U"@constructor")
+    FunctionSymbol(SymbolType::classDelegateTypeCopyConstructor, classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"@constructor")
 {
     SetGroupName(U"@constructor");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
-    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
-    thatParam->SetType(classDelegateType->AddConst(Span())->AddLvalueReference(Span()));
+    ParameterSymbol* thatParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"that");
+    thatParam->SetType(classDelegateType->AddConst(Span(), boost::uuids::nil_uuid())->AddLvalueReference(Span(), boost::uuids::nil_uuid()));
     AddMember(thatParam);
     ComputeName();
 }
 
-void ClassDelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void ClassDelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     genObjects[1]->Load(emitter, OperationFlags::none);
     void* thatPtr = emitter.Stack().Pop();
@@ -1004,26 +1024,26 @@ void ClassDelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vecto
     emitter.CreateStore(delegateValue, thisDelegatePtr);
 }
 
-ClassDelegateTypeMoveConstructor::ClassDelegateTypeMoveConstructor(const Span& span_, const std::u32string& name_) :
-    FunctionSymbol(SymbolType::classDelegateTypeMoveConstructor, span_, name_)
+ClassDelegateTypeMoveConstructor::ClassDelegateTypeMoveConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeMoveConstructor, span_, sourceModuleId_, name_)
 {
 }
 
 ClassDelegateTypeMoveConstructor::ClassDelegateTypeMoveConstructor(ClassDelegateTypeSymbol* classDelegateType) :
-    FunctionSymbol(SymbolType::classDelegateTypeCopyConstructor, Span(), U"@constructor")
+    FunctionSymbol(SymbolType::classDelegateTypeCopyConstructor, classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"@constructor")
 {
     SetGroupName(U"@constructor");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
-    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
-    thatParam->SetType(classDelegateType->AddRvalueReference(Span()));
+    ParameterSymbol* thatParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"that");
+    thatParam->SetType(classDelegateType->AddRvalueReference(Span(), boost::uuids::nil_uuid()));
     AddMember(thatParam);
     ComputeName();
 }
 
-void ClassDelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void ClassDelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     genObjects[1]->Load(emitter, OperationFlags::none);
     void* thatPtr = emitter.Stack().Pop();
@@ -1044,27 +1064,27 @@ void ClassDelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vecto
     emitter.CreateStore(delegateValue, thisDelegatePtr);
 }
 
-ClassDelegateTypeCopyAssignment::ClassDelegateTypeCopyAssignment(const Span& span_, const std::u32string& name_) :
-    FunctionSymbol(SymbolType::classDelegateTypeCopyAssignment, span_, name_)
+ClassDelegateTypeCopyAssignment::ClassDelegateTypeCopyAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeCopyAssignment, span_, sourceModuleId_, name_)
 {
 }
 
 ClassDelegateTypeCopyAssignment::ClassDelegateTypeCopyAssignment(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* voidType) :
-    FunctionSymbol(SymbolType::classDelegateTypeCopyAssignment, Span(), U"operator=")
+    FunctionSymbol(SymbolType::classDelegateTypeCopyAssignment, classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"operator=")
 {
     SetGroupName(U"operator=");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
-    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
-    thatParam->SetType(classDelegateType->AddConst(Span())->AddLvalueReference(Span()));
+    ParameterSymbol* thatParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"that");
+    thatParam->SetType(classDelegateType->AddConst(Span(), boost::uuids::nil_uuid())->AddLvalueReference(Span(), boost::uuids::nil_uuid()));
     AddMember(thatParam);
     SetReturnType(voidType);
     ComputeName();
 }
 
-void ClassDelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void ClassDelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     genObjects[1]->Load(emitter, OperationFlags::none);
     void* thatPtr = emitter.Stack().Pop();
@@ -1080,27 +1100,27 @@ void ClassDelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector
     emitter.CreateStore(delegateValue, thisDelegatePtr);
 }
 
-ClassDelegateTypeMoveAssignment::ClassDelegateTypeMoveAssignment(const Span& span_, const std::u32string& name_) :
-    FunctionSymbol(SymbolType::classDelegateTypeMoveAssignment, span_, name_)
+ClassDelegateTypeMoveAssignment::ClassDelegateTypeMoveAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeMoveAssignment, span_, sourceModuleId_, name_)
 {
 }
 
 ClassDelegateTypeMoveAssignment::ClassDelegateTypeMoveAssignment(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* voidType) :
-    FunctionSymbol(SymbolType::classDelegateTypeMoveAssignment, Span(), U"operator=")
+    FunctionSymbol(SymbolType::classDelegateTypeMoveAssignment, classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"operator=")
 {
     SetGroupName(U"operator=");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(classDelegateType->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"this");
+    thisParam->SetType(classDelegateType->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
-    ParameterSymbol* thatParam = new ParameterSymbol(Span(), U"that");
-    thatParam->SetType(classDelegateType->AddRvalueReference(Span()));
+    ParameterSymbol* thatParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"that");
+    thatParam->SetType(classDelegateType->AddRvalueReference(Span(), boost::uuids::nil_uuid()));
     AddMember(thatParam);
     SetReturnType(voidType);
     ComputeName();
 }
 
-void ClassDelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void ClassDelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     genObjects[1]->Load(emitter, OperationFlags::none);
     void* thatPtr = emitter.Stack().Pop();
@@ -1116,27 +1136,27 @@ void ClassDelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector
     emitter.CreateStore(delegateValue, thisDelegatePtr);
 }
 
-ClassDelegateTypeEquality::ClassDelegateTypeEquality(const Span& span_, const std::u32string& name_) :
-    FunctionSymbol(SymbolType::classDelegateTypeEquality, span_, name_)
+ClassDelegateTypeEquality::ClassDelegateTypeEquality(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::classDelegateTypeEquality, span_, sourceModuleId_, name_)
 {
 }
 
 ClassDelegateTypeEquality::ClassDelegateTypeEquality(ClassDelegateTypeSymbol* classDelegateType, TypeSymbol* boolType) :
-    FunctionSymbol(SymbolType::classDelegateTypeEquality, Span(), U"operator==")
+    FunctionSymbol(SymbolType::classDelegateTypeEquality, classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"operator==")
 {
     SetGroupName(U"operator==");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* leftParam = new ParameterSymbol(Span(), U"left");
-    leftParam->SetType(classDelegateType->AddConst(Span())->AddLvalueReference(Span()));
+    ParameterSymbol* leftParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"left");
+    leftParam->SetType(classDelegateType->AddConst(Span(), boost::uuids::nil_uuid())->AddLvalueReference(Span(), boost::uuids::nil_uuid()));
     AddMember(leftParam);
-    ParameterSymbol* rightParam = new ParameterSymbol(Span(), U"right");
-    rightParam->SetType(classDelegateType->AddConst(Span())->AddLvalueReference(Span()));
+    ParameterSymbol* rightParam = new ParameterSymbol(classDelegateType->GetSpan(), classDelegateType->SourceModuleId(), U"right");
+    rightParam->SetType(classDelegateType->AddConst(Span(), boost::uuids::nil_uuid())->AddLvalueReference(Span(), boost::uuids::nil_uuid()));
     AddMember(rightParam);
     SetReturnType(boolType);
     ComputeName();
 }
 
-void ClassDelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void ClassDelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     genObjects[0]->Load(emitter, OperationFlags::none);
     void* leftPtr = emitter.Stack().Pop();
@@ -1156,32 +1176,34 @@ void ClassDelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenOb
     emitter.Stack().Push(equal);
 }
 
-MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(const Span& span_, const std::u32string& name_) :
-    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, span_, name_)
+MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, span_, sourceModuleId_, name_), sourceType(nullptr), targetType(nullptr), function(nullptr)
 {
 }
 
-MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(const Span& span_, TypeSymbol* sourceType_, ClassDelegateTypeSymbol* targetType_, FunctionSymbol* function_) :
-    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, span_, U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_)
+MemberFunctionToClassDelegateConversion::MemberFunctionToClassDelegateConversion(const Span& span_, const boost::uuids::uuid& sourceModuleId_, TypeSymbol* sourceType_, ClassDelegateTypeSymbol* targetType_, FunctionSymbol* function_) :
+    FunctionSymbol(SymbolType::memberFunctionToClassDelegateSymbol, span_, sourceModuleId_, U"@conversion"), sourceType(sourceType_), targetType(targetType_), function(function_)
 {
     SetConversion();
+    SetConversionSourceType(sourceType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(targetType->PlainType(GetSpan(), SourceModuleId()));
 }
 
 std::vector<LocalVariableSymbol*> MemberFunctionToClassDelegateConversion::CreateTemporariesTo(FunctionSymbol* currentFunction)
 {
     std::vector<LocalVariableSymbol*> temporaries;
-    LocalVariableSymbol* objectDelegatePairVariable = currentFunction->CreateTemporary(targetType->ObjectDelegatePairType(), Span());
+    LocalVariableSymbol* objectDelegatePairVariable = currentFunction->CreateTemporary(targetType->ObjectDelegatePairType(), GetSpan(), SourceModuleId());
     temporaries.push_back(objectDelegatePairVariable);
     return temporaries;
 }
 
-void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 1, "MemberFunctionToClassDelegateConversion needs one temporary object");
     void* objectValue = emitter.Stack().Pop();
     if (!objectValue)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "cannot construct class delegate because expression has no this pointer", GetSpan());
+        throw Exception("cannot construct class delegate because expression has no this pointer", span, moduleId);
     }
     void* objectValueAsVoidPtr = emitter.CreateBitCast(objectValue, emitter.GetIrTypeForVoidPtrType());
     void* memFunPtrValue = emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter), function->DontThrow());
@@ -1200,15 +1222,15 @@ void MemberFunctionToClassDelegateConversion::Check()
     FunctionSymbol::Check();
     if (!sourceType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "member function to class delegate conversion has no source type", GetSpan());
+        throw SymbolCheckException("member function to class delegate conversion has no source type", GetSpan(), SourceModuleId());
     }
     if (!targetType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "member function to class delegate conversion has no target type", GetSpan());
+        throw SymbolCheckException("member function to class delegate conversion has no target type", GetSpan(), SourceModuleId());
     }
     if (!function)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "member function to class delegate conversion has no function", GetSpan());
+        throw SymbolCheckException("member function to class delegate conversion has no function", GetSpan(), SourceModuleId());
     }
 }
 

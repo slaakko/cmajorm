@@ -11,11 +11,13 @@
 
 namespace sngcm { namespace ast {
 
-ParameterNode::ParameterNode(const Span& span_) : Node(NodeType::parameterNode, span_), typeExpr(), id(), artificialId(false)
+ParameterNode::ParameterNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    Node(NodeType::parameterNode, span_, moduleId_), typeExpr(), id(), artificialId(false)
 {
 }
 
-ParameterNode::ParameterNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_) : Node(NodeType::parameterNode, span_), typeExpr(typeExpr_), id(id_), artificialId(false)
+ParameterNode::ParameterNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_) : 
+    Node(NodeType::parameterNode, span_, moduleId_), typeExpr(typeExpr_), id(id_), artificialId(false)
 {
     typeExpr->SetParent(this);
     if (id)
@@ -31,7 +33,7 @@ Node* ParameterNode::Clone(CloneContext& cloneContext) const
     {
         clonedId = static_cast<IdentifierNode*>(id->Clone(cloneContext));
     }
-    ParameterNode* clone = new ParameterNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), typeExpr->Clone(cloneContext), clonedId);
+    ParameterNode* clone = new ParameterNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext), clonedId);
     if (artificialId)
     {
         clone->artificialId = true;

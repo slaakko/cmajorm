@@ -16,9 +16,14 @@ namespace sngcm { namespace ast {
 
 using namespace soulng::util;
 
-enum class BackEnd
+enum class BackEnd : int8_t
 {
-    llvm, cmsx, cppcm
+    llvm = 0, cmsx = 1, cppcm = 2
+};
+
+enum class Config : int8_t
+{
+    debug = 0, release = 1, profile = 2
 };
 
 class SNGCM_AST_API ModuleVersionTagVerifier

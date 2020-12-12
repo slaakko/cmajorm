@@ -9,11 +9,7 @@
 
 namespace sngcm { namespace ast {
 
-SpanMapper::~SpanMapper()
-{
-}
-
-CloneContext::CloneContext() : spanMapper(nullptr), instantiateFunctionNode(false), instantiateClassNode(false), makeTestUnits(false)
+CloneContext::CloneContext() : instantiateFunctionNode(false), instantiateClassNode(false), makeTestUnits(false)
 {
 }
 
@@ -22,22 +18,6 @@ CloneContext::~CloneContext()
     for (FunctionNode* unitTestFunction : unitTestFunctions)
     {
         delete unitTestFunction;
-    }
-}
-
-Span CloneContext::MapSpan(const Span& span, const boost::uuids::uuid& rootModuleId)
-{
-    if (!rootModuleId.is_nil())
-    {
-        if (!spanMapper)
-        {
-            throw std::runtime_error("CloneContext: root module not null and span mapper not set");
-        }
-        return spanMapper->MapSpan(span, rootModuleId);
-    }
-    else
-    {
-        return span;
     }
 }
 

@@ -111,7 +111,7 @@ private:
     bool dontCheckDuplicateFunctionSymbols;
     std::stack<bool> conditionalCompilationStack;
     void AddStatement(BoundStatement* boundStatement);
-    void AddReleaseExceptionStatement(const Span& span);
+    void AddReleaseExceptionStatement(const Span& span, const boost::uuids::uuid& moduleId);
 };
 
 } } // namespace cmajor::binder

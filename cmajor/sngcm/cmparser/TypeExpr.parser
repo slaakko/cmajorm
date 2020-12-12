@@ -26,23 +26,23 @@ parser api(SNGCM_PARSER_API) TypeExprParser
     using ExpressionParser.Expression;
     using TemplateParser.TemplateId;
 
-    TypeExpr(ParsingContext* ctx) : sngcm::ast::Node*
-        ::= PrefixTypeExpr(ctx):prefixTypeExpr{ return prefixTypeExpr; }
+    TypeExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx) : sngcm::ast::Node*
+        ::= PrefixTypeExpr(moduleId, ctx):prefixTypeExpr{ return prefixTypeExpr; }
         ;
 
-    PrefixTypeExpr(ParsingContext* ctx, var Span s) : sngcm::ast::Node*
-        ::= CONST{ s = span; } PostfixTypeExpr(ctx):constTypeExpr{ s.end = span.end; return new ConstNode(s, constTypeExpr); }
-        |   PostfixTypeExpr(ctx):postfixTypeExpr{ return postfixTypeExpr; }
+    PrefixTypeExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : sngcm::ast::Node*
+        ::= CONST{ s = span; } PostfixTypeExpr(moduleId, ctx):constTypeExpr{ s.end = span.end; return new ConstNode(s, *moduleId, constTypeExpr); }
+        |   PostfixTypeExpr(moduleId, ctx):postfixTypeExpr{ return postfixTypeExpr; }
         ;
 
-    PostfixTypeExpr(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr, var Span s) : sngcm::ast::Node*
+    PostfixTypeExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<Node> typeExpr, var Span s) : sngcm::ast::Node*
         ::=
-        (   PrimaryTypeExpr(ctx):primaryTypeExpr{ s = span; typeExpr.reset(primaryTypeExpr); }
-            (   DOT ID!{ s.end = span.end; typeExpr.reset(new DotNode(s, typeExpr.release(), new IdentifierNode(span, lexer.GetToken(pos)))); }
-            |   STAR{ s.end = span.end; typeExpr.reset(new PointerNode(s, typeExpr.release())); }
-            |   AMPAMP{ s.end = span.end; typeExpr.reset(new RValueRefNode(s, typeExpr.release())); }
-            |   AMP{ s.end = span.end; typeExpr.reset(new LValueRefNode(s, typeExpr.release())); }
-            |   LBRACKET Expression(ctx):size? RBRACKET!{ s.end = span.end; typeExpr.reset(new ArrayNode(s, typeExpr.release(), size)); }
+        (   PrimaryTypeExpr(moduleId, ctx):primaryTypeExpr{ s = span; typeExpr.reset(primaryTypeExpr); }
+            (   DOT ID!{ s.end = span.end; typeExpr.reset(new DotNode(s, *moduleId, typeExpr.release(), new IdentifierNode(span, *moduleId, lexer.GetToken(pos)))); }
+            |   STAR{ s.end = span.end; typeExpr.reset(new PointerNode(s, *moduleId, typeExpr.release())); }
+            |   AMPAMP{ s.end = span.end; typeExpr.reset(new RValueRefNode(s, *moduleId, typeExpr.release())); }
+            |   AMP{ s.end = span.end; typeExpr.reset(new LValueRefNode(s, *moduleId, typeExpr.release())); }
+            |   LBRACKET Expression(moduleId, ctx):size? RBRACKET!{ s.end = span.end; typeExpr.reset(new ArrayNode(s, *moduleId, typeExpr.release(), size)); }
             )*
         )
         {
@@ -50,10 +50,10 @@ parser api(SNGCM_PARSER_API) TypeExprParser
         }
         ;
 
-    PrimaryTypeExpr(ParsingContext* ctx) : sngcm::ast::Node*
-        ::= BasicType:basicType{ return basicType; }
-        |   TemplateId(ctx):templateId{ return templateId; }
-        |   ID{ return new IdentifierNode(span, lexer.GetToken(pos)); }
+    PrimaryTypeExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx) : sngcm::ast::Node*
+        ::= BasicType(moduleId):basicType{ return basicType; }
+        |   TemplateId(moduleId, ctx):templateId{ return templateId; }
+        |   ID{ return new IdentifierNode(span, *moduleId, lexer.GetToken(pos)); }
         ;
 
     ruleinfo

@@ -16,8 +16,8 @@ class CompileUnitNode;
 class SNGCM_AST_API GlobalVariableNode : public Node
 {
 public:
-    GlobalVariableNode(const Span& span_);
-    GlobalVariableNode(const Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, CompileUnitNode* cu_);
+    GlobalVariableNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    GlobalVariableNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, CompileUnitNode* cu_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

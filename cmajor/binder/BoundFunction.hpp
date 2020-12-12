@@ -29,7 +29,7 @@ public:
     void SetHasGotos() { hasGotos = true; }
     bool HasGotos() const { return hasGotos; }
     void AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall, BoundFunction* currentFunction, ContainerScope* currentContainerScope,
-        const Span& span);
+        const Span& span, const boost::uuids::uuid& moduleId);
     void MoveTemporaryDestructorCallsTo(BoundExpression& expression);
     void AddLabeledStatement(BoundStatement* labeledStatement);
     const std::vector<BoundStatement*>& LabeledStatements() const { return labeledStatements; }
@@ -50,6 +50,7 @@ private:
     std::vector<std::unique_ptr<BoundStatement>> enterCode;
     std::vector<std::unique_ptr<BoundStatement>> exitCode;
     std::unique_ptr<BoundStatement> lineCode;
+    std::vector<std::unique_ptr<LocalVariableSymbol>> temporaries;
 };
 
 } } // namespace cmajor::binder

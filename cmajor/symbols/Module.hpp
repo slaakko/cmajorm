@@ -52,11 +52,12 @@ const uint8_t moduleFormat_10 = uint8_t('A');
 const uint8_t moduleFormat_11 = uint8_t('B');
 const uint8_t moduleFormat_12 = uint8_t('C');
 const uint8_t moduleFormat_13 = uint8_t('D');
-const uint8_t currentModuleFormat = moduleFormat_13;
+const uint8_t moduleFormat_14 = uint8_t('E');
+const uint8_t currentModuleFormat = moduleFormat_14;
 
 enum class ModuleFlags : uint8_t
 {
-    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4, dontRemoveFromModuleMap = 1 << 5, fileIndexFilePathMapBuilt = 1 << 6, readFromModuleFile = 1 << 7
+    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4, fileIndexFilePathMapBuilt = 1 << 5, readFromModuleFile = 1 << 6
 };
 
 inline ModuleFlags operator|(ModuleFlags left, ModuleFlags right)
@@ -94,9 +95,9 @@ private:
 class SYMBOLS_API FileTable
 {
 public:
-    int16_t RegisterFilePath(const std::string& filePath);
-    std::string GetFilePath(int16_t fileId) const;
-    int16_t NumFilePaths() const { return filePaths.size(); }
+    int32_t RegisterFilePath(const std::string& filePath);
+    std::string GetFilePath(int32_t fileIndex) const;
+    int32_t NumFilePaths() const { return filePaths.size(); }
     bool IsEmpty() const { return filePaths.empty(); }
     void Write(BinaryWriter& writer, bool systemModule);
     void Read(BinaryReader& reader, bool systemModule);
@@ -118,14 +119,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<std::u32string>> fileContentMap;
 };
 
-class SYMBOLS_API SpanMapper : public sngcm::ast::SpanMapper
-{
-public:
-    SpanMapper();
-    Span MapSpan(const Span& span, const boost::uuids::uuid& rootModuleId) override;
-private:
-    Module* currentRootModule;
-};
+SYMBOLS_API cmajor::debug::SourceSpan MakeSourceSpan(const Span& span, const boost::uuids::uuid& sourceModuleId);
 
 class SYMBOLS_API Module
 {
@@ -187,7 +181,6 @@ public:
     const std::vector<std::string>& AllExportedData() const { return allExportedData; }
     void Dump();
     ModuleDependency& GetModuleDependency() { return moduleDependency; }
-    int16_t GetModuleId(Module* module);
     void SetCurrentProjectName(const std::u32string& currentProjectName_);
     std::u32string GetCurrentProjectName();
     void SetCurrentToolName(const std::u32string& currentToolName_);
@@ -220,7 +213,6 @@ public:
     void SetPreparing(bool preparing_) { preparing = preparing_; }
     void AddCompileUnitId(const std::string& compileUnitId);
     const std::set<std::string>& AllCompileUnitIds() const { return allCompileUnitIds; }
-    FileIndex& GetFileIndex() { return fileIndex; }
     FunctionIndex& GetFunctionIndex() { return functionIndex; }
     TypeIndex& GetTypeIndex() { return typeIndex; }
     void WriteProjectDebugInfoFile(const std::string& projectDebufInfoFilePath);
@@ -230,11 +222,15 @@ public:
     std::unordered_map<std::string, int16_t>* GetModuleIdMap() { return &moduleIdMap; }
     cmajor::debug::SourceSpan SpanToSourceSpan(const Span& span);
     int32_t GetFileIndexForFilePath(const std::string& filePath) const;
+    void UpdateSourceFileModuleMap();
+    std::recursive_mutex& Lock() { return lock; }
 private:
     uint8_t format;
     ModuleFlags flags;
     std::u32string name;
     boost::uuids::uuid id;
+    sngcm::ast::BackEnd backend;
+    sngcm::ast::Config config;
     std::string originalFilePath;
     std::string filePathReadFrom;
     std::string libraryFilePath;
@@ -278,13 +274,13 @@ private:
     std::recursive_mutex lock;
     int64_t buildStartMs;
     int64_t buildStopMs;
-    FileIndex fileIndex;
     FunctionIndex functionIndex;
     TypeIndex typeIndex;
     SourceFileCache sourceFileCache;
     void CheckUpToDate();
 };
 
+SYMBOLS_API std::string GetSourceFilePath(int32_t fileIndex, const boost::uuids::uuid& moduleId);
 SYMBOLS_API bool HasRootModuleForCurrentThread();
 SYMBOLS_API Module* GetRootModuleForCurrentThread();
 SYMBOLS_API void SetRootModuleForCurrentThread(Module* rootModule_);

@@ -5,13 +5,13 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Parameter.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Parameter.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-soulng::parser::Match ParameterParser::ParameterList(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::Node* owner)
+soulng::parser::Match ParameterParser::ParameterList(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::Node* owner)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -56,7 +56,7 @@ soulng::parser::Match ParameterParser::ParameterList(CmajorLexer& lexer, Parsing
                             soulng::parser::Match* parentMatch6 = &match;
                             {
                                 int64_t pos = lexer.GetPos();
-                                soulng::parser::Match match = ParameterParser::Parameter(lexer, ctx);
+                                soulng::parser::Match match = ParameterParser::Parameter(lexer, moduleId, ctx);
                                 param.reset(static_cast<ParameterNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -98,7 +98,7 @@ soulng::parser::Match ParameterParser::ParameterList(CmajorLexer& lexer, Parsing
                                                     soulng::parser::Match* parentMatch11 = &match;
                                                     {
                                                         int64_t pos = lexer.GetPos();
-                                                        soulng::parser::Match match = ParameterParser::Parameter(lexer, ctx);
+                                                        soulng::parser::Match match = ParameterParser::Parameter(lexer, moduleId, ctx);
                                                         param.reset(static_cast<ParameterNode*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -185,7 +185,7 @@ soulng::parser::Match ParameterParser::ParameterList(CmajorLexer& lexer, Parsing
     return match;
 }
 
-soulng::parser::Match ParameterParser::Parameter(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match ParameterParser::Parameter(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -214,7 +214,7 @@ soulng::parser::Match ParameterParser::Parameter(CmajorLexer& lexer, ParsingCont
                 {
                     int64_t pos = lexer.GetPos();
                     soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                     type.reset(static_cast<sngcm::ast::Node*>(match.value));
                     if (match.hit)
                     {
@@ -241,7 +241,7 @@ soulng::parser::Match ParameterParser::Parameter(CmajorLexer& lexer, ParsingCont
                             {
                                 int64_t pos = lexer.GetPos();
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = IdentifierParser::Identifier(lexer);
+                                soulng::parser::Match match = IdentifierParser::Identifier(lexer, moduleId);
                                 id.reset(static_cast<IdentifierNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -272,7 +272,7 @@ soulng::parser::Match ParameterParser::Parameter(CmajorLexer& lexer, ParsingCont
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Parameter"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new ParameterNode(s, type.release(), id.release()));
+                return soulng::parser::Match(true, new ParameterNode(s, *moduleId, type.release(), id.release()));
             }
         }
         *parentMatch0 = match;

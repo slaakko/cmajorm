@@ -15,8 +15,8 @@ class TrapFunction : public FunctionSymbol
 {
 public:
     TrapFunction(SymbolTable& symbolTable);
-    TrapFunction(const Span& span_, const std::u32string& name_);
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span);
+    TrapFunction(const Span& span_, const boost::uuids::uuid& sourceModuleId, const std::u32string& name_);
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
 };
 
 void InitTrap(SymbolTable& symbolTable);

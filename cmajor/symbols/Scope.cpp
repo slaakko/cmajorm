@@ -93,9 +93,7 @@ void ContainerScope::Install(Symbol* symbol)
         Symbol* prev = it->second;
         if (prev != symbol)
         {
-            const Span& defined = symbol->GetSpan();
-            const Span& referenced = prev->GetSpan();
-            throw Exception(GetRootModuleForCurrentThread(), "symbol '" + ToUtf8(symbol->Name()) + "' already defined", defined, referenced);
+            throw Exception("symbol '" + ToUtf8(symbol->Name()) + "' already defined", symbol->GetSpan(), symbol->SourceModuleId(), prev->GetSpan(), prev->SourceModuleId());
         }
     }
     else
@@ -318,7 +316,7 @@ void ContainerScope::Clear()
     symbolMap.clear();
 }
 
-NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualifiedNsName, const Span& span)
+NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualifiedNsName, const Span& span, const boost::uuids::uuid& sourceModuleId)
 {
     ContainerScope* scope = this;
     NamespaceSymbol* parentNs = scope->Ns();
@@ -335,12 +333,12 @@ NamespaceSymbol* ContainerScope::CreateNamespace(const std::u32string& qualified
             }
             else
             {
-                throw Exception(GetRootModuleForCurrentThread(), "symbol '" + ToUtf8(s->Name()) + "' does not denote a namespace", s->GetSpan());
+                throw Exception("symbol '" + ToUtf8(s->Name()) + "' does not denote a namespace", s->GetSpan(), s->SourceModuleId());
             }
         }
         else
         {
-            NamespaceSymbol* newNs = new NamespaceSymbol(span, component);
+            NamespaceSymbol* newNs = new NamespaceSymbol(span, sourceModuleId, component);
             newNs->SetModule(container->GetModule());
             scope = newNs->GetContainerScope();
             parentNs->AddMember(newNs);
@@ -387,7 +385,7 @@ void ContainerScope::CollectViableFunctions(int arity, const std::u32string& gro
     }
 }
 
-FileScope::FileScope(Module* module_) : module(module_)
+FileScope::FileScope()
 {
 }
 
@@ -403,7 +401,7 @@ void FileScope::InstallAlias(ContainerScope* containerScope, AliasNode* aliasNod
     }
     else
     {
-        throw Exception(module, "referred symbol '" + ToUtf8(aliasNode->Qid()->Str()) + "' not found", aliasNode->Qid()->GetSpan());
+        throw Exception("referred symbol '" + ToUtf8(aliasNode->Qid()->Str()) + "' not found", aliasNode->Qid()->GetSpan(), aliasNode->Qid()->ModuleId());
     }
 }
 
@@ -434,12 +432,12 @@ void FileScope::InstallNamespaceImport(ContainerScope* containerScope, Namespace
             }
             else
             {
-                throw Exception(module, "'" + ToUtf8(namespaceImportNode->Ns()->Str()) + "' does not denote a namespace", namespaceImportNode->Ns()->GetSpan());
+                throw Exception("'" + ToUtf8(namespaceImportNode->Ns()->Str()) + "' does not denote a namespace", namespaceImportNode->Ns()->GetSpan(), namespaceImportNode->Ns()->ModuleId());
             }
         }
         else
         {
-            throw Exception(module, "referred namespace symbol '" + ToUtf8(namespaceImportNode->Ns()->Str()) + "' not found", namespaceImportNode->Ns()->GetSpan());
+            throw Exception("referred namespace symbol '" + ToUtf8(namespaceImportNode->Ns()->Str()) + "' not found", namespaceImportNode->Ns()->GetSpan(), namespaceImportNode->Ns()->ModuleId());
         }
     }
     catch (const Exception&)
@@ -486,12 +484,14 @@ Symbol* FileScope::Lookup(const std::u32string& name, ScopeLookup lookup) const
         std::string message("reference to object '" + ToUtf8(name) + "' is ambiguous: ");
         bool first = true;
         Span span;
+        boost::uuids::uuid moduleId;
         for (Symbol* symbol : foundSymbols)
         {
             if (first)
             {
                 first = false;
                 span = symbol->GetSpan();
+                moduleId = symbol->SourceModuleId();
             }
             else
             {
@@ -499,7 +499,7 @@ Symbol* FileScope::Lookup(const std::u32string& name, ScopeLookup lookup) const
             }
             message.append(ToUtf8(symbol->FullName()));
         }
-        throw Exception(module, message, span);
+        throw Exception(message, span, moduleId);
     }
     else
     {

@@ -15,8 +15,8 @@ class IdentifierNode;
 class SNGCM_AST_API TemplateIdNode : public Node
 {
 public:
-    TemplateIdNode(const Span& span_);
-    TemplateIdNode(const Span& span_, Node* primary_);
+    TemplateIdNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    TemplateIdNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* primary_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -33,8 +33,8 @@ private:
 class SNGCM_AST_API TemplateParameterNode : public Node
 {
 public:
-    TemplateParameterNode(const Span& span_);
-    TemplateParameterNode(const Span& span_, IdentifierNode* id_, Node* defaultTemplateArgument_);
+    TemplateParameterNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    TemplateParameterNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_, Node* defaultTemplateArgument_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

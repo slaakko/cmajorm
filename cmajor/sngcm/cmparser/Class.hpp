@@ -7,24 +7,24 @@
 #include <soulng/parser/Match.hpp>
 #include <soulng/parser/Value.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Class.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Class.parser' using soulng parser generator spg version 3.0.0
 
 class CmajorLexer;
 
 struct SNGCM_PARSER_API ClassParser
 {
-    static soulng::parser::Match Class(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match InheritanceAndInterfaces(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
-    static soulng::parser::Match BaseClassOrInterface(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match ClassContent(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
-    static soulng::parser::Match ClassMember(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
-    static soulng::parser::Match StaticConstructor(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
-    static soulng::parser::Match Constructor(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
-    static soulng::parser::Match Destructor(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
-    static soulng::parser::Match Initializer(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match MemberFunction(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match ConversionFunction(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match MemberVariable(CmajorLexer& lexer, ParsingContext* ctx);
+    static soulng::parser::Match Class(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match InheritanceAndInterfaces(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
+    static soulng::parser::Match BaseClassOrInterface(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match ClassContent(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
+    static soulng::parser::Match ClassMember(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
+    static soulng::parser::Match StaticConstructor(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
+    static soulng::parser::Match Constructor(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
+    static soulng::parser::Match Destructor(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode);
+    static soulng::parser::Match Initializer(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match MemberFunction(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match ConversionFunction(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
+    static soulng::parser::Match MemberVariable(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
 };
 
 #endif // CLASS_HPP

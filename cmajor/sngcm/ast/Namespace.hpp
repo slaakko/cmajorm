@@ -30,8 +30,8 @@ inline constexpr NsFlags operator&(NsFlags left, NsFlags right)
 class SNGCM_AST_API NamespaceNode : public Node
 {
 public:
-    NamespaceNode(const Span& span_);
-    NamespaceNode(const Span& span_, IdentifierNode* id_);
+    NamespaceNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    NamespaceNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -53,8 +53,8 @@ private:
 class SNGCM_AST_API AliasNode : public Node
 {
 public:
-    AliasNode(const Span& span_);
-    AliasNode(const Span& span_, IdentifierNode* id_, IdentifierNode* qid_);
+    AliasNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    AliasNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_, IdentifierNode* qid_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -69,8 +69,8 @@ private:
 class SNGCM_AST_API NamespaceImportNode : public Node
 {
 public:
-    NamespaceImportNode(const Span& span_);
-    NamespaceImportNode(const Span& span_, IdentifierNode* ns_);
+    NamespaceImportNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    NamespaceImportNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* ns_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

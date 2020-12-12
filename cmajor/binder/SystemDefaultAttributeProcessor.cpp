@@ -11,7 +11,7 @@ namespace cmajor { namespace binder {
 
 using namespace soulng::unicode;
 
-SystemDefaultAttributeProcessor::SystemDefaultAttributeProcessor(Module* module_) : AttributeProcessor(U"system_default"), module(module_)
+SystemDefaultAttributeProcessor::SystemDefaultAttributeProcessor() : AttributeProcessor(U"system_default")
 {
 }
 
@@ -26,7 +26,7 @@ void SystemDefaultAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* sy
         }
         else if (attribute->Value() != U"false")
         {
-            throw Exception(module, "unknown attribute value '" + ToUtf8(attribute->Value()) + "' for attribute '" + ToUtf8(attribute->Name()) + "'", attribute->GetSpan());
+            throw Exception("unknown attribute value '" + ToUtf8(attribute->Value()) + "' for attribute '" + ToUtf8(attribute->Name()) + "'", attribute->GetSpan(), attribute->ModuleId());
         }
     }
     else

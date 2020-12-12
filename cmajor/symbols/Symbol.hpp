@@ -109,12 +109,14 @@ std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess);
 class SYMBOLS_API SymbolLocation
 {
 public:
-    SymbolLocation() : fileIndex(0), line(0), scol(0), ecol(0)
+    SymbolLocation() : moduleId(boost::uuids::nil_uuid()), fileIndex(0), line(0), scol(0), ecol(0)
     {
     }
-    SymbolLocation(int32_t fileIndex_, int32_t line_, int32_t scol_, int32_t ecol_) : fileIndex(fileIndex_), line(line_), scol(scol_), ecol(ecol_)
+    SymbolLocation(const boost::uuids::uuid& moduleId_, int32_t fileIndex_, int32_t line_, int32_t scol_, int32_t ecol_) : 
+        moduleId(moduleId_), fileIndex(fileIndex_), line(line_), scol(scol_), ecol(ecol_)
     {
     }
+    boost::uuids::uuid moduleId;
     int32_t fileIndex;
     int32_t line;
     int32_t scol;
@@ -124,12 +126,12 @@ public:
 SYMBOLS_API bool operator==(const SymbolLocation& left, const SymbolLocation& right);
 SYMBOLS_API bool operator<(const SymbolLocation& left, const SymbolLocation& right);
 
-SYMBOLS_API SymbolLocation ToSymbolLocation(const Span& span, Module* module);
+SYMBOLS_API SymbolLocation MakeSymbolLocation(const Span& span, Module* module);
 
 class SYMBOLS_API Symbol
 {
 public:
-    Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
+    Symbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     virtual ~Symbol();
     virtual void Write(SymbolWriter& writer);
     virtual void Read(SymbolReader& reader);
@@ -160,6 +162,7 @@ public:
     virtual void Dump(CodeFormatter& formatter) {}
     virtual std::string GetSpecifierStr() const;
     virtual std::string Syntax() const;
+    virtual void CopyFrom(const Symbol* that);
     virtual void Check();
     void SetMangledName(const std::u32string& mangledName_);
     SymbolAccess Access() const { return SymbolAccess(flags & SymbolFlags::access);  }
@@ -232,10 +235,12 @@ public:
     virtual void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const {}
     virtual bool HasProjectMembers() const { return false; }
     virtual const char* ClassName() const { return "Symbol"; }
-    bool GetLocation(Module* idNodeModule, SymbolLocation& definitionLocation) const;
+    bool GetLocation(SymbolLocation& definitionLocation) const;
+    const boost::uuids::uuid& SourceModuleId() const { return sourceModuleId; }
 private:
     SymbolType symbolType;
     Span span;
+    boost::uuids::uuid sourceModuleId;
     std::u32string name;
     SymbolFlags flags;
     std::u32string mangledName;
@@ -249,7 +254,7 @@ class SymbolCreator
 {
 public:
     virtual ~SymbolCreator();
-    virtual Symbol* CreateSymbol(const Span& span, const std::u32string& name) = 0;
+    virtual Symbol* CreateSymbol(const Span& span, const boost::uuids::uuid& sourceModuleId, const std::u32string& name) = 0;
 };
 
 class SymbolFactory
@@ -258,7 +263,7 @@ public:
     static void Init();
     static void Done();
     static SymbolFactory& Instance() { Assert(instance, "symbol factory not initialized"); return *instance; }
-    Symbol* CreateSymbol(SymbolType symbolType, const Span& span, const std::u32string& name);
+    Symbol* CreateSymbol(SymbolType symbolType, const Span& span, const boost::uuids::uuid& sourceModuleId, const std::u32string& name);
     void Register(SymbolType symbolType, SymbolCreator* creator);
 private:
     static std::unique_ptr<SymbolFactory> instance;

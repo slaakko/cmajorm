@@ -323,20 +323,35 @@ DIVariable* FunctionScope::GetVariable(const std::string& name) const
     }
 }
 
-CompileUnitFunction::CompileUnitFunction(CompileUnit* compileUnit_, int32_t fileIndex_, const boost::uuids::uuid& functionId_) :
-    compileUnit(compileUnit_), fileIndex(fileIndex_), functionId(functionId_)
+bool operator==(const SourceFileKey& left, const SourceFileKey& right)
+{
+    return left.fileIndex == right.fileIndex && left.sourceModuleId == right.sourceModuleId;
+}
+
+bool operator<(const SourceFileKey& left, const SourceFileKey& right)
+{
+    if (left.sourceModuleId < right.sourceModuleId) return true;
+    if (left.sourceModuleId > right.sourceModuleId) return false;
+    return left.fileIndex < right.fileIndex;
+}
+
+CompileUnitFunction::CompileUnitFunction(CompileUnit* compileUnit_, int32_t fileIndex_, const boost::uuids::uuid& sourceModuleId_, const boost::uuids::uuid& functionId_) :
+    compileUnit(compileUnit_), fileIndex(fileIndex_), sourceModuleId(sourceModuleId_), functionId(functionId_)
 {
 }
 
 SourceFileReference* CompileUnitFunction::GetSourceFileReference() const
 {
-    CompileUnit* compileUnit = GetCompileUnit();
-    return compileUnit->GetProject()->GetSourceFileReference(fileIndex);
+    DebugInfo* debugInfo = compileUnit->GetProject()->GetDebugInfo();
+    Project* sourceProject = debugInfo->GetProjectById(sourceModuleId);
+    return sourceProject->GetSourceFileReference(fileIndex);
 }
 
 SourceFile& CompileUnitFunction::GetSourceFile() const
 {
-    return compileUnit->GetProject()->GetSourceFile(fileIndex);
+    DebugInfo* debugInfo = compileUnit->GetProject()->GetDebugInfo();
+    Project* sourceProject = debugInfo->GetProjectById(sourceModuleId);
+    return sourceProject->GetSourceFile(fileIndex);
 }
 
 Function* CompileUnitFunction::GetFunction() const
@@ -408,8 +423,8 @@ Function::Function(const boost::uuids::uuid& id_, const std::string& fullName_, 
 {
 }
 
-Project::Project(DebugInfo* debugInfo_, const std::string& name_, const std::string& directoryPath_) :
-    debugInfo(debugInfo_), name(name_), directoryPath(directoryPath_), mainFunction(nullptr), longType(nullptr), boolType(nullptr)
+Project::Project(DebugInfo* debugInfo_, const std::string& name_, const std::string& directoryPath_, const boost::uuids::uuid& moduleId_) :
+    debugInfo(debugInfo_), name(name_), directoryPath(directoryPath_), moduleId(moduleId_), mainFunction(nullptr), longType(nullptr), boolType(nullptr)
 {
 }
 
@@ -923,16 +938,31 @@ std::vector<Instruction*> SourceFileMap::GetInstructions(const SourceLocation& l
     return instructions;
 }
 
-void SourceFileMap::AddInstructionLocation(int32_t fileIndex, const InstructionLocation& location)
+void SourceFileMap::AddSourceFile(const SourceFileKey& sourceFileKey, const std::string& sourceFilePath)
 {
-    fileIndexLocationsMap[fileIndex].push_back(location);
+    sourceFileKeyMap.insert(std::make_pair(sourceFileKey, sourceFilePath));
 }
 
-void SourceFileMap::AddInstructionLocations(int32_t fileIndex, const std::string& sourceFilePath)
+void SourceFileMap::AddInstructionLocation(const SourceFileKey& sourceFileKey, const InstructionLocation& location)
+{
+    sourceFileKeyLocationsMap[sourceFileKey].push_back(location);
+}
+
+void SourceFileMap::ProcessSourceFileKeyLocationsMap()
+{
+    for (const std::pair<SourceFileKey, std::string>& p : sourceFileKeyMap)
+    {
+        AddInstructionLocations(p.first, p.second);
+    }
+    sourceFileKeyMap.clear();
+    sourceFileKeyLocationsMap.clear();
+}
+
+void SourceFileMap::AddInstructionLocations(const SourceFileKey& sourceFileKey, const std::string& sourceFilePath)
 {
     if (sourceFilePath.empty()) return;
-    auto it = fileIndexLocationsMap.find(fileIndex);
-    if (it != fileIndexLocationsMap.cend())
+    auto it = sourceFileKeyLocationsMap.find(sourceFileKey);
+    if (it != sourceFileKeyLocationsMap.cend())
     {
         const std::vector<InstructionLocation>& locations = it->second;
         SourceLineMap* lineMap;
@@ -952,12 +982,6 @@ void SourceFileMap::AddInstructionLocations(int32_t fileIndex, const std::string
             lineMap->AddInstructionLocation(location);
         }
     }
-    fileIndexLocationsMap.erase(fileIndex);
-}
-
-void SourceFileMap::ClearFileIndexLocationsMap()
-{
-    fileIndexLocationsMap.clear();
 }
 
 DebugInfo::DebugInfo(const std::string& filePath_) : filePath(filePath_), mainProject(nullptr), sourceFileCache(this), sourceFileMap(this), sourceFileWindowSize(5)
@@ -986,6 +1010,7 @@ void DebugInfo::AddProject(Project* project)
     projects.push_back(std::unique_ptr<Project>(project));
     projectPathMap[project->DirectoryPath()] = project;
     projectNameMap[project->Name()] = project;
+    projectIdMap[project->ModuleId()] = project;
 }
 
 Project* DebugInfo::GetProjectByPath(const std::string& directoryPath) const
@@ -1011,6 +1036,19 @@ Project* DebugInfo::GetProjectByName(const std::string& projectName) const
     else
     {
         return nullptr;
+    }
+}
+
+Project* DebugInfo::GetProjectById(const boost::uuids::uuid& projectId) const
+{
+    auto it = projectIdMap.find(projectId);
+    if (it != projectIdMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        throw std::runtime_error("project id '" + boost::uuids::to_string(projectId) + "' not found");
     }
 }
 
@@ -1115,6 +1153,11 @@ void DebugInfo::AddCatchInstruction(Instruction* catchInstruction)
     catchInstructions.push_back(catchInstruction);
 }
 
+void DebugInfo::ProcessSourceFileKeyLocationsMap()
+{
+    sourceFileMap.ProcessSourceFileKeyLocationsMap();
+}
+
 std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
 {
     std::unique_ptr<DebugInfo> debugInfo(new DebugInfo(cmdbFilePath));
@@ -1130,9 +1173,10 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
         std::string projectName;
         std::string projectDirectoryPath;
         int32_t numCompileUnits;
+        boost::uuids::uuid moduleId;
         boost::uuids::uuid mainFunctionId;
-        ReadProjectTableHeader(reader, projectName, projectDirectoryPath, numCompileUnits, mainFunctionId);
-        std::unique_ptr<Project> project(new Project(debugInfo.get(), projectName, projectDirectoryPath));
+        ReadProjectTableHeader(reader, projectName, projectDirectoryPath, moduleId, numCompileUnits, mainFunctionId);
+        std::unique_ptr<Project> project(new Project(debugInfo.get(), projectName, projectDirectoryPath, moduleId));
         if (projectName == mainProjectName)
         {
             debugInfo->SetMainProject(project.get());
@@ -1148,9 +1192,10 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
             for (int32_t i = 0; i < numFunctions; ++i)
             {
                 int32_t fileIndex;
+                boost::uuids::uuid sourceModuleId;
                 boost::uuids::uuid functionId;
-                ReadCompileUnitFunctionRecord(reader, fileIndex, functionId);
-                std::unique_ptr<CompileUnitFunction> compileUnitFunction(new CompileUnitFunction(compileUnit.get(), fileIndex, functionId));
+                ReadCompileUnitFunctionRecord(reader, fileIndex, sourceModuleId, functionId);
+                std::unique_ptr<CompileUnitFunction> compileUnitFunction(new CompileUnitFunction(compileUnit.get(), fileIndex, sourceModuleId, functionId));
                 if (!mainFunctionId.is_nil() && functionId == mainFunctionId)
                 {
                     project->SetMainFunction(compileUnitFunction.get());
@@ -1208,7 +1253,8 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
                         location.projectIndex = projectIndex;
                         location.compileUnitIndex = compileUnitIndex;
                         location.cppLineNumber = cppLineNumber;
-                        debugInfo->GetSourceFileMap().AddInstructionLocation(fileIndex, location);
+                        SourceFileKey sourceFileKey(fileIndex, sourceModuleId);
+                        debugInfo->GetSourceFileMap().AddInstructionLocation(sourceFileKey, location);
                     }
                 }
                 int32_t numScopes;
@@ -1267,9 +1313,9 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
             ReadFileIndexRecord(reader, fileIndex, sourceFilePath);
             std::unique_ptr<SourceFileReference> sourceFile(new SourceFileReference(fileIndex, sourceFilePath));
             project->AddSourceFileReference(sourceFile.release());
-            debugInfo->GetSourceFileMap().AddInstructionLocations(fileIndex, sourceFilePath);
+            SourceFileKey sourceFileKey(fileIndex, project->ModuleId());
+            debugInfo->GetSourceFileMap().AddSourceFile(sourceFileKey, sourceFilePath);
         }
-        debugInfo->GetSourceFileMap().ClearFileIndexLocationsMap();
         int32_t numFunctionIndexFunctionRecords;
         ReadNumberOfFunctionIndexFunctionRecords(reader, numFunctionIndexFunctionRecords);
         for (int32_t i = 0; i < numFunctionIndexFunctionRecords; ++i)
@@ -1297,6 +1343,7 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
         }
         debugInfo->AddProject(project.release());
     }
+    debugInfo->ProcessSourceFileKeyLocationsMap();
     return debugInfo;
 }
 

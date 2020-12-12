@@ -35,10 +35,8 @@ public:
     ClassTypeConversion(const std::u32string& name_, ConversionType conversionType_, uint8_t conversionDistance_, TypeSymbol* sourceType_, TypeSymbol* targetType_);
     ConversionType GetConversionType() const override { return conversionType; }
     uint8_t ConversionDistance() const override { return conversionDistance; }
-    TypeSymbol* ConversionSourceType() const override { return sourceType; }
-    TypeSymbol* ConversionTargetType() const override { return targetType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     const char* ClassName() const override { return "ClassTypeConversion"; }
 private:
     ConversionType conversionType;
@@ -48,14 +46,16 @@ private:
 };
 
 ClassTypeConversion::ClassTypeConversion(const std::u32string& name_, ConversionType conversionType_, uint8_t conversionDistance_, TypeSymbol* sourceType_, TypeSymbol* targetType_) : 
-    FunctionSymbol(Span(), name_), conversionType(conversionType_), conversionDistance(conversionDistance_), sourceType(sourceType_), targetType(targetType_)
+    FunctionSymbol(Span(), boost::uuids::nil_uuid(), name_), conversionType(conversionType_), conversionDistance(conversionDistance_), sourceType(sourceType_), targetType(targetType_)
 {
     SetConversion();
     SetGroupName(U"@conversion");
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(sourceType);
+    SetConversionTargetType(targetType);
 }
 
-void ClassTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void ClassTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     emitter.SetCurrentDebugLocation(span);
     void* value = emitter.Stack().Pop();
@@ -68,10 +68,8 @@ public:
     NullPtrToPtrConversion(TypeSymbol* nullPtrType_, TypeSymbol* targetPointerType_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
-    TypeSymbol* ConversionSourceType() const override { return nullPtrType; }
-    TypeSymbol* ConversionTargetType() const override { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;
     const char* ClassName() const override { return "NullPtrToPtrConversion"; }
 private:
@@ -80,14 +78,17 @@ private:
 };
 
 NullPtrToPtrConversion::NullPtrToPtrConversion(TypeSymbol* nullPtrType_, TypeSymbol* targetPointerType_) :
-    FunctionSymbol(Span(), U"nullptr2ptr"), nullPtrType(nullPtrType_), targetPointerType(targetPointerType_)
+    FunctionSymbol(Span(), boost::uuids::nil_uuid(), U"nullptr2ptr"), nullPtrType(nullPtrType_), targetPointerType(targetPointerType_)
 {
     SetConversion();
     SetGroupName(U"@conversion");
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(nullPtrType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(targetPointerType->PlainType(GetSpan(), SourceModuleId()));
+
 }
 
-void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     emitter.SetCurrentDebugLocation(span);
     void* value = emitter.Stack().Pop();
@@ -99,7 +100,7 @@ std::unique_ptr<Value> NullPtrToPtrConversion::ConvertValue(const std::unique_pt
     TypeSymbol* type = value->GetType(&nullPtrType->GetModule()->GetSymbolTable());
     if (type->IsPointerType())
     {
-        return std::unique_ptr<Value>(new PointerValue(value->GetSpan(), type, nullptr));
+        return std::unique_ptr<Value>(new PointerValue(value->GetSpan(), value->ModuleId(), type, nullptr));
     }
     else
     {
@@ -113,10 +114,8 @@ public:
     VoidPtrToPtrConversion(TypeSymbol* voidPtrType_, TypeSymbol* targetPointerType_);
     ConversionType GetConversionType() const override { return ConversionType::explicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const override { return voidPtrType; }
-    TypeSymbol* ConversionTargetType() const override { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     const char* ClassName() const override { return "VoidPtrToPtrConversion"; }
 private:
     TypeSymbol* voidPtrType;
@@ -124,14 +123,16 @@ private:
 };
 
 VoidPtrToPtrConversion::VoidPtrToPtrConversion(TypeSymbol* voidPtrType_, TypeSymbol* targetPointerType_) :
-    FunctionSymbol(Span(), U"voidPtr2ptr"), voidPtrType(voidPtrType_), targetPointerType(targetPointerType_)
+    FunctionSymbol(Span(), boost::uuids::nil_uuid(), U"voidPtr2ptr"), voidPtrType(voidPtrType_), targetPointerType(targetPointerType_)
 {
     SetConversion();
     SetGroupName(U"@conversion");
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(voidPtrType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(targetPointerType->PlainType(GetSpan(), SourceModuleId()));
 }
 
-void VoidPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void VoidPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     emitter.SetCurrentDebugLocation(span);
     void* value = emitter.Stack().Pop();
@@ -144,10 +145,8 @@ public:
     PtrToVoidPtrConversion(TypeSymbol* sourcePtrType_, TypeSymbol* voidPtrType_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 10; }
-    TypeSymbol* ConversionSourceType() const override { return sourcePtrType; }
-    TypeSymbol* ConversionTargetType() const override { return voidPtrType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     const char* ClassName() const override { return "PtrToVoidPtrConversion"; }
 private:
     TypeSymbol* sourcePtrType;
@@ -155,14 +154,16 @@ private:
 };
 
 PtrToVoidPtrConversion::PtrToVoidPtrConversion(TypeSymbol* sourcePtrType_, TypeSymbol* voidPtrType_) :
-    FunctionSymbol(Span(), U"ptr2voidPtr"), sourcePtrType(sourcePtrType_), voidPtrType(voidPtrType_)
+    FunctionSymbol(Span(), boost::uuids::nil_uuid(), U"ptr2voidPtr"), sourcePtrType(sourcePtrType_), voidPtrType(voidPtrType_)
 {
     SetConversion();
     SetGroupName(U"@conversion");
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(sourcePtrType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(voidPtrType->PlainType(GetSpan(), SourceModuleId()));
 }
 
-void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     emitter.SetCurrentDebugLocation(span);
     void* value = emitter.Stack().Pop();
@@ -175,10 +176,8 @@ public:
     PtrToULongConversion(TypeSymbol* ptrType_, TypeSymbol* ulongType_);
     ConversionType GetConversionType() const override { return ConversionType::explicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const override { return ptrType; }
-    TypeSymbol* ConversionTargetType() const override { return ulongType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     const char* ClassName() const override { return "PtrToULongConversion"; }
 private:
     TypeSymbol* ptrType;
@@ -186,14 +185,16 @@ private:
 };
 
 PtrToULongConversion::PtrToULongConversion(TypeSymbol* ptrType_, TypeSymbol* ulongType_) :
-    FunctionSymbol(Span(), U"ptr2ulong"), ptrType(ptrType_), ulongType(ulongType_)
+    FunctionSymbol(Span(), boost::uuids::nil_uuid(), U"ptr2ulong"), ptrType(ptrType_), ulongType(ulongType_)
 {
     SetConversion();
     SetGroupName(U"@conversion");
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(ptrType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(ulongType->PlainType(GetSpan(), SourceModuleId()));
 }
 
-void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     emitter.SetCurrentDebugLocation(span);
     void* value = emitter.Stack().Pop();
@@ -206,10 +207,8 @@ public:
     ULongToVoidPtrConversion(TypeSymbol* ulongType_, TypeSymbol* voidPtrType_);
     ConversionType GetConversionType() const override { return ConversionType::explicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const override { return ulongType; }
-    TypeSymbol* ConversionTargetType() const override { return voidPtrType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     const char* ClassName() const override { return "ULongToVoidPtrConversion"; }
 private:
     TypeSymbol* ulongType;
@@ -217,14 +216,16 @@ private:
 };
 
 ULongToVoidPtrConversion::ULongToVoidPtrConversion(TypeSymbol* ulongType_, TypeSymbol* voidPtrType_) :
-    FunctionSymbol(Span(), U"ulong2voidPtr"), ulongType(ulongType_), voidPtrType(voidPtrType_)
+    FunctionSymbol(Span(), boost::uuids::nil_uuid(), U"ulong2voidPtr"), ulongType(ulongType_), voidPtrType(voidPtrType_)
 {
     SetConversion();
     SetGroupName(U"@conversion");
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(ulongType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(voidPtrType->PlainType(GetSpan(), SourceModuleId()));
 }
 
-void ULongToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void ULongToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     emitter.SetCurrentDebugLocation(span);
     void* value = emitter.Stack().Pop();
@@ -237,10 +238,8 @@ public:
     CharacterPointerLiteralToStringFunctionContainerConversion(TypeSymbol* characterPtrType_, TypeSymbol* stringFunctionContainerType_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
-    TypeSymbol* ConversionSourceType() const override { return characterPtrType; }
-    TypeSymbol* ConversionTargetType() const override { return stringFunctionContainerType; }
     bool IsBasicTypeOperation() const override { return true; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;
     const char* ClassName() const override { return "CharacterPointerLiteralToStringFunctionContainerConversion"; }
 private:
@@ -249,14 +248,16 @@ private:
 };
 
 CharacterPointerLiteralToStringFunctionContainerConversion::CharacterPointerLiteralToStringFunctionContainerConversion(TypeSymbol* characterPtrType_, TypeSymbol* stringFunctionContainerType_) :
-    FunctionSymbol(Span(), U"charlit2stringFun"), characterPtrType(characterPtrType_), stringFunctionContainerType(stringFunctionContainerType_)
+    FunctionSymbol(Span(), boost::uuids::nil_uuid(), U"charlit2stringFun"), characterPtrType(characterPtrType_), stringFunctionContainerType(stringFunctionContainerType_)
 {
     SetConversion();
     SetGroupName(U"@conversion");
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(characterPtrType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(stringFunctionContainerType->PlainType(GetSpan(), SourceModuleId()));
 }
 
-void CharacterPointerLiteralToStringFunctionContainerConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void CharacterPointerLiteralToStringFunctionContainerConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     throw std::runtime_error(ToUtf8(Name()) + " function provides compile time calls only");
 }
@@ -267,9 +268,10 @@ std::unique_ptr<Value> CharacterPointerLiteralToStringFunctionContainerConversio
 }
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) :
-    BoundNode(&module_, Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), currentNamespace(nullptr), 
+    BoundNode(Span(), boost::uuids::nil_uuid(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), 
+    compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), currentNamespace(nullptr),
     hasGotos(false), operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), 
-    constExprFunctionRepository(*this), conversionTable(nullptr), bindingTypes(false), compileUnitIndex(-2), immutable(false), nextExitEntryIndex(0),
+    constExprFunctionRepository(*this), conversionTable(ConversionTable::Owner::compileUnit, nullptr), bindingTypes(false), compileUnitIndex(-2), immutable(false), nextExitEntryIndex(0),
     systemRuntimeUnwindInfoSymbol(nullptr), systemRuntimeAddCompileUnitFunctionSymbol(nullptr), pushCompileUnitUnwindInfoInitFunctionSymbol(nullptr),
     initUnwindInfoDelegateType(nullptr), globalInitFunctionSymbol(nullptr), latestIdentifierNode(nullptr)
 {
@@ -314,12 +316,12 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
 
 void BoundCompileUnit::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception(&GetModule(), "cannot load from compile unit", GetSpan());
+    throw Exception("cannot load from compile unit", GetSpan(), module.Id());
 }
 
 void BoundCompileUnit::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception(&GetModule(), "cannot store to compile unit", GetSpan());
+    throw Exception("cannot store to compile unit", GetSpan(), module.Id());
 }
 
 void BoundCompileUnit::Accept(BoundNodeVisitor& visitor)
@@ -336,7 +338,7 @@ void BoundCompileUnit::RemoveLastFileScope()
 {
     if (fileScopes.empty())
     {
-        throw Exception(&GetModule(), "file scopes of bound compile unit is empty", GetSpan());
+        throw Exception("file scopes of bound compile unit is empty", GetSpan(), module.Id());
     }
     fileScopes.erase(fileScopes.end() - 1);
 }
@@ -345,7 +347,7 @@ FileScope* BoundCompileUnit::ReleaseLastFileScope()
 {
     if (fileScopes.empty())
     {
-        throw Exception(&GetModule(), "file scopes of bound compile unit is empty", GetSpan());
+        throw Exception("file scopes of bound compile unit is empty", GetSpan(), module.Id());
     }
     FileScope* fileScope = fileScopes.back().release();
     RemoveLastFileScope();
@@ -368,16 +370,17 @@ void BoundCompileUnit::AddBoundNode(std::unique_ptr<BoundNode>&& boundNode)
     }
 }
 
-FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, ArgumentMatch& argumentMatch)
+FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, 
+    const Span& span, const boost::uuids::uuid& moduleId, ArgumentMatch& argumentMatch)
 {
-    FunctionSymbol* conversion = symbolTable.GetConversion(sourceType, targetType, span);
+    FunctionSymbol* conversion = symbolTable.GetConversion(sourceType, targetType, span, moduleId);
     if (conversion && conversion->GetSymbolType() == SymbolType::conversionFunctionSymbol)
     {
         argumentMatch.preReferenceConversionFlags = OperationFlags::addr;
     }
     if (!conversion)
     {
-        conversion = conversionTable.GetConversion(sourceType, targetType, span);
+        conversion = conversionTable.GetConversion(sourceType, targetType, span, moduleId);
         if (!conversion)
         {
             if (sourceType->IsNullPtrType() && targetType->IsPointerType() && !targetType->IsReferenceType())
@@ -391,16 +394,16 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
             }
             else if (sourceType->IsVoidPtrType() && targetType->IsPointerType() && !targetType->IsReferenceType())
             {
-                std::unique_ptr<FunctionSymbol> voidPtrToPtrConversion(new VoidPtrToPtrConversion(symbolTable.GetTypeByName(U"void")->AddPointer(span), targetType));
+                std::unique_ptr<FunctionSymbol> voidPtrToPtrConversion(new VoidPtrToPtrConversion(symbolTable.GetTypeByName(U"void")->AddPointer(span, moduleId), targetType));
                 voidPtrToPtrConversion->SetParent(&symbolTable.GlobalNs());
                 conversion = voidPtrToPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(voidPtrToPtrConversion));
                 return conversion;
             }
-            else if (sourceType->PlainType(span)->IsPointerType() && targetType == symbolTable.GetTypeByName(U"ulong"))
+            else if (sourceType->PlainType(span, moduleId)->IsPointerType() && targetType == symbolTable.GetTypeByName(U"ulong"))
             {
-                std::unique_ptr<FunctionSymbol> ptrToULongConversion(new PtrToULongConversion(sourceType->PlainType(span), symbolTable.GetTypeByName(U"ulong")));
+                std::unique_ptr<FunctionSymbol> ptrToULongConversion(new PtrToULongConversion(sourceType->PlainType(span, moduleId), symbolTable.GetTypeByName(U"ulong")));
                 ptrToULongConversion->SetParent(&symbolTable.GlobalNs());
                 conversion = ptrToULongConversion.get();
                 conversionTable.AddConversion(conversion);
@@ -434,19 +437,19 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 conversionTable.AddGeneratedConversion(std::move(voidPtrToDlgConversion));
                 return conversion;
             }
-            else if (sourceType->PlainType(span)->IsPointerType() && targetType->RemoveConst(span)->IsVoidPtrType())
+            else if (sourceType->PlainType(span, moduleId)->IsPointerType() && targetType->RemoveConst(span, moduleId)->IsVoidPtrType())
             {
-                std::unique_ptr<FunctionSymbol> ptrToVoidPtrConversion(new PtrToVoidPtrConversion(sourceType->PlainType(span), symbolTable.GetTypeByName(U"void")->AddPointer(span)));
+                std::unique_ptr<FunctionSymbol> ptrToVoidPtrConversion(new PtrToVoidPtrConversion(sourceType->PlainType(span, moduleId), symbolTable.GetTypeByName(U"void")->AddPointer(span, moduleId)));
                 ptrToVoidPtrConversion->SetParent(&symbolTable.GlobalNs());
                 conversion = ptrToVoidPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(ptrToVoidPtrConversion));
                 return conversion;
             }
-            else if (sourceType->PlainType(span)->IsCharacterPointerType() && targetType->IsStringFunctionContainer())
+            else if (sourceType->PlainType(span, moduleId)->IsCharacterPointerType() && targetType->IsStringFunctionContainer())
             {
                 std::unique_ptr<FunctionSymbol> charPtr2StringFunctionsConversion(
-                    new CharacterPointerLiteralToStringFunctionContainerConversion(sourceType->PlainType(span), symbolTable.GetTypeByName(U"@string_functions")));
+                    new CharacterPointerLiteralToStringFunctionContainerConversion(sourceType->PlainType(span, moduleId), symbolTable.GetTypeByName(U"@string_functions")));
                 charPtr2StringFunctionsConversion->SetParent(&symbolTable.GlobalNs());
                 conversion = charPtr2StringFunctionsConversion.get();
                 conversionTable.AddConversion(conversion);
@@ -467,10 +470,10 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                         if (targetType->IsReferenceType() && !sourceType->IsReferenceType())
                         {
                             argumentMatch.preReferenceConversionFlags = OperationFlags::addr;
-                            sourceType = sourceType->AddLvalueReference(span);
+                            sourceType = sourceType->AddLvalueReference(span, moduleId);
                             if (targetType->IsConstType())
                             {
-                                sourceType = sourceType->AddConst(span);
+                                sourceType = sourceType->AddConst(span, moduleId);
                             }
                         }
                         std::u32string conversionName = sourceType->FullName() + U"2" + targetType->FullName();
@@ -489,10 +492,10 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                             if (targetType->IsReferenceType() && !sourceType->IsReferenceType())
                             {
                                 argumentMatch.preReferenceConversionFlags = OperationFlags::addr;
-                                sourceType = sourceType->AddLvalueReference(span);
+                                sourceType = sourceType->AddLvalueReference(span, moduleId);
                                 if (targetType->IsConstType())
                                 {
-                                    sourceType = sourceType->AddConst(span);
+                                    sourceType = sourceType->AddConst(span, moduleId);
                                 }
                             }
                             std::u32string conversionName = sourceType->FullName() + U"2" + targetType->FullName();
@@ -571,7 +574,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                                             TypeSymbol* templateArgumentType = boundFunctionGroupExpression->TemplateArgumentTypes()[i];
                                             templateParameterMap[templateParameterSymbol] = templateArgumentType;
                                         }
-                                        viableFunction = InstantiateFunctionTemplate(viableFunction, templateParameterMap, span);
+                                        viableFunction = InstantiateFunctionTemplate(viableFunction, templateParameterMap, span, moduleId);
                                     }
                                     else
                                     {
@@ -594,9 +597,9 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 }
             }
             else if ((sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol || sourceType->GetSymbolType() == SymbolType::memberExpressionTypeSymbol) && 
-                targetType->PlainType(span)->GetSymbolType() == SymbolType::classDelegateTypeSymbol && currentFunction)
+                targetType->PlainType(span, moduleId)->GetSymbolType() == SymbolType::classDelegateTypeSymbol && currentFunction)
             {
-                ClassDelegateTypeSymbol* classDelegateType = static_cast<ClassDelegateTypeSymbol*>(targetType->PlainType(span));
+                ClassDelegateTypeSymbol* classDelegateType = static_cast<ClassDelegateTypeSymbol*>(targetType->PlainType(span, moduleId));
                 FunctionGroupSymbol* functionGroup = nullptr;
                 if (sourceType->GetSymbolType() == SymbolType::functionGroupTypeSymbol)
                 {
@@ -639,7 +642,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                         if (found)
                         {
                             //LocalVariableSymbol* objectDelegatePairVariable = currentFunction->GetFunctionSymbol()->CreateTemporary(classDelegateType->ObjectDelegatePairType(), span);
-                            std::unique_ptr<FunctionSymbol> memberFunctionToClassDelegateConversion(new MemberFunctionToClassDelegateConversion(span, sourceType, classDelegateType, viableFunction));
+                            std::unique_ptr<FunctionSymbol> memberFunctionToClassDelegateConversion(new MemberFunctionToClassDelegateConversion(span, moduleId, sourceType, classDelegateType, viableFunction));
                             memberFunctionToClassDelegateConversion->SetParent(&symbolTable.GlobalNs());
                             conversion = memberFunctionToClassDelegateConversion.get();
                             conversionTable.AddConversion(conversion);
@@ -649,9 +652,9 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                     }
                 }
             }
-            else if (targetType->PlainType(span)->GetSymbolType() == SymbolType::interfaceTypeSymbol && currentFunction)
+            else if (targetType->PlainType(span, moduleId)->GetSymbolType() == SymbolType::interfaceTypeSymbol && currentFunction)
             {
-                InterfaceTypeSymbol* targetInterfaceType = static_cast<InterfaceTypeSymbol*>(targetType->PlainType(span));
+                InterfaceTypeSymbol* targetInterfaceType = static_cast<InterfaceTypeSymbol*>(targetType->PlainType(span, moduleId));
                 if (sourceType->IsClassTypeSymbol()) 
                 {
                     ClassTypeSymbol* sourceClassType = static_cast<ClassTypeSymbol*>(sourceType);
@@ -662,7 +665,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                         if (TypesEqual(targetInterfaceType, sourceInterfaceType))
                         {
                             //LocalVariableSymbol* temporaryInterfaceObjectVar = currentFunction->GetFunctionSymbol()->CreateTemporary(targetInterfaceType, span);
-                            std::unique_ptr<FunctionSymbol> classToInterfaceConversion(new ClassToInterfaceConversion(sourceClassType, targetInterfaceType, i, span));
+                            std::unique_ptr<FunctionSymbol> classToInterfaceConversion(new ClassToInterfaceConversion(sourceClassType, targetInterfaceType, i, span, moduleId));
                             classToInterfaceConversion->SetParent(&symbolTable.GlobalNs());
                             classToInterfaceConversion->SetModule(&GetModule());
                             conversion = classToInterfaceConversion.get();
@@ -686,51 +689,50 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 int index = conversion->GetIndex();
                 conversion = specialization->GetFunctionByIndex(index);
             }
-            bool firstTry = InstantiateClassTemplateMemberFunction(conversion, containerScope, currentFunction, span);
+            bool firstTry = InstantiateClassTemplateMemberFunction(conversion, containerScope, currentFunction, span, moduleId);
             if (!firstTry)
             {
                 ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(conversion->Parent());
                 ClassTemplateSpecializationSymbol* copy = symbolTable.CopyClassTemplateSpecialization(specialization);
-                classTemplateRepository.BindClassTemplateSpecialization(copy, symbolTable.GlobalNs().GetContainerScope(), span);
+                classTemplateRepository.BindClassTemplateSpecialization(copy, symbolTable.GlobalNs().GetContainerScope(), span, moduleId);
                 int index = conversion->GetIndex();
                 conversion = copy->GetFunctionByIndex(index);
-                bool secondTry = InstantiateClassTemplateMemberFunction(conversion, containerScope, currentFunction, span);
+                bool secondTry = InstantiateClassTemplateMemberFunction(conversion, containerScope, currentFunction, span, moduleId);
                 if (!secondTry)
                 {
-                    throw Exception(GetRootModuleForCurrentThread(),
-                        "internal error: could not instantiate member function of a class template specialization '" + ToUtf8(specialization->FullName()) + "'",
-                        specialization->GetSpan());
+                    throw Exception("internal error: could not instantiate member function of a class template specialization '" + ToUtf8(specialization->FullName()) + "'",
+                        specialization->GetSpan(), specialization->SourceModuleId());
                 }
             }
         }
         else if (GetGlobalFlag(GlobalFlags::release) && conversion->IsInline())
         {
-            conversion = InstantiateInlineFunction(conversion, containerScope, span);
+            conversion = InstantiateInlineFunction(conversion, containerScope, span, moduleId);
         }
     }
     return conversion;
 }
 
 void BoundCompileUnit::CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, std::vector<std::unique_ptr<BoundExpression>>& arguments, 
-    BoundFunction* currentFunction, ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
+    BoundFunction* currentFunction, ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, const boost::uuids::uuid& moduleId, CollectFlags flags)
 {
-    operationRepository.CollectViableFunctions(groupName, containerScope, arguments, currentFunction, viableFunctions, exception, span, flags);
+    operationRepository.CollectViableFunctions(groupName, containerScope, arguments, currentFunction, viableFunctions, exception, span, moduleId, flags);
 }
 
 FunctionSymbol* BoundCompileUnit::InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, 
-    const Span& span)
+    const Span& span, const boost::uuids::uuid& moduleId)
 {
-    return functionTemplateRepository.Instantiate(functionTemplate, templateParameterMapping, span);
+    return functionTemplateRepository.Instantiate(functionTemplate, templateParameterMapping, span, moduleId);
 }
 
-bool BoundCompileUnit::InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
+bool BoundCompileUnit::InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId)
 {
-    return classTemplateRepository.Instantiate(memberFunction, containerScope, currentFunction, span);
+    return classTemplateRepository.Instantiate(memberFunction, containerScope, currentFunction, span, moduleId);
 }
 
-FunctionSymbol* BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)
+FunctionSymbol* BoundCompileUnit::InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId)
 {
-    return inlineFunctionRepository.Instantiate(inlineFunction, containerScope, span);
+    return inlineFunctionRepository.Instantiate(inlineFunction, containerScope, span, moduleId);
 }
 
 FunctionNode* BoundCompileUnit::GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol)
@@ -738,14 +740,14 @@ FunctionNode* BoundCompileUnit::GetFunctionNodeFor(FunctionSymbol* constExprFunc
     return constExprFunctionRepository.GetFunctionNodeFor(constExprFunctionSymbol);
 }
 
-void BoundCompileUnit::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
+void BoundCompileUnit::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId)
 {
-    operationRepository.GenerateCopyConstructorFor(classTypeSymbol, containerScope, currentFunction, span);
+    operationRepository.GenerateCopyConstructorFor(classTypeSymbol, containerScope, currentFunction, span, moduleId);
 }
 
-void BoundCompileUnit::GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
+void BoundCompileUnit::GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId)
 {
-    operationRepository.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, currentFunction, span);
+    operationRepository.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, currentFunction, span, moduleId);
 }
 
 int BoundCompileUnit::Install(const std::string& str)
@@ -892,11 +894,6 @@ void BoundCompileUnit::AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs)
     globalNamespaceNodes.push_back(std::move(globalNs));
 }
 
-void BoundCompileUnit::AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol)
-{
-    functionSymbols.push_back(std::move(functionSymbol));
-}
-
 bool BoundCompileUnit::IsGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol) const
 {
     return instantiatedGeneratedDestructors.find(generatedDestructorSymbol) != instantiatedGeneratedDestructors.cend();
@@ -916,7 +913,7 @@ void BoundCompileUnit::GenerateInitUnwindInfoFunctionSymbol()
 {
     std::string compileUnitId = compileUnitNode->Id();
     std::u32string groupName = U"InitUnwindInfo_" + ToUtf32(compileUnitId);
-    FunctionSymbol* functionSymbol = new FunctionSymbol(Span(), groupName);
+    FunctionSymbol* functionSymbol = new FunctionSymbol(Span(), boost::uuids::nil_uuid(), groupName);
     functionSymbol->SetParent(&symbolTable.GlobalNs());
     functionSymbol->SetGroupName(groupName);
     functionSymbol->SetAccess(SymbolAccess::public_);
@@ -933,7 +930,7 @@ void BoundCompileUnit::GenerateCompileUnitInitialization()
     if (module.IsCore()) return;
     std::string compileUnitId = compileUnitNode->Id();
     std::u32string groupName = U"InitCompileUnit_" + ToUtf32(compileUnitId);
-    FunctionSymbol* functionSymbol = new FunctionSymbol(Span(), groupName);
+    FunctionSymbol* functionSymbol = new FunctionSymbol(Span(), boost::uuids::nil_uuid(), groupName);
     functionSymbol->SetParent(&symbolTable.GlobalNs());
     functionSymbol->SetGroupName(groupName);
     functionSymbol->SetAccess(SymbolAccess::public_);
@@ -957,7 +954,8 @@ void BoundCompileUnit::GenerateCompileUnitInitialization()
         throw std::runtime_error("internal error: 'System.Runtime.PushCompileUnitUnwindInfoInit' symbol not found");
     }
     Span span = initCompileUnitFunctionSymbol->GetSpan();
-    compileUnitUnwindInfoVarSymbol.reset(new GlobalVariableSymbol(span, U"unwindInfoInit_" + ToUtf32(compileUnitId)));
+    boost::uuids::uuid moduleId = initCompileUnitFunctionSymbol->SourceModuleId();
+    compileUnitUnwindInfoVarSymbol.reset(new GlobalVariableSymbol(span, moduleId, U"unwindInfoInit_" + ToUtf32(compileUnitId)));
     compileUnitUnwindInfoVarSymbol->SetAccess(SymbolAccess::public_);
     compileUnitUnwindInfoVarSymbol->ComputeMangledName();
     Symbol* cuUnwindInfoTypeSymbol = symbolTable.GlobalNs().GetContainerScope()->Lookup(U"System.Runtime.CompileUnitUnwindInfo");
@@ -970,7 +968,7 @@ void BoundCompileUnit::GenerateCompileUnitInitialization()
             throw std::runtime_error("internal error: 'System.Runtime.CompileUnitUnwindInfo' class not found");
         }
         compileUnitUnwindInfoVarSymbol->SetType(classTypeSymbol);
-        BoundGlobalVariable* compileUnitUnwindInfoVar = new BoundGlobalVariable(symbolTable.GetModule(), span, compileUnitUnwindInfoVarSymbol.get());
+        BoundGlobalVariable* compileUnitUnwindInfoVar = new BoundGlobalVariable(span, moduleId, compileUnitUnwindInfoVarSymbol.get());
         AddBoundNode(std::unique_ptr<BoundNode>(compileUnitUnwindInfoVar));
     }
     else
@@ -991,7 +989,7 @@ void BoundCompileUnit::GenerateCompileUnitInitialization()
 void BoundCompileUnit::GenerateGlobalInitializationFunction()
 {
     std::u32string groupName = U"GlobalInitCompileUnits";
-    globalInitFunctionSymbol = new FunctionSymbol(Span(), groupName);
+    globalInitFunctionSymbol = new FunctionSymbol(Span(), boost::uuids::nil_uuid(), groupName);
     globalInitFunctionSymbol->SetParent(&symbolTable.GlobalNs());
     globalInitFunctionSymbol->SetGroupName(groupName);
     globalInitFunctionSymbol->SetAccess(SymbolAccess::public_);
@@ -1004,8 +1002,9 @@ void BoundCompileUnit::GenerateGlobalInitializationFunction()
     const std::set<std::string>& compileUnitIds = symbolTable.GetModule()->AllCompileUnitIds();
     for (const std::string& compileUnitId : compileUnitIds)
     {
+        Assert(!compileUnitId.empty(), "compiler unit ID is empty");
         std::u32string groupName = U"InitCompileUnit_" + ToUtf32(compileUnitId);
-        FunctionSymbol* initFunctionSymbol = new FunctionSymbol(Span(), groupName);
+        FunctionSymbol* initFunctionSymbol = new FunctionSymbol(Span(), boost::uuids::nil_uuid(), groupName);
         initFunctionSymbol->SetParent(&symbolTable.GlobalNs());
         initFunctionSymbol->SetGroupName(groupName);
         initFunctionSymbol->SetAccess(SymbolAccess::public_);

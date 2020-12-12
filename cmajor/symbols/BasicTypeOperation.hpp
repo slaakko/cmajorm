@@ -156,85 +156,85 @@ struct BasicTypeLShr
 struct DefaultInt1
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForBool(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new BoolValue(span, false)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new BoolValue(span, moduleId, false)); }
 };
 
 struct DefaultSInt8
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForSByte(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new SByteValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new SByteValue(span, moduleId, 0)); }
 };
 
 struct DefaultUInt8
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForByte(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new ByteValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new ByteValue(span, moduleId, 0)); }
 };
 
 struct DefaultSInt16
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForShort(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new ShortValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new ShortValue(span, moduleId, 0)); }
 };
 
 struct DefaultUInt16
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForUShort(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new UShortValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new UShortValue(span, moduleId, 0)); }
 };
 
 struct DefaultSInt32
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForInt(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new IntValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new IntValue(span, moduleId, 0)); }
 };
 
 struct DefaultUInt32
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForUInt(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new UIntValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new UIntValue(span, moduleId, 0)); }
 };
 
 struct DefaultSInt64
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForLong(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new LongValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new LongValue(span, moduleId, 0)); }
 };
 
 struct DefaultUInt64
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForULong(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new ULongValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new ULongValue(span, moduleId, 0)); }
 };
 
 struct DefaultFloat
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForFloat(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new FloatValue(span, 0.0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new FloatValue(span, moduleId, 0.0)); }
 };
 
 struct DefaultDouble
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForDouble(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new DoubleValue(span, 0.0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new DoubleValue(span, moduleId, 0.0)); }
 };
 
 struct DefaultChar
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForChar(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new CharValue(span, '\0')); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new CharValue(span, moduleId, '\0')); }
 };
 
 struct DefaultWChar
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForWChar(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new WCharValue(span, '\0')); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new WCharValue(span, moduleId, '\0')); }
 };
 
 struct DefaultUChar
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForUChar(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new UCharValue(span, '\0')); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) { return std::unique_ptr<Value>(new UCharValue(span, moduleId, '\0')); }
 };
 
 struct BasicTypeIntegerEquality
@@ -334,23 +334,23 @@ public:
     BasicTypeUnaryOperation(SymbolType symbolType);
     BasicTypeUnaryOperation(SymbolType symbolType, TypeSymbol* type);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "BasicTypeUnaryOperation"; }
     int ClassArity() const override { return 1; }
 };
 
 template<typename UnOp>
-BasicTypeUnaryOperation<UnOp>::BasicTypeUnaryOperation(SymbolType symbolType) : FunctionSymbol(symbolType, Span(), UnOp::GroupName())
+BasicTypeUnaryOperation<UnOp>::BasicTypeUnaryOperation(SymbolType symbolType) : FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), UnOp::GroupName())
 {
 }
 
 template<typename UnOp>
-BasicTypeUnaryOperation<UnOp>::BasicTypeUnaryOperation(SymbolType symbolType, TypeSymbol* type) : FunctionSymbol(symbolType, Span(), UnOp::GroupName())
+BasicTypeUnaryOperation<UnOp>::BasicTypeUnaryOperation(SymbolType symbolType, TypeSymbol* type) : FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), UnOp::GroupName())
 {
     SetGroupName(UnOp::GroupName());
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* operandParam = new ParameterSymbol(Span(), U"operand");
+    ParameterSymbol* operandParam = new ParameterSymbol(Span(), boost::uuids::nil_uuid(), U"operand");
     operandParam->SetType(type);
     AddMember(operandParam);
     SetReturnType(type);
@@ -358,7 +358,7 @@ BasicTypeUnaryOperation<UnOp>::BasicTypeUnaryOperation(SymbolType symbolType, Ty
 }
 
 template<typename UnOp>
-void BasicTypeUnaryOperation<UnOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void BasicTypeUnaryOperation<UnOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 1, "unary operation needs one object");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -370,31 +370,31 @@ void BasicTypeUnaryOperation<UnOp>::GenerateCall(Emitter& emitter, std::vector<G
 class BasicTypeUnaryPlusOperation : public BasicTypeUnaryOperation<BasicTypeUnaryPlus>
 {
 public:
-    BasicTypeUnaryPlusOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeUnaryPlusOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeIntUnaryMinusOperation : public BasicTypeUnaryOperation<BasicTypeIntUnaryMinus>
 {
 public:
-    BasicTypeIntUnaryMinusOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeIntUnaryMinusOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFloatUnaryMinusOperation : public BasicTypeUnaryOperation<BasicTypeFloatUnaryMinus>
 {
 public:
-    BasicTypeFloatUnaryMinusOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFloatUnaryMinusOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeComplementOperation : public BasicTypeUnaryOperation<BasicTypeComplement>
 {
 public:
-    BasicTypeComplementOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeComplementOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeNotOperation : public BasicTypeUnaryOperation<BasicTypeNot>
 {
 public:
-    BasicTypeNotOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeNotOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 template<typename BinOp>
@@ -404,26 +404,26 @@ public:
     BasicTypeBinaryOperation(SymbolType symbolType);
     BasicTypeBinaryOperation(SymbolType symbolType, TypeSymbol* type);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "BasicTypeBinaryOperation"; }
     int ClassArity() const override { return 1; }
 };
 
 template<typename BinOp>
-BasicTypeBinaryOperation<BinOp>::BasicTypeBinaryOperation(SymbolType symbolType) : FunctionSymbol(symbolType, Span(), BinOp::GroupName())
+BasicTypeBinaryOperation<BinOp>::BasicTypeBinaryOperation(SymbolType symbolType) : FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), BinOp::GroupName())
 {
 }
 
 template<typename BinOp>
-BasicTypeBinaryOperation<BinOp>::BasicTypeBinaryOperation(SymbolType symbolType, TypeSymbol* type) : FunctionSymbol(symbolType, Span(), BinOp::GroupName())
+BasicTypeBinaryOperation<BinOp>::BasicTypeBinaryOperation(SymbolType symbolType, TypeSymbol* type) : FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), BinOp::GroupName())
 {
     SetGroupName(BinOp::GroupName());
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* leftParam = new ParameterSymbol(Span(), U"left");
+    ParameterSymbol* leftParam = new ParameterSymbol(Span(), boost::uuids::nil_uuid(), U"left");
     leftParam->SetType(type);
     AddMember(leftParam);
-    ParameterSymbol* rightParam = new ParameterSymbol(Span(), U"right");
+    ParameterSymbol* rightParam = new ParameterSymbol(Span(), boost::uuids::nil_uuid(), U"right");
     rightParam->SetType(type);
     AddMember(rightParam);
     SetReturnType(type);
@@ -431,7 +431,7 @@ BasicTypeBinaryOperation<BinOp>::BasicTypeBinaryOperation(SymbolType symbolType,
 }
 
 template<typename BinOp>
-void BasicTypeBinaryOperation<BinOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void BasicTypeBinaryOperation<BinOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 2, "binary operation needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -445,103 +445,103 @@ void BasicTypeBinaryOperation<BinOp>::GenerateCall(Emitter& emitter, std::vector
 class BasicTypeAddOperation : public BasicTypeBinaryOperation<BasicTypeAdd>
 {
 public:
-    BasicTypeAddOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeAddOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFAddOperation : public BasicTypeBinaryOperation<BasicTypeFAdd>
 {
 public:
-    BasicTypeFAddOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFAddOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeSubOperation : public BasicTypeBinaryOperation<BasicTypeSub>
 {
 public:
-    BasicTypeSubOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeSubOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFSubOperation : public BasicTypeBinaryOperation<BasicTypeFSub>
 {
 public:
-    BasicTypeFSubOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFSubOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeMulOperation : public BasicTypeBinaryOperation<BasicTypeMul>
 {
 public:
-    BasicTypeMulOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeMulOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFMulOperation : public BasicTypeBinaryOperation<BasicTypeFMul>
 {
 public:
-    BasicTypeFMulOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFMulOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeSDivOperation : public BasicTypeBinaryOperation<BasicTypeSDiv>
 {
 public:
-    BasicTypeSDivOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeSDivOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeUDivOperation : public BasicTypeBinaryOperation<BasicTypeUDiv>
 {
 public:
-    BasicTypeUDivOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeUDivOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFDivOperation : public BasicTypeBinaryOperation<BasicTypeFDiv>
 {
 public:
-    BasicTypeFDivOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFDivOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeSRemOperation : public BasicTypeBinaryOperation<BasicTypeSRem>
 {
 public:
-    BasicTypeSRemOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeSRemOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeURemOperation : public BasicTypeBinaryOperation<BasicTypeURem>
 {
 public:
-    BasicTypeURemOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeURemOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeAndOperation : public BasicTypeBinaryOperation<BasicTypeAnd>
 {
 public:
-    BasicTypeAndOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeAndOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeOrOperation : public BasicTypeBinaryOperation<BasicTypeOr>
 {
 public:
-    BasicTypeOrOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeOrOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeXorOperation : public BasicTypeBinaryOperation<BasicTypeXor>
 {
 public:
-    BasicTypeXorOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeXorOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeShlOperation : public BasicTypeBinaryOperation<BasicTypeShl>
 {
 public:
-    BasicTypeShlOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeShlOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeAShrOperation : public BasicTypeBinaryOperation<BasicTypeAShr>
 {
 public:
-    BasicTypeAShrOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeAShrOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeLShrOperation : public BasicTypeBinaryOperation<BasicTypeLShr>
 {
 public:
-    BasicTypeLShrOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeLShrOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 template<typename DefaultOp>
@@ -551,26 +551,26 @@ public:
     BasicTypeDefaultCtor(SymbolType symbolType);
     BasicTypeDefaultCtor(SymbolType symbolType, TypeSymbol* type);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
-    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const override;
+    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) const override;
     bool IsCompileTimePrimitiveFunction() const override { return true; }
     const char* ClassName() const override { return "BasicTypeDefaultCtor"; }
     int ClassArity() const override { return 1; }
 };
 
 template<typename DefaultOp>
-BasicTypeDefaultCtor<DefaultOp>::BasicTypeDefaultCtor(SymbolType symbolType) : FunctionSymbol(symbolType, Span(), U"@constructor")
+BasicTypeDefaultCtor<DefaultOp>::BasicTypeDefaultCtor(SymbolType symbolType) : FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), U"@constructor")
 {
 }
 
 template<typename DefaultOp>
-BasicTypeDefaultCtor<DefaultOp>::BasicTypeDefaultCtor(SymbolType symbolType, TypeSymbol* type) : FunctionSymbol(symbolType, Span(), U"@constructor")
+BasicTypeDefaultCtor<DefaultOp>::BasicTypeDefaultCtor(SymbolType symbolType, TypeSymbol* type) : FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), U"@constructor")
 {
     SetGroupName(U"@constructor");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* thisParam = new ParameterSymbol(Span(), U"this");
-    thisParam->SetType(type->AddPointer(Span()));
+    ParameterSymbol* thisParam = new ParameterSymbol(Span(), boost::uuids::nil_uuid(), U"this");
+    thisParam->SetType(type->AddPointer(Span(), boost::uuids::nil_uuid()));
     AddMember(thisParam);
     ComputeName();
     if (type->IsBasicTypeSymbol())
@@ -581,7 +581,7 @@ BasicTypeDefaultCtor<DefaultOp>::BasicTypeDefaultCtor(SymbolType symbolType, Typ
 }
 
 template<typename DefaultOp>
-void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
     emitter.Stack().Push(DefaultOp::Generate(emitter));
@@ -589,103 +589,103 @@ void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector
 }
 
 template<typename DefaultOp>
-std::unique_ptr<Value> BasicTypeDefaultCtor<DefaultOp>::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const
+std::unique_ptr<Value> BasicTypeDefaultCtor<DefaultOp>::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) const
 {
-    return DefaultOp::ConstructValue(argumentValues, span, receiver);
+    return DefaultOp::ConstructValue(argumentValues, span, moduleId, receiver);
 }
 
 class BasicTypeDefaultInt1Operation : public BasicTypeDefaultCtor<DefaultInt1>
 {
 public:
-    BasicTypeDefaultInt1Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultInt1Operation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultSInt8Operation : public BasicTypeDefaultCtor<DefaultSInt8>
 {
 public:
-    BasicTypeDefaultSInt8Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultSInt8Operation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultUInt8Operation : public BasicTypeDefaultCtor<DefaultUInt8>
 {
 public:
-    BasicTypeDefaultUInt8Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultUInt8Operation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultSInt16Operation : public BasicTypeDefaultCtor<DefaultSInt16>
 {
 public:
-    BasicTypeDefaultSInt16Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultSInt16Operation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultUInt16Operation : public BasicTypeDefaultCtor<DefaultUInt16>
 {
 public:
-    BasicTypeDefaultUInt16Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultUInt16Operation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultSInt32Operation : public BasicTypeDefaultCtor<DefaultSInt32>
 {
 public:
-    BasicTypeDefaultSInt32Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultSInt32Operation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultUInt32Operation : public BasicTypeDefaultCtor<DefaultUInt32>
 {
 public:
-    BasicTypeDefaultUInt32Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultUInt32Operation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultSInt64Operation : public BasicTypeDefaultCtor<DefaultSInt64>
 {
 public:
-    BasicTypeDefaultSInt64Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultSInt64Operation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultUInt64Operation : public BasicTypeDefaultCtor<DefaultUInt64>
 {
 public:
-    BasicTypeDefaultUInt64Operation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultUInt64Operation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultFloatOperation : public BasicTypeDefaultCtor<DefaultFloat>
 {
 public:
-    BasicTypeDefaultFloatOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultFloatOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultDoubleOperation : public BasicTypeDefaultCtor<DefaultDouble>
 {
 public:
-    BasicTypeDefaultDoubleOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultDoubleOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultCharOperation : public BasicTypeDefaultCtor<DefaultChar>
 {
 public:
-    BasicTypeDefaultCharOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultCharOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultWCharOperation : public BasicTypeDefaultCtor<DefaultWChar>
 {
 public:
-    BasicTypeDefaultWCharOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultWCharOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeDefaultUCharOperation : public BasicTypeDefaultCtor<DefaultUChar>
 {
 public:
-    BasicTypeDefaultUCharOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeDefaultUCharOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeCopyCtor : public FunctionSymbol
 {
 public:
     BasicTypeCopyCtor(TypeSymbol* type);
-    BasicTypeCopyCtor(const Span& span_, const std::u32string& name_);
+    BasicTypeCopyCtor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
-    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
+    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) const override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
     const char* ClassName() const override { return "BasicTypeCopyCtor"; }
@@ -696,10 +696,10 @@ class BasicTypeMoveCtor : public FunctionSymbol
 {
 public:
     BasicTypeMoveCtor(TypeSymbol* type);
-    BasicTypeMoveCtor(const Span& span_, const std::u32string& name_);
+    BasicTypeMoveCtor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
-    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
+    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) const override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
     const char* ClassName() const override { return "BasicTypeMoveCtor"; }
@@ -710,9 +710,9 @@ class BasicTypeCopyAssignment : public FunctionSymbol
 {
 public:
     BasicTypeCopyAssignment(TypeSymbol* type, TypeSymbol* voidType);
-    BasicTypeCopyAssignment(const Span& span_, const std::u32string& name_);
+    BasicTypeCopyAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
     const char* ClassName() const override { return "BasicTypeCopyAssignment"; }
@@ -723,9 +723,9 @@ class BasicTypeMoveAssignment : public FunctionSymbol
 {
 public:
     BasicTypeMoveAssignment(TypeSymbol* type, TypeSymbol* voidType);
-    BasicTypeMoveAssignment(const Span& span_, const std::u32string& name_);
+    BasicTypeMoveAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "BasicTypeMoveAssignment"; }
     std::u32string Info() const override { return std::u32string(); }
@@ -735,9 +735,9 @@ class BasicTypeReturn : public FunctionSymbol
 {
 public:
     BasicTypeReturn(TypeSymbol* type);
-    BasicTypeReturn(const Span& span_, const std::u32string& name_);
+    BasicTypeReturn(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "BasicTypeReturn"; }
     std::u32string Info() const override { return std::u32string(); }
@@ -753,12 +753,10 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     ConversionType GetConversionType() const override { return conversionType; }
     uint8_t ConversionDistance() const override { return conversionDistance; }
-    TypeSymbol* ConversionSourceType() const override { return sourceType; }
-    TypeSymbol* ConversionTargetType() const override { return targetType; }
     const char* ClassName() const override { return "BasicTypeConversion"; }
     int ClassArity() const override { return 1; }
     std::u32string Info() const override;
@@ -772,7 +770,7 @@ private:
 
 template <typename ConversionOp>
 BasicTypeConversion<ConversionOp>::BasicTypeConversion(SymbolType symbolType) :
-    FunctionSymbol(symbolType, Span(), U"@conversion"), conversionType(ConversionType::implicit_), conversionDistance(0), sourceType(nullptr), targetType(nullptr)
+    FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), U"@conversion"), conversionType(ConversionType::implicit_), conversionDistance(0), sourceType(nullptr), targetType(nullptr)
 {
     SetGroupName(U"@conversion");
     SetConversion();
@@ -781,11 +779,13 @@ BasicTypeConversion<ConversionOp>::BasicTypeConversion(SymbolType symbolType) :
 
 template <typename ConversionOp>
 BasicTypeConversion<ConversionOp>::BasicTypeConversion(SymbolType symbolType, const std::u32string& name_, ConversionType conversionType_, uint8_t conversionDistance_, TypeSymbol* sourceType_, TypeSymbol* targetType_) :
-    FunctionSymbol(symbolType, Span(), name_), conversionType(conversionType_), conversionDistance(conversionDistance_), sourceType(sourceType_), targetType(targetType_)
+    FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), name_), conversionType(conversionType_), conversionDistance(conversionDistance_), sourceType(sourceType_), targetType(targetType_)
 {
     SetGroupName(U"@conversion");
     SetConversion();
     SetAccess(SymbolAccess::public_);
+    SetConversionSourceType(sourceType->PlainType(GetSpan(), SourceModuleId()));
+    SetConversionTargetType(targetType->PlainType(GetSpan(), SourceModuleId()));
 }
 
 template <typename ConversionOp>
@@ -830,7 +830,7 @@ void BasicTypeConversion<ConversionOp>::EmplaceType(TypeSymbol* typeSymbol, int 
 }
 
 template <typename ConversionOp>
-void BasicTypeConversion<ConversionOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void BasicTypeConversion<ConversionOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     void* value = emitter.Stack().Pop();
     emitter.SetCurrentDebugLocation(span);
@@ -852,11 +852,11 @@ void BasicTypeConversion<ConversionOp>::Check()
     FunctionSymbol::Check();
     if (!sourceType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type conversion has no conversion source type", GetSpan());
+        throw SymbolCheckException("basic type conversion has no conversion source type", GetSpan(), SourceModuleId());
     }
     if (!targetType)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "basic type conversion has no conversion target type", GetSpan());
+        throw SymbolCheckException("basic type conversion has no conversion target type", GetSpan(), SourceModuleId());
     }
 }
 
@@ -886,7 +886,7 @@ std::unique_ptr<Value> BasicTypeImplicitConversion<ConversionOp>::ConvertValue(c
     if (value)
     {
         TypeSymbol* targetType = BasicTypeConversion<ConversionOp>::ConversionTargetType();
-        return std::unique_ptr<Value>(value->As(targetType, false, value->GetSpan(), true));
+        return std::unique_ptr<Value>(value->As(targetType, false, value->GetSpan(), value->ModuleId(), true));
     }
     return std::unique_ptr<Value>();
 }
@@ -917,7 +917,7 @@ std::unique_ptr<Value> BasicTypeExplicitConversion<ConversionOp>::ConvertValue(c
     if (value)
     {
         TypeSymbol* targetType = BasicTypeConversion<ConversionOp>::ConversionTargetType();
-        return std::unique_ptr<Value>(value->As(targetType, true, value->GetSpan(), true));
+        return std::unique_ptr<Value>(value->As(targetType, true, value->GetSpan(), value->ModuleId(), true));
     }
     return std::unique_ptr<Value>();
 }
@@ -925,85 +925,85 @@ std::unique_ptr<Value> BasicTypeExplicitConversion<ConversionOp>::ConvertValue(c
 class BasicTypeImplicitSignExtensionOperation : public BasicTypeImplicitConversion<BasicTypeSignExtension>
 {
 public:
-    BasicTypeImplicitSignExtensionOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeImplicitSignExtensionOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeImplicitZeroExtensionOperation : public BasicTypeImplicitConversion<BasicTypeZeroExtension>
 {
 public:
-    BasicTypeImplicitZeroExtensionOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeImplicitZeroExtensionOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeExplicitSignExtensionOperation : public BasicTypeExplicitConversion<BasicTypeSignExtension>
 {
 public:
-    BasicTypeExplicitSignExtensionOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeExplicitSignExtensionOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeExplicitZeroExtensionOperation : public BasicTypeExplicitConversion<BasicTypeZeroExtension>
 {
 public:
-    BasicTypeExplicitZeroExtensionOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeExplicitZeroExtensionOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeTruncationOperation : public BasicTypeExplicitConversion<BasicTypeTruncation>
 {
 public:
-    BasicTypeTruncationOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeTruncationOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeBitCastOperation : public BasicTypeExplicitConversion<BasicTypeBitCast>
 {
 public:
-    BasicTypeBitCastOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeBitCastOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeImplicitUnsignedIntToFloatingOperation : public BasicTypeImplicitConversion<BasicTypeUnsignedIntToFloating>
 {
 public:
-    BasicTypeImplicitUnsignedIntToFloatingOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeImplicitUnsignedIntToFloatingOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeImplicitSignedIntToFloatingOperation : public BasicTypeImplicitConversion<BasicTypeSignedIntToFloating>
 {
 public:
-    BasicTypeImplicitSignedIntToFloatingOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeImplicitSignedIntToFloatingOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeExplicitUnsignedIntToFloatingOperation : public BasicTypeExplicitConversion<BasicTypeUnsignedIntToFloating>
 {
 public:
-    BasicTypeExplicitUnsignedIntToFloatingOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeExplicitUnsignedIntToFloatingOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeExplicitSignedIntToFloatingOperation : public BasicTypeExplicitConversion<BasicTypeSignedIntToFloating>
 {
 public:
-    BasicTypeExplicitSignedIntToFloatingOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeExplicitSignedIntToFloatingOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFloatingToUnsignedIntOperation : public BasicTypeExplicitConversion<BasicTypeFloatingToUnsignedInt>
 {
 public:
-    BasicTypeFloatingToUnsignedIntOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFloatingToUnsignedIntOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFloatingToSignedIntOperation : public BasicTypeExplicitConversion<BasicTypeFloatingToSignedInt>
 {
 public:
-    BasicTypeFloatingToSignedIntOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFloatingToSignedIntOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFloatingExtensionOperation : public BasicTypeImplicitConversion<BasicTypeFloatingExtension>
 {
 public:
-    BasicTypeFloatingExtensionOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFloatingExtensionOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFloatingTruncationOperation : public BasicTypeExplicitConversion<BasicTypeFloatingTruncation>
 {
 public:
-    BasicTypeFloatingTruncationOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFloatingTruncationOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 template<typename ComparisonOp>
@@ -1013,26 +1013,26 @@ public:
     BasicTypeComparisonOperation(SymbolType symbolType);
     BasicTypeComparisonOperation(SymbolType symbolType, TypeSymbol* type, TypeSymbol* boolType);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "BasicTypeComparisonOperation"; }
     int ClassArity() const override { return 1; }
 };
 
 template<typename ComparisonOp>
-BasicTypeComparisonOperation<ComparisonOp>::BasicTypeComparisonOperation(SymbolType symbolType) : FunctionSymbol(symbolType, Span(), ComparisonOp::GroupName())
+BasicTypeComparisonOperation<ComparisonOp>::BasicTypeComparisonOperation(SymbolType symbolType) : FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), ComparisonOp::GroupName())
 {
 }
 
 template<typename ComparisonOp>
-BasicTypeComparisonOperation<ComparisonOp>::BasicTypeComparisonOperation(SymbolType symbolType, TypeSymbol* type, TypeSymbol* boolType) : FunctionSymbol(symbolType, Span(), ComparisonOp::GroupName())
+BasicTypeComparisonOperation<ComparisonOp>::BasicTypeComparisonOperation(SymbolType symbolType, TypeSymbol* type, TypeSymbol* boolType) : FunctionSymbol(symbolType, Span(), boost::uuids::nil_uuid(), ComparisonOp::GroupName())
 {
     SetGroupName(ComparisonOp::GroupName());
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* leftParam = new ParameterSymbol(Span(), U"left");
+    ParameterSymbol* leftParam = new ParameterSymbol(Span(), boost::uuids::nil_uuid(), U"left");
     leftParam->SetType(type);
     AddMember(leftParam);
-    ParameterSymbol* rightParam = new ParameterSymbol(Span(), U"right");
+    ParameterSymbol* rightParam = new ParameterSymbol(Span(), boost::uuids::nil_uuid(), U"right");
     rightParam->SetType(type);
     AddMember(rightParam);
     SetReturnType(boolType);
@@ -1053,7 +1053,7 @@ BasicTypeComparisonOperation<ComparisonOp>::BasicTypeComparisonOperation(SymbolT
 }
 
 template<typename ComparisonOp>
-void BasicTypeComparisonOperation<ComparisonOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void BasicTypeComparisonOperation<ComparisonOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 2, "comparison operation needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
@@ -1066,31 +1066,31 @@ void BasicTypeComparisonOperation<ComparisonOp>::GenerateCall(Emitter& emitter, 
 class BasicTypeIntegerEqualityOperation : public BasicTypeComparisonOperation<BasicTypeIntegerEquality>
 {
 public:
-    BasicTypeIntegerEqualityOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeIntegerEqualityOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFloatingEqualityOperation : public BasicTypeComparisonOperation<BasicTypeFloatingEquality>
 {
 public:
-    BasicTypeFloatingEqualityOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFloatingEqualityOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeUnsignedIntegerLessThanOperation : public BasicTypeComparisonOperation<BasicTypeUnsignedIntegerLessThan>
 {
 public:
-    BasicTypeUnsignedIntegerLessThanOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeUnsignedIntegerLessThanOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeSignedIntegerLessThanOperation : public BasicTypeComparisonOperation<BasicTypeSignedIntegerLessThan>
 {
 public:
-    BasicTypeSignedIntegerLessThanOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeSignedIntegerLessThanOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 class BasicTypeFloatingLessThanOperation : public BasicTypeComparisonOperation<BasicTypeFloatingLessThan>
 {
 public:
-    BasicTypeFloatingLessThanOperation(const Span& span_, const std::u32string& name_);
+    BasicTypeFloatingLessThanOperation(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
 };
 
 void MakeBasicTypeOperations(SymbolTable& symbolTable,

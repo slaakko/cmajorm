@@ -24,14 +24,16 @@ class BINDER_API ClassTemplateRepository
 {
 public:
     ClassTemplateRepository(BoundCompileUnit& boundCompileUnit_);
-    void ResolveDefaultTemplateArguments(std::vector<TypeSymbol*>& templateArgumentTypes, ClassTypeSymbol* classTemplate, ContainerScope* containerScope, const Span& span);
-    void BindClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, const Span& span);
-    bool Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
+    void ResolveDefaultTemplateArguments(std::vector<TypeSymbol*>& templateArgumentTypes, ClassTypeSymbol* classTemplate, ContainerScope* containerScope, 
+        const Span& span, const boost::uuids::uuid& moduleId);
+    void BindClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId);
+    bool Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId);
 private:
     BoundCompileUnit& boundCompileUnit;
     std::unordered_set<FunctionSymbol*> instantiatedMemberFunctions;
     std::unordered_set<std::pair<boost::uuids::uuid, int>, ClassIdMemberFunctionIndexHash> classIdMemberFunctionIndexSet;
-    bool InstantiateDestructorAndVirtualFunctions(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
+    bool InstantiateDestructorAndVirtualFunctions(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, BoundFunction* currentFunction, 
+        const Span& span, const boost::uuids::uuid& moduleId);
 };
 
 } } // namespace cmajor::binder

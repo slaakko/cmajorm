@@ -40,7 +40,7 @@ private:
 class SYMBOLS_API FunctionGroupSymbol : public Symbol
 {
 public:
-    FunctionGroupSymbol(const Span& span_, const std::u32string& name_);
+    FunctionGroupSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     bool IsExportSymbol() const override { return false; }
     std::string TypeString() const override { return "function_group"; }
     void ComputeMangledName() override;
@@ -90,7 +90,8 @@ enum class FunctionSymbolFlags : uint32_t
     dontReuse = 1 << 20,
     hasArtificialBody = 1 << 21,
     hasCleanup = 1 << 22,
-    systemDefault = 1 << 23
+    systemDefault = 1 << 23,
+    immutable = 1 << 24
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -119,8 +120,8 @@ class BoundTemplateParameterSymbol;
 class SYMBOLS_API FunctionSymbol : public ContainerSymbol
 {
 public:
-    FunctionSymbol(const Span& span_, const std::u32string& name_);
-    FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
+    FunctionSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    FunctionSymbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     FunctionSymbol(const FunctionSymbol&) = delete;
     FunctionSymbol& operator=(const FunctionSymbol&) = delete;
     void Write(SymbolWriter& writer) override;
@@ -147,8 +148,10 @@ public:
     void SetIndex(int32_t index_) { index = index_; }
     virtual ConversionType GetConversionType() const { return ConversionType::implicit_; }
     virtual uint8_t ConversionDistance() const { return 0; }
-    virtual TypeSymbol* ConversionSourceType() const { return nullptr; }
-    virtual TypeSymbol* ConversionTargetType() const { return nullptr; }
+    TypeSymbol* ConversionSourceType() const { return conversionSourceType; }
+    void SetConversionSourceType(TypeSymbol* conversionSourceType_);
+    TypeSymbol* ConversionTargetType() const { return conversionTargetType; }
+    void SetConversionTargetType(TypeSymbol* conversionTargetType_);
     virtual bool IsBasicTypeOperation() const { return false; }
     virtual bool IsGeneratedFunction() const { return false; }
     virtual bool IsLvalueReferenceCopyAssignment() const { return false; }
@@ -156,9 +159,9 @@ public:
     virtual bool IsCompileTimePrimitiveFunction() const { return false; }
     virtual bool IsClassToInterfaceTypeConversion() const { return false; }
     virtual bool IsMemberFunctionToClassDelegateConversion() const { return false; }
-    virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span);
-    void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span);
-    virtual std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const;
+    virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId);
+    void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId);
+    virtual std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) const;
     virtual std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const;
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }
     virtual bool IsConstructorDestructorOrNonstaticMemberFunction() const { return false; }
@@ -217,6 +220,9 @@ public:
     void SetHasCleanup() { SetFlag(FunctionSymbolFlags::hasCleanup); }
     bool IsSystemDefault() const { return GetFlag(FunctionSymbolFlags::systemDefault); }
     void SetSystemDefault() { SetFlag(FunctionSymbolFlags::systemDefault); }
+    bool IsImmutable() const override { return GetFlag(FunctionSymbolFlags::immutable); }
+    void SetImmutable() { SetFlag(FunctionSymbolFlags::immutable); }
+    void ResetImmutable() { ResetFlag(FunctionSymbolFlags::immutable); }
     virtual bool DontThrow() const { return (IsNothrow() || IsBasicTypeOperation()) && !HasCleanup(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
@@ -234,7 +240,7 @@ public:
     bool ReturnsClassInterfaceOrClassDelegateByValue() const;
     bool IsFunctionTemplate() const { return !templateParameters.empty(); }
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
-    LocalVariableSymbol* CreateTemporary(TypeSymbol* type, const Span& span);
+    LocalVariableSymbol* CreateTemporary(TypeSymbol* type, const Span& span, const boost::uuids::uuid& moduleId);
     virtual std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
     void* IrType(Emitter& emitter);
     int32_t VmtIndex() const { return vmtIndex; }
@@ -265,6 +271,9 @@ public:
     LocalVariableSymbol* PrevUnwindInfoVar() const { return prevUnwindInfoVar.get(); }
     void SetUnwindInfoVar(LocalVariableSymbol* unwindInfoVar_);
     LocalVariableSymbol* UnwindInfoVar() const { return unwindInfoVar.get(); }
+    int NextTemporaryIndex();
+    void CopyFrom(const Symbol* that) override;
+    virtual FunctionSymbol* Copy() const;
 private:
     FunctionSymbol* functionTemplate;
     FunctionSymbol* master;
@@ -289,12 +298,14 @@ private:
     FunctionGroupSymbol* functionGroup;
     std::unique_ptr<IntrinsicFunction> intrinsic;
     bool isProgramMain;
+    TypeSymbol* conversionSourceType;
+    TypeSymbol* conversionTargetType;
 };
 
 class SYMBOLS_API StaticConstructorSymbol : public FunctionSymbol
 {
 public:
-    StaticConstructorSymbol(const Span& span_, const std::u32string& name_);
+    StaticConstructorSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "static_constructor"; }
     void Accept(SymbolCollector* collector) override {}
     void SetSpecifiers(Specifiers specifiers);
@@ -303,12 +314,13 @@ public:
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "StaticConstructorSymbol"; }
     int StartParamIndex() const override { return 0; }
+    FunctionSymbol* Copy() const override;
 };
    
 class SYMBOLS_API ConstructorSymbol : public FunctionSymbol
 {
 public:
-    ConstructorSymbol(const Span& span_, const std::u32string& name_);
+    ConstructorSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override;
     std::u32string DocName() const override;
     std::u32string CodeName() const override;
@@ -316,17 +328,16 @@ public:
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
     uint8_t ConversionDistance() const override;
-    TypeSymbol* ConversionSourceType() const override;
-    TypeSymbol* ConversionTargetType() const override;
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "ConstructorSymbol"; }
     int StartParamIndex() const override { return 1; }
+    FunctionSymbol* Copy() const override;
 };
 
 class SYMBOLS_API DestructorSymbol : public FunctionSymbol
 {
 public:
-    DestructorSymbol(const Span& span_, const std::u32string& name_);
+    DestructorSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     bool IsExportSymbol() const override;
@@ -342,6 +353,7 @@ public:
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "DestructorSymbol"; }
     int StartParamIndex() const override { return 1; }
+    FunctionSymbol* Copy() const override;
 private:
     bool generated;
 };
@@ -349,7 +361,7 @@ private:
 class SYMBOLS_API MemberFunctionSymbol : public FunctionSymbol
 {
 public:
-    MemberFunctionSymbol(const Span& span_, const std::u32string& name_);
+    MemberFunctionSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override;
     std::u32string DocName() const override;
     ParameterSymbol* GetThisParam() const override { if (IsStatic()) return nullptr; else return Parameters()[0]; }
@@ -357,25 +369,25 @@ public:
     void SetSpecifiers(Specifiers specifiers);
     const char* ClassName() const override { return "MemberFunctionSymbol"; }
     int StartParamIndex() const override;
+    FunctionSymbol* Copy() const override;
 };
 
 class SYMBOLS_API ConversionFunctionSymbol : public FunctionSymbol
 {
 public:
-    ConversionFunctionSymbol(const Span& span_, const std::u32string& name_);
+    ConversionFunctionSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "conversion_function";  }
     std::u32string DocName() const override;
     ParameterSymbol* GetThisParam() const override { return Parameters()[0]; }
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const override;
-    TypeSymbol* ConversionTargetType() const override;
     void SetSpecifiers(Specifiers specifiers);
     std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "ConversionFunctionSymbol"; }
     int StartParamIndex() const override { return 0; }
+    FunctionSymbol* Copy() const override;
 };
 
 class SYMBOLS_API FunctionGroupTypeSymbol : public TypeSymbol
@@ -397,7 +409,7 @@ private:
 class SYMBOLS_API MemberExpressionTypeSymbol : public TypeSymbol
 {
 public:
-    MemberExpressionTypeSymbol(const Span& span_, const std::u32string& name_, void* boundMemberExpression_);
+    MemberExpressionTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_, void* boundMemberExpression_);
     bool IsExportSymbol() const override { return false; }
     void* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of member expression type");  return nullptr; }
     void* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of member expression type"); return nullptr; }

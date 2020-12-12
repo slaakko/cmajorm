@@ -24,48 +24,48 @@ parser api(SNGCM_PARSER_API) StatementParser
     using TypeExprParser.TypeExpr;
     using IdentifierParser.Identifier;
 
-    Statement(ParsingContext* ctx) : StatementNode*
-        ::= LabeledStatement(ctx):labeledStatement{ return labeledStatement; }
-        |   ControlStatement(ctx):controlStatement{ return controlStatement; }
-        |   ExpressionStatement(ctx):expressionStatement{ return expressionStatement; }
-        |   AssignmentStatement(ctx):assignmentStatement{ return assignmentStatement; }
-        |   ConstructionStatement(ctx):constructionStatement{ return constructionStatement; }
-        |   DeleteStatement(ctx):deleteStatement{ return deleteStatement; }
-        |   DestroyStatement(ctx):destroyStatement{ return destroyStatement; }
-        |   EmptyStatement(ctx):emptyStatement{ return emptyStatement; }
-        |   ThrowStatement(ctx):throwStatement{ return throwStatement; }
-        |   TryStatement(ctx):tryStatement{ return tryStatement; }
-        |   AssertStatement(ctx):assertStatement{ return assertStatement; }
-        |   ConditionalCompilationStatement(ctx):condCompStatement{ return condCompStatement; }
+    Statement(boost::uuids::uuid* moduleId, ParsingContext* ctx) : StatementNode*
+        ::= LabeledStatement(moduleId, ctx):labeledStatement{ return labeledStatement; }
+        |   ControlStatement(moduleId, ctx):controlStatement{ return controlStatement; }
+        |   ExpressionStatement(moduleId, ctx):expressionStatement{ return expressionStatement; }
+        |   AssignmentStatement(moduleId, ctx):assignmentStatement{ return assignmentStatement; }
+        |   ConstructionStatement(moduleId, ctx):constructionStatement{ return constructionStatement; }
+        |   DeleteStatement(moduleId, ctx):deleteStatement{ return deleteStatement; }
+        |   DestroyStatement(moduleId, ctx):destroyStatement{ return destroyStatement; }
+        |   EmptyStatement(moduleId, ctx):emptyStatement{ return emptyStatement; }
+        |   ThrowStatement(moduleId, ctx):throwStatement{ return throwStatement; }
+        |   TryStatement(moduleId, ctx):tryStatement{ return tryStatement; }
+        |   AssertStatement(moduleId, ctx):assertStatement{ return assertStatement; }
+        |   ConditionalCompilationStatement(moduleId, ctx):condCompStatement{ return condCompStatement; }
         ;
 
-    Label(var Span s, var std::u32string label) : LabelNode*
-        ::= (ID{ s = span; label = lexer.GetMatch(span); } COLON{ s.end = span.end; }){ return new LabelNode(s, label); }
+    Label(boost::uuids::uuid* moduleId, var Span s, var std::u32string label) : LabelNode*
+        ::= (ID{ s = span; label = lexer.GetMatch(span); } COLON{ s.end = span.end; }){ return new LabelNode(s, *moduleId, label); }
         ;
 
-    LabeledStatement(ParsingContext* ctx, var std::unique_ptr<LabeledStatementNode> stmt) : StatementNode*
-        ::= Label:lbl Statement(ctx):s{ stmt.reset(new LabeledStatementNode(span, s)); stmt->SetLabelNode(lbl); return stmt.release(); }
+    LabeledStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<LabeledStatementNode> stmt) : StatementNode*
+        ::= Label(moduleId):lbl Statement(moduleId, ctx):s{ stmt.reset(new LabeledStatementNode(span, *moduleId, s)); stmt->SetLabelNode(lbl); return stmt.release(); }
         ;
 
-    ControlStatement(ParsingContext* ctx) : StatementNode*
-        ::= CompoundStatement(ctx):compoundStatement{ return compoundStatement; }
-        |   ReturnStatement(ctx):returnStatement{ return returnStatement; }
-        |   IfStatement(ctx):ifStatement{ return ifStatement; }
-        |   WhileStatement(ctx):whileStatement{ return whileStatement; }
-        |   DoStatement(ctx):doStatement{ return doStatement; }
-        |   RangeForStatement(ctx):rangeForStatement{ return rangeForStatement; }
-        |   ForStatement(ctx):forStatement{ return forStatement; }
-        |   BreakStatement(ctx):breakStatement{ return breakStatement; }
-        |   ContinueStatement(ctx):continueStatement{ return continueStatement; }
-        |   GotoStatement(ctx):gotoStatement{ return gotoStatement; }
-        |   SwitchStatement(ctx):switchStatement{ return switchStatement; }
-        |   GotoCaseStatement(ctx):gotoCaseStatement{ return gotoCaseStatement; }
-        |   GotoDefaultStatement(ctx):gotoDefaultStatement{ return gotoDefaultStatement; }
+    ControlStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx) : StatementNode*
+        ::= CompoundStatement(moduleId, ctx):compoundStatement{ return compoundStatement; }
+        |   ReturnStatement(moduleId, ctx):returnStatement{ return returnStatement; }
+        |   IfStatement(moduleId, ctx):ifStatement{ return ifStatement; }
+        |   WhileStatement(moduleId, ctx):whileStatement{ return whileStatement; }
+        |   DoStatement(moduleId, ctx):doStatement{ return doStatement; }
+        |   RangeForStatement(moduleId, ctx):rangeForStatement{ return rangeForStatement; }
+        |   ForStatement(moduleId, ctx):forStatement{ return forStatement; }
+        |   BreakStatement(moduleId, ctx):breakStatement{ return breakStatement; }
+        |   ContinueStatement(moduleId, ctx):continueStatement{ return continueStatement; }
+        |   GotoStatement(moduleId, ctx):gotoStatement{ return gotoStatement; }
+        |   SwitchStatement(moduleId, ctx):switchStatement{ return switchStatement; }
+        |   GotoCaseStatement(moduleId, ctx):gotoCaseStatement{ return gotoCaseStatement; }
+        |   GotoDefaultStatement(moduleId, ctx):gotoDefaultStatement{ return gotoDefaultStatement; }
         ;
 
-    CompoundStatement(ParsingContext* ctx, var std::unique_ptr<CompoundStatementNode> compoundStatement) : CompoundStatementNode*
-        ::= LBRACE{ compoundStatement.reset(new CompoundStatementNode(span)); compoundStatement->SetBeginBraceSpan(span); }
-            (Statement(ctx):stmt{ compoundStatement->AddStatement(stmt); })* RBRACE!
+    CompoundStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<CompoundStatementNode> compoundStatement) : CompoundStatementNode*
+        ::= LBRACE{ compoundStatement.reset(new CompoundStatementNode(span, *moduleId)); compoundStatement->SetBeginBraceSpan(span); }
+            (Statement(moduleId, ctx):stmt{ compoundStatement->AddStatement(stmt); })* RBRACE!
         {
             compoundStatement->SetEndBraceSpan(span);
             compoundStatement->SetSpanEnd(span.end);
@@ -73,18 +73,18 @@ parser api(SNGCM_PARSER_API) StatementParser
         }
         ;
 
-    ReturnStatement(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= RETURN{ s = span; } Expression(ctx):expr? SEMICOLON!{ s.end = span.end; return new ReturnStatementNode(s, expr); }
+    ReturnStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : StatementNode*
+        ::= RETURN{ s = span; } Expression(moduleId, ctx):expr? SEMICOLON!{ s.end = span.end; return new ReturnStatementNode(s, *moduleId, expr); }
         ;
 
-    IfStatement(ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span elseSpan, var std::unique_ptr<Node> condNode) : IfStatementNode*
+    IfStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span elseSpan, var std::unique_ptr<Node> condNode) : IfStatementNode*
         ::=
-        (   IF{ s = span; } LPAREN{ leftParenSpan = span; } Expression(ctx):cond{ condNode.reset(cond); s.end = condNode->GetSpan().end; }
+        (   IF{ s = span; } LPAREN{ leftParenSpan = span; } Expression(moduleId, ctx):cond{ condNode.reset(cond); s.end = condNode->GetSpan().end; }
             RPAREN{ rightParenSpan = span; s.end = span.end; }
-            Statement(ctx):thenS (ELSE{ elseSpan = span; } Statement(ctx):elseS)?
+            Statement(moduleId, ctx):thenS (ELSE{ elseSpan = span; } Statement(moduleId, ctx):elseS)?
         )
         {
-            IfStatementNode* value = new IfStatementNode(s, condNode.release(), thenS, elseS);
+            IfStatementNode* value = new IfStatementNode(s, *moduleId, condNode.release(), thenS, elseS);
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
             value->SetElseSpan(elseSpan);
@@ -92,20 +92,20 @@ parser api(SNGCM_PARSER_API) StatementParser
         }
         ;
 
-    WhileStatement(ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : WhileStatementNode*
-        ::= (WHILE{ s = span; } LPAREN!{ leftParenSpan = span; } Expression(ctx):cond! RPAREN!{ rightParenSpan = span; } Statement(ctx):stmt!{ s.end = span.end; })
+    WhileStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : WhileStatementNode*
+        ::= (WHILE{ s = span; } LPAREN!{ leftParenSpan = span; } Expression(moduleId, ctx):cond! RPAREN!{ rightParenSpan = span; } Statement(moduleId, ctx):stmt!{ s.end = span.end; })
         {
-            WhileStatementNode* value = new WhileStatementNode(s, cond, stmt);
+            WhileStatementNode* value = new WhileStatementNode(s, *moduleId, cond, stmt);
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
             return value;
         }
         ;
 
-    DoStatement(ParsingContext* ctx, var Span s, var Span whileSpan, var Span leftParenSpan, var Span rightParenSpan) : DoStatementNode*
-        ::= (DO{ s = span; } Statement(ctx):stmt! WHILE!{ whileSpan = span; } LPAREN!{ leftParenSpan = span; } Expression(ctx):cond! RPAREN!{ rightParenSpan = span; } SEMICOLON!{ s.end = span.end; })
+    DoStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var Span whileSpan, var Span leftParenSpan, var Span rightParenSpan) : DoStatementNode*
+        ::= (DO{ s = span; } Statement(moduleId, ctx):stmt! WHILE!{ whileSpan = span; } LPAREN!{ leftParenSpan = span; } Expression(moduleId, ctx):cond! RPAREN!{ rightParenSpan = span; } SEMICOLON!{ s.end = span.end; })
         {
-            DoStatementNode* value = new DoStatementNode(s, stmt, cond);
+            DoStatementNode* value = new DoStatementNode(s, *moduleId, stmt, cond);
             value->SetWhileSpan(whileSpan);
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
@@ -113,53 +113,53 @@ parser api(SNGCM_PARSER_API) StatementParser
         }
         ;
 
-    ForStatement(ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : ForStatementNode*
+    ForStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : ForStatementNode*
         ::=
         (
-            FOR{ s = span; } LPAREN{ leftParenSpan = span; } ForInitStatement(ctx):init! Expression(ctx):cond? SEMICOLON! ForLoopStatementExpr(ctx):loop! RPAREN!{ rightParenSpan = span; }
-            Statement(ctx):stmt!{ s.end = span.end; }
+            FOR{ s = span; } LPAREN{ leftParenSpan = span; } ForInitStatement(moduleId, ctx):init! Expression(moduleId, ctx):cond? SEMICOLON! ForLoopStatementExpr(moduleId, ctx):loop! RPAREN!{ rightParenSpan = span; }
+            Statement(moduleId, ctx):stmt!{ s.end = span.end; }
         )
         {
-            ForStatementNode* value = new ForStatementNode(s, init, cond, loop, stmt);
+            ForStatementNode* value = new ForStatementNode(s, *moduleId, init, cond, loop, stmt);
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
             return value;
         }
         ;
 
-    ForInitStatement(ParsingContext* ctx) : StatementNode*
-        ::= AssignmentStatement(ctx):assignmentStatement{ return assignmentStatement; }
-        |   ConstructionStatement(ctx):constructionStatement{ return constructionStatement; }
-        |   EmptyStatement(ctx):emptyStatement{ return emptyStatement; }
+    ForInitStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx) : StatementNode*
+        ::= AssignmentStatement(moduleId, ctx):assignmentStatement{ return assignmentStatement; }
+        |   ConstructionStatement(moduleId, ctx):constructionStatement{ return constructionStatement; }
+        |   EmptyStatement(moduleId, ctx):emptyStatement{ return emptyStatement; }
         ;
 
-    ForLoopStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> exprNode) : StatementNode*
-        ::= AssignmentStatementExpr(ctx):assignmentStatementExpr
+    ForLoopStatementExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<Node> exprNode) : StatementNode*
+        ::= AssignmentStatementExpr(moduleId, ctx):assignmentStatementExpr
         {
             return assignmentStatementExpr;
         }
-        |   Expression(ctx):expr
+        |   Expression(moduleId, ctx):expr
         {
             exprNode.reset(expr);
             Span s = exprNode->GetSpan();
-            ExpressionStatementNode* expressionStatementNode = new ExpressionStatementNode(s, exprNode.release());
+            ExpressionStatementNode* expressionStatementNode = new ExpressionStatementNode(s, *moduleId, exprNode.release());
             return expressionStatementNode;
         }
         |   empty
         {
-            EmptyStatementNode* emptyStatementNode = new EmptyStatementNode(span);
+            EmptyStatementNode* emptyStatementNode = new EmptyStatementNode(span, *moduleId);
             return emptyStatementNode;
         }
         ;
 
-    RangeForStatement(ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span colonSpan) : RangeForStatementNode*
+    RangeForStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span colonSpan) : RangeForStatementNode*
         ::=
         (
-            FOR{ s = span; } LPAREN{ leftParenSpan = span; } TypeExpr(ctx):type Identifier:id COLON{ colonSpan = span; } Expression(ctx):container! RPAREN!{ rightParenSpan = span; }
-            Statement(ctx):action{ s.end = span.end; }
+            FOR{ s = span; } LPAREN{ leftParenSpan = span; } TypeExpr(moduleId, ctx):type Identifier(moduleId):id COLON{ colonSpan = span; } Expression(moduleId, ctx):container! RPAREN!{ rightParenSpan = span; }
+            Statement(moduleId, ctx):action{ s.end = span.end; }
         )
         {
-            RangeForStatementNode* value = new RangeForStatementNode(s, type, id, container, action);
+            RangeForStatementNode* value = new RangeForStatementNode(s, *moduleId, type, id, container, action);
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
             value->SetColonSpan(colonSpan);
@@ -167,97 +167,97 @@ parser api(SNGCM_PARSER_API) StatementParser
         }
         ;
 
-    BreakStatement(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= BREAK{ s = span; } SEMICOLON!{ s.end = span.end; return new BreakStatementNode(s); }
+    BreakStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : StatementNode*
+        ::= BREAK{ s = span; } SEMICOLON!{ s.end = span.end; return new BreakStatementNode(s, *moduleId); }
         ;
 
-    ContinueStatement(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= CONTINUE{ s = span; } SEMICOLON!{ s.end = span.end; return new ContinueStatementNode(s); }
+    ContinueStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : StatementNode*
+        ::= CONTINUE{ s = span; } SEMICOLON!{ s.end = span.end; return new ContinueStatementNode(s, *moduleId); }
         ;
 
-    GotoStatement(ParsingContext* ctx, var std::u32string label, var Span s) : StatementNode*
-        ::= GOTO{ s = span; } ID{ label = lexer.GetMatch(span); } SEMICOLON!{ s.end = span.end; return new GotoStatementNode(s, label); }
+    GotoStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::u32string label, var Span s) : StatementNode*
+        ::= GOTO{ s = span; } ID{ label = lexer.GetMatch(span); } SEMICOLON!{ s.end = span.end; return new GotoStatementNode(s, *moduleId, label); }
         ;
 
-    SwitchStatement(ParsingContext* ctx, var std::unique_ptr<SwitchStatementNode> switchStatement,
+    SwitchStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<SwitchStatementNode> switchStatement,
         var Span leftParenSpan, var Span rightParenSpan, var Span beginBraceSpan, var Span endBraceSpan) : SwitchStatementNode*
-        ::= (SWITCH LPAREN!{ leftParenSpan = span; } Expression(ctx):cond! RPAREN!)
+        ::= (SWITCH LPAREN!{ leftParenSpan = span; } Expression(moduleId, ctx):cond! RPAREN!)
             {
                 rightParenSpan = span;
-                switchStatement.reset(new SwitchStatementNode(span, cond));
+                switchStatement.reset(new SwitchStatementNode(span, *moduleId, cond));
                 switchStatement->SetLeftParenSpan(leftParenSpan);
                 switchStatement->SetRightParenSpan(rightParenSpan);
             }
             LBRACE!{ beginBraceSpan = span; }
-            (   CaseStatement(ctx):caseStatement{ switchStatement->AddCase(caseStatement); }
-            |   DefaultStatement(ctx):defaultStatement{ switchStatement->SetDefault(defaultStatement); }
+            (   CaseStatement(moduleId, ctx):caseStatement{ switchStatement->AddCase(caseStatement); }
+            |   DefaultStatement(moduleId, ctx):defaultStatement{ switchStatement->SetDefault(defaultStatement); }
             )*
             RBRACE!{ endBraceSpan = span; switchStatement->SetBeginBraceSpan(beginBraceSpan); switchStatement->SetEndBraceSpan(endBraceSpan); return switchStatement.release(); }
         ;
 
-    CaseStatement(ParsingContext* ctx, var std::unique_ptr<CaseStatementNode> caseS, var Span s, var Span caseSpan) : CaseStatementNode*
-        ::= empty{ caseS.reset(new CaseStatementNode(span)); s = span; }
-            (((CASE{ caseSpan = span; } Expression(ctx):caseExpr{ caseS->AddCaseSpan(caseSpan); caseS->AddCaseExpr(caseExpr); } COLON!)+){ s.end = span.end; caseS->SetSpan(s); }
-            (Statement(ctx):stmt{ caseS->AddStatement(stmt); })*
+    CaseStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<CaseStatementNode> caseS, var Span s, var Span caseSpan) : CaseStatementNode*
+        ::= empty{ caseS.reset(new CaseStatementNode(span, *moduleId)); s = span; }
+            (((CASE{ caseSpan = span; } Expression(moduleId, ctx):caseExpr{ caseS->AddCaseSpan(caseSpan); caseS->AddCaseExpr(caseExpr); } COLON!)+){ s.end = span.end; caseS->SetSpan(s); }
+            (Statement(moduleId, ctx):stmt{ caseS->AddStatement(stmt); })*
         )
         {
             return caseS.release();
         }
         ;
 
-    DefaultStatement(ParsingContext* ctx, var std::unique_ptr<DefaultStatementNode> defaultS, var Span s) : DefaultStatementNode*
-        ::= (DEFAULT{ s = span; } COLON!{ s.end = span.end; defaultS.reset(new DefaultStatementNode(s)); }
-            (Statement(ctx):stmt{ defaultS->AddStatement(stmt); })*
+    DefaultStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<DefaultStatementNode> defaultS, var Span s) : DefaultStatementNode*
+        ::= (DEFAULT{ s = span; } COLON!{ s.end = span.end; defaultS.reset(new DefaultStatementNode(s, *moduleId)); }
+            (Statement(moduleId, ctx):stmt{ defaultS->AddStatement(stmt); })*
         )
         {
             return defaultS.release();
         }
         ;
 
-    GotoCaseStatement(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= GOTO{ s = span; } CASE Expression(ctx):caseExpr SEMICOLON!{ s.end = span.end; return new GotoCaseStatementNode(s, caseExpr); }
+    GotoCaseStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : StatementNode*
+        ::= GOTO{ s = span; } CASE Expression(moduleId, ctx):caseExpr SEMICOLON!{ s.end = span.end; return new GotoCaseStatementNode(s, *moduleId, caseExpr); }
         ;
 
-    GotoDefaultStatement(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= GOTO{ s = span; } DEFAULT SEMICOLON!{ s.end = span.end; return new GotoDefaultStatementNode(s); }
+    GotoDefaultStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : StatementNode*
+        ::= GOTO{ s = span; } DEFAULT SEMICOLON!{ s.end = span.end; return new GotoDefaultStatementNode(s, *moduleId); }
         ;
 
-    AssignmentStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> target, var Span s) : StatementNode*
+    AssignmentStatementExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<Node> target, var Span s) : StatementNode*
         ::= empty{ ctx->PushParsingLvalue(true); }
-            Expression(ctx):tgt{ target.reset(tgt); s = target->GetSpan(); ctx->PopParsingLvalue(); } / { ctx->PopParsingLvalue(); } ASSIGN Expression(ctx):source
+            Expression(moduleId, ctx):tgt{ target.reset(tgt); s = target->GetSpan(); ctx->PopParsingLvalue(); } / { ctx->PopParsingLvalue(); } ASSIGN Expression(moduleId, ctx):source
         {
-            s.end = span.end; return new AssignmentStatementNode(s, target.release(), source);
+            s.end = span.end; return new AssignmentStatementNode(s, *moduleId, target.release(), source);
         }
         ;
 
-    AssignmentStatement(ParsingContext* ctx, var std::unique_ptr<StatementNode> statement) : StatementNode*
-        ::= AssignmentStatementExpr(ctx):stmt SEMICOLON{ statement.reset(stmt); statement->SetSpanEnd(span.end); return statement.release(); }
+    AssignmentStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<StatementNode> statement) : StatementNode*
+        ::= AssignmentStatementExpr(moduleId, ctx):stmt SEMICOLON{ statement.reset(stmt); statement->SetSpanEnd(span.end); return statement.release(); }
         ;
 
-    ConstructionStatement(ParsingContext* ctx, var std::unique_ptr<ConstructionStatementNode> constructionStatement) : ConstructionStatementNode*
-        ::= (TypeExpr(ctx):type Identifier:id!){ constructionStatement.reset(new ConstructionStatementNode(span, type, id)); }
-            (   ASSIGN Expression(ctx):value!{ constructionStatement->AddArgument(value); constructionStatement->SetAssignment(); }
-            |   LPAREN ArgumentList(ctx, constructionStatement.get()):argumentList RPAREN!
+    ConstructionStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<ConstructionStatementNode> constructionStatement) : ConstructionStatementNode*
+        ::= (TypeExpr(moduleId, ctx):type Identifier(moduleId):id!){ constructionStatement.reset(new ConstructionStatementNode(span, *moduleId, type, id)); }
+            (   ASSIGN Expression(moduleId, ctx):value!{ constructionStatement->AddArgument(value); constructionStatement->SetAssignment(); }
+            |   LPAREN ArgumentList(moduleId, ctx, constructionStatement.get()):argumentList RPAREN!
             |   empty{ constructionStatement->SetEmpty(); }
             )
             SEMICOLON!{ constructionStatement->SetSpanEnd(span.end); return constructionStatement.release(); }
         ;
 
-    DeleteStatement(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= DELETE{ s = span; } Expression(ctx):ptr! SEMICOLON!{ s.end = span.end; return new DeleteStatementNode(s, ptr); }
+    DeleteStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : StatementNode*
+        ::= DELETE{ s = span; } Expression(moduleId, ctx):ptr! SEMICOLON!{ s.end = span.end; return new DeleteStatementNode(s, *moduleId, ptr); }
         ;
 
-    DestroyStatement(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= DESTROY{ s = span; } Expression(ctx):ptr! SEMICOLON!{ s.end = span.end; return new DestroyStatementNode(s, ptr); }
+    DestroyStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : StatementNode*
+        ::= DESTROY{ s = span; } Expression(moduleId, ctx):ptr! SEMICOLON!{ s.end = span.end; return new DestroyStatementNode(s, *moduleId, ptr); }
         ;
 
-    ExpressionStatement(ParsingContext* ctx, var std::unique_ptr<Node> exprNode, var Span s) : StatementNode*
+    ExpressionStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<Node> exprNode, var Span s) : StatementNode*
         ::= empty{ ctx->PushParsingExpressionStatement(true); }
-            (Expression(ctx):expr{ exprNode.reset(expr); s = span; } SEMICOLON{ s.end = span.end; })
+            (Expression(moduleId, ctx):expr{ exprNode.reset(expr); s = span; } SEMICOLON{ s.end = span.end; })
             {
                 ctx->PopParsingExpressionStatement();
                 exprNode->SetSpan(s);
-                return new ExpressionStatementNode(s, exprNode.release());
+                return new ExpressionStatementNode(s, *moduleId, exprNode.release());
             }
             /
             {
@@ -265,103 +265,103 @@ parser api(SNGCM_PARSER_API) StatementParser
             }
         ;
 
-    EmptyStatement(ParsingContext* ctx) : StatementNode*
-        ::= SEMICOLON{ return new EmptyStatementNode(span); }
+    EmptyStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx) : StatementNode*
+        ::= SEMICOLON{ return new EmptyStatementNode(span, *moduleId); }
         ;
 
-    ThrowStatement(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= THROW{ s = span; } Expression(ctx):exception? SEMICOLON!{ s.end = span.end; return new ThrowStatementNode(s, exception); }
+    ThrowStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : StatementNode*
+        ::= THROW{ s = span; } Expression(moduleId, ctx):exception? SEMICOLON!{ s.end = span.end; return new ThrowStatementNode(s, *moduleId, exception); }
         ;
 
-    TryStatement(ParsingContext* ctx, var std::unique_ptr<TryStatementNode> tryStatement) : TryStatementNode*
+    TryStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<TryStatementNode> tryStatement) : TryStatementNode*
         ::=
-        (   (TRY CompoundStatement(ctx):tryBlock){ tryStatement.reset(new TryStatementNode(span, tryBlock)); }
-            (Catch(ctx):ctch{ tryStatement->AddCatch(ctch); })+
+        (   (TRY CompoundStatement(moduleId, ctx):tryBlock){ tryStatement.reset(new TryStatementNode(span, *moduleId, tryBlock)); }
+            (Catch(moduleId, ctx):ctch{ tryStatement->AddCatch(ctch); })+
         )
         {
             return tryStatement.release();
         }
         ;
 
-    Catch(ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : CatchNode*
-        ::= CATCH{ s = span; } LPAREN!{ leftParenSpan = span; } TypeExpr(ctx):catchType! Identifier:catchId? RPAREN!{ rightParenSpan = span; }
-            CompoundStatement(ctx):catchBlock
+    Catch(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : CatchNode*
+        ::= CATCH{ s = span; } LPAREN!{ leftParenSpan = span; } TypeExpr(moduleId, ctx):catchType! Identifier(moduleId):catchId? RPAREN!{ rightParenSpan = span; }
+            CompoundStatement(moduleId, ctx):catchBlock
             {
                 s.end = span.end;
-                CatchNode* value = new CatchNode(s, catchType, catchId, catchBlock);
+                CatchNode* value = new CatchNode(s, *moduleId, catchType, catchId, catchBlock);
                 value->SetLeftParenSpan(leftParenSpan);
                 value->SetRightParenSpan(rightParenSpan);
                 return value;
             }
         ;
 
-    AssertStatement(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= HASH{ s = span; } ASSERT Expression(ctx):expr! SEMICOLON!{ s.end = span.end; return new AssertStatementNode(s, expr); }
+    AssertStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : StatementNode*
+        ::= HASH{ s = span; } ASSERT Expression(moduleId, ctx):expr! SEMICOLON!{ s.end = span.end; return new AssertStatementNode(s, *moduleId, expr); }
         ;
 
-    ConditionalCompilationStatement(ParsingContext* ctx, var std::unique_ptr<ConditionalCompilationStatementNode> condCompStmt,
+    ConditionalCompilationStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<ConditionalCompilationStatementNode> condCompStmt,
         var Span s, var Span keywordSpan, var Span leftParenSpan, var Span rightParenSpan) : ConditionalCompilationStatementNode*
         ::= HASH{ s = span; keywordSpan = span; }
             IF{ keywordSpan.end = span.end; } LPAREN!{ leftParenSpan = span; }
-            ConditionalCompilationExpression:ifExpr{ s.end = span.end; condCompStmt.reset(new ConditionalCompilationStatementNode(s, ifExpr)); condCompStmt->IfPart()->SetKeywordSpan(keywordSpan); }
+            ConditionalCompilationExpression(moduleId):ifExpr{ s.end = span.end; condCompStmt.reset(new ConditionalCompilationStatementNode(s, *moduleId, ifExpr)); condCompStmt->IfPart()->SetKeywordSpan(keywordSpan); }
             RPAREN!{ rightParenSpan = span; condCompStmt->IfPart()->SetLeftParenSpan(leftParenSpan); condCompStmt->IfPart()->SetRightParenSpan(rightParenSpan); }
-            (Statement(ctx):ifS{ condCompStmt->AddIfStatement(ifS); })*
+            (Statement(moduleId, ctx):ifS{ condCompStmt->AddIfStatement(ifS); })*
             (
                 HASH{ keywordSpan = span; } ELIF{ keywordSpan.end = span.end; }
-                LPAREN!{ leftParenSpan = span; } ConditionalCompilationExpression:elifExpr{ condCompStmt->AddElifExpr(span, elifExpr); } RPAREN!
+                LPAREN!{ leftParenSpan = span; } ConditionalCompilationExpression(moduleId):elifExpr{ condCompStmt->AddElifExpr(span, *moduleId, elifExpr); } RPAREN!
                 {
                     rightParenSpan = span;
                     condCompStmt->SetElifLeftParenSpan(leftParenSpan);
                     condCompStmt->SetElifRightParenSpan(rightParenSpan);
                     condCompStmt->SetElifKeywordSpan(keywordSpan); 
                 }
-                (Statement(ctx):elifS{ condCompStmt->AddElifStatement(elifS); })*
+                (Statement(moduleId, ctx):elifS{ condCompStmt->AddElifStatement(elifS); })*
             )*
             (
-                HASH{ keywordSpan = span; } ELSE (Statement(ctx):elseS{ condCompStmt->AddElseStatement(span, elseS); })* empty{ condCompStmt->ElsePart()->SetKeywordSpan(keywordSpan); }
+                HASH{ keywordSpan = span; } ELSE (Statement(moduleId, ctx):elseS{ condCompStmt->AddElseStatement(span, *moduleId, elseS); })* empty{ condCompStmt->ElsePart()->SetKeywordSpan(keywordSpan); }
             )?
             HASH{ keywordSpan = span; } ENDIF!{ keywordSpan.end = span.end; condCompStmt->SetEndIfSpan(keywordSpan); return condCompStmt.release(); }
         ;
 
-    ConditionalCompilationExpression : ConditionalCompilationExpressionNode*
-        ::= ConditionalCompilationDisjunction:disjunction{ return disjunction; }
+    ConditionalCompilationExpression(boost::uuids::uuid* moduleId) : ConditionalCompilationExpressionNode*
+        ::= ConditionalCompilationDisjunction(moduleId):disjunction{ return disjunction; }
         ;
 
-    ConditionalCompilationDisjunction(var Span s, var std::unique_ptr<ConditionalCompilationExpressionNode> condCompExpr) : ConditionalCompilationExpressionNode*
+    ConditionalCompilationDisjunction(boost::uuids::uuid* moduleId, var Span s, var std::unique_ptr<ConditionalCompilationExpressionNode> condCompExpr) : ConditionalCompilationExpressionNode*
         ::=
         (
-            ConditionalCompilationConjunction:left{ s = span; condCompExpr.reset(left); }
-            (DISJUNCTION ConditionalCompilationConjunction:right{ s.end = span.end; condCompExpr.reset(new ConditionalCompilationDisjunctionNode(s, condCompExpr.release(), right)); })*
+            ConditionalCompilationConjunction(moduleId):left{ s = span; condCompExpr.reset(left); }
+            (DISJUNCTION ConditionalCompilationConjunction(moduleId):right{ s.end = span.end; condCompExpr.reset(new ConditionalCompilationDisjunctionNode(s, *moduleId, condCompExpr.release(), right)); })*
         )
         {
             return condCompExpr.release(); 
         }
         ;
 
-    ConditionalCompilationConjunction(var Span s, var std::unique_ptr<ConditionalCompilationExpressionNode> condCompExpr) : ConditionalCompilationExpressionNode*
+    ConditionalCompilationConjunction(boost::uuids::uuid* moduleId, var Span s, var std::unique_ptr<ConditionalCompilationExpressionNode> condCompExpr) : ConditionalCompilationExpressionNode*
         ::=
         (
-            ConditionalCompilationPrefix:left{ s = span; condCompExpr.reset(left); }
-            (AMPAMP ConditionalCompilationPrefix:right{ s.end = span.end; condCompExpr.reset(new ConditionalCompilationConjunctionNode(s, condCompExpr.release(), right)); })*
+            ConditionalCompilationPrefix(moduleId):left{ s = span; condCompExpr.reset(left); }
+            (AMPAMP ConditionalCompilationPrefix(moduleId):right{ s.end = span.end; condCompExpr.reset(new ConditionalCompilationConjunctionNode(s, *moduleId, condCompExpr.release(), right)); })*
         )
         {
             return condCompExpr.release(); 
         }
         ;
 
-    ConditionalCompilationPrefix(var Span s, var std::unique_ptr<ConditionalCompilationExpressionNode> condCompExpr) : ConditionalCompilationExpressionNode*
+    ConditionalCompilationPrefix(boost::uuids::uuid* moduleId, var Span s, var std::unique_ptr<ConditionalCompilationExpressionNode> condCompExpr) : ConditionalCompilationExpressionNode*
         ::=
-        (   EXCLAMATION{ s = span; } ConditionalCompilationPrefix:prefix{ s.end = span.end; condCompExpr.reset(new ConditionalCompilationNotNode(s, prefix)); } 
-        |   ConditionalCompilationPrimary:primary!{ condCompExpr.reset(primary); }
+        (   EXCLAMATION{ s = span; } ConditionalCompilationPrefix(moduleId):prefix{ s.end = span.end; condCompExpr.reset(new ConditionalCompilationNotNode(s, *moduleId, prefix)); } 
+        |   ConditionalCompilationPrimary(moduleId):primary!{ condCompExpr.reset(primary); }
         )
         {
             return condCompExpr.release(); 
         }
         ;
 
-    ConditionalCompilationPrimary(var std::u32string symbol) : ConditionalCompilationExpressionNode*
-        ::= ID{ symbol = lexer.GetMatch(span); return new ConditionalCompilationPrimaryNode(span, symbol); }
-        |   LPAREN ConditionalCompilationExpression:expr RPAREN!{ return new ParenthesizedConditionalCompilationExpressionNode(span, expr); }
+    ConditionalCompilationPrimary(boost::uuids::uuid* moduleId, var std::u32string symbol) : ConditionalCompilationExpressionNode*
+        ::= ID{ symbol = lexer.GetMatch(span); return new ConditionalCompilationPrimaryNode(span, *moduleId, symbol); }
+        |   LPAREN ConditionalCompilationExpression(moduleId):expr RPAREN!{ return new ParenthesizedConditionalCompilationExpressionNode(span, *moduleId, expr); }
         ;
 
     ruleinfo

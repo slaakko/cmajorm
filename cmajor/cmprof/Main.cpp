@@ -716,7 +716,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     rootModule.reset(new Module(moduleFilePath));
     rootModule->SetRootModule();
     SetRootModuleForCurrentThread(rootModule.get());
-    CompileUnitNode compileUnit(Span(), "foo");
+    CompileUnitNode compileUnit(Span(), boost::uuids::nil_uuid(), "foo");
     AttributeBinder attributeBinder(rootModule.get());
     if (GetGlobalFlag(GlobalFlags::verbose))
     {

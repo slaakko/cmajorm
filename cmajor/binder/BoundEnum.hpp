@@ -15,7 +15,7 @@ using namespace cmajor::symbols;
 class BINDER_API BoundEnumTypeDefinition : public BoundNode
 {
 public:
-    BoundEnumTypeDefinition(Module* module_, EnumTypeSymbol* enumTypeSymbol_);
+    BoundEnumTypeDefinition(EnumTypeSymbol* enumTypeSymbol_);
     void Accept(BoundNodeVisitor& visitor) override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;

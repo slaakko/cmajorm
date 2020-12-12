@@ -43,7 +43,7 @@ class FunctionTemplateRepository
 {
 public:
     FunctionTemplateRepository(BoundCompileUnit& boundCompileUnit_);
-    FunctionSymbol* Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
+    FunctionSymbol* Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span, const boost::uuids::uuid& moduleId);
 private:
     BoundCompileUnit& boundCompileUnit;
     std::unordered_map<FunctionTemplateKey, FunctionSymbol*, FunctionTemplateKeyHash> functionTemplateMap;

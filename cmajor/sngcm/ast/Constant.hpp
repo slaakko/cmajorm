@@ -15,8 +15,8 @@ class IdentifierNode;
 class SNGCM_AST_API ConstantNode : public Node
 {
 public:
-    ConstantNode(const Span& span_);
-    ConstantNode(const Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Node* value_);
+    ConstantNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConstantNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Node* value_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

@@ -22,13 +22,13 @@ class FunctionSymbol;
 class SYMBOLS_API FunctionIndex
 {
 public:
-    FunctionIndex();
+    FunctionIndex(Module* module_);
     void AddFunction(const boost::uuids::uuid& functionId, FunctionSymbol* functionSymbol);
     void SetMainFunctionId(const boost::uuids::uuid& functionId);
     const boost::uuids::uuid& GetMainFunctionId() const { return mainFunctionId; }
     void Write(BinaryWriter& writer);
 private:
-    std::mutex mtx;
+    Module* module;
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     boost::uuids::uuid mainFunctionId;
 };

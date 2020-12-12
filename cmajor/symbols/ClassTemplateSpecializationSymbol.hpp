@@ -36,8 +36,9 @@ std::u32string MakeClassTemplateSpecializationName(ClassTypeSymbol* classTemplat
 class SYMBOLS_API ClassTemplateSpecializationSymbol : public ClassTypeSymbol
 {
 public:
-    ClassTemplateSpecializationSymbol(const Span& span_, const std::u32string& name_);
-    ClassTemplateSpecializationSymbol(const Span& span_, std::u32string& name_, ClassTypeSymbol* classTemplate_, const std::vector<TypeSymbol*>& templateArgumentTypes_);
+    ClassTemplateSpecializationSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    ClassTemplateSpecializationSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, std::u32string& name_, ClassTypeSymbol* classTemplate_, const std::vector<TypeSymbol*>& templateArgumentTypes_);
+    ~ClassTemplateSpecializationSymbol();
     std::u32string SimpleName() const override;
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
@@ -58,7 +59,7 @@ public:
     void SetFlag(ClassTemplateSpecializationFlags flag) { flags = flags | flag; }
     bool GetFlag(ClassTemplateSpecializationFlags flag) const { return (flags & flag) != ClassTemplateSpecializationFlags::none;  }
     void ResetFlag(ClassTemplateSpecializationFlags flag) { flags = flags & ~flag; }
-    TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) override;
+    TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span, const boost::uuids::uuid& moduleId) override;
     std::u32string Id() const override;
     const char* ClassName() const override { return "ClassTemplateSpecializationSymbol"; }
     void Check() override;

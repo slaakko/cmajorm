@@ -191,15 +191,15 @@ void* Emitter::CreateDITypeForEnumConstant(const std::string& name, int64_t valu
     return diBuilder->createEnumerator(name, value);
 }
 
-void* Emitter::CreateDITypeForEnumType(const std::string& name, const std::string& mangledName, const Span& span, const std::vector<void*>& enumConstantElements, uint64_t sizeInBits,
-    uint32_t alignInBits, void* underlyingDIType)
+void* Emitter::CreateDITypeForEnumType(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, const std::vector<void*>& enumConstantElements, 
+    uint64_t sizeInBits, uint32_t alignInBits, void* underlyingDIType)
 {
     std::vector<llvm::Metadata*> elements;
     for (void* element : enumConstantElements)
     {
         elements.push_back(static_cast<llvm::Metadata*>(element));
     }
-    return diBuilder->createEnumerationType(nullptr, name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)), span.line, sizeInBits, alignInBits,
+    return diBuilder->createEnumerationType(nullptr, name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span, moduleId)), span.line, sizeInBits, alignInBits,
         diBuilder->getOrCreateArray(elements), static_cast<llvm::DIType*>(underlyingDIType), mangledName);
 }
 
@@ -1155,24 +1155,18 @@ void Emitter::SetDIFile(void* diFile_)
     diFile = static_cast<llvm::DIFile*>(diFile_);
 }
 
-void* Emitter::GetDebugInfoForFile(int32_t fileIndex)
+void* Emitter::GetDebugInfoForFile(const Span& span, const boost::uuids::uuid& moduleId)
 {
-    if (fileIndex == -1)
+    if (span.fileIndex == -1)
     {
         return diFile;
     }
-    auto it = fileMap.find(fileIndex);
-    if (it != fileMap.cend())
-    {
-        return it->second;
-    }
-    std::string sourceFilePath = GetSourceFilePath(fileIndex);
+    std::string sourceFilePath = GetSourceFilePath(span, moduleId);
     if (sourceFilePath.empty())
     {
         return diFile;
     }
     llvm::DIFile* file = diBuilder->createFile(Path::GetFileName(sourceFilePath), Path::GetDirectoryName(sourceFilePath));
-    fileMap[fileIndex] = file;
     return file;
 }
 
@@ -1210,10 +1204,11 @@ void Emitter::SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memb
     diMemberTypeMap[memberVariableId] = static_cast<llvm::DIDerivedType*>(diType);
 }
 
-void* Emitter::CreateDIMemberType(void* scope, const std::string& name, const Span& span, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType)
+void* Emitter::CreateDIMemberType(void* scope, const std::string& name, const Span& span, const boost::uuids::uuid& moduleId, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType)
 {
     llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
-    return diBuilder->createMemberType(static_cast<llvm::DIType*>(scope), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)), span.line, sizeInBits, alignInBits, offsetInBits, flags,
+    return diBuilder->createMemberType(static_cast<llvm::DIType*>(scope), name, static_cast<llvm::DIFile*>(
+        GetDebugInfoForFile(span, moduleId)), span.line, sizeInBits, alignInBits, offsetInBits, flags,
         static_cast<llvm::DIType*>(diType));
 }
 
@@ -1671,23 +1666,24 @@ void* Emitter::CreateDITypeForArray(void* elementDIType, const std::vector<void*
 
 #if (LLVM_VERSION_MAJOR >= 10)
 
-void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span)
+void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId)
 {
     uint64_t sizeInBits = dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)))->getSizeInBits();
     uint64_t alignInBits = 8 * dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)))->getAlignment().value();
     uint64_t offsetInBits = 0; // todo?
-    return diBuilder->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, name, nullptr, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)), span.line,
+    return diBuilder->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, name, nullptr, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span, moduleId)), span.line,
         0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, mangledName);
 }
 
 #else
 
-void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span)
+void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId)
 {
     uint64_t sizeInBits = dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)))->getSizeInBits();
     uint32_t alignInBits = 8 * dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)))->getAlignment();
     uint64_t offsetInBits = 0; // todo?
-    return diBuilder->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, name, nullptr, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)), span.line,
+    return diBuilder->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, name, nullptr, static_cast<llvm::DIFile*>(
+        GetDebugInfoForFile(span, moduleId)), span.line,
         0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, mangledName);
 }
 
@@ -1702,7 +1698,7 @@ uint64_t Emitter::GetOffsetInBits(void* classIrType, int layoutIndex)
 
 #if (LLVM_VERSION_MAJOR >= 10)
 
-void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const std::string& name, void* vtableHolderClass,
+void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const boost::uuids::uuid& moduleId, const std::string& name, void* vtableHolderClass,
     const std::string& mangledName, void* baseClassDIType)
 {
     std::vector<llvm::Metadata*> elements;
@@ -1716,15 +1712,15 @@ void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& 
     uint64_t alignInBits = 8 * structLayout->getAlignment().value();
     uint64_t offsetInBits = 0; // todo?
     llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
-    return diBuilder->createClassType(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(classSpan.fileIndex)), classSpan.line, sizeInBits, alignInBits, offsetInBits,
+    return diBuilder->createClassType(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(classSpan, moduleId)), classSpan.line, sizeInBits, alignInBits, offsetInBits,
         flags, static_cast<llvm::DIType*>(baseClassDIType), diBuilder->getOrCreateArray(elements), static_cast<llvm::DIType*>(vtableHolderClass), templateParams, mangledName);
 }
 
 
 #else
 
-void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const std::string& name, void* vtableHolderClass,
-    const std::string& mangledName, void* baseClassDIType)
+void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const boost::uuids::uuid& moduleId, 
+    const std::string& name, void* vtableHolderClass, const std::string& mangledName, void* baseClassDIType)
 {
     std::vector<llvm::Metadata*> elements;
     const llvm::StructLayout* structLayout = dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)));
@@ -1737,7 +1733,8 @@ void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& 
     uint32_t alignInBits = 8 * structLayout->getAlignment();
     uint64_t offsetInBits = 0; // todo?
     llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
-    return diBuilder->createClassType(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(classSpan.fileIndex)), classSpan.line, sizeInBits, alignInBits, offsetInBits,
+    return diBuilder->createClassType(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(
+        GetDebugInfoForFile(classSpan, moduleId)), classSpan.line, sizeInBits, alignInBits, offsetInBits,
         flags, static_cast<llvm::DIType*>(baseClassDIType), diBuilder->getOrCreateArray(elements), static_cast<llvm::DIType*>(vtableHolderClass), templateParams, mangledName);
 }
 
@@ -1960,37 +1957,39 @@ unsigned Emitter::GetFunctionFlags(bool isStatic, unsigned accessFlags, bool isE
 }
 
 /*
-void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
+void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
     unsigned flags)
 {
-    void* subprogram = diBuilder->createMethod(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+    void* subprogram = diBuilder->createMethod(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span, moduleId)),
         span.line, static_cast<llvm::DISubroutineType*>(subroutineType), false, true, virtuality, vtableIndex, 0, static_cast<llvm::DIType*>(vtableHolder),
         static_cast<llvm::DINode::DIFlags>(flags));
     return subprogram;
 }
 */
 
-void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
+void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
     unsigned flags)
 {
-    void* subprogram = diBuilder->createMethod(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+    void* subprogram = diBuilder->createMethod(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span, moduleId)),
         span.line, static_cast<llvm::DISubroutineType*>(subroutineType), vtableIndex, 0, static_cast<llvm::DIType*>(vtableHolder),
         static_cast<llvm::DINode::DIFlags>(flags), llvm::DISubprogram::SPFlagDefinition);
     return subprogram;
 }
 
 /*
-void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags)
+void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned flags)
 {
-    void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+    void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(
+    GetDebugInfoForFile(span, moduleId)),
         span.line, static_cast<llvm::DISubroutineType*>(subroutineType), false, true, span.line, static_cast<llvm::DINode::DIFlags>(flags));
     return subprogram;
 }
 */
 
-void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags)
+void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned flags)
 {
-    void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+    void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(
+        GetDebugInfoForFile(span, moduleId)),
         span.line, static_cast<llvm::DISubroutineType*>(subroutineType), span.line, static_cast<llvm::DINode::DIFlags>(flags),
         llvm::DISubprogram::SPFlagDefinition);
     return subprogram;
@@ -2006,18 +2005,19 @@ void* Emitter::CreateAlloca(void* irType)
     return builder.CreateAlloca(static_cast<llvm::Type*>(irType));
 }
 
-void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)
+void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, const boost::uuids::uuid& moduleId, void* irType, void* allocaInst)
 {
-    llvm::DILocalVariable* paramVar = diBuilder->createParameterVariable(static_cast<llvm::DIScope*>(CurrentScope()), name, index, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+    llvm::DILocalVariable* paramVar = diBuilder->createParameterVariable(static_cast<llvm::DIScope*>(CurrentScope()), name, index, static_cast<llvm::DIFile*>(
+        GetDebugInfoForFile(span, moduleId)),
         span.line, static_cast<llvm::DIType*>(irType));
     llvm::SmallVector<int64_t, 13> expr; // todo
     diBuilder->insertDeclare(static_cast<llvm::Value*>(allocaInst), paramVar, diBuilder->createExpression(expr), GetDebugLocation(span), builder.GetInsertBlock());
     return paramVar;
 }
 
-void* Emitter::CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst)
+void* Emitter::CreateDIAutoVariable(const std::string& name, const Span& span, const boost::uuids::uuid& moduleId, void* irType, void* allocaInst)
 {
-    llvm::DILocalVariable* localVar = diBuilder->createAutoVariable(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+    llvm::DILocalVariable* localVar = diBuilder->createAutoVariable(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span, moduleId)),
         span.line, static_cast<llvm::DIType*>(irType));
     llvm::SmallVector<int64_t, 13> expr; // todo
     diBuilder->insertDeclare(static_cast<llvm::Value*>(allocaInst), localVar, diBuilder->createExpression(expr), GetDebugLocation(span), builder.GetInsertBlock());
@@ -2060,9 +2060,9 @@ void Emitter::AddUWTableAttribute(void* function)
     static_cast<llvm::Function*>(function)->addFnAttr(llvm::Attribute::UWTable);
 }
 
-void* Emitter::CreateLexicalBlock(const Span& span)
+void* Emitter::CreateLexicalBlock(const Span& span, const boost::uuids::uuid& moduleId)
 {
-    llvm::DILexicalBlock* block = diBuilder->createLexicalBlock(static_cast<llvm::DIScope*>(CurrentScope()), static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+    llvm::DILexicalBlock* block = diBuilder->createLexicalBlock(static_cast<llvm::DIScope*>(CurrentScope()), static_cast<llvm::DIFile*>(GetDebugInfoForFile(span, moduleId)),
         span.line, GetColumn(span));
     PushScope(block);
     return block;

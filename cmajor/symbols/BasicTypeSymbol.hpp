@@ -12,7 +12,7 @@ namespace cmajor { namespace symbols {
 class SYMBOLS_API BasicTypeSymbol : public TypeSymbol
 {
 public:
-    BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
+    BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "basic_type"; }
     bool IsBasicTypeSymbol() const override { return true; }
     void Write(SymbolWriter& writer) override;
@@ -49,7 +49,7 @@ private:
 class SYMBOLS_API BoolTypeSymbol : public BasicTypeSymbol
 {
 public:
-    BoolTypeSymbol(const Span& span_, const std::u32string& name_);
+    BoolTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "bool"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForBool(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForBool(); }
@@ -63,7 +63,7 @@ public:
 class SYMBOLS_API SByteTypeSymbol : public BasicTypeSymbol
 {
 public:
-    SByteTypeSymbol(const Span& span_, const std::u32string& name_);
+    SByteTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "sbyte"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForSByte(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForSByte(); }
@@ -78,7 +78,7 @@ public:
 class SYMBOLS_API ByteTypeSymbol : public BasicTypeSymbol
 {
 public:
-    ByteTypeSymbol(const Span& span_, const std::u32string& name_);
+    ByteTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "byte"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForByte(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForByte(); }
@@ -94,7 +94,7 @@ public:
 class SYMBOLS_API ShortTypeSymbol : public BasicTypeSymbol
 {
 public:
-    ShortTypeSymbol(const Span& span_, const std::u32string& name_);
+    ShortTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "short"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForShort(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForShort(); }
@@ -109,7 +109,7 @@ public:
 class SYMBOLS_API UShortTypeSymbol : public BasicTypeSymbol
 {
 public:
-    UShortTypeSymbol(const Span& span_, const std::u32string& name_);
+    UShortTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "ushort"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForUShort(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForUShort(); }
@@ -125,7 +125,7 @@ public:
 class SYMBOLS_API IntTypeSymbol : public BasicTypeSymbol
 {
 public:
-    IntTypeSymbol(const Span& span_, const std::u32string& name_);
+    IntTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "int"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForInt(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForInt(); }
@@ -140,7 +140,7 @@ public:
 class SYMBOLS_API UIntTypeSymbol : public BasicTypeSymbol
 {
 public:
-    UIntTypeSymbol(const Span& span_, const std::u32string& name_);
+    UIntTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "uint"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForUInt(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForUInt(); }
@@ -156,7 +156,7 @@ public:
 class SYMBOLS_API LongTypeSymbol : public BasicTypeSymbol
 {
 public:
-    LongTypeSymbol(const Span& span_, const std::u32string& name_);
+    LongTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "long"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForLong(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForLong(); }
@@ -171,7 +171,7 @@ public:
 class SYMBOLS_API ULongTypeSymbol : public BasicTypeSymbol
 {
 public:
-    ULongTypeSymbol(const Span& span_, const std::u32string& name_);
+    ULongTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "ulong"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForULong(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForULong(); }
@@ -187,7 +187,7 @@ public:
 class SYMBOLS_API FloatTypeSymbol : public BasicTypeSymbol
 {
 public:
-    FloatTypeSymbol(const Span& span_, const std::u32string& name_);
+    FloatTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "float"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForFloat(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForFloat(); }
@@ -201,7 +201,7 @@ public:
 class SYMBOLS_API DoubleTypeSymbol : public BasicTypeSymbol
 {
 public:
-    DoubleTypeSymbol(const Span& span_, const std::u32string& name_);
+    DoubleTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "double"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForDouble(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForDouble(); }
@@ -215,7 +215,7 @@ public:
 class SYMBOLS_API CharTypeSymbol : public BasicTypeSymbol
 {
 public:
-    CharTypeSymbol(const Span& span_, const std::u32string& name_);
+    CharTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "char"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForChar(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForChar(); }
@@ -231,7 +231,7 @@ public:
 class SYMBOLS_API WCharTypeSymbol : public BasicTypeSymbol
 {
 public:
-    WCharTypeSymbol(const Span& span_, const std::u32string& name_);
+    WCharTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "wchar"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForWChar(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForWChar(); }
@@ -247,7 +247,7 @@ public:
 class SYMBOLS_API UCharTypeSymbol : public BasicTypeSymbol
 {
 public:
-    UCharTypeSymbol(const Span& span_, const std::u32string& name_);
+    UCharTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "uchar"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForUChar(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForUChar(); }
@@ -263,7 +263,7 @@ public:
 class SYMBOLS_API VoidTypeSymbol : public BasicTypeSymbol
 {
 public:
-    VoidTypeSymbol(const Span& span_, const std::u32string& name_);
+    VoidTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "void"; }
     void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForVoid(); }
     void* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create default value for void type"); return nullptr; }

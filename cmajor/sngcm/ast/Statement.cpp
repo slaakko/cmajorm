@@ -9,17 +9,18 @@
 
 namespace sngcm { namespace ast {
 
-LabelNode::LabelNode(const Span& span_) : Node(NodeType::labelNode, span_)
+LabelNode::LabelNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::labelNode, span_, moduleId_)
 {
 }
 
-LabelNode::LabelNode(const Span& span_, const std::u32string& label_) : Node(NodeType::labelNode, span_), label(label_)
+LabelNode::LabelNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& label_) : Node(NodeType::labelNode, span_, moduleId_), label(label_)
 {
 }
 
 Node* LabelNode::Clone(CloneContext& cloneContext) const
 {
-    return new LabelNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), label);
+    LabelNode* clone = new LabelNode(GetSpan(), ModuleId(), label);
+    return clone;
 }
 
 void LabelNode::Accept(Visitor& visitor)
@@ -39,7 +40,7 @@ void LabelNode::Read(AstReader& reader)
     label = reader.GetBinaryReader().ReadUtf32String();
 }
 
-StatementNode::StatementNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_)
+StatementNode::StatementNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : Node(nodeType_, span_, moduleId_)
 {
 }
 
@@ -53,18 +54,19 @@ void StatementNode::Read(AstReader& reader)
     Node::Read(reader);
 }
 
-LabeledStatementNode::LabeledStatementNode(const Span& span_) : StatementNode(NodeType::labeledStatementNode, span_)
+LabeledStatementNode::LabeledStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : StatementNode(NodeType::labeledStatementNode, span_, moduleId_)
 {
 }
 
-LabeledStatementNode::LabeledStatementNode(const Span& span_, StatementNode* stmt_) : StatementNode(NodeType::labeledStatementNode, span_), stmt(stmt_)
+LabeledStatementNode::LabeledStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, StatementNode* stmt_) : 
+    StatementNode(NodeType::labeledStatementNode, span_, moduleId_), stmt(stmt_)
 {
     stmt->SetParent(this);
 }
 
 Node* LabeledStatementNode::Clone(CloneContext& cloneContext) const
 {
-    LabeledStatementNode* clone = new LabeledStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<StatementNode*>(stmt->Clone(cloneContext)));
+    LabeledStatementNode* clone = new LabeledStatementNode(GetSpan(), ModuleId(), static_cast<StatementNode*>(stmt->Clone(cloneContext)));
     clone->SetLabelNode(static_cast<LabelNode*>(labelNode->Clone(cloneContext)));
     return clone;
 }
@@ -96,21 +98,22 @@ void LabeledStatementNode::SetLabelNode(LabelNode* labelNode_)
     labelNode->SetParent(this);
 }
 
-CompoundStatementNode::CompoundStatementNode(const Span& span_) : StatementNode(NodeType::compoundStatementNode, span_), statements(), beginBraceSpan(), endBraceSpan()
+CompoundStatementNode::CompoundStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::compoundStatementNode, span_, moduleId_), statements(), beginBraceSpan(), endBraceSpan()
 {
 }
 
 Node* CompoundStatementNode::Clone(CloneContext& cloneContext) const
 {
-    CompoundStatementNode* clone = new CompoundStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    CompoundStatementNode* clone = new CompoundStatementNode(GetSpan(), ModuleId());
     int n = statements.Count();
     for (int i = 0; i < n; ++i)
     {
         StatementNode* statement = statements[i];
         clone->AddStatement(static_cast<StatementNode*>(statement->Clone(cloneContext)));
     }
-    clone->beginBraceSpan = cloneContext.MapSpan(beginBraceSpan, RootModuleId());
-    clone->endBraceSpan = cloneContext.MapSpan(endBraceSpan, RootModuleId());
+    clone->beginBraceSpan = beginBraceSpan;
+    clone->endBraceSpan = endBraceSpan;
     return clone;
 }
 
@@ -123,8 +126,9 @@ void CompoundStatementNode::Write(AstWriter& writer)
 {
     StatementNode::Write(writer);
     statements.Write(writer);
-    writer.Write(beginBraceSpan);
-    writer.Write(endBraceSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(beginBraceSpan, convertExternal);
+    writer.Write(endBraceSpan, convertExternal);
 }
 
 void CompoundStatementNode::Read(AstReader& reader)
@@ -142,11 +146,13 @@ void CompoundStatementNode::AddStatement(StatementNode* statement)
     statements.Add(statement);
 }
 
-ReturnStatementNode::ReturnStatementNode(const Span& span_) : StatementNode(NodeType::returnStatementNode, span_), expression()
+ReturnStatementNode::ReturnStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::returnStatementNode, span_, moduleId_), expression()
 {
 }
 
-ReturnStatementNode::ReturnStatementNode(const Span& span_, Node* expression_) : StatementNode(NodeType::returnStatementNode, span_), expression(expression_)
+ReturnStatementNode::ReturnStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_) : 
+    StatementNode(NodeType::returnStatementNode, span_, moduleId_), expression(expression_)
 {
     if (expression)
     {
@@ -161,7 +167,7 @@ Node* ReturnStatementNode::Clone(CloneContext& cloneContext) const
     {
         clonedExpression = expression->Clone(cloneContext);
     }
-    ReturnStatementNode* clone = new ReturnStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), clonedExpression);
+    ReturnStatementNode* clone = new ReturnStatementNode(GetSpan(), ModuleId(), clonedExpression);
     return clone;
 }
 
@@ -192,12 +198,13 @@ void ReturnStatementNode::Read(AstReader& reader)
     }
 }
 
-IfStatementNode::IfStatementNode(const Span& span_) : StatementNode(NodeType::ifStatementNode, span_), condition(), thenS(), elseS()
+IfStatementNode::IfStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::ifStatementNode, span_, moduleId_), condition(), thenS(), elseS()
 {
 }
 
-IfStatementNode::IfStatementNode(const Span& span_, Node* condition_, StatementNode* thenS_, StatementNode* elseS_) :
-    StatementNode(NodeType::ifStatementNode, span_), condition(condition_), thenS(thenS_), elseS(elseS_)
+IfStatementNode::IfStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* condition_, StatementNode* thenS_, StatementNode* elseS_) :
+    StatementNode(NodeType::ifStatementNode, span_, moduleId_), condition(condition_), thenS(thenS_), elseS(elseS_)
 {
     condition->SetParent(this);
     thenS->SetParent(this);
@@ -214,10 +221,10 @@ Node* IfStatementNode::Clone(CloneContext& cloneContext) const
     {
         clonedElseS = static_cast<StatementNode*>(elseS->Clone(cloneContext));
     }
-    IfStatementNode* clone = new IfStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), condition->Clone(cloneContext), static_cast<StatementNode*>(thenS->Clone(cloneContext)), clonedElseS);
-    clone->SetLeftParenSpan(cloneContext.MapSpan(leftParenSpan, RootModuleId()));
-    clone->SetRightParenSpan(cloneContext.MapSpan(rightParenSpan, RootModuleId()));
-    clone->SetElseSpan(cloneContext.MapSpan(elseSpan, RootModuleId()));
+    IfStatementNode* clone = new IfStatementNode(GetSpan(), ModuleId(), condition->Clone(cloneContext), static_cast<StatementNode*>(thenS->Clone(cloneContext)), clonedElseS);
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
+    clone->SetElseSpan(elseSpan);
     return clone;
 }
 
@@ -237,9 +244,10 @@ void IfStatementNode::Write(AstWriter& writer)
     {
         writer.Write(elseS.get());
     }
-    writer.Write(leftParenSpan);
-    writer.Write(rightParenSpan);
-    writer.Write(elseSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(leftParenSpan, convertExternal);
+    writer.Write(rightParenSpan, convertExternal);
+    writer.Write(elseSpan, convertExternal);
 }
 
 void IfStatementNode::Read(AstReader& reader)
@@ -260,12 +268,13 @@ void IfStatementNode::Read(AstReader& reader)
     elseSpan = reader.ReadSpan();
 }
 
-WhileStatementNode::WhileStatementNode(const Span& span_) : StatementNode(NodeType::whileStatementNode, span_), condition(), statement()
+WhileStatementNode::WhileStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::whileStatementNode, span_, moduleId_), condition(), statement()
 {
 }
 
-WhileStatementNode::WhileStatementNode(const Span& span_, Node* condition_, StatementNode* statement_) :
-    StatementNode(NodeType::whileStatementNode, span_), condition(condition_), statement(statement_)
+WhileStatementNode::WhileStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* condition_, StatementNode* statement_) :
+    StatementNode(NodeType::whileStatementNode, span_, moduleId_), condition(condition_), statement(statement_)
 {
     condition->SetParent(this);
     statement->SetParent(this);
@@ -273,9 +282,9 @@ WhileStatementNode::WhileStatementNode(const Span& span_, Node* condition_, Stat
 
 Node* WhileStatementNode::Clone(CloneContext& cloneContext) const
 {
-    WhileStatementNode* clone = new WhileStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), condition->Clone(cloneContext), static_cast<StatementNode*>(statement->Clone(cloneContext)));
-    clone->SetLeftParenSpan(cloneContext.MapSpan(leftParenSpan, RootModuleId()));
-    clone->SetRightParenSpan(cloneContext.MapSpan(rightParenSpan, RootModuleId()));
+    WhileStatementNode* clone = new WhileStatementNode(GetSpan(), ModuleId(), condition->Clone(cloneContext), static_cast<StatementNode*>(statement->Clone(cloneContext)));
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
     return clone;
 }
 
@@ -289,8 +298,9 @@ void WhileStatementNode::Write(AstWriter& writer)
     StatementNode::Write(writer);
     writer.Write(condition.get());
     writer.Write(statement.get());
-    writer.Write(leftParenSpan);
-    writer.Write(rightParenSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(leftParenSpan, convertExternal);
+    writer.Write(rightParenSpan, convertExternal);
 }
 
 void WhileStatementNode::Read(AstReader& reader)
@@ -304,11 +314,13 @@ void WhileStatementNode::Read(AstReader& reader)
     rightParenSpan = reader.ReadSpan();
 }
 
-DoStatementNode::DoStatementNode(const Span& span_) : StatementNode(NodeType::doStatementNode, span_), statement(), condition()
+DoStatementNode::DoStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::doStatementNode, span_, moduleId_), statement(), condition()
 {
 }
 
-DoStatementNode::DoStatementNode(const Span& span_, StatementNode* statement_, Node* condition_) : StatementNode(NodeType::doStatementNode, span_), statement(statement_), condition(condition_)
+DoStatementNode::DoStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, StatementNode* statement_, Node* condition_) : 
+    StatementNode(NodeType::doStatementNode, span_, moduleId_), statement(statement_), condition(condition_)
 {
     statement->SetParent(this);
     condition->SetParent(this);
@@ -316,10 +328,10 @@ DoStatementNode::DoStatementNode(const Span& span_, StatementNode* statement_, N
 
 Node* DoStatementNode::Clone(CloneContext& cloneContext) const
 {
-    DoStatementNode* clone = new DoStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<StatementNode*>(statement->Clone(cloneContext)), condition->Clone(cloneContext));
-    clone->SetWhileSpan(cloneContext.MapSpan(whileSpan, RootModuleId()));
-    clone->SetLeftParenSpan(cloneContext.MapSpan(leftParenSpan, RootModuleId()));
-    clone->SetRightParenSpan(cloneContext.MapSpan(rightParenSpan, RootModuleId()));
+    DoStatementNode* clone = new DoStatementNode(GetSpan(), ModuleId(), static_cast<StatementNode*>(statement->Clone(cloneContext)), condition->Clone(cloneContext));
+    clone->SetWhileSpan(whileSpan);
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
     return clone;
 }
 
@@ -333,9 +345,10 @@ void DoStatementNode::Write(AstWriter& writer)
     StatementNode::Write(writer);
     writer.Write(statement.get());
     writer.Write(condition.get());
-    writer.Write(whileSpan);
-    writer.Write(leftParenSpan);
-    writer.Write(rightParenSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(whileSpan, convertExternal);
+    writer.Write(leftParenSpan, convertExternal);
+    writer.Write(rightParenSpan, convertExternal);
 }
 
 void DoStatementNode::Read(AstReader& reader)
@@ -350,12 +363,13 @@ void DoStatementNode::Read(AstReader& reader)
     rightParenSpan = reader.ReadSpan();
 }
 
-ForStatementNode::ForStatementNode(const Span& span_) : StatementNode(NodeType::forStatementNode, span_), initS(), condition(), loopS(), actionS()
+ForStatementNode::ForStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::forStatementNode, span_, moduleId_), initS(), condition(), loopS(), actionS()
 {
 }
 
-ForStatementNode::ForStatementNode(const Span& span_, StatementNode* initS_, Node* condition_, StatementNode* loopS_, StatementNode* actionS_) :
-    StatementNode(NodeType::forStatementNode, span_), initS(initS_), condition(condition_), loopS(loopS_), actionS(actionS_)
+ForStatementNode::ForStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, StatementNode* initS_, Node* condition_, StatementNode* loopS_, StatementNode* actionS_) :
+    StatementNode(NodeType::forStatementNode, span_, moduleId_), initS(initS_), condition(condition_), loopS(loopS_), actionS(actionS_)
 {
     initS->SetParent(this);
     if (condition)
@@ -373,10 +387,10 @@ Node* ForStatementNode::Clone(CloneContext& cloneContext) const
     {
         clonedCondition = condition->Clone(cloneContext);
     }
-    ForStatementNode* clone = new ForStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<StatementNode*>(initS->Clone(cloneContext)), clonedCondition, static_cast<StatementNode*>(loopS->Clone(cloneContext)),
+    ForStatementNode* clone = new ForStatementNode(GetSpan(), ModuleId(), static_cast<StatementNode*>(initS->Clone(cloneContext)), clonedCondition, static_cast<StatementNode*>(loopS->Clone(cloneContext)),
         static_cast<StatementNode*>(actionS->Clone(cloneContext)));
-    clone->SetLeftParenSpan(cloneContext.MapSpan(leftParenSpan, RootModuleId()));
-    clone->SetRightParenSpan(cloneContext.MapSpan(rightParenSpan, RootModuleId()));
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
     return clone;
 }
 
@@ -397,8 +411,9 @@ void ForStatementNode::Write(AstWriter& writer)
     }
     writer.Write(loopS.get());
     writer.Write(actionS.get());
-    writer.Write(leftParenSpan);
-    writer.Write(rightParenSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(leftParenSpan, convertExternal);
+    writer.Write(rightParenSpan, convertExternal);
 }
 
 void ForStatementNode::Read(AstReader& reader)
@@ -420,13 +435,13 @@ void ForStatementNode::Read(AstReader& reader)
     rightParenSpan = reader.ReadSpan();
 }
 
-BreakStatementNode::BreakStatementNode(const Span& span_) : StatementNode(NodeType::breakStatementNode, span_)
+BreakStatementNode::BreakStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : StatementNode(NodeType::breakStatementNode, span_, moduleId_)
 {
 }
 
 Node* BreakStatementNode::Clone(CloneContext& cloneContext) const
 {
-    BreakStatementNode* clone = new BreakStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    BreakStatementNode* clone = new BreakStatementNode(GetSpan(), ModuleId());
     return clone;
 }
 
@@ -435,13 +450,13 @@ void BreakStatementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-ContinueStatementNode::ContinueStatementNode(const Span& span_) : StatementNode(NodeType::continueStatementNode, span_)
+ContinueStatementNode::ContinueStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : StatementNode(NodeType::continueStatementNode, span_, moduleId_)
 {
 }
 
 Node* ContinueStatementNode::Clone(CloneContext& cloneContext) const
 {
-    ContinueStatementNode* clone = new ContinueStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    ContinueStatementNode* clone = new ContinueStatementNode(GetSpan(), ModuleId());
     return clone;
 }
 
@@ -450,17 +465,19 @@ void ContinueStatementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-GotoStatementNode::GotoStatementNode(const Span& span_) : StatementNode(NodeType::gotoStatementNode, span_)
+GotoStatementNode::GotoStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::gotoStatementNode, span_, moduleId_)
 {
 }
 
-GotoStatementNode::GotoStatementNode(const Span& span_, const std::u32string& target_) : StatementNode(NodeType::gotoStatementNode, span_), target(target_)
+GotoStatementNode::GotoStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& target_) : 
+    StatementNode(NodeType::gotoStatementNode, span_, moduleId_), target(target_)
 {
 }
 
 Node* GotoStatementNode::Clone(CloneContext& cloneContext) const
 {
-    GotoStatementNode* clone = new GotoStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), target);
+    GotoStatementNode* clone = new GotoStatementNode(GetSpan(), ModuleId(), target);
     return clone;
 }
 
@@ -481,12 +498,13 @@ void GotoStatementNode::Read(AstReader& reader)
     target = reader.GetBinaryReader().ReadUtf32String();
 }
 
-ConstructionStatementNode::ConstructionStatementNode(const Span& span_) : StatementNode(NodeType::constructionStatementNode, span_), typeExpr(), id(), arguments(), assignment(false), empty(false)
+ConstructionStatementNode::ConstructionStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::constructionStatementNode, span_, moduleId_), typeExpr(), id(), arguments(), assignment(false), empty(false)
 {
 }
 
-ConstructionStatementNode::ConstructionStatementNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_) :
-    StatementNode(NodeType::constructionStatementNode, span_), typeExpr(typeExpr_), id(id_), arguments(), assignment(false), empty(false)
+ConstructionStatementNode::ConstructionStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_) :
+    StatementNode(NodeType::constructionStatementNode, span_, moduleId_), typeExpr(typeExpr_), id(id_), arguments(), assignment(false), empty(false)
 {
     typeExpr->SetParent(this);
     id->SetParent(this);
@@ -494,7 +512,7 @@ ConstructionStatementNode::ConstructionStatementNode(const Span& span_, Node* ty
 
 Node* ConstructionStatementNode::Clone(CloneContext& cloneContext) const
 {
-    ConstructionStatementNode* clone = new ConstructionStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    ConstructionStatementNode* clone = new ConstructionStatementNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int n = arguments.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -539,18 +557,19 @@ void ConstructionStatementNode::AddArgument(Node* argument)
     arguments.Add(argument);
 }
 
-DeleteStatementNode::DeleteStatementNode(const Span& span_) : StatementNode(NodeType::deleteStatementNode, span_), expression()
+DeleteStatementNode::DeleteStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : StatementNode(NodeType::deleteStatementNode, span_, moduleId_), expression()
 {
 }
 
-DeleteStatementNode::DeleteStatementNode(const Span& span_, Node* expression_) : StatementNode(NodeType::deleteStatementNode, span_), expression(expression_)
+DeleteStatementNode::DeleteStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_) : 
+    StatementNode(NodeType::deleteStatementNode, span_, moduleId_), expression(expression_)
 {
     expression->SetParent(this);
 }
 
 Node* DeleteStatementNode::Clone(CloneContext& cloneContext) const
 {
-    DeleteStatementNode* clone = new DeleteStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), expression->Clone(cloneContext));
+    DeleteStatementNode* clone = new DeleteStatementNode(GetSpan(), ModuleId(), expression->Clone(cloneContext));
     return clone;
 }
 
@@ -572,18 +591,20 @@ void DeleteStatementNode::Read(AstReader& reader)
     expression->SetParent(this);
 }
 
-DestroyStatementNode::DestroyStatementNode(const Span& span_) : StatementNode(NodeType::destroyStatementNode, span_), expression()
+DestroyStatementNode::DestroyStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::destroyStatementNode, span_, moduleId_), expression()
 {
 }
 
-DestroyStatementNode::DestroyStatementNode(const Span& span_, Node* expression_) : StatementNode(NodeType::destroyStatementNode, span_), expression(expression_)
+DestroyStatementNode::DestroyStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_) : 
+    StatementNode(NodeType::destroyStatementNode, span_, moduleId_), expression(expression_)
 {
     expression->SetParent(this);
 }
 
 Node* DestroyStatementNode::Clone(CloneContext& cloneContext) const
 {
-    DestroyStatementNode* clone = new DestroyStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), expression->Clone(cloneContext));
+    DestroyStatementNode* clone = new DestroyStatementNode(GetSpan(), ModuleId(), expression->Clone(cloneContext));
     return clone;
 }
 
@@ -605,12 +626,13 @@ void DestroyStatementNode::Read(AstReader& reader)
     expression->SetParent(this);
 }
 
-AssignmentStatementNode::AssignmentStatementNode(const Span& span_) : StatementNode(NodeType::assignmentStatementNode, span_), targetExpr(), sourceExpr()
+AssignmentStatementNode::AssignmentStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::assignmentStatementNode, span_, moduleId_), targetExpr(), sourceExpr()
 {
 }
 
-AssignmentStatementNode::AssignmentStatementNode(const Span& span_, Node* targetExpr_, Node* sourceExpr_) :
-    StatementNode(NodeType::assignmentStatementNode, span_), targetExpr(targetExpr_), sourceExpr(sourceExpr_)
+AssignmentStatementNode::AssignmentStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* targetExpr_, Node* sourceExpr_) :
+    StatementNode(NodeType::assignmentStatementNode, span_, moduleId_), targetExpr(targetExpr_), sourceExpr(sourceExpr_)
 {
     targetExpr->SetParent(this);
     sourceExpr->SetParent(this);
@@ -618,7 +640,7 @@ AssignmentStatementNode::AssignmentStatementNode(const Span& span_, Node* target
 
 Node* AssignmentStatementNode::Clone(CloneContext& cloneContext) const
 {
-    AssignmentStatementNode* clone = new AssignmentStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), targetExpr->Clone(cloneContext), sourceExpr->Clone(cloneContext));
+    AssignmentStatementNode* clone = new AssignmentStatementNode(GetSpan(), ModuleId(), targetExpr->Clone(cloneContext), sourceExpr->Clone(cloneContext));
     return clone;
 }
 
@@ -643,18 +665,20 @@ void AssignmentStatementNode::Read(AstReader& reader)
     sourceExpr->SetParent(this);
 }
 
-ExpressionStatementNode::ExpressionStatementNode(const Span& span_) : StatementNode(NodeType::expressionStatementNode, span_), expression()
+ExpressionStatementNode::ExpressionStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::expressionStatementNode, span_, moduleId_), expression()
 {
 }
 
-ExpressionStatementNode::ExpressionStatementNode(const Span& span_, Node* expression_) : StatementNode(NodeType::expressionStatementNode, span_), expression(expression_)
+ExpressionStatementNode::ExpressionStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_) : 
+    StatementNode(NodeType::expressionStatementNode, span_, moduleId_), expression(expression_)
 {
     expression->SetParent(this);
 }
 
 Node* ExpressionStatementNode::Clone(CloneContext& cloneContext) const
 {
-    ExpressionStatementNode* clone = new ExpressionStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), expression->Clone(cloneContext));
+    ExpressionStatementNode* clone = new ExpressionStatementNode(GetSpan(), ModuleId(), expression->Clone(cloneContext));
     return clone;
 }
 
@@ -676,13 +700,13 @@ void ExpressionStatementNode::Read(AstReader& reader)
     expression->SetParent(this);
 }
 
-EmptyStatementNode::EmptyStatementNode(const Span& span_) : StatementNode(NodeType::emptyStatementNode, span_)
+EmptyStatementNode::EmptyStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : StatementNode(NodeType::emptyStatementNode, span_, moduleId_)
 {
 }
 
 Node* EmptyStatementNode::Clone(CloneContext& cloneContext) const
 {
-    EmptyStatementNode* clone = new EmptyStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    EmptyStatementNode* clone = new EmptyStatementNode(GetSpan(), ModuleId());
     return clone;
 }
 
@@ -691,12 +715,13 @@ void EmptyStatementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-RangeForStatementNode::RangeForStatementNode(const Span& span_) : StatementNode(NodeType::rangeForStatementNode, span_), typeExpr(), id(), container(), action()
+RangeForStatementNode::RangeForStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::rangeForStatementNode, span_, moduleId_), typeExpr(), id(), container(), action()
 {
 }
 
-RangeForStatementNode::RangeForStatementNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_, Node* container_, StatementNode* action_) :
-    StatementNode(NodeType::rangeForStatementNode, span_), typeExpr(typeExpr_), id(id_), container(container_), action(action_)
+RangeForStatementNode::RangeForStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_, Node* container_, StatementNode* action_) :
+    StatementNode(NodeType::rangeForStatementNode, span_, moduleId_), typeExpr(typeExpr_), id(id_), container(container_), action(action_)
 {
     typeExpr->SetParent(this);
     id->SetParent(this);
@@ -706,11 +731,11 @@ RangeForStatementNode::RangeForStatementNode(const Span& span_, Node* typeExpr_,
 
 Node* RangeForStatementNode::Clone(CloneContext& cloneContext) const
 {
-    RangeForStatementNode* clone = new RangeForStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), container->Clone(cloneContext),
+    RangeForStatementNode* clone = new RangeForStatementNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), container->Clone(cloneContext),
         static_cast<StatementNode*>(action->Clone(cloneContext)));
-    clone->SetLeftParenSpan(cloneContext.MapSpan(leftParenSpan, RootModuleId()));
-    clone->SetRightParenSpan(cloneContext.MapSpan(rightParenSpan, RootModuleId()));
-    clone->SetColonSpan(cloneContext.MapSpan(colonSpan, RootModuleId()));
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
+    clone->SetColonSpan(colonSpan);
     return clone;
 }
 
@@ -726,9 +751,10 @@ void RangeForStatementNode::Write(AstWriter& writer)
     writer.Write(id.get());
     writer.Write(container.get());
     writer.Write(action.get());
-    writer.Write(leftParenSpan);
-    writer.Write(rightParenSpan);
-    writer.Write(colonSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(leftParenSpan, convertExternal);
+    writer.Write(rightParenSpan, convertExternal);
+    writer.Write(colonSpan, convertExternal);
 }
 
 void RangeForStatementNode::Read(AstReader& reader)
@@ -747,18 +773,20 @@ void RangeForStatementNode::Read(AstReader& reader)
     colonSpan = reader.ReadSpan();
 }
 
-SwitchStatementNode::SwitchStatementNode(const Span& span_) : StatementNode(NodeType::switchStatementNode, span_), condition(), cases(), defaultS()
+SwitchStatementNode::SwitchStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::switchStatementNode, span_, moduleId_), condition(), cases(), defaultS()
 {
 }
 
-SwitchStatementNode::SwitchStatementNode(const Span& span_, Node* condition_) : StatementNode(NodeType::switchStatementNode, span_), condition(condition_), cases(), defaultS()
+SwitchStatementNode::SwitchStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* condition_) : 
+    StatementNode(NodeType::switchStatementNode, span_, moduleId_), condition(condition_), cases(), defaultS()
 {
     condition->SetParent(this);
 }
 
 Node* SwitchStatementNode::Clone(CloneContext& cloneContext) const
 {
-    SwitchStatementNode* clone = new SwitchStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), condition->Clone(cloneContext));
+    SwitchStatementNode* clone = new SwitchStatementNode(GetSpan(), ModuleId(), condition->Clone(cloneContext));
     int n = cases.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -768,10 +796,10 @@ Node* SwitchStatementNode::Clone(CloneContext& cloneContext) const
     {
         clone->SetDefault(static_cast<DefaultStatementNode*>(defaultS->Clone(cloneContext)));
     }
-    clone->SetLeftParenSpan(cloneContext.MapSpan(leftParenSpan, RootModuleId()));
-    clone->SetRightParenSpan(cloneContext.MapSpan(rightParenSpan, RootModuleId()));
-    clone->SetBeginBraceSpan(cloneContext.MapSpan(beginBraceSpan, RootModuleId()));
-    clone->SetEndBraceSpan(cloneContext.MapSpan(endBraceSpan, RootModuleId()));
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
+    clone->SetBeginBraceSpan(beginBraceSpan);
+    clone->SetEndBraceSpan(endBraceSpan);
     return clone;
 }
 
@@ -791,10 +819,11 @@ void SwitchStatementNode::Write(AstWriter& writer)
     {
         writer.Write(defaultS.get());
     }
-    writer.Write(leftParenSpan);
-    writer.Write(rightParenSpan);
-    writer.Write(beginBraceSpan);
-    writer.Write(endBraceSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(leftParenSpan, convertExternal);
+    writer.Write(rightParenSpan, convertExternal);
+    writer.Write(beginBraceSpan, convertExternal);
+    writer.Write(endBraceSpan, convertExternal);
 }
 
 void SwitchStatementNode::Read(AstReader& reader)
@@ -828,13 +857,14 @@ void SwitchStatementNode::SetDefault(DefaultStatementNode* defaultS_)
     defaultS->SetParent(this);
 }
 
-CaseStatementNode::CaseStatementNode(const Span& span_) : StatementNode(NodeType::caseStatementNode, span_), caseExprs(), statements()
+CaseStatementNode::CaseStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::caseStatementNode, span_, moduleId_), caseExprs(), statements()
 {
 }
 
 Node* CaseStatementNode::Clone(CloneContext& cloneContext) const
 {
-    CaseStatementNode* clone = new CaseStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    CaseStatementNode* clone = new CaseStatementNode(GetSpan(), ModuleId());
     int ne = caseExprs.Count();
     for (int i = 0; i < ne; ++i)
     {
@@ -845,12 +875,7 @@ Node* CaseStatementNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddStatement(static_cast<StatementNode*>(statements[i]->Clone(cloneContext)));
     }
-    std::vector<Span> clonedCaseSpans = caseSpans;
-    for (Span& s : clonedCaseSpans)
-    {
-        s = cloneContext.MapSpan(s, RootModuleId());
-    }
-    clone->caseSpans = clonedCaseSpans;
+    clone->caseSpans = caseSpans;
     return clone;
 }
 
@@ -866,9 +891,10 @@ void CaseStatementNode::Write(AstWriter& writer)
     statements.Write(writer);
     uint32_t n = static_cast<uint32_t>(caseSpans.size());
     writer.GetBinaryWriter().WriteULEB128UInt(n);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
     for (uint32_t i = 0u; i < n; ++i)
     {
-        writer.Write(caseSpans[i]);
+        writer.Write(caseSpans[i], convertExternal);
     }
 }
 
@@ -903,13 +929,13 @@ void CaseStatementNode::AddStatement(StatementNode* statement)
     statements.Add(statement);
 }
 
-DefaultStatementNode::DefaultStatementNode(const Span& span_) : StatementNode(NodeType::defaultStatementNode, span_), statements()
+DefaultStatementNode::DefaultStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : StatementNode(NodeType::defaultStatementNode, span_, moduleId_), statements()
 {
 }
 
 Node* DefaultStatementNode::Clone(CloneContext& cloneContext) const
 {
-    DefaultStatementNode* clone = new DefaultStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    DefaultStatementNode* clone = new DefaultStatementNode(GetSpan(), ModuleId());
     int n = statements.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -942,18 +968,20 @@ void DefaultStatementNode::AddStatement(StatementNode* statement)
     statements.Add(statement);
 }
 
-GotoCaseStatementNode::GotoCaseStatementNode(const Span& span_) : StatementNode(NodeType::gotoCaseStatementNode, span_), caseExpr()
+GotoCaseStatementNode::GotoCaseStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::gotoCaseStatementNode, span_, moduleId_), caseExpr()
 {
 }
 
-GotoCaseStatementNode::GotoCaseStatementNode(const Span& span_, Node* caseExpr_) : StatementNode(NodeType::gotoCaseStatementNode, span_), caseExpr(caseExpr_)
+GotoCaseStatementNode::GotoCaseStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* caseExpr_) : 
+    StatementNode(NodeType::gotoCaseStatementNode, span_, moduleId_), caseExpr(caseExpr_)
 {
     caseExpr->SetParent(this);
 }
 
 Node* GotoCaseStatementNode::Clone(CloneContext& cloneContext) const
 {
-    GotoCaseStatementNode* clone = new GotoCaseStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), caseExpr->Clone(cloneContext));
+    GotoCaseStatementNode* clone = new GotoCaseStatementNode(GetSpan(), ModuleId(), caseExpr->Clone(cloneContext));
     return clone;
 }
 
@@ -974,13 +1002,13 @@ void GotoCaseStatementNode::Read(AstReader& reader)
     caseExpr.reset(reader.ReadNode());
 }
 
-GotoDefaultStatementNode::GotoDefaultStatementNode(const Span& span_) : StatementNode(NodeType::gotoDefaultStatementNode, span_)
+GotoDefaultStatementNode::GotoDefaultStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : StatementNode(NodeType::gotoDefaultStatementNode, span_, moduleId_)
 {
 }
 
 Node* GotoDefaultStatementNode::Clone(CloneContext& cloneContext) const
 {
-    GotoDefaultStatementNode* clone = new GotoDefaultStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    GotoDefaultStatementNode* clone = new GotoDefaultStatementNode(GetSpan(), ModuleId());
     return clone;
 }
 
@@ -989,11 +1017,13 @@ void GotoDefaultStatementNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-ThrowStatementNode::ThrowStatementNode(const Span& span_) : StatementNode(NodeType::throwStatementNode, span_), expression()
+ThrowStatementNode::ThrowStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::throwStatementNode, span_, moduleId_), expression()
 {
 }
 
-ThrowStatementNode::ThrowStatementNode(const Span& span_, Node* expression_) : StatementNode(NodeType::throwStatementNode, span_), expression(expression_)
+ThrowStatementNode::ThrowStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_) : 
+    StatementNode(NodeType::throwStatementNode, span_, moduleId_), expression(expression_)
 {
     if (expression)
     {
@@ -1008,7 +1038,7 @@ Node* ThrowStatementNode::Clone(CloneContext& cloneContext) const
     {
         clonedExpression = expression->Clone(cloneContext);
     }
-    ThrowStatementNode* clone = new ThrowStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), clonedExpression);
+    ThrowStatementNode* clone = new ThrowStatementNode(GetSpan(), ModuleId(), clonedExpression);
     return clone;
 }
 
@@ -1039,12 +1069,12 @@ void ThrowStatementNode::Read(AstReader& reader)
     }
 }
 
-CatchNode::CatchNode(const Span& span_) : Node(NodeType::catchNode, span_), typeExpr(), id(), catchBlock()
+CatchNode::CatchNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::catchNode, span_, moduleId_), typeExpr(), id(), catchBlock()
 {
 }
 
-CatchNode::CatchNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_, CompoundStatementNode* catchBlock_) :
-    Node(NodeType::catchNode, span_), typeExpr(typeExpr_), id(id_), catchBlock(catchBlock_)
+CatchNode::CatchNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_, CompoundStatementNode* catchBlock_) :
+    Node(NodeType::catchNode, span_, moduleId_), typeExpr(typeExpr_), id(id_), catchBlock(catchBlock_)
 {
     typeExpr->SetParent(this);
     if (id)
@@ -1061,9 +1091,9 @@ Node* CatchNode::Clone(CloneContext& cloneContext) const
     {
         clonedId = static_cast<IdentifierNode*>(id->Clone(cloneContext));
     }
-    CatchNode* clone = new CatchNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), typeExpr->Clone(cloneContext), clonedId, static_cast<CompoundStatementNode*>(catchBlock->Clone(cloneContext)));
-    clone->SetLeftParenSpan(cloneContext.MapSpan(leftParenSpan, RootModuleId()));
-    clone->SetRightParenSpan(cloneContext.MapSpan(rightParenSpan, RootModuleId()));
+    CatchNode* clone = new CatchNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext), clonedId, static_cast<CompoundStatementNode*>(catchBlock->Clone(cloneContext)));
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
     return clone;
 }
 
@@ -1083,8 +1113,9 @@ void CatchNode::Write(AstWriter& writer)
         writer.Write(id.get());
     }
     writer.Write(catchBlock.get());
-    writer.Write(leftParenSpan);
-    writer.Write(rightParenSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(leftParenSpan, convertExternal);
+    writer.Write(rightParenSpan, convertExternal);
 }
 
 void CatchNode::Read(AstReader& reader)
@@ -1104,18 +1135,20 @@ void CatchNode::Read(AstReader& reader)
     rightParenSpan = reader.ReadSpan();
 }
 
-TryStatementNode::TryStatementNode(const Span& span_) : StatementNode(NodeType::tryStatementNode, span_), tryBlock(), catches()
+TryStatementNode::TryStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::tryStatementNode, span_, moduleId_), tryBlock(), catches()
 {
 }
 
-TryStatementNode::TryStatementNode(const Span& span_, CompoundStatementNode* tryBlock_) : StatementNode(NodeType::tryStatementNode, span_), tryBlock(tryBlock_), catches()
+TryStatementNode::TryStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, CompoundStatementNode* tryBlock_) : 
+    StatementNode(NodeType::tryStatementNode, span_, moduleId_), tryBlock(tryBlock_), catches()
 {
     tryBlock->SetParent(this);
 }
 
 Node* TryStatementNode::Clone(CloneContext& cloneContext) const
 {
-    TryStatementNode* clone = new TryStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<CompoundStatementNode*>(tryBlock->Clone(cloneContext)));
+    TryStatementNode* clone = new TryStatementNode(GetSpan(), ModuleId(), static_cast<CompoundStatementNode*>(tryBlock->Clone(cloneContext)));
     int n = catches.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -1151,18 +1184,20 @@ void TryStatementNode::AddCatch(CatchNode* catch_)
     catches.Add(catch_);
 }
 
-AssertStatementNode::AssertStatementNode(const Span& span_) : StatementNode(NodeType::assertStatementNode, span_), assertExpr()
+AssertStatementNode::AssertStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::assertStatementNode, span_, moduleId_), assertExpr()
 {
 }
 
-AssertStatementNode::AssertStatementNode(const Span& span_, Node* assertExpr_) : StatementNode(NodeType::assertStatementNode, span_), assertExpr(assertExpr_)
+AssertStatementNode::AssertStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* assertExpr_) : 
+    StatementNode(NodeType::assertStatementNode, span_, moduleId_), assertExpr(assertExpr_)
 {
     assertExpr->SetParent(this);
 }
 
 Node* AssertStatementNode::Clone(CloneContext& cloneContext) const 
 {
-    AssertStatementNode* clone = new AssertStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), assertExpr->Clone(cloneContext));
+    AssertStatementNode* clone = new AssertStatementNode(GetSpan(), ModuleId(), assertExpr->Clone(cloneContext));
     return clone;
 }
 
@@ -1184,16 +1219,17 @@ void AssertStatementNode::Read(AstReader& reader)
     assertExpr->SetParent(this);
 }
 
-ConditionalCompilationExpressionNode::ConditionalCompilationExpressionNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_)
+ConditionalCompilationExpressionNode::ConditionalCompilationExpressionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : Node(nodeType_, span_, moduleId_)
 {
 }
 
-ConditionalCompilationBinaryExpressionNode::ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_) : ConditionalCompilationExpressionNode(nodeType_, span_)
+ConditionalCompilationBinaryExpressionNode::ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    ConditionalCompilationExpressionNode(nodeType_, span_, moduleId_)
 {
 }
 
-ConditionalCompilationBinaryExpressionNode::ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
-    ConditionalCompilationExpressionNode(nodeType_, span_), left(left_), right(right_)
+ConditionalCompilationBinaryExpressionNode::ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
+    ConditionalCompilationExpressionNode(nodeType_, span_, moduleId_), left(left_), right(right_)
 {
     left->SetParent(this);
     right->SetParent(this);
@@ -1215,18 +1251,21 @@ void ConditionalCompilationBinaryExpressionNode::Read(AstReader& reader)
     right->SetParent(this);
 }
 
-ConditionalCompilationDisjunctionNode::ConditionalCompilationDisjunctionNode(const Span& span_) : ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationDisjunctionNode, span_)
+ConditionalCompilationDisjunctionNode::ConditionalCompilationDisjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationDisjunctionNode, span_, moduleId_)
 {
 }
 
-ConditionalCompilationDisjunctionNode::ConditionalCompilationDisjunctionNode(const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
-    ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationDisjunctionNode, span_, left_, right_)
+ConditionalCompilationDisjunctionNode::ConditionalCompilationDisjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, 
+    ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
+    ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationDisjunctionNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* ConditionalCompilationDisjunctionNode::Clone(CloneContext& cloneContext) const
 {
-    return new ConditionalCompilationDisjunctionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), static_cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
+    ConditionalCompilationDisjunctionNode* clone = new ConditionalCompilationDisjunctionNode(GetSpan(), ModuleId(), static_cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), static_cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
+    return clone;
 }
 
 void ConditionalCompilationDisjunctionNode::Accept(Visitor& visitor)
@@ -1234,18 +1273,21 @@ void ConditionalCompilationDisjunctionNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-ConditionalCompilationConjunctionNode::ConditionalCompilationConjunctionNode(const Span& span_) : ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationConjunctionNode, span_)
+ConditionalCompilationConjunctionNode::ConditionalCompilationConjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationConjunctionNode, span_, moduleId_)
 {
 }
 
-ConditionalCompilationConjunctionNode::ConditionalCompilationConjunctionNode(const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
-    ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationConjunctionNode, span_, left_, right_)
+ConditionalCompilationConjunctionNode::ConditionalCompilationConjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, 
+    ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
+    ConditionalCompilationBinaryExpressionNode(NodeType::conditionalCompilationConjunctionNode, span_, moduleId_, left_, right_)
 {
 }
 
 Node* ConditionalCompilationConjunctionNode::Clone(CloneContext& cloneContext) const
 {
-    return new ConditionalCompilationConjunctionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), static_cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
+    ConditionalCompilationConjunctionNode* clone = new ConditionalCompilationConjunctionNode(GetSpan(), ModuleId(), static_cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), static_cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
+    return clone;
 }
 
 void ConditionalCompilationConjunctionNode::Accept(Visitor& visitor)
@@ -1253,19 +1295,21 @@ void ConditionalCompilationConjunctionNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-ConditionalCompilationNotNode::ConditionalCompilationNotNode(const Span& span_) : ConditionalCompilationExpressionNode(NodeType::conditionalCompilationNotNode, span_)
+ConditionalCompilationNotNode::ConditionalCompilationNotNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    ConditionalCompilationExpressionNode(NodeType::conditionalCompilationNotNode, span_, moduleId_)
 {
 }
 
-ConditionalCompilationNotNode::ConditionalCompilationNotNode(const Span& span_, ConditionalCompilationExpressionNode* expr_) : 
-    ConditionalCompilationExpressionNode(NodeType::conditionalCompilationNotNode, span_), expr(expr_)
+ConditionalCompilationNotNode::ConditionalCompilationNotNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* expr_) :
+    ConditionalCompilationExpressionNode(NodeType::conditionalCompilationNotNode, span_, moduleId_), expr(expr_)
 {
     expr->SetParent(this);
 }
 
 Node* ConditionalCompilationNotNode::Clone(CloneContext& cloneContext) const
 {
-    return new ConditionalCompilationNotNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext)));
+    ConditionalCompilationNotNode* clone = new ConditionalCompilationNotNode(GetSpan(), ModuleId(), static_cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext)));
+    return clone;
 }
 
 void ConditionalCompilationNotNode::Accept(Visitor& visitor)
@@ -1286,18 +1330,20 @@ void ConditionalCompilationNotNode::Read(AstReader& reader)
     expr->SetParent(this);
 }
 
-ConditionalCompilationPrimaryNode::ConditionalCompilationPrimaryNode(const Span& span_) : ConditionalCompilationExpressionNode(NodeType::conditionalCompilationPrimaryNode, span_)
+ConditionalCompilationPrimaryNode::ConditionalCompilationPrimaryNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    ConditionalCompilationExpressionNode(NodeType::conditionalCompilationPrimaryNode, span_, moduleId_)
 {
 }
 
-ConditionalCompilationPrimaryNode::ConditionalCompilationPrimaryNode(const Span& span_, const std::u32string& symbol_) :
-    ConditionalCompilationExpressionNode(NodeType::conditionalCompilationPrimaryNode, span_), symbol(symbol_)
+ConditionalCompilationPrimaryNode::ConditionalCompilationPrimaryNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& symbol_) :
+    ConditionalCompilationExpressionNode(NodeType::conditionalCompilationPrimaryNode, span_, moduleId_), symbol(symbol_)
 {
 }
 
 Node* ConditionalCompilationPrimaryNode::Clone(CloneContext& cloneContext) const
 {
-    return new ConditionalCompilationPrimaryNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), symbol);
+    ConditionalCompilationPrimaryNode* clone = new ConditionalCompilationPrimaryNode(GetSpan(), ModuleId(), symbol);
+    return clone;
 }
 
 void ConditionalCompilationPrimaryNode::Accept(Visitor& visitor)
@@ -1317,19 +1363,20 @@ void ConditionalCompilationPrimaryNode::Read(AstReader& reader)
     symbol = reader.GetBinaryReader().ReadUtf32String();
 }
 
-ParenthesizedConditionalCompilationExpressionNode::ParenthesizedConditionalCompilationExpressionNode(const Span& span_) :
-    ConditionalCompilationExpressionNode(NodeType::parenthesizedCondCompExpressionNode, span_)
+ParenthesizedConditionalCompilationExpressionNode::ParenthesizedConditionalCompilationExpressionNode(const Span& span_, const boost::uuids::uuid& moduleId_) :
+    ConditionalCompilationExpressionNode(NodeType::parenthesizedCondCompExpressionNode, span_, moduleId_)
 {
 }
 
-ParenthesizedConditionalCompilationExpressionNode::ParenthesizedConditionalCompilationExpressionNode(const Span& span_, ConditionalCompilationExpressionNode* expr_) :
-    ConditionalCompilationExpressionNode(NodeType::parenthesizedCondCompExpressionNode, span_), expr(expr_)
+ParenthesizedConditionalCompilationExpressionNode::ParenthesizedConditionalCompilationExpressionNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* expr_) :
+    ConditionalCompilationExpressionNode(NodeType::parenthesizedCondCompExpressionNode, span_, moduleId_), expr(expr_)
 {
 }
 
 Node* ParenthesizedConditionalCompilationExpressionNode::Clone(CloneContext& cloneContext) const
 {
-    return new ParenthesizedConditionalCompilationExpressionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext)));
+    ParenthesizedConditionalCompilationExpressionNode* clone = new ParenthesizedConditionalCompilationExpressionNode(GetSpan(), ModuleId(), static_cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext)));
+    return clone;
 }
 
 void ParenthesizedConditionalCompilationExpressionNode::Accept(Visitor& visitor)
@@ -1350,11 +1397,12 @@ void ParenthesizedConditionalCompilationExpressionNode::Read(AstReader& reader)
     expr->SetParent(this);
 }
 
-ConditionalCompilationPartNode::ConditionalCompilationPartNode(const Span& span_) : Node(NodeType::conditionalCompilationPartNode, span_)
+ConditionalCompilationPartNode::ConditionalCompilationPartNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::conditionalCompilationPartNode, span_, moduleId_)
 {
 }
 
-ConditionalCompilationPartNode::ConditionalCompilationPartNode(const Span& span_, ConditionalCompilationExpressionNode* expr_) : Node(NodeType::conditionalCompilationPartNode, span_), expr(expr_)
+ConditionalCompilationPartNode::ConditionalCompilationPartNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* expr_) : 
+    Node(NodeType::conditionalCompilationPartNode, span_, moduleId_), expr(expr_)
 {
     if (expr)
     {
@@ -1375,15 +1423,15 @@ Node* ConditionalCompilationPartNode::Clone(CloneContext& cloneContext) const
     {
         clonedIfExpr = static_cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext));
     }
-    ConditionalCompilationPartNode* clone = new ConditionalCompilationPartNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), clonedIfExpr);
+    ConditionalCompilationPartNode* clone = new ConditionalCompilationPartNode(GetSpan(), ModuleId(), clonedIfExpr);
     int n = statements.Count();
     for (int i = 0; i < n; ++i)
     {
         clone->AddStatement(static_cast<StatementNode*>(statements[i]->Clone(cloneContext)));
     }
-    clone->SetKeywordSpan(cloneContext.MapSpan(keywordSpan, RootModuleId()));
-    clone->SetLeftParenSpan(cloneContext.MapSpan(leftParenSpan, RootModuleId()));
-    clone->SetRightParenSpan(cloneContext.MapSpan(rightParenSpan, RootModuleId()));
+    clone->SetKeywordSpan(keywordSpan);
+    clone->SetLeftParenSpan(leftParenSpan);
+    clone->SetRightParenSpan(rightParenSpan);
     return clone;
 }
 
@@ -1402,9 +1450,10 @@ void ConditionalCompilationPartNode::Write(AstWriter& writer)
         writer.Write(expr.get());
     }
     statements.Write(writer);
-    writer.Write(keywordSpan);
-    writer.Write(leftParenSpan);
-    writer.Write(rightParenSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(keywordSpan, convertExternal);
+    writer.Write(leftParenSpan, convertExternal);
+    writer.Write(rightParenSpan, convertExternal);
 }
 
 void ConditionalCompilationPartNode::Read(AstReader& reader)
@@ -1423,12 +1472,13 @@ void ConditionalCompilationPartNode::Read(AstReader& reader)
     rightParenSpan = reader.ReadSpan();
 }
 
-ConditionalCompilationStatementNode::ConditionalCompilationStatementNode(const Span& span_) : StatementNode(NodeType::conditionalCompilationStatementNode, span_), ifPart(nullptr)
+ConditionalCompilationStatementNode::ConditionalCompilationStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    StatementNode(NodeType::conditionalCompilationStatementNode, span_, moduleId_), ifPart(nullptr)
 {
 }
 
-ConditionalCompilationStatementNode::ConditionalCompilationStatementNode(const Span& span_, ConditionalCompilationExpressionNode* ifExpr_) :
-    StatementNode(NodeType::conditionalCompilationStatementNode, span_), ifPart(new ConditionalCompilationPartNode(span_, ifExpr_))
+ConditionalCompilationStatementNode::ConditionalCompilationStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* ifExpr_) :
+    StatementNode(NodeType::conditionalCompilationStatementNode, span_, moduleId_), ifPart(new ConditionalCompilationPartNode(span_, moduleId_, ifExpr_))
 {
 }
 
@@ -1437,9 +1487,9 @@ void ConditionalCompilationStatementNode::AddIfStatement(StatementNode* statemen
     ifPart->AddStatement(statement);
 }
 
-void ConditionalCompilationStatementNode::AddElifExpr(const Span& span, ConditionalCompilationExpressionNode* expr)
+void ConditionalCompilationStatementNode::AddElifExpr(const Span& span, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* expr)
 {
-    elifParts.Add(new ConditionalCompilationPartNode(span, expr));
+    elifParts.Add(new ConditionalCompilationPartNode(span, moduleId_, expr));
 }
 
 void ConditionalCompilationStatementNode::AddElifStatement(StatementNode* statement)
@@ -1462,18 +1512,18 @@ void ConditionalCompilationStatementNode::SetElifKeywordSpan(const Span& span)
     elifParts[elifParts.Count() - 1]->SetKeywordSpan(span);
 }
 
-void ConditionalCompilationStatementNode::AddElseStatement(const Span& span, StatementNode* statement)
+void ConditionalCompilationStatementNode::AddElseStatement(const Span& span, const boost::uuids::uuid& moduleId_, StatementNode* statement)
 {
     if (!elsePart)
     {
-        elsePart.reset(new ConditionalCompilationPartNode(span));
+        elsePart.reset(new ConditionalCompilationPartNode(span, moduleId_));
     }
     elsePart->AddStatement(statement);
 }
 
 Node* ConditionalCompilationStatementNode::Clone(CloneContext& cloneContext) const
 {
-    ConditionalCompilationStatementNode* clone = new ConditionalCompilationStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    ConditionalCompilationStatementNode* clone = new ConditionalCompilationStatementNode(GetSpan(), ModuleId());
     ConditionalCompilationPartNode* clonedIfPart = static_cast<ConditionalCompilationPartNode*>(ifPart->Clone(cloneContext));
     clone->ifPart.reset(clonedIfPart);
     int n = elifParts.Count();
@@ -1488,7 +1538,7 @@ Node* ConditionalCompilationStatementNode::Clone(CloneContext& cloneContext) con
         ConditionalCompilationPartNode* clonedElsePart = static_cast<ConditionalCompilationPartNode*>(elsePart->Clone(cloneContext));
         clone->elsePart.reset(clonedElsePart);
     }
-    clone->SetEndIfSpan(cloneContext.MapSpan(endifSpan, RootModuleId()));
+    clone->SetEndIfSpan(endifSpan);
     return clone;
 }
 
@@ -1508,7 +1558,8 @@ void ConditionalCompilationStatementNode::Write(AstWriter& writer)
     {
         writer.Write(elsePart.get());
     }
-    writer.Write(endifSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(endifSpan, convertExternal);
 }
 
 void ConditionalCompilationStatementNode::Read(AstReader& reader)

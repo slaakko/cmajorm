@@ -15,17 +15,17 @@ parser api(SNGCM_PARSER_API) IdentifierParser
 {
     uselexer CmajorLexer;
 
-    Identifier : IdentifierNode*
-        ::= ID{ return new IdentifierNode(span, lexer.GetToken(pos)); }
+    Identifier(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= ID{ return new IdentifierNode(span, *moduleId, lexer.GetToken(pos)); }
         ;
 
-    QualifiedId(var std::u32string value, var Span s) : IdentifierNode*
+    QualifiedId(boost::uuids::uuid* moduleId, var std::u32string value, var Span s) : IdentifierNode*
         ::=
         (   ID{ s = span; Token token = lexer.GetToken(pos); value.append(std::u32string(token.match.begin, token.match.end)); }
             (DOT ID{ s.end = span.end; Token token = lexer.GetToken(pos); value.append(1, '.'); value.append(std::u32string(token.match.begin, token.match.end)); })*
         )
         {
-            return new IdentifierNode(s, value);
+            return new IdentifierNode(s, *moduleId, value);
         }
         ;
 

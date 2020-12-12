@@ -252,11 +252,13 @@ std::unique_ptr<sngxml::dom::Document> GetDebugInfoAsXml(const std::string& cmdb
         sngxml::dom::Element* projectElement = new sngxml::dom::Element(U"project");
         std::string projectName;
         std::string projectDirectoryPath;
+        boost::uuids::uuid moduleId;
         int32_t numCompileUnits;
         boost::uuids::uuid mainFunctionId;
-        ReadProjectTableHeader(reader, projectName, projectDirectoryPath, numCompileUnits, mainFunctionId);
+        ReadProjectTableHeader(reader, projectName, projectDirectoryPath, moduleId, numCompileUnits, mainFunctionId);
         projectElement->SetAttribute(U"name", ToUtf32(projectName));
         projectElement->SetAttribute(U"directoryPath", ToUtf32(projectDirectoryPath));
+        projectElement->SetAttribute(U"moduleId", ToUtf32(boost::uuids::to_string(moduleId)));
         if (!mainFunctionId.is_nil())
         {
             projectElement->SetAttribute(U"mainFunctionId", ToUtf32(boost::uuids::to_string(mainFunctionId)));
@@ -272,10 +274,12 @@ std::unique_ptr<sngxml::dom::Document> GetDebugInfoAsXml(const std::string& cmdb
             for (int32_t i = 0; i < numFunctions; ++i)
             {
                 int32_t fileIndex;
+                boost::uuids::uuid sourceModuleId;
                 boost::uuids::uuid functionId;
-                ReadCompileUnitFunctionRecord(reader, fileIndex, functionId);
+                ReadCompileUnitFunctionRecord(reader, fileIndex, sourceModuleId, functionId);
                 sngxml::dom::Element* functionElement = new sngxml::dom::Element(U"function");
                 functionElement->SetAttribute(U"fileIndex", ToUtf32(std::to_string(fileIndex)));
+                functionElement->SetAttribute(U"sourceModuleId", ToUtf32(boost::uuids::to_string(sourceModuleId)));
                 functionElement->SetAttribute(U"functionId", ToUtf32(boost::uuids::to_string(functionId)));
                 int32_t numInstructionRecords;
                 ReadNumberOfInstructionRecords(reader, numInstructionRecords);

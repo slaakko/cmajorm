@@ -12,7 +12,14 @@
 
 namespace cmajor { namespace symbols {
 
-ConversionTable::ConversionTable(Module* module_) : module(module_)
+ConversionTableEntry::ConversionTableEntry(TypeSymbol* sourceType_, TypeSymbol* targetType_) : sourceType(sourceType_), targetType(targetType_)
+{
+#ifdef VALID_CONVERSION_TABLE_ENTRY_CHECK
+    CheckValid();
+#endif
+}
+
+ConversionTable::ConversionTable(Owner owner_, Module* module_) : owner(owner_), module(module_)
 {
 }
 
@@ -28,7 +35,7 @@ void ConversionTableEntry::CheckValid() const
     }
 }
 
-void ConversionTable::AddConversion(FunctionSymbol* conversion, Module* module)
+void ConversionTable::AddConversion(FunctionSymbol* conversion)
 {
 #ifdef IMMUTABLE_MODULE_CHECK
     if (module && module->IsImmutable())
@@ -36,18 +43,16 @@ void ConversionTable::AddConversion(FunctionSymbol* conversion, Module* module)
         throw ModuleImmutableException(GetRootModuleForCurrentThread(), module, Span(), Span());
     }
 #endif
-    ConversionTableEntry entry(conversion->ConversionSourceType()->PlainType(conversion->GetSpan(), module),
-        conversion->ConversionTargetType()->PlainType(conversion->GetSpan(), module));
+/*  CHANGED 3.12.2020
+    ConversionTableEntry entry(conversion->ConversionSourceType()->PlainType(conversion->GetSpan(), conversion->SourceModuleId()),
+        conversion->ConversionTargetType()->PlainType(conversion->GetSpan(), conversion->SourceModuleId()));
+*/ 
+    ConversionTableEntry entry(conversion->ConversionSourceType(), conversion->ConversionTargetType());
 #ifdef VALID_CONVERSION_TABLE_ENTRY_CHECK
     entry.CheckValid();
 #endif
     conversionMap.erase(entry);
     conversionMap.insert(std::make_pair(entry, conversion));
-}
-
-void ConversionTable::AddConversion(FunctionSymbol* conversion)
-{
-    AddConversion(conversion, nullptr);
 }
 
 void ConversionTable::Add(const ConversionTable& that)
@@ -81,10 +86,10 @@ void ConversionTable::Check()
     }
 }
 
-FunctionSymbol* ConversionTable::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const
+FunctionSymbol* ConversionTable::GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span, const boost::uuids::uuid& moduleId) const
 {
-    TypeSymbol* sourcePlainType = sourceType->PlainType(span);
-    TypeSymbol* targetPlainType = targetType->PlainType(span);
+    TypeSymbol* sourcePlainType = sourceType->PlainType(span, moduleId);
+    TypeSymbol* targetPlainType = targetType->PlainType(span, moduleId);
     ConversionTableEntry entry(sourcePlainType, targetPlainType);
     auto it = conversionMap.find(entry);
     if (it != conversionMap.cend())

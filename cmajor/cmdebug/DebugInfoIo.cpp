@@ -68,21 +68,24 @@ void ReadNumberOfProjects(BinaryReader& reader, int32_t& numProjects)
     numProjects = reader.ReadInt();
 }
 
-void WriteProjectTableHeader(BinaryWriter& writer, const std::string& projectName, const std::string& projectDirectoryPath, int32_t numCompileUnits,
+void WriteProjectTableHeader(BinaryWriter& writer, const std::string& projectName, const std::string& projectDirectoryPath, const boost::uuids::uuid& moduleId, int32_t numCompileUnits,
     const boost::uuids::uuid& mainFunctionId)
 {
     writer.Write(projectName);
     std::string cmajorRootRelativeDirectoryPath = MakeCmajorRootRelativeFilePath(projectDirectoryPath);
     writer.Write(cmajorRootRelativeDirectoryPath);
+    writer.Write(moduleId);
     writer.Write(numCompileUnits);
     writer.Write(mainFunctionId);
 }
 
-void ReadProjectTableHeader(BinaryReader& reader, std::string& projectName, std::string& projectDirectoryPath, int32_t& numCompileUnits, boost::uuids::uuid& mainFunctionId)
+void ReadProjectTableHeader(BinaryReader& reader, std::string& projectName, std::string& projectDirectoryPath, boost::uuids::uuid& moduleId, int32_t& numCompileUnits, 
+    boost::uuids::uuid& mainFunctionId)
 {
     projectName = reader.ReadUtf8String();
     std::string cmajorRootRelativeDirectoryPath = reader.ReadUtf8String();
     projectDirectoryPath = ExpandCmajorRootRelativeFilePath(cmajorRootRelativeDirectoryPath);
+    reader.ReadUuid(moduleId);
     numCompileUnits = reader.ReadInt();
     reader.ReadUuid(mainFunctionId);
 }
@@ -131,15 +134,17 @@ void ReadNumberOfCompileUnitFunctionRecords(BinaryReader& reader, int32_t& numFu
     numFunctionRecords = reader.ReadInt();
 }
 
-void WriteCompileUnitFunctionRecord(BinaryWriter& writer, int32_t fileIndex, const boost::uuids::uuid& functionId)
+void WriteCompileUnitFunctionRecord(BinaryWriter& writer, int32_t fileIndex, const boost::uuids::uuid& sourceModuleId, const boost::uuids::uuid& functionId)
 {
     writer.Write(fileIndex);
+    writer.Write(sourceModuleId);
     writer.Write(functionId);
 }
 
-void ReadCompileUnitFunctionRecord(BinaryReader& reader, int32_t& fileIndex, boost::uuids::uuid& functionId)
+void ReadCompileUnitFunctionRecord(BinaryReader& reader, int32_t& fileIndex, boost::uuids::uuid& sourceModuleId, boost::uuids::uuid& functionId)
 {
     fileIndex = reader.ReadInt();
+    reader.ReadUuid(sourceModuleId);
     reader.ReadUuid(functionId);
 }
 

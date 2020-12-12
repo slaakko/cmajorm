@@ -17,7 +17,8 @@ class BoundFunction;
 using namespace cmajor::symbols;
 using namespace sngcm::ast;
 
-std::unique_ptr<Value> Evaluate(Node* node, TypeSymbol* targetType, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, bool dontThrow, BoundFunction* currentFunction, const Span& span);
+std::unique_ptr<Value> Evaluate(Node* node, TypeSymbol* targetType, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, bool dontThrow, BoundFunction* currentFunction, const Span& span,
+    const boost::uuids::uuid& moduleId);
 
 } } // namespace cmajor::binder
 

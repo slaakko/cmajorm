@@ -17,8 +17,8 @@ namespace cmajor { namespace symbols {
 
 using namespace soulng::unicode;
 
-TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u32string& name_) : 
-    TypeSymbol(SymbolType::templateParameterSymbol, span_, name_), hasDefault(false), defaultType(nullptr)
+TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    TypeSymbol(SymbolType::templateParameterSymbol, span_, sourceModuleId_, name_), hasDefault(false), defaultType(nullptr)
 {
 }
 
@@ -58,12 +58,12 @@ void TemplateParameterSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     defaultType = typeSymbol;
 }
 
-TypeSymbol* TemplateParameterSymbol::Unify(TypeSymbol* type, const Span& span)
+TypeSymbol* TemplateParameterSymbol::Unify(TypeSymbol* type, const Span& span, const boost::uuids::uuid& moduleId)
 {
     return type;
 }
 
-TypeSymbol* TemplateParameterSymbol::UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) 
+TypeSymbol* TemplateParameterSymbol::UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span, const boost::uuids::uuid& moduleId)
 {
     auto it = templateParameterMap.find(this);
     if (it != templateParameterMap.cend())
@@ -76,7 +76,8 @@ TypeSymbol* TemplateParameterSymbol::UnifyTemplateArgumentType(SymbolTable& symb
     }
 }
 
-BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::boundTemplateParameterSymbol, span_, name_), type(nullptr)
+BoundTemplateParameterSymbol::BoundTemplateParameterSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    Symbol(SymbolType::boundTemplateParameterSymbol, span_, sourceModuleId_, name_), type(nullptr)
 {
 }
 
@@ -112,7 +113,7 @@ void BoundTemplateParameterSymbol::Check()
     Symbol::Check();
     if (!type)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "bound template parameter symbol contains null type pointer", GetSpan());
+        throw SymbolCheckException("bound template parameter symbol contains null type pointer", GetSpan(), SourceModuleId());
     }
 }
 

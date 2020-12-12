@@ -17,18 +17,18 @@ namespace cmajor { namespace binder {
 using namespace soulng::unicode;
 
 BoundFunction::BoundFunction(BoundCompileUnit* boundCompileUnit_, FunctionSymbol* functionSymbol_) : 
-    BoundNode(&boundCompileUnit_->GetModule(), functionSymbol_->GetSpan(), BoundNodeType::boundFunction), boundCompileUnit(boundCompileUnit_), functionSymbol(functionSymbol_), hasGotos(false)
+    BoundNode(functionSymbol_->GetSpan(), functionSymbol_->SourceModuleId(), BoundNodeType::boundFunction), boundCompileUnit(boundCompileUnit_), functionSymbol(functionSymbol_), hasGotos(false)
 {
 }
 
 void BoundFunction::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception(GetModule(), "cannot load from function", GetSpan());
+    throw Exception("cannot load from function", GetSpan(), ModuleId());
 }
 
 void BoundFunction::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception(GetModule(), "cannot store to function", GetSpan());
+    throw Exception("cannot store to function", GetSpan(), ModuleId());
 }
 
 void BoundFunction::Accept(BoundNodeVisitor& visitor)
@@ -42,7 +42,7 @@ void BoundFunction::SetBody(std::unique_ptr<BoundCompoundStatement>&& body_)
 }
 
 void BoundFunction::AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall,
-    BoundFunction* currentFunction, ContainerScope* currentContainerScope, const Span& span)
+    BoundFunction* currentFunction, ContainerScope* currentContainerScope, const Span& span, const boost::uuids::uuid& moduleId)
 {
     FunctionSymbol* functionSymbol = destructorCall->GetFunctionSymbol();
     if (functionSymbol->GetSymbolType() == SymbolType::destructorSymbol)
@@ -56,30 +56,28 @@ void BoundFunction::AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall
                 if (!boundCompileUnit->IsGeneratedDestructorInstantiated(destructorSymbol))
                 {
                     boundCompileUnit->SetGeneratedDestructorInstantiated(destructorSymbol);
-                    std::unique_ptr<BoundClass> boundClass(new BoundClass(&boundCompileUnit->GetModule(), classType));
-                    GenerateDestructorImplementation(boundClass.get(), destructorSymbol, *boundCompileUnit, currentContainerScope, currentFunction, span);
+                    std::unique_ptr<BoundClass> boundClass(new BoundClass(classType));
+                    GenerateDestructorImplementation(boundClass.get(), destructorSymbol, *boundCompileUnit, currentContainerScope, currentFunction, span, moduleId);
                     boundCompileUnit->AddBoundNode(std::move(boundClass));
                 }
             }
         }
         else if (destructorSymbol->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
         {
-            bool firstTry = GetBoundCompileUnit()->GetClassTemplateRepository().Instantiate(destructorSymbol, currentContainerScope, currentFunction, span);
+            bool firstTry = GetBoundCompileUnit()->GetClassTemplateRepository().Instantiate(destructorSymbol, currentContainerScope, currentFunction, span, moduleId);
             if (!firstTry)
             {
                 ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(destructorSymbol->Parent());
                 ClassTemplateSpecializationSymbol* copy = GetBoundCompileUnit()->GetSymbolTable().CopyClassTemplateSpecialization(specialization);
-                GetBoundCompileUnit()->GetClassTemplateRepository().BindClassTemplateSpecialization(copy, currentContainerScope, span);
+                GetBoundCompileUnit()->GetClassTemplateRepository().BindClassTemplateSpecialization(copy, currentContainerScope, span, moduleId);
                 int index = destructorSymbol->GetIndex();
                 FunctionSymbol* functionSymbol = copy->GetFunctionByIndex(index);
-                bool secondTry = GetBoundCompileUnit()->InstantiateClassTemplateMemberFunction(functionSymbol, currentContainerScope, currentFunction, span);
+                bool secondTry = GetBoundCompileUnit()->InstantiateClassTemplateMemberFunction(functionSymbol, currentContainerScope, currentFunction, span, moduleId);
                 if (!secondTry)
                 {
-                    throw Exception(GetRootModuleForCurrentThread(),
-                        "internal error: could not instantiate destructor of a class template specialization '" + ToUtf8(specialization->FullName()) + "'",
-                        specialization->GetSpan());
+                    throw Exception("internal error: could not instantiate destructor of a class template specialization '" + ToUtf8(specialization->FullName()) + "'",
+                        specialization->GetSpan(), specialization->SourceModuleId());
                 }
-
             }
         }
     }

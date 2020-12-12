@@ -120,7 +120,7 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(Module* m
             }
             if (boost::filesystem::file_size(sourceFilePath) == 0)
             {
-                std::unique_ptr<CompileUnitNode> compileUnit(new CompileUnitNode(Span(), sourceFilePath));
+                std::unique_ptr<CompileUnitNode> compileUnit(new CompileUnitNode(Span(), boost::uuids::nil_uuid(), sourceFilePath));
                 compileUnit->SetHash(GetSha1MessageDigest(""));
                 int32_t fileIndex = module->GetFileTable().RegisterFilePath(sourceFilePath);
                 compileUnits.push_back(std::move(compileUnit));
@@ -141,7 +141,8 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(Module* m
                     {
                         lexer->SetLog(&log);
                     }
-                    std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(*lexer, &parsingContext);
+                    boost::uuids::uuid moduleId = module->Id();
+                    std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(*lexer, &moduleId, &parsingContext);
                     compileUnit->SetHash(GetSha1MessageDigest(fileContent));
                     if (GetGlobalFlag(GlobalFlags::ast2xml))
                     {
@@ -187,11 +188,12 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(Module* m
 
 struct ParserData
 {
-    ParserData(const std::vector<std::string>& sourceFilePaths_, std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits_, std::vector<std::unique_ptr<CmajorLexer>>& lexers_,
-        const std::vector<uint32_t>& fileIndeces_, std::vector<std::exception_ptr>& exceptions_, bool& stop_) :
-        sourceFilePaths(sourceFilePaths_), compileUnits(compileUnits_), lexers(lexers_), fileIndeces(fileIndeces_), stop(stop_), exceptions(exceptions_)
+    ParserData(const boost::uuids::uuid& moduleId_, const std::vector<std::string>& sourceFilePaths_, std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits_, 
+        std::vector<std::unique_ptr<CmajorLexer>>& lexers_, const std::vector<uint32_t>& fileIndeces_, std::vector<std::exception_ptr>& exceptions_, bool& stop_) :
+        moduleId(moduleId_), sourceFilePaths(sourceFilePaths_), compileUnits(compileUnits_), lexers(lexers_), fileIndeces(fileIndeces_), stop(stop_), exceptions(exceptions_)
     {
     }
+    boost::uuids::uuid moduleId;
     const std::vector<std::string>& sourceFilePaths;
     std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits;
     std::vector<std::unique_ptr<CmajorLexer>>& lexers;
@@ -218,7 +220,7 @@ void ParseSourceFile(ParserData* parserData)
             const std::string& sourceFilePath = parserData->sourceFilePaths[index];
             if (boost::filesystem::file_size(sourceFilePath) == 0)
             {
-                std::unique_ptr<CompileUnitNode> compileUnit(new CompileUnitNode(Span(), sourceFilePath));
+                std::unique_ptr<CompileUnitNode> compileUnit(new CompileUnitNode(Span(), boost::uuids::nil_uuid(), sourceFilePath));
                 compileUnit->SetHash(GetSha1MessageDigest(""));
                 parserData->compileUnits[index].reset(compileUnit.release());
                 parserData->lexers[index].reset();
@@ -233,7 +235,7 @@ void ParseSourceFile(ParserData* parserData)
                 std::unique_ptr<CmajorLexer> lexer(new CmajorLexer(s, sourceFilePath, fileIndex));
                 try
                 {
-                    std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(*lexer, &parsingContext);
+                    std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(*lexer, &parserData->moduleId, &parsingContext);
                     compileUnit->SetHash(GetSha1MessageDigest(fileContent));
                     if (GetGlobalFlag(GlobalFlags::ast2xml))
                     {
@@ -296,7 +298,7 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesConcurrently(Module* m
         }
         std::vector<std::exception_ptr> exceptions;
         exceptions.resize(n);
-        ParserData parserData(sourceFilePaths, compileUnits, lexers, fileIndeces, exceptions, stop);
+        ParserData parserData(module->Id(), sourceFilePaths, compileUnits, lexers, fileIndeces, exceptions, stop);
         for (int i = 0; i < n; ++i)
         {
             parserData.indexQueue.push_back(i);
@@ -363,7 +365,7 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSources(Module* module, const
     }
     catch (const AttributeNotUniqueException& ex)
     {
-        throw Exception(module, ex.what(), ex.GetSpan(), ex.PrevSpan());
+        throw Exception(ex.what(), ex.GetSpan(), ex.ModuleId(), ex.PrevSpan(), ex.PrevModuleId());
     }
 }
 
@@ -1571,48 +1573,50 @@ void CheckMainFunctionSymbol(Module& module)
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
     if (!userMain)
     {
-        throw Exception(&module, "program has no main function", Span());
+        throw Exception("program has no main function", Span(), boost::uuids::nil_uuid());
     }
     if (!userMain->Parameters().empty())
     {
         if (userMain->Parameters().size() != 2)
         {
-            throw Exception(&module, "main function must either take no parameters or take two parameters", userMain->GetSpan());
+            throw Exception("main function must either take no parameters or take two parameters", userMain->GetSpan(), userMain->SourceModuleId());
         }
         if (!TypesEqual(userMain->Parameters()[0]->GetType(), module.GetSymbolTable().GetTypeByName(U"int")))
         {
-            throw Exception(&module, "first parameter of main function must be of int type", userMain->GetSpan());
+            throw Exception("first parameter of main function must be of int type", userMain->GetSpan(), userMain->SourceModuleId());
         }
-        if (!TypesEqual(userMain->Parameters()[1]->GetType(), module.GetSymbolTable().GetTypeByName(U"char")->AddConst(userMain->GetSpan())->AddPointer(userMain->GetSpan())->AddPointer(userMain->GetSpan())))
+        if (!TypesEqual(userMain->Parameters()[1]->GetType(), module.GetSymbolTable().GetTypeByName(U"char")->AddConst(
+            userMain->GetSpan(), userMain->SourceModuleId())->AddPointer(userMain->GetSpan(), userMain->SourceModuleId())->AddPointer(userMain->GetSpan(), userMain->SourceModuleId())))
         {
-            throw Exception(&module, "second parameter of main function must be of 'const char**' type", userMain->GetSpan());
+            throw Exception("second parameter of main function must be of 'const char**' type", userMain->GetSpan(), userMain->SourceModuleId());
         }
     }
     if (userMain->ReturnType() && !userMain->ReturnType()->IsVoidType())
     {
         if (!TypesEqual(userMain->ReturnType(), module.GetSymbolTable().GetTypeByName(U"int")))
         {
-            throw Exception(&module, "main function must either be void function or return an int", userMain->GetSpan());
+            throw Exception("main function must either be void function or return an int", userMain->GetSpan(), userMain->SourceModuleId());
         }
     }
 }
 
 void CreateJsonRegistrationUnit(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder)
 {
-    CompileUnitNode jsonRegistrationCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__json__.cm").generic_string());
+    CompileUnitNode jsonRegistrationCompileUnit(Span(), boost::uuids::nil_uuid(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__json__.cm").generic_string());
     jsonRegistrationCompileUnit.SetSynthesizedUnit();
-    jsonRegistrationCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
-    jsonRegistrationCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System.Json")));
-    FunctionNode* jsonRegistrationFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"RegisterJsonClasses", nullptr));
-    jsonRegistrationFunction->SetReturnTypeExpr(new VoidNode(Span()));
-    CompoundStatementNode* jsonRegistrationFunctionBody = new CompoundStatementNode(Span());
+    jsonRegistrationCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System")));
+    jsonRegistrationCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Json")));
+    FunctionNode* jsonRegistrationFunction(new FunctionNode(Span(), boost::uuids::nil_uuid(), Specifiers::public_, new IntNode(Span(), boost::uuids::nil_uuid()), U"RegisterJsonClasses", nullptr));
+    jsonRegistrationFunction->SetReturnTypeExpr(new VoidNode(Span(), boost::uuids::nil_uuid()));
+    CompoundStatementNode* jsonRegistrationFunctionBody = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
     const std::unordered_set<std::u32string>& jsonClasses = module.GetSymbolTable().JsonClasses();
     for (const std::u32string& jsonClass : jsonClasses)
     {
-        InvokeNode* invokeRegisterJsonClass = new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClass"));
-        invokeRegisterJsonClass->AddArgument(new TypeNameNode(Span(), new IdentifierNode(Span(), jsonClass)));
-        invokeRegisterJsonClass->AddArgument(new DotNode(Span(), new IdentifierNode(Span(), jsonClass), new IdentifierNode(Span(), U"Create")));
-        ExpressionStatementNode* registerStatement = new ExpressionStatementNode(Span(), invokeRegisterJsonClass);
+        InvokeNode* invokeRegisterJsonClass = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RegisterJsonClass"));
+        invokeRegisterJsonClass->AddArgument(new TypeNameNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), jsonClass)));
+        invokeRegisterJsonClass->AddArgument(new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), jsonClass), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Create")));
+        ExpressionStatementNode* registerStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeRegisterJsonClass);
         jsonRegistrationFunctionBody->AddStatement(registerStatement);
     }
     jsonRegistrationFunction->SetBody(jsonRegistrationFunctionBody);
@@ -1637,114 +1641,133 @@ void CreateJsonRegistrationUnit(std::vector<std::string>& objectFilePaths, Modul
 void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
     std::string& mainObjectFilePath)
 {
-    CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    CompileUnitNode mainCompileUnit(Span(), boost::uuids::nil_uuid(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.SetProgramMainUnit();
-    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"@polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"@staticClassArray"));
-    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
+    FunctionNode* mainFunction(new FunctionNode(Span(), boost::uuids::nil_uuid(), Specifiers::public_, new IntNode(Span(), boost::uuids::nil_uuid()), U"main", nullptr));
 #ifndef _WIN32
-    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), 
+        new CharNode(Span(), boost::uuids::nil_uuid()))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv")));
 #endif
     mainFunction->SetProgramMain();
-    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
-    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
+    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
     ExpressionStatementNode* rtInitCall = nullptr;
     if (GetGlobalFlag(GlobalFlags::profile))
     {
-        InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtStartProfiling"));
-        invokeRtInit->AddArgument(new DivNode(Span(),
-            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
-        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-        invokeRtInit->AddArgument(new DivNode(Span(),
-            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
-        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-        invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
-        rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
+        InvokeNode* invokeRtInit = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtStartProfiling"));
+        invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@polymorphicClassArray"), 
+                new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+            new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 4))); // 4 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@polymorphicClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+        invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@staticClassArray"), 
+                new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+            new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 2))); // 2 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@staticClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+        invokeRtInit->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"GlobalInitCompileUnits"));
+        rtInitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeRtInit);
     }
     else
     {
-        InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit"));
-        invokeRtInit->AddArgument(new DivNode(Span(), 
-            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
-        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-        invokeRtInit->AddArgument(new DivNode(Span(),
-            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
-        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-        invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
-        rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
+        InvokeNode* invokeRtInit = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtInit"));
+        invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@polymorphicClassArray"),
+                new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+            new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 4))); // 4 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@polymorphicClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+        invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@staticClassArray"), 
+                new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+            new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 2))); // 2 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@staticClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+        invokeRtInit->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"GlobalInitCompileUnits"));
+        rtInitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeRtInit);
     }
     mainFunctionBody->AddStatement(rtInitCall);
 #ifdef _WIN32
-    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
-    argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
+    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc"));
+    argc->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtArgc")));
     mainFunctionBody->AddStatement(argc);
-    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
-    argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
+    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new ConstNode(Span(), boost::uuids::nil_uuid(), 
+        new PointerNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new CharNode(Span(), boost::uuids::nil_uuid())))), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv"));
+    argv->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtArgv")));
     mainFunctionBody->AddStatement(argv);
 #endif
-    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
+    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
     if (!module.GetSymbolTable().JsonClasses().empty())
     {
-        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), 
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RegisterJsonClasses")));
         tryBlock->AddStatement(registerJsonClassesCall);
     }
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
-    InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
+    InvokeNode* invokeMain = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), userMain->GroupName()));
     if (!userMain->Parameters().empty())
     {
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argc"));
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argv"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv"));
     }
     StatementNode* callMainStatement = nullptr;
     if (!userMain->ReturnType() || userMain->ReturnType()->IsVoidType())
     {
-        callMainStatement = new ExpressionStatementNode(Span(), invokeMain);
+        callMainStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeMain);
     }
     else
     {
-        callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
+        callMainStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), invokeMain);
     }
-    InvokeNode* invokeInitialize = new InvokeNode(Span(), new IdentifierNode(Span(), U"Initialize"));
-    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), invokeInitialize);
+    InvokeNode* invokeInitialize = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Initialize"));
+    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeInitialize);
     tryBlock->AddStatement(callInitializeStatement);
     tryBlock->AddStatement(callMainStatement);
-    TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
-    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
-    InvokeNode* consoleError = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"System.Console"), new IdentifierNode(Span(), U"Error")));
-    DotNode* writeLine = new DotNode(Span(), consoleError, new IdentifierNode(Span(), U"WriteLine"));
-    InvokeNode* printEx = new InvokeNode(Span(), writeLine);
-    InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
+    TryStatementNode* tryStatement = new TryStatementNode(Span(), boost::uuids::nil_uuid(), tryBlock);
+    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    InvokeNode* consoleError = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Console"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Error")));
+    DotNode* writeLine = new DotNode(Span(), boost::uuids::nil_uuid(), consoleError, new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WriteLine"));
+    InvokeNode* printEx = new InvokeNode(Span(), boost::uuids::nil_uuid(), writeLine);
+    InvokeNode* exToString = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ToString")));
     printEx->AddArgument(exToString);
-    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), printEx);
+    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), printEx);
     catchBlock->AddStatement(printExStatement);
-    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
+    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), 
+        new IntLiteralNode(Span(), boost::uuids::nil_uuid(), 1));
     catchBlock->AddStatement(assignExitCodeStatement);
-    CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
+    CatchNode* catchAll = new CatchNode(Span(), boost::uuids::nil_uuid(), new ConstNode(Span(), boost::uuids::nil_uuid(), new LValueRefNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Exception"))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), catchBlock);
     tryStatement->AddCatch(catchAll);
     mainFunctionBody->AddStatement(tryStatement);
     ExpressionStatementNode* rtDoneCall = nullptr;
     if (GetGlobalFlag(GlobalFlags::profile))
     {
-        rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtEndProfiling")));
+        rtDoneCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtEndProfiling")));
     }
     else
     {
-        rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
+        rtDoneCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtDone")));
     }
     mainFunctionBody->AddStatement(rtDoneCall);
-    InvokeNode* exitCall = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtExit"));
-    exitCall->AddArgument(new IdentifierNode(Span(), U"exitCode"));
-    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), exitCall);
+    InvokeNode* exitCall = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtExit"));
+    exitCall->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
+    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), exitCall);
     mainFunctionBody->AddStatement(rtExitCall);
-    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
+    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(returnStatement);
     mainFunction->SetBody(mainFunctionBody);
     mainCompileUnit.GlobalNs()->AddMember(mainFunction);
@@ -1769,26 +1792,28 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
     std::string& mainObjectFilePath, std::string& mainSourceFilePath)
 {
     bool vsToolChain = GetToolChain() == "vs";
-    CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    CompileUnitNode mainCompileUnit(Span(), boost::uuids::nil_uuid(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.SetProgramMainUnit();
-    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"__polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"__staticClassArray"));
     std::string platform = GetPlatform();
     FunctionNode* mainFunction = nullptr;
     if (platform == "windows")
     {
-        mainFunction = new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"wmain", nullptr);
+        mainFunction = new FunctionNode(Span(), boost::uuids::nil_uuid(), Specifiers::public_, new IntNode(Span(), boost::uuids::nil_uuid()), U"wmain", nullptr);
     }
     else
     {
-        mainFunction = new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr);
+        mainFunction = new FunctionNode(Span(), boost::uuids::nil_uuid(), Specifiers::public_, new IntNode(Span(), boost::uuids::nil_uuid()), U"main", nullptr);
     }
     if (platform != "windows")
     {
-        mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
-        mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
+        mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc")));
+        mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), 
+            new PointerNode(Span(), boost::uuids::nil_uuid(), new CharNode(Span(), boost::uuids::nil_uuid()))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv")));
     }
 /*
     if (!vsToolChain)
@@ -1798,47 +1823,59 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
     }
 */
     mainFunction->SetProgramMain();
-    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
-    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
+    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
     ExpressionStatementNode* rtInitCall = nullptr;
     if (GetGlobalFlag(GlobalFlags::profile))
     {
-        InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtStartProfiling"));
-        invokeRtInit->AddArgument(new DivNode(Span(),
-            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
-        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-        invokeRtInit->AddArgument(new DivNode(Span(),
-            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
-        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-        invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
-        rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
+        InvokeNode* invokeRtInit = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtStartProfiling"));
+        invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__polymorphicClassArray"), 
+                new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+            new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 4))); // 4 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__polymorphicClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+        invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__staticClassArray"), 
+                new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+            new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 2))); // 2 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__staticClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+        invokeRtInit->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"GlobalInitCompileUnits"));
+        rtInitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeRtInit);
     }
     else
     {
-        InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit"));
-        invokeRtInit->AddArgument(new DivNode(Span(),
-            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
-        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-        invokeRtInit->AddArgument(new DivNode(Span(),
-            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
-        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-        invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
-        rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
+        InvokeNode* invokeRtInit = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtInit"));
+        invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+                new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__polymorphicClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+            new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 4))); // 4 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__polymorphicClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+        invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__staticClassArray"), 
+                new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+            new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 2))); // 2 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__staticClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+        invokeRtInit->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"GlobalInitCompileUnits"));
+        rtInitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeRtInit);
     }
     mainFunctionBody->AddStatement(rtInitCall);
 
     if (platform == "windows")
     {
-        ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
-        argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
+        ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc"));
+        argc->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtArgc")));
         mainFunctionBody->AddStatement(argc);
-        ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
-        argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
+        ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new ConstNode(Span(), boost::uuids::nil_uuid(), 
+            new PointerNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new CharNode(Span(), boost::uuids::nil_uuid())))), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv"));
+        argv->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtArgv")));
         mainFunctionBody->AddStatement(argv);
     }
 
@@ -1853,61 +1890,67 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
         mainFunctionBody->AddStatement(argv);
     }
 */
-    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
+    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
     if (!module.GetSymbolTable().JsonClasses().empty())
     {
-        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), 
+            new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RegisterJsonClasses")));
         tryBlock->AddStatement(registerJsonClassesCall);
     }
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
-    InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
+    InvokeNode* invokeMain = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), userMain->GroupName()));
     if (!userMain->Parameters().empty())
     {
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argc"));
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argv"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv"));
     }
     StatementNode* callMainStatement = nullptr;
     if (!userMain->ReturnType() || userMain->ReturnType()->IsVoidType())
     {
-        callMainStatement = new ExpressionStatementNode(Span(), invokeMain);
+        callMainStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeMain);
     }
     else
     {
-        callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
+        callMainStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), invokeMain);
     }
-    InvokeNode* invokeInitialize = new InvokeNode(Span(), new IdentifierNode(Span(), U"Initialize"));
-    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), invokeInitialize);
+    InvokeNode* invokeInitialize = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Initialize"));
+    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeInitialize);
     tryBlock->AddStatement(callInitializeStatement);
     tryBlock->AddStatement(callMainStatement);
-    TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
-    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
-    InvokeNode* consoleError = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"System.Console"), new IdentifierNode(Span(), U"Error")));
-    DotNode* writeLine = new DotNode(Span(), consoleError, new IdentifierNode(Span(), U"WriteLine"));
-    InvokeNode* printEx = new InvokeNode(Span(), writeLine);
-    InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
+    TryStatementNode* tryStatement = new TryStatementNode(Span(), boost::uuids::nil_uuid(), tryBlock);
+    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    InvokeNode* consoleError = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Console"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Error")));
+    DotNode* writeLine = new DotNode(Span(), boost::uuids::nil_uuid(), consoleError, new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WriteLine"));
+    InvokeNode* printEx = new InvokeNode(Span(), boost::uuids::nil_uuid(), writeLine);
+    InvokeNode* exToString = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ToString")));
     printEx->AddArgument(exToString);
-    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), printEx);
+    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), printEx);
     catchBlock->AddStatement(printExStatement);
-    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
+    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), 
+        new IntLiteralNode(Span(), boost::uuids::nil_uuid(), 1));
     catchBlock->AddStatement(assignExitCodeStatement);
-    CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
+    CatchNode* catchAll = new CatchNode(Span(), boost::uuids::nil_uuid(), new ConstNode(Span(), boost::uuids::nil_uuid(), new LValueRefNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Exception"))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), catchBlock);
     tryStatement->AddCatch(catchAll);
     mainFunctionBody->AddStatement(tryStatement);
     ExpressionStatementNode* rtDoneCall = nullptr;
     if (GetGlobalFlag(GlobalFlags::profile))
     {
-        rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtEndProfiling")));
+        rtDoneCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtEndProfiling")));
     }
     else
     {
-        rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
+        rtDoneCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtDone")));
     }
     mainFunctionBody->AddStatement(rtDoneCall);
-    InvokeNode* exitCall = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtExit"));
-    exitCall->AddArgument(new IdentifierNode(Span(), U"exitCode"));
-    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), exitCall);
+    InvokeNode* exitCall = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtExit"));
+    exitCall->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
+    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), exitCall);
     mainFunctionBody->AddStatement(rtExitCall);
-    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
+    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(returnStatement);
     mainFunction->SetBody(mainFunctionBody);
     mainCompileUnit.GlobalNs()->AddMember(mainFunction);
@@ -1932,55 +1975,62 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
 void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
     std::string& mainObjectFilePath)
 {
-    CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    CompileUnitNode mainCompileUnit(Span(), boost::uuids::nil_uuid(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.SetProgramMainUnit();
-    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
-    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
-    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"envp")));
+    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System")));
+    FunctionNode* mainFunction(new FunctionNode(Span(), boost::uuids::nil_uuid(), Specifiers::public_, new IntNode(Span(), boost::uuids::nil_uuid()), U"main", nullptr));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), 
+        new CharNode(Span(), boost::uuids::nil_uuid()))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), 
+        new CharNode(Span(), boost::uuids::nil_uuid()))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"envp")));
     mainFunction->SetProgramMain();
-    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
-    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
+    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
-    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
-    InvokeNode* invokeSetupEnvironment = new InvokeNode(Span(), new IdentifierNode(Span(), U"StartupSetupEnvironment"));
-    invokeSetupEnvironment->AddArgument(new IdentifierNode(Span(), U"envp"));
-    StatementNode* callSetEnvironmentStatement = new ExpressionStatementNode(Span(), invokeSetupEnvironment);
+    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    InvokeNode* invokeSetupEnvironment = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"StartupSetupEnvironment"));
+    invokeSetupEnvironment->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"envp"));
+    StatementNode* callSetEnvironmentStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeSetupEnvironment);
     tryBlock->AddStatement(callSetEnvironmentStatement);
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
-    InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
+    InvokeNode* invokeMain = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), userMain->GroupName()));
     if (!userMain->Parameters().empty())
     {
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argc"));
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argv"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv"));
     }
     StatementNode* callMainStatement = nullptr;
     if (!userMain->ReturnType() || userMain->ReturnType()->IsVoidType())
     {
-        callMainStatement = new ExpressionStatementNode(Span(), invokeMain);
+        callMainStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeMain);
     }
     else
     {
-        callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
+        callMainStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), invokeMain);
     }
     tryBlock->AddStatement(callMainStatement);
-    TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
-    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
-    InvokeNode* consoleError = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"System.Console"), new IdentifierNode(Span(), U"Error")));
-    DotNode* writeLine = new DotNode(Span(), consoleError, new IdentifierNode(Span(), U"WriteLine"));
-    InvokeNode* printEx = new InvokeNode(Span(), writeLine);
-    InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
+    TryStatementNode* tryStatement = new TryStatementNode(Span(), boost::uuids::nil_uuid(), tryBlock);
+    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    InvokeNode* consoleError = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Console"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Error")));
+    DotNode* writeLine = new DotNode(Span(), boost::uuids::nil_uuid(), consoleError, new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WriteLine"));
+    InvokeNode* printEx = new InvokeNode(Span(), boost::uuids::nil_uuid(), writeLine);
+    InvokeNode* exToString = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ToString")));
     printEx->AddArgument(exToString);
-    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), printEx);
+    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), printEx);
     catchBlock->AddStatement(printExStatement);
-    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
+    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), 
+        new IntLiteralNode(Span(), boost::uuids::nil_uuid(), 1));
     catchBlock->AddStatement(assignExitCodeStatement);
-    CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
+    CatchNode* catchAll = new CatchNode(Span(), boost::uuids::nil_uuid(), new ConstNode(Span(), boost::uuids::nil_uuid(), new LValueRefNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Exception"))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), catchBlock);
     tryStatement->AddCatch(catchAll);
     mainFunctionBody->AddStatement(tryStatement);
-    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
+    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(returnStatement);
     mainFunction->SetBody(mainFunctionBody);
     mainCompileUnit.GlobalNs()->AddMember(mainFunction);
@@ -2004,106 +2054,125 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
 void CreateMainUnitLlvmWindowsGUI(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
     std::string& mainObjectFilePath)
 {
-    CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    CompileUnitNode mainCompileUnit(Span(), boost::uuids::nil_uuid(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.SetProgramMainUnit();
-    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"@polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"@staticClassArray"));
-    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_ | Specifiers::winapi, new IntNode(Span()), U"WinMain", nullptr));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new VoidNode(Span())), new IdentifierNode(Span(), U"instance")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new VoidNode(Span())), new IdentifierNode(Span(), U"prevInstance")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new CharNode(Span())), new IdentifierNode(Span(), U"commandLine")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"cmdShow")));
+    FunctionNode* mainFunction(new FunctionNode(Span(), boost::uuids::nil_uuid(), Specifiers::public_ | Specifiers::winapi, new IntNode(Span(), boost::uuids::nil_uuid()), U"WinMain", nullptr));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new VoidNode(Span(), boost::uuids::nil_uuid())), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"instance")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new VoidNode(Span(), boost::uuids::nil_uuid())), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"prevInstance")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new CharNode(Span(), boost::uuids::nil_uuid())), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"commandLine")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"cmdShow")));
     mainFunction->SetProgramMain();
-    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
-    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
+    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
     ExpressionStatementNode* rtInitCall = nullptr;
-    InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit"));
-    invokeRtInit->AddArgument(new DivNode(Span(),
-        new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-        new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
-    invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-    invokeRtInit->AddArgument(new DivNode(Span(),
-        new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
-        new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
-    invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-    invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
-    rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
+    InvokeNode* invokeRtInit = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtInit"));
+    invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+        new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@polymorphicClassArray"), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+        new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 4))); // 4 64-bit integers per entry
+    invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@polymorphicClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+    invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+        new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@staticClassArray"), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+        new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 2))); // 2 64-bit integers per entry
+    invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"@staticClassArray"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+    invokeRtInit->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"GlobalInitCompileUnits"));
+    rtInitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeRtInit);
     mainFunctionBody->AddStatement(rtInitCall);
-    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
-    argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
+    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc"));
+    argc->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtArgc")));
     mainFunctionBody->AddStatement(argc);
-    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
-    argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
+    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new ConstNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), 
+        new PointerNode(Span(), boost::uuids::nil_uuid(), new CharNode(Span(), boost::uuids::nil_uuid())))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv"));
+    argv->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtArgv")));
     mainFunctionBody->AddStatement(argv);
     if (!module.GetSymbolTable().JsonClasses().empty())
     {
-        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RegisterJsonClasses")));
         mainFunctionBody->AddStatement(registerJsonClassesCall);
     }
-    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
+    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
     if (!module.GetSymbolTable().JsonClasses().empty())
     {
-        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RegisterJsonClasses")));
         tryBlock->AddStatement(registerJsonClassesCall);
     }
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
-    InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
+    InvokeNode* invokeMain = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), userMain->GroupName()));
     if (!userMain->Parameters().empty())
     {
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argc"));
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argv"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv"));
     }
     StatementNode* callMainStatement = nullptr;
     if (!userMain->ReturnType() || userMain->ReturnType()->IsVoidType())
     {
-        callMainStatement = new ExpressionStatementNode(Span(), invokeMain);
+        callMainStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeMain);
     }
     else
     {
-        callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
+        callMainStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), invokeMain);
     }
-    InvokeNode* invokeInitialize = new InvokeNode(Span(), new IdentifierNode(Span(), U"Initialize"));
-    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), invokeInitialize);
+    InvokeNode* invokeInitialize = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Initialize"));
+    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeInitialize);
     tryBlock->AddStatement(callInitializeStatement);
-    InvokeNode* invokeSetInstance = new InvokeNode(Span(), new IdentifierNode(Span(), U"WinSetInstance"));
-    ExpressionStatementNode* setInstanceStatement = new ExpressionStatementNode(Span(), invokeSetInstance);
+    InvokeNode* invokeSetInstance = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WinSetInstance"));
+    ExpressionStatementNode* setInstanceStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeSetInstance);
     tryBlock->AddStatement(setInstanceStatement);
     tryBlock->AddStatement(callMainStatement);
-    TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
-    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
-    CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
+    TryStatementNode* tryStatement = new TryStatementNode(Span(), boost::uuids::nil_uuid(), tryBlock);
+    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    CatchNode* catchAll = new CatchNode(Span(), boost::uuids::nil_uuid(), new ConstNode(Span(), boost::uuids::nil_uuid(), new LValueRefNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Exception"))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), catchBlock);
     tryStatement->AddCatch(catchAll);
-    InvokeNode* invokeWinShowMessageBox = new InvokeNode(Span(), new IdentifierNode(Span(), U"WinShowMessageBoxWithType"));
-    InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
-    ConstructionStatementNode* constructExStr = new ConstructionStatementNode(Span(), new IdentifierNode(Span(), U"string"), new IdentifierNode(Span(), U"exStr"));
+    InvokeNode* invokeWinShowMessageBox = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WinShowMessageBoxWithType"));
+    InvokeNode* exToString = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ToString")));
+    ConstructionStatementNode* constructExStr = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"string"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exStr"));
     constructExStr->AddArgument(exToString);
     catchBlock->AddStatement(constructExStr);
-    ConstructionStatementNode* constructExCharPtr = new ConstructionStatementNode(Span(), new PointerNode(Span(), new CharNode(Span())), new IdentifierNode(Span(), U"exCharPtr"));
+    ConstructionStatementNode* constructExCharPtr = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), 
+        new CharNode(Span(), boost::uuids::nil_uuid())), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exCharPtr"));
     catchBlock->AddStatement(constructExCharPtr);
-    InvokeNode* invokeExChars = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"exStr"),  new IdentifierNode(Span(), U"Chars")));
+    InvokeNode* invokeExChars = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exStr"),  
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Chars")));
     constructExCharPtr->AddArgument(invokeExChars);
-    invokeWinShowMessageBox->AddArgument(new IdentifierNode(Span(), U"exCharPtr"));
-    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span()));
-    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span()));
-    invokeWinShowMessageBox->AddArgument(new UIntLiteralNode(Span(), 0x00000010 | 0x00000000)); // MB_ICONSTOP | MB_OK
-    ExpressionStatementNode* showMessageBoxStatement = new ExpressionStatementNode(Span(), invokeWinShowMessageBox);
+    invokeWinShowMessageBox->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exCharPtr"));
+    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span(), boost::uuids::nil_uuid()));
+    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span(), boost::uuids::nil_uuid()));
+    invokeWinShowMessageBox->AddArgument(new UIntLiteralNode(Span(), boost::uuids::nil_uuid(), 0x00000010 | 0x00000000)); // MB_ICONSTOP | MB_OK
+    ExpressionStatementNode* showMessageBoxStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeWinShowMessageBox);
     catchBlock->AddStatement(showMessageBoxStatement);
-    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
+    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), 
+        new IntLiteralNode(Span(), boost::uuids::nil_uuid(), 1));
     catchBlock->AddStatement(assignExitCodeStatement);
     mainFunctionBody->AddStatement(tryStatement);
-    ExpressionStatementNode* winDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"WinDone")));
+    ExpressionStatementNode* winDoneCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WinDone")));
     mainFunctionBody->AddStatement(winDoneCall);
     ExpressionStatementNode* rtDoneCall = nullptr;
-    rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
+    rtDoneCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtDone")));
     mainFunctionBody->AddStatement(rtDoneCall);
-    InvokeNode* exitCall = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtExit"));
-    exitCall->AddArgument(new IdentifierNode(Span(), U"exitCode"));
-    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), exitCall);
+    InvokeNode* exitCall = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtExit"));
+    exitCall->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
+    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), exitCall);
     mainFunctionBody->AddStatement(rtExitCall);
-    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
+    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(returnStatement);
     mainFunction->SetBody(mainFunctionBody);
     mainCompileUnit.GlobalNs()->AddMember(mainFunction);
@@ -2127,106 +2196,125 @@ void CreateMainUnitLlvmWindowsGUI(std::vector<std::string>& objectFilePaths, Mod
 void CreateMainUnitCppWindowsGUI(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
     std::string& mainObjectFilePath, std::string& mainSourceFilePath)
 {
-    CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    CompileUnitNode mainCompileUnit(Span(), boost::uuids::nil_uuid(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.SetProgramMainUnit();
-    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"__polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"__staticClassArray"));
-    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_ | Specifiers::winapi, new IntNode(Span()), U"wWinMain", nullptr));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new VoidNode(Span())), new IdentifierNode(Span(), U"instance")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new VoidNode(Span())), new IdentifierNode(Span(), U"prevInstance")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new CharNode(Span())), new IdentifierNode(Span(), U"commandLine")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"cmdShow")));
+    FunctionNode* mainFunction(new FunctionNode(Span(), boost::uuids::nil_uuid(), Specifiers::public_ | Specifiers::winapi, new IntNode(Span(), boost::uuids::nil_uuid()), U"wWinMain", nullptr));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new VoidNode(Span(), boost::uuids::nil_uuid())), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"instance")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new VoidNode(Span(), boost::uuids::nil_uuid())), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"prevInstance")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), new CharNode(Span(), boost::uuids::nil_uuid())), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"commandLine")));
+    mainFunction->AddParameter(new ParameterNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"cmdShow")));
     mainFunction->SetProgramMain();
-    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
-    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
+    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
     ExpressionStatementNode* rtInitCall = nullptr;
-    InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit"));
-    invokeRtInit->AddArgument(new DivNode(Span(),
-        new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-        new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
-    invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-    invokeRtInit->AddArgument(new DivNode(Span(),
-        new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"Length"))),
-        new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
-    invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
-    invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
-    rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
+    InvokeNode* invokeRtInit = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtInit"));
+    invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+        new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__polymorphicClassArray"), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+        new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 4))); // 4 64-bit integers per entry
+    invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), 
+        U"__polymorphicClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+    invokeRtInit->AddArgument(new DivNode(Span(), boost::uuids::nil_uuid(),
+        new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__staticClassArray"), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Length"))),
+        new LongLiteralNode(Span(), boost::uuids::nil_uuid(), 2))); // 2 64-bit integers per entry
+    invokeRtInit->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"__staticClassArray"), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"CBegin"))));
+    invokeRtInit->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"GlobalInitCompileUnits"));
+    rtInitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeRtInit);
     mainFunctionBody->AddStatement(rtInitCall);
-    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
-    argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
+    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IntNode(Span(), boost::uuids::nil_uuid()), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc"));
+    argc->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtArgc")));
     mainFunctionBody->AddStatement(argc);
-    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
-    argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
+    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new ConstNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), 
+        new PointerNode(Span(), boost::uuids::nil_uuid(), new CharNode(Span(), boost::uuids::nil_uuid())))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv"));
+    argv->AddArgument(new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtArgv")));
     mainFunctionBody->AddStatement(argv);
     if (!module.GetSymbolTable().JsonClasses().empty())
     {
-        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RegisterJsonClasses")));
         mainFunctionBody->AddStatement(registerJsonClassesCall);
     }
-    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
+    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
     if (!module.GetSymbolTable().JsonClasses().empty())
     {
-        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), 
+            new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RegisterJsonClasses")));
         tryBlock->AddStatement(registerJsonClassesCall);
     }
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
-    InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
+    InvokeNode* invokeMain = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), userMain->GroupName()));
     if (!userMain->Parameters().empty())
     {
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argc"));
-        invokeMain->AddArgument(new IdentifierNode(Span(), U"argv"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argc"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"argv"));
     }
     StatementNode* callMainStatement = nullptr;
     if (!userMain->ReturnType() || userMain->ReturnType()->IsVoidType())
     {
-        callMainStatement = new ExpressionStatementNode(Span(), invokeMain);
+        callMainStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeMain);
     }
     else
     {
-        callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
+        callMainStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), invokeMain);
     }
-    InvokeNode* invokeInitialize = new InvokeNode(Span(), new IdentifierNode(Span(), U"Initialize"));
-    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), invokeInitialize);
+    InvokeNode* invokeInitialize = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Initialize"));
+    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeInitialize);
     tryBlock->AddStatement(callInitializeStatement);
-    InvokeNode* invokeSetInstance = new InvokeNode(Span(), new IdentifierNode(Span(), U"WinSetInstance"));
-    ExpressionStatementNode* setInstanceStatement = new ExpressionStatementNode(Span(), invokeSetInstance);
+    InvokeNode* invokeSetInstance = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WinSetInstance"));
+    ExpressionStatementNode* setInstanceStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeSetInstance);
     tryBlock->AddStatement(setInstanceStatement);
     tryBlock->AddStatement(callMainStatement);
-    TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
-    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
-    CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
+    TryStatementNode* tryStatement = new TryStatementNode(Span(), boost::uuids::nil_uuid(), tryBlock);
+    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span(), boost::uuids::nil_uuid());
+    CatchNode* catchAll = new CatchNode(Span(), boost::uuids::nil_uuid(), new ConstNode(Span(), boost::uuids::nil_uuid(), new LValueRefNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"System.Exception"))), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), catchBlock);
     tryStatement->AddCatch(catchAll);
-    InvokeNode* invokeWinShowMessageBox = new InvokeNode(Span(), new IdentifierNode(Span(), U"WinShowMessageBoxWithType"));
-    InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
-    ConstructionStatementNode* constructExStr = new ConstructionStatementNode(Span(), new IdentifierNode(Span(), U"string"), new IdentifierNode(Span(), U"exStr"));
+    InvokeNode* invokeWinShowMessageBox = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WinShowMessageBoxWithType"));
+    InvokeNode* exToString = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ex"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"ToString")));
+    ConstructionStatementNode* constructExStr = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"string"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exStr"));
     constructExStr->AddArgument(exToString);
     catchBlock->AddStatement(constructExStr);
-    ConstructionStatementNode* constructExCharPtr = new ConstructionStatementNode(Span(), new PointerNode(Span(), new CharNode(Span())), new IdentifierNode(Span(), U"exCharPtr"));
+    ConstructionStatementNode* constructExCharPtr = new ConstructionStatementNode(Span(), boost::uuids::nil_uuid(), new PointerNode(Span(), boost::uuids::nil_uuid(), 
+        new CharNode(Span(), boost::uuids::nil_uuid())), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exCharPtr"));
     catchBlock->AddStatement(constructExCharPtr);
-    InvokeNode* invokeExChars = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"exStr"), new IdentifierNode(Span(), U"Chars")));
+    InvokeNode* invokeExChars = new InvokeNode(Span(), boost::uuids::nil_uuid(), new DotNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exStr"), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"Chars")));
     constructExCharPtr->AddArgument(invokeExChars);
-    invokeWinShowMessageBox->AddArgument(new IdentifierNode(Span(), U"exCharPtr"));
-    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span()));
-    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span()));
-    invokeWinShowMessageBox->AddArgument(new UIntLiteralNode(Span(), 0x00000010 | 0x00000000)); // MB_ICONSTOP | MB_OK
-    ExpressionStatementNode* showMessageBoxStatement = new ExpressionStatementNode(Span(), invokeWinShowMessageBox);
+    invokeWinShowMessageBox->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exCharPtr"));
+    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span(), boost::uuids::nil_uuid()));
+    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span(), boost::uuids::nil_uuid()));
+    invokeWinShowMessageBox->AddArgument(new UIntLiteralNode(Span(), boost::uuids::nil_uuid(), 0x00000010 | 0x00000000)); // MB_ICONSTOP | MB_OK
+    ExpressionStatementNode* showMessageBoxStatement = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), invokeWinShowMessageBox);
     catchBlock->AddStatement(showMessageBoxStatement);
-    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
+    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"), 
+        new IntLiteralNode(Span(), boost::uuids::nil_uuid(), 1));
     catchBlock->AddStatement(assignExitCodeStatement);
     mainFunctionBody->AddStatement(tryStatement);
-    ExpressionStatementNode* winDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"WinDone")));
+    ExpressionStatementNode* winDoneCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), 
+        new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"WinDone")));
     mainFunctionBody->AddStatement(winDoneCall);
     ExpressionStatementNode* rtDoneCall = nullptr;
-    rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
+    rtDoneCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtDone")));
     mainFunctionBody->AddStatement(rtDoneCall);
-    InvokeNode* exitCall = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtExit"));
-    exitCall->AddArgument(new IdentifierNode(Span(), U"exitCode"));
-    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), exitCall);
+    InvokeNode* exitCall = new InvokeNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"RtExit"));
+    exitCall->AddArgument(new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
+    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), boost::uuids::nil_uuid(), exitCall);
     mainFunctionBody->AddStatement(rtExitCall);
-    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
+    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), boost::uuids::nil_uuid(), new IdentifierNode(Span(), boost::uuids::nil_uuid(), U"exitCode"));
     mainFunctionBody->AddStatement(returnStatement);
     mainFunction->SetBody(mainFunctionBody);
     mainCompileUnit.GlobalNs()->AddMember(mainFunction);
@@ -2814,6 +2902,8 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
     {
         if (!GetGlobalFlag(GlobalFlags::msbuild))
         {
+            if (builtProjects.find(project->FilePath()) != builtProjects.cend()) return;
+            builtProjects.insert(project->FilePath());
             for (const std::string& referencedProjectFilePath : project->ReferencedProjectFilePaths())
             {
                 SystemDirKind systemDirKind = SystemDirKind::regular;
@@ -2827,7 +2917,6 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 {
                     if (builtProjects.find(referencedProjectFilePath) == builtProjects.cend())
                     {
-                        builtProjects.insert(referencedProjectFilePath);
                         std::unique_ptr<Module> module;
                         try
                         {
@@ -3037,8 +3126,13 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 }
                 SymbolWriter writer(project->ModuleFilePath());
                 writer.SetLexers(rootModule->GetLexers());
-                rootModule->ResetFlag(cmajor::symbols::ModuleFlags::compiling);
+                writer.SetSpanConversionModuleId(rootModule->Id());
                 rootModule->Write(writer);
+                rootModule->ResetFlag(cmajor::symbols::ModuleFlags::compiling);
+                if (cmajor::symbols::GetGlobalFlag(cmajor::symbols::GlobalFlags::updateSourceFileModuleMap))
+                {
+                    rootModule->UpdateSourceFileModuleMap();
+                }
                 if (GetGlobalFlag(GlobalFlags::verbose))
                 {
                     LogMessage(project->LogStreamId(), "==> " + project->ModuleFilePath());
@@ -3117,7 +3211,6 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
     }
     catch (const std::exception& ex)
     {
-        rootModule->SetFlag(ModuleFlags::dontRemoveFromModuleMap);
         LogMessage(-1, "project: " + ToUtf8(project->Name()) + ": " + ex.what());
         throw;
     }

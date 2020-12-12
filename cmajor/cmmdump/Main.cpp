@@ -101,7 +101,7 @@ int main(int argc, const char** argv)
             {
                 cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
             }
-            CompileUnitNode compileUnit(Span(), "foo");
+            CompileUnitNode compileUnit(Span(), boost::uuids::nil_uuid(), "foo");
             AttributeBinder attributeBinder(rootModule.get());
             rootModule->Dump();
         }

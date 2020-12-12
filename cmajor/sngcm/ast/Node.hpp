@@ -58,7 +58,7 @@ std::string NodeTypeStr(NodeType nodeType);
 class SNGCM_AST_API Node
 {
 public:
-    Node(NodeType nodeType_, const Span& span_);
+    Node(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
     virtual ~Node();
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
@@ -87,20 +87,19 @@ public:
     const Node* Parent() const { return parent; }
     Node* Parent() { return parent; }
     void SetParent(Node* parent_);
-    const boost::uuids::uuid& RootModuleId() const { return rootModuleId; }
-    void SetRootModuleId(const boost::uuids::uuid& rootModuleId_) { rootModuleId = rootModuleId_; }
+    const boost::uuids::uuid& ModuleId() const { return moduleId; }
 private:
     NodeType nodeType;
     Span span;
+    boost::uuids::uuid moduleId;
     Node* parent;
-    boost::uuids::uuid rootModuleId;
 };
 
 class SNGCM_AST_API UnaryNode : public Node
 {
 public:
-    UnaryNode(NodeType nodeType, const Span& span_);
-    UnaryNode(NodeType nodeType, const Span& span_, Node* subject_);
+    UnaryNode(NodeType nodeType, const Span& span_, const boost::uuids::uuid& moduleId_);
+    UnaryNode(NodeType nodeType, const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_);
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     void SetFullSpan() override;
@@ -113,8 +112,8 @@ private:
 class SNGCM_AST_API BinaryNode : public Node
 {
 public:
-    BinaryNode(NodeType nodeType, const Span& span_);
-    BinaryNode(NodeType nodeType, const Span& span_, Node* left_, Node* right_);
+    BinaryNode(NodeType nodeType, const Span& span_, const boost::uuids::uuid& moduleId_);
+    BinaryNode(NodeType nodeType, const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_);
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     void SetFullSpan() override;
@@ -134,7 +133,7 @@ public:
     NodeCreator(const NodeCreator&) = delete;
     NodeCreator& operator=(const NodeCreator&) = delete;
     virtual ~NodeCreator();
-    virtual Node* CreateNode(const Span& span) = 0;
+    virtual Node* CreateNode(const Span& span, const boost::uuids::uuid& moduleId) = 0;
 };
 
 class SNGCM_AST_API NodeFactory
@@ -146,7 +145,7 @@ public:
     static void Init();
     static void Done();
     void Register(NodeType nodeType, NodeCreator* creator);
-    Node* CreateNode(NodeType nodeType, const Span& span);
+    Node* CreateNode(NodeType nodeType, const Span& span, const boost::uuids::uuid& moduleId);
 private:
     static std::unique_ptr<NodeFactory> instance;
     std::vector<std::unique_ptr<NodeCreator>> creators;

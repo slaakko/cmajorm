@@ -13,13 +13,13 @@ namespace cmajor { namespace symbols {
 
 using namespace soulng::unicode;
 
-FunctionIndex::FunctionIndex() : mainFunctionId(boost::uuids::nil_uuid())
+FunctionIndex::FunctionIndex(Module* module_) : module(module_), mainFunctionId(boost::uuids::nil_uuid())
 {
 }
 
 void FunctionIndex::AddFunction(const boost::uuids::uuid& functionId, FunctionSymbol* functionSymbol)
 {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard<std::recursive_mutex> lock(module->GetLock());
     if (functionMap.find(functionId) == functionMap.cend())
     {
         functionMap[functionId] = functionSymbol;

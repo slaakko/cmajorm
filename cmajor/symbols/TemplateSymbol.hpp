@@ -12,20 +12,20 @@ namespace cmajor { namespace symbols {
 class SYMBOLS_API TemplateParameterSymbol : public TypeSymbol
 {
 public:
-    TemplateParameterSymbol(const Span& span_, const std::u32string& name_);
+    TemplateParameterSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::u32string FullName() const override { return Name(); }
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of template parameter"); return nullptr; }
     void* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create defualt ir value of template parameter"); return nullptr; }
-    TypeSymbol* Unify(TypeSymbol* type, const Span& span) override;
+    TypeSymbol* Unify(TypeSymbol* type, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool ContainsTemplateParameter() const override { return true; }
     bool HasDefault() const { return hasDefault; }
     void SetHasDefault() { hasDefault = true; }
     void SetDefaultType(TypeSymbol* defaultType_) { defaultType = defaultType_; }
     TypeSymbol* DefaultType() { return defaultType; }
-    TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) override;
+    TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span, const boost::uuids::uuid& moduleId) override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "TemplateParameterSymbol"; }
 private:
@@ -36,7 +36,7 @@ private:
 class SYMBOLS_API BoundTemplateParameterSymbol : public Symbol
 {
 public:
-    BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_);
+    BoundTemplateParameterSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::u32string FullName() const override { return Name(); }
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;

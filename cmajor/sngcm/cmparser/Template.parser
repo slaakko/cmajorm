@@ -22,11 +22,11 @@ parser api(SNGCM_PARSER_API) TemplateParser
     using IdentifierParser.QualifiedId;
     using TypeExprParser.TypeExpr;
 
-    TemplateId(ParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId, var Span e) : Node*
+    TemplateId(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId, var Span e) : Node*
         ::= empty{ ctx->BeginParsingTemplateId(); }
-            (QualifiedId:primary{ templateId.reset(new TemplateIdNode(span, primary)); }
+            (QualifiedId(moduleId):primary{ templateId.reset(new TemplateIdNode(span, *moduleId, primary)); }
             LANGLE{ ++lexer.leftAngleCount; }
-            ((TypeExpr(ctx):templateArg{ templateId->AddTemplateArgument(templateArg); } % COMMA) RANGLE{ e = span; }){ --lexer.leftAngleCount; } / { --lexer.leftAngleCount; })
+            ((TypeExpr(moduleId, ctx):templateArg{ templateId->AddTemplateArgument(templateArg); } % COMMA) RANGLE{ e = span; }){ --lexer.leftAngleCount; } / { --lexer.leftAngleCount; })
         {
             templateId->SetSpanEnd(e.end);
             ctx->EndParsingTemplateId();
@@ -38,12 +38,12 @@ parser api(SNGCM_PARSER_API) TemplateParser
         }
         ;
 
-    TemplateParameter(ParsingContext* ctx) : TemplateParameterNode*
-        ::= (Identifier:id (ASSIGN TypeExpr(ctx):type)?){ return new TemplateParameterNode(span, id, type); }
+    TemplateParameter(boost::uuids::uuid* moduleId, ParsingContext* ctx) : TemplateParameterNode*
+        ::= (Identifier(moduleId):id (ASSIGN TypeExpr(moduleId, ctx):type)?){ return new TemplateParameterNode(span, *moduleId, id, type); }
         ;
 
-    TemplateParameterList(ParsingContext* ctx, sngcm::ast::Node* owner)
-        ::= LANGLE (TemplateParameter(ctx):tp{ owner->AddTemplateParameter(tp); } % COMMA) RANGLE!
+    TemplateParameterList(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::Node* owner)
+        ::= LANGLE (TemplateParameter(moduleId, ctx):tp{ owner->AddTemplateParameter(tp); } % COMMA) RANGLE!
         ;
 
     ruleinfo

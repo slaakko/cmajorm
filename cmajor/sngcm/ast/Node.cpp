@@ -66,7 +66,7 @@ std::string NodeTypeStr(NodeType nodeType)
     return nodeTypeStr[static_cast<size_t>(nodeType)];
 }
 
-Node::Node(NodeType nodeType_, const Span& span_) : nodeType(nodeType_), span(span_), parent(nullptr), rootModuleId(boost::uuids::nil_uuid())
+Node::Node(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : nodeType(nodeType_), span(span_), moduleId(moduleId_), parent(nullptr)
 {
 }
 
@@ -91,11 +91,11 @@ void Node::SetFullSpan()
 {
 }
 
-UnaryNode::UnaryNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_), subject()
+UnaryNode::UnaryNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : Node(nodeType_, span_, moduleId_), subject()
 {
 }
 
-UnaryNode::UnaryNode(NodeType nodeType_, const Span& span_, Node* subject_) : Node(nodeType_, span_), subject(subject_)
+UnaryNode::UnaryNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : Node(nodeType_, span_, moduleId_), subject(subject_)
 {
 }
 
@@ -124,11 +124,11 @@ void UnaryNode::SetFullSpan()
     }
 }
 
-BinaryNode::BinaryNode(NodeType nodeType, const Span& span_) : Node(nodeType, span_), left(), right()
+BinaryNode::BinaryNode(NodeType nodeType, const Span& span_, const boost::uuids::uuid& moduleId_) : Node(nodeType, span_, moduleId_), left(), right()
 {
 }
 
-BinaryNode::BinaryNode(NodeType nodeType, const Span& span_, Node* left_, Node* right_) : Node(nodeType, span_), left(left_), right(right_)
+BinaryNode::BinaryNode(NodeType nodeType, const Span& span_, const boost::uuids::uuid& moduleId_, Node* left_, Node* right_) : Node(nodeType, span_, moduleId_), left(left_), right(right_)
 {
     left->SetParent(this);
     right->SetParent(this);
@@ -176,9 +176,9 @@ public:
     ConcreteNodeCreator() : NodeCreator() {}
     ConcreteNodeCreator(const ConcreteNodeCreator&) = delete;
     ConcreteNodeCreator& operator=(const ConcreteNodeCreator&) = delete;
-    Node* CreateNode(const Span& span) override
+    Node* CreateNode(const Span& span, const boost::uuids::uuid& moduleId) override
     {
-        return new T(span);
+        return new T(span, moduleId);
     }
 };
 
@@ -390,12 +390,12 @@ void NodeFactory::Register(NodeType nodeType, NodeCreator* creator)
     creators[static_cast<size_t>(nodeType)] = std::unique_ptr<NodeCreator>(creator);
 }
 
-Node* NodeFactory::CreateNode(NodeType nodeType, const Span& span)
+Node* NodeFactory::CreateNode(NodeType nodeType, const Span& span, const boost::uuids::uuid& moduleId)
 {
     const std::unique_ptr<NodeCreator>& creator = creators[static_cast<size_t>(nodeType)];
     if (creator)
     {
-        Node* value = creator->CreateNode(span);
+        Node* value = creator->CreateNode(span, moduleId);
         if (value)
         {
             return value;

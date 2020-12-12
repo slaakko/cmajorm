@@ -11,13 +11,13 @@
 #include <sngcm/cmparser/Parameter.hpp>
 #include <sngcm/cmparser/Statement.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Function.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Function.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -84,7 +84,7 @@ soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, ParsingContex
                                         int64_t save = lexer.GetPos();
                                         soulng::parser::Match* parentMatch10 = &match;
                                         {
-                                            soulng::parser::Match match = AttributeParser::Attributes(lexer);
+                                            soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
                                             attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
                                             if (match.hit)
                                             {
@@ -130,7 +130,7 @@ soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, ParsingContex
                             soulng::parser::Match match(false);
                             soulng::parser::Match* parentMatch13 = &match;
                             {
-                                soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                                soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                                 returnType.reset(static_cast<sngcm::ast::Node*>(match.value));
                                 *parentMatch13 = match;
                             }
@@ -148,12 +148,12 @@ soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, ParsingContex
                             {
                                 int64_t pos = lexer.GetPos();
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = FunctionParser::FunctionGroupId(lexer, ctx);
+                                soulng::parser::Match match = FunctionParser::FunctionGroupId(lexer, moduleId, ctx);
                                 functionGroupId.reset(static_cast<soulng::parser::Value<std::u32string>*>(match.value));
                                 if (match.hit)
                                 {
                                     s.end = span.end;
-                                    fun.reset(new FunctionNode(s, specifiers->value, returnType.release(), functionGroupId->value, attrs.release()));
+                                    fun.reset(new FunctionNode(s, *moduleId, specifiers->value, returnType.release(), functionGroupId->value, attrs.release()));
                                     fun->SetSpecifierSpan(specifierSpan);
                                     fun->SetGroupIdSpan(span);
                                 }
@@ -174,7 +174,7 @@ soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, ParsingContex
                         int64_t save = lexer.GetPos();
                         soulng::parser::Match* parentMatch17 = &match;
                         {
-                            soulng::parser::Match match = TemplateParser::TemplateParameterList(lexer, ctx, fun.get());
+                            soulng::parser::Match match = TemplateParser::TemplateParameterList(lexer, moduleId, ctx, fun.get());
                             if (match.hit)
                             {
                                 *parentMatch17 = match;
@@ -195,7 +195,7 @@ soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, ParsingContex
                 soulng::parser::Match match(false);
                 soulng::parser::Match* parentMatch18 = &match;
                 {
-                    soulng::parser::Match match = ParameterParser::ParameterList(lexer, ctx, fun.get());
+                    soulng::parser::Match match = ParameterParser::ParameterList(lexer, moduleId, ctx, fun.get());
                     *parentMatch18 = match;
                 }
                 *parentMatch2 = match;
@@ -218,7 +218,7 @@ soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, ParsingContex
                         soulng::parser::Match* parentMatch22 = &match;
                         {
                             int64_t pos = lexer.GetPos();
-                            soulng::parser::Match match = ConceptParser::WhereConstraint(lexer, ctx);
+                            soulng::parser::Match match = ConceptParser::WhereConstraint(lexer, moduleId, ctx);
                             constraint.reset(static_cast<WhereConstraintNode*>(match.value));
                             if (match.hit)
                             {
@@ -263,7 +263,7 @@ soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, ParsingContex
                         soulng::parser::Match* parentMatch27 = &match;
                         {
                             int64_t pos = lexer.GetPos();
-                            soulng::parser::Match match = StatementParser::CompoundStatement(lexer, ctx);
+                            soulng::parser::Match match = StatementParser::CompoundStatement(lexer, moduleId, ctx);
                             body.reset(static_cast<CompoundStatementNode*>(match.value));
                             if (match.hit)
                             {
@@ -320,7 +320,7 @@ soulng::parser::Match FunctionParser::Function(CmajorLexer& lexer, ParsingContex
     return match;
 }
 
-soulng::parser::Match FunctionParser::FunctionGroupId(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match FunctionParser::FunctionGroupId(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -369,7 +369,7 @@ soulng::parser::Match FunctionParser::FunctionGroupId(CmajorLexer& lexer, Parsin
                 soulng::parser::Match* parentMatch3 = &match;
                 {
                     int64_t pos = lexer.GetPos();
-                    soulng::parser::Match match = FunctionParser::OperatorFunctionGroupId(lexer, ctx);
+                    soulng::parser::Match match = FunctionParser::OperatorFunctionGroupId(lexer, moduleId, ctx);
                     operatorFunctionGroupId.reset(static_cast<soulng::parser::Value<std::u32string>*>(match.value));
                     if (match.hit)
                     {
@@ -401,7 +401,7 @@ soulng::parser::Match FunctionParser::FunctionGroupId(CmajorLexer& lexer, Parsin
     return match;
 }
 
-soulng::parser::Match FunctionParser::OperatorFunctionGroupId(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match FunctionParser::OperatorFunctionGroupId(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -636,7 +636,7 @@ soulng::parser::Match FunctionParser::OperatorFunctionGroupId(CmajorLexer& lexer
                                                                                                                                                 soulng::parser::Match match(false);
                                                                                                                                                 soulng::parser::Match* parentMatch41 = &match;
                                                                                                                                                 {
-                                                                                                                                                    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                                                                                                                                                    soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                                                                                                                                                     typeExpr.reset(static_cast<sngcm::ast::Node*>(match.value));
                                                                                                                                                     *parentMatch41 = match;
                                                                                                                                                 }
@@ -668,7 +668,7 @@ soulng::parser::Match FunctionParser::OperatorFunctionGroupId(CmajorLexer& lexer
                                                                                                                                                                         soulng::parser::Match match(false);
                                                                                                                                                                         soulng::parser::Match* parentMatch45 = &match;
                                                                                                                                                                         {
-                                                                                                                                                                            soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                                                                                                                                                                            soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                                                                                                                                                                             typeExpr.reset(static_cast<sngcm::ast::Node*>(match.value));
                                                                                                                                                                             *parentMatch45 = match;
                                                                                                                                                                         }

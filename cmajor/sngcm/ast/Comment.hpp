@@ -12,8 +12,8 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API CommentNode : public Node
 {
 public:
-    CommentNode(const Span& span_);
-    CommentNode(const Span& span_, const std::u32string& comment_);
+    CommentNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    CommentNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& comment_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

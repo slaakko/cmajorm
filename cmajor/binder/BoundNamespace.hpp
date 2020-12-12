@@ -15,7 +15,7 @@ using namespace sngcm::ast;
 class BINDER_API BoundNamespace : public BoundNode
 {
 public:
-    BoundNamespace(Module* module_, NamespaceNode& namespaceNode_);
+    BoundNamespace(NamespaceNode& namespaceNode_);
     BoundNamespace(const BoundNamespace&) = delete;
     BoundNamespace& operator=(const BoundNamespace&) = delete;
     void Accept(BoundNodeVisitor& visitor) override;

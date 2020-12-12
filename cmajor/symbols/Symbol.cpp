@@ -25,6 +25,7 @@
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/StringFunctions.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/ModuleCache.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Sha1.hpp>
 #ifdef _WIN32
@@ -136,11 +137,13 @@ uint32_t AccessFlag(Emitter& emitter, SymbolAccess access)
 
 bool operator==(const SymbolLocation& left, const SymbolLocation& right)
 {
-    return left.fileIndex == right.fileIndex && left.line == right.line && left.scol == right.scol && left.ecol == right.ecol;
+    return left.moduleId == right.moduleId && left.fileIndex == right.fileIndex && left.line == right.line && left.scol == right.scol && left.ecol == right.ecol;
 }
 
 bool operator<(const SymbolLocation& left, const SymbolLocation& right)
 {
+    if (left.moduleId < right.moduleId) return true;
+    if (left.moduleId > right.moduleId) return false;
     if (left.fileIndex < right.fileIndex) return true;
     if (left.fileIndex > right.fileIndex) return false;
     if (left.line < right.line) return true;
@@ -150,18 +153,16 @@ bool operator<(const SymbolLocation& left, const SymbolLocation& right)
     return left.ecol < right.ecol;
 }
 
-SymbolLocation ToSymbolLocation(const Span& span, Module* module)
+SymbolLocation MakeSymbolLocation(const Span& span, Module* module)
 {
-    int16_t moduleId = GetModuleId(span.fileIndex);
-    Assert(moduleId == 0, "current project expected");
     int32_t scol = 0;
     int32_t ecol = 0;
     module->GetColumns(span, scol, ecol);
-    return SymbolLocation(span.fileIndex, span.line, scol, ecol);
+    return SymbolLocation(module->Id(),span.fileIndex, span.line, scol, ecol);
 }
 
-Symbol::Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), module(nullptr), compileUnit(nullptr)
+Symbol::Symbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    symbolType(symbolType_), span(span_), sourceModuleId(sourceModuleId_), name(name_), flags(SymbolFlags::project), parent(nullptr), module(nullptr), compileUnit(nullptr)
 {
 }
 
@@ -266,6 +267,23 @@ std::string Symbol::Syntax() const
     return syntax;
 }
 
+void Symbol::CopyFrom(const Symbol* that)
+{
+    symbolType = that->symbolType;
+    span = that->span;
+    sourceModuleId = that->sourceModuleId;
+    name = that->name;
+    flags = that->flags;
+    mangledName = that->mangledName;
+    parent = that->parent;
+    module = that->module;
+    compileUnit = that->compileUnit;
+    if (that->attributes)
+    {
+        attributes.reset(static_cast<Attributes*>(that->attributes->Clone()));
+    }
+}
+
 void Symbol::Check()
 {
 }
@@ -309,7 +327,7 @@ void Symbol::SetAccess(Specifiers accessSpecifiers)
         }
         else
         {
-            throw Exception(GetRootModuleForCurrentThread(), "only class members can have protected access", GetSpan());
+            throw Exception("only class members can have protected access", GetSpan(), SourceModuleId());
         }
     }
     else if (accessSpecifiers == Specifiers::internal_)
@@ -324,12 +342,12 @@ void Symbol::SetAccess(Specifiers accessSpecifiers)
         }
         else
         {
-            throw Exception(GetRootModuleForCurrentThread(), "only class members and global variables can have private access", GetSpan());
+            throw Exception("only class members and global variables can have private access", GetSpan(), SourceModuleId());
         }
     }
     else if (accessSpecifiers != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "invalid combination of access specifiers: " + SpecifierStr(accessSpecifiers), GetSpan());
+        throw Exception("invalid combination of access specifiers: " + SpecifierStr(accessSpecifiers), GetSpan(), SourceModuleId());
     }
     SetAccess(access);
 }
@@ -381,7 +399,7 @@ const NamespaceSymbol* Symbol::Ns() const
         }
         else
         {
-            throw Exception(GetRootModuleForCurrentThread(), "namespace symbol not found", GetSpan());
+            throw Exception("namespace symbol not found", GetSpan(), SourceModuleId());
         }
     }
 }
@@ -409,7 +427,7 @@ NamespaceSymbol* Symbol::Ns()
         }
         else
         {
-            throw Exception(GetRootModuleForCurrentThread(), "namespace symbol not found", GetSpan());
+            throw Exception("namespace symbol not found", GetSpan(), SourceModuleId());
         }
     }
 }
@@ -701,7 +719,7 @@ const ClassTypeSymbol* Symbol::Class() const
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class type symbol not found", GetSpan());
+        throw Exception("class type symbol not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -714,7 +732,7 @@ ClassTypeSymbol* Symbol::Class()
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class type symbol not found", GetSpan());
+        throw Exception("class type symbol not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -851,7 +869,7 @@ const FunctionSymbol* Symbol::Function() const
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "function symbol not found", GetSpan());
+        throw Exception("function symbol not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -864,7 +882,7 @@ FunctionSymbol* Symbol::Function()
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "function symbol not found", GetSpan());
+        throw Exception("function symbol not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -901,7 +919,7 @@ const ContainerScope* Symbol::ClassOrNsScope() const
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class or namespace scope not found", GetSpan());
+        throw Exception("class or namespace scope not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -914,7 +932,7 @@ ContainerScope* Symbol::ClassOrNsScope()
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class or namespace scope not found", GetSpan());
+        throw Exception("class or namespace scope not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -927,7 +945,7 @@ const ContainerScope* Symbol::ClassInterfaceOrNsScope() const
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class, interface or namespace scope not found", GetSpan());
+        throw Exception("class, interface or namespace scope not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -940,7 +958,7 @@ ContainerScope* Symbol::ClassInterfaceOrNsScope()
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class, interface or namespace scope not found", GetSpan());
+        throw Exception("class, interface or namespace scope not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -953,7 +971,7 @@ const ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope() const
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
+        throw Exception("class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -966,7 +984,7 @@ ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope()
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan());
+        throw Exception("class, interface, enumeration, delegate, class delegate or namespace scope not found", GetSpan(), SourceModuleId());
     }
 }
 
@@ -995,22 +1013,14 @@ std::unique_ptr<sngxml::dom::Element> Symbol::CreateDomElement(TypeMap& typeMap)
     return std::unique_ptr<sngxml::dom::Element>(new sngxml::dom::Element(ToUtf32(ClassName())));
 }
 
-bool Symbol::GetLocation(Module* idNodeModule, SymbolLocation& definitionLocation) const
+bool Symbol::GetLocation(SymbolLocation& definitionLocation) const
 {
-    Span s = GetSpan();
-    std::string sourceFilePath = module->GetFilePath(s.fileIndex);
-    if (sourceFilePath.empty())
-    {
-        int32_t fileIndex = MakeFileIndex(0, GetFileId(s.fileIndex));
-        s = Span(fileIndex, span.line, span.start, span.end);
-        sourceFilePath = module->GetFilePath(fileIndex);
-    }
-    if (sourceFilePath.empty()) return false;
-    int32_t idModuleFileIndex = idNodeModule->GetFileIndexForFilePath(sourceFilePath);
+    Module* sourceModule = GetModuleById(sourceModuleId);
+    if (!sourceModule) return false;
     int32_t scol = 0;
     int32_t ecol = 0;
-    module->GetColumns(s, scol, ecol);
-    definitionLocation = SymbolLocation(idModuleFileIndex, span.line, scol, ecol);
+    sourceModule->GetColumns(span, scol, ecol);
+    definitionLocation = SymbolLocation(sourceModule->Id(), span.fileIndex, span.line, scol, ecol);
     return true;
 }
 
@@ -1022,9 +1032,9 @@ template<typename SymbolT>
 class ConcreteSymbolCreator : public SymbolCreator
 {
 public:
-    Symbol* CreateSymbol(const Span& span, const std::u32string& name) override
+    Symbol* CreateSymbol(const Span& span, const boost::uuids::uuid& sourceModuleId, const std::u32string& name) override
     {
-        return new SymbolT(span, name);
+        return new SymbolT(span, sourceModuleId, name);
     }
 };
 
@@ -1184,12 +1194,12 @@ SymbolFactory::SymbolFactory()
 #endif
 }
 
-Symbol* SymbolFactory::CreateSymbol(SymbolType symbolType, const Span& span, const std::u32string& name)
+Symbol* SymbolFactory::CreateSymbol(SymbolType symbolType, const Span& span, const boost::uuids::uuid& sourceModuleId, const std::u32string& name)
 {
     const std::unique_ptr<SymbolCreator>& symbolCreator = symbolCreators[static_cast<uint8_t>(symbolType)];
     if (symbolCreator)
     {
-        Symbol* symbol = symbolCreator->CreateSymbol(span, name);
+        Symbol* symbol = symbolCreator->CreateSymbol(span, sourceModuleId, name);
         if (symbol)
         {
             return symbol;

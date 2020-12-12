@@ -101,6 +101,24 @@ Module* ModuleCache::GetModule(const std::string& moduleFilePath)
     }
 }
 
+Module* ModuleCache::GetModule(const boost::uuids::uuid& moduleId) const
+{
+    auto it = moduleIdMap.find(moduleId);
+    if (it != moduleIdMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void ModuleCache::MapModule(Module* module)
+{
+    moduleIdMap[module->Id()] = module;
+}
+
 Module* ModuleCache::GetCachedModule(const std::string& moduleFilePath) const
 {
     auto it = moduleMap.find(moduleFilePath);
@@ -131,17 +149,16 @@ void ModuleCache::PutModule(std::unique_ptr<Module>&& module)
             {
                 throw std::runtime_error("module cache: invalid module index");
             }
-            module->SetFlag(ModuleFlags::readFromModuleFile); // added !!!
-            modules[moduleIndex] = std::move(module); // changed !!!
+            module->SetFlag(ModuleFlags::readFromModuleFile); 
+            modules[moduleIndex] = std::move(module);
         }
         else
         {
             int moduleIndex = modules.size();
             moduleMap[module->OriginalFilePath()] = moduleIndex;
-            //std::unique_ptr<Module> m(new Module()); // removed!!!
-            module->SetIndex(moduleIndex); // changed!!!
-            module->SetFlag(ModuleFlags::readFromModuleFile); // added !!!
-            modules.push_back(std::move(module)); // changed!!!
+            module->SetIndex(moduleIndex); 
+            module->SetFlag(ModuleFlags::readFromModuleFile); 
+            modules.push_back(std::move(module)); 
         }
     }
     else
@@ -207,6 +224,7 @@ void ModuleCache::Restore(ModuleCache* prevCache)
                 int moduleIndex = modules.size();
                 moduleMap[moduleFilePath] = moduleIndex;
                 module->SetIndex(moduleIndex);
+                moduleIdMap[module->Id()] = module.get();
                 modules.push_back(std::move(module));
             }
         }
@@ -233,6 +251,7 @@ void ModuleCache::SetModule(const std::string& moduleFilePath, std::unique_ptr<M
     int moduleIndex = modules.size();
     moduleMap[moduleFilePath] = moduleIndex;
     module->SetIndex(moduleIndex);
+    moduleIdMap[module->Id()] = module.get();
     modules.push_back(std::move(module));
 }
 
@@ -253,6 +272,7 @@ void ModuleCache::MoveNonSystemModulesTo(ModuleCache* cache)
         if (module)
         {
             moduleMap.erase(module->OriginalFilePath());
+            moduleIdMap.erase(module->Id());
             cache->SetModule(module->OriginalFilePath(), std::move(module));
         }
     }
@@ -349,6 +369,16 @@ void MoveNonSystemModulesTo(std::unique_ptr<ModuleCache>& cachePtr)
         cachePtr.reset(new ModuleCache());
     }
     ModuleCache::Instance().MoveNonSystemModulesTo(cachePtr.get());
+}
+
+Module* GetModuleById(const boost::uuids::uuid& moduleId)
+{
+    return ModuleCache::Instance().GetModule(moduleId);
+}
+
+void MapModule(Module* module)
+{
+    ModuleCache::Instance().MapModule(module);
 }
 
 } } // namespace cmajor::symbols

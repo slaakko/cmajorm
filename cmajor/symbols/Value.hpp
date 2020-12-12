@@ -33,10 +33,10 @@ SYMBOLS_API TypeSymbol* GetTypeFor(ValueType valueType, SymbolTable* symbolTable
 class SYMBOLS_API Value
 {
 public:
-    Value(const Span& span_, ValueType valueType_);
+    Value(const Span& span_, const boost::uuids::uuid& moduleId_, ValueType valueType_);
     virtual ~Value();
     virtual Value* Clone() const = 0;
-    virtual Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const = 0;
+    virtual Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const = 0;
     virtual void* IrValue(Emitter& emitter) = 0;
     virtual void Write(BinaryWriter& writer) = 0;
     virtual void Read(BinaryReader& reader) = 0;
@@ -52,11 +52,13 @@ public:
     virtual TypeSymbol* GetType(SymbolTable* symbolTable) = 0;
     virtual void SetType(TypeSymbol* type_) {}
     const Span& GetSpan() const { return span; }
+    const boost::uuids::uuid& ModuleId() const { return moduleId; }
     ValueType GetValueType() const { return valueType; }
     std::unique_ptr<sngxml::dom::Element> ToDomElement();
     virtual const char* ClassName() const { return "Value";  }
 private:
     Span span;
+    boost::uuids::uuid moduleId;
     ValueType valueType;
 };
 
@@ -64,12 +66,12 @@ class SYMBOLS_API BoolValue : public Value
 {
 public:
     typedef bool OperandType;
-    BoolValue(const Span& span_, bool value_);
-    Value* Clone() const override  { return new BoolValue(GetSpan(), value); }
+    BoolValue(const Span& span_, const boost::uuids::uuid& moduleId_, bool value_);
+    Value* Clone() const override  { return new BoolValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return value ? "true" : "false"; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     bool GetValue() const { return value; }
@@ -82,12 +84,12 @@ class SYMBOLS_API SByteValue : public Value
 {
 public:
     typedef int8_t OperandType;
-    SByteValue(const Span& span_, int8_t value_);
-    Value* Clone() const override  { return new SByteValue(GetSpan(), value); }
+    SByteValue(const Span& span_, const boost::uuids::uuid& moduleId_, int8_t value_);
+    Value* Clone() const override  { return new SByteValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int8_t GetValue() const { return value; }
@@ -100,12 +102,12 @@ class SYMBOLS_API ByteValue : public Value
 {
 public:
     typedef uint8_t OperandType;
-    ByteValue(const Span& span_, uint8_t value_);
-    Value* Clone() const override  { return new ByteValue(GetSpan(), value); }
+    ByteValue(const Span& span_, const boost::uuids::uuid& moduleId_, uint8_t value_);
+    Value* Clone() const override  { return new ByteValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     uint8_t GetValue() const { return value; }
@@ -118,12 +120,12 @@ class SYMBOLS_API ShortValue : public Value
 {
 public:
     typedef int16_t OperandType;
-    ShortValue(const Span& span_, int16_t value_);
-    Value* Clone() const override  { return new ShortValue(GetSpan(), value); }
+    ShortValue(const Span& span_, const boost::uuids::uuid& moduleId_, int16_t value_);
+    Value* Clone() const override  { return new ShortValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int16_t GetValue() const { return value; }
@@ -136,12 +138,12 @@ class SYMBOLS_API UShortValue : public Value
 {
 public:
     typedef uint16_t OperandType;
-    UShortValue(const Span& span_, uint16_t value_);
-    Value* Clone() const override  { return new UShortValue(GetSpan(), value); }
+    UShortValue(const Span& span_, const boost::uuids::uuid& moduleId_, uint16_t value_);
+    Value* Clone() const override  { return new UShortValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     uint16_t GetValue() const { return value; }
@@ -154,12 +156,12 @@ class SYMBOLS_API IntValue : public Value
 {
 public:
     typedef int32_t OperandType;
-    IntValue(const Span& span_, int32_t value_);
-    Value* Clone() const override  { return new IntValue(GetSpan(), value); }
+    IntValue(const Span& span_, const boost::uuids::uuid& moduleId_, int32_t value_);
+    Value* Clone() const override  { return new IntValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int32_t GetValue() const { return value; }
@@ -172,12 +174,12 @@ class SYMBOLS_API UIntValue : public Value
 {
 public:
     typedef uint32_t OperandType;
-    UIntValue(const Span& span_, uint32_t value_);
-    Value* Clone() const override  { return new UIntValue(GetSpan(), value); }
+    UIntValue(const Span& span_, const boost::uuids::uuid& moduleId_, uint32_t value_);
+    Value* Clone() const override  { return new UIntValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     uint32_t GetValue() const { return value; }
@@ -190,12 +192,12 @@ class SYMBOLS_API LongValue : public Value
 {
 public:
     typedef int64_t OperandType;
-    LongValue(const Span& span_, int64_t value_);
-    Value* Clone() const override  { return new LongValue(GetSpan(), value); }
+    LongValue(const Span& span_, const boost::uuids::uuid& moduleId_, int64_t value_);
+    Value* Clone() const override  { return new LongValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int64_t GetValue() const { return value; }
@@ -208,12 +210,12 @@ class SYMBOLS_API ULongValue : public Value
 {
 public:
     typedef uint64_t OperandType;
-    ULongValue(const Span& span_, uint64_t value_);
-    Value* Clone() const override  { return new ULongValue(GetSpan(), value); }
+    ULongValue(const Span& span_, const boost::uuids::uuid& moduleId_, uint64_t value_);
+    Value* Clone() const override  { return new ULongValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     uint64_t GetValue() const { return value; }
@@ -226,12 +228,12 @@ class SYMBOLS_API FloatValue : public Value
 {
 public:
     typedef float OperandType;
-    FloatValue(const Span& span_, float value_);
-    Value* Clone() const override  { return new FloatValue(GetSpan(), value); }
+    FloatValue(const Span& span_, const boost::uuids::uuid& moduleId_, float value_);
+    Value* Clone() const override  { return new FloatValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     float GetValue() const { return value; }
@@ -244,12 +246,12 @@ class SYMBOLS_API DoubleValue : public Value
 {
 public:
     typedef double OperandType;
-    DoubleValue(const Span& span_, double value_);
-    Value* Clone() const override  { return new DoubleValue(GetSpan(), value); }
+    DoubleValue(const Span& span_, const boost::uuids::uuid& moduleId_, double value_);
+    Value* Clone() const override  { return new DoubleValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     double GetValue() const { return value; }
@@ -262,12 +264,12 @@ class SYMBOLS_API CharValue : public Value
 {
 public:
     typedef unsigned char OperandType;
-    CharValue(const Span& span_, unsigned char value_);
-    Value* Clone() const override  { return new CharValue(GetSpan(), value); }
+    CharValue(const Span& span_, const boost::uuids::uuid& moduleId_, unsigned char value_);
+    Value* Clone() const override  { return new CharValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     unsigned char GetValue() const { return value; }
@@ -280,12 +282,12 @@ class SYMBOLS_API WCharValue : public Value
 {
 public:
     typedef char16_t OperandType;
-    WCharValue(const Span& span_, char16_t value_);
-    Value* Clone() const override  { return new WCharValue(GetSpan(), value); }
+    WCharValue(const Span& span_, const boost::uuids::uuid& moduleId_, char16_t value_);
+    Value* Clone() const override  { return new WCharValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     char16_t GetValue() const { return value; }
@@ -298,12 +300,12 @@ class SYMBOLS_API UCharValue : public Value
 {
 public:
     typedef char32_t OperandType;
-    UCharValue(const Span& span_, char32_t value_);
-    Value* Clone() const override  { return new UCharValue(GetSpan(), value); }
+    UCharValue(const Span& span_, const boost::uuids::uuid& moduleId_, char32_t value_);
+    Value* Clone() const override  { return new UCharValue(GetSpan(), ModuleId(), value); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return std::to_string(value); }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     char32_t GetValue() const { return value; }
@@ -315,12 +317,12 @@ private:
 class SYMBOLS_API StringValue : public Value
 {
 public:
-    StringValue(const Span& span_, int stringId_, const std::string& str_);
-    Value* Clone() const override  { return new StringValue(GetSpan(), stringId, str); }
+    StringValue(const Span& span_, const boost::uuids::uuid& moduleId_, int stringId_, const std::string& str_);
+    Value* Clone() const override  { return new StringValue(GetSpan(), ModuleId(), stringId, str); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int StringId() const { return stringId; }
     const std::string& Str() const { return str; }
@@ -333,12 +335,12 @@ private:
 class SYMBOLS_API WStringValue : public Value
 {
 public:
-    WStringValue(const Span& span_, int stringId_, const std::u16string& str_);
-    Value* Clone() const override  { return new WStringValue(GetSpan(), stringId, str); }
+    WStringValue(const Span& span_, const boost::uuids::uuid& moduleId_, int stringId_, const std::u16string& str_);
+    Value* Clone() const override  { return new WStringValue(GetSpan(), ModuleId(), stringId, str); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int StringId() const { return stringId; }
     const std::u16string& Str() const { return str; }
@@ -351,12 +353,12 @@ private:
 class SYMBOLS_API UStringValue : public Value
 {
 public:
-    UStringValue(const Span& span_, int stringId_, const std::u32string& str_);
-    Value* Clone() const override  { return new UStringValue(GetSpan(), stringId, str); }
+    UStringValue(const Span& span_, const boost::uuids::uuid& moduleId_, int stringId_, const std::u32string& str_);
+    Value* Clone() const override  { return new UStringValue(GetSpan(), ModuleId(), stringId, str); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int StringId() const { return stringId; }
     const std::u32string& Str() const { return str; }
@@ -369,12 +371,12 @@ private:
 class SYMBOLS_API NullValue : public Value
 {
 public:
-    NullValue(const Span& span_, TypeSymbol* nullPtrType_);
-    Value* Clone() const override  { return new NullValue(GetSpan(), nullPtrType); }
+    NullValue(const Span& span_, const boost::uuids::uuid& moduleId_, TypeSymbol* nullPtrType_);
+    Value* Clone() const override  { return new NullValue(GetSpan(), ModuleId(), nullPtrType); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     std::string ToString() const override { return "null"; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     const char* ClassName() const override { return "NullValue"; }
@@ -386,12 +388,12 @@ class SYMBOLS_API PointerValue : public Value
 {
 public:
     typedef const void* OperandType;
-    PointerValue(const Span& span_, TypeSymbol* type, const void* ptr_);
-    Value* Clone() const override  { return new PointerValue(GetSpan(), type, ptr); }
+    PointerValue(const Span& span_, const boost::uuids::uuid& moduleId_, TypeSymbol* type, const void* ptr_);
+    Value* Clone() const override  { return new PointerValue(GetSpan(), ModuleId(), type, ptr); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     void SetType(TypeSymbol* type_) override { type = type_; }
     TypeSymbol* PointeeType() const;
@@ -409,7 +411,7 @@ private:
 class SYMBOLS_API ArrayValue : public Value
 {
 public:
-    ArrayValue(const Span& span_, TypeSymbol* type_, std::vector<std::unique_ptr<Value>>&& elementValues_);
+    ArrayValue(const Span& span_, const boost::uuids::uuid& moduleId_, TypeSymbol* type_, std::vector<std::unique_ptr<Value>>&& elementValues_);
     ArrayValue(const ArrayValue&) = delete;
     ArrayValue& operator=(const ArrayValue&) = delete;
     Value* Clone() const override ;
@@ -417,7 +419,7 @@ public:
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
     bool IsComplexValue() const override { return true; }
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
     void SetType(TypeSymbol* type_) override { type = type_; }
     const std::vector<std::unique_ptr<Value>>& Elements() const { return elementValues; }
@@ -431,7 +433,7 @@ private:
 class SYMBOLS_API StructuredValue : public Value
 {
 public:
-    StructuredValue(const Span& span_, TypeSymbol* type_, std::vector<std::unique_ptr<Value>>&& memberValues_);
+    StructuredValue(const Span& span_, const boost::uuids::uuid& moduleId_, TypeSymbol* type_, std::vector<std::unique_ptr<Value>>&& memberValues_);
     StructuredValue(const StructuredValue&) = delete;
     StructuredValue& operator=(const StructuredValue&) = delete;
     Value* Clone() const override ;
@@ -439,7 +441,7 @@ public:
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
     bool IsComplexValue() const override { return true; }
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     void SetType(TypeSymbol* type_) override { type = type_; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
     const std::vector<std::unique_ptr<Value>>& Members() const { return memberValues; }
@@ -453,12 +455,12 @@ private:
 class SYMBOLS_API UuidValue : public Value
 {
 public:
-    UuidValue(const Span& span_, int uuidId_);
-    Value* Clone() const override { return new UuidValue(GetSpan(), uuidId); }
+    UuidValue(const Span& span_, const boost::uuids::uuid& moduleId_, int uuidId_);
+    Value* Clone() const override { return new UuidValue(GetSpan(), ModuleId(), uuidId); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
-    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, const boost::uuids::uuid& moduleId, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int UuidId() const { return uuidId; }
     const char* ClassName() const override { return "UuidValue"; }
@@ -498,7 +500,7 @@ struct SYMBOLS_API IntegralValueHash
 };
 
 SYMBOLS_API void WriteValue(Value* value, BinaryWriter& writer);
-SYMBOLS_API std::unique_ptr<Value> ReadValue(BinaryReader& reader, const Span& span);
+SYMBOLS_API std::unique_ptr<Value> ReadValue(BinaryReader& reader, const Span& span, const boost::uuids::uuid& moduleId);
 
 } } // namespace cmajor::symbols
 

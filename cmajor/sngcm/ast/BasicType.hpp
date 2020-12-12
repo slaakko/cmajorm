@@ -12,7 +12,7 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API BoolNode : public Node
 {
 public:
-    BoolNode(const Span& span_);
+    BoolNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "bool";  }
@@ -21,7 +21,7 @@ public:
 class SNGCM_AST_API SByteNode : public Node
 {
 public:
-    SByteNode(const Span& span_);
+    SByteNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "sbyte"; }
@@ -30,7 +30,7 @@ public:
 class SNGCM_AST_API ByteNode : public Node
 {
 public:
-    ByteNode(const Span& span_);
+    ByteNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     bool IsUnsignedTypeNode() const override { return true; }
@@ -40,7 +40,7 @@ public:
 class SNGCM_AST_API ShortNode : public Node
 {
 public:
-    ShortNode(const Span& span_);
+    ShortNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "short"; }
@@ -49,7 +49,7 @@ public:
 class SNGCM_AST_API UShortNode : public Node
 {
 public:
-    UShortNode(const Span& span_);
+    UShortNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     bool IsUnsignedTypeNode() const override { return true; }
@@ -59,7 +59,7 @@ public:
 class SNGCM_AST_API IntNode : public Node
 {
 public:
-    IntNode(const Span& span_);
+    IntNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "int"; }
@@ -68,7 +68,7 @@ public:
 class SNGCM_AST_API UIntNode : public Node
 {
 public:
-    UIntNode(const Span& span_);
+    UIntNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     bool IsUnsignedTypeNode() const override { return true; }
@@ -78,7 +78,7 @@ public:
 class SNGCM_AST_API LongNode : public Node
 {
 public:
-    LongNode(const Span& span_);
+    LongNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "long"; }
@@ -87,7 +87,7 @@ public:
 class SNGCM_AST_API ULongNode : public Node
 {
 public:
-    ULongNode(const Span& span_);
+    ULongNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     bool IsUnsignedTypeNode() const override { return true; }
@@ -97,7 +97,7 @@ public:
 class SNGCM_AST_API FloatNode : public Node
 {
 public:
-    FloatNode(const Span& span_);
+    FloatNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "float"; }
@@ -106,7 +106,7 @@ public:
 class SNGCM_AST_API DoubleNode : public Node
 {
 public:
-    DoubleNode(const Span& span_);
+    DoubleNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "double"; }
@@ -115,7 +115,7 @@ public:
 class SNGCM_AST_API CharNode : public Node
 {
 public:
-    CharNode(const Span& span_);
+    CharNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "char"; }
@@ -124,7 +124,7 @@ public:
 class SNGCM_AST_API WCharNode : public Node
 {
 public:
-    WCharNode(const Span& span_);
+    WCharNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "wchar"; }
@@ -133,7 +133,7 @@ public:
 class SNGCM_AST_API UCharNode : public Node
 {
 public:
-    UCharNode(const Span& span_);
+    UCharNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "uchar"; }
@@ -142,7 +142,7 @@ public:
 class SNGCM_AST_API VoidNode : public Node
 {
 public:
-    VoidNode(const Span& span_);
+    VoidNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override { return "void"; }

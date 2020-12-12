@@ -24,11 +24,14 @@ public:
     BinaryWriter& GetBinaryWriter() { return binaryWriter; }
     void Write(Node* node);
     void Write(Specifiers specifiers);
-    void Write(const Span& span);
+    void Write(const Span& span, bool convertExternal);
     void SetLexers(std::vector<soulng::lexer::Lexer*>* lexers_);
+    void SetSpanConversionModuleId(const boost::uuids::uuid& spanConversionModuleId_);
+    const boost::uuids::uuid& SpanConversionModuleId() const { return spanConversionModuleId; }
 private:
     BinaryWriter binaryWriter;
     std::vector<soulng::lexer::Lexer*>* lexers;
+    boost::uuids::uuid spanConversionModuleId;
 };
 
 } } // namespace sngcm::ast

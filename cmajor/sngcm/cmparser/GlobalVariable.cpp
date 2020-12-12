@@ -7,13 +7,13 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/GlobalVariable.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/GlobalVariable.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-soulng::parser::Match GlobalVariableParser::GlobalVariable(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu)
+soulng::parser::Match GlobalVariableParser::GlobalVariable(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -61,7 +61,7 @@ soulng::parser::Match GlobalVariableParser::GlobalVariable(CmajorLexer& lexer, P
                     soulng::parser::Match match(false);
                     soulng::parser::Match* parentMatch5 = &match;
                     {
-                        soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                        soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                         type.reset(static_cast<sngcm::ast::Node*>(match.value));
                         *parentMatch5 = match;
                     }
@@ -74,7 +74,7 @@ soulng::parser::Match GlobalVariableParser::GlobalVariable(CmajorLexer& lexer, P
                 soulng::parser::Match match(false);
                 soulng::parser::Match* parentMatch6 = &match;
                 {
-                    soulng::parser::Match match = IdentifierParser::Identifier(lexer);
+                    soulng::parser::Match match = IdentifierParser::Identifier(lexer, moduleId);
                     id.reset(static_cast<IdentifierNode*>(match.value));
                     *parentMatch6 = match;
                 }
@@ -110,7 +110,7 @@ soulng::parser::Match GlobalVariableParser::GlobalVariable(CmajorLexer& lexer, P
                             soulng::parser::Match match(false);
                             soulng::parser::Match* parentMatch11 = &match;
                             {
-                                soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                 initializer.reset(static_cast<Node*>(match.value));
                                 *parentMatch11 = match;
                             }
@@ -152,7 +152,7 @@ soulng::parser::Match GlobalVariableParser::GlobalVariable(CmajorLexer& lexer, P
                 if (match.hit)
                 {
                     s.end = span.end;
-                    GlobalVariableNode * value = new GlobalVariableNode(s, specifiers->value, type.release(), id.release(), cu);
+                    GlobalVariableNode * value = new GlobalVariableNode(s, *moduleId, specifiers->value, type.release(), id.release(), cu);
                     value->SetInitializer(initializer.release());
                     {
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT

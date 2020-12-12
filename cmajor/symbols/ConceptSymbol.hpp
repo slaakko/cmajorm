@@ -16,7 +16,7 @@ class ConceptSymbol;
 class SYMBOLS_API ConceptGroupSymbol : public Symbol
 {
 public:
-    ConceptGroupSymbol(const Span& span_, const std::u32string& name_);
+    ConceptGroupSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "concept_group"; }
     bool IsExportSymbol() const override { return false; }
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
@@ -34,7 +34,7 @@ private:
 class SYMBOLS_API ConceptSymbol : public ContainerSymbol
 {
 public:
-    ConceptSymbol(const Span& span_, const std::u32string& name_);
+    ConceptSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     bool IsParentSymbol() const override { return true; }
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;

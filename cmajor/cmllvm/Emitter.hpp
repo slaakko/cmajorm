@@ -113,19 +113,19 @@ public:
     void* CreateDITypeForUChar() override;
     void* CreateDITypeForVoid() override;
     void* CreateDITypeForArray(void* elementDIType, const std::vector<void*>& elements) override;
-    void* CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span) override;
+    void* CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId) override;
     uint64_t GetOffsetInBits(void* classIrType, int layoutIndex) override;
-    void* CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const std::string& name, void* vtableHolderClass,
+    void* CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const boost::uuids::uuid& moduleId, const std::string& name, void* vtableHolderClass,
         const std::string& mangledName, void* baseClassDIType) override;
     void* CreateDITypeForEnumConstant(const std::string& name, int64_t value) override;
-    void* CreateDITypeForEnumType(const std::string& name, const std::string& mangledName, const Span& span, const std::vector<void*>& enumConstantElements,
+    void* CreateDITypeForEnumType(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, const std::vector<void*>& enumConstantElements,
         uint64_t sizeInBits, uint32_t alignInBits, void* underlyingDIType) override;
     void MapFwdDeclaration(void* fwdDeclaration, const boost::uuids::uuid& typeId) override;
     void* GetDITypeByTypeId(const boost::uuids::uuid& typeId) const override;
     void SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType, const std::string& typeName) override;
     void* GetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId) override;
     void SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId, void* diType) override;
-    void* CreateDIMemberType(void* scope, const std::string& name, const Span& span, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType) override;
+    void* CreateDIMemberType(void* scope, const std::string& name, const Span& span, const boost::uuids::uuid& moduleId, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType) override;
     void* CreateConstDIType(void* diType) override;
     void* CreateLValueRefDIType(void* diType) override;
     void* CreateRValueRefDIType(void* diType) override;
@@ -247,7 +247,7 @@ public:
     void SaveObjectPointer(void* objectPointer_) override;
     void SetObjectPointer(void* objectPointer_) override { objectPointer = static_cast<llvm::Value*>(objectPointer_); }
     void* GetObjectPointer() override { return objectPointer; }
-    void SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& functionId) override { function = static_cast<llvm::Function*>(function_); }
+    void SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& sourceModuleId, const boost::uuids::uuid& functionId) override { function = static_cast<llvm::Function*>(function_); }
     void SetFunctionName(const std::string& functionName) override;
     void BeginScope() override;
     void EndScope() override;
@@ -281,7 +281,7 @@ public:
     void ResetCurrentDebugLocation() override;
     llvm::DebugLoc GetDebugLocation(const Span& span);
     llvm::DebugLoc GetCurrentDebugLocation() { return currentDebugLocation; }
-    void* GetDebugInfoForFile(int32_t fileIndex) override;
+    void* GetDebugInfoForFile(const Span& span, const boost::uuids::uuid& moduleId) override;
     void ReplaceForwardDeclarations();
     void* GetIrObject(void* symbol) const override;
     void SetIrObject(void* symbol, void* irObject) override;
@@ -311,13 +311,13 @@ public:
      unsigned GetPureVirtualVirtuality() override;
     unsigned GetVirtualVirtuality() override;
     unsigned GetFunctionFlags(bool isStatic, unsigned accessFlags, bool isExplicit) override;
-    void* CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
+    void* CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
         unsigned flags) override;
-    void* CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags) override;
+    void* CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned flags) override;
     void SetDISubprogram(void* function, void* subprogram) override;
     void* CreateAlloca(void* irType) override;
-    void* CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst) override;
-    void* CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst) override;
+    void* CreateDIParameterVariable(const std::string& name, int index, const Span& span, const boost::uuids::uuid& moduleId, void* irType, void* allocaInst) override;
+    void* CreateDIAutoVariable(const std::string& name, const Span& span, const boost::uuids::uuid& moduleId, void* irType, void* allocaInst) override;
     void* GetFunctionArgument(void* function, int argumentIndex) override;
     void SetDebugLoc(void* callInst) override;
     void* CreateRet(void* value) override;
@@ -325,7 +325,7 @@ public:
     void SetPersonalityFunction(void* function, void* personalityFunction) override;
     void AddNoUnwindAttribute(void* function) override;
     void AddUWTableAttribute(void* function) override;
-    void* CreateLexicalBlock(const Span& span) override;
+    void* CreateLexicalBlock(const Span& span, const boost::uuids::uuid& moduleId) override;
     void* CreateSwitch(void* condition, void* defaultDest, unsigned numCases) override;
     void AddCase(void* switchInst, void* caseValue, void* caseDest) override;
     void* CreateCleanupPadWithParent(void* parentPad, const std::vector<void*>& args) override;
@@ -341,7 +341,7 @@ public:
     void* CleanupBlock() override { return emittingDelegate->CleanupBlock(); }
     bool NewCleanupNeeded() override { return emittingDelegate->NewCleanupNeeded(); }
     void CreateCleanup() override { emittingDelegate->CreateCleanup(); }
-    std::string GetSourceFilePath(int32_t fileIndex) { return emittingDelegate->GetSourceFilePath(fileIndex); }
+    std::string GetSourceFilePath(const Span& span, const boost::uuids::uuid& moduleId) { return emittingDelegate->GetSourceFilePath(span, moduleId); }
     cmajor::ir::Pad* CurrentPad() override { return emittingDelegate->CurrentPad(); }
     void* CreateClassDIType(void* classPtr) override { return emittingDelegate->CreateClassDIType(classPtr); }
     void* GetGlobalStringPtr(int stringId) override { return emittingDelegate->GetGlobalStringPtr(stringId); }

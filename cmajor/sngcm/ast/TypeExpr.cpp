@@ -10,18 +10,19 @@
 
 namespace sngcm { namespace ast {
 
-ConstNode::ConstNode(const Span& span_) : Node(NodeType::constNode, span_)
+ConstNode::ConstNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::constNode, span_, moduleId_)
 {
 }
 
-ConstNode::ConstNode(const Span& span_, Node* subject_) : Node(NodeType::constNode, span_), subject(subject_)
+ConstNode::ConstNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : Node(NodeType::constNode, span_, moduleId_), subject(subject_)
 {
     subject->SetParent(this);
 }
 
 Node* ConstNode::Clone(CloneContext& cloneContext) const
 {
-    return new ConstNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext));
+    ConstNode* clone = new ConstNode(GetSpan(), ModuleId(), subject->Clone(cloneContext));
+    return clone;
 }
 
 void ConstNode::Accept(Visitor& visitor)
@@ -47,18 +48,20 @@ std::string ConstNode::ToString() const
     return "const " + subject->ToString();
 }
 
-LValueRefNode::LValueRefNode(const Span& span_) : Node(NodeType::lvalueRefNode, span_)
+LValueRefNode::LValueRefNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::lvalueRefNode, span_, moduleId_)
 {
 }
 
-LValueRefNode::LValueRefNode(const Span& span_, Node* subject_) : Node(NodeType::lvalueRefNode, span_), subject(subject_)
+LValueRefNode::LValueRefNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : 
+    Node(NodeType::lvalueRefNode, span_, moduleId_), subject(subject_)
 {
     subject->SetParent(this);
 }
 
 Node* LValueRefNode::Clone(CloneContext& cloneContext) const
 {
-    return new LValueRefNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext));
+    LValueRefNode* clone = new LValueRefNode(GetSpan(), ModuleId(), subject->Clone(cloneContext));
+    return clone;
 }
 
 void LValueRefNode::Accept(Visitor& visitor)
@@ -84,18 +87,20 @@ std::string LValueRefNode::ToString() const
     return subject->ToString() + "&";
 }
 
-RValueRefNode::RValueRefNode(const Span& span_) : Node(NodeType::rvalueRefNode, span_)
+RValueRefNode::RValueRefNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::rvalueRefNode, span_, moduleId_)
 {
 }
 
-RValueRefNode::RValueRefNode(const Span& span_, Node* subject_) : Node(NodeType::rvalueRefNode, span_), subject(subject_)
+RValueRefNode::RValueRefNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : 
+    Node(NodeType::rvalueRefNode, span_, moduleId_), subject(subject_)
 {
     subject->SetParent(this);
 }
 
 Node* RValueRefNode::Clone(CloneContext& cloneContext) const
 {
-    return new RValueRefNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext));
+    RValueRefNode* clone = new RValueRefNode(GetSpan(), ModuleId(), subject->Clone(cloneContext));
+    return clone;
 }
 
 void RValueRefNode::Accept(Visitor& visitor)
@@ -121,18 +126,20 @@ std::string RValueRefNode::ToString() const
     return subject->ToString() + "&&";
 }
 
-PointerNode::PointerNode(const Span& span_) : Node(NodeType::pointerNode, span_)
+PointerNode::PointerNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::pointerNode, span_, moduleId_)
 {
 }
 
-PointerNode::PointerNode(const Span& span_, Node* subject_) : Node(NodeType::pointerNode, span_), subject(subject_)
+PointerNode::PointerNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_) : 
+    Node(NodeType::pointerNode, span_, moduleId_), subject(subject_)
 {
     subject->SetParent(this);
 }
 
 Node* PointerNode::Clone(CloneContext& cloneContext) const
 {
-    return new PointerNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext));
+    PointerNode* clone = new PointerNode(GetSpan(), ModuleId(), subject->Clone(cloneContext));
+    return clone;
 }
 
 void PointerNode::Accept(Visitor& visitor)
@@ -158,11 +165,12 @@ std::string PointerNode::ToString() const
     return subject->ToString() + "*";
 }
 
-ArrayNode::ArrayNode(const Span& span_) : Node(NodeType::arrayNode, span_), subject(), size()
+ArrayNode::ArrayNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::arrayNode, span_, moduleId_), subject(), size()
 {
 }
 
-ArrayNode::ArrayNode(const Span& span_, Node* subject_, Node* size_) : Node(NodeType::arrayNode, span_), subject(subject_), size(size_)
+ArrayNode::ArrayNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_, Node* size_) : 
+    Node(NodeType::arrayNode, span_, moduleId_), subject(subject_), size(size_)
 {
     subject->SetParent(this);
     if (size)
@@ -178,7 +186,8 @@ Node* ArrayNode::Clone(CloneContext& cloneContext) const
     {
         clonedSize = size->Clone(cloneContext);
     }
-    return new ArrayNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext), clonedSize);
+    ArrayNode* clone = new ArrayNode(GetSpan(), ModuleId(), subject->Clone(cloneContext), clonedSize);
+    return clone;
 }
 
 void ArrayNode::Accept(Visitor& visitor)

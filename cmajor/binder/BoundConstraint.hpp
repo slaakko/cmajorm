@@ -15,7 +15,7 @@ using namespace cmajor::symbols;
 class BINDER_API BoundConstraint : public BoundNode
 {
 public:
-    BoundConstraint(Module* module_, const Span& span_, BoundNodeType boundNodeType_);
+    BoundConstraint(const Span& span_, const boost::uuids::uuid& moduleId_, BoundNodeType boundNodeType_);
     virtual bool Subsume(BoundConstraint* that) const = 0;
     virtual BoundConstraint* Clone() const = 0;
     virtual bool IsBinaryConstraint() const { return false; }
@@ -26,7 +26,7 @@ public:
 class BINDER_API BoundAtomicConstraint : public BoundConstraint
 {
 public:
-    BoundAtomicConstraint(Module* module_, const Span& span_, bool satisfied_);
+    BoundAtomicConstraint(const Span& span_, const boost::uuids::uuid& moduleId_, bool satisfied_);
     void Accept(BoundNodeVisitor& visitor) override;
     bool Subsume(BoundConstraint* that) const override;
     BoundConstraint* Clone() const override;
@@ -40,7 +40,7 @@ private:
 class BINDER_API BoundBinaryConstraint : public BoundConstraint
 {
 public:
-    BoundBinaryConstraint(Module* module_, const Span& span_, BoundNodeType boundNodeType_, BoundConstraint* left_, BoundConstraint* right_);
+    BoundBinaryConstraint(const Span& span_, const boost::uuids::uuid& moduleId_, BoundNodeType boundNodeType_, BoundConstraint* left_, BoundConstraint* right_);
     BoundBinaryConstraint(const BoundBinaryConstraint& that);
     bool IsBinaryConstraint() const override { return true; }
     BoundConstraint* Left() const { return left.get(); }
@@ -53,7 +53,7 @@ private:
 class BINDER_API BoundDisjunctiveConstraint : public BoundBinaryConstraint
 {
 public:
-    BoundDisjunctiveConstraint(Module* module_, const Span& span_, BoundConstraint* left_, BoundConstraint* right_);
+    BoundDisjunctiveConstraint(const Span& span_, const boost::uuids::uuid& moduleId_, BoundConstraint* left_, BoundConstraint* right_);
     BoundDisjunctiveConstraint(const BoundDisjunctiveConstraint& that);
     bool Subsume(BoundConstraint* that) const override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -63,7 +63,7 @@ public:
 class BINDER_API BoundConjunctiveConstraint : public BoundBinaryConstraint
 {
 public:
-    BoundConjunctiveConstraint(Module* module_, const Span& span_, BoundConstraint* left_, BoundConstraint* right_);
+    BoundConjunctiveConstraint(const Span& span_, const boost::uuids::uuid& moduleId_, BoundConstraint* left_, BoundConstraint* right_);
     BoundConjunctiveConstraint(const BoundConjunctiveConstraint& that);
     bool Subsume(BoundConstraint* that) const override;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -73,7 +73,7 @@ public:
 class BINDER_API BoundConcept : public BoundNode
 {
 public:
-    BoundConcept(Module* module_, ConceptSymbol* conceptSymbol_, const std::vector<TypeSymbol*>& typeArguments_, const Span& span_);
+    BoundConcept(ConceptSymbol* conceptSymbol_, const std::vector<TypeSymbol*>& typeArguments_, const Span& span_, const boost::uuids::uuid& moduleId_);
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;

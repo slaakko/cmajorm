@@ -24,7 +24,7 @@ ConceptSymbol* ResolveConceptId(ConceptIdNode* conceptIdNode, BoundCompileUnit& 
 
 bool CheckConstraint(ConstraintNode* constraint, const NodeList<Node>& usingNodes, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, BoundFunction* currentFunction,
     const std::vector<TemplateParameterSymbol*>& templateParameters, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, 
-    std::unique_ptr<BoundConstraint>& boundConstraint, const Span& span, FunctionSymbol* viableFunction, std::unique_ptr<Exception>& conceptCheckException);
+    std::unique_ptr<BoundConstraint>& boundConstraint, const Span& span, const boost::uuids::uuid& moduleId, FunctionSymbol* viableFunction, std::unique_ptr<Exception>& conceptCheckException);
 
 } } // namespace cmajor::binder
 

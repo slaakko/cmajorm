@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace symbols {
 
-StringFunctionContainerSymbol::StringFunctionContainerSymbol() : TypeSymbol(SymbolType::stringFunctionContainerSymbol, Span(), U"@string_functions")
+StringFunctionContainerSymbol::StringFunctionContainerSymbol() : TypeSymbol(SymbolType::stringFunctionContainerSymbol, Span(), boost::uuids::nil_uuid(), U"@string_functions")
 {
     AddMember(new StringLengthFunction(this));
 }
@@ -24,7 +24,8 @@ void* StringFunctionContainerSymbol::CreateDefaultIrValue(Emitter& emitter)
     throw std::runtime_error("string function container symbol has no IR value");
 }
 
-StringFunctionContainerSymbol::StringFunctionContainerSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::stringFunctionContainerSymbol, span_, name_)
+StringFunctionContainerSymbol::StringFunctionContainerSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    TypeSymbol(SymbolType::stringFunctionContainerSymbol, span_, sourceModuleId_, name_)
 {
 }
 
@@ -38,11 +39,11 @@ void StringFunctionContainerSymbol::Read(SymbolReader& reader)
     TypeSymbol::Read(reader);
 }
 
-StringLengthFunction::StringLengthFunction(TypeSymbol* parentType) : FunctionSymbol(SymbolType::stringLengthFunctionSymbol, Span(), U"Length")
+StringLengthFunction::StringLengthFunction(TypeSymbol* parentType) : FunctionSymbol(SymbolType::stringLengthFunctionSymbol, Span(), boost::uuids::nil_uuid(), U"Length")
 {
     SetGroupName(U"Length");
     SetAccess(SymbolAccess::public_);
-    ParameterSymbol* stringValueParam = new ParameterSymbol(Span(), U"stringValue");
+    ParameterSymbol* stringValueParam = new ParameterSymbol(Span(), boost::uuids::nil_uuid(), U"stringValue");
     stringValueParam->SetType(parentType);
     AddMember(stringValueParam);
     TypeSymbol* longType = GetRootModuleForCurrentThread()->GetSymbolTable().GetTypeByName(U"long");
@@ -51,7 +52,7 @@ StringLengthFunction::StringLengthFunction(TypeSymbol* parentType) : FunctionSym
     GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(this);
 }
 
-StringLengthFunction::StringLengthFunction(const Span& span_, const std::u32string& name_) : FunctionSymbol(span_, name_)
+StringLengthFunction::StringLengthFunction(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : FunctionSymbol(span_, sourceModuleId_, name_)
 {
 }
 
@@ -65,12 +66,12 @@ void StringLengthFunction::Read(SymbolReader& reader)
     FunctionSymbol::Read(reader);
 }
 
-void StringLengthFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void StringLengthFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(false, "string length is compile time function only");
 }
 
-std::unique_ptr<Value> StringLengthFunction::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const
+std::unique_ptr<Value> StringLengthFunction::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) const
 {
     if (argumentValues.size() == 0)
     {
@@ -88,17 +89,17 @@ std::unique_ptr<Value> StringLengthFunction::ConstructValue(const std::vector<st
                     case ValueType::stringValue:
                     {
                         StringValue* stringValue = static_cast<StringValue*>(value);
-                        return std::unique_ptr<Value>(new LongValue(span, stringValue->Str().length()));
+                        return std::unique_ptr<Value>(new LongValue(span, moduleId, stringValue->Str().length()));
                     }
                     case ValueType::wstringValue:
                     {
                         WStringValue* stringValue = static_cast<WStringValue*>(value);
-                        return std::unique_ptr<Value>(new LongValue(span, stringValue->Str().length()));
+                        return std::unique_ptr<Value>(new LongValue(span, moduleId, stringValue->Str().length()));
                     }
                     case ValueType::ustringValue:
                     {
                         UStringValue* stringValue = static_cast<UStringValue*>(value);
-                        return std::unique_ptr<Value>(new LongValue(span, stringValue->Str().length()));
+                        return std::unique_ptr<Value>(new LongValue(span, moduleId, stringValue->Str().length()));
                     }
                 }
             }

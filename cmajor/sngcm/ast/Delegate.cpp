@@ -9,12 +9,12 @@
 
 namespace sngcm { namespace ast {
 
-DelegateNode::DelegateNode(const Span& span_) : Node(NodeType::delegateNode, span_), specifiers(Specifiers::none), returnTypeExpr(), id(), parameters()
+DelegateNode::DelegateNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::delegateNode, span_, moduleId_), specifiers(Specifiers::none), returnTypeExpr(), id(), parameters()
 {
 }
 
-DelegateNode::DelegateNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_) :
-    Node(NodeType::delegateNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), id(id_), parameters()
+DelegateNode::DelegateNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_) :
+    Node(NodeType::delegateNode, span_, moduleId_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), id(id_), parameters()
 {
     returnTypeExpr->SetParent(this);
     id->SetParent(this);
@@ -22,7 +22,7 @@ DelegateNode::DelegateNode(const Span& span_, Specifiers specifiers_, Node* retu
 
 Node* DelegateNode::Clone(CloneContext& cloneContext) const
 {
-    DelegateNode* clone = new DelegateNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    DelegateNode* clone = new DelegateNode(GetSpan(), ModuleId(), specifiers, returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int n = parameters.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -63,12 +63,13 @@ void DelegateNode::AddParameter(ParameterNode* parameter)
     parameters.Add(parameter);
 }
 
-ClassDelegateNode::ClassDelegateNode(const Span& span_) : Node(NodeType::classDelegateNode, span_), specifiers(Specifiers::none), returnTypeExpr(), id(), parameters()
+ClassDelegateNode::ClassDelegateNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    Node(NodeType::classDelegateNode, span_, moduleId_), specifiers(Specifiers::none), returnTypeExpr(), id(), parameters()
 {
 }
 
-ClassDelegateNode::ClassDelegateNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_) :
-    Node(NodeType::classDelegateNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), id(id_), parameters()
+ClassDelegateNode::ClassDelegateNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_) :
+    Node(NodeType::classDelegateNode, span_, moduleId_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), id(id_), parameters()
 {
     returnTypeExpr->SetParent(this);
     id->SetParent(this);
@@ -76,7 +77,7 @@ ClassDelegateNode::ClassDelegateNode(const Span& span_, Specifiers specifiers_, 
 
 Node* ClassDelegateNode::Clone(CloneContext& cloneContext) const
 {
-    ClassDelegateNode* clone = new ClassDelegateNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    ClassDelegateNode* clone = new ClassDelegateNode(GetSpan(), ModuleId(), specifiers, returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int n = parameters.Count();
     for (int i = 0; i < n; ++i)
     {

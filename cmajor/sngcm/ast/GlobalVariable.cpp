@@ -11,12 +11,12 @@
 
 namespace sngcm {  namespace ast {
     
-GlobalVariableNode::GlobalVariableNode(const Span& span_) : Node(NodeType::globalVariableNode, span_), specifiers(Specifiers::none), cu(nullptr)
+GlobalVariableNode::GlobalVariableNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::globalVariableNode, span_, moduleId_), specifiers(Specifiers::none), cu(nullptr)
 {
 }
 
-GlobalVariableNode::GlobalVariableNode(const Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, CompileUnitNode* cu_) :
-    Node(NodeType::globalVariableNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), cu(cu_)
+GlobalVariableNode::GlobalVariableNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, CompileUnitNode* cu_) :
+    Node(NodeType::globalVariableNode, span_, moduleId_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), cu(cu_)
 {
     typeExpr->SetParent(this);
     id->SetParent(this);
@@ -24,7 +24,7 @@ GlobalVariableNode::GlobalVariableNode(const Span& span_, Specifiers specifiers_
 
 Node* GlobalVariableNode::Clone(CloneContext& cloneContext) const
 {
-    GlobalVariableNode* clone = new GlobalVariableNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), cu);
+    GlobalVariableNode* clone = new GlobalVariableNode(GetSpan(), ModuleId(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), cu);
     if (initializer)
     {
         clone->SetInitializer(initializer->Clone(cloneContext));

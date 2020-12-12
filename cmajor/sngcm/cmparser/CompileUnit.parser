@@ -41,105 +41,105 @@ parser api(SNGCM_PARSER_API) CompileUnitParser
     using DelegateParser.ClassDelegate;
     using GlobalVariableParser.GlobalVariable;
 
-    CompileUnit(ParsingContext* ctx, var std::unique_ptr<CompileUnitNode> compileUnit) : sngcm::ast::CompileUnitNode*
-        ::= empty{ compileUnit.reset(new CompileUnitNode(span, lexer.FileName())); }
-            NamespaceContent(ctx, compileUnit.get(), compileUnit->GlobalNs()):content{ return compileUnit.release(); }
+    CompileUnit(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<CompileUnitNode> compileUnit) : sngcm::ast::CompileUnitNode*
+        ::= empty{ compileUnit.reset(new CompileUnitNode(span, *moduleId, lexer.FileName())); }
+            NamespaceContent(moduleId, ctx, compileUnit.get(), compileUnit->GlobalNs()):content{ return compileUnit.release(); }
         ;
 
-    NamespaceContent(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns)
-        ::= UsingDirectives(ctx, ns):usingDirectives
-            Definitions(ctx, cu, ns):definitions
+    NamespaceContent(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns)
+        ::= UsingDirectives(moduleId, ctx, ns):usingDirectives
+            Definitions(moduleId, ctx, cu, ns):definitions
         ;
 
-    UsingDirectives(ParsingContext* ctx, sngcm::ast::NamespaceNode* ns)
-        ::= UsingDirective(ctx, ns):usingDirective*
+    UsingDirectives(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::NamespaceNode* ns)
+        ::= UsingDirective(moduleId, ctx, ns):usingDirective*
         ;
 
-    UsingDirective(ParsingContext* ctx, sngcm::ast::NamespaceNode* ns)
-        ::= UsingAliasDirective:usingAlias{ ns->AddMember(usingAlias); }
-        |   UsingNamespaceDirective(ctx):usingNs{ ns->AddMember(usingNs); }
+    UsingDirective(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::NamespaceNode* ns)
+        ::= UsingAliasDirective(moduleId):usingAlias{ ns->AddMember(usingAlias); }
+        |   UsingNamespaceDirective(moduleId, ctx):usingNs{ ns->AddMember(usingNs); }
         ;
 
-    UsingAliasDirective(var Span s) : Node*
-        ::= USING{ s = span; } Identifier:id ASSIGN QualifiedId:qid! SEMICOLON!
+    UsingAliasDirective(boost::uuids::uuid* moduleId, var Span s) : Node*
+        ::= USING{ s = span; } Identifier(moduleId):id ASSIGN QualifiedId(moduleId):qid! SEMICOLON!
         {
             s.end = span.end;
-            return new AliasNode(s, id, qid);
+            return new AliasNode(s, *moduleId, id, qid);
         }
         ;
 
-    UsingNamespaceDirective(ParsingContext* ctx, var Span s) : Node*
-        ::= USING{ s = span; } QualifiedId:ns! SEMICOLON!
+    UsingNamespaceDirective(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } QualifiedId(moduleId):ns! SEMICOLON!
         {
             s.end = span.end;
-            return new NamespaceImportNode(s, ns);
+            return new NamespaceImportNode(s, *moduleId, ns);
         }
         ;
 
-    Definitions(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns)
-        ::= (Definition(ctx, cu, ns):definition{ ns->AddMember(definition); })*
+    Definitions(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns)
+        ::= (Definition(moduleId, ctx, cu, ns):definition{ ns->AddMember(definition); })*
         ;
 
-    Definition(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns) : Node*
-        ::= NamespaceDefinition(ctx, cu, ns):nsDefinition{ return nsDefinition; }
-        |   TypedefDeclaration(ctx):typedefDeclaration{ return typedefDeclaration; }
-        |   ConceptDefinition(ctx):conceptDefinition{ return conceptDefinition; }
-        |   FunctionDefinition(ctx):functionDefinition{ return functionDefinition; }
-        |   ClassDefinition(ctx):classDefinition{ return classDefinition; }
-        |   InterfaceDefinition(ctx):interfaceDefinition{ return interfaceDefinition; }
-        |   EnumTypeDefinition(ctx):enumTypeDefinition{ return enumTypeDefinition; }
-        |   ConstantDefinition(ctx):constantDefinition{ return constantDefinition; }
-        |   DelegateDefinition(ctx):delegateDefinition{ return delegateDefinition; }
-        |   ClassDelegateDefinition(ctx):classDelegateDefinition{ return classDelegateDefinition; }
-        |   GlobalVariableDefinition(ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+    Definition(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns) : Node*
+        ::= NamespaceDefinition(moduleId, ctx, cu, ns):nsDefinition{ return nsDefinition; }
+        |   TypedefDeclaration(moduleId, ctx):typedefDeclaration{ return typedefDeclaration; }
+        |   ConceptDefinition(moduleId, ctx):conceptDefinition{ return conceptDefinition; }
+        |   FunctionDefinition(moduleId, ctx):functionDefinition{ return functionDefinition; }
+        |   ClassDefinition(moduleId, ctx):classDefinition{ return classDefinition; }
+        |   InterfaceDefinition(moduleId, ctx):interfaceDefinition{ return interfaceDefinition; }
+        |   EnumTypeDefinition(moduleId, ctx):enumTypeDefinition{ return enumTypeDefinition; }
+        |   ConstantDefinition(moduleId, ctx):constantDefinition{ return constantDefinition; }
+        |   DelegateDefinition(moduleId, ctx):delegateDefinition{ return delegateDefinition; }
+        |   ClassDelegateDefinition(moduleId, ctx):classDelegateDefinition{ return classDelegateDefinition; }
+        |   GlobalVariableDefinition(moduleId, ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
         ;
 
-    NamespaceDefinition(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns, var std::unique_ptr<NamespaceNode> nsNode, var Span s) : NamespaceNode*
-        ::= NAMESPACE{ s = span; } (QualifiedId:nsName{ s.end = span.end; nsNode.reset(new NamespaceNode(s, nsName)); } | empty{ nsNode.reset(new NamespaceNode(s, nullptr)); })
-            LBRACE! NamespaceContent(ctx, cu, nsNode.get()):content! RBRACE!
+    NamespaceDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns, var std::unique_ptr<NamespaceNode> nsNode, var Span s) : NamespaceNode*
+        ::= NAMESPACE{ s = span; } (QualifiedId(moduleId):nsName{ s.end = span.end; nsNode.reset(new NamespaceNode(s, *moduleId, nsName)); } | empty{ nsNode.reset(new NamespaceNode(s, *moduleId, nullptr)); })
+            LBRACE! NamespaceContent(moduleId, ctx, cu, nsNode.get()):content! RBRACE!
         {
             return nsNode.release();
         }
         ;
 
-    TypedefDeclaration(ParsingContext* ctx) : TypedefNode*
-        ::= Typedef(ctx):typedefDeclaration{ return typedefDeclaration; }
+    TypedefDeclaration(boost::uuids::uuid* moduleId, ParsingContext* ctx) : TypedefNode*
+        ::= Typedef(moduleId, ctx):typedefDeclaration{ return typedefDeclaration; }
         ;
 
-    ConceptDefinition(ParsingContext* ctx) : ConceptNode*
-        ::= Concept(ctx):conceptDefinition{ return conceptDefinition; }
+    ConceptDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx) : ConceptNode*
+        ::= Concept(moduleId, ctx):conceptDefinition{ return conceptDefinition; }
         ;
 
-    FunctionDefinition(ParsingContext* ctx) : FunctionNode*
-        ::= Function(ctx):functionDefinition{ return functionDefinition; }
+    FunctionDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx) : FunctionNode*
+        ::= Function(moduleId, ctx):functionDefinition{ return functionDefinition; }
         ;
 
-    ClassDefinition(ParsingContext* ctx) : ClassNode*
-        ::= Class(ctx):classDefinition{ return classDefinition; }
+    ClassDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx) : ClassNode*
+        ::= Class(moduleId, ctx):classDefinition{ return classDefinition; }
         ;
 
-    InterfaceDefinition(ParsingContext* ctx) : InterfaceNode*
-        ::= Interface(ctx):interfaceDefinition{ return interfaceDefinition; }
+    InterfaceDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx) : InterfaceNode*
+        ::= Interface(moduleId, ctx):interfaceDefinition{ return interfaceDefinition; }
         ;
 
-    EnumTypeDefinition(ParsingContext* ctx) : EnumTypeNode*
-        ::= EnumType(ctx):enumTypeDefinition{ return enumTypeDefinition; }
+    EnumTypeDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx) : EnumTypeNode*
+        ::= EnumType(moduleId, ctx):enumTypeDefinition{ return enumTypeDefinition; }
         ;
 
-    ConstantDefinition(ParsingContext* ctx) : ConstantNode*
-        ::= Constant(ctx):constantDefinition{ return constantDefinition; }
+    ConstantDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx) : ConstantNode*
+        ::= Constant(moduleId, ctx):constantDefinition{ return constantDefinition; }
         ;
 
-    DelegateDefinition(ParsingContext* ctx) : DelegateNode*
-        ::= Delegate(ctx):delegateDefinition{ return delegateDefinition; }
+    DelegateDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx) : DelegateNode*
+        ::= Delegate(moduleId, ctx):delegateDefinition{ return delegateDefinition; }
         ;
 
-    ClassDelegateDefinition(ParsingContext* ctx) : ClassDelegateNode*
-        ::= ClassDelegate(ctx):classDelegateDefinition{ return classDelegateDefinition; }
+    ClassDelegateDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx) : ClassDelegateNode*
+        ::= ClassDelegate(moduleId, ctx):classDelegateDefinition{ return classDelegateDefinition; }
         ;
 
-    GlobalVariableDefinition(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu) : GlobalVariableNode*
-        ::= GlobalVariable(ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+    GlobalVariableDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu) : GlobalVariableNode*
+        ::= GlobalVariable(moduleId, ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
         ;
 
     ruleinfo

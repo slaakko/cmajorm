@@ -74,7 +74,7 @@ void ControlFlowAnalyzer::CollectLabel(BoundStatement& statement)
         }
         else
         {
-            throw Exception(module, "duplicate label '" + ToUtf8(statement.Label()) + "'", statement.GetSpan(), it->second->GetSpan());
+            throw Exception("duplicate label '" + ToUtf8(statement.Label()) + "'", statement.GetSpan(), statement.ModuleId(), it->second->GetSpan(), it->second->ModuleId());
         }
     }
 }
@@ -105,12 +105,12 @@ void ControlFlowAnalyzer::ResolveGoto(BoundGotoStatement& boundGotoStatement)
         }
         if (!gotoBlock)
         {
-            throw Exception(module, "goto target '" + ToUtf8(target) + "' not in enclosing block", boundGotoStatement.GetSpan(), targetStatement->GetSpan());
+            throw Exception("goto target '" + ToUtf8(target) + "' not in enclosing block", boundGotoStatement.GetSpan(), boundGotoStatement.ModuleId(), targetStatement->GetSpan(), targetStatement->ModuleId());
         }
     }
     else
     {
-        throw Exception(module, "goto target '" + ToUtf8(target) + "' not found", boundGotoStatement.GetSpan());
+        throw Exception("goto target '" + ToUtf8(target) + "' not found", boundGotoStatement.GetSpan(), boundGotoStatement.ModuleId());
     }
 }
 

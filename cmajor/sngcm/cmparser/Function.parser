@@ -33,32 +33,32 @@ parser api(SNGCM_PARSER_API) FunctionParser
     using IdentifierParser.Identifier;
     using StatementParser.CompoundStatement;
 
-    Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var Span specifierSpan) : FunctionNode*
-        ::= empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):returnType FunctionGroupId(ctx):functionGroupId
+    Function(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var Span specifierSpan) : FunctionNode*
+        ::= empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(moduleId, ctx):returnType FunctionGroupId(moduleId, ctx):functionGroupId
         {
             s.end = span.end;
-            fun.reset(new FunctionNode(s, specifiers, returnType, functionGroupId, attrs));
+            fun.reset(new FunctionNode(s, *moduleId, specifiers, returnType, functionGroupId, attrs));
             fun->SetSpecifierSpan(specifierSpan);
             fun->SetGroupIdSpan(span);
         }
-        TemplateParameterList(ctx, fun.get()):templateParams?
-        ParameterList(ctx, fun.get()):paramList
-        (WhereConstraint(ctx):constraint{ fun->SetConstraint(constraint); })?
-        (CompoundStatement(ctx):body{ fun->SetBody(body); } | SEMICOLON)
+        TemplateParameterList(moduleId, ctx, fun.get()):templateParams?
+        ParameterList(moduleId, ctx, fun.get()):paramList
+        (WhereConstraint(moduleId, ctx):constraint{ fun->SetConstraint(constraint); })?
+        (CompoundStatement(moduleId, ctx):body{ fun->SetBody(body); } | SEMICOLON)
         {
             return fun.release();
         }
         ;
 
-    FunctionGroupId(ParsingContext* ctx) : std::u32string
+    FunctionGroupId(boost::uuids::uuid* moduleId, ParsingContext* ctx) : std::u32string
         ::= ID{ return lexer.GetMatch(span); }
-        |   OperatorFunctionGroupId(ctx):operatorFunctionGroupId{ return operatorFunctionGroupId; }
+        |   OperatorFunctionGroupId(moduleId, ctx):operatorFunctionGroupId{ return operatorFunctionGroupId; }
         ;
 
-    OperatorFunctionGroupId(ParsingContext* ctx) : std::u32string
+    OperatorFunctionGroupId(boost::uuids::uuid* moduleId, ParsingContext* ctx) : std::u32string
         ::= empty{ lexer.parsingOperatorFunctionGroupId = true; }
         (   OPERATOR
-            (   ((LANGLE LANGLE) - (LANGLE LANGLE (TypeExpr(ctx):typeExpr % COMMA) RANGLE)){ lexer.parsingOperatorFunctionGroupId = false; return U"operator<<"; }
+            (   ((LANGLE LANGLE) - (LANGLE LANGLE (TypeExpr(moduleId, ctx):typeExpr % COMMA) RANGLE)){ lexer.parsingOperatorFunctionGroupId = false; return U"operator<<"; }
             |   SHIFTRIGHT{ lexer.parsingOperatorFunctionGroupId = false; return U"operator>>"; }
             |   EQ{ lexer.parsingOperatorFunctionGroupId = false; return U"operator=="; }
             |   ASSIGN{ lexer.parsingOperatorFunctionGroupId = false; return U"operator="; }

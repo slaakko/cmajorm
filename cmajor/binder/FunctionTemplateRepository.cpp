@@ -40,7 +40,8 @@ FunctionTemplateRepository::FunctionTemplateRepository(BoundCompileUnit& boundCo
 {
 }
 
-FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping,  const Span& span)
+FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping,  
+    const Span& span, const boost::uuids::uuid& moduleId)
 {
     std::vector<TypeSymbol*> templateArgumentTypes;
     for (TemplateParameterSymbol* templateParameter : functionTemplate->TemplateParameters())
@@ -53,7 +54,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
         }
         else
         {
-            throw Exception(&boundCompileUnit.GetModule(), "template parameter type not found", span);
+            throw Exception("template parameter type not found", span, moduleId);
         }
     }
     FunctionTemplateKey key(functionTemplate, templateArgumentTypes);
@@ -72,12 +73,9 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     }
     Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
-    SpanMapper spanMapper;
-    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()),
-        new IdentifierNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()), U"")));
+    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(functionNode->GetSpan(), functionNode->ModuleId(), new IdentifierNode(functionNode->GetSpan(), functionNode->ModuleId(), U"")));
     NamespaceNode* currentNs = globalNs.get();
     CloneContext cloneContext;
-    cloneContext.SetSpanMapper(&spanMapper);
     cloneContext.SetInstantiateFunctionNode();
     int n = functionTemplate->UsingNodes().Count();
     for (int i = 0; i < n; ++i)
@@ -88,7 +86,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     bool fileScopeAdded = false;
     if (!functionTemplate->Ns()->IsGlobalNamespace())
     {
-        FileScope* primaryFileScope = new FileScope(&boundCompileUnit.GetModule());
+        FileScope* primaryFileScope = new FileScope();
         primaryFileScope->AddContainerScope(functionTemplate->Ns()->GetContainerScope());
         boundCompileUnit.AddFileScope(primaryFileScope);
         fileScopeAdded = true;
@@ -96,8 +94,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
         std::vector<std::u32string> nsComponents = Split(fullNsName, '.');
         for (const std::u32string& nsComponent : nsComponents)
         {
-            NamespaceNode* nsNode = new NamespaceNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()),
-                new IdentifierNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()), nsComponent));
+            NamespaceNode* nsNode = new NamespaceNode(functionNode->GetSpan(), functionNode->ModuleId(), new IdentifierNode(functionNode->GetSpan(), functionNode->ModuleId(), nsComponent));
             currentNs->AddMember(nsNode);
             currentNs = nsNode;
         }
@@ -121,13 +118,13 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
         if (it != templateParameterMapping.cend())
         {
             TypeSymbol* boundType = it->second;
-            BoundTemplateParameterSymbol* boundTemplateParameter = new BoundTemplateParameterSymbol(span, templateParameter->Name());
+            BoundTemplateParameterSymbol* boundTemplateParameter = new BoundTemplateParameterSymbol(span, moduleId, templateParameter->Name());
             boundTemplateParameter->SetType(boundType);
             functionSymbol->AddMember(boundTemplateParameter);
         }
         else
         {
-            throw Exception(&boundCompileUnit.GetModule(), "template parameter type not found", span);
+            throw Exception("template parameter type not found", span, moduleId);
         }
     }
     TypeBinder typeBinder(boundCompileUnit);

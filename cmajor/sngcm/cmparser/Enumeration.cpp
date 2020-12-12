@@ -7,13 +7,13 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Enumeration.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Enumeration.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -95,7 +95,7 @@ soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, ParsingCon
                                 soulng::parser::Match* parentMatch10 = &match;
                                 {
                                     soulng::lexer::Span span = lexer.GetSpan();
-                                    soulng::parser::Match match = IdentifierParser::Identifier(lexer);
+                                    soulng::parser::Match match = IdentifierParser::Identifier(lexer, moduleId);
                                     enumTypeId.reset(static_cast<IdentifierNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -109,7 +109,7 @@ soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, ParsingCon
                                 if (match.hit)
                                 {
                                     s.end = span.end;
-                                    enumTypeNode.reset(new EnumTypeNode(s, specifiers->value, enumTypeId.release()));
+                                    enumTypeNode.reset(new EnumTypeNode(s, *moduleId, specifiers->value, enumTypeId.release()));
                                 }
                                 *parentMatch9 = match;
                             }
@@ -135,7 +135,7 @@ soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, ParsingCon
                                 soulng::parser::Match* parentMatch14 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
-                                    soulng::parser::Match match = EnumerationParser::UnderlyingType(lexer, ctx);
+                                    soulng::parser::Match match = EnumerationParser::UnderlyingType(lexer, moduleId, ctx);
                                     underlyingType.reset(static_cast<Node*>(match.value));
                                     if (match.hit)
                                     {
@@ -206,7 +206,7 @@ soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, ParsingCon
             soulng::parser::Match match(false);
             soulng::parser::Match* parentMatch18 = &match;
             {
-                soulng::parser::Match match = EnumerationParser::EnumConstants(lexer, ctx, enumTypeNode.get());
+                soulng::parser::Match match = EnumerationParser::EnumConstants(lexer, moduleId, ctx, enumTypeNode.get());
                 *parentMatch18 = match;
             }
             *parentMatch1 = match;
@@ -274,7 +274,7 @@ soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, ParsingCon
     return match;
 }
 
-soulng::parser::Match EnumerationParser::UnderlyingType(CmajorLexer& lexer, ParsingContext* ctx)
+soulng::parser::Match EnumerationParser::UnderlyingType(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -306,7 +306,7 @@ soulng::parser::Match EnumerationParser::UnderlyingType(CmajorLexer& lexer, Pars
             soulng::parser::Match* parentMatch2 = &match;
             {
                 int64_t pos = lexer.GetPos();
-                soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, ctx);
+                soulng::parser::Match match = TypeExprParser::TypeExpr(lexer, moduleId, ctx);
                 type.reset(static_cast<sngcm::ast::Node*>(match.value));
                 if (match.hit)
                 {
@@ -337,7 +337,7 @@ soulng::parser::Match EnumerationParser::UnderlyingType(CmajorLexer& lexer, Pars
     return match;
 }
 
-soulng::parser::Match EnumerationParser::EnumConstants(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::EnumTypeNode* enumType)
+soulng::parser::Match EnumerationParser::EnumConstants(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::EnumTypeNode* enumType)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -360,7 +360,7 @@ soulng::parser::Match EnumerationParser::EnumConstants(CmajorLexer& lexer, Parsi
             soulng::parser::Match* parentMatch2 = &match;
             {
                 soulng::lexer::Span span = lexer.GetSpan();
-                soulng::parser::Match match = EnumerationParser::EnumConstant(lexer, ctx, enumType);
+                soulng::parser::Match match = EnumerationParser::EnumConstant(lexer, moduleId, ctx, enumType);
                 enumConstant.reset(static_cast<EnumConstantNode*>(match.value));
                 if (match.hit)
                 {
@@ -415,7 +415,7 @@ soulng::parser::Match EnumerationParser::EnumConstants(CmajorLexer& lexer, Parsi
                                     soulng::parser::Match* parentMatch8 = &match;
                                     {
                                         soulng::lexer::Span span = lexer.GetSpan();
-                                        soulng::parser::Match match = EnumerationParser::EnumConstant(lexer, ctx, enumType);
+                                        soulng::parser::Match match = EnumerationParser::EnumConstant(lexer, moduleId, ctx, enumType);
                                         enumConstant.reset(static_cast<EnumConstantNode*>(match.value));
                                         if (match.hit)
                                         {
@@ -466,7 +466,7 @@ soulng::parser::Match EnumerationParser::EnumConstants(CmajorLexer& lexer, Parsi
     return match;
 }
 
-soulng::parser::Match EnumerationParser::EnumConstant(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::EnumTypeNode* enumType)
+soulng::parser::Match EnumerationParser::EnumConstant(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::EnumTypeNode* enumType)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -493,7 +493,7 @@ soulng::parser::Match EnumerationParser::EnumConstant(CmajorLexer& lexer, Parsin
             soulng::parser::Match* parentMatch2 = &match;
             {
                 soulng::lexer::Span span = lexer.GetSpan();
-                soulng::parser::Match match = IdentifierParser::Identifier(lexer);
+                soulng::parser::Match match = IdentifierParser::Identifier(lexer, moduleId);
                 constantId.reset(static_cast<IdentifierNode*>(match.value));
                 if (match.hit)
                 {
@@ -544,7 +544,7 @@ soulng::parser::Match EnumerationParser::EnumConstant(CmajorLexer& lexer, Parsin
                             soulng::parser::Match* parentMatch8 = &match;
                             {
                                 int64_t pos = lexer.GetPos();
-                                soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
+                                soulng::parser::Match match = ExpressionParser::Expression(lexer, moduleId, ctx);
                                 constantValue.reset(static_cast<Node*>(match.value));
                                 if (match.hit)
                                 {
@@ -552,7 +552,7 @@ soulng::parser::Match EnumerationParser::EnumConstant(CmajorLexer& lexer, Parsin
                                     expr->SetFullSpan();
                                     Span v = expr->GetSpan();
                                     s.end = expr->GetSpan().end;
-                                    EnumConstantNode * value = new EnumConstantNode(s, constantId.release(), expr.release());
+                                    EnumConstantNode * value = new EnumConstantNode(s, *moduleId, constantId.release(), expr.release());
                                     value->SetHasValue();
                                     value->SetStrValue(lexer.GetMatch(v));
                                     {
@@ -586,7 +586,7 @@ soulng::parser::Match EnumerationParser::EnumConstant(CmajorLexer& lexer, Parsin
                                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("EnumConstant"));
                                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                        return soulng::parser::Match(true, new EnumConstantNode(s, constantId.release(), MakeNextEnumConstantValue(s, enumType)));
+                                        return soulng::parser::Match(true, new EnumConstantNode(s, *moduleId, constantId.release(), MakeNextEnumConstantValue(s, *moduleId, enumType)));
                                     }
                                 }
                                 *parentMatch10 = match;

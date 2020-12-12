@@ -16,7 +16,7 @@ using namespace cmajor::ir;
 class SYMBOLS_API VariableSymbol : public Symbol
 {
 public:
-    VariableSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
+    VariableSymbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     bool IsVariableSymbol() const override { return true; }
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
@@ -34,7 +34,7 @@ private:
 class SYMBOLS_API ParameterSymbol : public VariableSymbol
 {
 public:    
-    ParameterSymbol(const Span& span_, const std::u32string& name_);
+    ParameterSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
@@ -44,6 +44,7 @@ public:
     bool ArtificialName() const { return artificialName; }
     void SetArtificialName() { artificialName = true; }
     std::u32string CodeName() const override;
+    ParameterSymbol* Clone() const;
 private:
     bool artificialName;
 };
@@ -51,7 +52,7 @@ private:
 class SYMBOLS_API LocalVariableSymbol : public VariableSymbol
 {
 public:     
-    LocalVariableSymbol(const Span& span_, const std::u32string& name_);
+    LocalVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     bool IsExportSymbol() const override { return false; }
     std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
@@ -61,7 +62,7 @@ public:
 class SYMBOLS_API MemberVariableSymbol : public VariableSymbol
 {
 public:
-    MemberVariableSymbol(const Span& span_, const std::u32string& name_);
+    MemberVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     bool IsExportSymbol() const override;
@@ -85,7 +86,7 @@ class GlobalVariableSymbol;
 class SYMBOLS_API GlobalVariableGroupSymbol : public Symbol
 {
 public:
-    GlobalVariableGroupSymbol(const Span& span_, const std::u32string& name_);
+    GlobalVariableGroupSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     bool IsExportSymbol() const override { return false; }
     std::string TypeString() const override { return "global_variable_group"; }
     void ComputeMangledName() override;
@@ -100,8 +101,8 @@ private:
 class SYMBOLS_API GlobalVariableSymbol : public VariableSymbol
 {
 public:
-    GlobalVariableSymbol(const Span& span_, const std::u32string& groupName_, const std::string& compileUnitId, const std::string& compileUnitFilePath_);
-    GlobalVariableSymbol(const Span& span_, const std::u32string& name_);
+    GlobalVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& groupName_, const std::string& compileUnitId, const std::string& compileUnitFilePath_);
+    GlobalVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     bool IsExportSymbol() const override;

@@ -19,7 +19,8 @@ namespace cmajor { namespace symbols {
 
 using namespace soulng::unicode;
 
-VariableSymbol::VariableSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : Symbol(symbolType_, span_, name_), type()
+VariableSymbol::VariableSymbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    Symbol(symbolType_, span_, sourceModuleId_, name_), type()
 {
 }
 
@@ -48,11 +49,12 @@ void VariableSymbol::Check()
     Symbol::Check();
     if (!type)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "variable symbol contains null type pointer", GetSpan());
+        throw SymbolCheckException("variable symbol contains null type pointer", GetSpan(), SourceModuleId());
     }
 }
 
-ParameterSymbol::ParameterSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::parameterSymbol, span_, name_), artificialName(false)
+ParameterSymbol::ParameterSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    VariableSymbol(SymbolType::parameterSymbol, span_, sourceModuleId_, name_), artificialName(false)
 {
 }
 
@@ -90,7 +92,16 @@ std::unique_ptr<sngxml::dom::Element> ParameterSymbol::CreateDomElement(TypeMap&
     return element;
 }
 
-LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::localVariableSymbol, span_, name_)
+ParameterSymbol* ParameterSymbol::Clone() const
+{
+    ParameterSymbol* clone = new ParameterSymbol(GetSpan(), SourceModuleId(), Name());
+    clone->SetType(const_cast<TypeSymbol*>(GetType()));
+    clone->artificialName = artificialName;
+    return clone;
+}
+
+LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    VariableSymbol(SymbolType::localVariableSymbol, span_, sourceModuleId_, name_)
 {
 }
 
@@ -107,7 +118,8 @@ std::unique_ptr<sngxml::dom::Element> LocalVariableSymbol::CreateDomElement(Type
     return element;
 }
 
-MemberVariableSymbol::MemberVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::memberVariableSymbol, span_, name_), layoutIndex(-1)
+MemberVariableSymbol::MemberVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    VariableSymbol(SymbolType::memberVariableSymbol, span_, sourceModuleId_, name_), layoutIndex(-1)
 {
 }
 
@@ -169,63 +181,63 @@ void MemberVariableSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be virtual", GetSpan());
+        throw Exception("member variable cannot be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be override", GetSpan());
+        throw Exception("member variable cannot be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be abstract", GetSpan());
+        throw Exception("member variable cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be inline", GetSpan());
+        throw Exception("member variable cannot be inline", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be explicit", GetSpan());
+        throw Exception("member variable cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be external", GetSpan());
+        throw Exception("member variable cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be suppressed", GetSpan());
+        throw Exception("member variable cannot be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be default", GetSpan());
+        throw Exception("member variable cannot be default", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be constexpr", GetSpan());
+        throw Exception("member variable cannot be constexpr", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be cdecl", GetSpan());
+        throw Exception("member variable cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be nothrow", GetSpan());
+        throw Exception("member variable cannot be nothrow", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be throw", GetSpan());
+        throw Exception("member variable cannot be throw", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be new", GetSpan());
+        throw Exception("member variable cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be const", GetSpan());
+        throw Exception("member variable cannot be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member variable cannot be unit_test", GetSpan());
+        throw Exception("member variable cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
@@ -241,7 +253,7 @@ void* MemberVariableSymbol::GetDIMemberType(Emitter& emitter, uint64_t offsetInB
         uint64_t sizeInBits = GetType()->SizeInBits(emitter);
         uint32_t alignInBits = GetType()->AlignmentInBits(emitter);
         void* scope = parentClassType->GetDIType(emitter);
-        localDIType = emitter.CreateDIMemberType(scope, ToUtf8(Name()), GetSpan(), sizeInBits, alignInBits, offsetInBits, GetType()->GetDIType(emitter));
+        localDIType = emitter.CreateDIMemberType(scope, ToUtf8(Name()), GetSpan(), SourceModuleId(), sizeInBits, alignInBits, offsetInBits, GetType()->GetDIType(emitter));
         emitter.SetDIMemberType(memberVariableId, localDIType);
     }
     return localDIType;
@@ -265,11 +277,12 @@ void MemberVariableSymbol::Check()
     VariableSymbol::Check();
     if (layoutIndex == -1)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "member variable symbol contains invalid layout index", GetSpan());
+        throw SymbolCheckException("member variable symbol contains invalid layout index", GetSpan(), SourceModuleId());
     }
 }
 
-GlobalVariableGroupSymbol::GlobalVariableGroupSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::globalVariableGroupSymbol, span_, name_)
+GlobalVariableGroupSymbol::GlobalVariableGroupSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    Symbol(SymbolType::globalVariableGroupSymbol, span_, sourceModuleId_, name_)
 {
 }
 
@@ -295,16 +308,17 @@ void GlobalVariableGroupSymbol::AddGlobalVariable(GlobalVariableSymbol* globalVa
             {
                 if (globalVariableSymbol->Access() == SymbolAccess::internal_ || globalVariableSymbol->Access() == SymbolAccess::public_)
                 {
-                    throw Exception(GetRootModuleForCurrentThread(), "global variable group '" + ToUtf8(Name()) +
-                        "' already has public or internal global variable with the given name defined in the source file " + p.second, globalVariableSymbol->GetSpan(), GetSpan());
+                    throw Exception("global variable group '" + ToUtf8(Name()) +
+                        "' already has public or internal global variable with the given name defined in the source file " + p.second, 
+                        globalVariableSymbol->GetSpan(), globalVariableSymbol->SourceModuleId(), GetSpan(), SourceModuleId());
                 }
             }
             else
             {
                 if (p.second == globalVariableSymbol->CompileUnitFilePath())
                 {
-                    throw Exception(GetRootModuleForCurrentThread(), "global variable group '" + ToUtf8(Name()) + "' already has global variable with the given name and compile unit",
-                        globalVariableSymbol->GetSpan(), GetSpan());
+                    throw Exception("global variable group '" + ToUtf8(Name()) + "' already has global variable with the given name and compile unit",
+                        globalVariableSymbol->GetSpan(), globalVariableSymbol->SourceModuleId(), GetSpan(), SourceModuleId());
                 }
             }
         }
@@ -315,8 +329,8 @@ void GlobalVariableGroupSymbol::AddGlobalVariable(GlobalVariableSymbol* globalVa
         }
         else
         {
-            throw Exception(GetRootModuleForCurrentThread(), "global variable group '" + ToUtf8(Name()) + "' already has global variable with the given name and compile unit",
-                globalVariableSymbol->GetSpan(), GetSpan());
+            throw Exception("global variable group '" + ToUtf8(Name()) + "' already has global variable with the given name and compile unit",
+                globalVariableSymbol->GetSpan(), globalVariableSymbol->SourceModuleId(), GetSpan(), SourceModuleId());
         }
     }
 }
@@ -352,12 +366,13 @@ std::u32string MakeGlobalVariableName(const std::u32string& groupName, const std
     return name;
 }
 
-GlobalVariableSymbol::GlobalVariableSymbol(const Span& span_, const std::u32string& groupName_, const std::string& compileUnitId, const std::string& compileUnitFilePath_) :
-    VariableSymbol(SymbolType::globalVariableSymbol, span_, MakeGlobalVariableName(groupName_, compileUnitId)), groupName(groupName_), compileUnitFilePath(compileUnitFilePath_)
+GlobalVariableSymbol::GlobalVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& groupName_, const std::string& compileUnitId, const std::string& compileUnitFilePath_) :
+    VariableSymbol(SymbolType::globalVariableSymbol, span_, sourceModuleId_, MakeGlobalVariableName(groupName_, compileUnitId)), groupName(groupName_), compileUnitFilePath(compileUnitFilePath_)
 {
 }
 
-GlobalVariableSymbol::GlobalVariableSymbol(const Span& span_, const std::u32string& name_) : VariableSymbol(SymbolType::globalVariableSymbol, span_, name_)
+GlobalVariableSymbol::GlobalVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    VariableSymbol(SymbolType::globalVariableSymbol, span_, sourceModuleId_, name_)
 {
 }
 
@@ -384,7 +399,7 @@ void GlobalVariableSymbol::Read(SymbolReader& reader)
     bool privateAccess = Access() == SymbolAccess::private_;
     if (hasInitializer && !privateAccess)
     {
-        initializer = ReadValue(reader.GetBinaryReader(), GetSpan());
+        initializer = ReadValue(reader.GetBinaryReader(), GetSpan(), SourceModuleId());
         initializer->SetType(GetType());
     }
 }
@@ -438,67 +453,67 @@ void GlobalVariableSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be static", GetSpan());
+        throw Exception("global variable cannot be static", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be virtual", GetSpan());
+        throw Exception("global variable cannot be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be override", GetSpan());
+        throw Exception("global variable cannot be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be abstract", GetSpan());
+        throw Exception("global variable cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be inline", GetSpan());
+        throw Exception("global variable cannot be inline", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be explicit", GetSpan());
+        throw Exception("global variable cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be external", GetSpan());
+        throw Exception("global variable cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be suppressed", GetSpan());
+        throw Exception("global variable cannot be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be default", GetSpan());
+        throw Exception("global variable cannot be default", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be constexpr", GetSpan());
+        throw Exception("global variable cannot be constexpr", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be cdecl", GetSpan());
+        throw Exception("global variable cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be nothrow", GetSpan());
+        throw Exception("global variable cannot be nothrow", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be throw", GetSpan());
+        throw Exception("global variable cannot be throw", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be new", GetSpan());
+        throw Exception("global variable cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be const", GetSpan());
+        throw Exception("global variable cannot be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "global variable cannot be unit_test", GetSpan());
+        throw Exception("global variable cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 

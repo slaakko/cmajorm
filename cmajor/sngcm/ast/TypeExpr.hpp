@@ -12,8 +12,8 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API ConstNode : public Node
 {
 public:
-    ConstNode(const Span& span_);
-    ConstNode(const Span& span_, Node* subject_);
+    ConstNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConstNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -28,8 +28,8 @@ private:
 class SNGCM_AST_API LValueRefNode : public Node
 {
 public:
-    LValueRefNode(const Span& span_);
-    LValueRefNode(const Span& span_, Node* subject_);
+    LValueRefNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    LValueRefNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -44,8 +44,8 @@ private:
 class SNGCM_AST_API RValueRefNode : public Node
 {
 public:
-    RValueRefNode(const Span& span_);
-    RValueRefNode(const Span& span_, Node* subject_);
+    RValueRefNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    RValueRefNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -60,8 +60,8 @@ private:
 class SNGCM_AST_API PointerNode : public Node
 {
 public:
-    PointerNode(const Span& span_);
-    PointerNode(const Span& span_, Node* subject_);
+    PointerNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    PointerNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -76,8 +76,8 @@ private:
 class SNGCM_AST_API ArrayNode : public Node
 {
 public:
-    ArrayNode(const Span& span_);
-    ArrayNode(const Span& span_, Node* subject_, Node* size_);
+    ArrayNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ArrayNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* subject_, Node* size_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

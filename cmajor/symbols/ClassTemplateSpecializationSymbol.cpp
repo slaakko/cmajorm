@@ -34,13 +34,17 @@ std::u32string MakeClassTemplateSpecializationName(ClassTypeSymbol* classTemplat
     return name;
 }
 
-ClassTemplateSpecializationSymbol::ClassTemplateSpecializationSymbol(const Span& span_, const std::u32string& name_) : 
-    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(nullptr), templateArgumentTypes(), flags(ClassTemplateSpecializationFlags::none)
+ClassTemplateSpecializationSymbol::ClassTemplateSpecializationSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, sourceModuleId_, name_), classTemplate(nullptr), templateArgumentTypes(), flags(ClassTemplateSpecializationFlags::none)
 {
 }
 
-ClassTemplateSpecializationSymbol::ClassTemplateSpecializationSymbol(const Span& span_, std::u32string& name_, ClassTypeSymbol* classTemplate_, const std::vector<TypeSymbol*>& templateArgumentTypes_) : 
-    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, name_), classTemplate(classTemplate_), templateArgumentTypes(templateArgumentTypes_), flags(ClassTemplateSpecializationFlags::none)
+ClassTemplateSpecializationSymbol::ClassTemplateSpecializationSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, std::u32string& name_, ClassTypeSymbol* classTemplate_, const std::vector<TypeSymbol*>& templateArgumentTypes_) :
+    ClassTypeSymbol(SymbolType::classTemplateSpecializationSymbol, span_, sourceModuleId_, name_), classTemplate(classTemplate_), templateArgumentTypes(templateArgumentTypes_), flags(ClassTemplateSpecializationFlags::none)
+{
+}
+
+ClassTemplateSpecializationSymbol::~ClassTemplateSpecializationSymbol()
 {
 }
 
@@ -138,7 +142,7 @@ void* ClassTemplateSpecializationSymbol::IrType(Emitter& emitter)
 
 void ClassTemplateSpecializationSymbol::SetGlobalNs(std::unique_ptr<Node>&& globalNs_)
 {
-    globalNs = std::move(globalNs_);
+    globalNs = std::move(globalNs_); 
 }
 
 void ClassTemplateSpecializationSymbol::SetFileScope(FileScope* fileScope_)
@@ -151,12 +155,13 @@ FileScope* ClassTemplateSpecializationSymbol::ReleaseFileScope()
     return fileScope.release();
 }
 
-TypeSymbol* ClassTemplateSpecializationSymbol::UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span)
+TypeSymbol* ClassTemplateSpecializationSymbol::UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, 
+    const Span& span, const boost::uuids::uuid& moduleId)
 {
     std::vector<TypeSymbol*> targetTemplateArgumentTypes;
     for (int i = 0; i < templateArgumentTypes.size(); ++i)
     {
-        TypeSymbol* templateArgumentType = templateArgumentTypes[i]->UnifyTemplateArgumentType(symbolTable, templateParameterMap, span);
+        TypeSymbol* templateArgumentType = templateArgumentTypes[i]->UnifyTemplateArgumentType(symbolTable, templateParameterMap, span, moduleId);
         if (templateArgumentType)
         {
             targetTemplateArgumentTypes.push_back(templateArgumentType);
@@ -166,7 +171,7 @@ TypeSymbol* ClassTemplateSpecializationSymbol::UnifyTemplateArgumentType(SymbolT
             return nullptr;
         }
     }
-    return symbolTable.MakeClassTemplateSpecialization(classTemplate, targetTemplateArgumentTypes, span);
+    return symbolTable.MakeClassTemplateSpecialization(classTemplate, targetTemplateArgumentTypes, span, GetRootModuleForCurrentThread()->Id());
 }
 
 std::u32string ClassTemplateSpecializationSymbol::Id() const
@@ -186,13 +191,13 @@ void ClassTemplateSpecializationSymbol::Check()
     ClassTypeSymbol::Check();
     if (!classTemplate)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "class template specialization has no class template", GetSpan());
+        throw SymbolCheckException("class template specialization has no class template", GetSpan(), SourceModuleId());
     }
     for (TypeSymbol* templateArguementType : templateArgumentTypes)
     {
         if (!templateArguementType)
         {
-            throw SymbolCheckException(GetRootModuleForCurrentThread(), "class template specialization has no template argument type", GetSpan());
+            throw SymbolCheckException("class template specialization has no template argument type", GetSpan(), SourceModuleId());
         }
     }
 }

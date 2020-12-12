@@ -101,7 +101,7 @@ void TypeBinder::AddUsingNodesToCurrentCompileUnit(Node* node)
     }
     if (!namespaceNode)
     {
-        throw Exception(module, "global namespace parent not found for node", node->GetSpan());
+        throw Exception("global namespace parent not found for node", node->GetSpan(), node->ModuleId());
     }
     UsingNodeAdder usingNodeAdder(boundCompileUnit, containerScope);
     namespaceNode->Accept(usingNodeAdder);
@@ -113,7 +113,7 @@ void TypeBinder::Visit(CompileUnitNode& compileUnitNode)
     {
         boundCompileUnit.GenerateGlobalInitializationFunction();
     }
-    boundCompileUnit.AddFileScope(new FileScope(&boundCompileUnit.GetModule()));
+    boundCompileUnit.AddFileScope(new FileScope());
     compileUnitNode.GlobalNs()->Accept(*this);
 }
 
@@ -168,8 +168,6 @@ void TypeBinder::Visit(FunctionNode& functionNode)
         if (functionNode.WhereConstraint())
         {
             CloneContext cloneContext;
-            SpanMapper spanMapper;
-            cloneContext.SetSpanMapper(&spanMapper);
             functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
         }
     }
@@ -199,8 +197,6 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     if (!functionSymbol->Constraint() && functionNode.WhereConstraint())
     {
         CloneContext cloneContext;
-        SpanMapper spanMapper;
-        cloneContext.SetSpanMapper(&spanMapper);
         functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
     }
     functionSymbol->ComputeName();
@@ -210,9 +206,9 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     }
     if (functionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
-        ParameterSymbol* returnParam = new ParameterSymbol(functionNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        ParameterSymbol* returnParam = new ParameterSymbol(functionNode.ReturnTypeExpr()->GetSpan(), functionNode.ReturnTypeExpr()->ModuleId(), U"@return");
         returnParam->SetParent(functionSymbol);
-        returnParam->SetType(returnType->AddPointer(functionNode.GetSpan()));
+        returnParam->SetType(returnType->AddPointer(functionNode.GetSpan(), functionNode.ModuleId()));
         functionSymbol->SetReturnParam(returnParam);
     }
     if (functionNode.Body() && !functionSymbol->IsFunctionTemplate())
@@ -223,7 +219,7 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     {
         if (!functionSymbol->IsExternal() && !functionSymbol->IsFunctionTemplate())
         {
-            throw Exception(module, "function has no body", functionSymbol->GetSpan());
+            throw Exception("function has no body", functionSymbol->GetSpan(), functionSymbol->SourceModuleId());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(functionNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -245,8 +241,6 @@ void TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, ClassNode* cl
     if (classNode->WhereConstraint())
     {
         CloneContext cloneContext;
-        SpanMapper spanMapper;
-        cloneContext.SetSpanMapper(&spanMapper);
         classTemplate->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
@@ -260,10 +254,10 @@ void TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, ClassNode* cl
     {
         templateArgumentTypes.push_back(templateParam);
     }
-    ClassTemplateSpecializationSymbol* prototype = symbolTable.MakeClassTemplateSpecialization(classTemplate, templateArgumentTypes, classTemplate->GetSpan());
+    ClassTemplateSpecializationSymbol* prototype = symbolTable.MakeClassTemplateSpecialization(classTemplate, templateArgumentTypes, classTemplate->GetSpan(), classTemplate->SourceModuleId());
     prototype->SetPrototype();
     prototype->SetAccess(SymbolAccess::public_);
-    boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(prototype, containerScope, classTemplate->GetSpan());
+    boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(prototype, containerScope, classTemplate->GetSpan(), classTemplate->SourceModuleId());
     classTemplate->SetPrototype(prototype);
     if (GetGlobalFlag(GlobalFlags::cmdoc) && prototype->Constraint())
     {
@@ -297,8 +291,6 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     if (classNode->WhereConstraint())
     {
         CloneContext cloneContext;
-        SpanMapper spanMapper;
-        cloneContext.SetSpanMapper(&spanMapper);
         classTypeSymbol->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
@@ -323,11 +315,11 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
             }
             if (classTypeSymbol->BaseClass())
             {
-                throw Exception(module, "class type can have at most one base class", classTypeSymbol->GetSpan(), baseClassSymbol->GetSpan());
+                throw Exception("class type can have at most one base class", classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId(), baseClassSymbol->GetSpan(), baseClassSymbol->SourceModuleId());
             }
             else if (baseClassSymbol == classTypeSymbol)
             {
-                throw Exception(module, "class cannot derive from itself", classTypeSymbol->GetSpan());
+                throw Exception("class cannot derive from itself", classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId());
             }
             else
             {
@@ -348,7 +340,8 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
         }
         else
         {
-            throw Exception(module, "symbol '" + ToUtf8(baseOrInterfaceSymbol->FullName()) + "' is not a class or interface type symbol", baseOrInterfaceNode->GetSpan(), baseOrInterfaceSymbol->GetSpan());
+            throw Exception("symbol '" + ToUtf8(baseOrInterfaceSymbol->FullName()) + "' is not a class or interface type symbol", baseOrInterfaceNode->GetSpan(), baseOrInterfaceNode->ModuleId(), 
+                baseOrInterfaceSymbol->GetSpan(), baseOrInterfaceSymbol->SourceModuleId());
         }
     }
     int nm = classNode->Members().Count();
@@ -399,8 +392,6 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
     if (!staticConstructorSymbol->Constraint() && staticConstructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
-        SpanMapper spanMapper;
-        cloneContext.SetSpanMapper(&spanMapper);
         staticConstructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(staticConstructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     staticConstructorSymbol->ComputeName();
@@ -420,7 +411,7 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
     {
         if (!staticConstructorSymbol->IsTemplateSpecialization())
         {
-            throw Exception(module, "static constructor has no body", staticConstructorSymbol->GetSpan());
+            throw Exception("static constructor has no body", staticConstructorSymbol->GetSpan(), staticConstructorSymbol->SourceModuleId());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(staticConstructorNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -451,7 +442,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     Symbol* parent = constructorSymbol->Parent();
     if (parent->IsStatic())
     {
-        throw Exception(module, "static class cannot contain instance constructors", constructorSymbol->GetSpan(), parent->GetSpan());
+        throw Exception("static class cannot contain instance constructors", constructorSymbol->GetSpan(), constructorSymbol->SourceModuleId(), parent->GetSpan(), parent->SourceModuleId());
     }
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
@@ -473,8 +464,6 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     if (!constructorSymbol->Constraint() && constructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
-        SpanMapper spanMapper;
-        cloneContext.SetSpanMapper(&spanMapper);
         constructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(constructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     constructorSymbol->ComputeName();
@@ -505,13 +494,16 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     else if (constructorSymbol->Arity() == 2 && !constructorSymbol->IsExplicit() && !constructorSymbol->IsGeneratedFunction())
     {
         constructorSymbol->SetConversion();
+        constructorSymbol->SetConversionSourceType(constructorSymbol->Parameters()[1]->GetType()->PlainType(constructorSymbol->GetSpan(), constructorSymbol->SourceModuleId()));
+        constructorSymbol->SetConversionTargetType(constructorSymbol->Parameters()[0]->GetType()->RemovePointer(constructorSymbol->GetSpan(), constructorSymbol->SourceModuleId())->PlainType(
+            constructorSymbol->GetSpan(), constructorSymbol->SourceModuleId()));
         symbolTable.AddConversion(constructorSymbol);
     }
     if (constructorNode.Body())
     {
         if ((constructorSymbol->IsDefault() || constructorSymbol->IsSuppressed()) && !constructorSymbol->HasArtificialBody())
         {
-            throw Exception(module, "default or suppressed constructor cannot have a body", constructorSymbol->GetSpan());
+            throw Exception("default or suppressed constructor cannot have a body", constructorSymbol->GetSpan(), constructorSymbol->SourceModuleId());
         }
         constructorNode.Body()->Accept(*this);
     }
@@ -519,7 +511,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     {
         if (!constructorSymbol->IsDefault() && !constructorSymbol->IsSuppressed() && !constructorSymbol->IsTemplateSpecialization())
         {
-            throw Exception(module, "constructor has no body", constructorSymbol->GetSpan());
+            throw Exception("constructor has no body", constructorSymbol->GetSpan(), constructorSymbol->SourceModuleId());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(constructorNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -544,7 +536,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     const Symbol* parent = destructorSymbol->Parent();
     if (parent->IsStatic())
     {
-        throw Exception(module, "static class cannot contain a destructor", destructorSymbol->GetSpan(), parent->GetSpan());
+        throw Exception("static class cannot contain a destructor", destructorSymbol->GetSpan(), destructorSymbol->SourceModuleId(), parent->GetSpan(), parent->SourceModuleId());
     }
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
@@ -554,8 +546,6 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     if (!destructorSymbol->Constraint() && destructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
-        SpanMapper spanMapper;
-        cloneContext.SetSpanMapper(&spanMapper);
         destructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(destructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     destructorSymbol->ComputeName();
@@ -571,7 +561,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     {
         if (destructorSymbol->IsDefault() && !destructorSymbol->HasArtificialBody())
         {
-            throw Exception(module, "default destructor cannot have a body", destructorSymbol->GetSpan());
+            throw Exception("default destructor cannot have a body", destructorSymbol->GetSpan(), destructorSymbol->SourceModuleId());
         }
         destructorNode.Body()->Accept(*this);
     }
@@ -579,7 +569,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     {
         if (!destructorSymbol->IsDefault() && !destructorSymbol->IsTemplateSpecialization())
         {
-            throw Exception(module, "destructor has no body", destructorSymbol->GetSpan());
+            throw Exception("destructor has no body", destructorSymbol->GetSpan(), destructorSymbol->SourceModuleId());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(destructorNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -610,7 +600,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* parent = memberFunctionSymbol->Parent();
     if (parent->IsStatic() && !memberFunctionSymbol->IsStatic())
     {
-        throw Exception(module, "static class cannot contain nonstatic member functions", memberFunctionSymbol->GetSpan(), parent->GetSpan());
+        throw Exception("static class cannot contain nonstatic member functions", memberFunctionSymbol->GetSpan(), memberFunctionSymbol->SourceModuleId(), parent->GetSpan(), parent->SourceModuleId());
     }
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
@@ -632,8 +622,6 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     if (!memberFunctionSymbol->Constraint() && memberFunctionNode.WhereConstraint())
     {
         CloneContext cloneContext;
-        SpanMapper spanMapper;
-        cloneContext.SetSpanMapper(&spanMapper);
         memberFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(memberFunctionNode.WhereConstraint()->Clone(cloneContext)));
     }
     memberFunctionSymbol->ComputeName();
@@ -651,9 +639,9 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     }
     if (memberFunctionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
-        ParameterSymbol* returnParam = new ParameterSymbol(memberFunctionNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        ParameterSymbol* returnParam = new ParameterSymbol(memberFunctionNode.ReturnTypeExpr()->GetSpan(), memberFunctionNode.ReturnTypeExpr()->ModuleId(), U"@return");
         returnParam->SetParent(memberFunctionSymbol);
-        returnParam->SetType(returnType->AddPointer(memberFunctionNode.GetSpan()));
+        returnParam->SetType(returnType->AddPointer(memberFunctionNode.GetSpan(), memberFunctionNode.ModuleId()));
         memberFunctionSymbol->SetReturnParam(returnParam);
     }
     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(parent);
@@ -669,7 +657,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     {
         if ((memberFunctionSymbol->IsDefault() || memberFunctionSymbol->IsSuppressed()) && !memberFunctionSymbol->HasArtificialBody())
         {
-            throw Exception(module, "default or suppressed member function cannot have a body", memberFunctionSymbol->GetSpan());
+            throw Exception("default or suppressed member function cannot have a body", memberFunctionSymbol->GetSpan(), memberFunctionSymbol->SourceModuleId());
         }
         memberFunctionNode.Body()->Accept(*this);
     }
@@ -681,7 +669,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
             !memberFunctionSymbol->IsSuppressed() && 
             !memberFunctionSymbol->IsTemplateSpecialization())
         {
-            throw Exception(module, "member function has no body", memberFunctionSymbol->GetSpan());
+            throw Exception( "member function has no body", memberFunctionSymbol->GetSpan(), memberFunctionSymbol->SourceModuleId());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(memberFunctionNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -708,7 +696,7 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     const Symbol* parent = conversionFunctionSymbol->Parent();
     if (parent->IsStatic())
     {
-        throw Exception(module, "static class cannot contain conversion functions", conversionFunctionSymbol->GetSpan(), parent->GetSpan());
+        throw Exception("static class cannot contain conversion functions", conversionFunctionSymbol->GetSpan(), conversionFunctionSymbol->SourceModuleId(), parent->GetSpan(), parent->SourceModuleId());
     }
     bool requireBody = true;
     if (parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
@@ -719,11 +707,12 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     }
     TypeSymbol* returnType = ResolveType(conversionFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope, typeResolverFlags, currentClassTypeSymbol);
     conversionFunctionSymbol->SetReturnType(returnType);
+    TypeSymbol* parentTypeSymbol = const_cast<TypeSymbol*>(static_cast<const TypeSymbol*>(parent));
+    conversionFunctionSymbol->SetConversionSourceType(parentTypeSymbol->PlainType(conversionFunctionSymbol->GetSpan(), conversionFunctionSymbol->SourceModuleId()));
+    conversionFunctionSymbol->SetConversionTargetType(returnType->PlainType(conversionFunctionSymbol->GetSpan(), conversionFunctionSymbol->SourceModuleId())); 
     if (!conversionFunctionSymbol->Constraint() && conversionFunctionNode.WhereConstraint())
     {
         CloneContext cloneContext;
-        SpanMapper spanMapper;
-        cloneContext.SetSpanMapper(&spanMapper);
         conversionFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(conversionFunctionNode.WhereConstraint()->Clone(cloneContext)));
     }
     conversionFunctionSymbol->ComputeName();
@@ -737,9 +726,9 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     }
     if (conversionFunctionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
-        ParameterSymbol* returnParam = new ParameterSymbol(conversionFunctionNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        ParameterSymbol* returnParam = new ParameterSymbol(conversionFunctionNode.ReturnTypeExpr()->GetSpan(), conversionFunctionNode.ReturnTypeExpr()->ModuleId(), U"@return");
         returnParam->SetParent(conversionFunctionSymbol);
-        returnParam->SetType(returnType->AddPointer(conversionFunctionNode.GetSpan()));
+        returnParam->SetType(returnType->AddPointer(conversionFunctionNode.GetSpan(), conversionFunctionNode.ModuleId()));
         conversionFunctionSymbol->SetReturnParam(returnParam);
     }
     symbolTable.AddConversion(conversionFunctionSymbol);
@@ -751,7 +740,7 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     {
         if (requireBody)
         {
-            throw Exception(module, "conversion function has no body", conversionFunctionSymbol->GetSpan());
+            throw Exception("conversion function has no body", conversionFunctionSymbol->GetSpan(), conversionFunctionSymbol->SourceModuleId());
         }
     }
     boundCompileUnit.GetAttributeBinder()->BindAttributes(conversionFunctionNode.GetAttributes(), symbol, boundCompileUnit, containerScope);
@@ -769,7 +758,7 @@ void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
     const Symbol* parent = memberVariableSymbol->Parent();
     if (parent->IsStatic() && !memberVariableSymbol->IsStatic())
     {
-        throw Exception(module, "static class cannot contain instance variables", memberVariableSymbol->GetSpan(), parent->GetSpan());
+        throw Exception("static class cannot contain instance variables", memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), parent->GetSpan(), parent->SourceModuleId());
     }
     TypeSymbol* memberVariableType = ResolveType(memberVariableNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags, currentClassTypeSymbol);
     memberVariableSymbol->SetType(memberVariableType);
@@ -779,7 +768,7 @@ void TypeBinder::Visit(MemberVariableNode& memberVariableNode)
         if (memberVariableClassType->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
         {
             boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(static_cast<ClassTemplateSpecializationSymbol*>(memberVariableClassType),
-                containerScope, memberVariableNode.GetSpan());
+                containerScope, memberVariableNode.GetSpan(), memberVariableNode.ModuleId());
         }
         Node* node = symbolTable.GetNode(memberVariableClassType);
         Assert(node->GetNodeType() == NodeType::classNode, "class node expected");
@@ -843,9 +832,9 @@ void TypeBinder::Visit(DelegateNode& delegateNode)
     delegateTypeSymbol->SetReturnType(returnType);
     if (delegateTypeSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
-        ParameterSymbol* returnParam = new ParameterSymbol(delegateNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        ParameterSymbol* returnParam = new ParameterSymbol(delegateNode.ReturnTypeExpr()->GetSpan(), delegateNode.ReturnTypeExpr()->ModuleId(), U"@return");
         returnParam->SetParent(delegateTypeSymbol);
-        returnParam->SetType(returnType->AddPointer(delegateNode.GetSpan()));
+        returnParam->SetType(returnType->AddPointer(delegateNode.GetSpan(), delegateNode.ModuleId()));
         delegateTypeSymbol->SetReturnParam(returnParam);
     }
     for (ParameterSymbol* parameterSymbol : delegateTypeSymbol->Parameters())
@@ -886,11 +875,11 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     }
     classDelegateTypeSymbol->SetSpecifiers(classDelegateNode.GetSpecifiers());
     classDelegateTypeSymbol->ComputeMangledName();
-    DelegateTypeSymbol* memberDelegateType = new DelegateTypeSymbol(classDelegateNode.GetSpan(), U"delegate_type");
+    DelegateTypeSymbol* memberDelegateType = new DelegateTypeSymbol(classDelegateNode.GetSpan(), classDelegateNode.ModuleId(), U"delegate_type");
     memberDelegateType->SetModule(module);
     symbolTable.SetTypeIdFor(memberDelegateType);
-    ParameterSymbol* objectParam = new ParameterSymbol(classDelegateNode.GetSpan(), U"@obj");
-    TypeSymbol* voidPtrType = symbolTable.GetTypeByName(U"void")->AddPointer(classDelegateNode.GetSpan());
+    ParameterSymbol* objectParam = new ParameterSymbol(classDelegateNode.GetSpan(), classDelegateNode.ModuleId(), U"@obj");
+    TypeSymbol* voidPtrType = symbolTable.GetTypeByName(U"void")->AddPointer(classDelegateNode.GetSpan(), classDelegateNode.ModuleId());
     objectParam->SetType(voidPtrType);
     memberDelegateType->AddMember(objectParam);
     int n = classDelegateNode.Parameters().Count();
@@ -902,7 +891,7 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
         Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
-        ParameterSymbol* memberParam = new ParameterSymbol(classDelegateNode.GetSpan(), ToUtf32("@p" + std::to_string(i)));
+        ParameterSymbol* memberParam = new ParameterSymbol(classDelegateNode.GetSpan(), classDelegateNode.ModuleId(), ToUtf32("@p" + std::to_string(i)));
         memberParam->SetType(parameterType);
         memberDelegateType->AddMember(memberParam);
     }
@@ -910,13 +899,13 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     classDelegateTypeSymbol->SetReturnType(returnType);
     if (classDelegateTypeSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
-        ParameterSymbol* returnParam = new ParameterSymbol(classDelegateNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        ParameterSymbol* returnParam = new ParameterSymbol(classDelegateNode.ReturnTypeExpr()->GetSpan(), classDelegateNode.ReturnTypeExpr()->ModuleId(), U"@return");
         returnParam->SetParent(classDelegateTypeSymbol);
-        returnParam->SetType(returnType->AddPointer(classDelegateNode.GetSpan()));
+        returnParam->SetType(returnType->AddPointer(classDelegateNode.GetSpan(), classDelegateNode.ModuleId()));
         classDelegateTypeSymbol->SetReturnParam(returnParam);
-        ParameterSymbol* memberReturnParam = new ParameterSymbol(classDelegateNode.ReturnTypeExpr()->GetSpan(), U"@return");
+        ParameterSymbol* memberReturnParam = new ParameterSymbol(classDelegateNode.ReturnTypeExpr()->GetSpan(), classDelegateNode.ReturnTypeExpr()->ModuleId(), U"@return");
         memberReturnParam->SetParent(memberDelegateType);
-        memberReturnParam->SetType(returnType->AddPointer(classDelegateNode.GetSpan()));
+        memberReturnParam->SetType(returnType->AddPointer(classDelegateNode.GetSpan(), classDelegateNode.ModuleId()));
         memberDelegateType->SetReturnParam(memberReturnParam);
     }
     memberDelegateType->SetReturnType(returnType);
@@ -925,13 +914,13 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
         parameterSymbol->ComputeMangledName();
     }
     classDelegateTypeSymbol->AddMember(memberDelegateType);
-    ClassTypeSymbol* objectDelegatePairType = new ClassTypeSymbol(classDelegateNode.GetSpan(), U"@objectDelegatePairType");
+    ClassTypeSymbol* objectDelegatePairType = new ClassTypeSymbol(classDelegateNode.GetSpan(), classDelegateNode.ModuleId(), U"@objectDelegatePairType");
     objectDelegatePairType->SetAccess(SymbolAccess::public_);
     objectDelegatePairType->SetGroupName(U"@objectDelegatePairType");
-    MemberVariableSymbol* objVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"obj");
+    MemberVariableSymbol* objVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), classDelegateNode.ModuleId(), U"obj");
     objVar->SetAccess(SymbolAccess::public_);
     objVar->SetType(voidPtrType);
-    MemberVariableSymbol* dlgVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"dlg");
+    MemberVariableSymbol* dlgVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), classDelegateNode.ModuleId(), U"dlg");
     dlgVar->SetAccess(SymbolAccess::public_);
     dlgVar->SetType(memberDelegateType);
     objectDelegatePairType->AddMember(objVar);
@@ -1122,7 +1111,7 @@ void TypeBinder::Visit(CatchNode& catchNode)
         if (type->BaseType()->IsClassTypeSymbol())
         {
             ClassTypeSymbol* exceptionVarClassType = static_cast<ClassTypeSymbol*>(type->BaseType());
-            IdentifierNode systemExceptionNode(catchNode.GetSpan(), U"System.Exception");
+            IdentifierNode systemExceptionNode(catchNode.GetSpan(), catchNode.ModuleId(), U"System.Exception");
             TypeSymbol* systemExceptionType = ResolveType(&systemExceptionNode, boundCompileUnit, containerScope, typeResolverFlags, currentClassTypeSymbol);
             Assert(systemExceptionType->IsClassTypeSymbol(), "System.Exception not of class type");
             ClassTypeSymbol* systemExceptionClassType = static_cast<ClassTypeSymbol*>(systemExceptionType);
@@ -1139,12 +1128,12 @@ void TypeBinder::Visit(CatchNode& catchNode)
             }
             else
             {
-                throw Exception(module, "exception variable must be of class type equal to System.Exception class or derive from it", catchNode.TypeExpr()->GetSpan());
+                throw Exception("exception variable must be of class type equal to System.Exception class or derive from it", catchNode.TypeExpr()->GetSpan(), catchNode.TypeExpr()->ModuleId());
             }
         }
         else
         {
-            throw Exception(module, "exception variable must be of class type equal to System.Exception class or derive from it", catchNode.TypeExpr()->GetSpan());
+            throw Exception("exception variable must be of class type equal to System.Exception class or derive from it", catchNode.TypeExpr()->GetSpan(), catchNode.TypeExpr()->ModuleId());
         }
     }
     catchNode.CatchBlock()->Accept(*this);
@@ -1285,7 +1274,7 @@ void TypeBinder::Visit(ConstantNode& constantNode)
     constantSymbol->SetType(typeSymbol);
     constantSymbol->SetEvaluating();
     std::unique_ptr<Value> value;
-    value = Evaluate(constantNode.Value(), typeSymbol, containerScope, boundCompileUnit, false, nullptr, constantNode.GetSpan());
+    value = Evaluate(constantNode.Value(), typeSymbol, containerScope, boundCompileUnit, false, nullptr, constantNode.GetSpan(), constantNode.ModuleId());
     Value* val = value.get();
     if (val)
     {
@@ -1335,7 +1324,7 @@ void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
         EnumConstantNode* enumConstantNode = enumTypeNode.Constants()[i];
         enumConstantNode->Accept(*this);
     }
-    TypedefSymbol* underlyingTypedef = new TypedefSymbol(enumTypeNode.GetSpan(), U"UnderlyingType");
+    TypedefSymbol* underlyingTypedef = new TypedefSymbol(enumTypeNode.GetSpan(), enumTypeNode.ModuleId(), U"UnderlyingType");
     underlyingTypedef->SetModule(module);
     underlyingTypedef->SetAccess(SymbolAccess::public_);
     underlyingTypedef->SetType(underlyingType);
@@ -1362,12 +1351,12 @@ void TypeBinder::Visit(EnumTypeNode& enumTypeNode)
     EnumTypeEqualityOp* equality = new EnumTypeEqualityOp(enumTypeSymbol, symbolTable.GetTypeByName(U"bool"));
     symbolTable.SetFunctionIdFor(equality);
     enumTypeSymbol->Ns()->AddMember(equality);
-    EnumTypeToUnderlyingTypeConversion* enum2underlying = new EnumTypeToUnderlyingTypeConversion(enumTypeNode.GetSpan(), U"enum2underlying", enumTypeSymbol, underlyingType);
+    EnumTypeToUnderlyingTypeConversion* enum2underlying = new EnumTypeToUnderlyingTypeConversion(enumTypeNode.GetSpan(), enumTypeNode.ModuleId(), U"enum2underlying", enumTypeSymbol, underlyingType);
     symbolTable.SetFunctionIdFor(enum2underlying);
     enum2underlying->SetParent(enumTypeSymbol);
     symbolTable.AddConversion(enum2underlying);
     enumTypeSymbol->AddMember(enum2underlying);
-    UnderlyingTypeToEnumTypeConversion* underlying2enum = new UnderlyingTypeToEnumTypeConversion(enumTypeNode.GetSpan(), U"underlying2enum", underlyingType, enumTypeSymbol);
+    UnderlyingTypeToEnumTypeConversion* underlying2enum = new UnderlyingTypeToEnumTypeConversion(enumTypeNode.GetSpan(), enumTypeNode.ModuleId(), U"underlying2enum", underlyingType, enumTypeSymbol);
     symbolTable.SetFunctionIdFor(underlying2enum);
     underlying2enum->SetParent(enumTypeSymbol);
     symbolTable.AddConversion(underlying2enum);
@@ -1383,7 +1372,8 @@ void TypeBinder::Visit(EnumConstantNode& enumConstantNode)
     EnumConstantSymbol* enumConstantSymbol = static_cast<EnumConstantSymbol*>(symbol);
     enumConstantSymbol->ComputeMangledName();
     enumConstantSymbol->SetEvaluating();
-    std::unique_ptr<Value> value = Evaluate(enumConstantNode.GetValue(), enumType->UnderlyingType(), containerScope, boundCompileUnit, false, nullptr, enumConstantNode.GetSpan());
+    std::unique_ptr<Value> value = Evaluate(enumConstantNode.GetValue(), enumType->UnderlyingType(), containerScope, boundCompileUnit, false, nullptr, 
+        enumConstantNode.GetSpan(), enumConstantNode.ModuleId());
     enumConstantSymbol->SetValue(value.release());
     enumConstantSymbol->ResetEvaluating();
 }
@@ -1406,7 +1396,7 @@ void TypeBinder::Visit(GlobalVariableNode& globalVariableNode)
     if (globalVariableNode.Initializer())
     {
         std::unique_ptr<Value> value;
-        value = Evaluate(globalVariableNode.Initializer(), typeSymbol, containerScope, boundCompileUnit, false, nullptr, globalVariableNode.GetSpan());
+        value = Evaluate(globalVariableNode.Initializer(), typeSymbol, containerScope, boundCompileUnit, false, nullptr, globalVariableNode.GetSpan(), globalVariableNode.ModuleId());
         Value* val = value.get();
         if (val)
         {
@@ -1414,7 +1404,7 @@ void TypeBinder::Visit(GlobalVariableNode& globalVariableNode)
             globalVariableSymbol->SetInitializer(std::move(value));
         }
     }
-    boundGlobalVariable = new BoundGlobalVariable(module, globalVariableSymbol->GetSpan(), globalVariableSymbol);
+    boundGlobalVariable = new BoundGlobalVariable(globalVariableNode.GetSpan(), globalVariableNode.ModuleId(), globalVariableSymbol);
     boundCompileUnit.AddBoundNode(std::unique_ptr<BoundNode>(boundGlobalVariable));
     containerScope = prevContainerScope;
 }

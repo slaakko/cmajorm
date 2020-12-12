@@ -13,6 +13,7 @@
 #include <soulng/util/InitDone.hpp>
 #include <cmajor/cmmid/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #ifdef _WIN32
 #include <cmajor/cmres/InitDone.hpp>
 #endif

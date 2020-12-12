@@ -6,14 +6,14 @@
 #include <soulng/parser/Match.hpp>
 #include <soulng/parser/Value.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Identifier.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Identifier.parser' using soulng parser generator spg version 3.0.0
 
 class CmajorLexer;
 
 struct SNGCM_PARSER_API IdentifierParser
 {
-    static soulng::parser::Match Identifier(CmajorLexer& lexer);
-    static soulng::parser::Match QualifiedId(CmajorLexer& lexer);
+    static soulng::parser::Match Identifier(CmajorLexer& lexer, boost::uuids::uuid* moduleId);
+    static soulng::parser::Match QualifiedId(CmajorLexer& lexer, boost::uuids::uuid* moduleId);
 };
 
 #endif // IDENTIFIER_HPP

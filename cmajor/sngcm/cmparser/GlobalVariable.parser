@@ -25,11 +25,11 @@ parser api(SNGCM_PARSER_API) GlobalVariableParser
     using IdentifierParser.Identifier;
     using ExpressionParser.Expression;
 
-    GlobalVariable(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, var Span s) : GlobalVariableNode*
-        ::= Specifiers:specifiers{ s = span; } TypeExpr(ctx):type Identifier:id (ASSIGN Expression(ctx):initializer)? SEMICOLON
+    GlobalVariable(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, var Span s) : GlobalVariableNode*
+        ::= Specifiers:specifiers{ s = span; } TypeExpr(moduleId, ctx):type Identifier(moduleId):id (ASSIGN Expression(moduleId, ctx):initializer)? SEMICOLON
         {
             s.end = span.end;
-            GlobalVariableNode* value = new GlobalVariableNode(s, specifiers, type, id, cu);
+            GlobalVariableNode* value = new GlobalVariableNode(s, *moduleId, specifiers, type, id, cu);
             value->SetInitializer(initializer);
             return value;
         }

@@ -9,6 +9,7 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/ModuleCache.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -17,8 +18,8 @@ namespace cmajor { namespace symbols {
 
 using namespace soulng::unicode;
 
-TypeSymbol::TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), typeId(boost::uuids::nil_uuid())
+TypeSymbol::TypeSymbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    ContainerSymbol(symbolType_, span_, sourceModuleId_, name_), typeId(boost::uuids::nil_uuid())
 {
 }
 
@@ -36,32 +37,32 @@ void TypeSymbol::Read(SymbolReader& reader)
     reader.GetSymbolTable()->AddTypeOrConceptSymbolToTypeIdMap(this);
 }
 
-TypeSymbol* TypeSymbol::AddConst(const Span& span)
+TypeSymbol* TypeSymbol::AddConst(const Span& span, const boost::uuids::uuid& moduleId)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::constDerivation);
-    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span); 
+    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span, moduleId);
 }
 
-TypeSymbol* TypeSymbol::AddLvalueReference(const Span& span)
+TypeSymbol* TypeSymbol::AddLvalueReference(const Span& span, const boost::uuids::uuid& moduleId)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::lvalueRefDerivation);
-    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span);
+    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span, moduleId);
 }
 
-TypeSymbol* TypeSymbol::AddRvalueReference(const Span& span)
+TypeSymbol* TypeSymbol::AddRvalueReference(const Span& span, const boost::uuids::uuid& moduleId)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::rvalueRefDerivation);
-    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span);
+    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span, moduleId);
 }
 
-TypeSymbol* TypeSymbol::AddPointer(const Span& span)
+TypeSymbol* TypeSymbol::AddPointer(const Span& span, const boost::uuids::uuid& moduleId)
 {
     TypeDerivationRec typeDerivationRec;
     typeDerivationRec.derivations.push_back(Derivation::pointerDerivation);
-    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span);
+    return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span, moduleId);
 }
 
 void* TypeSymbol::CreateDIType(Emitter& emitter)
@@ -75,7 +76,7 @@ const TypeDerivationRec& TypeSymbol::DerivationRec() const
     return emptyDerivationRec;
 }
 
-TypeSymbol* TypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span)
+TypeSymbol* TypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span, const boost::uuids::uuid& moduleId)
 {
     if (HasPointerDerivation(sourceDerivationRec.derivations)) return nullptr;
     return this;
@@ -132,7 +133,7 @@ void TypeSymbol::Check()
     ContainerSymbol::Check();
     if (typeId.is_nil())
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "type symbol contains empty type id", GetSpan());
+        throw SymbolCheckException("type symbol contains empty type id", GetSpan(), SourceModuleId());
     }
 }
 

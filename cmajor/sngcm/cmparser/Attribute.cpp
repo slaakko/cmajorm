@@ -4,12 +4,12 @@
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 #include <sngcm/cmlexer/TokenValueParsers.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/Attribute.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Attribute.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace CmajorTokens;
 
-soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer)
+soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -60,7 +60,7 @@ soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer)
                         soulng::parser::Match match(false);
                         soulng::parser::Match* parentMatch6 = &match;
                         {
-                            soulng::parser::Match match = AttributeParser::Attribute(lexer, attributes.get());
+                            soulng::parser::Match match = AttributeParser::Attribute(lexer, attributes.get(), moduleId);
                             *parentMatch6 = match;
                         }
                         if (match.hit)
@@ -91,7 +91,7 @@ soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer)
                                                 soulng::parser::Match match(false);
                                                 soulng::parser::Match* parentMatch10 = &match;
                                                 {
-                                                    soulng::parser::Match match = AttributeParser::Attribute(lexer, attributes.get());
+                                                    soulng::parser::Match match = AttributeParser::Attribute(lexer, attributes.get(), moduleId);
                                                     *parentMatch10 = match;
                                                 }
                                                 *parentMatch9 = match;
@@ -186,7 +186,7 @@ soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer)
     return match;
 }
 
-soulng::parser::Match AttributeParser::Attribute(CmajorLexer& lexer, sngcm::ast::Attributes* attributes)
+soulng::parser::Match AttributeParser::Attribute(CmajorLexer& lexer, sngcm::ast::Attributes* attributes, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -325,7 +325,7 @@ soulng::parser::Match AttributeParser::Attribute(CmajorLexer& lexer, sngcm::ast:
         }
         if (match.hit)
         {
-            attributes->AddAttribute(s, name, value);
+            attributes->AddAttribute(s, *moduleId, name, value);
         }
         *parentMatch0 = match;
     }

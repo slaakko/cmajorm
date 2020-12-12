@@ -15,7 +15,7 @@ class Module;
 
 struct ConversionTableEntry
 {
-    ConversionTableEntry(TypeSymbol* sourceType_, TypeSymbol* targetType_) : sourceType(sourceType_), targetType(targetType_) {}
+    ConversionTableEntry(TypeSymbol* sourceType_, TypeSymbol* targetType_);
     void CheckValid() const;
     TypeSymbol* sourceType;
     TypeSymbol* targetType;
@@ -37,16 +37,20 @@ struct ConversionTableEntryHash
 class SYMBOLS_API ConversionTable
 {
 public:
-    ConversionTable(Module* module_);
+    enum class Owner
+    {
+        compileUnit, symbolTable
+    };
+    ConversionTable(Owner owner_, Module* module_);
     ConversionTable(const ConversionTable&) = delete;
     ConversionTable& operator=(const ConversionTable&) = delete;
     void AddConversion(FunctionSymbol* conversion);
-    void AddConversion(FunctionSymbol* conversion, Module* module);
-    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const;
+    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span, const boost::uuids::uuid& moduleId) const;
     void AddGeneratedConversion(std::unique_ptr<FunctionSymbol>&& generatedConversion);
     void Add(const ConversionTable& that);
     void Check();
 private:
+    Owner owner;
     Module* module;
     std::unordered_map<ConversionTableEntry, FunctionSymbol*, ConversionTableEntryHash> conversionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> generatedConversions;

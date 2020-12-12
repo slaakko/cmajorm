@@ -12,15 +12,16 @@ namespace cmajor { namespace symbols {
 using namespace soulng::util;
 using namespace soulng::unicode;
 
-Warning::Warning(const std::u32string& project_, const std::string& message_) : project(project_), message(message_), module(nullptr)
+Warning::Warning(const std::u32string& project_, const std::string& message_) : project(project_), message(message_)
 {
 }
 
-void Warning::SetReferences(const std::vector<Span>& references_)
+void Warning::SetReferences(const std::vector<std::pair<Span, boost::uuids::uuid>>& references_)
 {
     references = references_;
 }
 
+/*
 std::unique_ptr<JsonValue> Warning::ToJson(Module* module) const
 {
     JsonObject* o = new JsonObject();
@@ -43,6 +44,7 @@ std::unique_ptr<JsonValue> Warning::ToJson(Module* module) const
     o->AddField(U"references", std::unique_ptr<JsonValue>(referencesArray));
     return std::unique_ptr<JsonValue>(o);
 }
+*/
 
 CompileWarningCollection::CompileWarningCollection()
 {

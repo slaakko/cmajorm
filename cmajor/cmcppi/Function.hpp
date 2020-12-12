@@ -57,6 +57,7 @@ public:
     void AddResultInstruction(Instruction* instruction);
     void SetFileIndex(int32_t fileIndex_);
     int32_t FileIndex() const { return fileIndex; }
+    void SetSourceModuleId(const boost::uuids::uuid& sourceModuleId_);
     void SetFunctionId(const boost::uuids::uuid& functionId_);
     void AddScope(Scope* scope);
     const std::vector<std::unique_ptr<Scope>>& Scopes() const { return scopes; }
@@ -83,6 +84,7 @@ private:
     int nextBBNumber;
     bool nothrow;
     int32_t fileIndex;
+    boost::uuids::uuid sourceModuleId;
     boost::uuids::uuid functionId;
     std::vector<std::unique_ptr<Scope>> scopes;
     bool nopResultDeclarationWritten;

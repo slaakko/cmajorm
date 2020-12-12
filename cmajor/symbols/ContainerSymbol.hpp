@@ -18,7 +18,7 @@ class GlobalVariableGroupSymbol;
 class SYMBOLS_API ContainerSymbol : public Symbol
 {
 public:
-    ContainerSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
+    ContainerSymbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     virtual void AddMember(Symbol* member);
@@ -35,21 +35,23 @@ public:
     bool HasProjectMembers() const override;
     const char* ClassName() const override { return "ContainerSymbol"; }
     void Check() override;
+    void CopyFrom(const Symbol* that) override;
     FunctionSymbol* GetFunctionByIndex(int32_t functionIndex) const;
+    virtual bool IsImmutable() const { return false; }
 private:
     std::vector<std::unique_ptr<Symbol>> members;
     ContainerScope containerScope;
     std::unordered_map<int32_t, FunctionSymbol*> functionIndexMap;
-    FunctionGroupSymbol* MakeFunctionGroupSymbol(const std::u32string& groupName, const Span& span);
-    ConceptGroupSymbol* MakeConceptGroupSymbol(const std::u32string& groupName, const Span& span);
-    ClassGroupTypeSymbol* MakeClassGroupTypeSymbol(const std::u32string& groupName, const Span& span);
-    GlobalVariableGroupSymbol* MakeGlobalVariableGroupSymbol(const std::u32string& groupName, const Span& span);
+    FunctionGroupSymbol* MakeFunctionGroupSymbol(const std::u32string& groupName, const Span& span, const boost::uuids::uuid& sourceModuleId);
+    ConceptGroupSymbol* MakeConceptGroupSymbol(const std::u32string& groupName, const Span& span, const boost::uuids::uuid& sourceModuleId);
+    ClassGroupTypeSymbol* MakeClassGroupTypeSymbol(const std::u32string& groupName, const Span& span, const boost::uuids::uuid& sourceModuleId);
+    GlobalVariableGroupSymbol* MakeGlobalVariableGroupSymbol(const std::u32string& groupName, const Span& span, const boost::uuids::uuid& sourceModuleId);
 };
 
 class SYMBOLS_API DeclarationBlock : public ContainerSymbol
 {
 public:
-    DeclarationBlock(const Span& span_, const std::u32string& name_);
+    DeclarationBlock(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void AddMember(Symbol* member) override;
     const char* ClassName() const override { return "DeclarationBlock"; }
 };

@@ -18,7 +18,8 @@ namespace cmajor { namespace symbols {
 
 using namespace soulng::unicode;
 
-ConstantSymbol::ConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::constantSymbol, span_, name_), type(), evaluating(false), sizeOfValue(0), valuePos(0)
+ConstantSymbol::ConstantSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    Symbol(SymbolType::constantSymbol, span_, sourceModuleId_, name_), type(), evaluating(false), sizeOfValue(0), valuePos(0)
 {
 }
 
@@ -64,7 +65,7 @@ void ConstantSymbol::Read(SymbolReader& reader)
     }
     else
     {
-        value = ReadValue(reader.GetBinaryReader(), GetSpan());
+        value = ReadValue(reader.GetBinaryReader(), GetSpan(), SourceModuleId());
     }
     strValue = reader.GetBinaryReader().ReadUtf32String();
 }
@@ -75,14 +76,14 @@ Value* ConstantSymbol::GetValue()
     {
         if (filePathReadFrom.empty())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "internal error: could not read value: value file name not set", GetSpan());
+            throw Exception("internal error: could not read value: value file name not set", GetSpan(), SourceModuleId());
         }
         BinaryReader reader(filePathReadFrom);
         reader.Skip(valuePos);
         value.reset(type->MakeValue());
         if (!value)
         {
-            throw Exception(GetRootModuleForCurrentThread(), "internal error: could not read value because could not create value of type '" + ToUtf8(type->FullName()) + "'", GetSpan());
+            throw Exception("internal error: could not read value because could not create value of type '" + ToUtf8(type->FullName()) + "'", GetSpan(), SourceModuleId());
         }
         value->Read(reader);
     }
@@ -118,67 +119,67 @@ void ConstantSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be static", GetSpan());
+        throw Exception("constant cannot be static", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be virtual", GetSpan());
+        throw Exception("constant cannot be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be override", GetSpan());
+        throw Exception("constant cannot be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be abstract", GetSpan());
+        throw Exception("constant cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be inline", GetSpan());
+        throw Exception("constant cannot be inline", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be explicit", GetSpan());
+        throw Exception("constant cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be external", GetSpan());
+        throw Exception("constant cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be suppressed", GetSpan());
+        throw Exception("constant cannot be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be default", GetSpan());
+        throw Exception("constant cannot be default", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be constexpr", GetSpan());
+        throw Exception("constant cannot be constexpr", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be cdecl", GetSpan());
+        throw Exception("constant cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be nothrow", GetSpan());
+        throw Exception("constant cannot be nothrow", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be throw", GetSpan());
+        throw Exception("constant cannot be throw", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be new", GetSpan());
+        throw Exception("constant cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be const", GetSpan());
+        throw Exception("constant cannot be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constant cannot be unit_test", GetSpan());
+        throw Exception("constant cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
@@ -222,15 +223,15 @@ void* ConstantSymbol::ArrayIrObject(Emitter& emitter, bool create)
 {
     if (!type->IsArrayType())
     {
-        throw Exception(GetRootModuleForCurrentThread(), "internal error: array object expected", GetSpan());
+        throw Exception("internal error: array object expected", GetSpan(), SourceModuleId());
     }
     if (!value)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "internal error: array value missing", GetSpan());
+        throw Exception("internal error: array value missing", GetSpan(), SourceModuleId());
     }
     if (value->GetValueType() != ValueType::arrayValue)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "internal error: array value expected", GetSpan());
+        throw Exception("internal error: array value expected", GetSpan(), SourceModuleId());
     }
     ArrayValue* arrayValue = static_cast<ArrayValue*>(value.get());
     void* irArrayType = type->IrType(emitter);
@@ -247,15 +248,15 @@ void* ConstantSymbol::StructureIrObject(Emitter& emitter, bool create)
 {
     if (!type->IsClassTypeSymbol())
     {
-        throw Exception(GetRootModuleForCurrentThread(), "internal error: class type object expected", GetSpan());
+        throw Exception("internal error: class type object expected", GetSpan(), SourceModuleId());
     }
     if (!value)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "internal error: structured value missing", GetSpan());
+        throw Exception("internal error: structured value missing", GetSpan(), SourceModuleId());
     }
     if (value->GetValueType() != ValueType::structuredValue)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "internal error: structured value expected", GetSpan());
+        throw Exception("internal error: structured value expected", GetSpan(), SourceModuleId());
     }
     StructuredValue* structuredValue = static_cast<StructuredValue*>(value.get());
     void* irStructureType = type->IrType(emitter);
@@ -273,7 +274,7 @@ void ConstantSymbol::Check()
     Symbol::Check();
     if (!type)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "constant symbol has no type", GetSpan());
+        throw SymbolCheckException("constant symbol has no type", GetSpan(), SourceModuleId());
     }
 }
 

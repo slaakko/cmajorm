@@ -191,10 +191,20 @@ class SourceFile;
 class Function;
 class SourceFileReference;
 
+struct DEBUG_API SourceFileKey
+{
+    SourceFileKey(int32_t fileIndex_, const boost::uuids::uuid& sourceModuleId_) : fileIndex(fileIndex_), sourceModuleId(sourceModuleId_) {}
+    int32_t fileIndex;
+    boost::uuids::uuid sourceModuleId;
+};
+
+bool operator==(const SourceFileKey& left, const SourceFileKey& right);
+bool operator<(const SourceFileKey& left, const SourceFileKey& right);
+
 class DEBUG_API CompileUnitFunction
 {
 public:
-    CompileUnitFunction(CompileUnit* compileUnit_, int32_t fileIndex_, const boost::uuids::uuid& functionId_);
+    CompileUnitFunction(CompileUnit* compileUnit_, int32_t fileIndex_, const boost::uuids::uuid& sourceModuleId_, const boost::uuids::uuid& functionId_);
     CompileUnitFunction(const CompileUnitFunction&) = delete;
     CompileUnitFunction(CompileUnitFunction&&) = delete;
     CompileUnitFunction& operator=(const CompileUnitFunction&) = delete;
@@ -217,6 +227,7 @@ public:
 private:
     CompileUnit* compileUnit;
     int32_t fileIndex;
+    boost::uuids::uuid sourceModuleId;
     boost::uuids::uuid functionId;
     std::vector<std::unique_ptr<Instruction>> instructions;
     std::vector<std::unique_ptr<FunctionScope>> scopes;
@@ -276,7 +287,7 @@ class DebugInfo;
 class DEBUG_API Project
 {
 public:
-    Project(DebugInfo* debugInfo_, const std::string& name_, const std::string& directoryPath_);
+    Project(DebugInfo* debugInfo_, const std::string& name_, const std::string& directoryPath_, const boost::uuids::uuid& moduleId_);
     Project(const Project&) = delete;
     Project(Project&&) = delete;
     Project& operator=(const Project&) = delete;
@@ -300,10 +311,13 @@ public:
     DIConstType* GetConstType(DIType* baseType);
     DIType* GetLongType() const { return longType; }
     DIType* GetBoolType() const { return boolType; }
+    DebugInfo* GetDebugInfo() const { return debugInfo; }
+    const boost::uuids::uuid& ModuleId() const { return moduleId; }
 private:
     DebugInfo* debugInfo;
     std::string name;
     std::string directoryPath;
+    boost::uuids::uuid moduleId;
     std::vector<std::unique_ptr<CompileUnit>> compileUnits;
     std::unordered_map<std::string, CompileUnit*> compileUnitMap;
     std::vector<std::unique_ptr<SourceFileReference>> sourceFileReferences;
@@ -379,14 +393,16 @@ public:
     SourceFileMap& operator=(SourceFileMap&&) = delete;
     std::vector<Instruction*> GetInstructions(const SourceLocation& location) const;
     std::string GetSourceFilePath(const SourceLocation& location) const;
-    void AddInstructionLocation(int32_t fileIndex, const InstructionLocation& location);
-    void AddInstructionLocations(int32_t fileIndex, const std::string& sourceFilePath);
-    void ClearFileIndexLocationsMap();
+    void AddInstructionLocation(const SourceFileKey& sourceFileKey, const InstructionLocation& location);
+    void AddSourceFile(const SourceFileKey& sourceFileKey, const std::string& sourceFilePath);
+    void ProcessSourceFileKeyLocationsMap();
 private:
     DebugInfo* debugInfo;
     std::map<std::string, SourceLineMap*> sourceFileMap;
     std::vector<std::unique_ptr<SourceLineMap>> sourceLineMaps;
-    std::unordered_map<int32_t, std::vector<InstructionLocation>> fileIndexLocationsMap;
+    std::map<SourceFileKey, std::string> sourceFileKeyMap;
+    std::map<SourceFileKey, std::vector<InstructionLocation>> sourceFileKeyLocationsMap;
+    void AddInstructionLocations(const SourceFileKey& sourceFileKey, const std::string& sourceFilePath);
 };
 
 class DEBUG_API DebugInfo
@@ -402,6 +418,7 @@ public:
     void AddProject(Project* project);
     Project* GetProjectByPath(const std::string& directoryPath) const;
     Project* GetProjectByName(const std::string& projectName) const;
+    Project* GetProjectById(const boost::uuids::uuid& projectId) const;
     SourceFileCache& GetSourceFileCache() { return sourceFileCache; }
     SourceFileMap& GetSourceFileMap() { return sourceFileMap; }
     int GetSourceFileWindowSize() const { return sourceFileWindowSize; }
@@ -419,11 +436,13 @@ public:
     const std::vector<Instruction*>& GetThrowInstructions() const { return throwInstructions; }
     void AddCatchInstruction(Instruction* catchInstruction);
     const std::vector<Instruction*>& GetCatchInstructions() const { return catchInstructions; }
+    void ProcessSourceFileKeyLocationsMap();
 private:
     std::string filePath;
     std::vector<std::unique_ptr<Project>> projects;
     std::unordered_map<std::string, Project*> projectPathMap;
     std::unordered_map<std::string, Project*> projectNameMap;
+    std::unordered_map<boost::uuids::uuid, Project*, boost::hash<boost::uuids::uuid>> projectIdMap;
     std::unordered_map<std::string, DIType*> polymorphicTypeMap;
     std::unordered_map<std::string, DIType*> typeMap;
     Project* mainProject;

@@ -8,16 +8,18 @@
 
 namespace sngcm { namespace ast {
 
-FunctionNode::FunctionNode(const Span& span_) : Node(NodeType::functionNode, span_), specifiers(Specifiers::none), returnTypeExpr(), groupId(), parameters(), body(), bodySource(), programMain(false)
+FunctionNode::FunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::functionNode, span_, moduleId_), specifiers(Specifiers::none), returnTypeExpr(), groupId(), 
+    parameters(), body(), bodySource(), programMain(false)
 {
 }
 
-FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_) : Node(nodeType_, span_), specifiers(Specifiers::none), returnTypeExpr(), groupId(), parameters(), body(), bodySource(), programMain(false)
+FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : Node(nodeType_, span_, moduleId_), specifiers(Specifiers::none), returnTypeExpr(), groupId(), 
+    parameters(), body(), bodySource(), programMain(false)
 {
 }
 
-FunctionNode::FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_) :
-    Node(NodeType::functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
+FunctionNode::FunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_) :
+    Node(NodeType::functionNode, span_, moduleId_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
 {
     if (returnTypeExpr)
     {
@@ -25,8 +27,8 @@ FunctionNode::FunctionNode(const Span& span_, Specifiers specifiers_, Node* retu
     }
 }
 
-FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_) :
-    Node(nodeType_, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
+FunctionNode::FunctionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_) :
+    Node(nodeType_, span_, moduleId_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
 {
     if (returnTypeExpr)
     {
@@ -46,7 +48,7 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
     {
         clonedReturnTypeExpr = returnTypeExpr->Clone(cloneContext);
     }
-    FunctionNode* clone = new FunctionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, clonedReturnTypeExpr, groupId, clonedAttributes);
+    FunctionNode* clone = new FunctionNode(GetSpan(), ModuleId(), specifiers, clonedReturnTypeExpr, groupId, clonedAttributes);
     if (!cloneContext.InstantiateFunctionNode())
     {
         int nt = templateParameters.Count();
@@ -65,7 +67,6 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
         if (cloneContext.InstantiateClassNode())
         {
             CloneContext bodyCloneContext;
-            bodyCloneContext.SetSpanMapper(cloneContext.GetSpanMapper());
             clone->SetBodySource(static_cast<CompoundStatementNode*>(body->Clone(bodyCloneContext)));
         }
         else
@@ -77,8 +78,8 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
     {
         clone->SetConstraint(static_cast<WhereConstraintNode*>(whereConstraint->Clone(cloneContext)));
     }
-    clone->SetGroupIdSpan(cloneContext.MapSpan(groupIdSpan, RootModuleId()));
-    clone->SetSpecifierSpan(cloneContext.MapSpan(specifierSpan, RootModuleId()));
+    clone->SetGroupIdSpan(groupIdSpan);
+    clone->SetSpecifierSpan(specifierSpan);
     return clone;
 }
 
@@ -110,7 +111,6 @@ void FunctionNode::CloneContent(FunctionNode* clone, CloneContext& cloneContext)
         if (cloneContext.InstantiateClassNode())
         {
             CloneContext bodyCloneContext;
-            bodyCloneContext.SetSpanMapper(cloneContext.GetSpanMapper());
             clone->SetBodySource(static_cast<CompoundStatementNode*>(body->Clone(bodyCloneContext)));
         }
         else
@@ -122,8 +122,8 @@ void FunctionNode::CloneContent(FunctionNode* clone, CloneContext& cloneContext)
     { 
         clone->SetConstraint(static_cast<WhereConstraintNode*>(whereConstraint->Clone(cloneContext)));
     }
-    clone->SetGroupIdSpan(cloneContext.MapSpan(groupIdSpan, RootModuleId()));
-    clone->SetSpecifierSpan(cloneContext.MapSpan(specifierSpan, RootModuleId()));
+    clone->SetGroupIdSpan(groupIdSpan);
+    clone->SetSpecifierSpan(specifierSpan);
 }
 
 void FunctionNode::Accept(Visitor& visitor)
@@ -168,8 +168,9 @@ void FunctionNode::Write(AstWriter& writer)
     {
         writer.Write(bodySource.get());
     }
-    writer.Write(groupIdSpan);
-    writer.Write(specifierSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(groupIdSpan, convertExternal);
+    writer.Write(specifierSpan, convertExternal);
 }
 
 void FunctionNode::Read(AstReader& reader)
@@ -263,7 +264,7 @@ void FunctionNode::SetBodySource(CompoundStatementNode* bodySource_)
     bodySource->SetParent(this);
 }
 
-FunctionPtrNode::FunctionPtrNode(const Span& span_) : Node(NodeType::functionPtrNode, span_), boundExpression(nullptr)
+FunctionPtrNode::FunctionPtrNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::functionPtrNode, span_, moduleId_), boundExpression(nullptr)
 {
 }
 

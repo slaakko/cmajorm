@@ -42,10 +42,8 @@ private:
 class JsonFieldNameAttributeProcessor : public AttributeProcessor
 {
 public:
-    JsonFieldNameAttributeProcessor(Module* module_);
+    JsonFieldNameAttributeProcessor();
     void TypeCheck(Attribute* attribute, Symbol* symbol) override;
-private:
-    Module* module;
 };
 
 } } // namespace cmajor::binder

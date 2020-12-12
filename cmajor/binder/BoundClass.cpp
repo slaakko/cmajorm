@@ -10,8 +10,8 @@
 
 namespace cmajor { namespace binder {
 
-BoundClass::BoundClass(Module* module_, ClassTypeSymbol* classTypeSymbol_) : 
-    BoundNode(module_, classTypeSymbol_->GetSpan(), BoundNodeType::boundClass), classTypeSymbol(classTypeSymbol_), inlineFunctionContainer(false)
+BoundClass::BoundClass(ClassTypeSymbol* classTypeSymbol_) : 
+    BoundNode(classTypeSymbol_->GetSpan(), classTypeSymbol_->SourceModuleId(), BoundNodeType::boundClass), classTypeSymbol(classTypeSymbol_), inlineFunctionContainer(false)
 {
 }
 
@@ -22,12 +22,12 @@ void BoundClass::Accept(BoundNodeVisitor& visitor)
 
 void BoundClass::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception(GetModule(),  "cannot load from class", GetSpan());
+    throw Exception("cannot load from class", GetSpan(), ModuleId());
 }
 
 void BoundClass::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception(GetModule(), "cannot store to class", GetSpan());
+    throw Exception("cannot store to class", GetSpan(), ModuleId());
 }
 
 void BoundClass::AddMember(std::unique_ptr<BoundNode>&& member)

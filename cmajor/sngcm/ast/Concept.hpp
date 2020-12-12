@@ -13,7 +13,7 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API ConstraintNode : public Node
 {
 public:
-    ConstraintNode(NodeType nodeType_, const Span& span_);
+    ConstraintNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
     bool NodeIsConstraintNode() const override { return true; }
     virtual bool IsHeaderConstraint() const { return false; }
 };
@@ -21,8 +21,8 @@ public:
 class SNGCM_AST_API ParenthesizedConstraintNode : public ConstraintNode
 {
 public:
-    ParenthesizedConstraintNode(const Span& span_);
-    ParenthesizedConstraintNode(const Span& span_, ConstraintNode* constraint_);
+    ParenthesizedConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ParenthesizedConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConstraintNode* constraint_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -37,8 +37,8 @@ private:
 class SNGCM_AST_API BinaryConstraintNode : public ConstraintNode
 {
 public:
-    BinaryConstraintNode(NodeType nodeType_, const Span& span_);
-    BinaryConstraintNode(NodeType nodeType_, const Span& span_, ConstraintNode* left_, ConstraintNode* right_);
+    BinaryConstraintNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
+    BinaryConstraintNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_, ConstraintNode* left_, ConstraintNode* right_);
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     const ConstraintNode* Left() const { return left.get(); }
@@ -53,8 +53,8 @@ private:
 class SNGCM_AST_API DisjunctiveConstraintNode : public BinaryConstraintNode
 {
 public:
-    DisjunctiveConstraintNode(const Span& span_);
-    DisjunctiveConstraintNode(const Span& span_, ConstraintNode* left_, ConstraintNode* right_);
+    DisjunctiveConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    DisjunctiveConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConstraintNode* left_, ConstraintNode* right_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override;
@@ -63,8 +63,8 @@ public:
 class SNGCM_AST_API ConjunctiveConstraintNode : public BinaryConstraintNode
 {
 public:
-    ConjunctiveConstraintNode(const Span& span_);
-    ConjunctiveConstraintNode(const Span& span_, ConstraintNode* left_, ConstraintNode* right_);
+    ConjunctiveConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConjunctiveConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConstraintNode* left_, ConstraintNode* right_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     std::string ToString() const override;
@@ -73,8 +73,8 @@ public:
 class SNGCM_AST_API WhereConstraintNode : public ConstraintNode
 {
 public:
-    WhereConstraintNode(const Span& span_);
-    WhereConstraintNode(const Span& span_, ConstraintNode* constraint_);
+    WhereConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    WhereConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConstraintNode* constraint_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -95,8 +95,8 @@ private:
 class SNGCM_AST_API PredicateConstraintNode : public ConstraintNode
 {
 public:
-    PredicateConstraintNode(const Span& span_);
-    PredicateConstraintNode(const Span& span_, Node* invokeExpr_);
+    PredicateConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    PredicateConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* invokeExpr_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -111,8 +111,8 @@ private:
 class SNGCM_AST_API IsConstraintNode : public ConstraintNode
 {
 public:
-    IsConstraintNode(const Span& span_);
-    IsConstraintNode(const Span& span_, Node* typeExpr_, Node* conceptOrTypeName_);
+    IsConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    IsConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_, Node* conceptOrTypeName_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -130,8 +130,8 @@ private:
 class SNGCM_AST_API MultiParamConstraintNode : public ConstraintNode
 {
 public:
-    MultiParamConstraintNode(const Span& span_);
-    MultiParamConstraintNode(const Span& span_, IdentifierNode* conceptId_);
+    MultiParamConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    MultiParamConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* conceptId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -149,8 +149,8 @@ private:
 class SNGCM_AST_API TypeNameConstraintNode : public ConstraintNode
 {
 public:
-    TypeNameConstraintNode(const Span& span_);
-    TypeNameConstraintNode(const Span& span_, Node* typeId_);
+    TypeNameConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    TypeNameConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -165,14 +165,14 @@ private:
 class SNGCM_AST_API SignatureConstraintNode : public ConstraintNode
 {
 public:
-    SignatureConstraintNode(NodeType nodeType_, const Span& span_);
+    SignatureConstraintNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
 };
 
 class SNGCM_AST_API ConstructorConstraintNode : public SignatureConstraintNode
 {
 public:
-    ConstructorConstraintNode(const Span& span_);
-    ConstructorConstraintNode(const Span& span_, IdentifierNode* typeParamId_);
+    ConstructorConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConstructorConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* typeParamId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -190,8 +190,8 @@ private:
 class SNGCM_AST_API DestructorConstraintNode : public SignatureConstraintNode
 {
 public:
-    DestructorConstraintNode(const Span& span_);
-    DestructorConstraintNode(const Span& span_, IdentifierNode* typeParamId_);
+    DestructorConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    DestructorConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* typeParamId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -205,8 +205,8 @@ private:
 class SNGCM_AST_API MemberFunctionConstraintNode : public SignatureConstraintNode
 {
 public:
-    MemberFunctionConstraintNode(const Span& span_);
-    MemberFunctionConstraintNode(const Span& span_, Node* returnTypeExpr_, IdentifierNode* typeParamId_, const std::u32string& groupId_);
+    MemberFunctionConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    MemberFunctionConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* returnTypeExpr_, IdentifierNode* typeParamId_, const std::u32string& groupId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -229,8 +229,8 @@ private:
 class SNGCM_AST_API FunctionConstraintNode : public SignatureConstraintNode
 {
 public:
-    FunctionConstraintNode(const Span& span_);
-    FunctionConstraintNode(const Span& span_, Node* returnTypeExpr_, const std::u32string& groupId_);
+    FunctionConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    FunctionConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* returnTypeExpr_, const std::u32string& groupId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -250,8 +250,8 @@ private:
 class SNGCM_AST_API AxiomStatementNode : public Node
 {
 public:
-    AxiomStatementNode(const Span& span_);
-    AxiomStatementNode(const Span& span_, Node* expression_, const std::u32string& text_);
+    AxiomStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    AxiomStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_, const std::u32string& text_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -268,8 +268,8 @@ private:
 class SNGCM_AST_API AxiomNode : public Node
 {
 public:
-    AxiomNode(const Span& span_);
-    AxiomNode(const Span& span_, IdentifierNode* id_);
+    AxiomNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    AxiomNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -295,8 +295,8 @@ private:
 class SNGCM_AST_API ConceptIdNode : public Node
 {
 public:
-    ConceptIdNode(const Span& span_);
-    ConceptIdNode(const Span& span_, IdentifierNode* id_);
+    ConceptIdNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConceptIdNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -315,10 +315,10 @@ private:
 class SNGCM_AST_API ConceptNode : public Node
 {
 public:
-    ConceptNode(const Span& span_);
-    ConceptNode(NodeType nodeType_, const Span& span_);
-    ConceptNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_);
-    ConceptNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, IdentifierNode* id_);
+    ConceptNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConceptNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConceptNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_);
+    ConceptNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -362,7 +362,7 @@ class SNGCM_AST_API SameConstraintNode : public IntrinsicConstraintNode
 {
 public:
     SameConstraintNode();
-    SameConstraintNode(const Span& span_);
+    SameConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(Visitor& visitor) override;
     Node* Clone(CloneContext& cloneContext) const override;
 };
@@ -371,7 +371,7 @@ class SNGCM_AST_API DerivedConstraintNode : public IntrinsicConstraintNode
 {
 public:
     DerivedConstraintNode();
-    DerivedConstraintNode(const Span& span_);
+    DerivedConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(Visitor& visitor) override;
     Node* Clone(CloneContext& cloneContext) const override;
 };
@@ -380,7 +380,7 @@ class SNGCM_AST_API ConvertibleConstraintNode : public IntrinsicConstraintNode
 {
 public:
     ConvertibleConstraintNode();
-    ConvertibleConstraintNode(const Span& span_);
+    ConvertibleConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(Visitor& visitor) override;
     Node* Clone(CloneContext& cloneContext) const override;
 };
@@ -389,7 +389,7 @@ class SNGCM_AST_API ExplicitlyConvertibleConstraintNode : public IntrinsicConstr
 {
 public:
     ExplicitlyConvertibleConstraintNode();
-    ExplicitlyConvertibleConstraintNode(const Span& span_);
+    ExplicitlyConvertibleConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(Visitor& visitor) override;
     Node* Clone(CloneContext& cloneContext) const override;
 };
@@ -398,7 +398,7 @@ class SNGCM_AST_API CommonConstraintNode : public IntrinsicConstraintNode
 {
 public:
     CommonConstraintNode();
-    CommonConstraintNode(const Span& span_);
+    CommonConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(Visitor& visitor) override;
     Node* Clone(CloneContext& cloneContext) const override;
 };
@@ -407,7 +407,7 @@ class SNGCM_AST_API NonreferenceTypeConstraintNode : public IntrinsicConstraintN
 {
 public:
     NonreferenceTypeConstraintNode();
-    NonreferenceTypeConstraintNode(const Span& span_);
+    NonreferenceTypeConstraintNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(Visitor& visitor) override;
     Node* Clone(CloneContext& cloneContext) const override;
 };
@@ -416,7 +416,7 @@ class SNGCM_AST_API SameConceptNode : public ConceptNode
 {
 public:
     SameConceptNode();
-    SameConceptNode(const Span& span_);
+    SameConceptNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 
@@ -424,7 +424,7 @@ class SNGCM_AST_API DerivedConceptNode : public ConceptNode
 {
 public:
     DerivedConceptNode();
-    DerivedConceptNode(const Span& span_);
+    DerivedConceptNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 
@@ -432,7 +432,7 @@ class SNGCM_AST_API ConvertibleConceptNode : public ConceptNode
 {
 public:
     ConvertibleConceptNode();
-    ConvertibleConceptNode(const Span& span_);
+    ConvertibleConceptNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 
@@ -440,7 +440,7 @@ class SNGCM_AST_API ExplicitlyConvertibleConceptNode : public ConceptNode
 {
 public:
     ExplicitlyConvertibleConceptNode();
-    ExplicitlyConvertibleConceptNode(const Span& span_);
+    ExplicitlyConvertibleConceptNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 
@@ -448,7 +448,7 @@ class SNGCM_AST_API CommonConceptNode : public ConceptNode
 {
 public:
     CommonConceptNode();
-    CommonConceptNode(const Span& span_);
+    CommonConceptNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     bool IsCommonConceptNode() const override { return true; }
     bool IsIntrinsicConceptNode() const override { return true; }
 };
@@ -457,7 +457,7 @@ class SNGCM_AST_API NonreferenceTypeConceptNode : public ConceptNode
 {
 public:
     NonreferenceTypeConceptNode();
-    NonreferenceTypeConceptNode(const Span& span_);
+    NonreferenceTypeConceptNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 

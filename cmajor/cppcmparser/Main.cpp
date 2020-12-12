@@ -8,6 +8,7 @@
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <boost/uuid/nil_generator.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <vector>
@@ -50,8 +51,9 @@ void ParseSourceFile(const std::string& fileName, int index, bool verbose)
     }
     std::u32string content = ToUtf32(ReadFile(fileName));
     CmajorLexer lexer(content, fileName, index);
+    boost::uuids::uuid moduleId = boost::uuids::nil_uuid();
     ParsingContext ctx;
-    std::unique_ptr<sngcm::ast::CompileUnitNode> compileUnit = CompileUnitParser::Parse(lexer, &ctx);
+    std::unique_ptr<sngcm::ast::CompileUnitNode> compileUnit = CompileUnitParser::Parse(lexer, &moduleId, &ctx);
 }
 
 void ParseProject(const std::string& projectFileName, int index, bool verbose)

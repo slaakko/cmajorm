@@ -14,8 +14,8 @@ class IdentifierNode;
 class SNGCM_AST_API ParameterNode : public Node
 {
 public:
-    ParameterNode(const Span& span_);
-    ParameterNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_);
+    ParameterNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ParameterNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

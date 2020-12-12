@@ -22,8 +22,9 @@ Node* AstReader::ReadNode()
 {
     NodeType nodeType = static_cast<NodeType>(binaryReader.ReadByte());
     Span span = ReadSpan();
-    Node* node = NodeFactory::Instance().CreateNode(nodeType, span);
-    node->SetRootModuleId(rootModuleId);
+    boost::uuids::uuid moduleId;
+    GetBinaryReader().ReadUuid(moduleId);
+    Node* node = NodeFactory::Instance().CreateNode(nodeType, span, moduleId);
     node->Read(*this);
     return node;
 }
@@ -186,34 +187,6 @@ Span AstReader::ReadSpan()
     else
     {
         uint32_t fileIndex = binaryReader.ReadULEB128UInt();
-        int16_t moduleId = GetModuleId(fileIndex);
-        auto it = moduleNameTable->find(moduleId);
-        if (it != moduleNameTable->cend())
-        {
-            auto it2 = moduleIdMap->find(it->second);
-            if (it2 != moduleIdMap->cend())
-            {
-                moduleId = it2->second;
-            }
-            else
-            {
-                //throw std::runtime_error("module id for module name '" + it->second + "' not found");
-                uint32_t line = binaryReader.ReadULEB128UInt();
-                uint32_t start = binaryReader.ReadULEB128UInt();
-                uint32_t end = binaryReader.ReadULEB128UInt();
-                return Span();
-            }
-        }
-        else
-        {
-            //throw std::runtime_error("module name for module id " + std::to_string(moduleId) + " not found");
-            uint32_t line = binaryReader.ReadULEB128UInt();
-            uint32_t start = binaryReader.ReadULEB128UInt();
-            uint32_t end = binaryReader.ReadULEB128UInt();
-            return Span();
-        }
-        int16_t fileId = GetFileId(static_cast<int32_t>(fileIndex));
-        fileIndex = static_cast<uint32_t>(MakeFileIndex(moduleId, fileId));
         uint32_t line = binaryReader.ReadULEB128UInt();
         uint32_t start = binaryReader.ReadULEB128UInt();
         uint32_t end = binaryReader.ReadULEB128UInt();

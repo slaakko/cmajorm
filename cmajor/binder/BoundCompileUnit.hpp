@@ -48,15 +48,16 @@ public:
     const std::vector<std::unique_ptr<FileScope>>& FileScopes() const { return fileScopes; }
     void AddBoundNode(std::unique_ptr<BoundNode>&& boundNode);
     const std::vector<std::unique_ptr<BoundNode>>& BoundNodes() const { return boundNodes; }
-    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, ArgumentMatch& argumentMatch);
+    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId, 
+        ArgumentMatch& argumentMatch);
     void CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags);
-    FunctionSymbol* InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span);
-    bool InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
-    FunctionSymbol* InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, const boost::uuids::uuid& moduleId, CollectFlags flags);
+    FunctionSymbol* InstantiateFunctionTemplate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping, const Span& span, const boost::uuids::uuid& moduleId);
+    bool InstantiateClassTemplateMemberFunction(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId);
+    FunctionSymbol* InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId);
     FunctionNode* GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol);
-    void GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
-    void GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
+    void GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId);
+    void GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId);
     int Install(const std::string& str);
     int Install(const std::u16string& str);
     int Install(const std::u32string& str);
@@ -99,7 +100,6 @@ public:
     void SetImmutable() { immutable = true; }
     void AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs);
     int GetNextExitEntryIndex() { return nextExitEntryIndex++; }
-    void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
     bool IsGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol) const;
     void SetGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol);
     void SetSystemRuntimeUnwindInfoSymbol(TypeSymbol* systemRuntimeUnwindInfoSymbol_);
@@ -145,7 +145,6 @@ private:
     ClassTemplateRepository classTemplateRepository;
     InlineFunctionRepository inlineFunctionRepository;
     ConstExprFunctionRepository constExprFunctionRepository;
-    std::vector<std::unique_ptr<FunctionSymbol>> functionSymbols;
     StringRepository<std::string, const unsigned char*> utf8StringRepository;
     StringRepository<std::u16string, const char16_t*> utf16StringRepository;
     StringRepository<std::u32string, const char32_t*> utf32StringRepository;

@@ -36,14 +36,14 @@ class BoundNodeVisitor;
 class BINDER_API BoundNode : public GenObject
 {
 public:
-    BoundNode(Module* module_, const Span& span_, BoundNodeType boundNodeType_);
+    BoundNode(const Span& span_, const boost::uuids::uuid& moduleId, BoundNodeType boundNodeType_);
     virtual void Accept(BoundNodeVisitor& visitor) = 0;
     const Span& GetSpan() const { return span; }
+    const boost::uuids::uuid& ModuleId() const { return moduleId; }
     BoundNodeType GetBoundNodeType() const { return boundNodeType; }
-    Module* GetModule() const { return module; }
 private:
-    Module* module;
     Span span;
+    boost::uuids::uuid moduleId;
     BoundNodeType boundNodeType;
 };
 

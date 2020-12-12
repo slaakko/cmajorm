@@ -22,7 +22,7 @@ InlineFunctionRepository::InlineFunctionRepository(BoundCompileUnit& boundCompil
 {
 }
 
-FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span)
+FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId)
 {
     if (inlineFunction->GetCompileUnit() == boundCompileUnit.GetCompileUnitNode()) return inlineFunction;
     while (inlineFunction->Master())
@@ -43,18 +43,15 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         Assert(node, "function node not read");
     }
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
-    SpanMapper spanMapper;
-    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()),
-        new IdentifierNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()), U"")));
+    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(functionNode->GetSpan(), functionNode->ModuleId(), new IdentifierNode(functionNode->GetSpan(), functionNode->ModuleId(), U"")));
     NamespaceNode* currentNs = globalNs.get();
     CloneContext cloneContext;
-    cloneContext.SetSpanMapper(&spanMapper);
     cloneContext.SetInstantiateFunctionNode();
     bool fileScopeAdded = false;
     int n = inlineFunction->UsingNodes().Count();
     if (!inlineFunction->Ns()->IsGlobalNamespace() || n > 0)
     {
-        FileScope* primaryFileScope = new FileScope(&boundCompileUnit.GetModule());
+        FileScope* primaryFileScope = new FileScope();
         if (!inlineFunction->Ns()->IsGlobalNamespace())
         {
             primaryFileScope->AddContainerScope(inlineFunction->Ns()->GetContainerScope());
@@ -77,8 +74,7 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         std::vector<std::u32string> nsComponents = Split(fullNsName, '.');
         for (const std::u32string& nsComponent : nsComponents)
         {
-            NamespaceNode* nsNode = new NamespaceNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()),
-                new IdentifierNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()), nsComponent));
+            NamespaceNode* nsNode = new NamespaceNode(functionNode->GetSpan(), functionNode->ModuleId(), new IdentifierNode(functionNode->GetSpan(), functionNode->ModuleId(), nsComponent));
             currentNs->AddMember(nsNode);
             currentNs = nsNode;
         }
@@ -86,7 +82,7 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
     FunctionNode* functionInstanceNode = static_cast<FunctionNode*>(functionNode->Clone(cloneContext));
     if (inlineFunction->IsDefault())
     {
-        functionInstanceNode->SetBody(new sngcm::ast::CompoundStatementNode(span));
+        functionInstanceNode->SetBody(new sngcm::ast::CompoundStatementNode(span, moduleId));
         inlineFunction->SetHasArtificialBody();
     }
     currentNs->AddMember(functionInstanceNode);
@@ -126,7 +122,7 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
             boundCompileUnit.RemoveLastFileScope();
         }
         FunctionSymbol* result = functionSymbol.get();
-        boundCompileUnit.AddFunctionSymbol(std::move(functionSymbol));
+        boundCompileUnit.GetSymbolTable().AddFunctionSymbol(std::move(functionSymbol));
         boundCompileUnit.AddGlobalNs(std::move(globalNs));
         inlineFunctionMap[inlineFunction] = result;
         result->SetFunctionId(inlineFunction->FunctionId());
@@ -158,7 +154,7 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         typeBinder.SetContainerScope(functionSymbol->GetContainerScope());
         functionInstanceNode->Accept(typeBinder);
         StatementBinder statementBinder(boundCompileUnit);
-        std::unique_ptr<BoundClass> boundClass(new BoundClass(&boundCompileUnit.GetModule(), classTypeSymbol));
+        std::unique_ptr<BoundClass> boundClass(new BoundClass(classTypeSymbol));
         boundClass->SetInlineFunctionContainer();
         statementBinder.SetCurrentClass(boundClass.get());
         std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, functionSymbol.get()));
@@ -197,7 +193,7 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         boundCompileUnit.AddBoundNode(std::move(boundClass));
         FunctionSymbol* result = functionSymbol.get();
         boundCompileUnit.AddGlobalNs(std::move(globalNs));
-        boundCompileUnit.AddFunctionSymbol(std::move(functionSymbol));
+        boundCompileUnit.GetSymbolTable().AddFunctionSymbol(std::move(functionSymbol));
         if (fileScopeAdded)
         {
             boundCompileUnit.RemoveLastFileScope();

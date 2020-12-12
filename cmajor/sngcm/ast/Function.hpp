@@ -18,10 +18,10 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API FunctionNode : public Node
 {
 public:
-    FunctionNode(const Span& span_);
-    FunctionNode(NodeType nodeType_, const Span& span_);
-    FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
-    FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
+    FunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    FunctionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
+    FunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
+    FunctionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
     FunctionNode(const FunctionNode&) = delete;
     FunctionNode& operator=(const FunctionNode&) = delete;
     Node* Clone(CloneContext& cloneContext) const override;
@@ -74,7 +74,7 @@ private:
 class SNGCM_AST_API FunctionPtrNode : public Node
 {
 public:
-    FunctionPtrNode(const Span& span_);
+    FunctionPtrNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void SetBoundExpression(void* boundExpression_) { boundExpression = boundExpression_; }

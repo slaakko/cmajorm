@@ -9,12 +9,13 @@
 
 namespace sngcm { namespace ast {
 
-InterfaceNode::InterfaceNode(const Span& span_) : Node(NodeType::interfaceNode, span_), specifiers(), id(), members()
+InterfaceNode::InterfaceNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
+    Node(NodeType::interfaceNode, span_, moduleId_), specifiers(), id(), members()
 {
 }
 
-InterfaceNode::InterfaceNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_) : 
-    Node(NodeType::interfaceNode, span_), specifiers(specifiers_), id(id_), members(), attributes(attributes_)
+InterfaceNode::InterfaceNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_) :
+    Node(NodeType::interfaceNode, span_, moduleId_), specifiers(specifiers_), id(id_), members(), attributes(attributes_)
 {
     id->SetParent(this);
 }
@@ -26,15 +27,15 @@ Node* InterfaceNode::Clone(CloneContext& cloneContext) const
     {
         clonedAttributes = attributes->Clone();
     }
-    InterfaceNode* clone = new InterfaceNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+    InterfaceNode* clone = new InterfaceNode(GetSpan(), ModuleId(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
     int n = members.Count();
     for (int i = 0; i < n; ++i)
     {
         clone->AddMember(members[i]->Clone(cloneContext));
     }
-    clone->SetSpecifierSpan(cloneContext.MapSpan(specifierSpan, RootModuleId()));
-    clone->SetBeginBraceSpan(cloneContext.MapSpan(beginBraceSpan, RootModuleId()));
-    clone->SetEndBraceSpan(cloneContext.MapSpan(endBraceSpan, RootModuleId()));
+    clone->SetSpecifierSpan(specifierSpan);
+    clone->SetBeginBraceSpan(beginBraceSpan);
+    clone->SetEndBraceSpan(endBraceSpan);
     return clone;
 }
 
@@ -54,9 +55,10 @@ void InterfaceNode::Write(AstWriter& writer)
     }
     writer.Write(id.get());
     members.Write(writer);
-    writer.Write(specifierSpan);
-    writer.Write(beginBraceSpan);
-    writer.Write(endBraceSpan);
+    bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+    writer.Write(specifierSpan, convertExternal);
+    writer.Write(beginBraceSpan, convertExternal);
+    writer.Write(endBraceSpan, convertExternal);
 }
 
 void InterfaceNode::Read(AstReader& reader)

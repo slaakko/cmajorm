@@ -15,10 +15,8 @@ using namespace cmajor::symbols;
 class SystemDefaultAttributeProcessor : public AttributeProcessor
 {
 public:
-    SystemDefaultAttributeProcessor(Module* module_);
+    SystemDefaultAttributeProcessor();
     void TypeCheck(Attribute* attribute, Symbol* symbol) override;
-private:
-    Module* module;
 };
 
 } } // namespace cmajor::binder

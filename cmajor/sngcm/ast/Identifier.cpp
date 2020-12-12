@@ -13,19 +13,19 @@ namespace sngcm { namespace ast {
 
 using namespace soulng::unicode;
 
-IdentifierNode::IdentifierNode(const Span& span_) : Node(NodeType::identifierNode, span_), identifier()
+IdentifierNode::IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::identifierNode, span_, moduleId_), identifier()
 {
 }
 
-IdentifierNode::IdentifierNode(const Span& span_, NodeType nodeType_) : Node(nodeType_, span_), identifier()
+IdentifierNode::IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_, NodeType nodeType_) : Node(nodeType_, span_, moduleId_), identifier()
 {
 }
 
-IdentifierNode::IdentifierNode(const Span& span_, const std::u32string& identifier_) : Node(NodeType::identifierNode, span_), identifier(identifier_)
+IdentifierNode::IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& identifier_) : Node(NodeType::identifierNode, span_, moduleId_), identifier(identifier_)
 {
 }
 
-IdentifierNode::IdentifierNode(const Span& span_, NodeType nodeType_, const std::u32string& identifier_) : Node(nodeType_, span_), identifier(identifier_)
+IdentifierNode::IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_, NodeType nodeType_, const std::u32string& identifier_) : Node(nodeType_, span_, moduleId_), identifier(identifier_)
 {
     std::u32string result;
     for (char32_t c : identifier)
@@ -38,14 +38,15 @@ IdentifierNode::IdentifierNode(const Span& span_, NodeType nodeType_, const std:
     std::swap(result, identifier);
 }
 
-IdentifierNode::IdentifierNode(const Span& span_, const soulng::lexer::Token& token) : Node(NodeType::identifierNode, span_)
+IdentifierNode::IdentifierNode(const Span& span_, const boost::uuids::uuid& moduleId_, const soulng::lexer::Token& token) : Node(NodeType::identifierNode, span_, moduleId_)
 {
     identifier = std::u32string(token.match.begin, token.match.end);
 }
 
 Node* IdentifierNode::Clone(CloneContext& cloneContext) const
 {
-    return new IdentifierNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), identifier);
+    IdentifierNode* clone = new IdentifierNode(GetSpan(), ModuleId(), identifier);
+    return clone;
 }
 
 void IdentifierNode::Accept(Visitor& visitor)
@@ -75,17 +76,18 @@ bool IdentifierNode::IsInternal() const
     return !identifier.empty() && identifier.front() == '@';
 }
 
-CursorIdNode::CursorIdNode(const Span& span_) : IdentifierNode(span_, NodeType::cursorIdNode)
+CursorIdNode::CursorIdNode(const Span& span_, const boost::uuids::uuid& moduleId_) : IdentifierNode(span_, moduleId_, NodeType::cursorIdNode)
 {
 }
 
-CursorIdNode::CursorIdNode(const Span& span_, const std::u32string& identifier_) : IdentifierNode(span_, NodeType::cursorIdNode, identifier_)
+CursorIdNode::CursorIdNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& identifier_) : IdentifierNode(span_, moduleId_, NodeType::cursorIdNode, identifier_)
 {
 }
 
 Node* CursorIdNode::Clone(CloneContext& cloneContext) const 
 {
-    return new CursorIdNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Str());
+    CursorIdNode* clone = new CursorIdNode(GetSpan(), ModuleId(), Str());
+    return clone;
 }
 
 void CursorIdNode::Accept(Visitor& visitor)

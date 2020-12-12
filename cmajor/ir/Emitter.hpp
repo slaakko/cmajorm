@@ -39,7 +39,7 @@ public:
     virtual bool InTryBlock() const { return false; }
     virtual int CurrentTryBlockId() const { return 0; }
     virtual void CreateCleanup() { }
-    virtual std::string GetSourceFilePath(int32_t fileIndex) { return std::string(); }
+    virtual std::string GetSourceFilePath(const Span& span, const boost::uuids::uuid& moduleId) { return std::string(); }
     virtual cmajor::ir::Pad* CurrentPad() { return nullptr; }
     virtual void* CreateClassDIType(void* classPtr) { return nullptr; }
     virtual int Install(const std::string& str) = 0;
@@ -147,18 +147,18 @@ public:
     virtual void* CreateDITypeForVoid() = 0;
     virtual void* CreateDITypeForArray(void* elementDIType, const std::vector<void*>& elements) = 0;
     virtual void* CreateDITypeForEnumConstant(const std::string& name, int64_t value) = 0;
-    virtual void* CreateDITypeForEnumType(const std::string& name, const std::string& mangledName, const Span& span, const std::vector<void*>& enumConstantElements,
+    virtual void* CreateDITypeForEnumType(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, const std::vector<void*>& enumConstantElements,
         uint64_t sizeInBits, uint32_t alignInBits, void* underlyingDIType) = 0;
-    virtual void* CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span) = 0;
+    virtual void* CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId) = 0;
     virtual uint64_t GetOffsetInBits(void* classIrType, int layoutIndex) = 0;
-    virtual void* CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const std::string& name, void* vtableHolderClass,
+    virtual void* CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const boost::uuids::uuid& moduleId, const std::string& name, void* vtableHolderClass,
         const std::string& mangledName, void* baseClassDIType) = 0;
     virtual void MapFwdDeclaration(void* fwdDeclaration, const boost::uuids::uuid& typeId) = 0;
     virtual void* GetDITypeByTypeId(const boost::uuids::uuid& typeId) const = 0;
     virtual void SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType, const std::string& typeName) = 0;
     virtual void* GetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId) = 0;
     virtual void SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId, void* diType) = 0;
-    virtual void* CreateDIMemberType(void* scope, const std::string& name, const Span& span, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType) = 0;
+    virtual void* CreateDIMemberType(void* scope, const std::string& name, const Span& span, const boost::uuids::uuid& moduleId, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType) = 0;
     virtual void* CreateConstDIType(void* diType) = 0;
     virtual void* CreateLValueRefDIType(void* diType) = 0;
     virtual void* CreateRValueRefDIType(void* diType) = 0;
@@ -317,7 +317,7 @@ public:
     virtual void VerifyModule() = 0;
     virtual void EmitObjectCodeFile(const std::string& objectFilePath) = 0;
     virtual void* CreateDebugInfoForNamespace(void* scope, const std::string& name) = 0;
-    virtual void* GetDebugInfoForFile(int32_t fileIndex) = 0;
+    virtual void* GetDebugInfoForFile(const Span& span, const boost::uuids::uuid& moduleId) = 0;
     virtual void PushScope(void* scope) = 0;
     virtual void PopScope() = 0;
     virtual void* CurrentScope() = 0;
@@ -327,7 +327,7 @@ public:
     virtual void SetFunctionLinkage(void* function, bool setInline) = 0;
     virtual void SetFunctionLinkageToLinkOnceODRLinkage(void* function) = 0;
     virtual void SetFunctionCallConventionToStdCall(void* function) = 0;
-    virtual void SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& functionId) = 0;
+    virtual void SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& sourceModuleId, const boost::uuids::uuid& functionId) = 0;
     virtual void SetFunctionName(const std::string& functionName) = 0;
     virtual void BeginScope() = 0;
     virtual void EndScope() = 0;
@@ -344,13 +344,13 @@ public:
     virtual unsigned GetPureVirtualVirtuality() = 0;
     virtual unsigned GetVirtualVirtuality() = 0;
     virtual unsigned GetFunctionFlags(bool isStatic, unsigned accessFlags, bool isExplicit) = 0;
-    virtual void* CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
+    virtual void* CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
         unsigned flags) = 0;
-    virtual void* CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags) = 0;
+    virtual void* CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned flags) = 0;
     virtual void SetDISubprogram(void* function, void* subprogram) = 0;
     virtual void* CreateAlloca(void* irType) = 0;
-    virtual void* CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst) = 0;
-    virtual void* CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst) = 0;
+    virtual void* CreateDIParameterVariable(const std::string& name, int index, const Span& span, const boost::uuids::uuid& moduleId, void* irType, void* allocaInst) = 0;
+    virtual void* CreateDIAutoVariable(const std::string& name, const Span& span, const boost::uuids::uuid& moduleId, void* irType, void* allocaInst) = 0;
     virtual void* GetFunctionArgument(void* function, int argumentIndex) = 0;
     virtual void SetDebugLoc(void* callInst) = 0;
     virtual void* CreateRet(void* value) = 0;
@@ -358,7 +358,7 @@ public:
     virtual void SetPersonalityFunction(void* function, void* personalityFunction) = 0;
     virtual void AddNoUnwindAttribute(void* function) = 0;
     virtual void AddUWTableAttribute(void* function) = 0;
-    virtual void* CreateLexicalBlock(const Span& span) = 0;
+    virtual void* CreateLexicalBlock(const Span& span, const boost::uuids::uuid& moduleId) = 0;
     virtual void* CreateSwitch(void* condition, void* defaultDest, unsigned numCases) = 0;
     virtual void AddCase(void* switchInst, void* caseValue, void* caseDest) = 0;
     virtual void* GenerateTrap(const std::vector<void*>& args) = 0;

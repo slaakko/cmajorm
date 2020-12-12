@@ -11,7 +11,7 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
 
-BoundNamespace::BoundNamespace(Module* module_, NamespaceNode& namespaceNode_) : BoundNode(module_, namespaceNode_.GetSpan(), BoundNodeType::boundNamespace), namespaceNode(namespaceNode_)
+BoundNamespace::BoundNamespace(NamespaceNode& namespaceNode_) : BoundNode(namespaceNode_.GetSpan(), namespaceNode_.ModuleId(), BoundNodeType::boundNamespace), namespaceNode(namespaceNode_)
 {
 }
 
@@ -22,12 +22,12 @@ void BoundNamespace::Accept(BoundNodeVisitor& visitor)
 
 void BoundNamespace::Load(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception(GetModule(), "cannot load a namespace", GetSpan());
+    throw Exception("cannot load a namespace", GetSpan(), ModuleId());
 }
 
 void BoundNamespace::Store(Emitter& emitter, OperationFlags flags)
 {
-    throw Exception(GetModule(), "cannot store a namespace", GetSpan());
+    throw Exception("cannot store a namespace", GetSpan(), ModuleId());
 }
 
 void BoundNamespace::AddMember(std::unique_ptr<BoundNode>&& member)

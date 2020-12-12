@@ -13,8 +13,8 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API ClassNode : public Node
 {
 public:
-    ClassNode(const Span& span_);
-    ClassNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_);
+    ClassNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ClassNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -58,7 +58,7 @@ private:
 class SNGCM_AST_API InitializerNode : public Node
 {
 public:
-    InitializerNode(NodeType nodeType_, const Span& span_);
+    InitializerNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     void AddArgument(Node* argument) override;
@@ -70,7 +70,7 @@ private:
 class SNGCM_AST_API ThisInitializerNode : public InitializerNode
 {
 public:
-    ThisInitializerNode(const Span& span_);
+    ThisInitializerNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
 };
@@ -78,7 +78,7 @@ public:
 class SNGCM_AST_API BaseInitializerNode : public InitializerNode
 {
 public:
-    BaseInitializerNode(const Span& span_);
+    BaseInitializerNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
 };
@@ -86,8 +86,8 @@ public:
 class SNGCM_AST_API MemberInitializerNode : public InitializerNode
 {
 public:
-    MemberInitializerNode(const Span& span_);
-    MemberInitializerNode(const Span& span_, IdentifierNode* memberId_);
+    MemberInitializerNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    MemberInitializerNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* memberId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -101,8 +101,8 @@ private:
 class SNGCM_AST_API StaticConstructorNode : public FunctionNode
 {
 public:
-    StaticConstructorNode(const Span& span_);
-    StaticConstructorNode(const Span& span_, Specifiers specifiers_, Attributes* attributes_);
+    StaticConstructorNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    StaticConstructorNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -119,8 +119,8 @@ private:
 class SNGCM_AST_API ConstructorNode : public FunctionNode
 {
 public:
-    ConstructorNode(const Span& span_);
-    ConstructorNode(const Span& span_, Specifiers specifiers_, Attributes* attributes_);
+    ConstructorNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConstructorNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -137,8 +137,8 @@ private:
 class SNGCM_AST_API DestructorNode : public FunctionNode
 {
 public:
-    DestructorNode(const Span& span_);
-    DestructorNode(const Span& span_, Specifiers specifiers_, Attributes* attributes_);
+    DestructorNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    DestructorNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -152,8 +152,8 @@ private:
 class SNGCM_AST_API MemberFunctionNode : public FunctionNode
 {
 public:
-    MemberFunctionNode(const Span& span_);
-    MemberFunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
+    MemberFunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    MemberFunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     bool IsConst() const { return (GetSpecifiers() & Specifiers::const_) != Specifiers::none; }
@@ -163,8 +163,8 @@ public:
 class SNGCM_AST_API ConversionFunctionNode : public FunctionNode
 {
 public:
-    ConversionFunctionNode(const Span& span_);
-    ConversionFunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, Attributes* attributes_);
+    ConversionFunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConversionFunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     bool IsConst() const { return (GetSpecifiers() & Specifiers::const_) != Specifiers::none; }
@@ -174,8 +174,8 @@ public:
 class SNGCM_AST_API MemberVariableNode : public Node
 {
 public:
-    MemberVariableNode(const Span& span_);
-    MemberVariableNode(const Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Attributes* attributes_);
+    MemberVariableNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    MemberVariableNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

@@ -9,17 +9,14 @@
 
 namespace cmajor { namespace symbols {
 
-NamespaceSymbol::NamespaceSymbol(const Span& span_, const std::u32string& name_) : ContainerSymbol(SymbolType::namespaceSymbol, span_, name_)
+NamespaceSymbol::NamespaceSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    ContainerSymbol(SymbolType::namespaceSymbol, span_, sourceModuleId_, name_)
 {
 }
 
 void NamespaceSymbol::Import(NamespaceSymbol* that, SymbolTable& symbolTable)
 {
-    cmajor::symbols::SpanMapper spanMapper;
-    Span thatSpan = that->GetSpan();
-    Span span = spanMapper.MapSpan(thatSpan, GetRootModuleForCurrentThread()->Id());
-    //NamespaceSymbol* ns = symbolTable.BeginNamespace(that->Name(), that->GetSpan());
-    NamespaceSymbol* ns = symbolTable.BeginNamespace(that->Name(), span);
+    NamespaceSymbol* ns = symbolTable.BeginNamespace(that->Name(), that->GetSpan(), that->SourceModuleId());
     symbolTable.MapNs(that, ns);
     for (const std::unique_ptr<Symbol>& symbol : that->Members())
     {

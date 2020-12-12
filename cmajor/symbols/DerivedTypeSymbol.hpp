@@ -55,8 +55,9 @@ SYMBOLS_API TypeDerivationRec UnifyDerivations(const TypeDerivationRec& left, co
 class SYMBOLS_API DerivedTypeSymbol : public TypeSymbol
 {
 public:
-    DerivedTypeSymbol(const Span& span_, const std::u32string& name_);
-    DerivedTypeSymbol(const Span& span_, const std::u32string& name_, TypeSymbol* baseType_, const TypeDerivationRec& derivationRec_);
+    DerivedTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    DerivedTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_, TypeSymbol* baseType_, const TypeDerivationRec& derivationRec_);
+    ~DerivedTypeSymbol();
     std::string TypeString() const override { return "derived_type"; }
     std::u32string SimpleName() const override;
     void Write(SymbolWriter& writer) override;
@@ -65,15 +66,14 @@ public:
     void ComputeTypeId();
     const TypeSymbol* BaseType() const override { return baseType; }
     TypeSymbol* BaseType() override { return baseType; }
-    TypeSymbol* PlainType(const Span& span) override;
-    TypeSymbol* PlainType(const Span& span, Module* module) override;
-    TypeSymbol* RemoveReference(const Span& span) override;
-    TypeSymbol* RemovePointer(const Span& span) override;
-    TypeSymbol* RemoveConst(const Span& span) override;
-    TypeSymbol* AddConst(const Span& span) override;
-    TypeSymbol* AddLvalueReference(const Span& span) override;
-    TypeSymbol* AddRvalueReference(const Span& span) override;
-    TypeSymbol* AddPointer(const Span& span) override;
+    TypeSymbol* PlainType(const Span& span, const boost::uuids::uuid& moduleId) override;
+    TypeSymbol* RemoveReference(const Span& span, const boost::uuids::uuid& moduleId) override;
+    TypeSymbol* RemovePointer(const Span& span, const boost::uuids::uuid& moduleId) override;
+    TypeSymbol* RemoveConst(const Span& span, const boost::uuids::uuid& moduleId) override;
+    TypeSymbol* AddConst(const Span& span, const boost::uuids::uuid& moduleId) override;
+    TypeSymbol* AddLvalueReference(const Span& span, const boost::uuids::uuid& moduleId) override;
+    TypeSymbol* AddRvalueReference(const Span& span, const boost::uuids::uuid& moduleId) override;
+    TypeSymbol* AddPointer(const Span& span, const boost::uuids::uuid& moduleId) override;
     void* IrType(Emitter& emitter) override;
     void* CreateDefaultIrValue(Emitter& emitter) override;
     void* CreateDIType(Emitter& emitter) override;
@@ -87,8 +87,8 @@ public:
     int PointerCount() const override;
     bool ContainsTemplateParameter() const override { return baseType->ContainsTemplateParameter(); }
     const TypeDerivationRec& DerivationRec() const override { return derivationRec; }
-    TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span) override;
-    TypeSymbol* Unify(TypeSymbol* sourceType, const Span& span) override;
+    TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span, const boost::uuids::uuid& moduleId) override;
+    TypeSymbol* Unify(TypeSymbol* sourceType, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsRecursive(TypeSymbol* type, std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>>& tested) override;
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
@@ -103,7 +103,7 @@ private:
 class SYMBOLS_API NullPtrType : public TypeSymbol
 {
 public:
-    NullPtrType(const Span& span_, const std::u32string& name_);
+    NullPtrType(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     std::string TypeString() const override { return "nullptr_type"; }
     bool IsPointerType() const override { return true; }
     bool IsNullPtrType() const override { return true; }

@@ -8,13 +8,14 @@
 
 namespace sngcm { namespace ast {
 
-BoolNode::BoolNode(const Span& span_) : Node(NodeType::boolNode, span_)
+BoolNode::BoolNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::boolNode, span_, moduleId_)
 {
 }
 
 Node* BoolNode::Clone(CloneContext& cloneContext) const
 {
-    return new BoolNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    BoolNode* clone = new BoolNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void BoolNode::Accept(Visitor& visitor)
@@ -22,13 +23,14 @@ void BoolNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-SByteNode::SByteNode(const Span& span_) : Node(NodeType::sbyteNode, span_)
+SByteNode::SByteNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::sbyteNode, span_, moduleId_)
 {
 }
 
 Node* SByteNode::Clone(CloneContext& cloneContext) const
 {
-    return new SByteNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    SByteNode* clone = new SByteNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void SByteNode::Accept(Visitor& visitor)
@@ -36,13 +38,14 @@ void SByteNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-ByteNode::ByteNode(const Span& span_) : Node(NodeType::byteNode, span_)
+ByteNode::ByteNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::byteNode, span_, moduleId_)
 {
 }
 
 Node* ByteNode::Clone(CloneContext& cloneContext) const
 {
-    return new ByteNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    ByteNode* clone = new ByteNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void ByteNode::Accept(Visitor& visitor)
@@ -50,13 +53,14 @@ void ByteNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-ShortNode::ShortNode(const Span& span_) : Node(NodeType::shortNode, span_)
+ShortNode::ShortNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::shortNode, span_, moduleId_)
 {
 }
 
 Node* ShortNode::Clone(CloneContext& cloneContext) const
 {
-    return new ShortNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    ShortNode* clone = new ShortNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void ShortNode::Accept(Visitor& visitor)
@@ -64,13 +68,14 @@ void ShortNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-UShortNode::UShortNode(const Span& span_) : Node(NodeType::ushortNode, span_)
+UShortNode::UShortNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::ushortNode, span_, moduleId_)
 {
 }
 
 Node* UShortNode::Clone(CloneContext& cloneContext) const
 {
-    return new UShortNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    UShortNode* clone = new UShortNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void UShortNode::Accept(Visitor& visitor)
@@ -78,13 +83,14 @@ void UShortNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-IntNode::IntNode(const Span& span_) : Node(NodeType::intNode, span_)
+IntNode::IntNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::intNode, span_, moduleId_)
 {
 }
 
 Node* IntNode::Clone(CloneContext& cloneContext) const
 {
-    return new IntNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    IntNode* clone = new IntNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void IntNode::Accept(Visitor& visitor)
@@ -92,13 +98,14 @@ void IntNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-UIntNode::UIntNode(const Span& span_) : Node(NodeType::uintNode, span_)
+UIntNode::UIntNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::uintNode, span_, moduleId_)
 {
 }
 
 Node* UIntNode::Clone(CloneContext& cloneContext) const
 {
-    return new UIntNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    UIntNode* clone = new UIntNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void UIntNode::Accept(Visitor& visitor)
@@ -106,13 +113,14 @@ void UIntNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-LongNode::LongNode(const Span& span_) : Node(NodeType::longNode, span_)
+LongNode::LongNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::longNode, span_, moduleId_)
 {
 }
 
 Node* LongNode::Clone(CloneContext& cloneContext) const
 {
-    return new LongNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    LongNode* clone = new LongNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void LongNode::Accept(Visitor& visitor)
@@ -120,13 +128,14 @@ void LongNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-ULongNode::ULongNode(const Span& span_) : Node(NodeType::ulongNode, span_)
+ULongNode::ULongNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::ulongNode, span_, moduleId_)
 {
 }
 
 Node* ULongNode::Clone(CloneContext& cloneContext) const
 {
-    return new ULongNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    ULongNode* clone = new ULongNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void ULongNode::Accept(Visitor& visitor)
@@ -134,13 +143,14 @@ void ULongNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-FloatNode::FloatNode(const Span& span_) : Node(NodeType::floatNode, span_)
+FloatNode::FloatNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::floatNode, span_, moduleId_)
 {
 }
 
 Node* FloatNode::Clone(CloneContext& cloneContext) const
 {
-    return new FloatNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    FloatNode* clone = new FloatNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void FloatNode::Accept(Visitor& visitor)
@@ -148,13 +158,14 @@ void FloatNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-DoubleNode::DoubleNode(const Span& span_) : Node(NodeType::doubleNode, span_)
+DoubleNode::DoubleNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::doubleNode, span_, moduleId_)
 {
 }
 
 Node* DoubleNode::Clone(CloneContext& cloneContext) const
 {
-    return new DoubleNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    DoubleNode* clone = new DoubleNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void DoubleNode::Accept(Visitor& visitor)
@@ -162,13 +173,14 @@ void DoubleNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-CharNode::CharNode(const Span& span_) : Node(NodeType::charNode, span_)
+CharNode::CharNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::charNode, span_, moduleId_)
 {
 }
 
 Node* CharNode::Clone(CloneContext& cloneContext) const
 {
-    return new CharNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    CharNode* clone = new CharNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void CharNode::Accept(Visitor& visitor)
@@ -176,13 +188,14 @@ void CharNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-WCharNode::WCharNode(const Span& span_) : Node(NodeType::wcharNode, span_)
+WCharNode::WCharNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::wcharNode, span_, moduleId_)
 {
 }
 
 Node* WCharNode::Clone(CloneContext& cloneContext) const
 {
-    return new WCharNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    WCharNode* clone = new WCharNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void WCharNode::Accept(Visitor& visitor)
@@ -190,13 +203,14 @@ void WCharNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-UCharNode::UCharNode(const Span& span_) : Node(NodeType::ucharNode, span_)
+UCharNode::UCharNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::ucharNode, span_, moduleId_)
 {
 }
 
 Node* UCharNode::Clone(CloneContext& cloneContext) const
 {
-    return new UCharNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    UCharNode* clone = new UCharNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void UCharNode::Accept(Visitor& visitor)
@@ -204,13 +218,14 @@ void UCharNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-VoidNode::VoidNode(const Span& span_) : Node(NodeType::voidNode, span_)
+VoidNode::VoidNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::voidNode, span_, moduleId_)
 {
 }
 
 Node* VoidNode::Clone(CloneContext& cloneContext) const
 {
-    return new VoidNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
+    VoidNode* clone = new VoidNode(GetSpan(), ModuleId());
+    return clone;
 }
 
 void VoidNode::Accept(Visitor& visitor)

@@ -33,7 +33,8 @@ std::unique_ptr<sngcm::ast::CompileUnitNode> ParseCompileUnit(const std::string&
     }
     CmajorLexer lexer(ToUtf32(ReadFile(sourceFilePath)), sourceFilePath, 0);
     ParsingContext ctx;
-    return CompileUnitParser::Parse(lexer, &ctx);
+    boost::uuids::uuid moduleId = boost::uuids::nil_uuid();
+    return CompileUnitParser::Parse(lexer, &moduleId, &ctx);
 }
 
 std::unique_ptr<sngcm::ast::Project> ParseProject(const std::string& projectFilePath, bool verbose)

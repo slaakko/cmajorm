@@ -561,14 +561,14 @@ void* Emitter::CreateDITypeForEnumConstant(const std::string& name, int64_t valu
     return nullptr;
 }
 
-void* Emitter::CreateDITypeForEnumType(const std::string& name, const std::string& mangledName, const Span& span, const std::vector<void*>& enumConstantElements,
+void* Emitter::CreateDITypeForEnumType(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, const std::vector<void*>& enumConstantElements,
     uint64_t sizeInBits, uint32_t alignInBits, void* underlyingDIType)
 {
     // todo
     return nullptr;
 }
 
-void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span)
+void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId)
 {
     // todo
     return nullptr;
@@ -580,7 +580,7 @@ uint64_t Emitter::GetOffsetInBits(void* classIrType, int layoutIndex)
     return uint64_t();
 }
 
-void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const std::string& name, void* vtableHolderClass,
+void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const boost::uuids::uuid& moduleId, const std::string& name, void* vtableHolderClass,
     const std::string& mangledName, void* baseClassDIType)
 {
     // todo
@@ -614,7 +614,7 @@ void Emitter::SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memb
     // todo
 }
 
-void* Emitter::CreateDIMemberType(void* scope, const std::string& name, const Span& span, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType)
+void* Emitter::CreateDIMemberType(void* scope, const std::string& name, const Span& span, const boost::uuids::uuid& moduleId, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType)
 {
     // todo
     return nullptr;
@@ -1562,7 +1562,7 @@ void* Emitter::CreateDebugInfoForNamespace(void* scope, const std::string& name)
     return nullptr;
 }
 
-void* Emitter::GetDebugInfoForFile(int32_t fileIndex)
+void* Emitter::GetDebugInfoForFile(const Span& span, const boost::uuids::uuid& moduleId)
 {
     // todo
     return nullptr;
@@ -1617,7 +1617,7 @@ void Emitter::SetFunctionCallConventionToStdCall(void* function)
     // todo
 }
 
-void Emitter::SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& functionId)
+void Emitter::SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& sourceModuleId, const boost::uuids::uuid& functionId)
 {
     currentFunction = static_cast<cmsxi::Function*>(function_);
 }
@@ -1697,14 +1697,14 @@ unsigned Emitter::GetFunctionFlags(bool isStatic, unsigned accessFlags, bool isE
     return unsigned();
 }
 
-void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
+void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
     unsigned flags)
 {
     // todo
     return nullptr;
 }
 
-void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags)
+void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, const boost::uuids::uuid& moduleId, void* subroutineType, unsigned flags)
 {
     // todo
     return nullptr;
@@ -1720,13 +1720,13 @@ void* Emitter::CreateAlloca(void* irType)
     return context->CreateLocal(static_cast<cmsxi::Type*>(irType));
 }
 
-void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)
+void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, const boost::uuids::uuid& moduleId, void* irType, void* allocaInst)
 {
     // todo
     return nullptr;
 }
 
-void* Emitter::CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst)
+void* Emitter::CreateDIAutoVariable(const std::string& name, const Span& span, const boost::uuids::uuid& moduleId, void* irType, void* allocaInst)
 {
     // todo
     return nullptr;
@@ -1767,7 +1767,7 @@ void Emitter::AddUWTableAttribute(void* function)
     // todo
 }
 
-void* Emitter::CreateLexicalBlock(const Span& span)
+void* Emitter::CreateLexicalBlock(const Span& span, const boost::uuids::uuid& moduleId)
 {
     // todo
     return nullptr;

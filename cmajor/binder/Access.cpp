@@ -36,7 +36,7 @@ void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
             ClassTypeSymbol* fromContainingClass = fromFunction->ContainingClassNoThrow();
             if (fromContainingClass)
             {
-                if (toContainingClass->IsSameParentOrAncestorOf(fromContainingClass))
+                if (toContainingClass && toContainingClass->IsSameParentOrAncestorOf(fromContainingClass))
                 {
                     return;
                 }
@@ -71,7 +71,8 @@ void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
             break;
         }
     }
-    throw Exception(toSymbol->GetModule(), toSymbol->TypeString() + " '" + ToUtf8(toSymbol->FullName()) + "' is inaccessible due to its protection level", fromFunction->GetSpan(), toSymbol->GetSpan());
+    throw Exception(toSymbol->TypeString() + " '" + ToUtf8(toSymbol->FullName()) + "' is inaccessible due to its protection level", 
+        fromFunction->GetSpan(), fromFunction->SourceModuleId(), toSymbol->GetSpan(), toSymbol->SourceModuleId());
 }
 
 } } // namespace cmajor::binder

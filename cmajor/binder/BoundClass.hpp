@@ -15,7 +15,7 @@ using namespace cmajor::symbols;
 class BINDER_API BoundClass : public BoundNode
 {
 public:
-    BoundClass(Module* module_, ClassTypeSymbol* classTypeSymbol_);
+    BoundClass(ClassTypeSymbol* classTypeSymbol_);
     BoundClass(const BoundClass&) = delete;
     BoundClass& operator=(const BoundClass&) = delete;
     void Accept(BoundNodeVisitor& visitor) override;

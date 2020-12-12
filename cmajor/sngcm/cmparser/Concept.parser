@@ -31,14 +31,14 @@ parser api(SNGCM_PARSER_API) ConceptParser
     using TypeExprParser.TypeExpr;
     using FunctionParser.FunctionGroupId;
 
-    Concept(ParsingContext* ctx, var std::unique_ptr<ConceptNode> conceptNode, var std::unique_ptr<WhereConstraintNode> constraint,
+    Concept(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<ConceptNode> conceptNode, var std::unique_ptr<WhereConstraintNode> constraint,
         var Span s, var Span beginBraceSpan, var Span endBraceSpan) : ConceptNode*
         ::= empty{ ctx->BeginParsingConcept(); }
-        (   (Specifiers:specifiers{ s = span; } CONCEPT Identifier:conceptName!){ conceptNode.reset(new ConceptNode(span, specifiers, conceptName)); }
-            LANGLE! (Identifier:typeParam{ conceptNode->AddTypeParameter(typeParam); } % COMMA) RANGLE!
-            ((Refinement:refinement{ conceptNode->SetRefinement(refinement); })?
-            (WhereConstraint(ctx):c{ s.end = span.end; constraint.reset(c); constraint->SetHeaderConstraint(); conceptNode->AddConstraint(constraint.release()); })?){ conceptNode->SetSpan(s); }
-            LBRACE!{ beginBraceSpan = span; } ConceptBody(ctx, conceptNode.get()):body! RBRACE!{ endBraceSpan = span; }
+        (   (Specifiers:specifiers{ s = span; } CONCEPT Identifier(moduleId):conceptName!){ conceptNode.reset(new ConceptNode(span, *moduleId, specifiers, conceptName)); }
+            LANGLE! (Identifier(moduleId):typeParam{ conceptNode->AddTypeParameter(typeParam); } % COMMA) RANGLE!
+            ((Refinement(moduleId):refinement{ conceptNode->SetRefinement(refinement); })?
+            (WhereConstraint(moduleId, ctx):c{ s.end = span.end; constraint.reset(c); constraint->SetHeaderConstraint(); conceptNode->AddConstraint(constraint.release()); })?){ conceptNode->SetSpan(s); }
+            LBRACE!{ beginBraceSpan = span; } ConceptBody(moduleId, ctx, conceptNode.get()):body! RBRACE!{ endBraceSpan = span; }
         )
         {
             ctx->EndParsingConcept();
@@ -52,120 +52,120 @@ parser api(SNGCM_PARSER_API) ConceptParser
         }
         ;
 
-    Refinement(var std::unique_ptr<ConceptIdNode> conceptId) : ConceptIdNode*
-        ::= (COLON QualifiedId:refinedConcept{ conceptId.reset(new ConceptIdNode(span, refinedConcept)); }
-            LANGLE! (Identifier:typeParam{ conceptId->AddTypeParameter(typeParam); } % COMMA) RANGLE!){ return conceptId.release(); }
+    Refinement(boost::uuids::uuid* moduleId, var std::unique_ptr<ConceptIdNode> conceptId) : ConceptIdNode*
+        ::= (COLON QualifiedId(moduleId):refinedConcept{ conceptId.reset(new ConceptIdNode(span, *moduleId, refinedConcept)); }
+            LANGLE! (Identifier(moduleId):typeParam{ conceptId->AddTypeParameter(typeParam); } % COMMA) RANGLE!){ return conceptId.release(); }
         ;
 
 
-    ConceptBody(ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode)
-        ::= (ConceptBodyConstraint(ctx, conceptNode):bodyConstraint | Axiom(ctx, conceptNode):axiom)*
+    ConceptBody(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode)
+        ::= (ConceptBodyConstraint(moduleId, ctx, conceptNode):bodyConstraint | Axiom(moduleId, ctx, conceptNode):axiom)*
         ;
 
-    ConceptBodyConstraint(ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode)
-        ::= TypeNameConstraint(ctx):typeNameConstraint{ conceptNode->AddConstraint(typeNameConstraint); }
-        |   SignatureConstraint(ctx, conceptNode->TypeParameters()[0]):signatureConstraint{ conceptNode->AddConstraint(signatureConstraint); }
-        |   EmbeddedConstraint(ctx):embeddedConstraint{ conceptNode->AddConstraint(embeddedConstraint); }
+    ConceptBodyConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode)
+        ::= TypeNameConstraint(moduleId, ctx):typeNameConstraint{ conceptNode->AddConstraint(typeNameConstraint); }
+        |   SignatureConstraint(moduleId, ctx, conceptNode->TypeParameters()[0]):signatureConstraint{ conceptNode->AddConstraint(signatureConstraint); }
+        |   EmbeddedConstraint(moduleId, ctx):embeddedConstraint{ conceptNode->AddConstraint(embeddedConstraint); }
         ;
 
-    TypeNameConstraint(ParsingContext* ctx, var Span s) : ConstraintNode*
-        ::= TYPENAME{ s = span; } TypeExpr(ctx):type! SEMICOLON!{ s.end = span.end; return new TypeNameConstraintNode(s, type); }
+    TypeNameConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : ConstraintNode*
+        ::= TYPENAME{ s = span; } TypeExpr(moduleId, ctx):type! SEMICOLON!{ s.end = span.end; return new TypeNameConstraintNode(s, *moduleId, type); }
         ;
 
-    SignatureConstraint(ParsingContext* ctx, sngcm::ast::IdentifierNode* firstTypeParameter) : ConstraintNode*
-        ::= ConstructorConstraint(ctx, firstTypeParameter):constructorConstraint{ return constructorConstraint; }
-        |   DestructorConstraint(ctx, firstTypeParameter):destructorConstraint{ return destructorConstraint; }
-        |   MemberFunctionConstraint(ctx):memberFunctionConstraint{ return memberFunctionConstraint; }
-        |   FunctionConstraint(ctx):functionConstraint{ return functionConstraint; }
+    SignatureConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::IdentifierNode* firstTypeParameter) : ConstraintNode*
+        ::= ConstructorConstraint(moduleId, ctx, firstTypeParameter):constructorConstraint{ return constructorConstraint; }
+        |   DestructorConstraint(moduleId, ctx, firstTypeParameter):destructorConstraint{ return destructorConstraint; }
+        |   MemberFunctionConstraint(moduleId, ctx):memberFunctionConstraint{ return memberFunctionConstraint; }
+        |   FunctionConstraint(moduleId, ctx):functionConstraint{ return functionConstraint; }
         ;
 
-    ConstructorConstraint(ParsingContext* ctx, sngcm::ast::IdentifierNode* firstTypeParameter, var std::unique_ptr<ConstraintNode> ctorConstraint, var Span e) : ConstraintNode*
-        ::= (EXPLICIT? Identifier:id{ std::u32string className = lexer.GetMatch(span); pass = className == firstTypeParameter->Str(); if (pass) ctorConstraint.reset(new ConstructorConstraintNode(span, id)); }
-            ParameterList(ctx, ctorConstraint.get()):paramList SEMICOLON!{ e = span; }){ ctorConstraint->SetSpanEnd(e.end); return ctorConstraint.release(); }
+    ConstructorConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::IdentifierNode* firstTypeParameter, var std::unique_ptr<ConstraintNode> ctorConstraint, var Span e) : ConstraintNode*
+        ::= (EXPLICIT? Identifier(moduleId):id{ std::u32string className = lexer.GetMatch(span); pass = className == firstTypeParameter->Str(); if (pass) ctorConstraint.reset(new ConstructorConstraintNode(span, *moduleId, id)); }
+            ParameterList(moduleId, ctx, ctorConstraint.get()):paramList SEMICOLON!{ e = span; }){ ctorConstraint->SetSpanEnd(e.end); return ctorConstraint.release(); }
         ;
 
-    DestructorConstraint(ParsingContext* ctx, sngcm::ast::IdentifierNode* firstTypeParameter, var Span s) : ConstraintNode*
-        ::= (CPL{ s = span; } Identifier:id{ std::u32string className = lexer.GetMatch(span); pass = className == firstTypeParameter->Str(); } LPAREN! RPAREN! SEMICOLON!{ s.end = span.end; })
+    DestructorConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::IdentifierNode* firstTypeParameter, var Span s) : ConstraintNode*
+        ::= (CPL{ s = span; } Identifier(moduleId):id{ std::u32string className = lexer.GetMatch(span); pass = className == firstTypeParameter->Str(); } LPAREN! RPAREN! SEMICOLON!{ s.end = span.end; })
         {
-            return new DestructorConstraintNode(s, id);
+            return new DestructorConstraintNode(s, *moduleId, id);
         }
         ;
 
-    MemberFunctionConstraint(ParsingContext* ctx, var std::unique_ptr<ConstraintNode> memberFunctionConstraint) : ConstraintNode*
-        ::= (TypeExpr(ctx):returnType Identifier:typeParam DOT FunctionGroupId(ctx):functionGroupId!){ memberFunctionConstraint.reset(new MemberFunctionConstraintNode(span, returnType, typeParam, functionGroupId)); }
-            ParameterList(ctx, memberFunctionConstraint.get()):paramList! SEMICOLON!{ memberFunctionConstraint->SetSpanEnd(span.end); return memberFunctionConstraint.release(); }
+    MemberFunctionConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<ConstraintNode> memberFunctionConstraint) : ConstraintNode*
+        ::= (TypeExpr(moduleId, ctx):returnType Identifier(moduleId):typeParam DOT FunctionGroupId(moduleId, ctx):functionGroupId!){ memberFunctionConstraint.reset(new MemberFunctionConstraintNode(span, *moduleId, returnType, typeParam, functionGroupId)); }
+            ParameterList(moduleId, ctx, memberFunctionConstraint.get()):paramList! SEMICOLON!{ memberFunctionConstraint->SetSpanEnd(span.end); return memberFunctionConstraint.release(); }
         ;
 
-    FunctionConstraint(ParsingContext* ctx, var std::unique_ptr<ConstraintNode> functionConstraint) : ConstraintNode*
-        ::= (TypeExpr(ctx):returnType FunctionGroupId(ctx):functionGroupId!){ functionConstraint.reset(new FunctionConstraintNode(span, returnType, functionGroupId)); }
-            ParameterList(ctx, functionConstraint.get()):paramList! SEMICOLON!{ functionConstraint->SetSpanEnd(span.end); return functionConstraint.release(); }
+    FunctionConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<ConstraintNode> functionConstraint) : ConstraintNode*
+        ::= (TypeExpr(moduleId, ctx):returnType FunctionGroupId(moduleId, ctx):functionGroupId!){ functionConstraint.reset(new FunctionConstraintNode(span, *moduleId, returnType, functionGroupId)); }
+            ParameterList(moduleId, ctx, functionConstraint.get()):paramList! SEMICOLON!{ functionConstraint->SetSpanEnd(span.end); return functionConstraint.release(); }
         ;
 
-    EmbeddedConstraint(ParsingContext* ctx, var std::unique_ptr<WhereConstraintNode> constraint) : WhereConstraintNode*
-        ::= (WhereConstraint(ctx):c SEMICOLON!){ constraint.reset(c); constraint->SetSemicolon(); return constraint.release(); }
+    EmbeddedConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<WhereConstraintNode> constraint) : WhereConstraintNode*
+        ::= (WhereConstraint(moduleId, ctx):c SEMICOLON!){ constraint.reset(c); constraint->SetSemicolon(); return constraint.release(); }
         ;
 
-    WhereConstraint(ParsingContext* ctx, var Span s) : WhereConstraintNode*
-        ::= WHERE{ s = span; } ConstraintExpr(ctx):constraint!{ s.end = span.end; return new WhereConstraintNode(s, constraint); }
+    WhereConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : WhereConstraintNode*
+        ::= WHERE{ s = span; } ConstraintExpr(moduleId, ctx):constraint!{ s.end = span.end; return new WhereConstraintNode(s, *moduleId, constraint); }
         ;
 
-    ConstraintExpr(ParsingContext* ctx) : ConstraintNode*
-        ::= DisjunctiveConstraintExpr(ctx):disjunctiveConstraint{ return disjunctiveConstraint; }
+    ConstraintExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx) : ConstraintNode*
+        ::= DisjunctiveConstraintExpr(moduleId, ctx):disjunctiveConstraint{ return disjunctiveConstraint; }
         ;
 
-    DisjunctiveConstraintExpr(ParsingContext* ctx, var Span s, var std::unique_ptr<ConstraintNode> constraint) : ConstraintNode*
+    DisjunctiveConstraintExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var std::unique_ptr<ConstraintNode> constraint) : ConstraintNode*
         ::=
-        (   ConjunctiveConstraintExpr(ctx):left{ constraint.reset(left); s = span; }
-            (   OR ConjunctiveConstraintExpr(ctx):right{ s.end = span.end; constraint.reset(new DisjunctiveConstraintNode(s, constraint.release(), right)); })*
+        (   ConjunctiveConstraintExpr(moduleId, ctx):left{ constraint.reset(left); s = span; }
+            (   OR ConjunctiveConstraintExpr(moduleId, ctx):right{ s.end = span.end; constraint.reset(new DisjunctiveConstraintNode(s, *moduleId, constraint.release(), right)); })*
         )
         {
             return constraint.release();
         }
         ;
 
-    ConjunctiveConstraintExpr(ParsingContext* ctx, var Span s, var std::unique_ptr<ConstraintNode> constraint) : ConstraintNode*
+    ConjunctiveConstraintExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var std::unique_ptr<ConstraintNode> constraint) : ConstraintNode*
         ::=
-        (   PrimaryConstraintExpr(ctx):left{ constraint.reset(left); s = span; }
-            (   AND PrimaryConstraintExpr(ctx):right{ s.end = span.end; constraint.reset(new ConjunctiveConstraintNode(s, constraint.release(), right)); })*
+        (   PrimaryConstraintExpr(moduleId, ctx):left{ constraint.reset(left); s = span; }
+            (   AND PrimaryConstraintExpr(moduleId, ctx):right{ s.end = span.end; constraint.reset(new ConjunctiveConstraintNode(s, *moduleId, constraint.release(), right)); })*
         )
         {
             return constraint.release();
         }
         ;
 
-    PrimaryConstraintExpr(ParsingContext* ctx, var Span s) : ConstraintNode*
-        ::= LPAREN{ s = span; } ConstraintExpr(ctx):constraint RPAREN!{ s.end = span.end; return new ParenthesizedConstraintNode(s, constraint); }
-        |   AtomicConstraintExpr(ctx):atomicConstraint{ return atomicConstraint; }
+    PrimaryConstraintExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : ConstraintNode*
+        ::= LPAREN{ s = span; } ConstraintExpr(moduleId, ctx):constraint RPAREN!{ s.end = span.end; return new ParenthesizedConstraintNode(s, *moduleId, constraint); }
+        |   AtomicConstraintExpr(moduleId, ctx):atomicConstraint{ return atomicConstraint; }
         ;
 
-    AtomicConstraintExpr(ParsingContext* ctx) : ConstraintNode*
-        ::= PredicateConstraint(ctx):predicateConstraint{ return predicateConstraint; }
-        |   IsConstraint(ctx):isConstraint{ return isConstraint; }
-        |   MultiParamConstraint(ctx):multiParamConstraint{ return multiParamConstraint; }
+    AtomicConstraintExpr(boost::uuids::uuid* moduleId, ParsingContext* ctx) : ConstraintNode*
+        ::= PredicateConstraint(moduleId, ctx):predicateConstraint{ return predicateConstraint; }
+        |   IsConstraint(moduleId, ctx):isConstraint{ return isConstraint; }
+        |   MultiParamConstraint(moduleId, ctx):multiParamConstraint{ return multiParamConstraint; }
         ;
 
-    PredicateConstraint(ParsingContext* ctx) : ConstraintNode*
-        ::= InvokeExpr(ctx):invokeExpr{ return new PredicateConstraintNode(span, invokeExpr); }
+    PredicateConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx) : ConstraintNode*
+        ::= InvokeExpr(moduleId, ctx):invokeExpr{ return new PredicateConstraintNode(span, *moduleId, invokeExpr); }
         ;
 
-    IsConstraint(ParsingContext* ctx, var Span s) : ConstraintNode*
-        ::= TypeExpr(ctx):type{ s = span; } IS ConceptOrTypeName(ctx):conceptOrTypeName!{ s.end = span.end; return new IsConstraintNode(s, type, conceptOrTypeName); }
+    IsConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : ConstraintNode*
+        ::= TypeExpr(moduleId, ctx):type{ s = span; } IS ConceptOrTypeName(moduleId, ctx):conceptOrTypeName!{ s.end = span.end; return new IsConstraintNode(s, *moduleId, type, conceptOrTypeName); }
         ;
 
-    ConceptOrTypeName(ParsingContext* ctx) : Node*
-        ::= TypeExpr(ctx):conceptOrTypeName{ return conceptOrTypeName; }
+    ConceptOrTypeName(boost::uuids::uuid* moduleId, ParsingContext* ctx) : Node*
+        ::= TypeExpr(moduleId, ctx):conceptOrTypeName{ return conceptOrTypeName; }
         ;
 
-    MultiParamConstraint(ParsingContext* ctx, var std::unique_ptr<MultiParamConstraintNode> constraint) : ConstraintNode*
-        ::= QualifiedId:id{ constraint.reset(new MultiParamConstraintNode(span, id)); }
-            LANGLE (TypeExpr(ctx):typeExpr{ constraint->AddTypeExpr(typeExpr); } % COMMA) RANGLE!{ constraint->SetSpanEnd(span.end); return constraint.release(); }
+    MultiParamConstraint(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<MultiParamConstraintNode> constraint) : ConstraintNode*
+        ::= QualifiedId(moduleId):id{ constraint.reset(new MultiParamConstraintNode(span, *moduleId, id)); }
+            LANGLE (TypeExpr(moduleId, ctx):typeExpr{ constraint->AddTypeExpr(typeExpr); } % COMMA) RANGLE!{ constraint->SetSpanEnd(span.end); return constraint.release(); }
         ;
 
-    Axiom(ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode, var std::unique_ptr<AxiomNode> axiomNode, var Span axiomSpan, var Span beginBraceSpan, var Span endBraceSpan)
+    Axiom(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode, var std::unique_ptr<AxiomNode> axiomNode, var Span axiomSpan, var Span beginBraceSpan, var Span endBraceSpan)
         ::=
-        (   AXIOM{ axiomSpan = span; } Identifier:id? empty{ axiomNode.reset(new AxiomNode(axiomSpan, id)); }
-            ParameterList(ctx, axiomNode.get()):paramList?
-            LBRACE!{ beginBraceSpan = span; } AxiomBody(ctx, axiomNode.get()):axiomBody! RBRACE!{ endBraceSpan = span; }
+        (   AXIOM{ axiomSpan = span; } Identifier(moduleId):id? empty{ axiomNode.reset(new AxiomNode(axiomSpan, *moduleId, id)); }
+            ParameterList(moduleId, ctx, axiomNode.get()):paramList?
+            LBRACE!{ beginBraceSpan = span; } AxiomBody(moduleId, ctx, axiomNode.get()):axiomBody! RBRACE!{ endBraceSpan = span; }
         )
         {
             axiomNode->SetBeginBraceSpan(beginBraceSpan);
@@ -174,12 +174,12 @@ parser api(SNGCM_PARSER_API) ConceptParser
         }
         ;
 
-    AxiomBody(ParsingContext* ctx, sngcm::ast::AxiomNode* axiom)
-        ::= (AxiomStatement(ctx):stmt{ axiom->AddStatement(stmt); })*
+    AxiomBody(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::AxiomNode* axiom)
+        ::= (AxiomStatement(moduleId, ctx):stmt{ axiom->AddStatement(stmt); })*
         ;
 
-    AxiomStatement(ParsingContext* ctx, var Span s) : AxiomStatementNode*
-        ::= (Expression(ctx):expr{ s = span; } SEMICOLON!{ s.end = span.end; }){ return new AxiomStatementNode(s, expr, lexer.GetMatch(s)); }
+    AxiomStatement(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s) : AxiomStatementNode*
+        ::= (Expression(moduleId, ctx):expr{ s = span; } SEMICOLON!{ s.end = span.end; }){ return new AxiomStatementNode(s, *moduleId, expr, lexer.GetMatch(s)); }
         ;
 
     ruleinfo

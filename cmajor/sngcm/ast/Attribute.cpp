@@ -12,11 +12,12 @@ namespace sngcm { namespace ast {
 
 using namespace soulng::unicode;
 
-Attribute::Attribute() : span(), name(), value()
+Attribute::Attribute() : span(), moduleId(), name(), value()
 {
 }
 
-Attribute::Attribute(const Span& span_, const std::u32string& name_, const std::u32string& value_) : span(span_), name(name_), value(value_)
+Attribute::Attribute(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& name_, const std::u32string& value_) : 
+    span(span_), moduleId(moduleId_), name(name_), value(value_)
 {
 }
 
@@ -27,7 +28,15 @@ void Attribute::Accept(Visitor& visitor)
 
 void Attribute::Write(AstWriter& writer)
 {
-    writer.Write(span);
+    if (moduleId == writer.SpanConversionModuleId())
+    {
+        writer.Write(span, true);
+    }
+    else
+    {
+        writer.Write(span, false);
+    }
+    writer.GetBinaryWriter().Write(moduleId);
     writer.GetBinaryWriter().Write(name);
     writer.GetBinaryWriter().Write(value);
 }
@@ -35,6 +44,7 @@ void Attribute::Write(AstWriter& writer)
 void Attribute::Read(AstReader& reader)
 {
     span = reader.ReadSpan();
+    reader.GetBinaryReader().ReadUuid(moduleId);
     name = reader.GetBinaryReader().ReadUtf32String();
     value = reader.GetBinaryReader().ReadUtf32String();
 }
@@ -53,19 +63,19 @@ Attribute* Attributes::GetAttribute(const std::u32string& name) const
     return nullptr;
 }
 
-void Attributes::AddAttribute(const Span& span, const std::u32string& name)
+void Attributes::AddAttribute(const Span& span, const boost::uuids::uuid& moduleId, const std::u32string& name)
 {
-    AddAttribute(span, name, U"true");
+    AddAttribute(span, moduleId, name, U"true");
 }
 
-void Attributes::AddAttribute(const Span& span, const std::u32string& name, const std::u32string& value)
+void Attributes::AddAttribute(const Span& span, const boost::uuids::uuid& moduleId, const std::u32string& name, const std::u32string& value)
 {
     Attribute* prev = GetAttribute(name);
     if (prev != nullptr)
     {
-        throw AttributeNotUniqueException("attribute '" + ToUtf8(name) + "' not unique", span, prev->GetSpan());
+        throw AttributeNotUniqueException("attribute '" + ToUtf8(name) + "' not unique", span, moduleId, prev->GetSpan(), prev->ModuleId());
     }
-    Attribute* attribute = new Attribute(span, name, value);
+    Attribute* attribute = new Attribute(span, moduleId, name, value);
     AddAttribute(attribute);
 }
 
@@ -80,7 +90,7 @@ Attributes* Attributes::Clone() const
     std::unique_ptr<Attributes> clone(new Attributes());
     for (const std::unique_ptr<Attribute>& attribute : attributes)
     {
-        clone->AddAttribute(attribute->GetSpan(), attribute->Name(), attribute->Value());
+        clone->AddAttribute(attribute->GetSpan(), attribute->ModuleId(), attribute->Name(), attribute->Value());
     }
     return clone.release();
 }
@@ -110,7 +120,8 @@ void Attributes::Read(AstReader& reader)
     }
 }
 
-AttributeNotUniqueException::AttributeNotUniqueException(const std::string& message_, const Span& span_, const Span& prevSpan_) : std::runtime_error(message_), span(span_), prevSpan(prevSpan_)
+AttributeNotUniqueException::AttributeNotUniqueException(const std::string& message_, const Span& span_, const boost::uuids::uuid& moduleId_,
+    const Span& prevSpan_, const boost::uuids::uuid& prevModuleId_) : std::runtime_error(message_), span(span_), moduleId(moduleId_), prevSpan(prevSpan_), prevModuleId(prevModuleId_)
 {
 }
 

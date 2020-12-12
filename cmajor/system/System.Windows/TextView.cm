@@ -1360,6 +1360,7 @@ namespace System.Windows
                     OnLineInserted(insertedArgs);
                     ++lineIndex;
                 }
+                SetTextExtent();
                 SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength() + indent);
                 ScrollToCaret();
                 Invalidate();
@@ -1385,6 +1386,7 @@ namespace System.Windows
                     OnLineDeleted(deleteArgs);
                 }
             }
+            SetTextExtent();
             SetLineNumberFieldLength(cast<int>(lines.Count()));
             SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength());
             ScrollToCaret();
@@ -1437,6 +1439,7 @@ namespace System.Windows
                     lines.Remove(lines.Begin() + lineIndex + 1);
                     LineEventArgs deletedArgs(lineIndex + 1, -1);
                     OnLineDeleted(deletedArgs);
+                    SetTextExtent();
                 }
             }
             SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength());
@@ -1540,6 +1543,7 @@ namespace System.Windows
             }
             LineEventArgs insertedArgs(lineIndex + 1, indentLineIndex);
             OnLineInserted(insertedArgs);
+            SetTextExtent();
             SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength() + GetIndent(lines[indentLineIndex], indentLineIndex));
             ScrollToCaret();
             Invalidate();

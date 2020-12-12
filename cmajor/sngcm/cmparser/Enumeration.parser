@@ -25,10 +25,10 @@ parser api(SNGCM_PARSER_API) EnumerationParser
     using TypeExprParser.TypeExpr;
     using ExpressionParser.Expression;
 
-    EnumType(ParsingContext* ctx, var std::unique_ptr<EnumTypeNode> enumTypeNode, var Span s, var Span beginBraceSpan, var Span endBraceSpan) : EnumTypeNode*
-        ::= Specifiers:specifiers{ s = span; } ENUM Identifier:enumTypeId!{ s.end = span.end; enumTypeNode.reset(new EnumTypeNode(s, specifiers, enumTypeId)); }
-            (UnderlyingType(ctx):underlyingType{ enumTypeNode->SetUnderlyingType(underlyingType); })?
-            LBRACE!{ beginBraceSpan = span; } EnumConstants(ctx, enumTypeNode.get()):enumConstants RBRACE!
+    EnumType(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<EnumTypeNode> enumTypeNode, var Span s, var Span beginBraceSpan, var Span endBraceSpan) : EnumTypeNode*
+        ::= Specifiers:specifiers{ s = span; } ENUM Identifier(moduleId):enumTypeId!{ s.end = span.end; enumTypeNode.reset(new EnumTypeNode(s, *moduleId, specifiers, enumTypeId)); }
+            (UnderlyingType(moduleId, ctx):underlyingType{ enumTypeNode->SetUnderlyingType(underlyingType); })?
+            LBRACE!{ beginBraceSpan = span; } EnumConstants(moduleId, ctx, enumTypeNode.get()):enumConstants RBRACE!
             {
                 endBraceSpan = span;
                 enumTypeNode->SetBeginBraceSpan(beginBraceSpan);
@@ -37,28 +37,28 @@ parser api(SNGCM_PARSER_API) EnumerationParser
             }
         ;
 
-    UnderlyingType(ParsingContext* ctx) : Node*
-        ::= COLON TypeExpr(ctx):type{ return type; }
+    UnderlyingType(boost::uuids::uuid* moduleId, ParsingContext* ctx) : Node*
+        ::= COLON TypeExpr(moduleId, ctx):type{ return type; }
         ;
 
-    EnumConstants(ParsingContext* ctx, sngcm::ast::EnumTypeNode* enumType)
-        ::= EnumConstant(ctx, enumType):enumConstant!{ enumType->AddConstant(enumConstant); } % COMMA
+    EnumConstants(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::EnumTypeNode* enumType)
+        ::= EnumConstant(moduleId, ctx, enumType):enumConstant!{ enumType->AddConstant(enumConstant); } % COMMA
         ;
 
-    EnumConstant(ParsingContext* ctx, sngcm::ast::EnumTypeNode* enumType, var Span s, var std::unique_ptr<Node> expr) : EnumConstantNode*
-        ::= Identifier:constantId!{ s = span; }
-        (   ASSIGN Expression(ctx):constantValue
+    EnumConstant(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::EnumTypeNode* enumType, var Span s, var std::unique_ptr<Node> expr) : EnumConstantNode*
+        ::= Identifier(moduleId):constantId!{ s = span; }
+        (   ASSIGN Expression(moduleId, ctx):constantValue
             {
                 expr.reset(constantValue);
                 expr->SetFullSpan();
                 Span v = expr->GetSpan();
                 s.end = expr->GetSpan().end;
-                EnumConstantNode* value = new EnumConstantNode(s, constantId, expr.release());
+                EnumConstantNode* value = new EnumConstantNode(s, *moduleId, constantId, expr.release());
                 value->SetHasValue();
                 value->SetStrValue(lexer.GetMatch(v));
                 return value;
             }
-        |   empty{ return new EnumConstantNode(s, constantId, MakeNextEnumConstantValue(s, enumType)); }
+        |   empty{ return new EnumConstantNode(s, *moduleId, constantId, MakeNextEnumConstantValue(s, *moduleId, enumType)); }
         )
         ;
 

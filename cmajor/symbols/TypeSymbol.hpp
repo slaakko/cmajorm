@@ -18,11 +18,12 @@ struct TypeDerivationRec;
 enum class ValueType : uint8_t;
 class Value;
 class TemplateParameterSymbol;
+struct ConversionTableEntry;
 
 class SYMBOLS_API TypeSymbol : public ContainerSymbol
 {
 public:
-    TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
+    TypeSymbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     bool IsTypeSymbol() const override { return true; }
@@ -40,15 +41,14 @@ public:
     virtual bool IsCharacterPointerType() const { return false; }
     virtual const TypeSymbol* BaseType() const { return this; }
     virtual TypeSymbol* BaseType() { return this; }
-    virtual TypeSymbol* PlainType(const Span& span) { return this; }
-    virtual TypeSymbol* PlainType(const Span& span, Module* module) { return this; }
-    virtual TypeSymbol* RemoveConst(const Span& span) { return this; }
-    virtual TypeSymbol* RemoveReference(const Span& span) { return this; }
-    virtual TypeSymbol* RemovePointer(const Span& span) { return this; }
-    virtual TypeSymbol* AddConst(const Span& span);
-    virtual TypeSymbol* AddLvalueReference(const Span& span);
-    virtual TypeSymbol* AddRvalueReference(const Span& span);
-    virtual TypeSymbol* AddPointer(const Span& span);
+    virtual TypeSymbol* PlainType(const Span& span, const boost::uuids::uuid& moduleId) { return this; }
+    virtual TypeSymbol* RemoveConst(const Span& span, const boost::uuids::uuid& moduleId) { return this; }
+    virtual TypeSymbol* RemoveReference(const Span& span, const boost::uuids::uuid& moduleId) { return this; }
+    virtual TypeSymbol* RemovePointer(const Span& span, const boost::uuids::uuid& moduleId) { return this; }
+    virtual TypeSymbol* AddConst(const Span& span, const boost::uuids::uuid& moduleId);
+    virtual TypeSymbol* AddLvalueReference(const Span& span, const boost::uuids::uuid& moduleId);
+    virtual TypeSymbol* AddRvalueReference(const Span& span, const boost::uuids::uuid& moduleId);
+    virtual TypeSymbol* AddPointer(const Span& span, const boost::uuids::uuid& moduleId);
     virtual void* IrType(Emitter& emitter) = 0;
     virtual void* CreateDefaultIrValue(Emitter& emitter) = 0;
     virtual void* CreateDIType(Emitter& emitter);
@@ -71,9 +71,9 @@ public:
     const boost::uuids::uuid& TypeId() const { Assert(!typeId.is_nil(), "type id not initialized");  return typeId; }
     bool TypeIdNotSet() const { return typeId.is_nil(); }
     virtual const TypeDerivationRec& DerivationRec() const;
-    virtual TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span);
-    virtual TypeSymbol* Unify(TypeSymbol* that, const Span& span) { return nullptr; }
-    virtual TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span) { return nullptr; }
+    virtual TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span, const boost::uuids::uuid& moduleId);
+    virtual TypeSymbol* Unify(TypeSymbol* that, const Span& span, const boost::uuids::uuid& moduleId) { return nullptr; }
+    virtual TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span, const boost::uuids::uuid& moduleId) { return nullptr; }
     virtual bool IsRecursive(TypeSymbol* type, std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>>& tested);
     virtual ValueType GetValueType() const;
     virtual Value* MakeValue() const { return nullptr; }

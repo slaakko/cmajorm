@@ -3,13 +3,13 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/BasicType.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/BasicType.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace CmajorTokens;
 
-soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
+soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -33,7 +33,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new BoolNode(span));
+                    return soulng::parser::Match(true, new BoolNode(span, *moduleId));
                 }
             }
             break;
@@ -46,7 +46,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new SByteNode(span));
+                    return soulng::parser::Match(true, new SByteNode(span, *moduleId));
                 }
             }
             break;
@@ -59,7 +59,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new ByteNode(span));
+                    return soulng::parser::Match(true, new ByteNode(span, *moduleId));
                 }
             }
             break;
@@ -72,7 +72,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new ShortNode(span));
+                    return soulng::parser::Match(true, new ShortNode(span, *moduleId));
                 }
             }
             break;
@@ -85,7 +85,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new UShortNode(span));
+                    return soulng::parser::Match(true, new UShortNode(span, *moduleId));
                 }
             }
             break;
@@ -98,7 +98,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new IntNode(span));
+                    return soulng::parser::Match(true, new IntNode(span, *moduleId));
                 }
             }
             break;
@@ -111,7 +111,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new UIntNode(span));
+                    return soulng::parser::Match(true, new UIntNode(span, *moduleId));
                 }
             }
             break;
@@ -124,7 +124,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new LongNode(span));
+                    return soulng::parser::Match(true, new LongNode(span, *moduleId));
                 }
             }
             break;
@@ -137,7 +137,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new ULongNode(span));
+                    return soulng::parser::Match(true, new ULongNode(span, *moduleId));
                 }
             }
             break;
@@ -150,7 +150,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new FloatNode(span));
+                    return soulng::parser::Match(true, new FloatNode(span, *moduleId));
                 }
             }
             break;
@@ -163,7 +163,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new DoubleNode(span));
+                    return soulng::parser::Match(true, new DoubleNode(span, *moduleId));
                 }
             }
             break;
@@ -176,7 +176,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new CharNode(span));
+                    return soulng::parser::Match(true, new CharNode(span, *moduleId));
                 }
             }
             break;
@@ -189,7 +189,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new WCharNode(span));
+                    return soulng::parser::Match(true, new WCharNode(span, *moduleId));
                 }
             }
             break;
@@ -202,7 +202,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new UCharNode(span));
+                    return soulng::parser::Match(true, new UCharNode(span, *moduleId));
                 }
             }
             break;
@@ -215,7 +215,7 @@ soulng::parser::Match BasicTypeParser::BasicType(CmajorLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BasicType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new VoidNode(span));
+                    return soulng::parser::Match(true, new VoidNode(span, *moduleId));
                 }
             }
             break;

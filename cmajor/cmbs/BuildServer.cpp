@@ -11,6 +11,7 @@
 #include <sngcm/ast/Project.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
+#include <cmajor/symbols/SourceFileModuleMap.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/cmmid/InitDone.hpp>
 #include <soulng/util/CodeFormatter.hpp>
@@ -337,6 +338,7 @@ BuildReply BuildServer::ProcessBuildRequest(const BuildRequest& buildRequest)
     try
     {
         cmajor::symbols::ResetGlobalFlags();
+        cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::updateSourceFileModuleMap);
         cmajor::build::ResetStopBuild();
         StartLogging();
         cmajor::symbols::SetCompilerVersion(version);
@@ -430,6 +432,7 @@ CacheModuleReply BuildServer::ProcessCacheModuleRequest(const CacheModuleRequest
 
 GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionRequest& getDefinitionRequest)
 {
+    cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::updateSourceFileModuleMap);
     GetDefinitionReply reply;
     reply.messageKind = "getDefinitionReply";
     try
@@ -445,45 +448,51 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
             backend = sngcm::ast::BackEnd::llvm;
             SetBackEnd(cmajor::symbols::BackEnd::llvm);
         }
+        sngcm::ast::Config config = sngcm::ast::Config::debug;
         if (getDefinitionRequest.config == "release")
         {
             cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::release);
+            config = sngcm::ast::Config::release;
         }
         else if (!getDefinitionRequest.config.empty() && getDefinitionRequest.config != "debug")
         {
             throw std::runtime_error("buildserver: error processing get definition request: unknown configuration '" + getDefinitionRequest.config + "'");
         }
-        ReadToolChains(cmajor::symbols::GetGlobalFlag(cmajor::symbols::GlobalFlags::verbose));
-        ResetToolChain();
-        BackendSelector backendSelector(cmajor::symbols::GetBackEnd());
-        std::u32string moduleName = ToUtf32(getDefinitionRequest.projectName);
-        Project project(moduleName, getDefinitionRequest.projectFilePath, getDefinitionRequest.config, backend, GetToolChain(), sngcm::ast::SystemDirKind::regular);
-        std::string moduleFilePath = project.ModuleFilePath();
-        if (!IsModuleCached(moduleFilePath))
+        Module* module = GetModuleBySourceFile(backend, config, getDefinitionRequest.identifierLocation.file);
+        if (!module)
         {
-            std::unique_ptr<ModuleCache> prevCache;
-            try
+            ReadToolChains(cmajor::symbols::GetGlobalFlag(cmajor::symbols::GlobalFlags::verbose));
+            ResetToolChain();
+            BackendSelector backendSelector(cmajor::symbols::GetBackEnd());
+            std::u32string moduleName = ToUtf32(getDefinitionRequest.projectName);
+            Project project(moduleName, getDefinitionRequest.projectFilePath, getDefinitionRequest.config, backend, GetToolChain(), sngcm::ast::SystemDirKind::regular);
+            std::string moduleFilePath = project.ModuleFilePath();
+            if (!IsModuleCached(moduleFilePath))
             {
-                if (IsSystemModule(moduleName))
+                std::unique_ptr<ModuleCache> prevCache;
+                try
                 {
-                    prevCache = ReleaseModuleCache();
-                    InitModuleCache();
+                    if (IsSystemModule(moduleName))
+                    {
+                        prevCache = ReleaseModuleCache();
+                        InitModuleCache();
+                    }
+                    else
+                    {
+                        MoveNonSystemModulesTo(prevCache);
+                    }
+                    std::unique_ptr<Module> module(new Module(moduleFilePath, true));
+                    SetCacheModule(moduleFilePath, std::move(module));
+                    RestoreModulesFrom(prevCache.get());
                 }
-                else
+                catch (...)
                 {
-                    MoveNonSystemModulesTo(prevCache);
+                    RestoreModulesFrom(prevCache.get());
+                    throw;
                 }
-                std::unique_ptr<Module> module(new Module(moduleFilePath, true));
-                SetCacheModule(moduleFilePath, std::move(module));
-                RestoreModulesFrom(prevCache.get());
             }
-            catch (...)
-            {
-                RestoreModulesFrom(prevCache.get());
-                throw;
-            }
+            module = GetModuleBySourceFile(backend, config, getDefinitionRequest.identifierLocation.file);
         }
-        Module* module = GetCachedModule(moduleFilePath);
         if (module)
         {
             int32_t fileIndex = module->GetFileIndexForFilePath(getDefinitionRequest.identifierLocation.file);
@@ -492,14 +501,20 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
                 int32_t line = boost::lexical_cast<int32_t>(getDefinitionRequest.identifierLocation.line);
                 int32_t scol = boost::lexical_cast<int32_t>(getDefinitionRequest.identifierLocation.scol);
                 int32_t ecol = boost::lexical_cast<int32_t>(getDefinitionRequest.identifierLocation.ecol);
-                SymbolLocation identifierLocation(fileIndex, line, scol, ecol);
+                SymbolLocation identifierLocation(module->Id(), fileIndex, line, scol, ecol);
                 SymbolLocation* definitionLocation = module->GetSymbolTable().GetDefinitionLocation(identifierLocation);
                 if (definitionLocation)
                 {
-                    std::string filePath = module->GetFilePath(definitionLocation->fileIndex);
+                    std::string filePath = GetSourceFilePath(definitionLocation->fileIndex, definitionLocation->moduleId);
                     if (filePath.empty())
                     {
-                        throw std::runtime_error("file path for file index " + std::to_string(definitionLocation->fileIndex) + " not found");
+                        std::string moduleName = "<unknown>";
+                        Module* m = GetModuleById(definitionLocation->moduleId);
+                        if (m)
+                        {
+                            moduleName = ToUtf8(m->Name());
+                        }
+                        throw std::runtime_error("file path for file index " + std::to_string(definitionLocation->fileIndex) + " not found from module '" + moduleName + "'");
                     }
                     reply.definitionLocation.file = filePath;
                     reply.definitionLocation.line = std::to_string(definitionLocation->line);
@@ -519,7 +534,7 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
         }
         else
         {
-            throw std::runtime_error("module '" + moduleFilePath + "' not in cache");
+            throw std::runtime_error("module for source file '" + getDefinitionRequest.identifierLocation.file + "' not in cache");
         }
     }
     catch (const std::exception& ex)
@@ -576,6 +591,7 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
     {
         useModuleCache = false;
     }
+    cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::singleThreadedCompile);
     if (cppBuildRequest.singleThreadedCompile)
     {
         cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::singleThreadedCompile);

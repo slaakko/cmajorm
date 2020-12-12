@@ -68,9 +68,10 @@ public:
     const NamespaceSymbol* Ns() const;
     NamespaceSymbol* Ns();
     void Clear();
-    NamespaceSymbol* CreateNamespace(const std::u32string& qualifiedNsName, const Span& span);
+    NamespaceSymbol* CreateNamespace(const std::u32string& qualifiedNsName, const Span& span, const boost::uuids::uuid& sourceModuleId);
     void CollectViableFunctions(int arity, const std::u32string& groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ScopeLookup scopeLookup, 
         ViableFunctionSet& viableFunctions, Module* module);
+    const std::unordered_map<std::u32string, Symbol*>& SymbolMap() const { return symbolMap; }
 private:
     ContainerSymbol* container;
     ContainerScope* parentScope;
@@ -80,7 +81,7 @@ private:
 class SYMBOLS_API FileScope : public Scope
 {
 public:
-    FileScope(Module* module_);
+    FileScope();
     void InstallAlias(ContainerScope* containerScope, AliasNode* aliasNode);
     void AddContainerScope(ContainerScope* containerScope);
     void InstallNamespaceImport(ContainerScope* containerScope, NamespaceImportNode* namespaceImportNode);
@@ -89,7 +90,6 @@ public:
     void CollectViableFunctions(int arity, const std::u32string&  groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ViableFunctionSet& viableFunctions,
         Module* module);
 private:
-    Module* module;
     std::vector<ContainerScope*> containerScopes;
     std::unordered_map<std::u32string, Symbol*> aliasSymbolMap;
 };

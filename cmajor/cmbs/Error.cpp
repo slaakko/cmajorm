@@ -5,6 +5,7 @@
 
 #include <cmajor/cmbs/Error.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/ModuleCache.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmbs {
@@ -36,7 +37,7 @@ std::vector<CompileError> SymbolsExceptionToErrors(const cmajor::symbols::Except
     std::vector<CompileError> errors;
     CompileError mainError;
     mainError.message = ex.Message();
-    cmajor::symbols::Module* mod = static_cast<cmajor::symbols::Module*>(ex.GetModule());
+    cmajor::symbols::Module* mod = cmajor::symbols::GetModuleById(ex.DefinedModuleId());
     Span span = ex.Defined();
     std::u32string code = mod->GetErrorLines(span);
     mainError.message.append("\n").append(ToUtf8(code));
@@ -49,17 +50,18 @@ std::vector<CompileError> SymbolsExceptionToErrors(const cmajor::symbols::Except
     mainError.scol = std::to_string(startCol);
     mainError.ecol = std::to_string(endCol);
     errors.push_back(mainError);
-    for (const Span& span : ex.References())
+    for (const std::pair<Span, boost::uuids::uuid>& spanModuleId : ex.References())
     {
         CompileError referenceError;
         referenceError.message = "See:";
-        std::u32string code = mod->GetErrorLines(span);
+        cmajor::symbols::Module* mod = cmajor::symbols::GetModuleById(spanModuleId.second);
+        std::u32string code = mod->GetErrorLines(spanModuleId.first);
         referenceError.message.append("\n").append(ToUtf8(code));
-        referenceError.file = mod->GetFilePath(span.fileIndex);
-        referenceError.line = std::to_string(span.line);
+        referenceError.file = mod->GetFilePath(spanModuleId.first.fileIndex);
+        referenceError.line = std::to_string(spanModuleId.first.line);
         int startCol = 0;
         int endCol = 0;
-        mod->GetColumns(span, startCol, endCol);
+        mod->GetColumns(spanModuleId.first, startCol, endCol);
         referenceError.scol = std::to_string(startCol);
         referenceError.ecol = std::to_string(endCol);
         errors.push_back(referenceError);

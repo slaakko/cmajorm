@@ -42,7 +42,7 @@ inline BoundStatementFlags operator&(BoundStatementFlags left, BoundStatementFla
 class BINDER_API BoundStatement : public BoundNode
 {
 public:
-    BoundStatement(Module* module_, const Span& span_, BoundNodeType boundNodeType_);
+    BoundStatement(const Span& span_, const boost::uuids::uuid& moduleId_, BoundNodeType boundNodeType_);
     BoundStatement(const BoundStatement&) = delete;
     BoundStatement& operator=(const BoundStatement&) = delete;
     void Load(Emitter& emitter, OperationFlags flags) override;
@@ -74,7 +74,7 @@ private:
 class BINDER_API BoundSequenceStatement : public BoundStatement
 {
 public:
-    BoundSequenceStatement(Module* module_, const Span& span_, std::unique_ptr<BoundStatement>&& first_, std::unique_ptr<BoundStatement>&& second_);
+    BoundSequenceStatement(const Span& span_, const boost::uuids::uuid& moduleId_, std::unique_ptr<BoundStatement>&& first_, std::unique_ptr<BoundStatement>&& second_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundStatement* First() { return first.get(); }
     BoundStatement* Second() { return second.get(); }
@@ -88,8 +88,8 @@ private:
 class BINDER_API BoundCompoundStatement : public BoundStatement
 {
 public:
-    BoundCompoundStatement(Module* module_, const Span& span_);
-    BoundCompoundStatement(Module* module_, const Span& span_, const Span& endSpan_);
+    BoundCompoundStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
+    BoundCompoundStatement(const Span& span_, const Span& endSpan_, const boost::uuids::uuid& moduleId_);
     BoundCompoundStatement(const BoundCompoundStatement&) = delete;
     BoundCompoundStatement& operator=(const BoundCompoundStatement&) = delete;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -105,7 +105,7 @@ private:
 class BINDER_API BoundReturnStatement : public BoundStatement
 {
 public:
-    BoundReturnStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& returnFunctionCall_, const Span& span_);
+    BoundReturnStatement(std::unique_ptr<BoundFunctionCall>&& returnFunctionCall_, const Span& span_, const boost::uuids::uuid& moduleId_);
     BoundReturnStatement(const BoundReturnStatement&) = delete;
     BoundReturnStatement& operator=(const BoundReturnStatement&) = delete;
     void Accept(BoundNodeVisitor& visitor) override;
@@ -118,7 +118,7 @@ private:
 class BINDER_API BoundIfStatement : public BoundStatement
 {
 public:
-    BoundIfStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& thenS_, std::unique_ptr<BoundStatement>&& elseS_);
+    BoundIfStatement(const Span& span_, const boost::uuids::uuid& moduleId_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& thenS_, std::unique_ptr<BoundStatement>&& elseS_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundExpression* Condition() { return condition.get(); }
     BoundStatement* ThenS() { return thenS.get(); }
@@ -132,7 +132,7 @@ private:
 class BINDER_API BoundWhileStatement : public BoundStatement
 {
 public:
-    BoundWhileStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& statement_);
+    BoundWhileStatement(const Span& span_, const boost::uuids::uuid& moduleId_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& statement_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundExpression* Condition() { return condition.get(); }
     BoundStatement* Statement() { return statement.get(); }
@@ -144,7 +144,7 @@ private:
 class BINDER_API BoundDoStatement : public BoundStatement
 {
 public:
-    BoundDoStatement(Module* module_, const Span& span_, std::unique_ptr<BoundStatement>&& statement_, std::unique_ptr<BoundExpression>&& condition_);
+    BoundDoStatement(const Span& span_, const boost::uuids::uuid& moduleId_, std::unique_ptr<BoundStatement>&& statement_, std::unique_ptr<BoundExpression>&& condition_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundStatement* Statement() { return statement.get(); }
     BoundExpression* Condition() { return condition.get(); }
@@ -156,7 +156,7 @@ private:
 class BINDER_API BoundForStatement : public BoundStatement
 {
 public:
-    BoundForStatement(Module* module_, const Span& span_, std::unique_ptr<BoundStatement>&& initS_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& loopS_, std::unique_ptr<BoundStatement>&& actionS_);
+    BoundForStatement(const Span& span_, const boost::uuids::uuid& moduleId_, std::unique_ptr<BoundStatement>&& initS_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& loopS_, std::unique_ptr<BoundStatement>&& actionS_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundStatement* InitS() { return initS.get(); }
     BoundExpression* Condition() { return condition.get(); }
@@ -175,7 +175,7 @@ class BoundDefaultStatement;
 class BINDER_API BoundSwitchStatement : public BoundStatement
 {
 public:
-    BoundSwitchStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& condition_);
+    BoundSwitchStatement(const Span& span_, const boost::uuids::uuid& moduleId_, std::unique_ptr<BoundExpression>&& condition_);
     BoundExpression* Condition() { return condition.get(); }
     const std::vector<std::unique_ptr<BoundCaseStatement>>& CaseStatements() { return caseStatements; }
     void AddCaseStatement(std::unique_ptr<BoundCaseStatement>&& caseStatement);
@@ -191,7 +191,7 @@ private:
 class BINDER_API BoundCaseStatement : public BoundStatement
 {
 public:
-    BoundCaseStatement(Module* module_, const Span& span_);
+    BoundCaseStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
     void AddCaseValue(std::unique_ptr<Value>&& caseValue_);
     const std::vector<std::unique_ptr<Value>>& CaseValues() const { return caseValues; }
     void AddStatement(std::unique_ptr<BoundStatement>&& statement);
@@ -205,7 +205,7 @@ private:
 class BINDER_API BoundDefaultStatement : public BoundStatement
 {
 public:
-    BoundDefaultStatement(Module* module_, const Span& span_);
+    BoundDefaultStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
     void AddStatement(std::unique_ptr<BoundStatement>&& statement);
     BoundCompoundStatement* CompoundStatement() { return compoundStatement.get(); }
     void Accept(BoundNodeVisitor& visitor) override;
@@ -216,7 +216,7 @@ private:
 class BINDER_API BoundGotoCaseStatement : public BoundStatement
 {
 public:
-    BoundGotoCaseStatement(Module* module_, const Span& span_, std::unique_ptr<Value>&& caseValue_);
+    BoundGotoCaseStatement(const Span& span_, const boost::uuids::uuid& moduleId_, std::unique_ptr<Value>&& caseValue_);
     void Accept(BoundNodeVisitor& visitor) override;
     Value* CaseValue() { return caseValue.get(); }
 private:
@@ -226,28 +226,28 @@ private:
 class BINDER_API BoundGotoDefaultStatement : public BoundStatement
 {
 public:
-    BoundGotoDefaultStatement(Module* module_, const Span& span_);
+    BoundGotoDefaultStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(BoundNodeVisitor& visitor) override;
 };
 
 class BINDER_API BoundBreakStatement : public BoundStatement
 {
 public:
-    BoundBreakStatement(Module* module_, const Span& span_);
+    BoundBreakStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(BoundNodeVisitor& visitor) override;
 };
 
 class BINDER_API BoundContinueStatement : public BoundStatement
 {
 public:
-    BoundContinueStatement(Module* module_, const Span& span_);
+    BoundContinueStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(BoundNodeVisitor& visitor) override;
 };
 
 class BINDER_API BoundGotoStatement : public BoundStatement
 {
 public:
-    BoundGotoStatement(Module* module_, const Span& span_, const std::u32string& target_);
+    BoundGotoStatement(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& target_);
     void Accept(BoundNodeVisitor& visitor) override;
     const std::u32string& Target() const { return target; }
     void SetTargetStatement(BoundStatement* targetStatement_) { targetStatement = targetStatement_; }
@@ -263,7 +263,7 @@ private:
 class BINDER_API BoundConstructionStatement : public BoundStatement
 {
 public:
-    BoundConstructionStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& constructorCall_, const Span& span);
+    BoundConstructionStatement(std::unique_ptr<BoundFunctionCall>&& constructorCall_, const Span& span, const boost::uuids::uuid& moduleId_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundFunctionCall* ConstructorCall() { return constructorCall.get(); }
     void SetLocalVariable(LocalVariableSymbol* localVariable_);
@@ -276,7 +276,7 @@ private:
 class BINDER_API BoundAssignmentStatement : public BoundStatement
 {
 public:
-    BoundAssignmentStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& assignmentCall_, const Span& span);
+    BoundAssignmentStatement(std::unique_ptr<BoundFunctionCall>&& assignmentCall_, const Span& span, const boost::uuids::uuid& moduleId_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundFunctionCall* AssignmentCall() { return assignmentCall.get(); }
 private:
@@ -286,7 +286,7 @@ private:
 class BINDER_API BoundExpressionStatement : public BoundStatement
 {
 public:
-    BoundExpressionStatement(Module* module_, std::unique_ptr<BoundExpression>&& expression_, const Span& span);
+    BoundExpressionStatement(std::unique_ptr<BoundExpression>&& expression_, const Span& span, const boost::uuids::uuid& moduleId_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundExpression* Expression() { return expression.get(); }
 private:
@@ -296,7 +296,7 @@ private:
 class BINDER_API BoundInitializationStatement : public BoundStatement
 {
 public:
-    BoundInitializationStatement(Module* module_, std::unique_ptr<BoundExpression>&& initializationExpression_);
+    BoundInitializationStatement(std::unique_ptr<BoundExpression>&& initializationExpression_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundExpression* InitializationExpression() { return initializationExpression.get(); }
 private:
@@ -306,14 +306,14 @@ private:
 class BINDER_API BoundEmptyStatement : public BoundStatement
 {
 public:
-    BoundEmptyStatement(Module* module_, const Span& span_);
+    BoundEmptyStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
     void Accept(BoundNodeVisitor& visitor) override;
 };
 
 class BINDER_API BoundSetVmtPtrStatement : public BoundStatement
 {
 public:
-    BoundSetVmtPtrStatement(Module * module_, std::unique_ptr<BoundExpression>&& classPtr_, ClassTypeSymbol* classType_);
+    BoundSetVmtPtrStatement(std::unique_ptr<BoundExpression>&& classPtr_, ClassTypeSymbol* classType_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundExpression* ClassPtr() { return classPtr.get(); }
     ClassTypeSymbol* ClassType() { return classType; }
@@ -325,7 +325,7 @@ private:
 class BINDER_API BoundThrowStatement : public BoundStatement
 {
 public:
-    BoundThrowStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& throwCallExpr_);
+    BoundThrowStatement(const Span& span_, const boost::uuids::uuid& moduleId_, std::unique_ptr<BoundExpression>&& throwCallExpr_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundExpression* ThrowCallExpr() { return throwCallExpr.get(); }
 private:
@@ -335,7 +335,7 @@ private:
 class BINDER_API BoundRethrowStatement : public BoundStatement
 {
 public:
-    BoundRethrowStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& releaseCall_);
+    BoundRethrowStatement(const Span& span_, const boost::uuids::uuid& moduleId_, std::unique_ptr<BoundExpression>&& releaseCall_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundExpression* ReleaseCall() { return releaseCall.get(); }
 private:
@@ -347,7 +347,7 @@ class BoundCatchStatement;
 class BINDER_API BoundTryStatement : public BoundStatement
 {
 public:
-    BoundTryStatement(Module* module_, const Span& span_);
+    BoundTryStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
     void SetTryBlock(std::unique_ptr<BoundStatement>&& tryBlock_);
     BoundStatement* TryBlock() { return tryBlock.get(); }
     void AddCatch(std::unique_ptr<BoundCatchStatement>&& catchStatement);
@@ -361,7 +361,7 @@ private:
 class BINDER_API BoundCatchStatement : public BoundStatement
 {
 public:
-    BoundCatchStatement(Module* module_, const Span& span__);
+    BoundCatchStatement(const Span& span_, const boost::uuids::uuid& moduleId_);
     void SetCatchedType(TypeSymbol* catchedType_) { catchedType = catchedType_; }
     TypeSymbol* CatchedType() { return catchedType; }
     void SetCatchVar(LocalVariableSymbol* catchVar_) { catchVar = catchVar_; }

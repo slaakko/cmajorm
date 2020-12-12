@@ -48,18 +48,18 @@ parser api(SNGCM_PARSER_API) ClassParser
     using DelegateParser.Delegate;
     using DelegateParser.ClassDelegate;
 
-    Class(ParsingContext* ctx, var std::unique_ptr<ClassNode> cls, var Span s, var Span specifierSpan, var Span classSpan, var Span beginBraceSpan, var Span endBraceSpan) : ClassNode*
-        ::= empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } CLASS{ classSpan = span; } Identifier:id
+    Class(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<ClassNode> cls, var Span s, var Span specifierSpan, var Span classSpan, var Span beginBraceSpan, var Span endBraceSpan) : ClassNode*
+        ::= empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } CLASS{ classSpan = span; } Identifier(moduleId):id
         {
             s.end = span.end;
-            cls.reset(new ClassNode(s, specifiers, id, attrs));
+            cls.reset(new ClassNode(s, *moduleId, specifiers, id, attrs));
             cls->SetSpecifierSpan(specifierSpan);
             cls->SetClassSpan(classSpan);
         }
-        TemplateParameterList(ctx, cls.get()):templateParams?
-        InheritanceAndInterfaces(ctx, cls.get()):inheritance?
-        (WhereConstraint(ctx):constraint{ cls->SetConstraint(constraint); })?
-        LBRACE!{ beginBraceSpan = span; } ClassContent(ctx, cls.get()):content RBRACE!
+        TemplateParameterList(moduleId, ctx, cls.get()):templateParams?
+        InheritanceAndInterfaces(moduleId, ctx, cls.get()):inheritance?
+        (WhereConstraint(moduleId, ctx):constraint{ cls->SetConstraint(constraint); })?
+        LBRACE!{ beginBraceSpan = span; } ClassContent(moduleId, ctx, cls.get()):content RBRACE!
         {
             endBraceSpan = span;
             cls->SetBeginBraceSpan(beginBraceSpan);
@@ -68,154 +68,154 @@ parser api(SNGCM_PARSER_API) ClassParser
         }
         ;
 
-    InheritanceAndInterfaces(ParsingContext* ctx, sngcm::ast::ClassNode* classNode)
+    InheritanceAndInterfaces(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode)
         ::= COLON
         (   empty{ ctx->BeginParsingTypeExpr(); }
-            BaseClassOrInterface(ctx):baseOrIntf{ classNode->AddBaseClassOrInterface(baseOrIntf); ctx->EndParsingTypeExpr(); } / { ctx->EndParsingTypeExpr(); }
+            BaseClassOrInterface(moduleId, ctx):baseOrIntf{ classNode->AddBaseClassOrInterface(baseOrIntf); ctx->EndParsingTypeExpr(); } / { ctx->EndParsingTypeExpr(); }
         ) % COMMA
         ;
 
-    BaseClassOrInterface(ParsingContext* ctx) : Node*
-        ::= TemplateId(ctx):templateId{ return templateId; }
-        |   QualifiedId:qid{ return qid; }
+    BaseClassOrInterface(boost::uuids::uuid* moduleId, ParsingContext* ctx) : Node*
+        ::= TemplateId(moduleId, ctx):templateId{ return templateId; }
+        |   QualifiedId(moduleId):qid{ return qid; }
         ;
 
-    ClassContent(ParsingContext* ctx, sngcm::ast::ClassNode* classNode)
-        ::= (ClassMember(ctx, classNode):classMember{ classNode->AddMember(classMember); })*
+    ClassContent(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode)
+        ::= (ClassMember(moduleId, ctx, classNode):classMember{ classNode->AddMember(classMember); })*
         ;
 
-    ClassMember(ParsingContext* ctx, sngcm::ast::ClassNode* classNode) : Node*
-        ::= StaticConstructor(ctx, classNode):staticConstructor{ return staticConstructor; }
-        |   Constructor(ctx, classNode):constructor{ return constructor; }
-        |   Destructor(ctx, classNode):destructor{ return destructor; }
-        |   MemberFunction(ctx):memberFunction{ return memberFunction; }
-        |   ConversionFunction(ctx):conversionFunction{ return conversionFunction; }
-        |   MemberVariable(ctx):memberVariable{ return memberVariable; }
-        |   Typedef(ctx):typedefinition{ return typedefinition; }
-        |   Class(ctx):cls{ return cls; }
-        |   EnumType(ctx):enumType{ return enumType; }
-        |   Constant(ctx):constant{ return constant; }
-        |   Delegate(ctx):delegate{ return delegate; }
-        |   ClassDelegate(ctx):classDelegate{ return classDelegate; }
+    ClassMember(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode) : Node*
+        ::= StaticConstructor(moduleId, ctx, classNode):staticConstructor{ return staticConstructor; }
+        |   Constructor(moduleId, ctx, classNode):constructor{ return constructor; }
+        |   Destructor(moduleId, ctx, classNode):destructor{ return destructor; }
+        |   MemberFunction(moduleId, ctx):memberFunction{ return memberFunction; }
+        |   ConversionFunction(moduleId, ctx):conversionFunction{ return conversionFunction; }
+        |   MemberVariable(moduleId, ctx):memberVariable{ return memberVariable; }
+        |   Typedef(moduleId, ctx):typedefinition{ return typedefinition; }
+        |   Class(moduleId, ctx):cls{ return cls; }
+        |   EnumType(moduleId, ctx):enumType{ return enumType; }
+        |   Constant(moduleId, ctx):constant{ return constant; }
+        |   Delegate(moduleId, ctx):delegate{ return delegate; }
+        |   ClassDelegate(moduleId, ctx):classDelegate{ return classDelegate; }
         ;
 
-    StaticConstructor(ParsingContext* ctx, sngcm::ast::ClassNode* classNode, var std::unique_ptr<StaticConstructorNode> staticConstructor, var Span s, var Span specifierSpan,
+    StaticConstructor(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode, var std::unique_ptr<StaticConstructorNode> staticConstructor, var Span s, var Span specifierSpan,
         var std::u32string className) : StaticConstructorNode*
         ::=
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier:id{ className = lexer.GetMatch(span); } LPAREN RPAREN
+        (   empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier(moduleId):id{ className = lexer.GetMatch(span); } LPAREN RPAREN
             {
                 s.end = span.end;
                 if (className != classNode->Id()->Str()) pass = false; else if (!StaticConstructorSpecifiers(specifiers)) pass = false; else
                 {
-                    staticConstructor.reset(new StaticConstructorNode(s, specifiers, attrs));
+                    staticConstructor.reset(new StaticConstructorNode(s, *moduleId, specifiers, attrs));
                     staticConstructor->SetClassId(id);
                     staticConstructor->SetSpecifierSpan(specifierSpan);
                 }
             }
-            (COLON (Initializer(ctx):initializer{ staticConstructor->AddInitializer(initializer); } % COMMA))?
-            (WhereConstraint(ctx):constraint{ staticConstructor->SetConstraint(constraint); })?
-            (CompoundStatement(ctx):body{ staticConstructor->SetBody(body); } | SEMICOLON)
+            (COLON (Initializer(moduleId, ctx):initializer{ staticConstructor->AddInitializer(initializer); } % COMMA))?
+            (WhereConstraint(moduleId, ctx):constraint{ staticConstructor->SetConstraint(constraint); })?
+            (CompoundStatement(moduleId, ctx):body{ staticConstructor->SetBody(body); } | SEMICOLON)
         )
         {
             return staticConstructor.release();
         }
         ;
 
-    Constructor(ParsingContext* ctx, sngcm::ast::ClassNode* classNode, var std::unique_ptr<ConstructorNode> ctor, var Span s, var Span specifierSpan) : Node*
+    Constructor(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode, var std::unique_ptr<ConstructorNode> ctor, var Span s, var Span specifierSpan) : Node*
         ::=
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier:id
+        (   empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier(moduleId):id
             {
                 std::u32string className = lexer.GetMatch(span);
                 s.end = span.end;
                 if (className != classNode->Id()->Str()) pass = false; else
                 {
-                    ctor.reset(new ConstructorNode(s, specifiers, attrs));
+                    ctor.reset(new ConstructorNode(s, *moduleId, specifiers, attrs));
                     ctor->SetClassId(id);
                     ctor->SetSpecifierSpan(specifierSpan);
                 }
             }
-            ParameterList(ctx, ctor.get()):paramList
-            (COLON (Initializer(ctx):initializer{ ctor->AddInitializer(initializer); } % COMMA))?
-            (WhereConstraint(ctx):constraint{ ctor->SetConstraint(constraint); })?
-            (CompoundStatement(ctx):body{ ctor->SetBody(body); } | SEMICOLON)
+            ParameterList(moduleId, ctx, ctor.get()):paramList
+            (COLON (Initializer(moduleId, ctx):initializer{ ctor->AddInitializer(initializer); } % COMMA))?
+            (WhereConstraint(moduleId, ctx):constraint{ ctor->SetConstraint(constraint); })?
+            (CompoundStatement(moduleId, ctx):body{ ctor->SetBody(body); } | SEMICOLON)
         )
         {
             return ctor.release();
         }
         ;
 
-    Destructor(ParsingContext* ctx, sngcm::ast::ClassNode* classNode, var std::unique_ptr<DestructorNode> dtor, var Span s, var Span specifierSpan, var std::u32string className) : Node*
+    Destructor(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::ClassNode* classNode, var std::unique_ptr<DestructorNode> dtor, var Span s, var Span specifierSpan, var std::u32string className) : Node*
         ::=
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } CPL Identifier:id{ className = lexer.GetMatch(span); } LPAREN! RPAREN!
+        (   empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } CPL Identifier(moduleId):id{ className = lexer.GetMatch(span); } LPAREN! RPAREN!
             {
                 s.end = span.end;
                 if (className != classNode->Id()->Str()) pass = false; else
                 {
-                    dtor.reset(new DestructorNode(s, specifiers, attrs));
+                    dtor.reset(new DestructorNode(s, *moduleId, specifiers, attrs));
                     dtor->SetClassId(id);
                     dtor->SetSpecifierSpan(specifierSpan);
                 }
             }
-            (WhereConstraint(ctx):contraint{ dtor->SetConstraint(contraint); })?
-            (CompoundStatement(ctx):body{ dtor->SetBody(body); } | SEMICOLON)
+            (WhereConstraint(moduleId, ctx):contraint{ dtor->SetConstraint(contraint); })?
+            (CompoundStatement(moduleId, ctx):body{ dtor->SetBody(body); } | SEMICOLON)
         )
         {
             return dtor.release();
         }
         ;
 
-    Initializer(ParsingContext* ctx, var std::unique_ptr<InitializerNode> initializer) : InitializerNode*
+    Initializer(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<InitializerNode> initializer) : InitializerNode*
         ::=
-        (   THIS{ initializer.reset(new ThisInitializerNode(span)); } LPAREN! ArgumentList(ctx, initializer.get()):thisArgs! RPAREN!
-        |   BASE{ initializer.reset(new BaseInitializerNode(span)); } LPAREN! ArgumentList(ctx, initializer.get()):baseArgs! RPAREN!
-        |   Identifier:id{ initializer.reset(new MemberInitializerNode(span, id)); } LPAREN! ArgumentList(ctx, initializer.get()):memberArgs! RPAREN!
+        (   THIS{ initializer.reset(new ThisInitializerNode(span, *moduleId)); } LPAREN! ArgumentList(moduleId, ctx, initializer.get()):thisArgs! RPAREN!
+        |   BASE{ initializer.reset(new BaseInitializerNode(span, *moduleId)); } LPAREN! ArgumentList(moduleId, ctx, initializer.get()):baseArgs! RPAREN!
+        |   Identifier(moduleId):id{ initializer.reset(new MemberInitializerNode(span, *moduleId, id)); } LPAREN! ArgumentList(moduleId, ctx, initializer.get()):memberArgs! RPAREN!
         )
         {
             return initializer.release();
         }
         ;
 
-    MemberFunction(ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var Span s, var Span specifierSpan, var Span groupIdSpan) : Node*
+    MemberFunction(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<MemberFunctionNode> memFun, var Span s, var Span specifierSpan, var Span groupIdSpan) : Node*
         ::=
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):returnType FunctionGroupId(ctx):groupId
+        (   empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(moduleId, ctx):returnType FunctionGroupId(moduleId, ctx):groupId
             {
                 s.end = span.end;
                 groupIdSpan = span;
-                memFun.reset(new MemberFunctionNode(s, specifiers, returnType, groupId, attrs));
+                memFun.reset(new MemberFunctionNode(s, *moduleId, specifiers, returnType, groupId, attrs));
                 memFun->SetSpecifierSpan(specifierSpan);
                 memFun->SetGroupIdSpan(groupIdSpan);
             }
-            ParameterList(ctx, memFun.get()):paramList (CONST{ memFun->SetConst(); })?
-            (WhereConstraint(ctx):constraint{ memFun->SetConstraint(constraint); })?
-            (CompoundStatement(ctx):body{ memFun->SetBody(body); } | SEMICOLON)
+            ParameterList(moduleId, ctx, memFun.get()):paramList (CONST{ memFun->SetConst(); })?
+            (WhereConstraint(moduleId, ctx):constraint{ memFun->SetConstraint(constraint); })?
+            (CompoundStatement(moduleId, ctx):body{ memFun->SetBody(body); } | SEMICOLON)
         )
         {
             return memFun.release();
         }
         ;
 
-    ConversionFunction(ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun, var Span s, var Span specifierSpan) : Node*
+    ConversionFunction(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<ConversionFunctionNode> conversionFun, var Span s, var Span specifierSpan) : Node*
         ::=
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } OPERATOR TypeExpr(ctx):type LPAREN! RPAREN!
+        (   empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } OPERATOR TypeExpr(moduleId, ctx):type LPAREN! RPAREN!
             {
                 s.end = span.end;
-                conversionFun.reset(new ConversionFunctionNode(s, specifiers, type, attrs));
+                conversionFun.reset(new ConversionFunctionNode(s, *moduleId, specifiers, type, attrs));
                 conversionFun->SetSpecifierSpan(specifierSpan);
             }
             (CONST{ conversionFun->SetConst(); })?
-            (WhereConstraint(ctx):constraint{ conversionFun->SetConstraint(constraint); })?
-            (CompoundStatement(ctx):body{ conversionFun->SetBody(body); } | SEMICOLON)
+            (WhereConstraint(moduleId, ctx):constraint{ conversionFun->SetConstraint(constraint); })?
+            (CompoundStatement(moduleId, ctx):body{ conversionFun->SetBody(body); } | SEMICOLON)
         )
         {
             return conversionFun.release();
         }
         ;
 
-    MemberVariable(ParsingContext* ctx, var Span s, var Span specifierSpan) : MemberVariableNode*
-        ::= empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):type Identifier:id SEMICOLON
+    MemberVariable(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var Span specifierSpan) : MemberVariableNode*
+        ::= empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(moduleId, ctx):type Identifier(moduleId):id SEMICOLON
         {
             s.end = span.end;
-            MemberVariableNode* value = new MemberVariableNode(s, specifiers, type, id, attrs);
+            MemberVariableNode* value = new MemberVariableNode(s, *moduleId, specifiers, type, id, attrs);
             value->SetSpecifierSpan(specifierSpan);
             return value;
         }

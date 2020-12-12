@@ -17,8 +17,8 @@ class EnumConstantNode;
 class SNGCM_AST_API EnumTypeNode : public Node
 {
 public:
-    EnumTypeNode(const Span& span_);
-    EnumTypeNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_);
+    EnumTypeNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    EnumTypeNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -46,8 +46,8 @@ private:
 class SNGCM_AST_API EnumConstantNode : public Node
 {
 public:
-    EnumConstantNode(const Span& span_);
-    EnumConstantNode(const Span& span_, IdentifierNode* id_, Node* value_);
+    EnumConstantNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    EnumConstantNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_, Node* value_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -65,7 +65,7 @@ private:
     std::u32string strValue;
 };
 
-SNGCM_AST_API Node* MakeNextEnumConstantValue(const Span& span, EnumTypeNode* enumType);
+SNGCM_AST_API Node* MakeNextEnumConstantValue(const Span& span, const boost::uuids::uuid& moduleId_, EnumTypeNode* enumType);
 
 } } // namespace sngcm::ast
 

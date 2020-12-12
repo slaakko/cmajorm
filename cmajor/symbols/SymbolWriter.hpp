@@ -22,8 +22,10 @@ public:
     BinaryWriter& GetBinaryWriter() { return astWriter.GetBinaryWriter(); }
     void Write(Symbol* symbol);
     void SetLexers(std::vector<soulng::lexer::Lexer*>* lexers_);
+    void SetSpanConversionModuleId(const boost::uuids::uuid& spanConversionModuleId_);
 private:
     AstWriter astWriter;
+    boost::uuids::uuid spanConversionModuleId;
     std::vector<soulng::lexer::Lexer*>* lexers;
 };
 

@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/symbols/FunctionSymbol.hpp>
+#include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/TypeSymbol.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
@@ -167,7 +168,7 @@ std::u32string OperatorMangleMap::Mangle(const std::u32string& groupName)
     }
 }
 
-FunctionGroupSymbol::FunctionGroupSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::functionGroupSymbol, span_, name_)
+FunctionGroupSymbol::FunctionGroupSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : Symbol(SymbolType::functionGroupSymbol, span_, sourceModuleId_,name_)
 {
 }
 
@@ -285,7 +286,7 @@ void FunctionGroupSymbol::Check()
         {
             if (!q)
             {
-                throw SymbolCheckException(GetRootModuleForCurrentThread(), "function group symbol contains empty function pointer", GetSpan());
+                throw SymbolCheckException("function group symbol contains empty function pointer", GetSpan(), SourceModuleId());
             }
         }
     }
@@ -302,7 +303,7 @@ void FunctionGroupSymbol::CheckDuplicateFunctionSymbols()
             {
                 if (names.find(functionSymbol->FullName()) != names.cend())
                 {
-                    throw Exception(GetRootModuleForCurrentThread(), "function with identical name '" + ToUtf8(functionSymbol->FullName()) + "' already defined.", GetSpan());
+                    throw Exception("function with identical name '" + ToUtf8(functionSymbol->FullName()) + "' already defined.", GetSpan(), SourceModuleId());
                 }
                 names.insert(functionSymbol->FullName());
             }
@@ -384,19 +385,21 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
     return s;
 }
 
-FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionTemplate(nullptr), master(nullptr),
+FunctionSymbol::FunctionSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    ContainerSymbol(SymbolType::functionSymbol, span_, sourceModuleId_, name_), functionTemplate(nullptr), master(nullptr),
     functionId(boost::uuids::nil_uuid()), groupName(), parameters(), localVariables(),
     returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
-    nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false), unwindInfoVar(nullptr)
+    nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false), unwindInfoVar(nullptr),
+    conversionSourceType(nullptr), conversionTargetType(nullptr)
 {
 }
 
-FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), functionTemplate(nullptr), master(nullptr),
+FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
+    ContainerSymbol(symbolType_, span_, sourceModuleId_, name_), functionTemplate(nullptr), master(nullptr),
     functionId(boost::uuids::nil_uuid()), groupName(), parameters(), localVariables(),
     returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
-    nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false), unwindInfoVar(nullptr)
+    nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false), unwindInfoVar(nullptr),
+    conversionSourceType(nullptr), conversionTargetType(nullptr)
 {
 }
 
@@ -450,6 +453,11 @@ void FunctionSymbol::Write(SymbolWriter& writer)
         TypeSymbol* templateArgumentType = templateArgumentTypes[i];
         writer.GetBinaryWriter().Write(templateArgumentType->TypeId());
     }
+    if (IsConversion())
+    {
+        writer.GetBinaryWriter().Write(conversionSourceType->TypeId());
+        writer.GetBinaryWriter().Write(conversionTargetType->TypeId());
+    }
 }
 
 void FunctionSymbol::Read(SymbolReader& reader)
@@ -491,10 +499,6 @@ void FunctionSymbol::Read(SymbolReader& reader)
     {
         constraint.reset(reader.GetAstReader().ReadConstraintNode());
     }
-    if (IsConversion())
-    {
-        reader.AddConversion(this);
-    }
     uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
     templateArgumentTypes.resize(n);
     for (uint32_t i = 0; i < n; ++i)
@@ -502,6 +506,16 @@ void FunctionSymbol::Read(SymbolReader& reader)
         boost::uuids::uuid templateArgumentId;
         reader.GetBinaryReader().ReadUuid(templateArgumentId);
         reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, templateArgumentId, -1 - i);
+    }
+    if (IsConversion())
+    {
+        boost::uuids::uuid conversionSourceTypeId;
+        reader.GetBinaryReader().ReadUuid(conversionSourceTypeId);
+        reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, conversionSourceTypeId, 10000);
+        boost::uuids::uuid conversionTargetTypeId;
+        reader.GetBinaryReader().ReadUuid(conversionTargetTypeId);
+        reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, conversionTargetTypeId, 10001);
+        reader.AddConversion(this);
     }
 }
 
@@ -527,7 +541,15 @@ void FunctionSymbol::Accept(SymbolCollector* collector)
 
 void FunctionSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
 {
-    if (index == 0)
+    if (index == 10000)
+    {
+        conversionSourceType = typeSymbol;
+    }
+    else if (index == 10001)
+    {
+        conversionTargetType = typeSymbol;
+    }
+    else if (index == 0)
     {
         returnType = typeSymbol;
     }
@@ -536,13 +558,13 @@ void FunctionSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
         int templateArgumentIndex = -(index + 1);
         if (templateArgumentIndex < 0 || templateArgumentIndex > templateArgumentTypes.size())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "invalid emplace template argument index '" + std::to_string(index) + "'", GetSpan());
+            throw Exception("invalid emplace template argument index '" + std::to_string(index) + "'", GetSpan(), SourceModuleId());
         }
         templateArgumentTypes[templateArgumentIndex] = typeSymbol;
     }
     else
     {
-        throw Exception(GetRootModuleForCurrentThread(), "invalid emplace type index '" + std::to_string(index) + "'", GetSpan());
+        throw Exception("invalid emplace type index '" + std::to_string(index) + "'", GetSpan(), SourceModuleId());
     }
 }
 
@@ -561,7 +583,6 @@ void FunctionSymbol::AddMember(Symbol* member)
 
 bool FunctionSymbol::IsExportSymbol() const
 {
-    
     if (IsTemplateSpecialization() && Parent()->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol) return false;
     if (IsGeneratedFunction()) return false;
     if (intrinsic) return false;
@@ -584,7 +605,7 @@ void FunctionSymbol::ComputeName()
         ParameterSymbol* parameter = parameters[i];
         if (i == 0 && (groupName == U"@constructor" || groupName == U"operator=" || IsConstructorDestructorOrNonstaticMemberFunction()))
         {
-            name.append(parameter->GetType()->RemovePointer(GetSpan())->FullName());
+            name.append(parameter->GetType()->RemovePointer(GetSpan(), SourceModuleId())->FullName());
         }
         else
         {
@@ -777,11 +798,21 @@ std::string FunctionSymbol::Syntax() const
     return syntax;
 }
 
-void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void FunctionSymbol::SetConversionSourceType(TypeSymbol* conversionSourceType_)
+{
+    conversionSourceType = conversionSourceType_;
+}
+
+void FunctionSymbol::SetConversionTargetType(TypeSymbol* conversionTargetType_)
+{
+    conversionTargetType = conversionTargetType_;
+}
+
+void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     if ((flags & OperationFlags::virtualCall) != OperationFlags::none)
     {
-        GenerateVirtualCall(emitter, genObjects, flags, span);
+        GenerateVirtualCall(emitter, genObjects, flags, span, moduleId);
         return;
     }
     int na = genObjects.size();
@@ -906,7 +937,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     }
 }
 
-void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     int na = genObjects.size();
     Assert(na > 0, "nonempty argument list expected");
@@ -928,7 +959,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             void* thisPtr = emitter.Stack().Pop();
             if (classType != vmtPtrHolderClass)
             {
-                thisPtr = emitter.CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+                thisPtr = emitter.CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan(), SourceModuleId())->IrType(emitter));
             }
             void* vmtPtr = emitter.GetVmtPtr(thisPtr, vmtPtrHolderClass->VmtPtrIndex(), classType->VmtPtrType(emitter));
             void* methodPtr = emitter.GetMethodPtr(vmtPtr, VmtIndex() + GetFunctionVmtIndexOffset());
@@ -1049,7 +1080,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     }
 }
 
-std::unique_ptr<Value> FunctionSymbol::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const
+std::unique_ptr<Value> FunctionSymbol::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, const boost::uuids::uuid& moduleId, Value* receiver) const
 {
     return std::unique_ptr<Value>();
 }
@@ -1095,39 +1126,39 @@ void FunctionSymbol::Dump(CodeFormatter& formatter)
 
 bool FunctionSymbol::IsDefaultConstructor() const
 {
-    return parameters.size() == 1 && groupName == U"@constructor" && parameters[0]->GetType()->PointerCount() == 1 && parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol();
+    return parameters.size() == 1 && groupName == U"@constructor" && parameters[0]->GetType()->PointerCount() == 1 && parameters[0]->GetType()->RemovePointer(GetSpan(), SourceModuleId())->IsClassTypeSymbol();
 }
 
 bool FunctionSymbol::IsCopyConstructor() const
 {
     return parameters.size() == 2 && groupName == U"@constructor" &&
         parameters[0]->GetType()->PointerCount() == 1 &&
-        parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
-        TypesEqual(parameters[0]->GetType()->BaseType()->AddConst(GetSpan())->AddLvalueReference(GetSpan()), parameters[1]->GetType());
+        parameters[0]->GetType()->RemovePointer(GetSpan(), SourceModuleId())->IsClassTypeSymbol() &&
+        TypesEqual(parameters[0]->GetType()->BaseType()->AddConst(GetSpan(), SourceModuleId())->AddLvalueReference(GetSpan(), SourceModuleId()), parameters[1]->GetType());
 }
 
 bool FunctionSymbol::IsMoveConstructor() const
 {
     return parameters.size() == 2 && groupName == U"@constructor" &&
         parameters[0]->GetType()->PointerCount() == 1 &&
-        parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
-        TypesEqual(parameters[0]->GetType()->BaseType()->AddRvalueReference(GetSpan()), parameters[1]->GetType());
+        parameters[0]->GetType()->RemovePointer(GetSpan(), SourceModuleId())->IsClassTypeSymbol() &&
+        TypesEqual(parameters[0]->GetType()->BaseType()->AddRvalueReference(GetSpan(), SourceModuleId()), parameters[1]->GetType());
 }
 
 bool FunctionSymbol::IsCopyAssignment() const
 {
     return parameters.size() == 2 && groupName == U"operator=" &&
         parameters[0]->GetType()->PointerCount() == 1 &&
-        parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
-        TypesEqual(parameters[0]->GetType()->BaseType()->AddConst(GetSpan())->AddLvalueReference(GetSpan()), parameters[1]->GetType());
+        parameters[0]->GetType()->RemovePointer(GetSpan(), SourceModuleId())->IsClassTypeSymbol() &&
+        TypesEqual(parameters[0]->GetType()->BaseType()->AddConst(GetSpan(), SourceModuleId())->AddLvalueReference(GetSpan(), SourceModuleId()), parameters[1]->GetType());
 }
 
 bool FunctionSymbol::IsMoveAssignment() const
 {
     return parameters.size() == 2 && groupName == U"operator=" &&
 parameters[0]->GetType()->PointerCount() == 1 &&
-parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
-TypesEqual(parameters[0]->GetType()->BaseType()->AddRvalueReference(GetSpan()), parameters[1]->GetType());
+parameters[0]->GetType()->RemovePointer(GetSpan(), SourceModuleId())->IsClassTypeSymbol() &&
+TypesEqual(parameters[0]->GetType()->BaseType()->AddRvalueReference(GetSpan(), SourceModuleId()), parameters[1]->GetType());
 }
 
 void FunctionSymbol::AddLocalVariable(LocalVariableSymbol* localVariable)
@@ -1156,19 +1187,19 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "only member functions can be static", GetSpan());
+        throw Exception("only member functions can be static", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "only member functions can be virtual", GetSpan());
+        throw Exception("only member functions can be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "only member functions can be override", GetSpan());
+        throw Exception("only member functions can be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "only member functions can be abstract", GetSpan());
+        throw Exception("only member functions can be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
@@ -1176,7 +1207,7 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "only constructors can be explicit", GetSpan());
+        throw Exception("only constructors can be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
@@ -1184,11 +1215,11 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "only special member functions can be suppressed", GetSpan());
+        throw Exception("only special member functions can be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "only special member functions can be default", GetSpan());
+        throw Exception("only special member functions can be default", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
@@ -1206,22 +1237,22 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "function symbol cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception("function symbol cannot be throw and nothrow at the same time", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "only member functions can be new", GetSpan());
+        throw Exception("only member functions can be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "only member functions can be const", GetSpan());
+        throw Exception("only member functions can be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
         if (!GetGlobalFlag(GlobalFlags::unitTest))
         {
-            throw Exception(GetRootModuleForCurrentThread(), "function symbol cannot be unit_test", GetSpan());
+            throw Exception("function symbol cannot be unit_test", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::winapi) != Specifiers::none)
@@ -1233,17 +1264,15 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
 void FunctionSymbol::CloneUsingNodes(const std::vector<Node*>& usingNodes_)
 {
     CloneContext cloneContext;
-    SpanMapper spanMapper;
-    cloneContext.SetSpanMapper(&spanMapper);
     for (Node* usingNode : usingNodes_)
     {
         usingNodes.Add(usingNode->Clone(cloneContext));
     }
 }
 
-LocalVariableSymbol* FunctionSymbol::CreateTemporary(TypeSymbol* type, const Span& span)
+LocalVariableSymbol* FunctionSymbol::CreateTemporary(TypeSymbol* type, const Span& span, const boost::uuids::uuid& moduleId)
 {
-    LocalVariableSymbol* temporary = new LocalVariableSymbol(span, U"@t" + ToUtf32(std::to_string(nextTemporaryIndex++)));
+    LocalVariableSymbol* temporary = new LocalVariableSymbol(span, moduleId, U"@t" + ToUtf32(std::to_string(nextTemporaryIndex++)));
     temporary->SetType(type);
     AddMember(temporary);
     AddLocalVariable(temporary);
@@ -1280,7 +1309,7 @@ void* FunctionSymbol::IrType(Emitter& emitter)
                 TypeSymbol* paramType = parameter->GetType();
                 if (paramType->IsClassTypeSymbol() || paramType->GetSymbolType() == SymbolType::classDelegateTypeSymbol || paramType->GetSymbolType() == SymbolType::interfaceTypeSymbol)
                 {
-                    paramType = paramType->AddConst(GetSpan())->AddLvalueReference(GetSpan());
+                    paramType = paramType->AddConst(GetSpan(), SourceModuleId())->AddLvalueReference(GetSpan(), SourceModuleId());
                 }
                 paramTypes.push_back(paramType->IrType(emitter));
             }
@@ -1338,12 +1367,12 @@ std::u32string FunctionSymbol::Id() const
                     }
                     else
                     {
-                        throw Exception(GetRootModuleForCurrentThread(), "function symbol " + std::to_string(index) + " not found", GetSpan());
+                        throw Exception("function symbol " + std::to_string(index) + " not found", GetSpan(), SourceModuleId());
                     }
                 }
                 else
                 {
-                    throw Exception(GetRootModuleForCurrentThread(), "prototype not found", GetSpan());
+                    throw Exception("prototype not found", GetSpan(), SourceModuleId());
                 }
             }
         }
@@ -1353,7 +1382,7 @@ std::u32string FunctionSymbol::Id() const
         }
         else
         {
-            throw Exception(GetRootModuleForCurrentThread(), "function template expected", GetSpan());
+            throw Exception("function template expected", GetSpan(), SourceModuleId());
         }
     }
     else
@@ -1372,11 +1401,11 @@ void FunctionSymbol::Check()
     ContainerSymbol::Check();
     if (functionId.is_nil())
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "function symbol has no id", GetSpan());
+        throw SymbolCheckException("function symbol has no id", GetSpan(), SourceModuleId());
     }
     if (groupName.empty())
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "function symbol has empty group name", GetSpan());
+        throw SymbolCheckException("function symbol has empty group name", GetSpan(), SourceModuleId());
     }
 }
 
@@ -1390,9 +1419,56 @@ void FunctionSymbol::SetUnwindInfoVar(LocalVariableSymbol* unwindInfoVar_)
     unwindInfoVar.reset(unwindInfoVar_);
 }
 
-StaticConstructorSymbol::StaticConstructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::staticConstructorSymbol, span_, name_)
+int FunctionSymbol::NextTemporaryIndex()
+{
+    return nextTemporaryIndex++;
+}
+
+void FunctionSymbol::CopyFrom(const Symbol* that)
+{
+    ContainerSymbol::CopyFrom(that);
+    const FunctionSymbol* thatFunctionSymbol = static_cast<const FunctionSymbol*>(that);
+    functionTemplate = thatFunctionSymbol->functionTemplate;
+    master = thatFunctionSymbol->master;
+    functionId = thatFunctionSymbol->functionId;
+    groupName = thatFunctionSymbol->groupName;
+    templateParameters = thatFunctionSymbol->templateParameters;
+    templateArgumentTypes = thatFunctionSymbol->templateArgumentTypes;
+    parameters = thatFunctionSymbol->parameters;
+    if (thatFunctionSymbol->returnParam)
+    {
+        SetReturnParam(thatFunctionSymbol->returnParam->Clone());
+    }
+    localVariables = thatFunctionSymbol->localVariables;
+    returnType = thatFunctionSymbol->returnType;
+    flags = thatFunctionSymbol->flags;
+    index = thatFunctionSymbol->index;
+    vmtIndex = thatFunctionSymbol->vmtIndex;
+    imtIndex = thatFunctionSymbol->imtIndex;
+    functionGroup = thatFunctionSymbol->functionGroup;
+    isProgramMain = thatFunctionSymbol->isProgramMain;
+    conversionSourceType = thatFunctionSymbol->conversionSourceType;
+    conversionTargetType = thatFunctionSymbol->conversionTargetType;
+}
+
+FunctionSymbol* FunctionSymbol::Copy() const
+{
+    FunctionSymbol* copy = new FunctionSymbol(GetSpan(), SourceModuleId(), Name());
+    copy->CopyFrom(this);
+    return copy;
+}
+
+StaticConstructorSymbol::StaticConstructorSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::staticConstructorSymbol, span_, sourceModuleId_, name_)
 {
     SetGroupName(U"@static_constructor");
+}
+
+FunctionSymbol* StaticConstructorSymbol::Copy() const
+{
+    StaticConstructorSymbol* copy = new StaticConstructorSymbol(GetSpan(), SourceModuleId(), Name());
+    copy->CopyFrom(this);
+    return copy;
 }
 
 std::u32string StaticConstructorSymbol::FullNameWithSpecifiers() const
@@ -1427,43 +1503,43 @@ void StaticConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     SetStatic();
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be virtual", GetSpan());
+        throw Exception("static constructor cannot be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be override", GetSpan());
+        throw Exception("static constructor cannot be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be abstract", GetSpan());
+        throw Exception("static constructor cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be inline", GetSpan());
+        throw Exception("static constructor cannot be inline", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be explicit", GetSpan());
+        throw Exception("static constructor cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be external", GetSpan());
+        throw Exception("static constructor cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be suppressed", GetSpan());
+        throw Exception("static constructor cannot be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be default", GetSpan());
+        throw Exception("static constructor cannot be default", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be constexpr", GetSpan());
+        throw Exception("static constructor cannot be constexpr", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be cdecl", GetSpan());
+        throw Exception("static constructor cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -1473,26 +1549,34 @@ void StaticConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception("static constructor cannot be throw and nothrow at the same time", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be new", GetSpan());
+        throw Exception("static constructor cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be const", GetSpan());
+        throw Exception("static constructor cannot be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "static constructor cannot be unit_test", GetSpan());
+        throw Exception("static constructor cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
-ConstructorSymbol::ConstructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::constructorSymbol, span_, name_)
+ConstructorSymbol::ConstructorSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::constructorSymbol, span_, sourceModuleId_, name_)
 {
     SetGroupName(U"@constructor");
+}
+
+FunctionSymbol* ConstructorSymbol::Copy() const
+{
+    ConstructorSymbol* copy = new ConstructorSymbol(GetSpan(), SourceModuleId(), Name());
+    copy->CopyFrom(this);
+    return copy;
 }
 
 std::string ConstructorSymbol::TypeString() const 
@@ -1552,35 +1636,25 @@ uint8_t ConstructorSymbol::ConversionDistance() const
     return 5;
 }
 
-TypeSymbol* ConstructorSymbol::ConversionSourceType() const
-{
-    return Parameters()[1]->GetType();
-}
-
-TypeSymbol* ConstructorSymbol::ConversionTargetType() const
-{
-    return Parameters()[0]->GetType()->RemovePointer(GetSpan());
-}
-
 void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
 {
     Specifiers accessSpecifiers = specifiers & Specifiers::access_;
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "ordinary constructor cannot be static", GetSpan());
+        throw Exception("ordinary constructor cannot be static", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be virtual", GetSpan());
+        throw Exception("constructor cannot be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be override", GetSpan());
+        throw Exception("constructor cannot be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be abstract", GetSpan());
+        throw Exception("constructor cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
@@ -1592,13 +1666,13 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be external", GetSpan());
+        throw Exception("constructor cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
         if (IsInline())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "suppressed member function cannot be inline", GetSpan());
+            throw Exception("suppressed member function cannot be inline", GetSpan(), SourceModuleId());
         }
         SetSuppressed();
     }
@@ -1606,11 +1680,11 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsSuppressed())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be default and suppressed at the same time", GetSpan());
+            throw Exception("constructor cannot be default and suppressed at the same time", GetSpan(), SourceModuleId());
         }
         if (IsInline())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "default member function cannot be inline", GetSpan());
+            throw Exception("default member function cannot be inline", GetSpan(), SourceModuleId());
         }
         SetDefault();
     }
@@ -1620,7 +1694,7 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be cdecl", GetSpan());
+        throw Exception("constructor cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -1630,26 +1704,35 @@ void ConstructorSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception("constructor cannot be throw and nothrow at the same time", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be new", GetSpan());
+        throw Exception("constructor cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be const", GetSpan());
+        throw Exception("constructor cannot be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "constructor cannot be unit_test", GetSpan());
+        throw Exception("constructor cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
-DestructorSymbol::DestructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::destructorSymbol, span_, name_), generated(false)
+DestructorSymbol::DestructorSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::destructorSymbol, span_, sourceModuleId_, name_), generated(false)
 {
     SetGroupName(U"@destructor");
+}
+
+FunctionSymbol* DestructorSymbol::Copy() const
+{
+    DestructorSymbol* copy = new DestructorSymbol(GetSpan(), SourceModuleId(), Name());
+    copy->CopyFrom(this);
+    copy->generated = generated;
+    return copy;
 }
 
 bool DestructorSymbol::IsExportSymbol() const
@@ -1682,12 +1765,12 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
     Specifiers accessSpecifiers = specifiers & Specifiers::access_;
     if (accessSpecifiers != Specifiers::public_)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor must be public", GetSpan());
+        throw Exception("destructor must be public", GetSpan(), SourceModuleId());
     }
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be static", GetSpan());
+        throw Exception("destructor cannot be static", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
@@ -1697,29 +1780,29 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsVirtual())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be virtual and override at the same time", GetSpan());
+            throw Exception("destructor cannot be virtual and override at the same time", GetSpan(), SourceModuleId());
         }
         SetOverride();
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be abstract", GetSpan());
+        throw Exception("destructor cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be inline", GetSpan());
+        throw Exception("destructor cannot be inline", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be explicit", GetSpan());
+        throw Exception("destructor cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be external", GetSpan());
+        throw Exception("destructor cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be suppressed", GetSpan());
+        throw Exception("destructor cannot be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
@@ -1727,31 +1810,31 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be constexpr", GetSpan());
+        throw Exception("destructor cannot be constexpr", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be cdecl", GetSpan());
+        throw Exception("destructor cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor is implicitly nothrow", GetSpan());
+        throw Exception("destructor is implicitly nothrow", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be throw", GetSpan());
+        throw Exception("destructor cannot be throw", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be new", GetSpan());
+        throw Exception("destructor cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be const", GetSpan());
+        throw Exception("destructor cannot be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "destructor cannot be unit_test", GetSpan());
+        throw Exception("destructor cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
@@ -1769,8 +1852,16 @@ bool DestructorSymbol::DontThrow() const
     return true;
 }
 
-MemberFunctionSymbol::MemberFunctionSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::memberFunctionSymbol, span_, name_)
+MemberFunctionSymbol::MemberFunctionSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::memberFunctionSymbol, span_, sourceModuleId_, name_)
 {
+}
+
+FunctionSymbol* MemberFunctionSymbol::Copy() const
+{
+    MemberFunctionSymbol* copy = new MemberFunctionSymbol(GetSpan(), SourceModuleId(), Name());
+    copy->CopyFrom(this);
+    return copy;
 }
 
 std::string MemberFunctionSymbol::TypeString() const 
@@ -1856,7 +1947,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsVirtual())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "member function cannot be virtual and override at the same time", GetSpan());
+            throw Exception("member function cannot be virtual and override at the same time", GetSpan(), SourceModuleId());
         }
         SetOverride();
     }
@@ -1864,7 +1955,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsVirtual() || IsOverride())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "member function cannot be abstract and virtual or override at the same time", GetSpan());
+            throw Exception("member function cannot be abstract and virtual or override at the same time", GetSpan(), SourceModuleId());
         }
         SetAbstract();
     }
@@ -1874,17 +1965,17 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member function cannot be explicit", GetSpan());
+        throw Exception("member function cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member function cannot be external", GetSpan());
+        throw Exception("member function cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
         if (IsInline())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "suppressed member function cannot be inline", GetSpan());
+            throw Exception("suppressed member function cannot be inline", GetSpan(), SourceModuleId());
         }
         if (GroupName() == U"operator=")
         {
@@ -1892,18 +1983,18 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
         }
         else
         {
-            throw Exception(GetRootModuleForCurrentThread(), "only special member functions can be suppressed", GetSpan());
+            throw Exception("only special member functions can be suppressed", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
         if (IsSuppressed())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "member function cannot be default and suppressed at the same time", GetSpan());
+            throw Exception("member function cannot be default and suppressed at the same time", GetSpan(), SourceModuleId());
         }
         if (IsInline())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "default member function cannot be inline", GetSpan());
+            throw Exception("default member function cannot be inline", GetSpan(), SourceModuleId());
         }
         if (GroupName() == U"operator=")
         {
@@ -1911,7 +2002,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
         }
         else
         {
-            throw Exception(GetRootModuleForCurrentThread(), "only special member functions can be default", GetSpan());
+            throw Exception("only special member functions can be default", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
@@ -1920,7 +2011,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member function cannot be cdecl", GetSpan());
+        throw Exception("member function cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -1930,14 +2021,14 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "member function cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception("member function cannot be throw and nothrow at the same time", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
         if (IsVirtualAbstractOrOverride())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "member function cannot be new and virtual, abstract or overridden at the same time", GetSpan());
+            throw Exception("member function cannot be new and virtual, abstract or overridden at the same time", GetSpan(), SourceModuleId());
         }
         SetNew();
     }
@@ -1947,7 +2038,7 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "member function cannot be unit_test", GetSpan());
+        throw Exception("member function cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
@@ -1963,9 +2054,17 @@ int MemberFunctionSymbol::StartParamIndex() const
     }
 }
 
-ConversionFunctionSymbol::ConversionFunctionSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::conversionFunctionSymbol, span_, name_)
+ConversionFunctionSymbol::ConversionFunctionSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    FunctionSymbol(SymbolType::conversionFunctionSymbol, span_, sourceModuleId_, name_)
 {
     SetConversion();
+}
+
+FunctionSymbol* ConversionFunctionSymbol::Copy() const
+{
+    ConversionFunctionSymbol* copy = new ConversionFunctionSymbol(GetSpan(), SourceModuleId(), Name());
+    copy->CopyFrom(this);
+    return copy;
 }
 
 std::u32string ConversionFunctionSymbol::DocName() const
@@ -1989,36 +2088,25 @@ std::u32string ConversionFunctionSymbol::DocName() const
     return docName;
 }
 
-TypeSymbol* ConversionFunctionSymbol::ConversionSourceType() const
-{
-    Assert(Parent()->IsTypeSymbol(), "type symbol expected");
-    return const_cast<TypeSymbol*>(static_cast<const TypeSymbol*>(Parent()));
-}
-
-TypeSymbol* ConversionFunctionSymbol::ConversionTargetType() const
-{
-    return ReturnType();
-}
-
 void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
 {
     Specifiers accessSpecifiers = specifiers & Specifiers::access_;
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be static", GetSpan());
+        throw Exception("conversion function cannot be static", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be virtual", GetSpan());
+        throw Exception("conversion function cannot be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be override", GetSpan());
+        throw Exception("conversion function cannot be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be abstract", GetSpan());
+        throw Exception("conversion function cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
@@ -2026,19 +2114,19 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be explicit", GetSpan());
+        throw Exception("conversion function cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be external", GetSpan());
+        throw Exception("conversion function cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be suppressed", GetSpan());
+        throw Exception("conversion function cannot be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be default", GetSpan());
+        throw Exception("conversion function cannot be default", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
@@ -2046,7 +2134,7 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be cdecl", GetSpan());
+        throw Exception("conversion function cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
@@ -2056,12 +2144,12 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     {
         if (IsNothrow())
         {
-            throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be throw and nothrow at the same time", GetSpan());
+            throw Exception("conversion function cannot be throw and nothrow at the same time", GetSpan(), SourceModuleId());
         }
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be new", GetSpan());
+        throw Exception("conversion function cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
@@ -2069,7 +2157,7 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "conversion function cannot be unit_test", GetSpan());
+        throw Exception("conversion function cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
@@ -2087,13 +2175,13 @@ std::unique_ptr<sngxml::dom::Element> ConversionFunctionSymbol::CreateDomElement
 }
 
 FunctionGroupTypeSymbol::FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_, void* boundFunctionGroup_) : 
-    TypeSymbol(SymbolType::functionGroupTypeSymbol, Span(), functionGroup_->Name()), functionGroup(functionGroup_), boundFunctionGroup(boundFunctionGroup_)
+    TypeSymbol(SymbolType::functionGroupTypeSymbol, functionGroup_->GetSpan(), functionGroup_->SourceModuleId(), functionGroup_->Name()), functionGroup(functionGroup_), boundFunctionGroup(boundFunctionGroup_)
 {
     SetModule(functionGroup->GetModule());
 }
 
-MemberExpressionTypeSymbol::MemberExpressionTypeSymbol(const Span& span_, const std::u32string& name_, void* boundMemberExpression_) :
-    TypeSymbol(SymbolType::memberExpressionTypeSymbol, span_, name_), boundMemberExpression(boundMemberExpression_)
+MemberExpressionTypeSymbol::MemberExpressionTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_, void* boundMemberExpression_) :
+    TypeSymbol(SymbolType::memberExpressionTypeSymbol, span_, sourceModuleId_, name_), boundMemberExpression(boundMemberExpression_)
 {
 }
 

@@ -10,13 +10,12 @@
 
 namespace cmajor { namespace symbols {
 
-void FileIndex::AddFile(int32_t fileIndex, Module* module)
+/*/
+void FileIndex::AddFile(int32_t fileIndex, const std::string& filePath)
 {
     if (fileIndex == -1) return;
-    std::lock_guard<std::mutex> lock(mtx);
     if (fileMap.find(fileIndex) == fileMap.cend())
     {
-        std::string filePath = module->GetFilePath(fileIndex);
         fileMap[fileIndex] = filePath;
     }
 }
@@ -29,5 +28,6 @@ void FileIndex::Write(BinaryWriter& writer)
         cmajor::debug::WriteFileIndexRecord(writer, p.first, p.second);
     }
 }
+*/
 
 } } // namespace cmajor::symbols

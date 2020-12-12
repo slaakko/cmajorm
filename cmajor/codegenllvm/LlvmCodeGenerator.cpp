@@ -144,7 +144,7 @@ void LlvmCodeGenerator::Visit(BoundNamespace& boundNamespace)
         }
         else
         {
-            emitter->PushScope(emitter->GetDebugInfoForFile(boundNamespace.GetSpan().fileIndex));
+            emitter->PushScope(emitter->GetDebugInfoForFile(boundNamespace.GetSpan(), boundNamespace.ModuleId()));
         }
     }
     int n = boundNamespace.Members().size();
@@ -204,13 +204,15 @@ void LlvmCodeGenerator::Visit(BoundClass& boundClass)
             }
             void* classIrType = currentClass->GetClassTypeSymbol()->IrType(*emitter);
             Span classSpan = currentClass->GetClassTypeSymbol()->GetSpan();
+            boost::uuids::uuid moduleId = currentClass->GetClassTypeSymbol()->SourceModuleId();
             if (currentClass->GetClassTypeSymbol()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
             {
                 ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(currentClass->GetClassTypeSymbol());
                 classSpan = specialization->GetClassTemplate()->GetSpan();
+                moduleId = specialization->GetClassTemplate()->SourceModuleId();
             }
             void* forwardDeclaration = emitter->CreateIrDIForwardDeclaration(classIrType, ToUtf8(currentClass->GetClassTypeSymbol()->Name()), ToUtf8(currentClass->GetClassTypeSymbol()->MangledName()),
-                classSpan);
+                classSpan, moduleId);
             emitter->SetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId(), forwardDeclaration, ToUtf8(currentClass->GetClassTypeSymbol()->FullName()));
             std::vector<void*> memberVariableElements;
             for (MemberVariableSymbol* memberVariable : currentClass->GetClassTypeSymbol()->MemberVariables())
@@ -219,7 +221,7 @@ void LlvmCodeGenerator::Visit(BoundClass& boundClass)
                 uint64_t offsetInBits = emitter->GetOffsetInBits(classIrType, memberVariableLayoutIndex);
                 memberVariableElements.push_back(memberVariable->GetDIMemberType(*emitter, offsetInBits));
             }
-            void* clsDIType = emitter->CreateDITypeForClassType(classIrType, memberVariableElements, classSpan, ToUtf8(currentClass->GetClassTypeSymbol()->Name()), vtableHolderClassDIType,
+            void* clsDIType = emitter->CreateDITypeForClassType(classIrType, memberVariableElements, classSpan, currentClass->GetClassTypeSymbol()->SourceModuleId(), ToUtf8(currentClass->GetClassTypeSymbol()->Name()), vtableHolderClassDIType,
                 ToUtf8(currentClass->GetClassTypeSymbol()->MangledName()), baseClassDIType);
             emitter->MapFwdDeclaration(forwardDeclaration, currentClass->GetClassTypeSymbol()->TypeId());
             emitter->SetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId(), clsDIType, ToUtf8(currentClass->GetClassTypeSymbol()->FullName()));
@@ -256,7 +258,7 @@ void LlvmCodeGenerator::Visit(BoundEnumTypeDefinition& boundEnumTypeDefinition)
             int64_t value = 0;
             if (enumTypeSymbol->UnderlyingType()->IsUnsignedType())
             {
-                Value* val = enumConstant->GetValue()->As(symbolTable->GetTypeByName(U"ulong"), false, enumTypeSymbol->GetSpan(), true);
+                Value* val = enumConstant->GetValue()->As(symbolTable->GetTypeByName(U"ulong"), false, enumTypeSymbol->GetSpan(), enumTypeSymbol->SourceModuleId(), true);
                 if (val)
                 {
                     ULongValue* ulongValue = static_cast<ULongValue*>(val);
@@ -265,7 +267,7 @@ void LlvmCodeGenerator::Visit(BoundEnumTypeDefinition& boundEnumTypeDefinition)
             }
             else
             {
-                Value* val = enumConstant->GetValue()->As(symbolTable->GetTypeByName(U"long"), false, enumTypeSymbol->GetSpan(), true);
+                Value* val = enumConstant->GetValue()->As(symbolTable->GetTypeByName(U"long"), false, enumTypeSymbol->GetSpan(), enumTypeSymbol->SourceModuleId(), true);
                 if (val)
                 {
                     LongValue* longValue = static_cast<LongValue*>(val);
@@ -274,7 +276,7 @@ void LlvmCodeGenerator::Visit(BoundEnumTypeDefinition& boundEnumTypeDefinition)
             }
             elements.push_back(emitter->CreateDITypeForEnumConstant(ToUtf8(enumConstant->Name()), value));
         }
-        void* enumTypeDI = emitter->CreateDITypeForEnumType(ToUtf8(enumTypeSymbol->Name()), ToUtf8(enumTypeSymbol->MangledName()), enumTypeSymbol->GetSpan(), elements,
+        void* enumTypeDI = emitter->CreateDITypeForEnumType(ToUtf8(enumTypeSymbol->Name()), ToUtf8(enumTypeSymbol->MangledName()), enumTypeSymbol->GetSpan(), enumTypeSymbol->SourceModuleId(), elements,
             sizeInBits, alignInBits, enumTypeSymbol->UnderlyingType()->GetDIType(*emitter));
         emitter->SetDITypeByTypeId(enumTypeSymbol->TypeId(), enumTypeDI, ToUtf8(enumTypeSymbol->FullName()));
     }
@@ -330,7 +332,7 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
         fileIndex = functionSymbol->GetSpan().fileIndex;
         functionId = functionSymbol->FunctionId();
     }
-    emitter->SetFunction(function, fileIndex, functionId);
+    emitter->SetFunction(function, fileIndex, functionSymbol->SourceModuleId(), functionId);
     bool hasSource = functionSymbol->HasSource();
     bool prevDebugInfo = debugInfo;
     void* prevDIBuilder = emitter->DIBuilder();
@@ -390,13 +392,13 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
             {
                 vtableIndex = functionSymbol->VmtIndex();
             }
-            subprogram = emitter->CreateDIMethod(ToUtf8(functionSymbol->Name()), ToUtf8(functionSymbol->MangledName()), functionSymbol->GetSpan(), subroutineType, virtuality, vtableIndex,
+            subprogram = emitter->CreateDIMethod(ToUtf8(functionSymbol->Name()), ToUtf8(functionSymbol->MangledName()), functionSymbol->GetSpan(), functionSymbol->SourceModuleId(), subroutineType, virtuality, vtableIndex,
                 vtableHolder, flags);
         }
         else
         {
             unsigned flags = AccessFlag(*emitter, functionSymbol->Access());
-            subprogram = emitter->CreateDIFunction(ToUtf8(functionSymbol->Name()), ToUtf8(functionSymbol->MangledName()), functionSymbol->GetSpan(), subroutineType, flags);
+            subprogram = emitter->CreateDIFunction(ToUtf8(functionSymbol->Name()), ToUtf8(functionSymbol->MangledName()), functionSymbol->GetSpan(), functionSymbol->SourceModuleId(), subroutineType, flags);
         }
         emitter->SetDISubprogram(function, subprogram);
         emitter->PushScope(subprogram);
@@ -425,7 +427,7 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
         lastAlloca = allocaInst;
         if (debugInfo)
         {
-            void* paramVar = emitter->CreateDIParameterVariable(ToUtf8(parameter->Name()), i + 1, parameter->GetSpan(), parameter->GetType()->GetDIType(*emitter), allocaInst);
+            void* paramVar = emitter->CreateDIParameterVariable(ToUtf8(parameter->Name()), i + 1, parameter->GetSpan(), parameter->SourceModuleId(), parameter->GetType()->GetDIType(*emitter), allocaInst);
         }
     }
     if (functionSymbol->ReturnParam())
@@ -444,7 +446,8 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
         lastAlloca = allocaInst;
         if (debugInfo && localVariable->GetSpan().Valid())
         {
-            void* localVar = emitter->CreateDIAutoVariable(ToUtf8(localVariable->Name()), localVariable->GetSpan(), localVariable->GetType()->GetDIType(*emitter), allocaInst);
+            void* localVar = emitter->CreateDIAutoVariable(ToUtf8(localVariable->Name()), localVariable->GetSpan(), localVariable->SourceModuleId(), 
+                localVariable->GetType()->GetDIType(*emitter), allocaInst);
         }
     }
     if (!functionSymbol->DontThrow())
@@ -498,13 +501,13 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
             {
                 emitter->SetInPrologue(false);
                 emitter->SetCurrentDebugLocation(boundFunction.Body()->GetSpan());
-                copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan());
+                copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan(), boundFunction.Body()->ModuleId());
                 emitter->SetInPrologue(true);
                 emitter->SetCurrentDebugLocation(Span());
             }
             else
             {
-                copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan());
+                copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan(), boundFunction.Body()->ModuleId());
             }
         }
         else if (parameter->GetType()->GetSymbolType() == SymbolType::interfaceTypeSymbol)
@@ -517,22 +520,22 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
             }
             std::vector<GenObject*> copyCtorArgs;
             NativeValue paramValue(parameter->IrObject(*emitter));
-            paramValue.SetType(interfaceType->AddPointer(Span()));
+            paramValue.SetType(interfaceType->AddPointer(Span(), boost::uuids::nil_uuid()));
             copyCtorArgs.push_back(&paramValue);
             NativeValue argumentValue(arg);
-            argumentValue.SetType(interfaceType->AddPointer(Span()));
+            argumentValue.SetType(interfaceType->AddPointer(Span(), boost::uuids::nil_uuid()));
             copyCtorArgs.push_back(&argumentValue);
             if (debugInfo)
             {
                 emitter->SetInPrologue(false);
                 emitter->SetCurrentDebugLocation(boundFunction.Body()->GetSpan());
-                copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan());
+                copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan(), boundFunction.Body()->ModuleId());
                 emitter->SetInPrologue(true);
                 emitter->SetCurrentDebugLocation(Span());
             }
             else
             {
-                copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan());
+                copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan(), boundFunction.Body()->ModuleId());
             }
         }
         else
@@ -622,7 +625,7 @@ void LlvmCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
     }
     if (debugInfo && compoundLevel > 0)
     {
-        void* block = emitter->CreateLexicalBlock(boundCompoundStatement.GetSpan());
+        void* block = emitter->CreateLexicalBlock(boundCompoundStatement.GetSpan(), boundCompoundStatement.ModuleId());
     }
     ++compoundLevel;
     destructorCallGenerated = false;
@@ -895,12 +898,12 @@ void LlvmCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
         }
         else
         {
-            throw Exception(symbolsModule, "case not found", boundCaseStatement.GetSpan());
+            throw Exception("case not found", boundCaseStatement.GetSpan(), boundCaseStatement.ModuleId());
         }
     }
     else
     {
-        throw Exception(symbolsModule, "no cases", boundCaseStatement.GetSpan());
+        throw Exception("no cases", boundCaseStatement.GetSpan(), boundCaseStatement.ModuleId());
     }
 }
 
@@ -920,7 +923,7 @@ void LlvmCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
     }
     else
     {
-        throw Exception(symbolsModule, "no default destination", boundDefaultStatement.GetSpan());
+        throw Exception("no default destination", boundDefaultStatement.GetSpan(), boundDefaultStatement.ModuleId());
     }
 }
 
@@ -940,14 +943,15 @@ void LlvmCodeGenerator::Visit(BoundConstructionStatement& boundConstructionState
             TypeSymbol* firstArgumentBaseType = firstArgument->GetType()->BaseType();
             if (firstArgumentBaseType->IsClassTypeSymbol())
             {
-                if (firstArgument->GetType()->IsPointerType() && firstArgument->GetType()->RemovePointer(boundConstructionStatement.GetSpan())->IsClassTypeSymbol())
+                if (firstArgument->GetType()->IsPointerType() && firstArgument->GetType()->RemovePointer(
+                    boundConstructionStatement.GetSpan(), boundConstructionStatement.ModuleId())->IsClassTypeSymbol())
                 {
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(firstArgumentBaseType);
                     if (classType->Destructor())
                     {
                         newCleanupNeeded = true;
                         std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
-                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(symbolsModule, currentBlock->EndSpan(), classType->Destructor()));
+                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(currentBlock->EndSpan(), currentBlock->ModuleId(), classType->Destructor()));
                         destructorCall->AddArgument(std::move(classPtrArgument));
                         Assert(currentBlock, "current block not set");
                         auto it = blockDestructionMap.find(currentBlock);
@@ -1415,26 +1419,31 @@ void LlvmCodeGenerator::GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCo
     }
     void* functionType = initUnwindInfoFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initUnwindInfoFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function, -1, boost::uuids::nil_uuid());
+    emitter->SetFunction(function, -1, boost::uuids::nil_uuid(), boost::uuids::nil_uuid());
     emitter->SetFunctionName(ToUtf8(initUnwindInfoFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
     for (FunctionSymbol* compileUnitFunction : compileUnitFunctions)
     {
-        std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(symbolsModule, compileUnitFunction->GetSpan(), addCompileUnitFunctionSymbol));
-        BoundBitCast* functionPtrAsVoidPtr = new BoundBitCast(symbolsModule, std::unique_ptr<BoundExpression>(
-            new BoundFunctionPtr(symbolsModule, compileUnitFunction->GetSpan(), compileUnitFunction, symbolTable->GetTypeByName(U"void")->AddPointer(compileUnitFunction->GetSpan()))),
-            symbolTable->GetTypeByName(U"void")->AddPointer(compileUnitFunction->GetSpan()));
+        std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId(), addCompileUnitFunctionSymbol));
+        BoundBitCast* functionPtrAsVoidPtr = new BoundBitCast(std::unique_ptr<BoundExpression>(
+            new BoundFunctionPtr(compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId(), 
+                compileUnitFunction, symbolTable->GetTypeByName(U"void")->AddPointer(compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId()))),
+            symbolTable->GetTypeByName(U"void")->AddPointer(compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId()));
         boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(functionPtrAsVoidPtr));
         std::string functionName = ToUtf8(compileUnitFunction->FullName());
         int functionNameStringId = Install(functionName);
-        BoundLiteral* boundFunctionNameLiteral = new BoundLiteral(symbolsModule, std::unique_ptr<Value>(new StringValue(compileUnitFunction->GetSpan(), functionNameStringId, functionName)),
-            symbolTable->GetTypeByName(U"char")->AddConst(compileUnitFunction->GetSpan())->AddPointer(compileUnitFunction->GetSpan()));
+        BoundLiteral* boundFunctionNameLiteral = new BoundLiteral(std::unique_ptr<Value>(new StringValue(compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId(), 
+            functionNameStringId, functionName)),
+            symbolTable->GetTypeByName(U"char")->AddConst(compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId())->AddPointer(
+                compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId()));
         boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(boundFunctionNameLiteral));
-        std::string sourceFilePath = GetSourceFilePath(compileUnitFunction->GetSpan().fileIndex);
+        std::string sourceFilePath = GetSourceFilePath(compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId());
         int sourceFilePathStringId = Install(sourceFilePath);
-        BoundLiteral* boundSourceFilePathLiteral = new BoundLiteral(symbolsModule, std::unique_ptr<Value>(new StringValue(compileUnitFunction->GetSpan(), sourceFilePathStringId, sourceFilePath)),
-            symbolTable->GetTypeByName(U"char")->AddConst(compileUnitFunction->GetSpan())->AddPointer(compileUnitFunction->GetSpan()));
+        BoundLiteral* boundSourceFilePathLiteral = new BoundLiteral(std::unique_ptr<Value>(new StringValue(
+            compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId(), sourceFilePathStringId, sourceFilePath)),
+            symbolTable->GetTypeByName(U"char")->AddConst(compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId())->AddPointer(
+                compileUnitFunction->GetSpan(), compileUnitFunction->SourceModuleId()));
         boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(boundSourceFilePathLiteral));
         boundFunctionCall->Accept(*this);
     }
@@ -1472,9 +1481,10 @@ void LlvmCodeGenerator::GenerateInitCompileUnitFunction(BoundCompileUnit& boundC
         return;
     }
     Span span = initCompileUnitFunctionSymbol->GetSpan();
+    boost::uuids::uuid moduleId = initCompileUnitFunctionSymbol->SourceModuleId();
     void* functionType = initCompileUnitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initCompileUnitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function, -1, boost::uuids::nil_uuid());
+    emitter->SetFunction(function, -1, boost::uuids::nil_uuid(), boost::uuids::nil_uuid());
     emitter->SetFunctionName(ToUtf8(initCompileUnitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -1489,11 +1499,11 @@ void LlvmCodeGenerator::GenerateInitCompileUnitFunction(BoundCompileUnit& boundC
     FunctionSymbol* pushCompileUnitUnwindInfoInitFunctionSymbol = boundCompileUnit.GetPushCompileUnitUnwindInfoInitFunctionSymbol();
     TypeSymbol* initUnwindInfoDelegateType = boundCompileUnit.GetInitUnwindInfoDelegateType();
     GlobalVariableSymbol* compileUnitUnwindInfoVarSymbol = boundCompileUnit.GetCompileUnitUnwindInfoVarSymbol();
-    BoundGlobalVariable* boundCompileUnitUnwindInfoVar = new BoundGlobalVariable(symbolsModule, span, compileUnitUnwindInfoVarSymbol);
-    BoundAddressOfExpression* unwindInfoVarAddress = new BoundAddressOfExpression(symbolsModule, std::unique_ptr<BoundExpression>(boundCompileUnitUnwindInfoVar),
-        boundCompileUnitUnwindInfoVar->GetType()->AddPointer(span));
-    BoundFunctionPtr* boundInitUnwindInfoFunction = new BoundFunctionPtr(symbolsModule, span, initUnwindInfoFunctionSymbol, initUnwindInfoDelegateType);
-    std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(symbolsModule, span, pushCompileUnitUnwindInfoInitFunctionSymbol));
+    BoundGlobalVariable* boundCompileUnitUnwindInfoVar = new BoundGlobalVariable(span, moduleId, compileUnitUnwindInfoVarSymbol);
+    BoundAddressOfExpression* unwindInfoVarAddress = new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(boundCompileUnitUnwindInfoVar),
+        boundCompileUnitUnwindInfoVar->GetType()->AddPointer(span, moduleId));
+    BoundFunctionPtr* boundInitUnwindInfoFunction = new BoundFunctionPtr(span, moduleId, initUnwindInfoFunctionSymbol, initUnwindInfoDelegateType);
+    std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(span, moduleId, pushCompileUnitUnwindInfoInitFunctionSymbol));
     boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(boundInitUnwindInfoFunction));
     boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(unwindInfoVarAddress));
     boundFunctionCall->Accept(*this);
@@ -1532,16 +1542,17 @@ void LlvmCodeGenerator::GenerateGlobalInitFuncion(BoundCompileUnit& boundCompile
     pads.clear();
     labeledStatementMap.clear();
     Span span = globalInitFunctionSymbol->GetSpan();
+    boost::uuids::uuid moduleId = globalInitFunctionSymbol->SourceModuleId();
     void* functionType = globalInitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(globalInitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function, -1, boost::uuids::nil_uuid());
+    emitter->SetFunction(function, -1, boost::uuids::nil_uuid(), boost::uuids::nil_uuid());
     emitter->SetFunctionName(ToUtf8(globalInitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
     const std::vector<std::unique_ptr<FunctionSymbol>>& allCompileUnitInitFunctionSymbols = boundCompileUnit.AllCompileUnitInitFunctionSymbols();
     for (const std::unique_ptr<FunctionSymbol>& initCompileUnitFunctionSymbol : allCompileUnitInitFunctionSymbols)
     {
-        std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(symbolsModule, span, initCompileUnitFunctionSymbol.get()));
+        std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(span, moduleId, initCompileUnitFunctionSymbol.get()));
         boundFunctionCall->Accept(*this);
     }
     emitter->CreateRetVoid();
@@ -1564,9 +1575,9 @@ bool LlvmCodeGenerator::NewCleanupNeeded()
     return newCleanupNeeded;
 }
 
-std::string LlvmCodeGenerator::GetSourceFilePath(int32_t fileIndex)
+std::string LlvmCodeGenerator::GetSourceFilePath(const Span& span, const boost::uuids::uuid& moduleId)
 {
-    return symbolsModule->GetFilePath(fileIndex);
+    return cmajor::symbols::GetSourceFilePath(span.fileIndex, moduleId);
 }
 
 cmajor::ir::Pad* LlvmCodeGenerator::CurrentPad()
@@ -1615,7 +1626,7 @@ void LlvmCodeGenerator::SetTarget(BoundStatement* labeledStatement)
     }
     else
     {
-        throw Exception(symbolsModule, "target for labeled statement not found", labeledStatement->GetSpan());
+        throw Exception("target for labeled statement not found", labeledStatement->GetSpan(), labeledStatement->ModuleId());
     }
 }
 

@@ -242,7 +242,7 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
         fileIndex = functionSymbol->GetSpan().fileIndex;
         functionId = functionSymbol->FunctionId();
     }
-    emitter->SetFunction(function, fileIndex, functionId);
+    emitter->SetFunction(function, fileIndex, functionSymbol->SourceModuleId(), functionId);
     void* entryBlock = emitter->CreateBasicBlock("entry");
     entryBasicBlock = entryBlock;
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -329,7 +329,7 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
             copyCtorArgs.push_back(&paramValue);
             NativeValue argumentValue(arg);
             copyCtorArgs.push_back(&argumentValue);
-            copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan());
+            copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan(), boundFunction.Body()->ModuleId());
         }
         else if (parameter->GetType()->GetSymbolType() == SymbolType::interfaceTypeSymbol)
         {
@@ -341,12 +341,12 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
             }
             std::vector<GenObject*> copyCtorArgs;
             NativeValue paramValue(parameter->IrObject(*emitter));
-            paramValue.SetType(interfaceType->AddPointer(Span()));
+            paramValue.SetType(interfaceType->AddPointer(Span(), boost::uuids::nil_uuid()));
             copyCtorArgs.push_back(&paramValue);
             NativeValue argumentValue(arg);
-            argumentValue.SetType(interfaceType->AddPointer(Span()));
+            argumentValue.SetType(interfaceType->AddPointer(Span(), boost::uuids::nil_uuid()));
             copyCtorArgs.push_back(&argumentValue);
-            copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan());
+            copyConstructor->GenerateCall(*emitter, copyCtorArgs, OperationFlags::none, boundFunction.Body()->GetSpan(), boundFunction.Body()->ModuleId());
         }
         else
         {
@@ -496,7 +496,7 @@ void SystemXCodeGenerator::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
     }
     else
     {
-        throw Exception(module, "case not found", boundGotoCaseStatement.GetSpan());
+        throw Exception("case not found", boundGotoCaseStatement.GetSpan(), boundGotoCaseStatement.ModuleId());
     }
 }
 
@@ -518,7 +518,7 @@ void SystemXCodeGenerator::Visit(BoundGotoDefaultStatement& boundGotoDefaultStat
     }
     else
     {
-        throw Exception(module, "no default destination", boundGotoDefaultStatement.GetSpan());
+        throw Exception("no default destination", boundGotoDefaultStatement.GetSpan(), boundGotoDefaultStatement.ModuleId());
     }
 }
 
@@ -582,7 +582,7 @@ void SystemXCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
     }
     else
     {
-        throw Exception(module, "goto target not found", boundGotoStatement.GetSpan());
+        throw Exception("goto target not found", boundGotoStatement.GetSpan(), boundGotoStatement.ModuleId());
     }
     void* nextBlock = emitter->CreateBasicBlock("next");
     emitter->SetCurrentBasicBlock(nextBlock);
@@ -858,12 +858,12 @@ void SystemXCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
         }
         else
         {
-            throw Exception(module, "case not found", boundCaseStatement.GetSpan());
+            throw Exception("case not found", boundCaseStatement.GetSpan(), boundCaseStatement.ModuleId());
         }
     }
     else
     {
-        throw Exception(module, "no cases", boundCaseStatement.GetSpan());
+        throw Exception("no cases", boundCaseStatement.GetSpan(), boundCaseStatement.ModuleId());
     }
 
 }
@@ -888,7 +888,7 @@ void SystemXCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
     }
     else
     {
-        throw Exception(module, "no default destination", boundDefaultStatement.GetSpan());
+        throw Exception("no default destination", boundDefaultStatement.GetSpan(), boundDefaultStatement.ModuleId());
     }
 }
 
@@ -912,14 +912,14 @@ void SystemXCodeGenerator::Visit(BoundConstructionStatement& boundConstructionSt
             TypeSymbol* firstArgumentBaseType = firstArgument->GetType()->BaseType();
             if (firstArgumentBaseType->IsClassTypeSymbol())
             {
-                if (firstArgument->GetType()->IsPointerType() && firstArgument->GetType()->RemovePointer(boundConstructionStatement.GetSpan())->IsClassTypeSymbol())
+                if (firstArgument->GetType()->IsPointerType() && firstArgument->GetType()->RemovePointer(boundConstructionStatement.GetSpan(), boundConstructionStatement.ModuleId())->IsClassTypeSymbol())
                 {
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(firstArgumentBaseType);
                     if (classType->Destructor())
                     {
                         newCleanupNeeded = true; 
                         std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
-                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, currentBlock->EndSpan(), classType->Destructor()));
+                        std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(currentBlock->EndSpan(), currentBlock->ModuleId(), classType->Destructor()));
                         destructorCall->AddArgument(std::move(classPtrArgument));
                         Assert(currentBlock, "current block not set");
                         auto it = blockDestructionMap.find(currentBlock);
@@ -1330,7 +1330,7 @@ void SystemXCodeGenerator::SetTarget(BoundStatement* labeledStatement)
     }
     else
     {
-        throw Exception(module, "target for labeled statement not found", labeledStatement->GetSpan());
+        throw Exception("target for labeled statement not found", labeledStatement->GetSpan(), labeledStatement->ModuleId());
     }
 }
 

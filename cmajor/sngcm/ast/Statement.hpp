@@ -15,8 +15,8 @@ class IdentifierNode;
 class SNGCM_AST_API LabelNode : public Node
 {
 public:
-    LabelNode(const Span& span_);
-    LabelNode(const Span& span_, const std::u32string& label_);
+    LabelNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    LabelNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& label_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -29,7 +29,7 @@ private:
 class SNGCM_AST_API StatementNode : public Node
 {
 public:
-    StatementNode(NodeType nodeType_, const Span& span_);
+    StatementNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     bool IsStatementNode() const override { return true; }
@@ -43,8 +43,8 @@ public:
 class SNGCM_AST_API LabeledStatementNode : public StatementNode
 {
 public:
-    LabeledStatementNode(const Span& span_);
-    LabeledStatementNode(const Span& span_, StatementNode* stmt_);
+    LabeledStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    LabeledStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, StatementNode* stmt_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -61,7 +61,7 @@ private:
 class SNGCM_AST_API CompoundStatementNode : public StatementNode
 {
 public:
-    CompoundStatementNode(const Span& span_);
+    CompoundStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -81,8 +81,8 @@ private:
 class SNGCM_AST_API ReturnStatementNode : public StatementNode
 {
 public:
-    ReturnStatementNode(const Span& span_);
-    ReturnStatementNode(const Span& span_, Node* expression_);
+    ReturnStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ReturnStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -99,8 +99,8 @@ private:
 class SNGCM_AST_API IfStatementNode : public StatementNode
 {
 public:
-    IfStatementNode(const Span& span_);
-    IfStatementNode(const Span& span_, Node* condition_, StatementNode* thenS_, StatementNode* elseS_);
+    IfStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    IfStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* condition_, StatementNode* thenS_, StatementNode* elseS_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -129,8 +129,8 @@ private:
 class SNGCM_AST_API WhileStatementNode : public StatementNode
 {
 public:
-    WhileStatementNode(const Span& span_);
-    WhileStatementNode(const Span& span_, Node* condition_, StatementNode* statement_);
+    WhileStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    WhileStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* condition_, StatementNode* statement_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -155,8 +155,8 @@ private:
 class SNGCM_AST_API DoStatementNode : public StatementNode
 {
 public:
-    DoStatementNode(const Span& span_);
-    DoStatementNode(const Span& span_, StatementNode* statement_, Node* condition_);
+    DoStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    DoStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, StatementNode* statement_, Node* condition_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -184,8 +184,8 @@ private:
 class SNGCM_AST_API ForStatementNode : public StatementNode
 {
 public:
-    ForStatementNode(const Span& span_);
-    ForStatementNode(const Span& span_, StatementNode* initS_, Node* condition_, StatementNode* loopS_, StatementNode* actionS_);
+    ForStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ForStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, StatementNode* initS_, Node* condition_, StatementNode* loopS_, StatementNode* actionS_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -216,7 +216,7 @@ private:
 class SNGCM_AST_API BreakStatementNode : public StatementNode
 {
 public:
-    BreakStatementNode(const Span& span_);
+    BreakStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     bool IsCaseTerminatingNode() const override { return true; }
@@ -226,7 +226,7 @@ public:
 class SNGCM_AST_API ContinueStatementNode : public StatementNode
 {
 public:
-    ContinueStatementNode(const Span& span_);
+    ContinueStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     bool IsCaseTerminatingNode() const override { return true; }
@@ -236,8 +236,8 @@ public:
 class SNGCM_AST_API GotoStatementNode : public StatementNode
 {
 public:
-    GotoStatementNode(const Span& span_);
-    GotoStatementNode(const Span& span_, const std::u32string& target_);
+    GotoStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    GotoStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& target_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -250,8 +250,8 @@ private:
 class SNGCM_AST_API ConstructionStatementNode : public StatementNode
 {
 public:
-    ConstructionStatementNode(const Span& span_);
-    ConstructionStatementNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_);
+    ConstructionStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConstructionStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -277,8 +277,8 @@ private:
 class SNGCM_AST_API DeleteStatementNode : public StatementNode
 {
 public:
-    DeleteStatementNode(const Span& span_);
-    DeleteStatementNode(const Span& span_, Node* expression_);
+    DeleteStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    DeleteStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -292,8 +292,8 @@ private:
 class SNGCM_AST_API DestroyStatementNode : public StatementNode
 {
 public:
-    DestroyStatementNode(const Span& span_);
-    DestroyStatementNode(const Span& span_, Node* expression_);
+    DestroyStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    DestroyStatementNode(const Span&, const boost::uuids::uuid& moduleId_span_, Node* expression_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -307,8 +307,8 @@ private:
 class SNGCM_AST_API AssignmentStatementNode : public StatementNode
 {
 public:
-    AssignmentStatementNode(const Span& span_);
-    AssignmentStatementNode(const Span& span_, Node* targetExpr_, Node* sourceExpr_);
+    AssignmentStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    AssignmentStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* targetExpr_, Node* sourceExpr_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -325,8 +325,8 @@ private:
 class SNGCM_AST_API ExpressionStatementNode : public StatementNode
 {
 public:
-    ExpressionStatementNode(const Span& span_);
-    ExpressionStatementNode(const Span& span_, Node* expression_);
+    ExpressionStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ExpressionStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -340,7 +340,7 @@ private:
 class SNGCM_AST_API EmptyStatementNode : public StatementNode
 {
 public:
-    EmptyStatementNode(const Span& span_);
+    EmptyStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
 };
@@ -348,8 +348,8 @@ public:
 class SNGCM_AST_API RangeForStatementNode : public StatementNode
 {
 public:
-    RangeForStatementNode(const Span& span_);
-    RangeForStatementNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_, Node* container_, StatementNode* action_);
+    RangeForStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    RangeForStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_, Node* container_, StatementNode* action_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -386,8 +386,8 @@ class DefaultStatementNode;
 class SNGCM_AST_API SwitchStatementNode : public StatementNode
 {
 public:
-    SwitchStatementNode(const Span& span_);
-    SwitchStatementNode(const Span& span_, Node* condition_);
+    SwitchStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    SwitchStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* condition_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -421,7 +421,7 @@ private:
 class SNGCM_AST_API CaseStatementNode : public StatementNode
 {
 public:
-    CaseStatementNode(const Span& span_);
+    CaseStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -441,7 +441,7 @@ private:
 class SNGCM_AST_API DefaultStatementNode : public StatementNode
 {
 public:
-    DefaultStatementNode(const Span& span_);
+    DefaultStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -455,8 +455,8 @@ private:
 class SNGCM_AST_API GotoCaseStatementNode : public StatementNode
 {
 public:
-    GotoCaseStatementNode(const Span& span_);
-    GotoCaseStatementNode(const Span& span_, Node* caseExpr_);
+    GotoCaseStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    GotoCaseStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* caseExpr_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -472,7 +472,7 @@ private:
 class SNGCM_AST_API GotoDefaultStatementNode : public StatementNode
 {
 public:
-    GotoDefaultStatementNode(const Span& span_);
+    GotoDefaultStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     bool IsCaseTerminatingNode() const override { return true; }
@@ -481,8 +481,8 @@ public:
 class SNGCM_AST_API ThrowStatementNode : public StatementNode
 {
 public:
-    ThrowStatementNode(const Span& span_);
-    ThrowStatementNode(const Span& span_, Node* expression_);
+    ThrowStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ThrowStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* expression_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -501,8 +501,8 @@ class CatchNode;
 class SNGCM_AST_API TryStatementNode : public StatementNode
 {
 public:
-    TryStatementNode(const Span& span_);
-    TryStatementNode(const Span& span_, CompoundStatementNode* tryBlock_);
+    TryStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    TryStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, CompoundStatementNode* tryBlock_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -519,8 +519,8 @@ private:
 class SNGCM_AST_API CatchNode : public Node
 {
 public:
-    CatchNode(const Span& span_);
-    CatchNode(const Span& span_, Node* typeExpr_, IdentifierNode* id_, CompoundStatementNode* catchBlock_);
+    CatchNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    CatchNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_, CompoundStatementNode* catchBlock_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -546,8 +546,8 @@ private:
 class SNGCM_AST_API AssertStatementNode : public StatementNode
 {
 public:
-    AssertStatementNode(const Span& span_);
-    AssertStatementNode(const Span& span_, Node* assertExpr_);
+    AssertStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    AssertStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* assertExpr_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -561,15 +561,15 @@ private:
 class SNGCM_AST_API ConditionalCompilationExpressionNode : public Node
 {
 public:
-    ConditionalCompilationExpressionNode(NodeType nodeType_, const Span& span_);
+    ConditionalCompilationExpressionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
     bool IsConditionalCompilationExpressionNode() const override { return true; }
 };
 
 class SNGCM_AST_API ConditionalCompilationBinaryExpressionNode : public ConditionalCompilationExpressionNode
 {
 public:
-    ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_);
-    ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
+    ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     ConditionalCompilationExpressionNode* Left() const { return left.get(); }
@@ -582,8 +582,8 @@ private:
 class SNGCM_AST_API ConditionalCompilationDisjunctionNode : public ConditionalCompilationBinaryExpressionNode
 {
 public:
-    ConditionalCompilationDisjunctionNode(const Span& span_);
-    ConditionalCompilationDisjunctionNode(const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
+    ConditionalCompilationDisjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConditionalCompilationDisjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
 };
@@ -591,8 +591,8 @@ public:
 class SNGCM_AST_API ConditionalCompilationConjunctionNode : public ConditionalCompilationBinaryExpressionNode
 {
 public:
-    ConditionalCompilationConjunctionNode(const Span& span_);
-    ConditionalCompilationConjunctionNode(const Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
+    ConditionalCompilationConjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConditionalCompilationConjunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
 };
@@ -600,8 +600,8 @@ public:
 class SNGCM_AST_API ConditionalCompilationNotNode : public ConditionalCompilationExpressionNode
 {
 public:
-    ConditionalCompilationNotNode(const Span& span_);
-    ConditionalCompilationNotNode(const Span& span_, ConditionalCompilationExpressionNode* expr_);
+    ConditionalCompilationNotNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConditionalCompilationNotNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* expr_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -614,8 +614,8 @@ private:
 class SNGCM_AST_API ConditionalCompilationPrimaryNode : public ConditionalCompilationExpressionNode
 {
 public:
-    ConditionalCompilationPrimaryNode(const Span& span_);
-    ConditionalCompilationPrimaryNode(const Span& span_, const std::u32string& symbol_);
+    ConditionalCompilationPrimaryNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConditionalCompilationPrimaryNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& symbol_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -628,8 +628,8 @@ private:
 class SNGCM_AST_API ParenthesizedConditionalCompilationExpressionNode : public ConditionalCompilationExpressionNode
 {
 public:
-    ParenthesizedConditionalCompilationExpressionNode(const Span& span_);
-    ParenthesizedConditionalCompilationExpressionNode(const Span& span_, ConditionalCompilationExpressionNode* expr_);
+    ParenthesizedConditionalCompilationExpressionNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ParenthesizedConditionalCompilationExpressionNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* expr_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -642,8 +642,8 @@ private:
 class SNGCM_AST_API ConditionalCompilationPartNode : public Node
 {
 public:
-    ConditionalCompilationPartNode(const Span& span_);
-    ConditionalCompilationPartNode(const Span& span_, ConditionalCompilationExpressionNode* expr_);
+    ConditionalCompilationPartNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConditionalCompilationPartNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* expr_);
     void AddStatement(StatementNode* statement);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
@@ -668,16 +668,16 @@ private:
 class SNGCM_AST_API ConditionalCompilationStatementNode : public StatementNode
 {
 public:
-    ConditionalCompilationStatementNode(const Span& span_);
-    ConditionalCompilationStatementNode(const Span& span_, ConditionalCompilationExpressionNode* ifExpr_);
+    ConditionalCompilationStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ConditionalCompilationStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* ifExpr_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
     void Read(AstReader& reader) override;
     void AddIfStatement(StatementNode* statement);
-    void AddElifExpr(const Span& span, ConditionalCompilationExpressionNode* expr);
+    void AddElifExpr(const Span& span, const boost::uuids::uuid& moduleId_, ConditionalCompilationExpressionNode* expr);
     void AddElifStatement(StatementNode* statement);
-    void AddElseStatement(const Span& span, StatementNode* statement);
+    void AddElseStatement(const Span& span, const boost::uuids::uuid& moduleId_, StatementNode* statement);
     ConditionalCompilationPartNode* IfPart() { return ifPart.get(); }
     const NodeList<ConditionalCompilationPartNode>& ElifParts() const { return elifParts; }
     ConditionalCompilationPartNode* ElsePart() { return elsePart.get(); }

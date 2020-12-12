@@ -9,18 +9,19 @@
 
 namespace sngcm { namespace ast {
 
-TemplateIdNode::TemplateIdNode(const Span& span_) : Node(NodeType::templateIdNode, span_)
+TemplateIdNode::TemplateIdNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::templateIdNode, span_, moduleId_)
 {
 }
 
-TemplateIdNode::TemplateIdNode(const Span& span_, Node* primary_) : Node(NodeType::templateIdNode, span_), primary(primary_)
+TemplateIdNode::TemplateIdNode(const Span& span_, const boost::uuids::uuid& moduleId_, Node* primary_) : 
+    Node(NodeType::templateIdNode, span_, moduleId_), primary(primary_)
 {
     primary->SetParent(this);
 }
 
 Node* TemplateIdNode::Clone(CloneContext& cloneContext) const
 {
-    TemplateIdNode* clone = new TemplateIdNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), primary->Clone(cloneContext));
+    TemplateIdNode* clone = new TemplateIdNode(GetSpan(), ModuleId(), primary->Clone(cloneContext));
     int n = templateArguments.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -74,12 +75,12 @@ void TemplateIdNode::AddTemplateArgument(Node* templateArgument)
     templateArguments.Add(templateArgument);
 }
 
-TemplateParameterNode::TemplateParameterNode(const Span& span_) : Node(NodeType::templateParameterNode, span_), id()
+TemplateParameterNode::TemplateParameterNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::templateParameterNode, span_, moduleId_), id()
 {
 }
 
-TemplateParameterNode::TemplateParameterNode(const Span& span_, IdentifierNode* id_, Node* defaultTemplateArgument_) : 
-    Node(NodeType::templateParameterNode, span_), id(id_), defaultTemplateArgument(defaultTemplateArgument_)
+TemplateParameterNode::TemplateParameterNode(const Span& span_, const boost::uuids::uuid& moduleId_, IdentifierNode* id_, Node* defaultTemplateArgument_) :
+    Node(NodeType::templateParameterNode, span_, moduleId_), id(id_), defaultTemplateArgument(defaultTemplateArgument_)
 {
     id->SetParent(this);
     if (defaultTemplateArgument)
@@ -95,7 +96,8 @@ Node* TemplateParameterNode::Clone(CloneContext& cloneContext) const
     {
         clonedDefaultTemplateArgument = defaultTemplateArgument->Clone(cloneContext);
     }
-    return new TemplateParameterNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedDefaultTemplateArgument);
+    TemplateParameterNode* clone = new TemplateParameterNode(GetSpan(), ModuleId(), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedDefaultTemplateArgument);
+    return clone;
 }
 
 void TemplateParameterNode::Accept(Visitor& visitor)

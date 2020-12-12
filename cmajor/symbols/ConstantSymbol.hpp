@@ -13,7 +13,7 @@ namespace cmajor { namespace symbols {
 class SYMBOLS_API ConstantSymbol : public Symbol
 {
 public:
-    ConstantSymbol(const Span& span_, const std::u32string& name_);
+    ConstantSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;

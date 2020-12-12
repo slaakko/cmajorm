@@ -15,22 +15,22 @@ parser api(SNGCM_PARSER_API) BasicTypeParser
 {
     uselexer CmajorLexer;
 
-    BasicType : Node*
-        ::= BOOL{ return new BoolNode(span); }
-        |   SBYTE{ return new SByteNode(span); }
-        |   BYTE{ return new ByteNode(span); }
-        |   SHORT{ return new ShortNode(span); }
-        |   USHORT{ return new UShortNode(span); }
-        |   INT{ return new IntNode(span); }
-        |   UINT{ return new UIntNode(span); }
-        |   LONG{ return new LongNode(span); }
-        |   ULONG{ return new ULongNode(span); }
-        |   FLOAT{ return new FloatNode(span); }
-        |   DOUBLE{ return new DoubleNode(span); }
-        |   CHAR{ return new CharNode(span); }
-        |   WCHAR{ return new WCharNode(span); }
-        |   UCHAR{ return new UCharNode(span); }
-        |   VOID{ return new VoidNode(span); }
+    BasicType(boost::uuids::uuid* moduleId) : Node*
+        ::= BOOL{ return new BoolNode(span, *moduleId); }
+        |   SBYTE{ return new SByteNode(span, *moduleId); }
+        |   BYTE{ return new ByteNode(span, *moduleId); }
+        |   SHORT{ return new ShortNode(span, *moduleId); }
+        |   USHORT{ return new UShortNode(span, *moduleId); }
+        |   INT{ return new IntNode(span, *moduleId); }
+        |   UINT{ return new UIntNode(span, *moduleId); }
+        |   LONG{ return new LongNode(span, *moduleId); }
+        |   ULONG{ return new ULongNode(span, *moduleId); }
+        |   FLOAT{ return new FloatNode(span, *moduleId); }
+        |   DOUBLE{ return new DoubleNode(span, *moduleId); }
+        |   CHAR{ return new CharNode(span, *moduleId); }
+        |   WCHAR{ return new WCharNode(span, *moduleId); }
+        |   UCHAR{ return new UCharNode(span, *moduleId); }
+        |   VOID{ return new VoidNode(span, *moduleId); }
         ;
 
     ruleinfo

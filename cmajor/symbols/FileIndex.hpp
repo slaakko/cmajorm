@@ -16,15 +16,16 @@ using namespace soulng::util;
 
 class Module;
 
+/*
 class SYMBOLS_API FileIndex
 {
 public:
-    void AddFile(int32_t fileIndex, Module* module);
+    void AddFile(int32_t fileIndex, const std::string& filePath);
     void Write(BinaryWriter& writer);
 private:
-    std::mutex mtx;
     std::unordered_map<int32_t, std::string> fileMap;
 };
+*/
 
 } } // namespace cmajor::symbols
 

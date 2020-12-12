@@ -12,8 +12,8 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API InterfaceNode : public Node
 {
 public:
-    InterfaceNode(const Span& span_);
-    InterfaceNode(const Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_);
+    InterfaceNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    InterfaceNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;

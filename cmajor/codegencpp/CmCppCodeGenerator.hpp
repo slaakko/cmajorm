@@ -113,7 +113,7 @@ public:
     int Install(const std::u32string& str) override;
     void Compile(const std::string& intermediateCodeFile);
     void SetLineNumber(int32_t lineNumber) override;
-    std::string GetSourceFilePath(int32_t fileIndex) override;
+    std::string GetSourceFilePath(const Span& span, const boost::uuids::uuid& moduleId) override;
     void GenerateEnterFunctionCode(BoundFunction& boundFunction);
     void GenerateExitFunctionCode(BoundFunction& boundFunction);
     void GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCompileUnit);

@@ -13,8 +13,8 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API CompileUnitNode : public Node, public cmajor::common::ColumnSpanProvider
 {
 public:
-    CompileUnitNode(const Span& span_);
-    CompileUnitNode(const Span& span_, const std::string& filePath_);
+    CompileUnitNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    CompileUnitNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::string& filePath_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     const std::string& FilePath() const { return filePath; }

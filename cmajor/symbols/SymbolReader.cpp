@@ -21,8 +21,10 @@ Symbol* SymbolReader::ReadSymbol(Symbol* parent)
 {
     SymbolType symbolType = static_cast<SymbolType>(astReader.GetBinaryReader().ReadByte());
     Span span = astReader.ReadSpan();
+    boost::uuids::uuid sourceModuleId;
+    GetBinaryReader().ReadUuid(sourceModuleId);
     std::u32string name = astReader.GetBinaryReader().ReadUtf32String();
-    Symbol* symbol = SymbolFactory::Instance().CreateSymbol(symbolType, span, name);
+    Symbol* symbol = SymbolFactory::Instance().CreateSymbol(symbolType, span, sourceModuleId, name);
     symbol->SetModule(module);
     symbol->SetParent(parent);
     symbol->Read(*this);

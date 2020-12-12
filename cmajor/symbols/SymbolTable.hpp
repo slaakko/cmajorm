@@ -95,10 +95,13 @@ struct ArrayKeyHash
     }
 };
 
+SYMBOLS_API void MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode, Symbol* symbol);
+
 class SYMBOLS_API SymbolTable
 {
 public:
     SymbolTable(Module* module_);
+    ~SymbolTable();
     void Write(SymbolWriter& writer);
     void Read(SymbolReader& reader);
     void Import(const SymbolTable& symbolTable);
@@ -116,7 +119,7 @@ public:
     void MapNs(NamespaceSymbol* fromNs, NamespaceSymbol* toNs);
     NamespaceSymbol* GetMappedNs(NamespaceSymbol* fromNs) const;
     NamespaceSymbol* BeginNamespace(NamespaceNode& namespaceNode);
-    NamespaceSymbol* BeginNamespace(const std::u32string& namespaceName, const Span& span);
+    NamespaceSymbol* BeginNamespace(const std::u32string& namespaceName, const Span& span, const boost::uuids::uuid& sourceModuleId);
     void EndNamespace();
     void BeginFunction(FunctionNode& functionNode, int32_t functionIndex);
     void EndFunction(bool addMember);
@@ -175,17 +178,18 @@ public:
     void ProcessTypeConceptAndFunctionRequests(const std::vector<TypeOrConceptRequest>& typeAndConceptRequests, const std::vector<FunctionRequest>& functionRequests);
     TypeSymbol* GetTypeByNameNoThrow(const std::u32string& typeName) const;
     TypeSymbol* GetTypeByName(const std::u32string& typeName) const;
-    TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span);
-    ClassTemplateSpecializationSymbol* MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, const Span& span);
+    TypeSymbol* MakeDerivedType(TypeSymbol* baseType, const TypeDerivationRec& derivationRec, const Span& span, const boost::uuids::uuid& moduleId);
+    ClassTemplateSpecializationSymbol* MakeClassTemplateSpecialization(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes, 
+        const Span& span, const boost::uuids::uuid& moduleId);
     ClassTemplateSpecializationSymbol* CopyClassTemplateSpecialization(ClassTemplateSpecializationSymbol* source);
     ClassTemplateSpecializationSymbol* GetCurrentClassTemplateSpecialization(ClassTemplateSpecializationSymbol* source);
     void AddClassTemplateSpecializationsToClassTemplateSpecializationMap(const std::vector<ClassTemplateSpecializationSymbol*>& classTemplateSpecializations);
-    ArrayTypeSymbol* MakeArrayType(TypeSymbol* elementType, int64_t size, const Span& span);
+    ArrayTypeSymbol* MakeArrayType(TypeSymbol* elementType, int64_t size, const Span& span, const boost::uuids::uuid& moduleId);
     const FunctionSymbol* MainFunctionSymbol() const { return mainFunctionSymbol; }
     FunctionSymbol* MainFunctionSymbol() { return mainFunctionSymbol; }
     void AddConversion(FunctionSymbol* conversion);
     void AddConversion(FunctionSymbol* conversion, Module* module);
-    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const;
+    FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span, const boost::uuids::uuid& moduleId) const;
     ConversionTable& GetConversionTable() { return conversionTable; }
     const ConversionTable& GetConversionTable() const { return conversionTable; }
     void AddPolymorphicClass(ClassTypeSymbol* polymorphicClass);
@@ -207,7 +211,7 @@ public:
     FunctionSymbol* GetInvoke(IdentifierNode* invokeId) const;
     void MapSymbol(Node* node, Symbol* symbol);
     Symbol* GetMappedSymbol(Node* node) const;
-    void MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode, Symbol* symbol);
+    void MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode, Module* module, Symbol* symbol);
     SymbolLocation* GetDefinitionLocation(const SymbolLocation& identifierLocation);
     void InitUuids();
     const boost::uuids::uuid& GetDerivationId(Derivation derivation) const;
@@ -217,6 +221,7 @@ public:
     int NumSpecializationsCopied() const { return numSpecializationsCopied; }
     void Check();
     FunctionSymbol* GetCreatedFunctionSymbol() { return createdFunctionSymbol; }
+    void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
 private:
     Module* module;
     std::vector<boost::uuids::uuid> derivationIds;
@@ -252,6 +257,7 @@ private:
     std::vector<std::unique_ptr<ArrayTypeSymbol>> arrayTypes;
     std::unordered_map<IdentifierNode*, FunctionSymbol*> invokeMap;
     std::unordered_map<Node*, Symbol*> mappedNodeSymbolMap;
+    std::vector<std::unique_ptr<FunctionSymbol>> functionSymbols;
     ConversionTable conversionTable;
     std::unordered_set<ClassTypeSymbol*> polymorphicClasses;
     std::unordered_set<ClassTypeSymbol*> classesHavingStaticConstructor;

@@ -17,7 +17,7 @@ class InlineFunctionRepository
 {
 public:
     InlineFunctionRepository(BoundCompileUnit& boundCompileUnit_);
-    FunctionSymbol* Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span);
+    FunctionSymbol* Instantiate(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId);
 private:
     BoundCompileUnit& boundCompileUnit;
     std::unordered_map<FunctionSymbol*, FunctionSymbol*> inlineFunctionMap;

@@ -17,7 +17,8 @@ namespace cmajor { namespace symbols {
 
 using namespace soulng::unicode;
 
-TypedefSymbol::TypedefSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::typedefSymbol, span_, name_), type()
+TypedefSymbol::TypedefSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
+    Symbol(SymbolType::typedefSymbol, span_, sourceModuleId_, name_), type()
 {
 }
 
@@ -83,67 +84,67 @@ void TypedefSymbol::SetSpecifiers(Specifiers specifiers)
     SetAccess(accessSpecifiers);
     if ((specifiers & Specifiers::static_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be static", GetSpan());
+        throw Exception("typedef cannot be static", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::virtual_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be virtual", GetSpan());
+        throw Exception("typedef cannot be virtual", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::override_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be override", GetSpan());
+        throw Exception("typedef cannot be override", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::abstract_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be abstract", GetSpan());
+        throw Exception("typedef cannot be abstract", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::inline_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be inline", GetSpan());
+        throw Exception("typedef cannot be inline", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::explicit_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be explicit", GetSpan());
+        throw Exception("typedef cannot be explicit", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::external_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be external", GetSpan());
+        throw Exception("typedef cannot be external", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::suppress_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be suppressed", GetSpan());
+        throw Exception("typedef cannot be suppressed", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::default_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be default", GetSpan());
+        throw Exception("typedef cannot be default", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::constexpr_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be constexpr", GetSpan());
+        throw Exception("typedef cannot be constexpr", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::cdecl_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be cdecl", GetSpan());
+        throw Exception("typedef cannot be cdecl", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::nothrow_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be nothrow", GetSpan());
+        throw Exception("typedef cannot be nothrow", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::throw_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be throw", GetSpan());
+        throw Exception("typedef cannot be throw", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::new_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be new", GetSpan());
+        throw Exception("typedef cannot be new", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::const_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be const", GetSpan());
+        throw Exception("typedef cannot be const", GetSpan(), SourceModuleId());
     }
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
-        throw Exception(GetRootModuleForCurrentThread(), "typedef cannot be unit_test", GetSpan());
+        throw Exception("typedef cannot be unit_test", GetSpan(), SourceModuleId());
     }
 }
 
@@ -165,7 +166,7 @@ void TypedefSymbol::Check()
     Symbol::Check();
     if (!type)
     {
-        throw SymbolCheckException(GetRootModuleForCurrentThread(), "typedef symbol contains null type pointer", GetSpan());
+        throw SymbolCheckException("typedef symbol contains null type pointer", GetSpan(), SourceModuleId());
     }
 }
 

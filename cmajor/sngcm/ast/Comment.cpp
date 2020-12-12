@@ -10,17 +10,18 @@
 
 namespace sngcm { namespace ast {
 
-CommentNode::CommentNode(const Span& span_) : Node(NodeType::commentNode, span_)
+CommentNode::CommentNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::commentNode, span_, moduleId_)
 {
 }
 
-CommentNode::CommentNode(const Span& span_, const std::u32string& comment_) : Node(NodeType::commentNode, span_), comment(comment_)
+CommentNode::CommentNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& comment_) : Node(NodeType::commentNode, span_, moduleId_), comment(comment_)
 {
 }
 
 Node* CommentNode::Clone(CloneContext& cloneContext) const
 {
-    return new CommentNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), comment);
+    CommentNode* clone = new CommentNode(GetSpan(), ModuleId(), comment);
+    return clone;
 }
 
 void CommentNode::Accept(Visitor& visitor)

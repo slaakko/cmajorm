@@ -7,7 +7,7 @@
 
 namespace cmajor { namespace binder {
 
-BoundNode::BoundNode(Module* module_, const Span& span_, BoundNodeType boundNodeType_) : module(module_), span(span_), boundNodeType(boundNodeType_)
+BoundNode::BoundNode(const Span& span_, const boost::uuids::uuid& moduleId_, BoundNodeType boundNodeType_) : span(span_), moduleId(moduleId_), boundNodeType(boundNodeType_)
 {
 }
 

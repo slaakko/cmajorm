@@ -14,8 +14,8 @@ namespace sngcm { namespace ast {
 class SNGCM_AST_API DelegateNode : public Node
 {
 public:
-    DelegateNode(const Span& span_);
-    DelegateNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_);
+    DelegateNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    DelegateNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
@@ -35,8 +35,8 @@ private:
 class SNGCM_AST_API ClassDelegateNode : public Node
 {
 public:
-    ClassDelegateNode(const Span& span_);
-    ClassDelegateNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_);
+    ClassDelegateNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    ClassDelegateNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_);
     Node* Clone(CloneContext& cloneContext) const override;
     void Accept(Visitor& visitor) override;
     void Write(AstWriter& writer) override;
