@@ -1213,19 +1213,26 @@ namespace System.Windows
                     }
                     case cast<Keys>(Keys.controlModifier | Keys.insert):
                     {
-                        if (selection.IsEmpty()) return;
-                        OnCopy();
+                        if (!selection.IsEmpty())
+                        {
+                            OnCopy();
+                        }
+                        args.handled = true;
                         break;
                     }
                     case cast<Keys>(Keys.shiftModifier | Keys.insert):
                     {
                         OnPaste();
+                        args.handled = true;
                         break;
                     }
                     case cast<Keys>(Keys.shiftModifier | Keys.delete_):
                     {
-                        if (selection.IsEmpty()) return;
-                        OnCut();
+                        if (!selection.IsEmpty())
+                        {
+                            OnCut();
+                        }
+                        args.handled = true;
                         break;
                     }
                     case cast<Keys>(Keys.altModifier | Keys.back):

@@ -367,12 +367,6 @@ int main(int argc, const char** argv)
 #ifndef _WIN32
             SetNumBuildThreads(1);
             SetGlobalFlag(GlobalFlags::singleThreadedCompile);
-#else
-            int n = GetNumBuildThreads();
-            if (n == -1)
-            {
-                SetNumBuildThreads(1);
-            }
 #endif
             ReadToolChains(GetGlobalFlag(GlobalFlags::verbose));
             if (GetGlobalFlag(GlobalFlags::verbose))

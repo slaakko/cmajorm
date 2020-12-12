@@ -6,6 +6,9 @@
 #include <cmajor/rt/WindowsAPI.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Process.hpp>
+#include <soulng/util/Time.hpp>
+#include <chrono>
+#include <fstream>
 #define OEMRESOURCE
 #ifdef __MINGW32__
 #define WINVER 0x0600
@@ -282,6 +285,8 @@ void WinDone()
 {
     GdiplusShutdown(gdiplusToken);
 }
+
+bool test = false;
 
 int WinRun()
 {
@@ -2057,3 +2062,13 @@ bool WinGetFolder(void* windowHandle, const char16_t* defaultDirectory, char16_t
 }
 
 #endif
+
+void WinBeginTest() 
+{
+    test = true;
+}
+
+void WinEndTest()
+{
+    test = false;
+}

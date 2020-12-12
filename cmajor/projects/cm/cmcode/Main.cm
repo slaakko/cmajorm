@@ -371,10 +371,9 @@ namespace cmcode
             menuBar->AddMenuItem(helpMenuItem.Release());
 
             UniquePtr<MenuItem> testMenuItem(new MenuItem("&Test"));
-
-                        UniquePtr<MenuItem> cacheModuleMenuItem(new MenuItem("&Cache Module"));
-            cacheModuleMenuItem->ClickEvent().AddHandler(CacheModuleClick);
-            testMenuItem->AddMenuItem(cacheModuleMenuItem.Release());
+            UniquePtr<MenuItem> runTestMenuItem(new MenuItem("&Run"));
+            runTestMenuItem->ClickEvent().AddHandler(RunTestClick);
+            testMenuItem->AddMenuItem(runTestMenuItem.Release());
             menuBar->AddMenuItem(testMenuItem.Release());
 
             UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, ToolButtonToolTipColor(), Color.DefaultBitmapTransparent(), ToolBar.Style.regular,
@@ -3525,46 +3524,21 @@ namespace cmcode
         {
             MessageBox.Show("Cmajor Code version " + Version(), "Info", null, MessageBoxType.MB_OK);
         }
-        private void CacheModuleClick()
+        private bool testing;
+        private void RunTestClick()
         {
             try
             {
-                if (solution.IsNull()) return;
-                TimePoint start = Now();
-                Cm.Ast.Project* project = null;
-                TabPage* tabPage = codeTabControl->SelectedTabPage();
-                if (tabPage != null)
+                if (!testing)
                 {
-                    Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
-                    if (editor != null)
-                    {
-                        if (editor is Cm.Views.CmajorEditor*)
-                        {
-                            Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
-                            TreeViewNodeData* data = solutionExplorerData->GetTreeViewNodeDataByKey(cmajorEditor->FilePath());
-                            if (data != null)
-                            {
-                                project = data->project;
-                            }
-                        }
-                    }
+                    testing = true;
+                    WinBeginTest();
                 }
-                if (project == null)
+                else
                 {
-                    project = solution->ActiveProject();
+                    testing = false;
+                    WinEndTest();
                 }
-                if (project != null)
-                {
-                    CacheModuleRequest cacheModuleRequest;
-                    cacheModuleRequest.projectName = ToUtf8(project->Name());
-                    cacheModuleRequest.projectFilePath = project->FilePath();
-                    cacheModuleRequest.backend = GetBackend();
-                    cacheModuleRequest.config = GetConfig();
-                    GetBuildService().ProcessCacheModuleRequest(cacheModuleRequest);
-                }
-                TimePoint end = Now();
-                Duration dur = end - start;
-                MessageBox.Show(ToString(dur.Milliseconds()));
             }
             catch (const Exception& ex)
             {

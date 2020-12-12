@@ -25,6 +25,11 @@ Utf8ToUtf32Engine::Utf8ToUtf32Engine() : state(0), resultReady(false), result(U'
     std::memset(bytes, 0, sizeof(bytes));
 }
 
+void ThrowInvalidUtf8Sequence()
+{
+    throw UnicodeException("invalid UTF-8 sequence");
+}
+
 void Utf8ToUtf32Engine::Put(uint8_t x)
 {
     switch (state)
@@ -54,7 +59,7 @@ void Utf8ToUtf32Engine::Put(uint8_t x)
             }
             else
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             break;
         }
@@ -65,7 +70,7 @@ void Utf8ToUtf32Engine::Put(uint8_t x)
             uint8_t b1 = bytes[1];
             if ((b1 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             uint8_t shift = 0u;
             for (uint8_t i = 0u; i < 6u; ++i)
@@ -100,7 +105,7 @@ void Utf8ToUtf32Engine::Put(uint8_t x)
             uint8_t b2 = bytes[2];
             if ((b2 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             uint8_t shift = 0u;
             for (uint8_t i = 0u; i < 6u; ++i)
@@ -113,7 +118,7 @@ void Utf8ToUtf32Engine::Put(uint8_t x)
             uint8_t b1 = bytes[1];
             if ((b1 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             for (uint8_t i = 0u; i < 6u; ++i)
             {
@@ -153,7 +158,7 @@ void Utf8ToUtf32Engine::Put(uint8_t x)
             uint8_t b3 = bytes[3];
             if ((b3 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             uint8_t shift = 0u;
             for (uint8_t i = 0u; i < 6u; ++i)
@@ -166,7 +171,7 @@ void Utf8ToUtf32Engine::Put(uint8_t x)
             uint8_t b2 = bytes[2];
             if ((b2 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             for (uint8_t i = 0u; i < 6u; ++i)
             {
@@ -178,7 +183,7 @@ void Utf8ToUtf32Engine::Put(uint8_t x)
             uint8_t b1 = bytes[1];
             if ((b1 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             for (uint8_t i = 0u; i < 6u; ++i)
             {
@@ -221,13 +226,13 @@ std::u32string ToUtf32(const std::string& utf8Str)
         {
             if (bytesRemaining < 2)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             char32_t u = static_cast<char32_t>(static_cast<uint32_t>(0u));
             uint8_t b1 = static_cast<uint8_t>(p[1]);
             if ((b1 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             uint8_t shift = 0u;
             for (uint8_t i = 0u; i < 6u; ++i)
@@ -253,13 +258,13 @@ std::u32string ToUtf32(const std::string& utf8Str)
         {
             if (bytesRemaining < 3)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             char32_t u = static_cast<char32_t>(static_cast<uint32_t>(0u));
             uint8_t b2 = static_cast<uint8_t>(p[2]);
             if ((b2 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             uint8_t shift = 0u;
             for (uint8_t i = 0u; i < 6u; ++i)
@@ -272,7 +277,7 @@ std::u32string ToUtf32(const std::string& utf8Str)
             uint8_t b1 = static_cast<uint8_t>(p[1]);
             if ((b1 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             for (uint8_t i = 0u; i < 6u; ++i)
             {
@@ -297,13 +302,13 @@ std::u32string ToUtf32(const std::string& utf8Str)
         {
             if (bytesRemaining < 4)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             char32_t u = static_cast<char32_t>(static_cast<uint32_t>(0u));
             uint8_t b3 = static_cast<uint8_t>(p[3]);
             if ((b3 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             uint8_t shift = 0u;
             for (uint8_t i = 0u; i < 6u; ++i)
@@ -316,7 +321,7 @@ std::u32string ToUtf32(const std::string& utf8Str)
             uint8_t b2 = static_cast<uint8_t>(p[2]);
             if ((b2 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             for (uint8_t i = 0u; i < 6u; ++i)
             {
@@ -328,7 +333,7 @@ std::u32string ToUtf32(const std::string& utf8Str)
             uint8_t b1 = static_cast<uint8_t>(p[1]);
             if ((b1 & 0xC0u) != 0x80u)
             {
-                throw UnicodeException("invalid UTF-8 sequence");
+                ThrowInvalidUtf8Sequence();
             }
             for (uint8_t i = 0u; i < 6u; ++i)
             {
@@ -351,7 +356,7 @@ std::u32string ToUtf32(const std::string& utf8Str)
         }
         else
         {
-            throw UnicodeException("invalid UTF-8 sequence");
+            ThrowInvalidUtf8Sequence();
         }
     }
     return result;

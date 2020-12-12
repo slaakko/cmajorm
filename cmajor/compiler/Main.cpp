@@ -214,7 +214,6 @@ void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, Module* module)
 int main(int argc, const char** argv)
 {
     InitDone initDone;
-    SetNumBuildThreads(1);
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
     std::set<std::string> builtProjects;
@@ -488,12 +487,6 @@ int main(int argc, const char** argv)
 #ifndef _WIN32
             SetNumBuildThreads(1);
             SetGlobalFlag(GlobalFlags::singleThreadedCompile);
-#else
-            int n = GetNumBuildThreads();
-            if (n == -1)
-            {
-                SetNumBuildThreads(1);
-            }
 #endif
             for (const std::string& file : files)
             {

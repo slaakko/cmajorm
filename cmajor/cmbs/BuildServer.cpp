@@ -638,7 +638,7 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
     }
     else
     {
-        cmajor::symbols::SetNumBuildThreads(1);
+        cmajor::symbols::SetNumBuildThreads(-1);
     }
     if (!cppBuildRequest.optimizationLevel.empty() && cppBuildRequest.optimizationLevel != "default")
     {
@@ -805,7 +805,7 @@ void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest
     }
     else
     {
-        cmajor::symbols::SetNumBuildThreads(1);
+        cmajor::symbols::SetNumBuildThreads(-1);
     }
     if (!llvmBuildRequest.optimizationLevel.empty() && llvmBuildRequest.optimizationLevel != "default")
     {

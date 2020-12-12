@@ -336,11 +336,13 @@ void SetUseModuleCache(bool useModuleCache_)
 
 std::unique_ptr<ModuleCache> ReleaseModuleCache()
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     return ModuleCache::Release();
 }
 
 void RestoreModulesFrom(ModuleCache* prevCache)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     if (prevCache)
     {
         ModuleCache::Instance().Restore(prevCache);
@@ -349,21 +351,25 @@ void RestoreModulesFrom(ModuleCache* prevCache)
 
 bool IsModuleCached(const std::string& moduleFilePath)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     return ModuleCache::Instance().HasModule(moduleFilePath);
 }
 
 Module* GetCachedModule(const std::string& moduleFilePath)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     return ModuleCache::Instance().GetCachedModule(moduleFilePath);
 }
 
 void SetCacheModule(const std::string& moduleFilePath, std::unique_ptr<Module>&& module)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     ModuleCache::Instance().SetModule(moduleFilePath, std::move(module));
 }
 
 void MoveNonSystemModulesTo(std::unique_ptr<ModuleCache>& cachePtr)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     if (!cachePtr)
     {
         cachePtr.reset(new ModuleCache());
@@ -373,11 +379,13 @@ void MoveNonSystemModulesTo(std::unique_ptr<ModuleCache>& cachePtr)
 
 Module* GetModuleById(const boost::uuids::uuid& moduleId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     return ModuleCache::Instance().GetModule(moduleId);
 }
 
 void MapModule(Module* module)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     ModuleCache::Instance().MapModule(module);
 }
 
