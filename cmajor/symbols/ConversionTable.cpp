@@ -43,10 +43,6 @@ void ConversionTable::AddConversion(FunctionSymbol* conversion)
         throw ModuleImmutableException(GetRootModuleForCurrentThread(), module, Span(), Span());
     }
 #endif
-/*  CHANGED 3.12.2020
-    ConversionTableEntry entry(conversion->ConversionSourceType()->PlainType(conversion->GetSpan(), conversion->SourceModuleId()),
-        conversion->ConversionTargetType()->PlainType(conversion->GetSpan(), conversion->SourceModuleId()));
-*/ 
     ConversionTableEntry entry(conversion->ConversionSourceType(), conversion->ConversionTargetType());
 #ifdef VALID_CONVERSION_TABLE_ENTRY_CHECK
     entry.CheckValid();

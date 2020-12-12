@@ -591,7 +591,6 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
     {
         useModuleCache = false;
     }
-    cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::singleThreadedCompile);
     if (cppBuildRequest.singleThreadedCompile)
     {
         cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::singleThreadedCompile);
