@@ -1285,6 +1285,7 @@ namespace System.Windows
             }
             if (!args.handled)
             {
+                editCommandList.BeginGroup();
                 if (!selection.IsEmpty())
                 {
                     AddRemoveSelectionCommand();
@@ -1295,6 +1296,7 @@ namespace System.Windows
                 int columnIndex = CaretColumn() - 1;
                 AddInsertCharCommand(lineIndex, columnIndex, c);
                 InsertChar(lineIndex, columnIndex, c);
+                editCommandList.EndGroup();
                 args.handled = true;
             }
         }
@@ -1341,6 +1343,7 @@ namespace System.Windows
         public void InsertText(int lineIndex, int columnIndex, const ustring& text)
         {
             if (text.IsEmpty()) return;
+            editCommandList.BeginGroup();
             if (!selection.IsEmpty())
             {
                 lineIndex = selection.start.line - 1;
@@ -1351,6 +1354,7 @@ namespace System.Windows
             List<ustring> linesToInsert = SplitTextIntoLines(text);
             AddInsertLinesCommand(lineIndex, columnIndex, linesToInsert);
             InsertLines(lineIndex, columnIndex, linesToInsert);
+            editCommandList.EndGroup();
         }
         public nothrow void AddInsertLinesCommand(int lineIndex, int columnIndex, const List<ustring>& linesToInsert)
         {

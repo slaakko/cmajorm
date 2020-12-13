@@ -17,7 +17,7 @@ namespace System.Windows
 
     public class EditCommandList
     {
-        public nothrow EditCommandList(TextView* textView_) : textView(textView_), currentIndex(0)
+        public nothrow EditCommandList(TextView* textView_) : textView(textView_), currentIndex(0), inGroup(false)
         {
         }
         public nothrow void SetMenuItems(MenuItem* undoMenuItem_, MenuItem* redoMenuItem_)
@@ -55,18 +55,25 @@ namespace System.Windows
         }
         public nothrow void AddCommand(EditCommand* command)
         {
-            if (currentIndex >= commands.Count())
+            if (inGroup)
             {
-                commands.Add(UniquePtr<EditCommand>(command));
-                currentIndex = cast<int>(commands.Count());
+                groupCommand->AddCommand(command);
             }
             else
             {
-                commands[currentIndex].Reset(command);
-                ++currentIndex;
+                if (currentIndex >= commands.Count())
+                {
+                    commands.Add(UniquePtr<EditCommand>(command));
+                    currentIndex = cast<int>(commands.Count());
+                }
+                else
+                {
+                    commands[currentIndex].Reset(command);
+                    ++currentIndex;
+                }
+                commands.Resize(currentIndex);
+                UpdateMenuItems();
             }
-            commands.Resize(currentIndex);
-            UpdateMenuItems();
         }
         public nothrow void Undo()
         {
@@ -88,11 +95,23 @@ namespace System.Windows
             }
             UpdateMenuItems();
         }
+        public nothrow void BeginGroup()
+        {
+            groupCommand.Reset(new GroupCommand());
+            inGroup = true;
+        }
+        public nothrow void EndGroup()
+        {
+            inGroup = false;
+            AddCommand(groupCommand.Release());
+        }
         private TextView* textView;
         private int currentIndex;
         private List<UniquePtr<EditCommand>> commands;
         private MenuItem* undoMenuItem;
         private MenuItem* redoMenuItem;
+        private UniquePtr<GroupCommand> groupCommand;
+        private bool inGroup;
     }
 
     public class InsertCharCommand : EditCommand
@@ -267,5 +286,35 @@ namespace System.Windows
             textView->UnindentSelection();
         }
         private Selection selection;
+    }
+
+    public class GroupCommand : EditCommand
+    {
+        public GroupCommand()
+        {
+        }
+        public nothrow void AddCommand(EditCommand* command)
+        {
+            commands.Add(UniquePtr<EditCommand>(command));
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            long n = commands.Count();
+            for (long i = n - 1; i >= 0; --i)
+            {
+                EditCommand* command = commands[i].Get();
+                command->Undo(textView);
+            }
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            long n = commands.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                EditCommand* command = commands[i].Get();
+                command->Redo(textView);
+            }
+        }
+        private List<UniquePtr<EditCommand>> commands;
     }
 }
