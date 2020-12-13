@@ -1805,6 +1805,10 @@ namespace System.Windows
                 }
                 c = GetCharAt(line, column);
             }
+            if (!IsWhiteSpace(c) && !IsWordSeparator(c))
+            {
+                column = column + 1;
+            }
             SourcePos end(line, column);
             ExtendSelection(start, end);
             SetCaretLineCol(start.line, start.column + LineNumberFieldLength());
