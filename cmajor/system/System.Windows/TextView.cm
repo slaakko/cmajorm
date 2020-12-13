@@ -653,6 +653,15 @@ namespace System.Windows
             textHeight = cast<int>(lines.Count() * charHeight);
             SetContentSize(Size(textWidth, textHeight));
         }
+        private nothrow void FixColumn(int& column, int line)
+        {
+            if (column < 1) column = 1;
+            int n = GetLineLength(line);
+            if (column > n + 1)
+            {
+                column = n + 1;
+            }
+        }
         protected override void OnMouseDown(MouseEventArgs& args)
         {
             base->OnMouseDown(args);
@@ -670,6 +679,7 @@ namespace System.Windows
                 GetLineColumn(args.location, line, column);
                 if (line >= 1 && line <= lines.Count())
                 {
+                    FixColumn(column, line);
                     mouseSelectionStart = SourcePos(line, column);
                     SetMouseExtendSelection();
                 }
@@ -709,6 +719,7 @@ namespace System.Windows
                 GetLineColumn(args.location, line, column);
                 if (line >= 1 && line <= lines.Count())
                 {
+                    FixColumn(column, line);
                     mouseSelectionEnd = SourcePos(line, column);
                     if (mouseSelectionStart != mouseSelectionEnd)
                     {
@@ -734,6 +745,7 @@ namespace System.Windows
                 GetLineColumn(args.location, line, column);
                 if (line >= 1 && line <= lines.Count())
                 {
+                    FixColumn(column, line);
                     mouseSelectionEnd = SourcePos(line, column);
                     if (mouseSelectionStart != mouseSelectionEnd)
                     {
@@ -988,6 +1000,16 @@ namespace System.Windows
                         end.line = end.line - windowLines;
                         lineNumber = Max(lineNumber, 1);
                         end.line = Max(end.line, 1);
+                        ExtendSelection(start, end);
+                        InvalidateLines(selection.start.line, selection.end.line);
+                        args.handled = true;
+                        break;
+                    }
+                    case cast<Keys>(Keys.controlModifier | Keys.a):
+                    {
+                        ResetSelection();
+                        SourcePos start(1, 1);
+                        SourcePos end(cast<int>(lines.Count() + 1), 1);
                         ExtendSelection(start, end);
                         InvalidateLines(selection.start.line, selection.end.line);
                         args.handled = true;
