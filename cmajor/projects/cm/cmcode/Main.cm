@@ -2406,6 +2406,7 @@ namespace cmcode
                             crlfText.Replace(u"\n", u"\r\n");
                             ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
                             clipboard.SetStringData(unicodeText, crlfText);
+                            textView->AddRemoveSelectionCommand();
                             textView->RemoveSelection();
                         }
                     }
