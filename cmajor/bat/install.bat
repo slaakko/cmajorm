@@ -11,6 +11,8 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmdbd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmdb.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmdb2xmld.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmdb2xml.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmtrace2txtd.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmtrace2txt.exe ..\bin
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmd.lib ..\lib

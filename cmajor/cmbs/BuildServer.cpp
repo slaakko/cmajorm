@@ -84,15 +84,15 @@ public:
     void Start(int port, const std::string& version, std::condition_variable* exitVar, bool* exiting);
     void Stop();
     void Run();
-    BuildReply ProcessBuildRequest(const BuildRequest& buildRequest);
+    BuildReply ProcessBuildRequest(const BuildRequest& buildRequest, LogFileWriter* writer);
     CacheModuleReply ProcessCacheModuleRequest(const CacheModuleRequest& cacheModuleRequest);
     GetDefinitionReply ProcessGetDefinitionRequest(const GetDefinitionRequest& getDefinitionRequest);
     void WriteGenericErrorReply(const std::string& messageKind);
-    void ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, BuildReply& reply);
-    void ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest, BuildReply& reply);
-    void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<cmajor::symbols::Module>>& rootModules, BuildReply& reply);
+    void ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, BuildReply& reply, LogFileWriter* logWriter);
+    void ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest, BuildReply& reply, LogFileWriter* logWriter);
+    void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<cmajor::symbols::Module>>& rootModules, BuildReply& reply, LogFileWriter* logWriter);
     void BuildProject(const std::string& projectFilePath, std::unique_ptr<cmajor::symbols::Module>& rootModule,
-        std::set<std::string>& builtProjects, BuildReply& reply);
+        std::set<std::string>& builtProjects, BuildReply& reply, LogFileWriter* logWriter);
     void SetRunException(const std::exception_ptr& runException_);
     void SetLogException(const std::exception_ptr& logException_);
     void SetLogExceptionToReply(BuildReply& reply);
@@ -226,7 +226,7 @@ void BuildServer::Run()
                     requestJsonValue->Write(formatter);
                 }
                 BuildRequest buildRequest(requestJsonValue.get());
-                BuildReply buildReply = ProcessBuildRequest(buildRequest);
+                BuildReply buildReply = ProcessBuildRequest(buildRequest, &writer);
                 std::unique_ptr<JsonValue> replyJsonValue = buildReply.ToJson();
                 if (log)
                 {
@@ -330,7 +330,7 @@ void BuildServer::WriteGenericErrorReply(const std::string& messageKind)
     Write(socket, reply);
 }
 
-BuildReply BuildServer::ProcessBuildRequest(const BuildRequest& buildRequest)
+BuildReply BuildServer::ProcessBuildRequest(const BuildRequest& buildRequest, LogFileWriter* logWriter)
 {
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     BuildReply buildReply;
@@ -344,11 +344,11 @@ BuildReply BuildServer::ProcessBuildRequest(const BuildRequest& buildRequest)
         cmajor::symbols::SetCompilerVersion(version);
         if (buildRequest.backend == "cpp")
         {
-            ProcessCppBackendRequest(buildRequest, buildReply);
+            ProcessCppBackendRequest(buildRequest, buildReply, logWriter);
         }
         else if (buildRequest.backend == "llvm")
         {
-            ProcessLlvmBackendRequest(buildRequest, buildReply);
+            ProcessLlvmBackendRequest(buildRequest, buildReply, logWriter);
         }
         else
         {
@@ -545,7 +545,7 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
     return reply;
 }
 
-void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, BuildReply& reply)
+void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, BuildReply& reply, LogFileWriter* logWriter)
 {
     LogMessage(-1, "Cmajor with C++ backend compiler version " + version + " for Windows x64");
     SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
@@ -691,7 +691,7 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
             throw std::runtime_error("buildserver: error processing build request: solution file '" + filePath + "' does not exist");
         }
         reply.requestValid = true;
-        BuildSolution(GetFullPath(fp.generic_string()), rootModules, reply);
+        BuildSolution(GetFullPath(fp.generic_string()), rootModules, reply, logWriter);
     }
     else if (fp.extension() == ".cmp")
     {
@@ -700,7 +700,7 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
             throw std::runtime_error("buildserver: error processing build request: project file '" + filePath + "' does not exist");
         }
         reply.requestValid = true;
-        BuildProject(GetFullPath(fp.generic_string()), rootModule, builtProjects, reply);
+        BuildProject(GetFullPath(fp.generic_string()), rootModule, builtProjects, reply, logWriter);
     }
     else
     {
@@ -708,7 +708,7 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
     }
 }
 
-void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest, BuildReply& reply)
+void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest, BuildReply& reply, LogFileWriter* logWriter)
 {
     LogMessage(-1, "Cmajor with LLVM backend compiler version " + version + " for Windows x64");
     SetBackEnd(cmajor::symbols::BackEnd::llvm);
@@ -839,7 +839,7 @@ void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest
             throw std::runtime_error("buildserver: error processing build request: solution file '" + filePath + "' does not exist");
         }
         reply.requestValid = true;
-        BuildSolution(GetFullPath(fp.generic_string()), rootModules, reply);
+        BuildSolution(GetFullPath(fp.generic_string()), rootModules, reply, logWriter);
     }
     else if (fp.extension() == ".cmp")
     {
@@ -848,7 +848,7 @@ void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest
             throw std::runtime_error("buildserver: error processing build request: project file '" + filePath + "' does not exist");
         }
         reply.requestValid = true;
-        BuildProject(GetFullPath(fp.generic_string()), rootModule, builtProjects, reply);
+        BuildProject(GetFullPath(fp.generic_string()), rootModule, builtProjects, reply, logWriter);
     }
     else
     {
@@ -856,19 +856,30 @@ void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest
     }
 }
 
-void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<cmajor::symbols::Module>>& rootModules, BuildReply& reply)
+void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<cmajor::symbols::Module>>& rootModules, BuildReply& reply, LogFileWriter* logWriter)
 {
     std::unique_ptr<ModuleCache> prevCache;
     try
     {
-        if (cmajor::build::SolutionContainsSystemModule(solutionFilePath))
+        if (!GetGlobalFlag(GlobalFlags::clean))
         {
-            prevCache = ReleaseModuleCache();
-            InitModuleCache();
+            if (cmajor::build::SolutionContainsSystemModule(solutionFilePath))
+            {
+                prevCache = ReleaseModuleCache();
+                InitModuleCache();
+            }
+            else
+            {
+                MoveNonSystemModulesTo(prevCache);
+            }
+        }
+        if (log)
+        {
+            cmajor::build::SetBuildLogWriter(logWriter);
         }
         else
         {
-            MoveNonSystemModulesTo(prevCache);
+            cmajor::build::SetBuildLogWriter(nullptr);
         }
         cmajor::build::BuildSolution(solutionFilePath, rootModules);
         reply.success = true;
@@ -897,20 +908,31 @@ void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector
 }
 
 void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_ptr<cmajor::symbols::Module>& rootModule,
-    std::set<std::string>& builtProjects, BuildReply& reply)
+    std::set<std::string>& builtProjects, BuildReply& reply, LogFileWriter* logWriter)
 {
     std::unique_ptr<ModuleCache> prevCache;
     try
     {
         std::unique_ptr<Project> project = cmajor::build::ReadProject(projectFilePath);
-        if (IsSystemModule(project->Name()))
+        if (!GetGlobalFlag(GlobalFlags::clean))
         {
-            prevCache = ReleaseModuleCache();
-            InitModuleCache();
+            if (IsSystemModule(project->Name()))
+            {
+                prevCache = ReleaseModuleCache();
+                InitModuleCache();
+            }
+            else
+            {
+                MoveNonSystemModulesTo(prevCache);
+            }
+        }
+        if (log)
+        {
+            cmajor::build::SetBuildLogWriter(logWriter);
         }
         else
         {
-            MoveNonSystemModulesTo(prevCache);
+            cmajor::build::SetBuildLogWriter(nullptr);
         }
         cmajor::build::BuildProject(projectFilePath, rootModule, builtProjects);
         reply.success = true;

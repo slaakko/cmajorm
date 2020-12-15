@@ -72,10 +72,13 @@ public:
     const Span& BeginBraceSpan() const { return beginBraceSpan; }
     void SetEndBraceSpan(const Span& endBraceSpan_) { endBraceSpan = endBraceSpan_; }
     const Span& EndBraceSpan() const { return endBraceSpan; }
+    bool TracerInserted() const { return tracerInserted; }
+    void SetTracerInserted() { tracerInserted = true; }
 private:
     NodeList<StatementNode> statements;
     Span beginBraceSpan;
     Span endBraceSpan;
+    bool tracerInserted;
 };
 
 class SNGCM_AST_API ReturnStatementNode : public StatementNode

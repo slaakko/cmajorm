@@ -67,6 +67,10 @@ std::string GetConfig()
             config = "release";
         }
     }
+    else if (GetGlobalFlag(GlobalFlags::trace))
+    {
+        config = "trace";
+    }
     return config;
 }
 

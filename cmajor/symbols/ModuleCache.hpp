@@ -30,6 +30,7 @@ public:
     void PutModule(std::unique_ptr<Module>&& module);
     Module* ResetModule(const std::string& moduleFilePath);
     void ResetCacheEntries(Module* module);
+    void RemoveModule(const std::string& moduleFilePath);
     void Restore(ModuleCache* prevCache);
     bool HasModule(const std::string& moduleFilePath) const;
     void SetModule(const std::string& moduleFilePath, std::unique_ptr<Module>&& module);
@@ -56,6 +57,7 @@ SYMBOLS_API void RestoreModulesFrom(ModuleCache* prevCache);
 SYMBOLS_API bool IsModuleCached(const std::string& moduleFilePath);
 SYMBOLS_API Module* GetCachedModule(const std::string& moduleFilePath);
 SYMBOLS_API void SetCacheModule(const std::string& moduleFilePath, std::unique_ptr<Module>&& module);
+SYMBOLS_API void RemoveModuleFromCache(const std::string& moduleFilePath);
 SYMBOLS_API void MoveNonSystemModulesTo(std::unique_ptr<ModuleCache>& cachePtr);
 SYMBOLS_API Module* GetModuleById(const boost::uuids::uuid& moduleId);
 SYMBOLS_API void MapModule(Module* module);

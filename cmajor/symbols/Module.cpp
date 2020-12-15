@@ -860,6 +860,10 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
     {
         config = sngcm::ast::Config::profile;
     }
+    else if (configStr == "trace")
+    {
+        config = sngcm::ast::Config::trace;
+    }
     boost::filesystem::path mfd = originalFilePath;
     mfd.remove_filename();
     boost::filesystem::create_directories(mfd);

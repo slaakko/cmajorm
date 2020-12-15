@@ -13,6 +13,7 @@
 #include <sngcm/ast/CompileUnit.hpp>
 #include <sngcm/ast/Identifier.hpp>
 #include <sngcm/ast/GlobalVariable.hpp>
+#include <sngcm/ast/Literal.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/DelegateSymbol.hpp>
@@ -22,6 +23,7 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/Trace.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -1047,6 +1049,22 @@ void TypeBinder::Visit(ConstructionStatementNode& constructionStatementNode)
     LocalVariableSymbol* localVariableSymbol = static_cast<LocalVariableSymbol*>(symbol);
     TypeSymbol* type = ResolveType(constructionStatementNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags, currentClassTypeSymbol);
     localVariableSymbol->SetType(type);
+    if (GetGlobalFlag(GlobalFlags::trace))
+    {
+        if (localVariableSymbol->Name() == U"@tracer" && constructionStatementNode.Arguments().Count() == 1)
+        {
+            Node* argumentNode = constructionStatementNode.Arguments()[0];
+            if (argumentNode->GetNodeType() == NodeType::intLiteralNode)
+            {
+                IntLiteralNode* intLiteralNode = static_cast<IntLiteralNode*>(argumentNode);
+                if (currentFunctionSymbol)
+                {
+                    int32_t traceFunctionId = GetTraceFunctionId(ToUtf8(currentFunctionSymbol->FullName()));
+                    intLiteralNode->SetValue(traceFunctionId);
+                }
+            }
+        }
+    }
 }
 
 void TypeBinder::Visit(SwitchStatementNode& switchStatementNode)

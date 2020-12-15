@@ -212,6 +212,7 @@ namespace Cm.Service.Run
         {
             try
             {
+                RtSetThreadId('R');
                 string command = args.executableName;
                 command.Append(" ").Append(args.arguments);
                 process.Reset(new Process(command, Process.Redirections.none));

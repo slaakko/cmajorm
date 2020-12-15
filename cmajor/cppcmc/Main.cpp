@@ -259,6 +259,10 @@ int main(int argc, const char** argv)
                                 {
                                     SetGlobalFlag(GlobalFlags::release);
                                 }
+                                else if (components[1] == "trace")
+                                {
+                                    SetGlobalFlag(GlobalFlags::trace);
+                                }
                                 else if (components[1] != "debug")
                                 {
                                     throw std::runtime_error("unknown configuration '" + components[1] + "'");

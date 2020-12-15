@@ -23,7 +23,7 @@ enum class BackEnd : int8_t
 
 enum class Config : int8_t
 {
-    debug = 0, release = 1, profile = 2
+    debug = 0, release = 1, profile = 2, trace = 3
 };
 
 class SNGCM_AST_API ModuleVersionTagVerifier

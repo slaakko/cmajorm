@@ -1,0 +1,20 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System.Runtime
+{
+    public class Tracer
+    {
+        public explicit nothrow Tracer(int traceFunctionId_) : traceFunctionId(traceFunctionId_)
+        {
+            RtBeginTraceFunction(traceFunctionId);
+        }
+        public ~Tracer()
+        {
+            RtEndTraceFunction(traceFunctionId);
+        }
+        private int traceFunctionId;
+    }
+}

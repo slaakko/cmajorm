@@ -10,6 +10,8 @@
 #include <sngcm/ast/CompileUnit.hpp>
 #include <sngcm/ast/Class.hpp>
 #include <sngcm/ast/Interface.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <sngcm/ast/Literal.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -114,6 +116,7 @@ void SymbolCreatorVisitor::Visit(StaticConstructorNode& staticConstructorNode)
     symbolTable.BeginStaticConstructor(staticConstructorNode, functionIndex++);
     if (staticConstructorNode.Body())
     {
+        InsertTracer(staticConstructorNode.Body());
         staticConstructorNode.Body()->Accept(*this);
     }
     symbolTable.EndStaticConstructor(!leaveFunction);
@@ -130,6 +133,7 @@ void SymbolCreatorVisitor::Visit(ConstructorNode& constructorNode)
     }
     if (constructorNode.Body())
     {
+        InsertTracer(constructorNode.Body());
         constructorNode.Body()->Accept(*this);
     }
     symbolTable.EndConstructor(!leaveFunction);
@@ -140,6 +144,7 @@ void SymbolCreatorVisitor::Visit(DestructorNode& destructorNode)
     symbolTable.BeginDestructor(destructorNode, functionIndex++);
     if (destructorNode.Body())
     {
+        InsertTracer(destructorNode.Body());
         destructorNode.Body()->Accept(*this);
     }
     symbolTable.EndDestructor(!leaveFunction);
@@ -156,6 +161,7 @@ void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
     }
     if (memberFunctionNode.Body())
     {
+        InsertTracer(memberFunctionNode.Body());
         memberFunctionNode.Body()->Accept(*this);
     }
     symbolTable.EndMemberFunction(!leaveFunction);
@@ -166,6 +172,7 @@ void SymbolCreatorVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
     symbolTable.BeginConversionFunction(conversionFunctionNode, functionIndex++);
     if (conversionFunctionNode.Body())
     {
+        InsertTracer(conversionFunctionNode.Body());
         conversionFunctionNode.Body()->Accept(*this);
     }
     symbolTable.EndConversionFunction(!leaveFunction);
@@ -446,6 +453,25 @@ void SymbolCreatorVisitor::Visit(EnumConstantNode& enumConstantNode)
 void SymbolCreatorVisitor::Visit(GlobalVariableNode& globalVariableNode)
 {
     symbolTable.AddGlobalVariable(globalVariableNode);
+}
+
+void SymbolCreatorVisitor::InsertTracer(CompoundStatementNode* body)
+{
+    if (!GetGlobalFlag(GlobalFlags::trace)) return;
+    Module* rootModule = GetRootModuleForCurrentThread();
+    if (!rootModule) return;
+    if (rootModule->IsCore()) return;
+    if (rootModule->Name() == U"System.Runtime") return;
+    if (rootModule->Name() == U"System.Parsing") return;
+    if (body->TracerInserted()) return;
+    body->SetTracerInserted();
+    Span span = body->GetSpan();
+    boost::uuids::uuid moduleId = body->ModuleId();
+    DotNode* typeExprNode = new DotNode(span, moduleId, new DotNode(span, moduleId, new IdentifierNode(span, moduleId, U"System"), new IdentifierNode(span, moduleId, U"Runtime")),
+        new IdentifierNode(span, moduleId, U"Tracer"));
+    ConstructionStatementNode* constructTracer(new ConstructionStatementNode(span, moduleId, typeExprNode, new IdentifierNode(span, moduleId, U"@tracer")));
+    constructTracer->AddArgument(new IntLiteralNode(span, moduleId, -1));
+    body->Statements().Insert(0, constructTracer);
 }
 
 } } // namespace cmajor::symbols

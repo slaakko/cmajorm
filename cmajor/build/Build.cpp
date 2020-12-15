@@ -83,6 +83,13 @@ using namespace soulng::unicode;
 
 namespace cmajor { namespace build {
 
+LogFileWriter* buildLogWriter = nullptr;
+
+void SetBuildLogWriter(LogFileWriter* buildLogWriter_)
+{
+    buildLogWriter = buildLogWriter_;
+}
+
 bool stopBuild = false;
 
 void StopBuild()
@@ -1554,6 +1561,7 @@ void CleanProject(Project* project)
         LogMessage(project->LogStreamId(), "Cleaning project '" + ToUtf8(project->Name()) + "' (" + project->FilePath() + ") using " + config + " configuration...");
     }
     boost::filesystem::path mfp = project->ModuleFilePath();
+    RemoveModuleFromCache(project->ModuleFilePath());
     mfp.remove_filename();
     boost::filesystem::remove_all(mfp);
     if (project->GetTarget() == Target::program || project->GetTarget() == Target::winguiapp || project->GetTarget() == Target::winapp)
@@ -3410,6 +3418,11 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
 
 void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<Module>>& rootModules, std::u32string& solutionName, std::vector<std::u32string>& moduleNames)
 {
+    if (buildLogWriter)
+    {
+        buildLogWriter->WriteCurrentDateTime();
+        buildLogWriter->WriteLine("Building solution '" + solutionFilePath + "'");
+    }
     std::set<std::string> builtProjects;
     MappedInputFile solutionFile(solutionFilePath);
     std::u32string s(ToUtf32(std::string(solutionFile.Begin(), solutionFile.End())));
@@ -3482,6 +3495,10 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
         {
             numThreads = std::max(1, n);
         }
+        if (buildLogWriter)
+        {
+            buildLogWriter->WriteLine("building " + std::to_string(numProjectsToBuild) + " projects using " + std::to_string(numThreads) + " threads...");
+        }
         rootModules.resize(numProjectsToBuild);
         if (numThreads <= 1)
         {
@@ -3529,6 +3546,11 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
                 {
                     if (project->Ready())
                     {
+                        if (buildLogWriter)
+                        {
+                            buildLogWriter->WriteCurrentDateTime();
+                            buildLogWriter->WriteLine("project '" + ToUtf8(project->Name()) + "' is ready to build");
+                        }
                         building.push_back(project);
                         buildQueue.Put(project);
                     }
@@ -3541,6 +3563,11 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
                 if (ready)
                 {
                     --numProjectsToBuild;
+                    if (buildLogWriter)
+                    {
+                        buildLogWriter->WriteCurrentDateTime();
+                        buildLogWriter->WriteLine("project '" + ToUtf8(ready->Name()) + "' built");
+                    }
                 }
             }
             if (stopBuild)

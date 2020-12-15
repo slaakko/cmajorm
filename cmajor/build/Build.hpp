@@ -9,12 +9,14 @@
 #include <cmajor/build/MessageBody.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <sngcm/ast/Project.hpp>
+#include <soulng/util/LogFileWriter.hpp>
 #include <set>
 
 namespace cmajor { namespace build {
 
 using namespace sngcm::ast;
 using namespace cmajor::symbols;
+using namespace soulng::util;
 
 BUILD_API void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& rootModule, std::set<std::string>& builtProjects);
 BUILD_API void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop, bool resetRootModule, std::set<std::string>& builtProjects);
@@ -31,6 +33,7 @@ BUILD_API void ResetStopBuild();
 BUILD_API std::unique_ptr<Project> ReadProject(const std::string& projectFilePath);
 BUILD_API ProjectInfo ReadPojectInfo(Project* project, const std::string& projectInfoFilePath);
 BUILD_API bool SolutionContainsSystemModule(const std::string& solutionFilePath);
+BUILD_API void SetBuildLogWriter(LogFileWriter* buildLogWriter_);
 
 } } // namespace cmajor::build
 

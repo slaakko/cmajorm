@@ -77,6 +77,17 @@ void ModuleCache::ResetCacheEntries(Module* module)
     }
 }
 
+void ModuleCache::RemoveModule(const std::string& moduleFilePath)
+{
+    auto it = moduleMap.find(moduleFilePath);
+    if (it != moduleMap.cend())
+    {
+        int moduleIndex = it->second;
+        modules[moduleIndex].reset();
+        moduleMap.erase(moduleFilePath);
+    }
+}
+
 Module* ModuleCache::GetModule(const std::string& moduleFilePath)
 {
     auto it = moduleMap.find(moduleFilePath);
@@ -259,7 +270,14 @@ struct IsNonsystemModule
 {
     bool operator()(const std::unique_ptr<Module>& module) const
     {
-        return !module->IsSystemModule();
+        if (module)
+        {
+            return !module->IsSystemModule();
+        }
+        else
+        {
+            return false;
+        }
     }
 };
 
@@ -375,6 +393,12 @@ void MoveNonSystemModulesTo(std::unique_ptr<ModuleCache>& cachePtr)
         cachePtr.reset(new ModuleCache());
     }
     ModuleCache::Instance().MoveNonSystemModulesTo(cachePtr.get());
+}
+
+void RemoveModuleFromCache(const std::string& moduleFilePath)
+{
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+    ModuleCache::Instance().RemoveModule(moduleFilePath);
 }
 
 Module* GetModuleById(const boost::uuids::uuid& moduleId)

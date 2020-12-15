@@ -11,6 +11,7 @@
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
+#include <cmajor/symbols/Trace.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #ifdef _WIN32
 #include <cmajor/cmres/InitDone.hpp>
@@ -355,6 +356,10 @@ int main(int argc, const char** argv)
                                 {
                                     SetGlobalFlag(GlobalFlags::release);
                                 }
+                                else if (components[1] == "trace")
+                                {
+                                    SetGlobalFlag(GlobalFlags::trace);
+                                }
                                 else if (components[1] != "debug")
                                 {
                                     throw std::runtime_error("unknown configuration '" + components[1] + "'");
@@ -478,6 +483,10 @@ int main(int argc, const char** argv)
 #ifndef _WIN32
             noDebugInfo = true;
 #endif
+            if (GetGlobalFlag(GlobalFlags::trace))
+            {
+                ReadTraceTable();
+            }
             SetUseModuleCache(useModuleCache);
             BackendSelector backend(GetBackEnd());
             if (!GetGlobalFlag(GlobalFlags::release) && !noDebugInfo)
@@ -626,6 +635,10 @@ int main(int argc, const char** argv)
                 CodeFormatter formatter(std::cerr);
                 formatter.SetIndentSize(1);
                 compileResultDoc.Write(formatter);
+            }
+            if (GetGlobalFlag(GlobalFlags::trace))
+            {
+                WriteTraceTable();
             }
             if (GetGlobalFlag(GlobalFlags::time))
             {

@@ -61,6 +61,7 @@ public:
     void Visit(EnumConstantNode& enumConstantNode) override;
     void Visit(GlobalVariableNode& globalVariableNode) override;
     void SetLeaveFunction() { leaveFunction = true; }
+    void InsertTracer(CompoundStatementNode* body);
 private:
     SymbolTable& symbolTable;
     ClassNode* classInstanceNode;

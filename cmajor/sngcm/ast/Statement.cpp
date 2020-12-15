@@ -99,7 +99,7 @@ void LabeledStatementNode::SetLabelNode(LabelNode* labelNode_)
 }
 
 CompoundStatementNode::CompoundStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
-    StatementNode(NodeType::compoundStatementNode, span_, moduleId_), statements(), beginBraceSpan(), endBraceSpan()
+    StatementNode(NodeType::compoundStatementNode, span_, moduleId_), statements(), beginBraceSpan(), endBraceSpan(), tracerInserted(false)
 {
 }
 

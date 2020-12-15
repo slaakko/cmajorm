@@ -26,7 +26,6 @@
 #include <cmajor/rt/Environment.hpp>
 #include <cmajor/rt/Unwind.hpp>
 #include <cmajor/rt/Debug.hpp>
-#include <csignal>
 
 GlobalInitFunctionType initCompileUnitsFunction = nullptr;
 

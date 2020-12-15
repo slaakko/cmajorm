@@ -54,6 +54,7 @@ namespace System.Windows
     {
         static Application() : logView(null), activeWindow(null), runningModal(false)
         {
+            RtSetThreadId('M');
             MessageProcessorFunction messageProcessorFunction = ProcessMessage;
             ModelessWindowKeyPreviewFunction keyPreviewFunction = ModelessWindowKeyPreview;
             void* messageProcessorFunctionAddress = cast<void*>(messageProcessorFunction);

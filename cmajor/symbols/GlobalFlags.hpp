@@ -47,7 +47,8 @@ enum class GlobalFlags : uint64_t
     buildAll = 1 << 28,
     printDebugMessages = 1 << 29,
     repository = 1 << 30,
-    updateSourceFileModuleMap = 1 << 31
+    updateSourceFileModuleMap = 1ll << 31,
+    trace = 1ll << 32
 };
 
 enum class BackEnd : int

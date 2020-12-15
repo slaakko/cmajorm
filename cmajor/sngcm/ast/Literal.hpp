@@ -113,6 +113,7 @@ public:
     void Read(AstReader& reader) override;
     std::string ToString() const override;
     int32_t Value() const { return value; }
+    void SetValue(int32_t value_) { value = value_; }
 private:
     int32_t value;
 };

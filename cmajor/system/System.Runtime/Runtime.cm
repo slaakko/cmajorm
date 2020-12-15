@@ -276,3 +276,8 @@ public extern cdecl nothrow bool RtProcessEof(void* process, int handle, int& er
 public extern cdecl nothrow int RtProcessReadLine(void* process, int handle, int& errorStringHandle);
 public extern cdecl nothrow int RtProcessReadToEnd(void* process, int handle, int& errorStringHandle);
 public extern cdecl nothrow bool RtProcessWriteLine(void* process, const char* line, int& errorStringHandle);
+public extern cdecl nothrow void RtBeginTracing();
+public extern cdecl nothrow void RtEndTracing();
+public extern cdecl nothrow void RtSetThreadId(char threadId);
+public extern cdecl nothrow void RtBeginTraceFunction(int traceFunctionId);
+public extern cdecl nothrow void RtEndTraceFunction(int traceFunctionId);
