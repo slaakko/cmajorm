@@ -12,7 +12,7 @@ namespace System.Windows
     {
         private enum Flags : sbyte
         {
-            none = 0, toolTipWindowAdded = 1 << 0
+            none = 0, toolTipWindowAdded = 1 << 0, toolTipWindowVisible = 1 << 1
         }
         public enum Style
         {
@@ -28,6 +28,7 @@ namespace System.Windows
             pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip(toolTipWindowColor)), padding(padding_), buttonPadding(buttonPadding_), toolButtons(this),
             centerFormat(StringAlignment.center, StringAlignment.center)
         {
+            SetMouseHoverMs(DefaultMouseHoverMs());
         }
         public ToolBar(int toolButtonHeight, const Color& toolTipWindowColor, const Color& toolButtonTransparentColor, Style style, const Padding& padding,
             const Padding& buttonPadding) :
@@ -285,6 +286,15 @@ namespace System.Windows
                 toolButton->MouseMoveInternal(args);
             }
         }
+        protected override void OnMouseHover(MouseEventArgs& args)
+        {
+            base->OnMouseHover(args);
+            ToolButton* toolButton = GetToolButtonAt(args.location);
+            if (toolButton != null)
+            {
+                toolButton->MouseHoverInternal();
+            }
+        }
         protected override void OnMouseDown(MouseEventArgs& args)
         {
             base->OnMouseDown(args);
@@ -356,7 +366,9 @@ namespace System.Windows
         }
         internal void ShowToolTipWindow(ToolButton* toolButton)
         {
-            toolTipWindow->Hide();
+            if (toolTipWindow == null || !ToolTipWindowAdded()) return;
+            if (ToolTipWindowVisible()) toolTipWindow->Hide();
+            ResetToolTipWindowVisible();
             Point loc = toolButton->Location();
             Size size = toolButton->GetSize();
             toolTipWindow->SetText(toolButton->GetToolTip());
@@ -382,12 +394,14 @@ namespace System.Windows
                 toolTipWindow->BringToFront();
                 toolTipWindow->Show();
                 toolTipWindow->Invalidate();
-                toolTipWindow->Update();
+                SetToolTipWindowVisible();
             }
         }
         internal void HideToolTipWindow()
         {
+            if (toolTipWindow == null || !ToolTipWindowAdded() || !ToolTipWindowVisible()) return;
             toolTipWindow->Hide();
+            ResetToolTipWindowVisible();
         }
         internal SolidBrush* GetOrInsertSolidBrush(const Color& color)
         {
@@ -430,7 +444,7 @@ namespace System.Windows
                 bitmaps.Add(Rvalue(bitmapPtr));
                 bitmaps.Add(Rvalue(disabledBitmapPtr));
                 return bitmapPair;
-            }        
+            }
             catch (const Exception& ex)
             {
                 throw Exception("could not load bitmap '" + bitmapName + "': " + ex.Message());
@@ -469,6 +483,18 @@ namespace System.Windows
         private nothrow inline void ResetToolTipWindowAdded()
         {
             flags = cast<Flags>(flags & ~Flags.toolTipWindowAdded);
+        }
+        private nothrow inline bool ToolTipWindowVisible() const
+        {
+            return (flags & Flags.toolTipWindowVisible) != Flags.none;
+        }
+        private nothrow inline void SetToolTipWindowVisible()
+        {
+            flags = cast<Flags>(flags | Flags.toolTipWindowVisible);
+        }
+        private nothrow inline void ResetToolTipWindowVisible()
+        {
+            flags = cast<Flags>(flags & ~Flags.toolTipWindowVisible);
         }
         private Flags flags;
         private Container toolButtons;
@@ -675,6 +701,10 @@ namespace System.Windows
         internal void MouseEnterInternal()
         {
             OnMouseEnter();
+        }
+        internal void MouseHoverInternal()
+    
+   {
             ToolBar* toolBar = GetToolBar();
             if (!toolTip.IsEmpty() && toolBar != null)
             {

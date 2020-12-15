@@ -665,11 +665,6 @@ namespace System.Windows
         protected override void OnMouseDown(MouseEventArgs& args)
         {
             base->OnMouseDown(args);
-            LogView* logView = Application.GetLogView();
-            if (logView != null)
-            {
-                logView->WriteLine("OnMouseDown!");
-            }
             SetFocus(this);
             ResetSelection();
             if (args.buttons == MouseButtons.lbutton && !lines.IsEmpty())
@@ -732,11 +727,6 @@ namespace System.Windows
         protected override void OnMouseUp(MouseEventArgs& args)
         {
             base->OnMouseUp(args);
-            LogView* logView = Application.GetLogView();
-            if (logView != null)
-            {
-                logView->WriteLine("OnMouseUp!");
-            }
             if (MouseExtendSelection())
             {
                 ResetMouseExtendSelection();

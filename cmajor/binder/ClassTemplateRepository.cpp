@@ -353,6 +353,7 @@ bool ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
         SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
         symbolTable.BeginContainer(memberFunction);
         symbolTable.MapNode(functionInstanceNode, memberFunction);
+        symbolCreatorVisitor.InsertTracer(functionInstanceNode->Body());
         functionInstanceNode->Body()->Accept(symbolCreatorVisitor); 
         symbolTable.EndContainer();
         TypeBinder typeBinder(boundCompileUnit);

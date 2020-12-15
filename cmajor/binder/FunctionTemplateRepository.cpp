@@ -103,6 +103,7 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     currentNs->AddMember(functionInstanceNode);
     symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
     SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
+    symbolCreatorVisitor.InsertTracer(functionInstanceNode->Body());
     globalNs->Accept(symbolCreatorVisitor);
     Symbol* symbol = symbolTable.GetSymbol(functionInstanceNode);
     Assert(symbol->GetSymbolType() == SymbolType::functionSymbol, "function symbol expected");
