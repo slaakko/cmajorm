@@ -128,6 +128,7 @@ namespace System.Windows
                     writer << GetCurrentTimestamp().ToString() << endl();
                     writer << ">" << MessageNameMap.Instance().GetMessageName(msg) << endl();
                 }
+                RtWindowsMessage(cast<int>(msg));
                 Message message(windowHandle, msg, wparam, lparam, result);
                 bool handled = window->ProcessMessageInternal(message);
                 if (message.originalWndProc != null)

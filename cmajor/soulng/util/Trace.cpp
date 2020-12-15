@@ -37,10 +37,24 @@ std::string TraceDir()
     return traceDir;
 }
 
+std::string ConfigDir()
+{
+    std::string root = CmajorRootDir();
+    std::string configDir = GetFullPath(Path::Combine(root, "config"));
+    boost::filesystem::create_directories(configDir);
+    return configDir;
+}
+
 std::string TraceFilePath()
 {
     std::string traceFilePath = GetFullPath(Path::Combine(TraceDir(), "trace.bin"));
     return traceFilePath;
+}
+
+std::string WinMsgFilePath()
+{
+    std::string winMsgFilePath = GetFullPath(Path::Combine(ConfigDir(), "winmsg.txt"));
+    return winMsgFilePath;
 }
 
 class TraceTable
@@ -51,6 +65,7 @@ public:
     static TraceTable& Instance() { return *instance; }
     int32_t GetTraceFunctionId(const std::string& functionFullName);
     const std::string& GetTraceFunctionName(int32_t traceFunctionId) const;
+    const std::string& GetTraceMessageName(int32_t traceMessageId) const;
     void Read();
     void Write();
 private:
@@ -58,6 +73,9 @@ private:
     static std::unique_ptr<TraceTable> instance;
     std::vector<std::string> traceFunctions;
     std::map<std::string, int32_t> traceFunctionMap;
+    std::map<int32_t, std::string> traceMessageMap;
+    std::string unknownMessage;
+    TraceTable();
 };
 
 std::string TraceTablePath()
@@ -75,6 +93,10 @@ void TraceTable::Init()
 void TraceTable::Done()
 {
     instance.reset();
+}
+
+TraceTable::TraceTable() : unknownMessage("<UNKNOWN_WINDOWS_MESSSAGE>")
+{
 }
 
 int32_t TraceTable::GetTraceFunctionId(const std::string& functionFullName)
@@ -97,6 +119,19 @@ const std::string& TraceTable::GetTraceFunctionName(int32_t traceFunctionId) con
     return traceFunctions[traceFunctionId];
 }
 
+const std::string& TraceTable::GetTraceMessageName(int32_t traceMessageId) const
+{
+    auto it = traceMessageMap.find(traceMessageId);
+    if (it != traceMessageMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return unknownMessage;
+    }
+}
+
 void TraceTable::Read()
 {
     std::string traceTablePath = TraceTablePath();
@@ -111,6 +146,22 @@ void TraceTable::Read()
         Assert(index == traceFunctions.size(), "index invalid");
         traceFunctions.push_back(functionName);
         traceFunctionMap[functionName] = index;
+    }
+    std::string winMsgFilePath = WinMsgFilePath();
+    std::ifstream winMsgFile(winMsgFilePath);
+    std::string msgLine;
+    while (std::getline(winMsgFile, msgLine))
+    {
+        if (msgLine.empty()) continue;
+        std::string::size_type colonPos = msgLine.find(':');
+        if (colonPos == std::string::npos) continue;
+        std::string indexStr = msgLine.substr(0, colonPos);
+        int32_t index = boost::lexical_cast<int32_t>(indexStr);
+        std::string messageName = msgLine.substr(colonPos + 1);
+        if (traceMessageMap.find(index) == traceMessageMap.cend())
+        {
+            traceMessageMap[index] = messageName;
+        }
     }
 }
 
@@ -150,14 +201,14 @@ int32_t GetTraceFunctionId(const std::string& functionFullName)
 
 struct TraceEntry
 {
-    TraceEntry(EntryKind kind_, char threadId_, int32_t functionId_, int64_t nanosecs_);
+    TraceEntry(EntryKind kind_, char threadId_, int32_t id_, int64_t nanosecs_);
     EntryKind kind;
     char threadId;
-    int32_t functionId;
+    int32_t id;
     int64_t nanosecs;
 };
 
-TraceEntry::TraceEntry(EntryKind kind_, char threadId_, int32_t functionId_, int64_t nanosecs_) : kind(kind_), threadId(threadId_), functionId(functionId_), nanosecs(nanosecs_)
+TraceEntry::TraceEntry(EntryKind kind_, char threadId_, int32_t id_, int64_t nanosecs_) : kind(kind_), threadId(threadId_), id(id_), nanosecs(nanosecs_)
 {
 }
 
@@ -203,7 +254,7 @@ void Trace::Write()
         const TraceEntry& entry = entries[i];
         writer.Write(static_cast<int8_t>(entry.kind));
         writer.Write(entry.threadId);
-        writer.Write(entry.functionId);
+        writer.Write(entry.id);
         writer.Write(entry.nanosecs);
     }
 }
@@ -217,9 +268,9 @@ std::vector<TraceEntry> ReadTrace(const std::string& traceFilePath)
     {
         EntryKind kind = static_cast<EntryKind>(reader.ReadSByte());
         char threadId = reader.ReadChar();
-        int32_t functionId = reader.ReadInt();
+        int32_t id = reader.ReadInt();
         int64_t nanosecs = reader.ReadLong();
-        TraceEntry entry(kind, threadId, functionId, nanosecs);
+        TraceEntry entry(kind, threadId, id, nanosecs);
         trace.push_back(std::move(entry));
     }
     return trace;
@@ -289,7 +340,7 @@ void ConvertTraceToText(const std::string& traceFilePath)
         if (entry.kind == EntryKind::begin)
         {
             entryStr.append(thread->indent, ' ');
-            entryStr.append(1, '>').append(TraceTable::Instance().GetTraceFunctionName(entry.functionId));
+            entryStr.append(1, '>').append(TraceTable::Instance().GetTraceFunctionName(entry.id));
             while (thread->indent >= thread->startEntries.size())
             {
                 thread->startEntries.push_back(nullptr);
@@ -304,13 +355,13 @@ void ConvertTraceToText(const std::string& traceFilePath)
                 --thread->indent;
             }
             entryStr.append(thread->indent, ' ');
-            entryStr.append(1, '<').append(TraceTable::Instance().GetTraceFunctionName(entry.functionId));
+            entryStr.append(1, '<').append(TraceTable::Instance().GetTraceFunctionName(entry.id));
             if (thread->startEntries.size() > thread->indent)
             {
                 TraceEntry* start = thread->startEntries[thread->indent];
                 if (start)
                 {
-                    if (start->functionId == entry.functionId)
+                    if (start->id == entry.id)
                     {
                         int64_t duration = entry.nanosecs - start->nanosecs;
                         entryStr.append(" duration=").append(TimeStr(duration));
@@ -318,6 +369,11 @@ void ConvertTraceToText(const std::string& traceFilePath)
                     }
                 }
             }
+        }
+        else if (entry.kind == EntryKind::message)
+        {
+            entryStr.append(thread->indent, ' ');
+            entryStr.append(1, '!').append(TraceTable::Instance().GetTraceMessageName(entry.id));
         }
         textFile << entryStr << std::endl;
     }
@@ -351,11 +407,11 @@ void SetThreadId(char threadId_)
     threadId = threadId_;
 }
 
-void AddTraceEntry(EntryKind kind, int32_t functionId)
+void AddTraceEntry(EntryKind kind, int32_t id)
 {
     if (!tracing) return;
     std::chrono::steady_clock::duration time = std::chrono::steady_clock::now() - start;
-    TraceEntry entry(kind, threadId, functionId, std::chrono::duration_cast<std::chrono::nanoseconds>(time).count());
+    TraceEntry entry(kind, threadId, id, std::chrono::duration_cast<std::chrono::nanoseconds>(time).count());
     Trace::Instance().AddEntry(entry);
 }
 

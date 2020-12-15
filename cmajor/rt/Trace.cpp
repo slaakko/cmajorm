@@ -30,3 +30,8 @@ void RtEndTraceFunction(int32_t traceFunctionId)
 {
     soulng::util::AddTraceEntry(soulng::util::EntryKind::end, traceFunctionId);
 }
+
+void RtWindowsMessage(int32_t messageId)
+{
+    soulng::util::AddTraceEntry(soulng::util::EntryKind::message, messageId);
+}

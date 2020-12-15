@@ -24,3 +24,7 @@ void RtBeginTraceFunction(int32_t traceFunctionId)
 void RtEndTraceFunction(int32_t traceFunctionId)
 {
 }
+
+void RtWindowsMessage(int32_t messageId)
+{
+}

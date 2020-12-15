@@ -14,14 +14,14 @@ namespace soulng { namespace util {
 
 enum class EntryKind : int8_t
 {
-    begin = 0, end = 1
+    begin = 0, end = 1, message = 2
 };
 
 UTIL_API void BeginTracing();
 UTIL_API void EndTracing();
 UTIL_API void SetThreadId(char threadId_);
 UTIL_API int32_t GetTraceFunctionId(const std::string& functionFullName);
-UTIL_API void AddTraceEntry(EntryKind kind, int32_t functionId);
+UTIL_API void AddTraceEntry(EntryKind kind, int32_t id);
 UTIL_API void ConvertTraceToText(const std::string& traceFilePath);
 UTIL_API void ReadTraceTable();
 UTIL_API void WriteTraceTable();
