@@ -1780,6 +1780,11 @@ namespace System.Windows
                 ShowCaret();
             }
         }
+        protected override void OnLostFocus()
+        {
+            base->OnLostFocus();
+            KillTimer(1u);
+        }
         protected override void OnClick()
         {
             base->OnClick();
