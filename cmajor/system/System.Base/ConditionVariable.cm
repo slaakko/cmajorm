@@ -17,29 +17,29 @@ namespace System.Threading
     
     public class ConditionVariable
     {
-        public nothrow ConditionVariable() : id(RtAllocateConditionVariable())
+        public nothrow ConditionVariable() : nativeHandle(RtAllocateConditionVariable())
         {
         }
         public ~ConditionVariable()
         {
-            if (id > 0)
+            if (nativeHandle != null)
             {
-                RtFreeConditionVariable(id);
+                RtFreeConditionVariable(nativeHandle);
             }            
         }
         suppress ConditionVariable(const ConditionVariable&);
         suppress void operator=(ConditionVariable&);
-        public nothrow ConditionVariable(ConditionVariable&& that) : id(that.id)
+        public nothrow ConditionVariable(ConditionVariable&& that) : nativeHandle(that.nativeHandle)
         {
-            that.id = -1;
+            that.nativeHandle = null;
         }
         public nothrow void operator=(ConditionVariable&& that)
         {
-            Swap(id, that.id);
+            Swap(nativeHandle, that.nativeHandle);
         }
         public void NotifyOne()
         {
-            int result = RtNotifyOne(id);
+            int result = RtNotifyOne(nativeHandle);
             if (result < 0)
             {
                 string message = RtGetError(result);
@@ -49,7 +49,7 @@ namespace System.Threading
         }
         public void NotifyAll()
         {
-            int result = RtNotifyAll(id);
+            int result = RtNotifyAll(nativeHandle);
             if (result < 0)
             {
                 string message = RtGetError(result);
@@ -59,7 +59,7 @@ namespace System.Threading
         }
         public void Wait(RecursiveMutex& mtx)
         {
-            int result = RtWaitConditionVariable(id, cast<void*>(&mtx));
+            int result = RtWaitConditionVariable(nativeHandle, mtx.NativeHandle());
             if (result < 0)
             {
                 string message = RtGetError(result);
@@ -69,7 +69,7 @@ namespace System.Threading
         }
         public ConditionVariableStatus WaitFor(RecursiveMutex& mtx, const Duration& duration)
         {
-            int result = RtWaitConditionVariableDuration(id, cast<void*>(&mtx), duration.Rep());
+            int result = RtWaitConditionVariableDuration(nativeHandle, mtx.NativeHandle(), duration.Rep());
             if (result < 0)
             {
                 string message = RtGetError(result);
@@ -129,6 +129,6 @@ namespace System.Threading
             Duration duration = tp - Now();
             return WaitFor(mtx, predicateMethod, arg, duration);
         }
-        private int id;
+        private void* nativeHandle;
     }
 }

@@ -10,12 +10,15 @@ namespace System.Threading
 {
     public class Mutex
     {
-        public nothrow Mutex() : mutexId(RtAllocateMutex())
+        public nothrow Mutex() : nativeHandle(RtAllocateMutex())
         {
         }
         public ~Mutex()
         {
-            RtFreeMutex(mutexId);
+            if (nativeHandle != null)
+            {
+                RtFreeMutex(nativeHandle);
+            }
         }
         suppress Mutex(const Mutex&);
         suppress void operator=(Mutex&);
@@ -23,23 +26,26 @@ namespace System.Threading
         suppress void operator=(Mutex&&);
         public nothrow void Lock()
         {
-            RtLockMutex(mutexId);
+            RtLockMutex(nativeHandle);
         }
         public nothrow void Unlock()
         {
-            RtUnlockMutex(mutexId);
+            RtUnlockMutex(nativeHandle);
         }
-        private int mutexId;
+        private void* nativeHandle;
     }
     
     public class RecursiveMutex
     {
-        public nothrow RecursiveMutex() : mutexId(RtAllocateRecursiveMutex())
+        public nothrow RecursiveMutex() : nativeHandle(RtAllocateRecursiveMutex())
         {
         }
         public ~RecursiveMutex()
         {
-            RtFreeRecursiveMutex(mutexId);
+            if (nativeHandle != null)
+            {
+                RtFreeRecursiveMutex(nativeHandle);
+            }
         }
         suppress RecursiveMutex(const RecursiveMutex&);
         suppress void operator=(RecursiveMutex&);
@@ -47,13 +53,17 @@ namespace System.Threading
         suppress void operator=(RecursiveMutex&&);
         public nothrow void Lock()
         {
-            RtLockRecursiveMutex(mutexId);
+            RtLockRecursiveMutex(nativeHandle);
         }
         public nothrow void Unlock()
         {
-            RtUnlockRecursiveMutex(mutexId);
+            RtUnlockRecursiveMutex(nativeHandle);
         }
-        private int mutexId;
+        public nothrow void* NativeHandle() const
+        {
+            return nativeHandle;
+        }
+        private void* nativeHandle;
     }
     
     public concept Lockable<T>

@@ -7,24 +7,15 @@
 #define CMAJOR_RTS_MUTEX_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
-#include <mutex>
 
-extern "C" RT_API int32_t RtAllocateMutex();
-extern "C" RT_API void RtFreeMutex(int32_t mutexId);
-extern "C" RT_API void RtLockMutex(int32_t mutexId);
-extern "C" RT_API void RtUnlockMutex(int32_t mutexId);
+extern "C" RT_API void* RtAllocateMutex();
+extern "C" RT_API void RtFreeMutex(void* nativeHandle);
+extern "C" RT_API void RtLockMutex(void* nativeHandle);
+extern "C" RT_API void RtUnlockMutex(void* nativeHandle);
 
-extern "C" RT_API int32_t RtAllocateRecursiveMutex();
-extern "C" RT_API void RtFreeRecursiveMutex(int32_t mutexId);
-extern "C" RT_API void RtLockRecursiveMutex(int32_t mutexId);
-extern "C" RT_API void RtUnlockRecursiveMutex(int32_t mutexId);
-
-namespace cmajor { namespace rt { 
-
-std::recursive_mutex& GetRecursiveMutex(int32_t mutexId);
-void InitMutex();
-void DoneMutex();
-
-} } // namespace cmajor::rt
+extern "C" RT_API void* RtAllocateRecursiveMutex();
+extern "C" RT_API void RtFreeRecursiveMutex(void* nativeHandle);
+extern "C" RT_API void RtLockRecursiveMutex(void* nativeHandle);
+extern "C" RT_API void RtUnlockRecursiveMutex(void* nativeHandle);
 
 #endif // CMAJOR_RTS_MUTEX_INCLUDED

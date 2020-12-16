@@ -8,18 +8,11 @@
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
-namespace cmajor { namespace rt {
-
-void InitConditionVariable();
-void DoneConditionVariable();
-
-} } // namespace cmajor::rt
-
-extern "C" RT_API int32_t RtAllocateConditionVariable();
-extern "C" RT_API int32_t RtFreeConditionVariable(int32_t conditionVariableId);
-extern "C" RT_API int32_t RtNotifyOne(int32_t conditionVariableId);
-extern "C" RT_API int32_t RtNotifyAll(int32_t conditionVariableId);
-extern "C" RT_API int32_t RtWaitConditionVariable(int32_t conditionVariableId, void* recursiveMutex);
-extern "C" RT_API int32_t RtWaitConditionVariableDuration(int32_t conditionVariableId, void* recursiveMutex, int64_t nanoseconds);
+extern "C" RT_API void* RtAllocateConditionVariable();
+extern "C" RT_API void RtFreeConditionVariable(void* nativeHandle);
+extern "C" RT_API int32_t RtNotifyOne(void* nativeHandle);
+extern "C" RT_API int32_t RtNotifyAll(void* nativeHandle);
+extern "C" RT_API int32_t RtWaitConditionVariable(void* nativeHandle, void* recursiveMutexHandle);
+extern "C" RT_API int32_t RtWaitConditionVariableDuration(void* nativeHandle, void* recursiveMutexHandle, int64_t nanoseconds);
 
 #endif // CMAJOR_RTS_CONDITION_VARIABLE_INCLUDED

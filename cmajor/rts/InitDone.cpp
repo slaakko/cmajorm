@@ -26,7 +26,7 @@
 #include <cmajor/rts/Environment.hpp>
 #include <cmajor/rts/Unwind.hpp>
 #include <cmajor/rts/Debug.hpp>
-#include <csignal>
+#include <mutex>
 
 GlobalInitFunctionType initCompileUnitsFunction = nullptr;
 
@@ -80,7 +80,6 @@ namespace cmajor { namespace rt {
 
 void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
 {
-    InitMutex();
     soulng::util::Init();
     sngxml::xpath::Init();
     InitIo();
@@ -89,7 +88,6 @@ void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassI
     InitError();
     InitString();
     InitMemory();
-    InitConditionVariable();
     InitThread();
     InitSocket();
     InitEnvironment();
@@ -115,7 +113,6 @@ void Done()
     DoneEnvironment();
     DoneSocket();
     DoneThread();
-    DoneConditionVariable();
     DoneMemory();
     DoneString();
     DoneError();
@@ -124,7 +121,6 @@ void Done()
     DoneIo();
     sngxml::xpath::Done();
     soulng::util::Done();
-    DoneMutex();
 }
 
 } } // namespace cmajor::rt
