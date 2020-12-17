@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Tracing</title>
+    <link rel="stylesheet" type="text/css" href="../../style/tool.css" />
+</head>
+<body>
+    <h1>Tracing</h1>
+    
+	<p>
+		Tracing a (portion of a) Cmajor program consists of the following phases:
+		
+		<ol>
+			<li>Insert <em>RtBeginTracing</em> and <em>RtEndTracing</em> function calls to the program being traced.</li>
+			<li>Compile the system library and the program using the <em>trace</em> configuration option.</li>
+			<li>Run the program compiled with the <em>trace</em> configuration.</li>
+			<li>Convert the <em>trace.bin</em> binary trace file that is generated to the Cmajor <em>trace</em> subdirectory to a text file using the <em>cmtrace2txt</em> utility.</li>
+			<li>Inspect the trace text file.</li>
+		</ol>
+		
+	</p>
+
+	<h2>
+		Starting and stopping tracing
+	</h2>
+	
+	<p>
+		Tracing begins when the program being traced issues the <em>RtBeginTracing</em> function call and ends when the program issues the <em>RtEndTracing</em> function call.
+		When the tracing ends the RtEndTracing function writes a binary <strong>trace.bin</strong> file to the <em>trace</em> subdirectory of the Cmajor installation directory.
+	</p>
+	
+	<h2>
+		Compiling the system library and the program using the <em>trace</em> configuration option.</li>
+	</h2>
+	
+	<p>
+		To instrument the system library for tracing, compile it using the <em>trace</em> configration option:		
+		<pre>
+			C:\cmajor\system\platform\windows> cmc -u -v -c=trace System.cms
+		</pre>
+	</p>
+	
+	<p>
+		To instrument the program being traced, for example <em>program.cmp</em>, compile it using the <em>trace</em> configuration option:
+		<pre>
+			cmc -u -v -c=trace program.cmp
+		</pre>
+	</p>
+	
+	<p>
+		These two commands generate a text file <strong>trace.tab</strong> to the <em>trace</em> subdirectory of the Cmajor installation directory.
+		The trace.tab contains one line for each function contained by the system library and the program.
+		The line consists of an integer identifier for the function, a colon, and the full name of the function.
+	</p>
+	
+	<p>
+		When the system library and the program is compiled with the <em>trace</em> configration, each function in the system library and the program begin traced is instrumented 
+		by function calls <em>RtBeginTraceFunction</em> and <em>RtEndTraceFunction</em> that generate a <em>trace entry</em> to the <strong>trace.bin</strong> file.
+	</p>
+	
+	<p>
+		Each trace entry (14 bytes) consists of 
+		<ol>
+			<li>The type of the entry: <strong>begin</strong>=0 or <strong>end</strong>=1 (1 byte).</li>
+			<li>A thread identifier character set by the program using <em>RtSetThreadId</em> function call, or '0' if the thread identifier is not explicitly set (1 byte).</li>
+			<li>A function identifier integer of the function (4 bytes).</li>
+			<li>A timestamp containing nanoseconds elapsed since the <em>RtBeginTracing</em> function call (8 bytes).</li>
+		</ol>
+	</p>
+	
+	<h2>
+		Running the instrumented program.
+	</h2>
+	
+	<p>
+		When the instrumented program is run, the <em>RtEndTracing</em> function generates a binary <strong>trace.bin</strong> 
+		file to the <em>trace</em> subdirectory of the Cmajor installation directory that contains the trace information.
+	</p>
+	
+	<h2>
+		Converting the <em>trace.bin</em> file to a text file.
+	</h2>
+	
+	<p>
+		Run the following command:
+		<pre>
+			C:\cmajor\trace> cmtrace2txt -v trace.bin
+		</pre>
+
+		The command converts the trace.bin to <strong>trace.txt</strong>.
+	</p>
+	
+	<h2>
+		Inspecting <em>trace.txt</em>.
+	</h2>
+	
+	<p>
+		The trace looks like the following:
+	</p>
+	
+	<pre>
+00:00:01.936.268.100 M  &gt;System.Windows.Control.ProcessMessageInternal(Message&)
+00:00:01.936.268.500 M   &gt;System.Windows.Window.ProcessMessage(Message&)
+00:00:01.936.268.700 M    &gt;System.Windows.ContainerControl.ProcessMessage(Message&)
+00:00:01.936.269.100 M     &gt;System.Windows.Control.ProcessMessage(Message&)
+00:00:01.936.269.400 M      &gt;System.Windows.Control.DoTimer(uint)
+00:00:01.936.269.700 M       &gt;System.Windows.TimerEventArgs.TimerEventArgs(uint)
+00:00:01.936.269.700 M       &lt;System.Windows.TimerEventArgs.TimerEventArgs(uint) duration=00:00:00.000.000.000
+00:00:01.936.270.000 M       &gt;cmcode.MainWindow.OnTimer(TimerEventArgs&)
+00:00:01.936.270.400 M        &gt;cmcode.MainConfiguration.Instance()
+00:00:01.936.270.700 M         &gt;UniquePtr&lt;cmcode.MainConfiguration&gt;.operator*()
+00:00:01.936.270.700 M         &lt;UniquePtr&lt;cmcode.MainConfiguration&gt;.operator*() duration=00:00:00.000.000.000
+00:00:01.936.270.800 M        &lt;cmcode.MainConfiguration.Instance() duration=00:00:00.000.000.400
+00:00:01.936.270.900 M        &gt;cmcode.MainConfiguration.Save(bool)
+00:00:01.936.271.100 M        &lt;cmcode.MainConfiguration.Save(bool) duration=00:00:00.000.000.200
+00:00:01.936.271.200 M       &lt;cmcode.MainWindow.OnTimer(TimerEventArgs&) duration=00:00:00.000.001.200
+00:00:01.936.271.200 M      &lt;System.Windows.Control.DoTimer(uint) duration=00:00:00.000.001.800
+00:00:01.936.271.500 M     &lt;System.Windows.Control.ProcessMessage(Message&) duration=00:00:00.000.002.400
+00:00:01.936.271.600 M    &lt;System.Windows.ContainerControl.ProcessMessage(Message&) duration=00:00:00.000.002.900
+00:00:01.936.271.700 M   &lt;System.Windows.Window.ProcessMessage(Message&) duration=00:00:00.000.003.200
+00:00:01.936.271.800 M  &lt;System.Windows.Control.ProcessMessageInternal(Message&) duration=00:00:00.000.003.700
+00:00:01.936.271.900 M  &gt;System.Windows.Debug.Messages()
+00:00:01.936.271.900 M  &lt;System.Windows.Debug.Messages() duration=00:00:00.000.000.000
+00:00:01.936.272.100 M &lt;System.Windows.Application.ProcessMessage(void*, uint, uint, long, long&, void*&) duration=00:00:00.000.011.700
+	</pre>
+	
+	<p>
+		Each trace line consists of the following fields:
+		<ol>
+			<li>Timestamp that shows hours, minutes, seconds, milliseconds, microseconds and nanoseconds elapsed since the <em>RtBeginTracing</em> function call.</li>
+			<li>Thread identifier character (here 'M' for the main thread). The thread identifier can be set by calling the <em>RtSetThreadId</em> function from the program being traced.</li>
+			<li>Space characters show the nesting level of the function being traced.</li>
+			<li>'&gt;' character for the start of the function trace entry and '&lt;' character for the end of the function trace entry.</li>
+			<li>The full name of the function being traced.</li>
+			<li>If the entry is an end function entry, the duration field shows the duration of the function call.
+		</ol>
+	</p>
+</body>

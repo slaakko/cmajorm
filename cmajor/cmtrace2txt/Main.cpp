@@ -24,7 +24,14 @@ struct InitDone
 
 void PrintHelp()
 {
-
+    std::cout << "Trace file conversion utility" << std::endl;
+    std::cout << "Usage: cmtrace2txt [options] <trace.file>" << std::endl;
+    std::cout << "Converts a binary trace file to a text file for inspection." << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "--verbose | -v" << std::endl;
+    std::cout << "  Be verbose." << std::endl;
+    std::cout << "--help | -h" << std::endl;
+    std::cout << "  Print help and exit." << std::endl;
 }
 
 int main(int argc, const char** argv)
