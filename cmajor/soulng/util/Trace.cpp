@@ -398,7 +398,7 @@ void EndTracing()
 #ifdef _WIN32
 __declspec(thread) char threadId = '0';
 #else
-__thread char* threadId = '0';
+__thread char threadId = '0';
 #endif
 
 
