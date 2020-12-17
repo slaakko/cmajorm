@@ -1,7 +1,7 @@
 include ../Makefile.common
 
 OBJECTS = Ascii.o CallStack.o Classes.o Compression.o ConditionVariable.o Debug.o Directory.o Environment.o Error.o Fiber.o InitDone.o Io.o Math.o Memory.o \
-Multiprecision.o Mutex.o Process.o Profile.o Random.o Screen.o Socket.o Statics.o String.o Thread.o Time.o UnitTest.o Unwind.o BZ2Interface.o ZlibInterface.o
+Multiprecision.o Mutex.o Process.o Profile.o Random.o Screen.o Socket.o Statics.o String.o Thread.o Time.o Trace.o UnitTest.o Unwind.o BZ2Interface.o ZlibInterface.o
 
 LIBRARIES = ../lib/libcmsngutil.a ../lib/libcmsnglexer.a ../lib/libcmsngparser.a ../lib/libcmsngxmlxml.a ../lib/libcmsngxmldom.a ../lib/libcmsngxmlxpath.a \
 ../lib/libcmsngcmast.a ../lib/libcmsngcmcmlexer.a ../lib/libcmsngcmcmparser.a ../lib/libcmcommon.a ../lib/libcmir.a ../lib/libcmllvm.a ../lib/libcmsymbols.a \
