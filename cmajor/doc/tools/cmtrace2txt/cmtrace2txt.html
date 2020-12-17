@@ -13,7 +13,8 @@
 		Tracing a (portion of a) Cmajor program consists of the following phases:
 		
 		<ol>
-			<li>Insert <em>RtBeginTracing</em> and <em>RtEndTracing</em> function calls to the program being traced.</li>
+			<li>Insert <a href="../../system/content/System.Runtime/index.html#RtBeginTracing">RtBeginTracing</a> and 
+			<a href="../../system/content/System.Runtime/index.html#RtEndTracing">RtEndTracing</a> function calls to the program being traced.</li>
 			<li>Compile the system library and the program using the <em>trace</em> configuration option.</li>
 			<li>Run the program compiled with the <em>trace</em> configuration.</li>
 			<li>Convert the <em>trace.bin</em> binary trace file that is generated to the Cmajor <em>trace</em> subdirectory to a text file using the <em>cmtrace2txt</em> utility.</li>
@@ -57,14 +58,16 @@
 	
 	<p>
 		When the system library and the program is compiled with the <em>trace</em> configration, each function in the system library and the program begin traced is instrumented 
-		by function calls <em>RtBeginTraceFunction</em> and <em>RtEndTraceFunction</em> that generate a <em>trace entry</em> to the <strong>trace.bin</strong> file.
+		by function calls <a href="../../system/content/System.Runtime/index.html#RtBeginTraceFunction">RtBeginTraceFunction</a> and 
+		<a href="../../system/content/System.Runtime/index.html#RtEndTraceFunction">RtEndTraceFunction</a> that generate a <em>trace entry</em> to the <strong>trace.bin</strong> file.
 	</p>
 	
 	<p>
 		Each trace entry (14 bytes) consists of 
 		<ol>
 			<li>The type of the entry: <strong>begin</strong>=0 or <strong>end</strong>=1 (1 byte).</li>
-			<li>A thread identifier character set by the program using <em>RtSetThreadId</em> function call, or '0' if the thread identifier is not explicitly set (1 byte).</li>
+			<li>A thread identifier character set by the program using <a href="../../system/content/System.Runtime/index.html#RtSetThreadId">RtSetThreadId</a> function call, 
+			or '0' if the thread identifier is not explicitly set (1 byte).</li>
 			<li>A function identifier integer of the function (4 bytes).</li>
 			<li>A timestamp containing nanoseconds elapsed since the <em>RtBeginTracing</em> function call (8 bytes).</li>
 		</ol>

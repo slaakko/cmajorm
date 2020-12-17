@@ -22,12 +22,20 @@
     <td xml:space="preserve"><a href="../../System.Windows/doc/class_EditCommandList_FADBEB51ADEA151029F4D858ECCA5E8979D596D9.html#member_function_AddCommand_EditCommandList_09013D0EC34FBFD12FF15FAC9BA06C9AFC6857B2">AddCommand</a>(<a href="../../System.Windows/doc/class_EditCommand_856F1EFC60A9A25DC289ACDA084A331A0E5F9D7D.html">EditCommand</a>*&nbsp;command)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Windows/doc/class_EditCommandList_FADBEB51ADEA151029F4D858ECCA5E8979D596D9.html#member_function_BeginGroup_EditCommandList_5AE48300BB6B1048298ED66A0337FAD75185528C">BeginGroup</a>()</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
     <td xml:space="preserve"><a href="../../System.Windows/doc/class_EditCommandList_FADBEB51ADEA151029F4D858ECCA5E8979D596D9.html#member_function_CanRedo_EditCommandList_003634434267C7408258395428C2E01E2079E959">CanRedo</a>()&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
     <td xml:space="preserve"><a href="../../System.Windows/doc/class_EditCommandList_FADBEB51ADEA151029F4D858ECCA5E8979D596D9.html#member_function_CanUndo_EditCommandList_066437A7A50660C90136D134356BA56C56CB4435">CanUndo</a>()&nbsp;<span class="kw">const</span></td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../System.Windows/doc/class_EditCommandList_FADBEB51ADEA151029F4D858ECCA5E8979D596D9.html#member_function_EndGroup_EditCommandList_AE6D60C89FCA99AC407C444B587E30601BEBFAEF">EndGroup</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -55,6 +63,14 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">int</span></td>
     <td xml:space="preserve">currentIndex</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../System.Windows/doc/class_GroupCommand_52CAA6A2F8AF683DED8D6D5F60A0F112D1F21E99.html">GroupCommand</a>></td>
+    <td xml:space="preserve">groupCommand</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve">inGroup</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../System.Windows/doc/class_MenuItem_4DA94BB6D1B0CFA968E2A33ED1F77C58EAECDD67.html">MenuItem</a>*</td>
@@ -85,6 +101,13 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="member_function_BeginGroup_EditCommandList_5AE48300BB6B1048298ED66A0337FAD75185528C" xml:space="preserve">BeginGroup&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;BeginGroup()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html#98">98</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html">System.Windows/EditCommand.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="member_function_CanRedo_EditCommandList_003634434267C7408258395428C2E01E2079E959" xml:space="preserve">CanRedo&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;CanRedo()</h4>
   <h5>Definition</h5>
@@ -99,10 +122,17 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="member_function_EndGroup_EditCommandList_AE6D60C89FCA99AC407C444B587E30601BEBFAEF" xml:space="preserve">EndGroup&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;EndGroup()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html#103">103</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html">System.Windows/EditCommand.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="member_function_Redo_EditCommandList_9546645AB880995EA67698596920ADDFDC50A5E2" xml:space="preserve">Redo&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Redo()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html#81">81</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html">System.Windows/EditCommand.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html#88">88</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html">System.Windows/EditCommand.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -116,7 +146,7 @@
   <h3 id="member_function_Undo_EditCommandList_F97367E50F54DC0AB2A97E65F012FE18CAFDB6E3" xml:space="preserve">Undo&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Undo()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html#71">71</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html">System.Windows/EditCommand.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html#78">78</a>&nbsp;of&nbsp;<a href="../../System.Windows/file/EditCommand.cm.html">System.Windows/EditCommand.cm</a></span>
   <br/>
   <br/>
   <hr/>

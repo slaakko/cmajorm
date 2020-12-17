@@ -39,6 +39,9 @@
     <td xml:space="preserve"><a href="file/StaticInitCriticalSection.cm.html">System.Runtime/StaticInitCriticalSection.cm</a></td>
    </tr>
    <tr>
+    <td xml:space="preserve"><a href="file/Tracer.cm.html">System.Runtime/Tracer.cm</a></td>
+   </tr>
+   <tr>
     <td xml:space="preserve"><a href="file/Unwind.cm.html">System.Runtime/Unwind.cm</a></td>
    </tr>
    <tr>
@@ -276,15 +279,15 @@
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtAddStr">RtAddStr</a>(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;str)</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*</td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtAllocateConditionVariable">RtAllocateConditionVariable</a>()</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*</td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtAllocateMutex">RtAllocateMutex</a>()</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*</td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtAllocateRecursiveMutex">RtAllocateRecursiveMutex</a>()</td>
    </tr>
    <tr>
@@ -338,6 +341,14 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtBeginStaticInitCriticalSection">RtBeginStaticInitCriticalSection</a>(<span class="kw">void</span>*&nbsp;staticClassId)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtBeginTraceFunction">RtBeginTraceFunction</a>(<span class="kw">int</span>&nbsp;traceFunctionId)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtBeginTracing">RtBeginTracing</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -701,6 +712,14 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtEndTraceFunction">RtEndTraceFunction</a>(<span class="kw">int</span>&nbsp;traceFunctionId)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtEndTracing">RtEndTracing</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtEndUnitTest">RtEndUnitTest</a>(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;testName, <span class="kw">int</span>&nbsp;exitCode)</td>
    </tr>
    <tr>
@@ -752,8 +771,8 @@
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtFlushAll">RtFlushAll</a>()</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtFreeConditionVariable">RtFreeConditionVariable</a>(<span class="kw">int</span>&nbsp;conditionVariableId)</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtFreeConditionVariable">RtFreeConditionVariable</a>(<span class="kw">void</span>*&nbsp;nativeHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -761,11 +780,11 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtFreeMutex">RtFreeMutex</a>(<span class="kw">int</span>&nbsp;mutexId)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtFreeMutex">RtFreeMutex</a>(<span class="kw">void</span>*&nbsp;nativeHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtFreeRecursiveMutex">RtFreeRecursiveMutex</a>(<span class="kw">int</span>&nbsp;mutexId)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtFreeRecursiveMutex">RtFreeRecursiveMutex</a>(<span class="kw">void</span>*&nbsp;nativeHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span>*</td>
@@ -965,11 +984,11 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtLockMutex">RtLockMutex</a>(<span class="kw">int</span>&nbsp;mutexId)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtLockMutex">RtLockMutex</a>(<span class="kw">void</span>*&nbsp;nativeHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtLockRecursiveMutex">RtLockRecursiveMutex</a>(<span class="kw">int</span>&nbsp;mutexId)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtLockRecursiveMutex">RtLockRecursiveMutex</a>(<span class="kw">void</span>*&nbsp;nativeHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">short</span></td>
@@ -1049,11 +1068,11 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtNotifyAll">RtNotifyAll</a>(<span class="kw">int</span>&nbsp;conditionVariableId)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtNotifyAll">RtNotifyAll</a>(<span class="kw">void</span>*&nbsp;nativeHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtNotifyOne">RtNotifyOne</a>(<span class="kw">int</span>&nbsp;conditionVariableId)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtNotifyOne">RtNotifyOne</a>(<span class="kw">void</span>*&nbsp;nativeHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span></td>
@@ -1205,6 +1224,10 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtSetThreadId">RtSetThreadId</a>(<span class="kw">char</span>&nbsp;threadId)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtSetUnitTestAssertionResult">RtSetUnitTestAssertionResult</a>(<span class="kw">int</span>&nbsp;assertionIndex, <span class="kw">bool</span>&nbsp;assertionResult, <span class="kw">int</span>&nbsp;lineNumber)</td>
    </tr>
    <tr>
@@ -1285,23 +1308,27 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtUnlockMutex">RtUnlockMutex</a>(<span class="kw">int</span>&nbsp;mutexId)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtUnlockMutex">RtUnlockMutex</a>(<span class="kw">void</span>*&nbsp;nativeHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtUnlockRecursiveMutex">RtUnlockRecursiveMutex</a>(<span class="kw">int</span>&nbsp;mutexId)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtUnlockRecursiveMutex">RtUnlockRecursiveMutex</a>(<span class="kw">void</span>*&nbsp;nativeHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtWaitConditionVariable">RtWaitConditionVariable</a>(<span class="kw">int</span>&nbsp;conditionVariableId, <span class="kw">void</span>*)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtWaitConditionVariable">RtWaitConditionVariable</a>(<span class="kw">void</span>*&nbsp;nativeHandle, <span class="kw">void</span>*&nbsp;recursiveMutexHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
-    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtWaitConditionVariableDuration">RtWaitConditionVariableDuration</a>(<span class="kw">int</span>&nbsp;conditionVariableId, <span class="kw">void</span>*, <span class="kw">long</span>&nbsp;duration)</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtWaitConditionVariableDuration">RtWaitConditionVariableDuration</a>(<span class="kw">void</span>*&nbsp;nativeHandle, <span class="kw">void</span>*&nbsp;recursiveMutexHandle, <span class="kw">long</span>&nbsp;duration)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">short</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtWhite">RtWhite</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtWindowsMessage">RtWindowsMessage</a>(<span class="kw">int</span>&nbsp;messageId)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
@@ -1330,6 +1357,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*</td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinBeginPaint">WinBeginPaint</a>(<span class="kw">void</span>*&nbsp;windowHandle, <span class="kw">void</span>*&amp;&nbsp;paintStruct)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinBeginTest">WinBeginTest</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
@@ -1422,6 +1453,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinEndPaint">WinEndPaint</a>(<span class="kw">void</span>*&nbsp;windowHandle, <span class="kw">void</span>*&nbsp;paintStruct)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinEndTest">WinEndTest</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
@@ -3224,21 +3259,21 @@
   <br/>
   <hr/>
   <h3 id="RtAllocateConditionVariable" xml:space="preserve">RtAllocateConditionVariable&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtAllocateConditionVariable()</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;RtAllocateConditionVariable()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#76">76</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtAllocateMutex" xml:space="preserve">RtAllocateMutex&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtAllocateMutex()</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;RtAllocateMutex()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#68">68</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtAllocateRecursiveMutex" xml:space="preserve">RtAllocateRecursiveMutex&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtAllocateRecursiveMutex()</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;RtAllocateRecursiveMutex()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#72">72</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
@@ -3332,6 +3367,20 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtBeginStaticInitCriticalSection(<span class="kw">void</span>*&nbsp;staticClassId)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#19">19</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtBeginTraceFunction" xml:space="preserve">RtBeginTraceFunction&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtBeginTraceFunction(<span class="kw">int</span>&nbsp;traceFunctionId)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#282">282</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtBeginTracing" xml:space="preserve">RtBeginTracing&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtBeginTracing()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#279">279</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -3965,6 +4014,20 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="RtEndTraceFunction" xml:space="preserve">RtEndTraceFunction&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtEndTraceFunction(<span class="kw">int</span>&nbsp;traceFunctionId)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#283">283</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtEndTracing" xml:space="preserve">RtEndTracing&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtEndTracing()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#280">280</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="RtEndUnitTest" xml:space="preserve">RtEndUnitTest&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtEndUnitTest(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;testName, <span class="kw">int</span>&nbsp;exitCode)</h4>
   <h5>Definition</h5>
@@ -4057,7 +4120,7 @@
   <br/>
   <hr/>
   <h3 id="RtFreeConditionVariable" xml:space="preserve">RtFreeConditionVariable&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtFreeConditionVariable(<span class="kw">int</span>&nbsp;conditionVariableId)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtFreeConditionVariable(<span class="kw">void</span>*&nbsp;nativeHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#77">77</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
@@ -4071,14 +4134,14 @@
   <br/>
   <hr/>
   <h3 id="RtFreeMutex" xml:space="preserve">RtFreeMutex&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtFreeMutex(<span class="kw">int</span>&nbsp;mutexId)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtFreeMutex(<span class="kw">void</span>*&nbsp;nativeHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#69">69</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtFreeRecursiveMutex" xml:space="preserve">RtFreeRecursiveMutex&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtFreeRecursiveMutex(<span class="kw">int</span>&nbsp;mutexId)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtFreeRecursiveMutex(<span class="kw">void</span>*&nbsp;nativeHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#73">73</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
@@ -4428,14 +4491,14 @@
   <br/>
   <hr/>
   <h3 id="RtLockMutex" xml:space="preserve">RtLockMutex&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtLockMutex(<span class="kw">int</span>&nbsp;mutexId)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtLockMutex(<span class="kw">void</span>*&nbsp;nativeHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#70">70</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtLockRecursiveMutex" xml:space="preserve">RtLockRecursiveMutex&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtLockRecursiveMutex(<span class="kw">int</span>&nbsp;mutexId)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtLockRecursiveMutex(<span class="kw">void</span>*&nbsp;nativeHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#74">74</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
@@ -4575,14 +4638,14 @@
   <br/>
   <hr/>
   <h3 id="RtNotifyAll" xml:space="preserve">RtNotifyAll&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtNotifyAll(<span class="kw">int</span>&nbsp;conditionVariableId)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtNotifyAll(<span class="kw">void</span>*&nbsp;nativeHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#79">79</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtNotifyOne" xml:space="preserve">RtNotifyOne&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtNotifyOne(<span class="kw">int</span>&nbsp;conditionVariableId)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtNotifyOne(<span class="kw">void</span>*&nbsp;nativeHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#78">78</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
@@ -4847,6 +4910,13 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="RtSetThreadId" xml:space="preserve">RtSetThreadId&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtSetThreadId(<span class="kw">char</span>&nbsp;threadId)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#281">281</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="RtSetUnitTestAssertionResult" xml:space="preserve">RtSetUnitTestAssertionResult&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtSetUnitTestAssertionResult(<span class="kw">int</span>&nbsp;assertionIndex, <span class="kw">bool</span>&nbsp;assertionResult, <span class="kw">int</span>&nbsp;lineNumber)</h4>
   <h5>Definition</h5>
@@ -4988,28 +5058,28 @@
   <br/>
   <hr/>
   <h3 id="RtUnlockMutex" xml:space="preserve">RtUnlockMutex&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtUnlockMutex(<span class="kw">int</span>&nbsp;mutexId)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtUnlockMutex(<span class="kw">void</span>*&nbsp;nativeHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#71">71</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtUnlockRecursiveMutex" xml:space="preserve">RtUnlockRecursiveMutex&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtUnlockRecursiveMutex(<span class="kw">int</span>&nbsp;mutexId)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtUnlockRecursiveMutex(<span class="kw">void</span>*&nbsp;nativeHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#75">75</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtWaitConditionVariable" xml:space="preserve">RtWaitConditionVariable&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtWaitConditionVariable(<span class="kw">int</span>&nbsp;conditionVariableId, <span class="kw">void</span>*)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtWaitConditionVariable(<span class="kw">void</span>*&nbsp;nativeHandle, <span class="kw">void</span>*&nbsp;recursiveMutexHandle)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#80">80</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="RtWaitConditionVariableDuration" xml:space="preserve">RtWaitConditionVariableDuration&nbsp;Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtWaitConditionVariableDuration(<span class="kw">int</span>&nbsp;conditionVariableId, <span class="kw">void</span>*, <span class="kw">long</span>&nbsp;duration)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtWaitConditionVariableDuration(<span class="kw">void</span>*&nbsp;nativeHandle, <span class="kw">void</span>*&nbsp;recursiveMutexHandle, <span class="kw">long</span>&nbsp;duration)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#81">81</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
@@ -5019,6 +5089,13 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">short</span>&nbsp;RtWhite()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#246">246</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtWindowsMessage" xml:space="preserve">RtWindowsMessage&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtWindowsMessage(<span class="kw">int</span>&nbsp;messageId)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#284">284</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -5068,6 +5145,13 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;WinBeginPaint(<span class="kw">void</span>*&nbsp;windowHandle, <span class="kw">void</span>*&amp;&nbsp;paintStruct)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#53">53</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinBeginTest" xml:space="preserve">WinBeginTest&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;WinBeginTest()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#280">280</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -5229,6 +5313,13 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;WinEndPaint(<span class="kw">void</span>*&nbsp;windowHandle, <span class="kw">void</span>*&nbsp;paintStruct)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#54">54</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinEndTest" xml:space="preserve">WinEndTest&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;WinEndTest()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#281">281</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
   <br/>
   <br/>
   <hr/>

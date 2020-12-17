@@ -7,7 +7,7 @@
  <body>
   <h1>RecursiveMutex Class</h1>
   <h2>Definition</h2>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#35">35</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#38">38</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
   <h2>Constructors &amp; Destructor</h2>
   <table>
    <tr>
@@ -34,6 +34,10 @@
     <td xml:space="preserve"><a href="../../System.Base/doc/class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82.html#member_function_Lock_RecursiveMutex_5C949C31F1236AAB4AF7907CBC42E452E115C04D">Lock</a>()</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*</td>
+    <td xml:space="preserve"><a href="../../System.Base/doc/class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82.html#member_function_NativeHandle_RecursiveMutex_BAE2BCA8329B38FB127E4537F35D442B5A7FFF40">NativeHandle</a>()&nbsp;<span class="kw">const</span></td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../System.Base/doc/class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82.html#member_function_Unlock_RecursiveMutex_E4FE0318580B755039B989B5031F79CBCA10FF12">Unlock</a>()</td>
    </tr>
@@ -49,36 +53,36 @@
   <h2>Member Variables</h2>
   <table>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">int</span></td>
-    <td xml:space="preserve">mutexId</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span>*</td>
+    <td xml:space="preserve">nativeHandle</td>
    </tr>
   </table>
   <h2>Constructor&amp; Destructor Details</h2>
   <h3 id="default_constructor_RecursiveMutex_94141E837C4D9A35F5AE7BB3C133A4D4770992B9" xml:space="preserve">RecursiveMutex&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;RecursiveMutex()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#37">37</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#40">40</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="move_constructor_RecursiveMutex_60265A751E149B5C0D93FB1BD6619373667BAB53" xml:space="preserve">RecursiveMutex&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">suppress</span>&nbsp;RecursiveMutex(<a href="../../System.Base/doc/class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82.html">RecursiveMutex</a>&amp;&amp;)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#46">46</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#52">52</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="copy_constructor_RecursiveMutex_80FF36CF4B97993F92D29128B3000969CEAE4A5E" xml:space="preserve">RecursiveMutex&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">suppress</span>&nbsp;RecursiveMutex(<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82.html">RecursiveMutex</a>&amp;)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#44">44</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#50">50</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="destructor_RecursiveMutex_C80CD5C4E989D0380C0814837FEEFB3804FA1432" xml:space="preserve">~RecursiveMutex&nbsp;Destructor</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;~RecursiveMutex()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#40">40</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#43">43</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -86,28 +90,35 @@
   <h3 id="member_function_Lock_RecursiveMutex_5C949C31F1236AAB4AF7907CBC42E452E115C04D" xml:space="preserve">Lock&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Lock()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#48">48</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#54">54</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_NativeHandle_RecursiveMutex_BAE2BCA8329B38FB127E4537F35D442B5A7FFF40" xml:space="preserve">NativeHandle&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;NativeHandle()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#62">62</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Unlock_RecursiveMutex_E4FE0318580B755039B989B5031F79CBCA10FF12" xml:space="preserve">Unlock&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Unlock()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#52">52</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#58">58</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_op_assign_RecursiveMutex_7B5FEF8F955B232D4F927327DF697135DD2ACB96" xml:space="preserve">operator=&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">suppress</span>&nbsp;<span class="kw">void</span>&nbsp;operator=(<a href="../../System.Base/doc/class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82.html">RecursiveMutex</a>&amp;)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#45">45</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#51">51</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="move_assignment_op_assign_RecursiveMutex_68EBA3B81F119A9A206AED3E0DA51D8338478435" xml:space="preserve">operator=&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">suppress</span>&nbsp;<span class="kw">void</span>&nbsp;operator=(<a href="../../System.Base/doc/class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82.html">RecursiveMutex</a>&amp;&amp;)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#47">47</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../System.Base/file/Mutex.cm.html#53">53</a>&nbsp;of&nbsp;<a href="../../System.Base/file/Mutex.cm.html">System.Base/Mutex.cm</a></span>
   <br/>
   <br/>
   <hr/>

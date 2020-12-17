@@ -271,13 +271,14 @@ function drawInheritanceDiagram() {
         { name: "System.Windows.EditCommand", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Windows/doc/class_EditCommand_856F1EFC60A9A25DC289ACDA084A331A0E5F9D7D.html" },
         { name: "System.Windows.BacktabCommand", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_BacktabCommand_D977EE800B3F7AE4962AF8D2BD326975905E5B35.html" },
         { name: "System.Windows.DeleteCharCommand", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_DeleteCharCommand_05C4234748B7102F9D29739DF9E935F9D4D7B471.html" },
-        { name: "System.Windows.IndentSelectionCommand", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_IndentSelectionCommand_176245DF01E1BAA800B1F8632F1E1A87069A2CE9.html" },
-        { name: "System.Windows.InsertCharCommand", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_InsertCharCommand_374954064B786BC06A774F36E749EF9D60FCDB45.html" },
+        { name: "System.Windows.GroupCommand", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_GroupCommand_52CAA6A2F8AF683DED8D6D5F60A0F112D1F21E99.html" },
+        { name: "System.Windows.IndentSelectionCommand", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_IndentSelectionCommand_176245DF01E1BAA800B1F8632F1E1A87069A2CE9.html" },
+        { name: "System.Windows.InsertCharCommand", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_InsertCharCommand_374954064B786BC06A774F36E749EF9D60FCDB45.html" },
         { name: "System.Windows.InsertLinesCommand", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_InsertLinesCommand_56CE56C76E1E78531DD9DF81CC81B7FCE6284D51.html" },
         { name: "System.Windows.NewLineCommand", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_NewLineCommand_EB4D2E198DB43AD79631F22387EA56FD5E6E9797.html" },
-        { name: "System.Windows.RemoveSelectionCommand", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_RemoveSelectionCommand_683A6D44C913CD6DBCB7FDD7ED90DFECF8FD98B1.html" },
-        { name: "System.Windows.TabCommand", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TabCommand_4480F4659005582D43347871A8A15D273DB8E598.html" },
-        { name: "System.Windows.UnindentSelectionCommand", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_UnindentSelectionCommand_96FD5D66384BC35CF0C32A6E5DCDCC50BA18CC25.html" }];
+        { name: "System.Windows.RemoveSelectionCommand", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_RemoveSelectionCommand_683A6D44C913CD6DBCB7FDD7ED90DFECF8FD98B1.html" },
+        { name: "System.Windows.TabCommand", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TabCommand_4480F4659005582D43347871A8A15D273DB8E598.html" },
+        { name: "System.Windows.UnindentSelectionCommand", id: "diagram_node_10", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_UnindentSelectionCommand_96FD5D66384BC35CF0C32A6E5DCDCC50BA18CC25.html" }];
     drawDiagram(diagramNodes);
 }
 
