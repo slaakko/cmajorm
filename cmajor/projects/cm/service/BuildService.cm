@@ -309,7 +309,6 @@ namespace Cm.Service.Build
                 stopKeepAlives = false;
                 while (!stopKeepAlives)
                 {
-                    LockGuard<RecursiveMutex> lock(keepAliveMutex);
                     if (stopKeepAlivesVar.WaitFor(keepAliveMutex, StopKeepAlives, null, Duration.FromSeconds(defaultKeepAliveIntervalSeconds)))
                     {
                         return;

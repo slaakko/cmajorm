@@ -100,7 +100,6 @@ namespace Cm.Service.Run
         }
         public CmdbSessionRequest* GetRequest()
         {
-            LockGuard<RecursiveMutex> lock(mtx);
             if (requestVar.WaitFor(mtx, RequestWaiting, null, Duration.FromMilliseconds(250)))
             {
                 requestWaiting = false;
@@ -295,7 +294,6 @@ namespace Cm.Service.Run
             request.Reset(new CmdbInputRequest(this));
             requestVar.NotifyOne();
             {
-                LockGuard<RecursiveMutex> lock(mtx);
                 replyVar.Wait(mtx, ReplyReady, null);
                 if (!reply.IsNull() && (reply.Get() is CmdbInputReply*))
                 {
@@ -339,7 +337,6 @@ namespace Cm.Service.Run
                         request.Reset(new CmdbOutputRequest(this, handle, output));
                         requestVar.NotifyOne();
                         {
-                            LockGuard<RecursiveMutex> lock(mtx);
                             replyVar.Wait(mtx, ReplyReady, null);
                         }
                         requestWaiting = false;
