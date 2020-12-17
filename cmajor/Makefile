@@ -41,6 +41,7 @@ build:
 	$(MAKE) -C cmdoc
 	$(MAKE) -C cmmdump
 	$(MAKE) -C cmfileredirector
+	$(MAKE) -C cmtrace2txt
 	$(MAKE) -C eh
 	$(MAKE) -C rt
 
@@ -68,7 +69,7 @@ SRCDIR = ~/cmajor-3.8.0-src
 SRCPACKAGE = cmajor-3.8.0-src.tar.bz2
 SRCDIRNAME = cmajor-3.8.0-src
 
-srcpackage:
+srcdir:
 	mkdir -p $(SRCDIR)
 	cd ~/cmajorm && git archive master | tar -x -C $(SRCDIR)
 	rm -r $(SRCDIR)/devenv
@@ -82,6 +83,8 @@ srcpackage:
 	mkdir -p $(SRCDIR)/cmajor/rts/build/gcc/bin
 	mkdir -p $(SRCDIR)/cmajor/rts/build/gcc/lib
 	cp /mnt/c/work/cmajorm/cmajor/unicode/cmajor_ucd.bin $(SRCDIR)/cmajor/unicode
+
+srcpackage:
 	cd ~ && tar cjf $(SRCPACKAGE) $(SRCDIRNAME)
 
 BINDISTDIR = ~/cmajor-3.8.0
@@ -167,5 +170,6 @@ clean:
 	$(MAKE) -C cmdoc clean
 	$(MAKE) -C cmmdump clean
 	$(MAKE) -C cmfileredirector clean
+	$(MAKE) -C cmtrace2txt clean
 	$(MAKE) -C eh clean
 	$(MAKE) -C rt clean
