@@ -1365,7 +1365,107 @@
         Waits a thread to end. If the thread is not joinable, throws a <ref>class_ThreadingException_4952259FBBDB6BDFCF1A52EABE2C1A61BF601670</ref>.
     </desc>
   </doc>
-
+  <doc id="member_function_NotifyAll_ConditionVariable_2CAF36B95B161BDAF58DE556C3363A2E94D6BDA5">
+	<desc>
+		Signals the condition variable and unblocks all threads waiting on it.
+	</desc>
+  </doc>
+  <doc id="member_function_NotifyOne_ConditionVariable_EABB7DC0EB9BEA63213AC1752680C80DEB6256C0">
+	<desc>
+		Signals the condition variable and unblocks one thread waiting on it.
+	</desc>
+  </doc>
+  <doc id="member_function_Wait_ConditionVariable_249E26197A29EE7C39629CB8CABEBB2802C19D3E">
+	<desc>
+		Locks the given recursive mutex internally and waits the condition variable to become signaled. The waiting is done with the recursive mutex unlocked.
+	</desc>
+	<details>
+		After the call the recursive mutex is unlocked.
+	</details>
+  </doc>
+  <doc id="member_function_Wait_ConditionVariable_4153CA08186BDB6B1E2F002F2B9E464DDA53ECE9">
+	<desc>
+		Locks the given recursive mutex internally and waits until the given predicate returns true. The waiting is done with the recursive mutex unlocked.
+	</desc>
+	<details>
+		The predicate is called with the given void* argument that can be null.
+		After the call the recursive mutex is unlocked.
+	</details>
+  </doc>
+  <doc id="member_function_Wait_ConditionVariable_64FC4ED39209427EE3AC09E4BC57A466F3C51F93">
+	<desc>
+		Locks the given recursive mutex internally and waits until the given predicate method returns true. The waiting is done with the recursive mutex unlocked.
+	</desc>
+	<details>
+		The predicate method is called with the given void* argument that can be null.
+		After the call the recursive mutex is unlocked.
+	</details>
+  </doc>
+  <doc id="member_function_WaitFor_ConditionVariable_0E06BC7E9837DF66A41C1BB043C49C33E0FB807A">
+	<desc>
+		Locks the given recursive mutex internally and waits until duration has been elapsed or the condition variable has become signaled. The waiting is done with the recursive mutex unlocked.
+	</desc>
+	<details>
+		Returns true if the condition variable has become signaled and the predicate returns true.
+		Returns false if the condition variable has not become signaled after duration has been elapsed.
+		The predicate is called with the given void* argument that can be null.
+		After the call the recursive mutex is unlocked.
+	</details>
+  </doc>
+  <doc id="member_function_WaitFor_ConditionVariable_A2D7E0AB67ECEDB3BBFF8D11B4F46B77A782B4B7">
+	<desc>
+		Locks the given recursive mutex internally and waits until duration has been elapsed or the condition variable has become signaled. The waiting is done with the recursive mutex unlocked.
+	</desc>
+	<details>
+		Returns true if the condition variable has become signaled and the predicate method returns true.
+		Returns false if the condition variable has not become signaled after duration has been elapsed.
+		The predicate method is called with the given void* argument that can be null.
+		After the call the recursive mutex is unlocked.
+	</details>
+  </doc>
+  <doc id="member_function_WaitFor_ConditionVariable_ED26DDEF0165DCB23E6F69C4AE81B33B48870612">
+	<desc>
+		Locks the given recursive mutex internally and waits until duration has been elapsed or the condition variable has become signaled. The waiting is done with the recursive mutex unlocked.
+	</desc>
+	<details>
+		Returns ConditionVariableStatus.no_timeout if the condition variable has become signaled.
+		Returns ConditionVariableStatus.timeout if the condition variable has not become signaled after duration has been elapsed.
+		After the call the recursive mutex is unlocked.
+	</details>
+  </doc>
+  <doc id="member_function_WaitUntil_ConditionVariable_CD4EBCBE79373D7B69949B69BDC0CE0E09AB2B8E">
+	<desc>
+		Locks the given recursive mutex internally and waits until time point tp has been reached or the condition variable has become signaled. The waiting is done with the recursive mutex unlocked.
+	</desc>
+	<details>
+		Returns true if the condition variable has become signaled and the predicate method returns true.
+		Returns false if the condition variable has not become signaled after time point tp has been reached.
+		The predicate is called with the given void* argument that can be null.
+		After the call the recursive mutex is unlocked.
+	</details>
+  </doc>
+  <doc id="member_function_WaitUntil_ConditionVariable_7CC6D6FABCE1028C8DC9023ED8429D88631CA606">
+	<desc>
+		Locks the given recursive mutex internally and waits until time point tp has been reached or the condition variable has become signaled. The waiting is done with the recursive mutex unlocked.
+	</desc>
+	<details>
+		Returns true if the condition variable has become signaled and the predicate method returns true.
+		Returns false if the condition variable has not become signaled after time point tp has been reached.
+		The predicate method is called with the given void* argument that can be null.
+		After the call the recursive mutex is unlocked.
+	</details>
+  </doc>
+  <doc id="member_function_WaitUntil_ConditionVariable_AC1FB48FBB6C3A4AF52EADD98D6EDF72A6956972">
+	<desc>
+		Locks the given recursive mutex internally and waits until time point tp has been reached or the condition variable has become signaled. The waiting is done with the recursive mutex unlocked.
+	</desc>
+	<details>
+		Returns ConditionVariableStatus.no_timeout if the condition variable has become signaled.
+		Returns ConditionVariableStatus.timeout if the condition variable has not become signaled after time point tp has been reached.
+		After the call the recursive mutex is unlocked.
+	</details>
+  </doc>
+  
   <doc id="System.Runtime">
     <desc>
       The System.Runtime module contains symbols for functions that form the lowest level of the Cmajor runtime library.

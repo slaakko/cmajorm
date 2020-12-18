@@ -269,14 +269,14 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Net.Http.MediaType", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Net.Http/doc/class_MediaType_63E6771B1EEBFED7CA92F446A43D1954D4E22439.html" },
-        { name: "System.Net.Http.AnyMediaType", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_AnyMediaType_4E286B8D146271D2F3C71FEF5E48C8B12AFB41D6.html" },
-        { name: "System.Net.Http.ApplicationMediaType", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_ApplicationMediaType_5F5CAEF8DB8AC402135EA67E812511C4228C99FE.html" },
+        { name: "System.Net.Http.AnyMediaType", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_AnyMediaType_4E286B8D146271D2F3C71FEF5E48C8B12AFB41D6.html" },
+        { name: "System.Net.Http.ApplicationMediaType", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_ApplicationMediaType_5F5CAEF8DB8AC402135EA67E812511C4228C99FE.html" },
         { name: "System.Net.Http.AudioMediaType", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_AudioMediaType_13DF974E523CBFADB07FBAFCE3213D85C9C00067.html" },
-        { name: "System.Net.Http.ImageMediaType", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_ImageMediaType_723E64C8A98A7AE40A6A3CBE70608A620F853D3A.html" },
+        { name: "System.Net.Http.ImageMediaType", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_ImageMediaType_723E64C8A98A7AE40A6A3CBE70608A620F853D3A.html" },
         { name: "System.Net.Http.MessageMediaType", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_MessageMediaType_FD89E681E2F33ADD3E534B6FDF08F1FB209BC56F.html" },
-        { name: "System.Net.Http.MultipartMediaType", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_MultipartMediaType_8835679FF7665E46D100AA4C8CFDA642C6BFA8F1.html" },
-        { name: "System.Net.Http.TextMediaType", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_TextMediaType_FA5BE1C47B3CA9F48A496C27C6E36C8D37AB61A7.html" },
-        { name: "System.Net.Http.VideoMediaType", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_VideoMediaType_BEBFACB5A7CC8BA36130137E750A211E6E00F890.html" }];
+        { name: "System.Net.Http.MultipartMediaType", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_MultipartMediaType_8835679FF7665E46D100AA4C8CFDA642C6BFA8F1.html" },
+        { name: "System.Net.Http.TextMediaType", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_TextMediaType_FA5BE1C47B3CA9F48A496C27C6E36C8D37AB61A7.html" },
+        { name: "System.Net.Http.VideoMediaType", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_VideoMediaType_BEBFACB5A7CC8BA36130137E750A211E6E00F890.html" }];
     drawDiagram(diagramNodes);
 }
 
