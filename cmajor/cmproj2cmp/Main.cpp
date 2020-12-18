@@ -27,7 +27,7 @@ struct InitDone
 using namespace soulng::util;
 using namespace cmajor::cmproj;
 
-const char* version = "3.8.0";
+const char* version = "3.9.0";
 
 void PrintHelp()
 {

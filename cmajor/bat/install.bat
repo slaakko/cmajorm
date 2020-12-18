@@ -184,10 +184,10 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcmd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmcm.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmcm.lib ..\lib
 
-xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrt380d.dll ..\bin
-xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrt380d.lib ..\lib
-xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrt380.dll ..\bin
-xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrt380.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrt390d.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrt390d.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrt390.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrt390.lib ..\lib
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrtsd.lib ..\lib\vs
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrts.lib ..\lib\vs
@@ -260,7 +260,6 @@ xcopy /Y /D C:\work\cmajorm\cmajor\projects\cmsx\cmsxas\bin\release\cmsxas.exe .
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\cmsx\cmsxdump\bin\release\cmsxdump.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\cmsx\cmsxlink\bin\release\cmsxlink.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\cmsx\cmsxar\bin\release\cmsxar.exe ..\bin
-xcopy /Y /D C:\work\cmajorm\cmajor\projects\cmsx\cmsxpg\cmsxpg\bin\release\cmsxpg.exe ..\bin
 
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\supd\bin\release\supd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\spring\bin\release\spring.exe ..\bin
