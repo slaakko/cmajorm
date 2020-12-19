@@ -14,7 +14,7 @@ namespace cmcode
         string projectDir = Path.GetDirectoryName(project->FilePath());
         if (backend == "cpp")
         {
-            string intermediateCodeFilePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(projectDir, "lib"), backend), "cpp"), config),
+            string intermediateCodeFilePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(projectDir, "lib"), backend), "gcc"), config),
                 Path.ChangeExtension(Path.GetFileName(sourceFilePath), ".cpp"));
             return intermediateCodeFilePath;
         }
