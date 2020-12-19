@@ -285,6 +285,10 @@ namespace cmcode
             cleanActiveProjectMenuItem = cleanActiveProjectMenuItemPtr.Get();
             cleanActiveProjectMenuItem->ClickEvent().AddHandler(CleanActiveProjectClick);
             buildMenuItem->AddMenuItem(cleanActiveProjectMenuItemPtr.Release());
+            UniquePtr<MenuItem> buildSettingsMenuItemPtr(new MenuItem("&Settings..."));
+            buildSettingsMenuItem = buildSettingsMenuItemPtr.Get();
+            buildSettingsMenuItem->ClickEvent().AddHandler(BuildSettingsClick);
+            buildMenuItem->AddMenuItem(buildSettingsMenuItemPtr.Release());
             menuBar->AddMenuItem(buildMenuItem.Release());
 
             UniquePtr<MenuItem> debugMenuItem(new MenuItem("&Debug"));
@@ -370,15 +374,16 @@ namespace cmcode
             helpMenuItem->AddMenuItem(aboutMenuItem.Release());
             menuBar->AddMenuItem(helpMenuItem.Release());
 
-/*			Uncomment to enable trace menu:	
-            UniquePtr<MenuItem> traceMenuItem(new MenuItem("&Trace"));
-            UniquePtr<MenuItem> startStopTraceMenuItemPtr(new MenuItem("&Start"));
-            startStopTraceMenuItem = startStopTraceMenuItemPtr.Get();
-            startStopTraceMenuItemPtr->SetShortcut(Keys.f2);
-            startStopTraceMenuItemPtr->ClickEvent().AddHandler(StartStopTraceClick);
-            traceMenuItem->AddMenuItem(startStopTraceMenuItemPtr.Release());
-            menuBar->AddMenuItem(traceMenuItem.Release());
-*/			
+            if (File.Exists(CmcodeTraceFlagFileName()))
+            {
+                UniquePtr<MenuItem> traceMenuItem(new MenuItem("&Trace"));
+                UniquePtr<MenuItem> startStopTraceMenuItemPtr(new MenuItem("&Start"));
+                startStopTraceMenuItem = startStopTraceMenuItemPtr.Get();
+                startStopTraceMenuItemPtr->SetShortcut(Keys.f2);
+                startStopTraceMenuItemPtr->ClickEvent().AddHandler(StartStopTraceClick);
+                traceMenuItem->AddMenuItem(startStopTraceMenuItemPtr.Release());
+                menuBar->AddMenuItem(traceMenuItem.Release());
+            }
 
             UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, ToolButtonToolTipColor(), Color.DefaultBitmapTransparent(), ToolBar.Style.regular,
                 Padding(4, 4, 4, 4), Padding(2, 0, 2, 0)));
@@ -922,7 +927,10 @@ namespace cmcode
                         contextMenu->AddMenuItemAction(openFileLocationMenuItem, new OpenFileLocationAction(this, solution->FilePath()));
                         if (contextMenu->HasMenuItems())
                         {
-                            Point loc = args.location;
+                            Point contentLoc = args.location;
+                            TreeView* treeView = node->GetTreeView();
+                            Point treeViewContentLocation = treeView->ContentLocation();
+                            Point loc(contentLoc.x, contentLoc.y - treeViewContentLocation.y);
                             Point screenLoc = solutionExplorerTreeView->ClientToScreen(loc);
                             ShowContextMenu(contextMenu.Release(), screenLoc);
                         }
@@ -963,7 +971,10 @@ namespace cmcode
                         contextMenu->AddMenuItemAction(removeMenuItem, new RemoveProjectAction(this, solution.Get(), project));
                         if (contextMenu->HasMenuItems())
                         {
-                            Point loc = args.location;
+                            Point contentLoc = args.location;
+                            TreeView* treeView = node->GetTreeView();
+                            Point treeViewContentLocation = treeView->ContentLocation();
+                            Point loc(contentLoc.x, contentLoc.y - treeViewContentLocation.y);
                             Point screenLoc = solutionExplorerTreeView->ClientToScreen(loc);
                             ShowContextMenu(contextMenu.Release(), screenLoc);
                         }
@@ -971,11 +982,22 @@ namespace cmcode
                     else if (data->kind == TreeViewNodeData.Kind.file)
                     {
                         UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+                        MenuItem* viewIntermediateCodeMenuItem = new MenuItem("View Intermediate Code");
+                        viewIntermediateCodeMenuItem->Disable();
+                        string intermediateCodeFilePath = MakeIntermediateCodeFilePath(data->project, data->filePath, GetConfig(), GetBackend());
+                        if (File.Exists(intermediateCodeFilePath))
+                        {
+                            viewIntermediateCodeMenuItem->Enable();
+                        }
+                        contextMenu->AddMenuItemAction(viewIntermediateCodeMenuItem, new ViewIntermediateCodeAction(this, intermediateCodeFilePath));
                         MenuItem* removeFileMenuItem = new MenuItem("Remove");
                         contextMenu->AddMenuItemAction(removeFileMenuItem, new RemoveFileAction(this, data->project, data->filePath, data->fileName, node));
                         MenuItem* openFileLocationMenuItem = new MenuItem("Open File Location");
                         contextMenu->AddMenuItemAction(openFileLocationMenuItem, new OpenFileLocationAction(this, data->filePath));
-                        Point loc = args.location;
+                        Point contentLoc = args.location;
+                        TreeView* treeView = node->GetTreeView();
+                        Point treeViewContentLocation = treeView->ContentLocation();
+                        Point loc(contentLoc.x, contentLoc.y - treeViewContentLocation.y);
                         Point screenLoc = solutionExplorerTreeView->ClientToScreen(loc);
                         ShowContextMenu(contextMenu.Release(), screenLoc);
                     }
@@ -1046,6 +1068,18 @@ namespace cmcode
             {
                 MessageBox.Show(ex.Message());
                 LogException(ex);
+            }
+        }
+        public void ViewIntermediateCode(const string& filePath)
+        {
+            TabPage* prevTabPage = codeTabControl->GetTabPageByKey(filePath);
+            if (prevTabPage != null)
+            {
+                codeTabControl->SetSelectedTabPage(prevTabPage);
+            }
+            else
+            {
+                AddIntermediateCodeFileEditor(Path.GetFileName(filePath), filePath, filePath);
             }
         }
         private void OpenProject(const string& filePath)
@@ -2031,6 +2065,23 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private void BuildSettingsClick()
+        {
+            try
+            {
+                BuildSettingsDialog dialog;
+                dialog.SetValues(MainConfiguration.Instance().GetBuildSettings());
+                if (dialog.ShowDialog(*this) == DialogResult.ok)
+                {
+                    MainConfiguration.Instance().SetBuildSettings(dialog.GetValues());
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void StopBuildServerClick()
         {
             try
@@ -2573,6 +2624,19 @@ namespace cmcode
             textView->CutEvent().AddHandler(CutClick);
             textView->PasteEvent().AddHandler(PasteClick);
             textView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
+            textView->CaretPosChangedEvent().AddHandler(EditorCaretPosChanged);
+            gotoLineMenuItem->Enable();
+            editorByTabPageMap[tabPage.Get()] = editor;
+            tabPage->AddChild(editorPtr.Release());
+            codeTabControl->AddTabPage(tabPage.Release());
+            textView->SetFocus();
+        }
+        private void AddIntermediateCodeFileEditor(const string& fileName, const string& key, const string& filePath)
+        {
+            UniquePtr<TabPage> tabPage(new TabPage(fileName, key));
+            UniquePtr<Cm.Views.IntermediateCodeFileEditor> editorPtr(new Cm.Views.IntermediateCodeFileEditor(filePath));
+            Cm.Views.IntermediateCodeFileEditor* editor = editorPtr.Get();
+            TextView* textView = editor->GetTextView();
             textView->CaretPosChangedEvent().AddHandler(EditorCaretPosChanged);
             gotoLineMenuItem->Enable();
             editorByTabPageMap[tabPage.Get()] = editor;
@@ -4200,6 +4264,7 @@ namespace cmcode
         private MenuItem* redoMenuItem;
         private MenuItem* gotoLineMenuItem;
         private MenuItem* searchMenuItem;
+        private MenuItem* buildSettingsMenuItem;
 
         private ToolButton* prevToolButton;
         private ToolButton* nextToolButton;

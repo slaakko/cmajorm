@@ -52,6 +52,26 @@ namespace cmcode
     }
 
     [json]
+    public class BuildSettings
+    {
+        public nothrow BuildSettings() : numberOfProjectBuildThreads(0), singleThreadedCompile(false), generateIntermediateCodeFiles(false)
+        {
+        }
+        public nothrow BuildSettings(int numberOfProjectBuildThreads_, bool singleThreadedCompile_, bool generateIntermediateCodeFiles_,
+            bool generateOptimizedIntermediateCodeFiles_) :
+            numberOfProjectBuildThreads(numberOfProjectBuildThreads_),
+            singleThreadedCompile(singleThreadedCompile_),
+            generateIntermediateCodeFiles(generateIntermediateCodeFiles_),
+            generateOptimizedIntermediateCodeFiles(generateOptimizedIntermediateCodeFiles_)
+        {
+        }
+        public int numberOfProjectBuildThreads;
+        public bool singleThreadedCompile;
+        public bool generateIntermediateCodeFiles;
+        public bool generateOptimizedIntermediateCodeFiles;
+    }
+
+    [json]
     public class MainConfig
     {
         public enum JsonWindowState : sbyte
@@ -61,7 +81,8 @@ namespace cmcode
         public nothrow MainConfig() :
             mainWindowWindowState(JsonWindowState.normal),
             normalVerticalSplitterDistance(0), normalHorizontalSplitterDistance(0),
-            maximizedVerticalSplitterDistance(0), maximizedHorizontalSplitterDistance(0)
+            maximizedVerticalSplitterDistance(0), maximizedHorizontalSplitterDistance(0),
+            buildSettings()
         {
         }
         public System.Windows.WindowState GetMainWindowWindowState()
@@ -154,6 +175,14 @@ namespace cmcode
         {
             maximizedHorizontalSplitterDistance = horizontalSplitterDistance_;
         }
+        public nothrow const BuildSettings& GetBuildSettings() const
+        {
+            return buildSettings;
+        }
+        public nothrow void SetBuildSettings(const BuildSettings& buildSettings_)
+        {
+            buildSettings = buildSettings_;
+        }
         private JsonWindowState mainWindowWindowState;
         private JsonPoint mainWindowNormalLocation;
         private JsonPoint mainWindowMaximizedLocation;
@@ -163,6 +192,22 @@ namespace cmcode
         private int normalHorizontalSplitterDistance;
         private int maximizedVerticalSplitterDistance;
         private int maximizedHorizontalSplitterDistance;
+        private BuildSettings buildSettings;
+    }
+
+    public nothrow void AddBuildSettingsValue(JsonValue* configurationValue)
+    {
+        if (configurationValue is JsonObject*)
+        {
+            JsonObject* jsonObject = cast<JsonObject*>(configurationValue);
+            JsonValue* buildSettingsField = jsonObject->GetField("buildSettings");
+            if (buildSettingsField == null)
+            {
+                BuildSettings buildSettings;
+                UniquePtr<JsonValue> buildSettingsValue = buildSettings.ToJson();
+                jsonObject->AddField("buildSettings", Rvalue(buildSettingsValue));
+            }
+        }
     }
 
     public class MainConfiguration
@@ -230,6 +275,7 @@ namespace cmcode
                     {
                         string content = File.ReadAllText(jsonFilePath);
                         UniquePtr<JsonValue> mainConfigJsonValue = ParseJson(content);
+                        AddBuildSettingsValue(mainConfigJsonValue.Get());
                         FromJson(mainConfigJsonValue.Get(), mainConfig);
                         loaded = true;
                     }
@@ -392,6 +438,15 @@ namespace cmcode
                 }
             }
         }
+        public nothrow const BuildSettings& GetBuildSettings() const
+        {
+            return mainConfig.GetBuildSettings();
+        }
+        public nothrow void SetBuildSettings(const BuildSettings& buildSettings)
+        {
+           mainConfig.SetBuildSettings(buildSettings);
+           SetChanged();
+        }
         private void SetChanged()
         {
             dirty = true;
@@ -501,5 +556,13 @@ namespace cmcode
         {
         }
         return 0;
+    }
+
+    public nothrow string CmcodeTraceFlagFileName()
+    {
+        string cmajorRootDir = Cm.Ast.CmajorRootDir();
+        string cmajorConfigDir = Path.Combine(cmajorRootDir, "config");
+        Directory.CreateDirectories(cmajorConfigDir);
+        return Path.Combine(cmajorConfigDir, "cmcode.trace.flag");
     }
 }

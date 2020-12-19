@@ -1,0 +1,30 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Windows;
+
+namespace cmcode
+{
+    public nothrow string MakeIntermediateCodeFilePath(Cm.Ast.Project* project, const string& sourceFilePath, const string& config, const string& backend)
+    {
+        string projectDir = Path.GetDirectoryName(project->FilePath());
+        if (backend == "cpp")
+        {
+            string intermediateCodeFilePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(projectDir, "lib"), backend), "cpp"), config),
+                Path.ChangeExtension(Path.GetFileName(sourceFilePath), ".cpp"));
+            return intermediateCodeFilePath;
+        }
+        else if (backend == "llvm")
+        {
+            string intermediateCodeFilePath = Path.Combine(Path.Combine(Path.Combine(projectDir, "lib"), config),
+                Path.ChangeExtension(Path.GetFileName(sourceFilePath), ".ll"));
+            return intermediateCodeFilePath;
+        }
+        return string();
+    }
+}
+

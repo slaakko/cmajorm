@@ -1,0 +1,131 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace cmcode
+{
+    public nothrow bool IsValidProjectBuildThreadsValue(const string& s)
+    {
+        int value = 0;
+        for (char c : s)
+        {
+            if (c < '0' || c > '9') return false;
+        }
+        if (ParseInt(s, value))
+        {
+            return value >= 0 && value < 256;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public class BuildSettingsDialog : Window
+    {
+        public BuildSettingsDialog() : base("cmcode.BuildSettingsDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(),
+            "Build settings", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(160), ScreenMetrics.Get().MMToVerticalPixels(100)), Dock.none, Anchors.none, WindowState.normal)
+        {
+            Size s = GetSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            Size defaultCheckBoxSize = ScreenMetrics.Get().DefaultCheckBoxSize();
+
+            int borderWidth = DefaultSingleBorderWidth();
+
+            Point projectBuildThreadsLabelLocation(16, 16);
+            UniquePtr<Label> projectBuildThreadsLabelPtr(new Label("Number of project build threads (0=use default number of threads, 1=build projects sequentially):",
+                projectBuildThreadsLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            AddChild(projectBuildThreadsLabelPtr.Release());
+
+            UniquePtr<TextBox> projectBuildThreadsTextBoxPtr(new TextBox("0"));
+            projectBuildThreadsTextBox = projectBuildThreadsTextBoxPtr.Get();
+            projectBuildThreadsTextBox->TextChangedEvent().AddHandler(ProjectBuildThreadsTextBoxTextChanged);
+            Point projectBuildThreadsTextBoxLocation(20, 16 + 24);
+            Size projectBuildThreadsTextBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(10), defaultTextBoxSize.h);
+            Rect projectBuildThreadsTextBoxRec(projectBuildThreadsTextBoxLocation, projectBuildThreadsTextBoxSize);
+            UniquePtr<Control> paddedProjectBuildThreadsTextBox = new PaddedControl(projectBuildThreadsTextBoxPtr.Release());
+            Rect paddedProjectBuildThreadsTextBoxRect = projectBuildThreadsTextBoxRec;
+            paddedProjectBuildThreadsTextBoxRect.Inflate(4, 4);
+            Rect borderedPaddedProjectBuildThreadsTextBoxRect = paddedProjectBuildThreadsTextBoxRect;
+            borderedPaddedProjectBuildThreadsTextBoxRect.Inflate(borderWidth, borderWidth);
+            UniquePtr<Control> borderedPaddedProjectBuildThreadsTextBox(new BorderedControl(paddedProjectBuildThreadsTextBox.Release(),
+                borderedPaddedProjectBuildThreadsTextBoxRect.location,
+                borderedPaddedProjectBuildThreadsTextBoxRect.size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedProjectBuildThreadsTextBox.Release());
+
+            Point singleThreadedCheckBoxLocation(16, cast<int>(16) + 24 + 24);
+            UniquePtr<CheckBox> singleThreadedCheckBoxPtr(new CheckBox("Compile source files in a project sequentially using only one thread", singleThreadedCheckBoxLocation,
+                defaultCheckBoxSize, Dock.none,  cast<Anchors>(Anchors.top | Anchors.left), true));
+            singleThreadedCompileCheckBox = singleThreadedCheckBoxPtr.Get();
+            AddChild(singleThreadedCheckBoxPtr.Release());
+
+            Point generateIntermediateCodeFilesCheckBoxLocation(16, cast<int>(16) + 24 + 24 + 24);
+            UniquePtr<CheckBox> generateIntermediateCodeFilesCheckBoxPtr(new CheckBox("Generate intermediate code files", generateIntermediateCodeFilesCheckBoxLocation,
+                defaultCheckBoxSize, Dock.none,  cast<Anchors>(Anchors.top | Anchors.left), true));
+            generateIntermediateCodeFilesCheckBox = generateIntermediateCodeFilesCheckBoxPtr.Get();
+            AddChild(generateIntermediateCodeFilesCheckBoxPtr.Release());
+
+            Point generateOptimizedIntermediateCodeFilesCheckBoxLocation(16, cast<int>(16) + 24 + 24 + 24 + 24);
+            UniquePtr<CheckBox> generateOptimizedIntermediateCodeFilesCheckBoxPtr(new CheckBox("Generate optimized intermediate code files",
+                generateOptimizedIntermediateCodeFilesCheckBoxLocation,
+                defaultCheckBoxSize, Dock.none,  cast<Anchors>(Anchors.top | Anchors.left), true));
+            generateOptimizedIntermediateCodeFilesCheckBox = generateOptimizedIntermediateCodeFilesCheckBoxPtr.Get();
+            AddChild(generateOptimizedIntermediateCodeFilesCheckBoxPtr.Release());
+
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            okButton = okButtonPtr.Get();
+            okButton->SetDialogResult(DialogResult.ok);
+            AddChild(okButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(okButton);
+            SetCancelButton(cancelButton);
+        }
+        private void ProjectBuildThreadsTextBoxTextChanged()
+        {
+            string projectBuildThreads = projectBuildThreadsTextBox->Text();
+            if (IsValidProjectBuildThreadsValue(projectBuildThreads))
+            {
+                okButton->Enable();
+            }
+            else
+            {
+                okButton->Disable();
+            }
+        }
+        public nothrow void SetValues(const BuildSettings& buildSettings)
+        {
+            projectBuildThreadsTextBox->SetText(ToString(buildSettings.numberOfProjectBuildThreads));
+            singleThreadedCompileCheckBox->SetChecked(buildSettings.singleThreadedCompile);
+            generateIntermediateCodeFilesCheckBox->SetChecked(buildSettings.generateIntermediateCodeFiles);
+            generateOptimizedIntermediateCodeFilesCheckBox->SetChecked(buildSettings.generateOptimizedIntermediateCodeFiles);
+        }
+        public nothrow BuildSettings GetValues() const
+        {
+            return BuildSettings(ParseInt(projectBuildThreadsTextBox->Text()),
+                singleThreadedCompileCheckBox->Checked(),
+                generateIntermediateCodeFilesCheckBox->Checked(),
+                generateOptimizedIntermediateCodeFilesCheckBox->Checked());
+        }
+        private Button* okButton;
+        private Button* cancelButton;
+        private TextBox* projectBuildThreadsTextBox;
+        private CheckBox* singleThreadedCompileCheckBox;
+        private CheckBox* generateIntermediateCodeFilesCheckBox;
+        private CheckBox* generateOptimizedIntermediateCodeFilesCheckBox;
+    }
+}

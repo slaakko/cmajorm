@@ -15,12 +15,20 @@ namespace cmcode
 
     BuildRequest MakeBuildRequest(const string& backend, const string& config, const string& filePath, BuildRequestKind buildRequestKind)
     {
+        const BuildSettings& buildSettings = MainConfiguration.Instance().GetBuildSettings();
         BuildRequest buildRequest;
         buildRequest.backend = backend;
         buildRequest.config = config;
         buildRequest.optimizationLevel = "default";
         buildRequest.filePath = filePath;
         buildRequest.numBuildThreads = "default";
+        if (buildSettings.numberOfProjectBuildThreads != 0)
+        {
+            buildRequest.numBuildThreads = ToString(buildSettings.numberOfProjectBuildThreads);
+        }
+        buildRequest.singleThreadedCompile = buildSettings.singleThreadedCompile;
+        buildRequest.emitIR = buildSettings.generateIntermediateCodeFiles;
+        buildRequest.emitOptIR = buildSettings.generateOptimizedIntermediateCodeFiles;
         buildRequest.toolChain = "default";
         buildRequest.verbose = true;
         if ((buildRequestKind & BuildRequestKind.clean) != BuildRequestKind.none)

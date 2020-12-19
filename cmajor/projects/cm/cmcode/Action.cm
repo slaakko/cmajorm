@@ -238,7 +238,7 @@ namespace cmcode
         private Cm.Ast.Project* project;
         private TreeViewNode* projectNode;
     }
-    
+
     public class AddNewTextFileAction : ClickAction
     {
         public nothrow AddNewTextFileAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, TreeViewNode* projectNode_) :
@@ -350,4 +350,18 @@ namespace cmcode
         private Cm.Views.CmajorSourceCodeView* sourceCodeView;
     }
 
+    public class ViewIntermediateCodeAction : ClickAction
+    {
+        public nothrow ViewIntermediateCodeAction(MainWindow* mainWindow_, const string& intermediateCodeFilePath_) :
+            mainWindow(mainWindow_), intermediateCodeFilePath(intermediateCodeFilePath_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->ViewIntermediateCode(intermediateCodeFilePath);
+        }
+        private MainWindow* mainWindow;
+        private string intermediateCodeFilePath;
+    }
 }

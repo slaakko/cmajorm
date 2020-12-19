@@ -1,0 +1,52 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace Cm.Views
+{
+    public class IntermediateCodeFileEditor : Editor
+    {
+        public IntermediateCodeFileEditor(const string& filePath) : base(filePath)
+        {
+            UniquePtr<TextView> textViewPtr(new TextView(Point(), Size(), Dock.none, Anchors.none));
+            textView = textViewPtr.Get();
+            textView->SetReadOnly();
+            UniquePtr<ScrollableControl> scrollableTextView(new ScrollableControl(textViewPtr.Release(), Point(), Size(), Dock.fill, Anchors.none));
+            AddChild(scrollableTextView.Release());
+            ustring content = ToUtf32(File.ReadAllText(filePath));
+            textView->SetTextContent(content);
+            textView->SetFixed();
+            textView->SetIndentSize(1);
+            textView->SetFilePath(filePath);
+        }
+        public nothrow override TextView* GetTextView() const
+        {
+            return textView;
+        }
+        public override void SaveTo(const string& filePath)
+        {
+        }
+        public nothrow override bool IsDirty() const
+        {
+            return false;
+        }
+        public nothrow override void ResetDirty()
+        {
+        }
+        public nothrow override void Select()
+        {
+        }
+        public nothrow override void Undo()
+        {
+        }
+        public nothrow override void Redo()
+        {
+        }
+        private TextView* textView;
+    }
+}
+
