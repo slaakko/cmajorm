@@ -83,8 +83,17 @@ void ModuleCache::RemoveModule(const std::string& moduleFilePath)
     if (it != moduleMap.cend())
     {
         int moduleIndex = it->second;
-        modules[moduleIndex].reset();
+        Module* module = modules[moduleIndex].get();
+        if (module)
+        {
+            moduleMap.erase(module->OriginalFilePath());
+            if (!module->FilePathReadFrom().empty())
+            {
+                moduleMap.erase(module->FilePathReadFrom());
+            }
+        }
         moduleMap.erase(moduleFilePath);
+        modules[moduleIndex].reset();
     }
 }
 
@@ -167,6 +176,10 @@ void ModuleCache::PutModule(std::unique_ptr<Module>&& module)
         {
             int moduleIndex = modules.size();
             moduleMap[module->OriginalFilePath()] = moduleIndex;
+            if (!module->FilePathReadFrom().empty())
+            {
+                moduleMap[module->FilePathReadFrom()] = moduleIndex;
+            }
             module->SetIndex(moduleIndex); 
             module->SetFlag(ModuleFlags::readFromModuleFile); 
             modules.push_back(std::move(module)); 
@@ -233,7 +246,11 @@ void ModuleCache::Restore(ModuleCache* prevCache)
             if (module && module->HasSymbolTable())
             {
                 int moduleIndex = modules.size();
-                moduleMap[moduleFilePath] = moduleIndex;
+                moduleMap[module->OriginalFilePath()] = moduleIndex;
+                if (!module->FilePathReadFrom().empty())
+                {
+                    moduleMap[module->FilePathReadFrom()] = moduleIndex;
+                }
                 module->SetIndex(moduleIndex);
                 moduleIdMap[module->Id()] = module.get();
                 modules.push_back(std::move(module));
@@ -266,6 +283,27 @@ void ModuleCache::SetModule(const std::string& moduleFilePath, std::unique_ptr<M
     modules.push_back(std::move(module));
 }
 
+void ModuleCache::Update()
+{
+    moduleMap.clear();
+    moduleIdMap.clear();
+    int32_t numModules = modules.size();
+    for (int32_t moduleIndex = 0; moduleIndex < numModules; ++moduleIndex)
+    {
+        Module* module = modules[moduleIndex].get();
+        if (module)
+        {
+            module->SetIndex(moduleIndex);
+            moduleMap[module->OriginalFilePath()] = moduleIndex;
+            if (!module->FilePathReadFrom().empty())
+            {
+                moduleMap[module->FilePathReadFrom()] = moduleIndex;
+            }
+            moduleIdMap[module->Id()] = module;
+        }
+    }
+}
+
 struct IsNonsystemModule
 {
     bool operator()(const std::unique_ptr<Module>& module) const
@@ -290,6 +328,10 @@ void ModuleCache::MoveNonSystemModulesTo(ModuleCache* cache)
         if (module)
         {
             moduleMap.erase(module->OriginalFilePath());
+            if (!module->FilePathReadFrom().empty())
+            {
+                moduleMap.erase(module->FilePathReadFrom());
+            }
             moduleIdMap.erase(module->Id());
             cache->SetModule(module->OriginalFilePath(), std::move(module));
         }
@@ -411,6 +453,12 @@ void MapModule(Module* module)
 {
     std::lock_guard<std::recursive_mutex> lock(mtx);
     ModuleCache::Instance().MapModule(module);
+}
+
+void UpdateModuleCache()
+{
+    std::lock_guard<std::recursive_mutex> lock(mtx);
+    ModuleCache::Instance().Update();
 }
 
 } } // namespace cmajor::symbols

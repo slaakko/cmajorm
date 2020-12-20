@@ -411,6 +411,7 @@ CacheModuleReply BuildServer::ProcessCacheModuleRequest(const CacheModuleRequest
                 else
                 {
                     MoveNonSystemModulesTo(prevCache);
+                    UpdateModuleCache();
                 }
                 std::unique_ptr<Module> module(new Module(moduleFilePath, true));
                 SetCacheModule(moduleFilePath, std::move(module));
@@ -480,6 +481,7 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
                     else
                     {
                         MoveNonSystemModulesTo(prevCache);
+                        UpdateModuleCache();
                     }
                     std::unique_ptr<Module> module(new Module(moduleFilePath, true));
                     SetCacheModule(moduleFilePath, std::move(module));
@@ -871,6 +873,7 @@ void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector
             else
             {
                 MoveNonSystemModulesTo(prevCache);
+                UpdateModuleCache();
             }
         }
         if (log)
@@ -924,6 +927,7 @@ void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_p
             else
             {
                 MoveNonSystemModulesTo(prevCache);
+                UpdateModuleCache();
             }
         }
         if (log)
