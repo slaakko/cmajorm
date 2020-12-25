@@ -157,7 +157,7 @@ namespace cmcode
         {
             UniquePtr<MenuBar> menuBarPtr(new MenuBar());
             menuBar = menuBarPtr.Get();
-            menuBar->DisableMenuKey();  
+            menuBar->DisableMenuKey();
             UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
             UniquePtr<MenuItem> newProjectMenuItemPtr(new MenuItem("&New Project..."));
             newProjectMenuItem = newProjectMenuItemPtr.Get();
@@ -913,16 +913,16 @@ namespace cmcode
                     if (data->kind == TreeViewNodeData.Kind.solution)
                     {
                         UniquePtr<ContextMenu> contextMenu(new ContextMenu());
-                        MenuItem* addNewProjectMenuItem = new MenuItem("Add New Project...");
-                        contextMenu->AddMenuItemAction(addNewProjectMenuItem, new AddNewProjectAction(this, solution.Get()));
-                        MenuItem* addExistingProjectMenuItem = new MenuItem("Add Existing Project...");
-                        contextMenu->AddMenuItemAction(addExistingProjectMenuItem, new AddExistingProjectAction(this, solution.Get()));
                         MenuItem* buildMenuItem = new MenuItem("Build");
                         contextMenu->AddMenuItemAction(buildMenuItem, new BuildSolutionAction(this, solution.Get()));
                         MenuItem* rebuildMenuItem = new MenuItem("Rebuild");
                         contextMenu->AddMenuItemAction(rebuildMenuItem, new RebuildSolutionAction(this, solution.Get()));
                         MenuItem* cleanMenuItem = new MenuItem("Clean");
                         contextMenu->AddMenuItemAction(cleanMenuItem, new CleanSolutionAction(this, solution.Get()));
+                        MenuItem* addNewProjectMenuItem = new MenuItem("Add New Project...");
+                        contextMenu->AddMenuItemAction(addNewProjectMenuItem, new AddNewProjectAction(this, solution.Get()));
+                        MenuItem* addExistingProjectMenuItem = new MenuItem("Add Existing Project...");
+                        contextMenu->AddMenuItemAction(addExistingProjectMenuItem, new AddExistingProjectAction(this, solution.Get()));
                         MenuItem* openFileLocationMenuItem = new MenuItem("Open File Location");
                         contextMenu->AddMenuItemAction(openFileLocationMenuItem, new OpenFileLocationAction(this, solution->FilePath()));
                         if (contextMenu->HasMenuItems())

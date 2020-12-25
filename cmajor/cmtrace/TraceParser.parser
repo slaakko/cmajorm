@@ -1,0 +1,96 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/cmtrace/TraceExpr.hpp>
+[cpp]#include <cmajor/cmtrace/TraceLexer.hpp>
+[cpp]#include <cmajor/cmtrace/TraceTokens.hpp>
+
+using namespace cmtrace;
+using namespace TraceTokens;
+using namespace soulng::rex;
+using namespace soulng::unicode;
+
+parser TraceParser
+{
+    uselexer TraceLexer;
+    main;
+
+    Expr(var std::unique_ptr<TraceExpr> expr) : cmtrace::TraceExpr*
+        ::= 
+        (
+            OrExpr:left{ expr.reset(left); } (OR OrExpr:right{ expr.reset(new cmtrace::OrExpr(expr.release(), right)); })*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    OrExpr(var std::unique_ptr<TraceExpr> expr) : TraceExpr*
+        ::= 
+        (
+            BooleanExpr:left{ expr.reset(left); } (AND BooleanExpr:right{ expr.reset(new cmtrace::AndExpr(expr.release(), right)); })*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    BooleanExpr : TraceExpr*
+        ::= MatchExpr:matchExpr{ return matchExpr; }
+        |   RelationalExpr:relationalExpr{ return relationalExpr; }
+        ;
+
+    MatchExpr : TraceExpr*
+        ::= 
+        (
+            PrimaryExpr:left MATCH PrimaryExpr:right
+        )
+        {
+            return new cmtrace::MatchExpr(left, right);
+        }
+        ;
+
+    RelationalExpr(var std::unique_ptr<TraceExpr> expr) : TraceExpr*
+        ::= 
+        (
+            PrimaryExpr:left{ expr.reset(left); } (RelOp:op PrimaryExpr:right{ expr.reset(new cmtrace::RelationalExpr(expr.release(), right, op)); })*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    RelOp : Operator
+        ::= EQ{ return Operator::eq; }
+        |   NEQ{ return Operator::neq; }
+        |   LESSEQ{ return Operator::lessEq; }
+        |   GREATEREQ{ return Operator::greaterEq; }
+        |   LESS{ return Operator::less; }
+        |   GREATER{ return Operator::greater; }
+        ;
+
+    PrimaryExpr(var int64_t value) : TraceExpr*
+        ::= NAME{ return new NameField(); }
+        |   THREAD{ return new ThreadField(); }
+        |   DURATION{ return new DurationField(); }
+        |   TIME{ return TimeField(); }
+        |   LEVEL{ return new LevelField(); }
+        |   MESSAGE{ return new MessageField(); }
+        |   PARENT{ return new Parent(); }
+        |   TRUE{ return new Boolean(true); }
+        |   FALSE{ return new Boolean(false);}
+        |   PATTERN{ return new Pattern(MakePattern(ToUtf8(lexer.GetMatch(span)))); }
+        |   STRING{ return new String(MakeString(ToUtf8(lexer.GetMatch(span)))); }
+        |   INTEGER{ value = ToInteger(lexer.GetMatch(span)); } (Unit:unit{ return new cmtrace::Duration(value, unit); } | empty{ return new cmtrace::Integer(value); })
+        |   LPAREN Expr:expr RPAREN{ return new ParenExpr(expr); }
+        ;
+
+    Unit : cmtrace::Unit
+        ::= S{ return cmtrace::Unit::seconds; }
+        |   MS{ return cmtrace::Unit::milliseconds; }
+        |   MUS{ return cmtrace::Unit::microseconds; }
+        |   NS{ return cmtrace::Unit::nanoseconds; }
+        ;
+}

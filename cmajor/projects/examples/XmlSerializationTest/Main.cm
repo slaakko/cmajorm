@@ -1,0 +1,208 @@
+using System;
+using System.Text;
+using System.Dom;
+using System.IO;
+using System.Xml.Serialization;
+
+[xml]
+public class Nonpolymorphic
+{
+    public nothrow Nonpolymorphic() : member("nonpolymorphic.member")
+    {
+    }
+    public string member;
+}
+
+[xml]
+public class Polymorphic
+{
+    public nothrow Polymorphic() : member("polymorphic.member")
+    {
+    }
+    public nothrow Polymorphic(const string& member_) : member(member_)
+    {
+    }
+    public default virtual ~Polymorphic();
+    public string member;
+}
+
+[xml]
+public class DerivedClass : Polymorphic
+{
+    public nothrow DerivedClass() : base("base.member"), derivedMember("derivedClass.member"), transientMember("transient.member")
+    {
+    }
+    public string derivedMember;
+    [xml="false"]
+    public string transientMember; // members with [xml="false"] attribute not serialized
+}
+
+[xml]
+public class XmlTestClass
+{
+    public bool f0;
+    public sbyte f1;
+    public byte f2;
+    public short f3;
+    public ushort f4;
+    public int f5;
+    public uint f6;
+    public long f7;
+    public ulong f8;
+    public float f9;
+    public double f10;
+    public char f11;
+    public wchar f12;
+    public uchar f13;
+    public Date f14;
+    public DateTime f15;
+    public Timestamp f16;
+    public string f17;
+    public wstring f18;
+    public ustring f19;
+    public TimePoint f20;
+    public Duration f21;
+    public Uuid f22;
+    public Nonpolymorphic f23;
+    public UniquePtr<Polymorphic> f24;
+    public UniquePtr<Polymorphic> f25;
+    public UniquePtr<Polymorphic> f26;
+}
+
+void main()
+{
+	// Note: Only classes contained by a UniquePtr or SharedPtr need to be registered:
+    RegisterXmlClass<Polymorphic>();
+    RegisterXmlClass<DerivedClass>();
+
+    XmlTestClass testClass;
+    testClass.f0 = true;
+    testClass.f1 = 1;
+    testClass.f2 = 2u;
+    testClass.f3 = 3;
+    testClass.f4 = 4u;
+    testClass.f5 = 5;
+    testClass.f6 = 6u;
+    testClass.f7 = 7;
+    testClass.f8 = 8u;
+    testClass.f9 = 9.1f;
+    testClass.f10 = 10.2;
+    testClass.f11 = 'x';
+    testClass.f12 = w'y';
+    testClass.f13 = u'z';
+    testClass.f14 = GetCurrentDate();
+    testClass.f15 = GetCurrentDateTime();
+    testClass.f16 = GetCurrentTimestamp();
+    testClass.f17 = "string.f17";
+    testClass.f18 = w"wstring.f18";
+    testClass.f19 = u"ustring.f19";
+    testClass.f20 = Now();
+    testClass.f21 = Duration.FromSeconds(21);
+    testClass.f22 = Uuid.Random();
+    testClass.f24.Reset(); // will be null
+    testClass.f25.Reset(new Polymorphic());
+    testClass.f26.Reset(new DerivedClass());
+
+    UniquePtr<Element> xmlElement = testClass.ToXml("object");
+    Document xmlDoc;
+    xmlDoc.AppendChild(UniquePtr<Node>(xmlElement.Release()));
+
+    CodeFormatter outFormatter(Console.Out());
+    outFormatter.SetIndentSize(1);
+    xmlDoc.Write(outFormatter);
+    outFormatter.WriteLine();
+/*     Prints:
+	<object>
+	 <f0 value="true"/>
+	 <f1 value="1"/>
+	 <f2 value="2"/>
+	 <f3 value="3"/>
+	 <f4 value="4"/>
+	 <f5 value="5"/>
+	 <f6 value="6"/>
+	 <f7 value="7"/>
+	 <f8 value="8"/>
+	 <f9 value="9.100000381469726"/>
+	 <f10 value="10.199999999999999"/>
+	 <f11 value="x"/>
+	 <f12 value="y"/>
+	 <f13 value="z"/>
+	 <f14 value="2020-12-25"/>
+	 <f15 value="2020-12-25T21:04:03"/>
+	 <f16 value="2020-12-25T21:04:03.000001900"/>
+	 <f17 value="string.f17"/>
+	 <f18 value="wstring.f18"/>
+	 <f19 value="ustring.f19"/>
+	 <f20 value="498148510308600"/>
+	 <f21 value="21000000000"/>
+	 <f22 value="27607122999BD8461305D32FFD5E875A"/>
+	 <f23 className="Nonpolymorphic">
+	  <member value="nonpolymorphic.member"/>
+	 </f23>
+	 <f24 value="null"/>
+	 <f25 className="Polymorphic">
+	  <member value="polymorphic.member"/>
+	 </f25>
+	 <f26 className="DerivedClass">
+	  <base>
+	   <member value="base.member"/>
+	  </base>
+	  <derivedMember value="derivedClass.member"/>
+	 </f26>
+	</object>
+*/
+    StringWriter stringWriter;
+    CodeFormatter stringFormatter(stringWriter);
+    stringFormatter.SetIndentSize(1);
+    xmlDoc.Write(stringFormatter);
+
+    ustring docStr = ToUtf32(stringWriter.GetString());
+    UniquePtr<Document> docRead = ParseDocument(docStr, "fromString");
+
+    XmlTestClass classRead(docRead->DocumentElement());
+    UniquePtr<Element> elementFromClassRead = classRead.ToXml("object");
+    Document docFromClassRead;
+    docFromClassRead.AppendChild(UniquePtr<Node>(elementFromClassRead.Release()));
+    docFromClassRead.Write(outFormatter);
+    outFormatter.WriteLine();
+/*	Prints:
+	<object>
+	 <f0 value="true"/>
+	 <f1 value="1"/>
+	 <f2 value="2"/>
+	 <f3 value="3"/>
+	 <f4 value="4"/>
+	 <f5 value="5"/>
+	 <f6 value="6"/>
+	 <f7 value="7"/>
+	 <f8 value="8"/>
+	 <f9 value="9.100000381469726"/>
+	 <f10 value="10.200000000000001"/>
+	 <f11 value="x"/>
+	 <f12 value="y"/>
+	 <f13 value="z"/>
+	 <f14 value="2020-12-25"/>
+	 <f15 value="2020-12-25T21:04:03"/>
+	 <f16 value="2020-12-25T21:04:03.000001900"/>
+	 <f17 value="string.f17"/>
+	 <f18 value="wstring.f18"/>
+	 <f19 value="ustring.f19"/>
+	 <f20 value="498148510308600"/>
+	 <f21 value="21000000000"/>
+	 <f22 value="27607122999BD8461305D32FFD5E875A"/>
+	 <f23 className="Nonpolymorphic">
+	  <member value="nonpolymorphic.member"/>
+	 </f23>
+	 <f24 value="null"/>
+	 <f25 className="Polymorphic">
+	  <member value="polymorphic.member"/>
+	 </f25>
+	 <f26 className="DerivedClass">
+	  <base>
+	   <member value="base.member"/>
+	  </base>
+	  <derivedMember value="derivedClass.member"/>
+	 </f26>
+	</object>
+*/
+}

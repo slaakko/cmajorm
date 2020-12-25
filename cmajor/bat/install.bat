@@ -11,8 +11,14 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmdbd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmdb.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmdb2xmld.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmdb2xml.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmtraced.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmtraced.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmtrace.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmtrace.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmtrace2txtd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmtrace2txt.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmtrace2xmld.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmtrace2xml.exe ..\bin
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmd.lib ..\lib
@@ -173,6 +179,11 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmresd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmresd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmres.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmres.lib ..\lib
+
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngrexd.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngrexd.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngrex.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngrex.lib ..\lib
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngutild.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngutild.lib ..\lib

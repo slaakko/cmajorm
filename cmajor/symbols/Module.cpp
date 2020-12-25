@@ -75,6 +75,7 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.Json");
     systemModuleNames.insert(U"System.Xml");
     systemModuleNames.insert(U"System.Dom");
+    systemModuleNames.insert(U"System.Xml.Serialization");
     systemModuleNames.insert(U"System.Numerics.Multiprecision");
     systemModuleNames.insert(U"System.IO.Compression");
     systemModuleNames.insert(U"System.RegularExpressions");
@@ -890,7 +891,7 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
     modules.push_back(this);
     moduleDependencyMap[originalFilePath] = &moduleDependency;
     std::unordered_map<Module*, ModuleDependency*> dependencyMap;
-    for (const auto& p : moduleDependencyMap)
+    for (const auto& p : moduleDependencyMap) 
     {
         dependencyMap[p.second->GetModule()] = p.second;
     }

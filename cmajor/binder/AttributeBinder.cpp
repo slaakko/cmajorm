@@ -6,6 +6,7 @@
 #include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/binder/JsonAttributeProcessor.hpp>
 #include <cmajor/binder/SystemDefaultAttributeProcessor.hpp>
+#include <cmajor/binder/XmlAttributeProcessor.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/symbols/Exception.hpp>
@@ -46,6 +47,8 @@ AttributeBinder::AttributeBinder(Module* module)
     attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(jsonFieldNameAttributeProcessor));
     AttributeProcessor* systemDefaultAttributeProcessor = new SystemDefaultAttributeProcessor();
     attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(systemDefaultAttributeProcessor));
+    AttributeProcessor* xmlAttributeProcessor = new XmlAttributeProcessor();
+    attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(xmlAttributeProcessor));
     for (const std::unique_ptr<AttributeProcessor>& attributeProcessor : attributeProcessors)
     {
         attributeProcessorMap[attributeProcessor->AttributeName()] = attributeProcessor.get();

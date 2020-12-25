@@ -11,7 +11,7 @@ public nothrow inline ulong GetHashCode(Cm.Ast.Target target)
 {
     return cast<ulong>(cast<int>(target));
 }
-    
+
 namespace cmcode
 {
     public nothrow bool IsValidProjectOrSolutionName(const string& name)
@@ -25,7 +25,7 @@ namespace cmcode
         for (int i = 1; i < s.Length(); ++i)
         {
             uchar c = s[i];
-            if (!IsIdCont(c))
+            if (!IsIdCont(c) && c != '.')
             {
                 return false;
             }
@@ -76,7 +76,7 @@ namespace cmcode
 
             Point projectTypeTextLocation(16, cast<int>(64) + 24);
             UniquePtr<Label> projectTypeTextPtr(new Label(GetProjectTypeName(projectType), projectTypeTextLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
-            projectTypeText = projectTypeTextPtr.Get(); 
+            projectTypeText = projectTypeTextPtr.Get();
             AddChild(projectTypeTextPtr.Release());
 
             Point selectProjectTypeButtonLocation(20 + ScreenMetrics.Get().MMToHorizontalPixels(120) + 24, cast<int>(64) + 20);

@@ -1,0 +1,95 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <soulng/rex/Context.hpp>
+[hpp]#include <soulng/rex/Nfa.hpp>
+[cpp]#include <soulng/rex/RexLexer.hpp>
+[cpp]#include <soulng/rex/RexTokens.hpp>
+[cpp]#include <soulng/rex/TokenValueParsers.hpp>
+
+using namespace soulng::lexer;
+using namespace RexTokens;
+
+parser api(SOULNG_REX_API) RexParser
+{
+    uselexer RexLexer;
+
+    main;
+
+    RegularExpression(soulng::rex::Context* context) : soulng::rex::Nfa
+        ::= Alternative(context):alternative{ return alternative; }
+        ;
+
+    Alternative(soulng::rex::Context* context, var soulng::rex::Nfa value) : soulng::rex::Nfa
+        ::= (Catenation(context):left{ value = left; } (ALT Catenation(context):right!{ value = soulng::rex::Alt(*context, value, right); })*)
+        {
+            return value;
+        }
+        ;
+
+    Catenation(soulng::rex::Context* context, var soulng::rex::Nfa value) : soulng::rex::Nfa
+        ::= (Repetition(context):left{ value = left; } (Repetition(context):right{ value = soulng::rex::Cat(value, right); })*)
+        {
+            return value;
+        }
+        ;
+
+    Repetition(soulng::rex::Context* context, var soulng::rex::Nfa value) : soulng::rex::Nfa
+        ::=
+        (   Primary(context):left{ value = left; }
+            (   STAR{ value = soulng::rex::Kleene(*context, value); }
+            |   PLUS{ value = soulng::rex::Pos(*context, value); }
+            |   QUEST{ value = soulng::rex::Opt(*context, value); }
+            )?
+        )
+        {
+            return value;
+        }
+        ;
+
+    Primary(soulng::rex::Context* context, var soulng::rex::Nfa value) : soulng::rex::Nfa
+        ::=
+        (   LPAREN Alternative(context):alt!{ value = alt; } RPAREN!
+        |   ESCAPE{ value = MakeNfa(*context, context->MakeChar(soulng::rex::MakeEscapeValue(lexer.FileName(), lexer.GetToken(pos)))); }
+        |   INVERSE{ value = MakeNfa(*context, context->MakeChar('^')); }
+        |   MINUS{ value = MakeNfa(*context, context->MakeChar('-')); }
+        |   CHAR{ std::u32string match = lexer.GetMatch(span); value = MakeNfa(*context, context->MakeChar(match.front())); }
+        |   DOT{ value = MakeNfa(*context, context->MakeAny()); }
+        |   Class(context):cls{ value = MakeNfa(*context, cls); }
+        )
+        {
+            return value; 
+        }
+        ;
+
+    Class(soulng::rex::Context* context, var soulng::rex::Class* cls) : soulng::rex::Class*
+        ::= (LBRACKET{ cls = context->MakeClass(); } ((INVERSE{ cls->SetInverse(); })? (Range(context):r{ cls->AddSymbol(r); })*) RBRACKET!)
+        {
+            return cls;
+        }
+        ;
+
+    Range(soulng::rex::Context* context, var soulng::rex::Symbol* symbol) : soulng::rex::Symbol*
+        ::= (Char:s (MINUS Char:e{ symbol = context->MakeRange(s, e); } | empty{ symbol = context->MakeChar(s); }))
+        {
+            return symbol;
+        }
+        ;
+
+    Char : char32_t
+        ::= LPAREN{ return '('; }
+        |   RPAREN{ return ')'; }
+        |   LBRACKET{ return '['; }
+        |   ALT{ return '|'; }
+        |   STAR{ return '*'; }
+        |   PLUS{ return '+'; }
+        |   QUEST{ return '?'; }
+        |   DOT{ return '.'; }
+        |   ESCAPE{ return soulng::rex::MakeEscapeValue(lexer.FileName(), lexer.GetToken(pos)); }
+        |   INVERSE{ return '^'; }
+        |   MINUS{ return '-'; }
+        |   CHAR{ std::u32string match = lexer.GetMatch(span); return match.front(); }
+        ;
+}
