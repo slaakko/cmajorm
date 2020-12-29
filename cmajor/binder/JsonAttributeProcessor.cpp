@@ -100,7 +100,12 @@ void JsonAttributeProcessor::CheckMemberVariableJsonFieldNames(ClassTypeSymbol* 
 {
     if (classTypeSymbol->BaseClass())
     {
-        CheckMemberVariableJsonFieldNames(classTypeSymbol->BaseClass(), memberVariableFieldNames);
+        Attributes* attributes = classTypeSymbol->BaseClass()->GetAttributes();
+        Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+        if (jsonAttribute && jsonAttribute->Value() != U"false")
+        {
+            CheckMemberVariableJsonFieldNames(classTypeSymbol->BaseClass(), memberVariableFieldNames);
+        }
     }
     for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
     {
