@@ -19,12 +19,12 @@ parser api(SNGJSON_JSON_API) JsonSchemaParser
 
     JsonSchemaFile(sngjson::json::Context* context)
         ::= empty{ lexer.parsingIncludeDeclaration = true; } 
-            IncludeDirectives(context):id*
+            IncludeDirective(context):id*
             empty{ lexer.parsingIncludeDeclaration = false; } 
             StructDeclaration(context):sd*
         ;
 
-    IncludeDirectives(sngjson::json::Context* context)
+    IncludeDirective(sngjson::json::Context* context)
         ::= HASH INCLUDE FILEPATH{ Token token = lexer.GetToken(pos); context->AddInclude(soulng::unicode::ToUtf8(token.match.ToString())); }
         ;
 

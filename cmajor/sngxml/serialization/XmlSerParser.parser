@@ -1,0 +1,103 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngxml/serialization/XmlSerLexer.hpp>
+[hpp]#include <sngxml/serialization/XmlSerAst.hpp>
+[cpp]#include <sngxml/serialization/XmlSerTokens.hpp>
+[cpp]#include <sngxml/serialization/XmlSerAst.hpp>
+
+using namespace XmlSerTokens;
+
+parser api(SNGXML_SERIALIZATION_API) XmlSerParser
+{
+    uselexer XmlSerLexer;
+    main;
+
+    SourceFile(var std::unique_ptr<sngxml::xmlser::SourceFileNode> sourceFile) : sngxml::xmlser::SourceFileNode*
+        ::= (empty{ sourceFile.reset(new sngxml::xmlser::SourceFileNode()); } 
+            empty{ lexer.parsingIncludeDeclaration = true; } 
+            (IncludeDirective:id{ sourceFile->AddInclude(id); })*
+            empty{ lexer.parsingIncludeDeclaration = false; } 
+            (Class:cls{ sourceFile->AddClass(cls); })*)
+        {
+            return sourceFile.release();
+        }
+        ;
+
+    IncludeDirective : std::string
+        ::= HASH INCLUDE FILEPATH{ return ToUtf8(lexer.GetMatch(span)); }
+        ;
+
+    Class(var std::unique_ptr<sngxml::xmlser::ClassNode> classNode, var std::string api_) : sngxml::xmlser::ClassNode*
+        ::= (ClassKey:clsKey (Api:a{ api_ = a; })? ID{ classNode.reset(new sngxml::xmlser::ClassNode(clsKey, api_, ToUtf8(lexer.GetMatch(span)))); } 
+            (Inheritance:inheritance{ classNode->SetBaseClassId(inheritance); })? 
+            LBRACE ClassContent(classNode.get()):classContent RBRACE)
+        {
+            return classNode.release();
+        }
+        ;
+
+    Api(var std::string api_) : std::string
+        ::= API LPAREN ID{ api_ = ToUtf8(lexer.GetMatch(span)); } RPAREN{ return api_; }
+        ;
+
+    ClassKey : sngxml::xmlser::ClassNode::Key
+        ::= BASE CLASS{ return sngxml::xmlser::ClassNode::Key::baseClass; }
+        |   CLASS{ return sngxml::xmlser::ClassNode::Key::class_; }
+        ;
+
+    Inheritance : std::string
+        ::= COLON ID{ return ToUtf8(lexer.GetMatch(span)); }
+        ;
+
+    ClassContent(sngxml::xmlser::ClassNode* classNode)
+        ::= (MemberVariable:memberVariable{ classNode->AddMemberVariable(memberVariable); })*
+        ;
+
+    MemberVariable(var std::string memberVarId) : sngxml::xmlser::MemberVariableNode*
+        ::= (Type:type ID{ memberVarId = ToUtf8(lexer.GetMatch(span)); } SEMICOLON)
+        {
+            return new sngxml::xmlser::MemberVariableNode(type, memberVarId);
+        }
+        ;
+
+    Type(var std::unique_ptr<sngxml::xmlser::TypeNode> typeNode) : sngxml::xmlser::TypeNode*
+        ::= ((ScalarType:scalarType{ typeNode.reset(scalarType); } | ClassType:classType{ typeNode.reset(classType); } 
+            (AST{ typeNode.reset(new sngxml::xmlser::PointerNode(typeNode.release())); })?) 
+            (LBRACKET RBRACKET{ typeNode.reset(new sngxml::xmlser::ArrayNode(typeNode.release())); })?)
+        {
+            return typeNode.release();
+        }
+        ;
+
+    ScalarType : sngxml::xmlser::TypeNode*
+        ::= BOOL{ return new sngxml::xmlser::BoolNode(); }
+        |   SBYTE{ return new sngxml::xmlser::SByteNode(); }
+        |   BYTE{ return new sngxml::xmlser::ByteNode(); }
+        |   SHORT{ return new sngxml::xmlser::ShortNode(); }
+        |   USHORT{ return new sngxml::xmlser::UShortNode(); }
+        |   INT{ return new sngxml::xmlser::IntNode(); }
+        |   UINT{ return new sngxml::xmlser::UIntNode(); }
+        |   LONG{ return new sngxml::xmlser::LongNode(); }
+        |   ULONG{ return new sngxml::xmlser::ULongNode(); }
+        |   FLOAT{ return new sngxml::xmlser::FloatNode(); }
+        |   DOUBLE{ return new sngxml::xmlser::DoubleNode(); }
+        |   CHAR{ return new sngxml::xmlser::CharNode(); }
+        |   WCHAR{ return new sngxml::xmlser::WCharNode(); }
+        |   UCHAR{ return new sngxml::xmlser::UCharNode(); }
+        |   UUID{ return new sngxml::xmlser::UuidNode(); }
+        |   STRING{ return new sngxml::xmlser::StringNode(); }
+        |   WSTRING{ return new sngxml::xmlser::WStringNode(); }
+        |   USTRING{ return new sngxml::xmlser::UStringNode(); }
+        |   DATE{ return new sngxml::xmlser::DateNode(); }
+        |   DATETIME{ return new sngxml::xmlser::DateTimeNode(); }
+        |   TIME_POINT{ return new sngxml::xmlser::TimePointNode(); }
+        |   DURATION{ return new sngxml::xmlser::DurationNode(); }
+        ;
+
+    ClassType : sngxml::xmlser::TypeNode*
+        ::= ID{ return new sngxml::xmlser::ClassIdNode(ToUtf8(lexer.GetMatch(span))); }
+        ;
+}

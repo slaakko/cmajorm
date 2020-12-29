@@ -64,11 +64,16 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmlxmld.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmlxmld.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngxmlxml.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngxmlxml.lib ..\lib
-
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmldomd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmldomd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngxmldom.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngxmldom.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmlserd.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmlserd.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngxmlser.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngxmlser.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\xmlsergend.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\xmlsergen.exe ..\bin
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmlxpathd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmlxpathd.lib ..\lib

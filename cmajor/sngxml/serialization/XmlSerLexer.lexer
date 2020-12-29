@@ -1,0 +1,65 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <sngxml/serialization/XmlSerApi.hpp>
+
+prefix "sngxml/serialization";
+
+classmap XmlSerClassMap;
+
+tokens XmlSerTokens
+{
+    (API, "'api'"), (ID, "'identifier'"), (CLASS, "'class'"), (BASE, "'base'"), (BOOL, "'bool'"), (SBYTE, "'sbyte'"), (BYTE, "'byte'"), (SHORT, "'short'"), (USHORT, "'ushort'"), 
+    (INT, "'int'"), (UINT, "'uint'"), (LONG, "'long'"), (ULONG, "'ulong'"), (FLOAT, "'float'"), (DOUBLE, "'double'"), 
+    (CHAR, "'char'"), (WCHAR, "'wchar'"), (UCHAR, "'uchar'"), (UUID, "'uuid'"), (STRING, "'string'"), (WSTRING, "'wstring'"), (USTRING, "'ustring'"),
+    (DATE, "'date'"), (DATETIME, "'datetime'"), (TIME_POINT, "'time_point'"), (DURATION, "'duration'"),
+    (LBRACKET, "'['"), (RBRACKET, "']'"), (LBRACE, "'{'"), (RBRACE, "'}'"), (SEMICOLON, "';'"), (COLON, "':'"), (AST, "'*'"), (LPAREN, "'('"), (RPAREN, "')'"),
+    (HASH, "'#'"), (INCLUDE, "'include'"), (FILEPATH, "'filepath'")
+}
+
+keywords  XmlSerKeywords
+{
+    ("api", API), ("class", CLASS), ("base", BASE), ("bool", BOOL), ("sbyte", SBYTE), ("byte", BYTE), ("short", SHORT), ("ushort", USHORT),
+    ("int", INT), ("uint", UINT), ("long", LONG), ("ulong", ULONG), ("float", FLOAT), ("double", DOUBLE),
+    ("char", CHAR), ("wchar", WCHAR), ("uchar", UCHAR), ("uuid", UUID), ("string", STRING), ("wstring", WSTRING), ("ustring", USTRING),
+    ("date", DATE), ("datetime", DATETIME), ("time_point", TIME_POINT), ("duration", DURATION), ("include", INCLUDE)
+}
+
+expressions
+{
+    ws = "[\n\r\t ]";
+    newline = "\r\n|\n|\r";
+    linecomment = "//[^\n\r]*{newline}";
+    blockcomment = "/\*([^*]|\*[^/])*\*/";
+    comment = "{linecomment}|{blockcomment}";
+    separators = "({ws}|{comment})+";
+    id = "{idstart}{idcont}*";
+    filepath = "<[^\n>]*>";
+}
+
+lexer api(SNGXML_SERIALIZATION_API) XmlSerLexer
+{
+    "{separators}" {}
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "\[" { return LBRACKET; }
+    "\]" { return RBRACKET; }
+    "\{" { return LBRACE; }
+    "\}" { return RBRACE; }
+    ";" { return SEMICOLON; }
+    ":" { return COLON; }
+    "\*"{ return AST; }
+    "#"{ return HASH; }
+    "{filepath}" $(0) { return FILEPATH; }
+
+    variables
+    {
+        bool parsingIncludeDeclaration;
+    }
+
+    actions
+    {
+        $(0)={ if (!parsingIncludeDeclaration) return INVALID_TOKEN; }
+    }
+}

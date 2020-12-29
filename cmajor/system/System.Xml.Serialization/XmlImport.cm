@@ -36,6 +36,7 @@ namespace System.Xml.Serialization
             T is string or
             T is wstring or
             T is ustring or
+            T is Uuid or
             T is Date or
             T is DateTime or
             T is Timestamp or
@@ -359,6 +360,68 @@ namespace System.Xml.Serialization
                         Element* element = cast<Element*>(node);
                         T value(element);
                         list.Add(Rvalue(value));
+                    }
+                }
+            }
+        }
+    }
+
+    public void FromXml<T>(Element* parentElement, const string& fieldName, List<UniquePtr<T>>& list)
+        where T is XmlConstructible
+    {
+        list.Clear();
+        Element* element = GetXmlFieldElement(fieldName, parentElement);
+        UniquePtr<XPathObject> result = Evaluate(u"item", element);
+        if (!result.IsNull())
+        {
+            if (result.Get() is XPathNodeSet*)
+            {
+                XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    Node* node = (*nodeSet)[i];
+                    if (node is Element*)
+                    {
+                        Element* element = cast<Element*>(node);
+                        UniquePtr<T> object;
+                        ustring value = element->GetAttribute(u"value");
+                        if (value != u"null")
+                        {
+                            object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(element)));
+                        }
+                        list.Add(Rvalue(object));
+                    }
+                }
+            }
+        }
+    }
+
+    public void FromXml<T>(Element* parentElement, const string& fieldName, List<SharedPtr<T>>& list)
+        where T is XmlConstructible
+    {
+        list.Clear();
+        Element* element = GetXmlFieldElement(fieldName, parentElement);
+        UniquePtr<XPathObject> result = Evaluate(u"item", element);
+        if (!result.IsNull())
+        {
+            if (result.Get() is XPathNodeSet*)
+            {
+                XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    Node* node = (*nodeSet)[i];
+                    if (node is Element*)
+                    {
+                        Element* element = cast<Element*>(node);
+                        SharedPtr<T> object;
+                        ustring value = element->GetAttribute(u"value");
+                        if (value != u"null")
+                        {
+                            object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(element)));
+                        }
+                        list.Add(Rvalue(object));
                     }
                 }
             }

@@ -107,6 +107,28 @@ namespace System.Xml.Serialization
         return element;
     }
 
+    public UniquePtr<Element> ToXml<T>(const List<UniquePtr<T>>& list, const string& fieldName)
+        where T is XmlExportableClassType
+    {
+        UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
+        for (const UniquePtr<T>& item : list)
+        {
+            element->AppendChild(UniquePtr<Node>(ToXml(item, "item").Release()));
+        }
+        return element;
+    }
+    
+    public UniquePtr<Element> ToXml<T>(const List<SharedPtr<T>>& list, const string& fieldName)
+        where T is XmlExportableClassType
+    {
+        UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
+        for (const SharedPtr<T>& item : list)
+        {
+            element->AppendChild(ShareadPtr<Node>(ToXml(item, "item").Release()));
+        }
+        return element;
+    }
+    
     public UniquePtr<Element> ToXml(const string& value, const string& fieldName)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));

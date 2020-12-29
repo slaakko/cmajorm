@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Dom;
 using System.IO;
+using System.Collections;
 using System.Xml.Serialization;
 
 [xml]
@@ -64,9 +65,11 @@ public class XmlTestClass
     public Duration f21;
     public Uuid f22;
     public Nonpolymorphic f23;
-    public UniquePtr<Polymorphic> f24;
+    public List<Nonpolymorphic> f24;
     public UniquePtr<Polymorphic> f25;
     public UniquePtr<Polymorphic> f26;
+    public UniquePtr<Polymorphic> f27;
+    public List<UniquePtr<Polymorphic>> f28;
 }
 
 void main()
@@ -99,9 +102,15 @@ void main()
     testClass.f20 = Now();
     testClass.f21 = Duration.FromSeconds(21);
     testClass.f22 = Uuid.Random();
-    testClass.f24.Reset(); // will be null
-    testClass.f25.Reset(new Polymorphic());
-    testClass.f26.Reset(new DerivedClass());
+    testClass.f23 = Nonpolymorphic();
+    testClass.f24.Add(Nonpolymorphic());
+    testClass.f24.Add(Nonpolymorphic());
+    testClass.f25.Reset(); // will be null
+    testClass.f26.Reset(new Polymorphic());
+    testClass.f27.Reset(new DerivedClass());
+    testClass.f28.Add(UniquePtr<Polymorphic>(new Polymorphic()));
+    testClass.f28.Add(UniquePtr<Polymorphic>(new DerivedClass()));
+    testClass.f28.Add(UniquePtr<Polymorphic>());
 
     UniquePtr<Element> xmlElement = testClass.ToXml("object");
     Document xmlDoc;
@@ -111,7 +120,7 @@ void main()
     outFormatter.SetIndentSize(1);
     xmlDoc.Write(outFormatter);
     outFormatter.WriteLine();
-/*     Prints:
+/*	Prints:
 	<object>
 	 <f0 value="true"/>
 	 <f1 value="1"/>
@@ -128,27 +137,47 @@ void main()
 	 <f12 value="y"/>
 	 <f13 value="z"/>
 	 <f14 value="2020-12-25"/>
-	 <f15 value="2020-12-25T21:04:03"/>
-	 <f16 value="2020-12-25T21:04:03.000001900"/>
+	 <f15 value="2020-12-25T22:25:46"/>
+	 <f16 value="2020-12-25T22:25:46.000002000"/>
 	 <f17 value="string.f17"/>
 	 <f18 value="wstring.f18"/>
 	 <f19 value="ustring.f19"/>
-	 <f20 value="498148510308600"/>
+	 <f20 value="503051261495700"/>
 	 <f21 value="21000000000"/>
-	 <f22 value="27607122999BD8461305D32FFD5E875A"/>
+	 <f22 value="2CCE9411493673A49C1D2D897E0F1CEE"/>
 	 <f23 className="Nonpolymorphic">
 	  <member value="nonpolymorphic.member"/>
 	 </f23>
-	 <f24 value="null"/>
-	 <f25 className="Polymorphic">
+	 <f24>
+	  <item className="Nonpolymorphic">
+	   <member value="nonpolymorphic.member"/>
+	  </item>
+	  <item className="Nonpolymorphic">
+	   <member value="nonpolymorphic.member"/>
+	  </item>
+	 </f24>
+	 <f25 value="null"/>
+	 <f26 className="Polymorphic">
 	  <member value="polymorphic.member"/>
-	 </f25>
-	 <f26 className="DerivedClass">
+	 </f26>
+	 <f27 className="DerivedClass">
 	  <base>
 	   <member value="base.member"/>
 	  </base>
 	  <derivedMember value="derivedClass.member"/>
-	 </f26>
+	 </f27>
+	 <f28>
+	  <item className="Polymorphic">
+	   <member value="polymorphic.member"/>
+	  </item>
+	  <item className="DerivedClass">
+	   <base>
+		<member value="base.member"/>
+	   </base>
+	   <derivedMember value="derivedClass.member"/>
+	  </item>
+	  <item value="null"/>
+	 </f28>
 	</object>
 */
     StringWriter stringWriter;
@@ -182,27 +211,47 @@ void main()
 	 <f12 value="y"/>
 	 <f13 value="z"/>
 	 <f14 value="2020-12-25"/>
-	 <f15 value="2020-12-25T21:04:03"/>
-	 <f16 value="2020-12-25T21:04:03.000001900"/>
+	 <f15 value="2020-12-25T22:25:46"/>
+	 <f16 value="2020-12-25T22:25:46.000002000"/>
 	 <f17 value="string.f17"/>
 	 <f18 value="wstring.f18"/>
 	 <f19 value="ustring.f19"/>
-	 <f20 value="498148510308600"/>
+	 <f20 value="503051261495700"/>
 	 <f21 value="21000000000"/>
-	 <f22 value="27607122999BD8461305D32FFD5E875A"/>
+	 <f22 value="2CCE9411493673A49C1D2D897E0F1CEE"/>
 	 <f23 className="Nonpolymorphic">
 	  <member value="nonpolymorphic.member"/>
 	 </f23>
-	 <f24 value="null"/>
-	 <f25 className="Polymorphic">
+	 <f24>
+	  <item className="Nonpolymorphic">
+	   <member value="nonpolymorphic.member"/>
+	  </item>
+	  <item className="Nonpolymorphic">
+	   <member value="nonpolymorphic.member"/>
+	  </item>
+	 </f24>
+	 <f25 value="null"/>
+	 <f26 className="Polymorphic">
 	  <member value="polymorphic.member"/>
-	 </f25>
-	 <f26 className="DerivedClass">
+	 </f26>
+	 <f27 className="DerivedClass">
 	  <base>
 	   <member value="base.member"/>
 	  </base>
 	  <derivedMember value="derivedClass.member"/>
-	 </f26>
+	 </f27>
+	 <f28>
+	  <item className="Polymorphic">
+	   <member value="polymorphic.member"/>
+	  </item>
+	  <item className="DerivedClass">
+	   <base>
+		<member value="base.member"/>
+	   </base>
+	   <derivedMember value="derivedClass.member"/>
+	  </item>
+	  <item value="null"/>
+	 </f28>
 	</object>
 */
 }

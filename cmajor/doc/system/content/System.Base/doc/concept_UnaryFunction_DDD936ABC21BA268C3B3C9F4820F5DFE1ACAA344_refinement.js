@@ -269,10 +269,10 @@ function drawDiagram(diagramNodes) {
 function drawRefinementDiagram() {
     var diagramNodes = [
         { name: "System.Concepts.UnaryFunction&lt;T&gt;", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Base/doc/concept_UnaryFunction_DDD936ABC21BA268C3B3C9F4820F5DFE1ACAA344.html" },
-        { name: "System.Concepts.HashFunction&lt;T, Key&gt;", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/concept_HashFunction_996DE63476FF956BFF568F751960AF2CB4A097A8.html" },
+        { name: "System.Concepts.HashFunction&lt;T, Key&gt;", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/concept_HashFunction_996DE63476FF956BFF568F751960AF2CB4A097A8.html" },
         { name: "System.Concepts.KeySelectionFunction&lt;T, Key, Value&gt;", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/concept_KeySelectionFunction_719538A539328921CB0D528AECE6DCBE1B8C6E19.html" },
         { name: "System.Concepts.UnaryOperation&lt;T&gt;", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/concept_UnaryOperation_A42C7312D25FC827BE924605B8EB6CAF29F5668A.html" },
-        { name: "System.Concepts.UnaryPredicate&lt;T&gt;", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/concept_UnaryPredicate_817CC9DCD26C0954E03389EC0C9357DB1879C53F.html" }];
+        { name: "System.Concepts.UnaryPredicate&lt;T&gt;", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/concept_UnaryPredicate_817CC9DCD26C0954E03389EC0C9357DB1879C53F.html" }];
     drawDiagram(diagramNodes);
 }
 

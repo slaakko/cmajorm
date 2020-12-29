@@ -16,7 +16,7 @@ enum class Month : int8_t
     january = 1, february, march, april, may, june, july, august, september, october, november, december
 };
 
-class Date
+class UTIL_API Date
 {
 public:
     Date() : year(0), month(Month::january), day(1)
@@ -46,6 +46,8 @@ private:
 };
 
 UTIL_API Date GetCurrentDate();
+
+UTIL_API Date ParseDate(const std::string& dateStr);
 
 class UTIL_API DateTime
 {
@@ -84,9 +86,13 @@ private:
 
 UTIL_API DateTime GetCurrentDateTime();
 
+UTIL_API DateTime ParseDateTime(const std::string& dateTimeStr);
+
 UTIL_API std::string FormatTimeMs(int32_t milliseconds);
 
 UTIL_API std::int64_t CurrentMs();
+
+UTIL_API int64_t GetCurrentTime();
 
 } } // namespace soulng::util
 
