@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -323,6 +323,16 @@ void DoneTrace()
 {
     TraceTable::Done();
     Trace::Done();
+}
+
+Tracer::Tracer(int32_t traceFunctionId_) : traceFunctionId(traceFunctionId_)
+{
+    AddTraceEntry(EntryKind::begin, traceFunctionId);
+}
+
+Tracer::~Tracer()
+{
+    AddTraceEntry(EntryKind::end, traceFunctionId);
 }
 
 } } // namespace soulng::util

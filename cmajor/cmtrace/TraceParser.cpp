@@ -773,6 +773,19 @@ soulng::parser::Match TraceParser::PrimaryExpr(TraceLexer& lexer)
                     }
                     break;
                 }
+                case TIME:
+                {
+                    ++lexer;
+                    {
+                        {
+                            #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                            if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("PrimaryExpr"));
+                            #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                            return soulng::parser::Match(true, new TimeField);
+                        }
+                    }
+                    break;
+                }
                 case LEVEL:
                 {
                     ++lexer;
@@ -1087,7 +1100,7 @@ soulng::parser::Match TraceParser::Unit(TraceLexer& lexer)
             }
             break;
         }
-        case MUS:
+        case US:
         {
             ++lexer;
             {

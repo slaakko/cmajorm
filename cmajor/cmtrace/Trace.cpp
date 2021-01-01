@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -22,14 +22,14 @@ std::string TimeStr(int64_t nanosecs)
 {
     std::string timeStr;
     int64_t ns = nanosecs % 1000;
-    int64_t mus = (nanosecs / 1000) % 1000;
+    int64_t us = (nanosecs / 1000) % 1000;
     int64_t ms = (nanosecs / (1000ll * 1000)) % 1000;
     int64_t s = (nanosecs / (1000ll * 1000 * 1000)) % 60;
     int64_t m = (nanosecs / (1000ll * 1000 * 1000 * 60)) % 60;
     int64_t h = (nanosecs / (1000ll * 1000 * 1000 * 60 * 60));
     timeStr.append(std::to_string(h / 10)).append(std::to_string(h % 10)).append(1, ':').append(std::to_string(m / 10)).append(std::to_string(m % 10)).append(1, ':');
     timeStr.append(std::to_string(s / 10)).append(std::to_string(s % 10)).append(1, '.').append(std::to_string(ms / 100)).append(std::to_string((ms % 100) / 10)).append(std::to_string(ms % 10));
-    timeStr.append(1, '.').append(std::to_string(mus / 100)).append(std::to_string((mus % 100) / 10).append(std::to_string(mus % 10)));
+    timeStr.append(1, '.').append(std::to_string(us / 100)).append(std::to_string((us % 100) / 10).append(std::to_string(us % 10)));
     timeStr.append(1, '.').append(std::to_string(ns / 100)).append(std::to_string((ns % 100) / 10).append(std::to_string(ns % 10)));
     return timeStr;
 }

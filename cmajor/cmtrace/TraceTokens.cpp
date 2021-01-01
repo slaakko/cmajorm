@@ -25,7 +25,6 @@ namespace TraceTokens
         tokenIdMap[U"MATCH"] = 18;
         tokenIdMap[U"MESSAGE"] = 7;
         tokenIdMap[U"MS"] = 13;
-        tokenIdMap[U"MUS"] = 14;
         tokenIdMap[U"NAME"] = 1;
         tokenIdMap[U"NEQ"] = 20;
         tokenIdMap[U"NS"] = 15;
@@ -38,6 +37,7 @@ namespace TraceTokens
         tokenIdMap[U"THREAD"] = 2;
         tokenIdMap[U"TIME"] = 4;
         tokenIdMap[U"TRUE"] = 10;
+        tokenIdMap[U"US"] = 14;
     }
 
     int GetTokenId(const std::u32string& tokenName)
@@ -69,7 +69,7 @@ namespace TraceTokens
         "FALSE",
         "S",
         "MS",
-        "MUS",
+        "US",
         "NS",
         "LPAREN",
         "RPAREN",
@@ -107,7 +107,7 @@ namespace TraceTokens
         "'false'",
         "'s'",
         "'ms'",
-        "'mus'",
+        "'us'",
         "'ns'",
         "'('",
         "')'",

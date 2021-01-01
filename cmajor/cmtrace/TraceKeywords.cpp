@@ -23,7 +23,7 @@ namespace TraceKeywords
         {U"false", FALSE}, 
         {U"s", S}, 
         {U"ms", MS}, 
-        {U"mus", MUS}, 
+        {U"us", US}, 
         {U"ns", NS}, 
         {U"match", MATCH},
         {nullptr, -1}

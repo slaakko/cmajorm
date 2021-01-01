@@ -21,7 +21,7 @@ namespace TraceTokens
     const int FALSE = 11;
     const int S = 12;
     const int MS = 13;
-    const int MUS = 14;
+    const int US = 14;
     const int NS = 15;
     const int LPAREN = 16;
     const int RPAREN = 17;

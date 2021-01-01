@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -38,6 +38,15 @@ UTIL_API void ReadTraceTable();
 UTIL_API void WriteTraceTable();
 UTIL_API void InitTrace();
 UTIL_API void DoneTrace();
+
+class UTIL_API Tracer
+{
+public:
+    Tracer(int32_t traceFunctionId_);
+    ~Tracer();
+private:
+    int32_t traceFunctionId;
+};
 
 } } // namespace soulng::util
 

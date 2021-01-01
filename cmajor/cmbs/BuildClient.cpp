@@ -1,10 +1,14 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 #include <cmajor/cmbs/BuildClient.hpp>
 #include <cmajor/cmbs/BuildServerMessage.hpp>
+#ifdef TRACE
+#include <cmajor/cmbs_trace/TraceFunctions.hpp>
+#include <soulng/util/Trace.hpp>
+#endif
 #include <sngjson/json/JsonLexer.hpp>
 #include <sngjson/json/JsonParser.hpp>
 #include <soulng/util/MappedInputFile.hpp>
@@ -19,6 +23,9 @@ using namespace soulng::unicode;
 
 std::string GetMessageKind(JsonValue* message) 
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(GetMessageKind_f);
+#endif // TRACE
     if (message->Type() == JsonValueType::object)
     {
         JsonObject* messageObject = static_cast<JsonObject*>(message);
@@ -29,6 +36,9 @@ std::string GetMessageKind(JsonValue* message)
 
 std::unique_ptr<JsonValue> ReadMessage(TcpSocket& socket)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(ReadMessage_f);
+#endif // TRACE
     std::string message = ReadStr(socket);
     std::u32string content = ToUtf32(message);
     JsonLexer lexer(content, "", 0);
@@ -38,6 +48,9 @@ std::unique_ptr<JsonValue> ReadMessage(TcpSocket& socket)
 
 void ProcessBuildReply(const BuildReply& buildReply)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(ProcessBuildReply_f);
+#endif // TRACE
     if (!buildReply.requestValid)
     {
         std::cout << "buildReply.requestValid=false:\n" << buildReply.requestErrorMessage << std::endl;;
@@ -58,6 +71,9 @@ void ProcessBuildReply(const BuildReply& buildReply)
 
 void RunRequest(const std::string& requestFilePath, int port)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(RunRequest_f);
+#endif // TRACE
     std::string request = ReadFile(requestFilePath);
     TcpSocket socket("localhost", std::to_string(port));
     Write(socket, request);

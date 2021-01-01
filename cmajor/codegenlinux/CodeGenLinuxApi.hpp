@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -14,7 +14,9 @@
 #define CODEGENLINUX_API __declspec(dllimport)
 
 #ifdef NDEBUG
-#pragma comment(lib, "codegenwlinux.lib")
+#pragma comment(lib, "codegenlinux.lib")
+#elif defined(TRACE)
+#pragma comment(lib, "codegenlinuxt.lib")
 #else
 #pragma comment(lib, "codegenlinuxd.lib")
 #endif

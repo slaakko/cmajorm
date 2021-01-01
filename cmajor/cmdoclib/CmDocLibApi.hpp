@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -15,6 +15,8 @@
 
 #ifdef NDEBUG
 #pragma comment(lib, "cmdoclib.lib")
+#elif defined(TRACE)
+#pragma comment(lib, "cmdoclibt.lib")
 #else
 #pragma comment(lib, "cmdoclibd.lib")
 #endif

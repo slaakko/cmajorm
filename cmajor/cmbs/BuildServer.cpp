@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -14,6 +14,10 @@
 #include <cmajor/symbols/SourceFileModuleMap.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/cmmid/InitDone.hpp>
+#ifdef TRACE
+#include <cmajor/cmbs_trace/TraceFunctions.hpp>
+#include <soulng/util/Trace.hpp>
+#endif
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Log.hpp>
 #include <soulng/util/LogFileWriter.hpp>
@@ -46,6 +50,9 @@ struct BackendSelector
 {
     BackendSelector(cmajor::symbols::BackEnd backend)
     {
+#ifdef TRACE
+        soulng::util::Tracer tracer(BackendSelector_BackendSelector);
+#endif // TRACE
         switch (backend)
         {
             case cmajor::symbols::BackEnd::llvm:
@@ -67,12 +74,18 @@ struct BackendSelector
     }
     ~BackendSelector()
     {
+#ifdef TRACE
+        soulng::util::Tracer tracer(BackendSelector_BackendSelector_dtor);
+#endif // TRACE
         CmmDone();
     }
 };
 
 std::string CmbsLogFilePath()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(CmbsLogFilePath_f);
+#endif // TRACE
     return Path::Combine(CmajorLogFileDir(), "cmbs.log");
 }
 
@@ -132,10 +145,16 @@ struct RequestGuard
 {
     RequestGuard(BuildServer* server_) : server(server_)
     {
+#ifdef TRACE
+        soulng::util::Tracer tracer(RequestGuard_RequestGuard);
+#endif // TRACE
         server->SetRequestInProgress();
     }
     ~RequestGuard()
     {
+#ifdef TRACE
+        soulng::util::Tracer tracer(RequestGuard_RequestGuard_dtor);
+#endif // TRACE
         server->ResetRequestInProgress();
     }
     BuildServer* server;
@@ -145,6 +164,9 @@ BuildServer::BuildServer(bool log_) :
     port(54325), log(log_), version(), exit(false), listenSocket(), socket(), requestInProgress(false), 
     lastActionTime(), stopRequested(false), logFilePath(CmbsLogFilePath()), running(false), progressIntervalMs(250), exitVar(nullptr), exiting(nullptr)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_BuildServer);
+#endif // TRACE
     if (log)
     {
         LogFileWriter writer(logFilePath);
@@ -157,10 +179,16 @@ BuildServer::BuildServer(bool log_) :
 
 BuildServer::~BuildServer()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_BuildServer_dtor);
+#endif // TRACE
 }
 
 void BuildServer::Run()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_Run);
+#endif // TRACE
     try
     {
         running = true;
@@ -315,6 +343,9 @@ void BuildServer::Run()
 
 void BuildServer::WriteGenericErrorReply(const std::string& messageKind)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_WriteGenericErrorReply);
+#endif // TRACE
     GenericErrorReply genericErrorReply;
     genericErrorReply.messageKind = "genericErrorReply";
     if (messageKind.empty())
@@ -332,6 +363,9 @@ void BuildServer::WriteGenericErrorReply(const std::string& messageKind)
 
 BuildReply BuildServer::ProcessBuildRequest(const BuildRequest& buildRequest, LogFileWriter* logWriter)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_ProcessBuildRequest);
+#endif // TRACE
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     BuildReply buildReply;
     buildReply.messageKind = "buildReply";
@@ -382,6 +416,9 @@ BuildReply BuildServer::ProcessBuildRequest(const BuildRequest& buildRequest, Lo
 
 CacheModuleReply BuildServer::ProcessCacheModuleRequest(const CacheModuleRequest& cacheModuleRequest)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_ProcessCacheModuleRequest);
+#endif // TRACE
     CacheModuleReply reply;
     reply.messageKind = "cacheModuleReply";
     try
@@ -433,6 +470,9 @@ CacheModuleReply BuildServer::ProcessCacheModuleRequest(const CacheModuleRequest
 
 GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionRequest& getDefinitionRequest)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_ProcessGetDefinitionRequest);
+#endif // TRACE
     cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::updateSourceFileModuleMap);
     GetDefinitionReply reply;
     reply.messageKind = "getDefinitionReply";
@@ -549,6 +589,9 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
 
 void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, BuildReply& reply, LogFileWriter* logWriter)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_ProcessCppBackendRequest);
+#endif // TRACE
     LogMessage(-1, "Cmajor with C++ backend compiler version " + version + " for Windows x64");
     SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
     ResetToolChain();
@@ -712,6 +755,9 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
 
 void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest, BuildReply& reply, LogFileWriter* logWriter)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_ProcessLlvmBackendRequest);
+#endif // TRACE
     LogMessage(-1, "Cmajor with LLVM backend compiler version " + version + " for Windows x64");
     SetBackEnd(cmajor::symbols::BackEnd::llvm);
     std::unique_ptr<cmajor::symbols::Module> rootModule;
@@ -860,6 +906,9 @@ void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest
 
 void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<cmajor::symbols::Module>>& rootModules, BuildReply& reply, LogFileWriter* logWriter)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_BuildSolution);
+#endif // TRACE
     std::unique_ptr<ModuleCache> prevCache;
     try
     {
@@ -913,6 +962,9 @@ void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector
 void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_ptr<cmajor::symbols::Module>& rootModule,
     std::set<std::string>& builtProjects, BuildReply& reply, LogFileWriter* logWriter)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_BuildProject);
+#endif // TRACE
     std::unique_ptr<ModuleCache> prevCache;
     try
     {
@@ -966,16 +1018,25 @@ void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_p
 
 void BuildServer::SetRunException(const std::exception_ptr& runException_)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_SetRunException);
+#endif // TRACE
     runException = runException_;
 }
 
 void BuildServer::SetLogException(const std::exception_ptr& logException_)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_SetLogException);
+#endif // TRACE
     logException = logException_;
 }
 
 void BuildServer::SetLogExceptionToReply(BuildReply& reply)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_SetLogExceptionToReply);
+#endif // TRACE
     if (!logException)
     {
         return;
@@ -992,6 +1053,9 @@ void BuildServer::SetLogExceptionToReply(BuildReply& reply)
 
 void BuildServer::StartLogging()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_StartLogging);
+#endif // TRACE
     if (log)
     {
         LogFileWriter writer(logFilePath);
@@ -1006,6 +1070,9 @@ void BuildServer::StartLogging()
 
 void BuildServer::EndLogging()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_EndLogging);
+#endif // TRACE
     if (log)
     {
         LogFileWriter writer(logFilePath);
@@ -1019,6 +1086,9 @@ void BuildServer::EndLogging()
 
 void BuildServer::RunLog()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_RunLog);
+#endif // TRACE
     while (true)
     {
         bool endOfLog = false;
@@ -1071,6 +1141,10 @@ void BuildServer::RunLog()
 
 void RunLogThread(BuildServer* server)
 {
+#ifdef TRACE
+    soulng::util::SetThreadId('L');
+    soulng::util::Tracer tracer(RunLogThread_f);
+#endif // TRACE
     try
     {
         server->RunLog();
@@ -1084,6 +1158,9 @@ void RunLogThread(BuildServer* server)
 
 void BuildServer::StartLogThread()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_StartLogThread);
+#endif // TRACE
     try
     {
         logThread = std::thread{ RunLogThread, this };
@@ -1104,6 +1181,9 @@ void BuildServer::StartLogThread()
 
 void BuildServer::StopLogThread()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_StopLogThread);
+#endif // TRACE
     try
     {
         logThread.join();
@@ -1123,6 +1203,9 @@ void BuildServer::StopLogThread()
 
 std::string BuildServer::GetMessageKind(JsonValue* message) const
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_GetMessageKind);
+#endif // TRACE
     if (message->Type() == JsonValueType::object)
     {
         JsonObject* messageObject = static_cast<JsonObject*>(message);
@@ -1133,6 +1216,10 @@ std::string BuildServer::GetMessageKind(JsonValue* message) const
 
 void RunServer(BuildServer* server)
 {
+#ifdef TRACE
+    soulng::util::SetThreadId('B');
+    soulng::util::Tracer tracer(RunServer_BuildServer_f);
+#endif // TRACE
     try
     {
         server->Run();
@@ -1155,6 +1242,9 @@ void RunServer(BuildServer* server)
 
 void BuildServer::Start(int port, const std::string& version, std::condition_variable* exitVar, bool* exiting)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_Start);
+#endif // TRACE
     try
     {
         if (log)
@@ -1185,6 +1275,9 @@ void BuildServer::Start(int port, const std::string& version, std::condition_var
 
 void BuildServer::Stop()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_Stop);
+#endif // TRACE
     try
     {
         if (log)
@@ -1219,11 +1312,17 @@ void BuildServer::Stop()
 
 void BuildServer::SetRequestInProgress()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_SetRequestInProgress);
+#endif // TRACE
     requestInProgress = true;
 }
 
 void BuildServer::ResetRequestInProgress()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServer_ResetRequestInProgress);
+#endif // TRACE
     requestInProgress = false;
 }
 
@@ -1231,6 +1330,9 @@ BuildServer* buildServer = nullptr;
 
 void StartBuildServer(int port, const std::string& version, bool log, std::condition_variable* exitVar, bool* exiting)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(StartBuildServer_f);
+#endif // TRACE
     if (!buildServer)
     {
         buildServer = new BuildServer(log);
@@ -1240,11 +1342,17 @@ void StartBuildServer(int port, const std::string& version, bool log, std::condi
 
 void StopBuildServer()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(StopBuildServer_f);
+#endif // TRACE
     buildServer->Stop();
 }
 
 bool BuildServerStopRequested()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(BuildServerStopRequested_f);
+#endif // TRACE
     return buildServer->StopRequested();
 }
 

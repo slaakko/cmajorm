@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -11,6 +11,10 @@
 #include <soulng/util/Process.hpp>
 #include <sngcm/ast/InitDone.hpp>
 #include <soulng/util/InitDone.hpp>
+#ifdef TRACE
+#include <cmajor/cmbs_trace/TraceFunctions.hpp>
+#include <soulng/util/Trace.hpp>
+#endif
 #include <cmajor/cmmid/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -82,7 +86,7 @@ void PrintHelp()
     std::cout << "  Default port number is 54329." << std::endl;
     std::cout << "--portMapServicePort=PORT | -m=PORT" << std::endl;
     std::cout << "  Set port map service port number to PORT." << std::endl;
-    std::cout << "  Optional. When set revises main port number and keep aliver server port number using port map service every minute." << std::endl;
+    std::cout << "  Optional. When set revises main port number and keep alive server port number using port map service every minute." << std::endl;
     std::cout << std::endl;
     std::cout << "--request=FILE | -r=FILE" << std::endl;
     std::cout << "  Read build request from file FILE and run it." << std::endl;
@@ -136,6 +140,11 @@ std::mutex mtx;
 int main(int argc, const char** argv)
 {
     InitDone initDone;
+    #ifdef TRACE    
+    soulng::util::BeginTracing();
+    soulng::util::SetThreadId('M');
+    soulng::util::Tracer mainTracer(main_f);
+    #endif
     std::condition_variable exitVar;
     bool exiting = false;
     bool log = false;
@@ -327,7 +336,13 @@ int main(int argc, const char** argv)
             writer.WriteCurrentDateTime();
             writer << "main got exception: " << ex.what() << std::endl;
         }
+        #ifdef TRACE
+        soulng::util::EndTracing();
+        #endif
         return 1;
     }
+    #ifdef TRACE
+    soulng::util::EndTracing();
+    #endif
     return 0;
 }

@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -1917,7 +1917,8 @@ namespace cmcode
         private BuildServiceArgs MakeBuildServiceArgs()
         {
         #if (DEBUG)
-            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).Wait(false).SaveRequestOnly(false).DebugServer(true);
+            //BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).Wait(false).SaveRequestOnly(false).DebugServer(true);
+            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).Wait(false).SaveRequestOnly(false).TraceServer(true);
         #else
             BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(false).SaveRequestOnly(false).DebugServer(false);
         #endif

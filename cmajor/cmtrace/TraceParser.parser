@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -75,7 +75,7 @@ parser TraceParser
         ::= NAME{ return new NameField(); }
         |   THREAD{ return new ThreadField(); }
         |   DURATION{ return new DurationField(); }
-        |   TIME{ return TimeField(); }
+        |   TIME{ return new TimeField(); }
         |   LEVEL{ return new LevelField(); }
         |   MESSAGE{ return new MessageField(); }
         |   PARENT{ return new Parent(); }
@@ -90,7 +90,7 @@ parser TraceParser
     Unit : cmtrace::Unit
         ::= S{ return cmtrace::Unit::seconds; }
         |   MS{ return cmtrace::Unit::milliseconds; }
-        |   MUS{ return cmtrace::Unit::microseconds; }
+        |   US{ return cmtrace::Unit::microseconds; }
         |   NS{ return cmtrace::Unit::nanoseconds; }
         ;
 }

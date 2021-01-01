@@ -67,6 +67,7 @@ namespace System.Windows
                 int line = cast<int>(lines.Count());
                 int col = cast<int>(lines.Back().Length() + 1);
                 SetCaretLineCol(line, col);
+                SetTextExtent();
                 ScrollToCaret();
                 Invalidate();
             }
@@ -199,6 +200,7 @@ namespace System.Windows
             IncrementCaretColorCount();
             ++caretCol;
             SetCaretLineCol(caretLine, caretCol);
+            SetTextExtent();
             Invalidate();
         }
         private nothrow void DeleteChar()

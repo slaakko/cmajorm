@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -12,6 +12,8 @@
 
 #ifdef NDEBUG
 #pragma comment(lib, "bdt2dom.lib")
+#elif defined(TRACE)
+#pragma comment(lib, "bdt2domt.lib")
 #else
 #pragma comment(lib, "bdt2domd.lib")
 #endif

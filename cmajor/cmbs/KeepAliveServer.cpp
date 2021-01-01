@@ -1,10 +1,14 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 #include <cmajor/cmbs/KeepAliveServer.hpp>
 #include <cmajor/cmbs/BuildServerMessage.hpp>
+#ifdef TRACE
+#include <cmajor/cmbs_trace/TraceFunctions.hpp>
+#include <soulng/util/Trace.hpp>
+#endif
 #include <sngjson/json/JsonLexer.hpp>
 #include <sngjson/json/JsonParser.hpp>
 #include <soulng/util/LogFileWriter.hpp>
@@ -23,6 +27,9 @@ using namespace soulng::unicode;
 
 std::string CmajorRootDir()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(CmajorRootDir_f);
+#endif // TRACE
     char* e = getenv("CMAJOR_ROOT");
     if (e == nullptr || !*e)
     {
@@ -33,6 +40,9 @@ std::string CmajorRootDir()
 
 std::string CmajorLogDir()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(CmajorLogDir_f);
+#endif // TRACE
     std::string logDir = Path::Combine(CmajorRootDir(), "log");
     boost::filesystem::create_directories(logDir);
     return logDir;
@@ -40,6 +50,9 @@ std::string CmajorLogDir()
 
 std::string LogFilePath()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(LogFilePath_f);
+#endif // TRACE
     return Path::Combine(CmajorLogDir(), "cmbs.log");
 }
 
@@ -71,10 +84,16 @@ private:
 
 KeepAliveServer::KeepAliveServer() : exit(false), started(false), keepAliveServerPort(defaultKeepAliveServerPort), exitVar(nullptr), exiting(nullptr)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(KeepAliveServer_KeepAliveServer);
+#endif // TRACE
 }
 
 std::string KeepAliveServer::GetMessage(JsonValue* messageValue)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(KeepAliveServer_GetMessage);
+#endif // TRACE
     if (messageValue->Type() == JsonValueType::object)
     {
         JsonObject* jsonObject = static_cast<JsonObject*>(messageValue);
@@ -90,6 +109,9 @@ std::string KeepAliveServer::GetMessage(JsonValue* messageValue)
 
 KeepAliveReply KeepAliveServer::ProcessKeepAliveRequest(const KeepAliveRequest& request)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(KeepAliveServer_ProcessKeepAliveRequest);
+#endif // TRACE
     std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
     keepAliveReceivedTimePoint = now;
     KeepAliveReply reply;
@@ -99,6 +121,9 @@ KeepAliveReply KeepAliveServer::ProcessKeepAliveRequest(const KeepAliveRequest& 
 
 void KeepAliveServer::Run()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(KeepAliveServer_Run);
+#endif // TRACE
     std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
     keepAliveReceivedTimePoint = now;
     listenSocket.Bind(keepAliveServerPort);
@@ -138,6 +163,9 @@ void KeepAliveServer::Run()
 
 bool KeepAliveServer::Timeout() const
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(KeepAliveServer_Timeout);
+#endif // TRACE
     std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<std::chrono::seconds>(now - keepAliveReceivedTimePoint).count() > timeoutSecs)
     {
@@ -156,6 +184,10 @@ bool KeepAliveServer::Timeout() const
 
 void RunServer(KeepAliveServer* server)
 {
+#ifdef TRACE
+    soulng::util::SetThreadId('K');
+    soulng::util::Tracer tracer(RunServer_KeepAliveServer_f);
+#endif // TRACE
     try
     {
         server->Run();
@@ -167,6 +199,9 @@ void RunServer(KeepAliveServer* server)
 
 void KeepAliveServer::Start(int keepAliveServerPort_, std::condition_variable* exitVar_, bool* exiting_)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(KeepAliveServer_Start);
+#endif // TRACE
     keepAliveServerPort = keepAliveServerPort_;
     exitVar = exitVar_;
     exiting = exiting_;
@@ -175,6 +210,9 @@ void KeepAliveServer::Start(int keepAliveServerPort_, std::condition_variable* e
 
 void KeepAliveServer::Stop()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(KeepAliveServer_Stop);
+#endif // TRACE
     try
     {
         exit = true;
@@ -200,6 +238,9 @@ void KeepAliveServer::Done()
 
 void StartKeepAliveServer(int keepAliveServerPort, std::condition_variable* exitVar, bool* exiting)
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(StartKeepAliveServer_f);
+#endif // TRACE
     KeepAliveServer::Init();
     KeepAliveServer::Instance().Start(keepAliveServerPort, exitVar, exiting);
     while (!KeepAliveServer::Instance().Started())
@@ -210,12 +251,18 @@ void StartKeepAliveServer(int keepAliveServerPort, std::condition_variable* exit
 
 void StopKeepAliveServer()
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(StopKeepAliveServer_f);
+#endif // TRACE
     KeepAliveServer::Instance().Stop();
     KeepAliveServer::Done();
 }
 
 bool Timeout() 
 {
+#ifdef TRACE
+    soulng::util::Tracer tracer(Timeout_f);
+#endif // TRACE
     return KeepAliveServer::Instance().Timeout();
 }
 

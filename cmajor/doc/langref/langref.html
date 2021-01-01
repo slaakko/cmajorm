@@ -5089,8 +5089,18 @@
     </p>
 
     <p>
-        Currently Cmajor compiler recognizes three attributes:
+        Currently Cmajor compiler recognizes four attributes:
         <ul>
+			<li>
+				<strong>xml</strong> attribute can have value "true" or "false".
+				It can be attached to classes and member variables.
+				When a class is attached an <strong>xml</strong> attribute with
+				value of "true" or with no value, the compiler generates two functions for you:
+				a constructor taking an XML <a href="../system/content/System.Dom/doc/class_Element_2A1273470957C607E9B6D2BC48EACE25C2E3FEB9.html">element</a>,
+				that reads the contents of the class from the element,
+				and a <strong>ToXml</strong> member function that serializes the contents of the class to an XML element.
+				See XmlSerializationTest in the examples subdirectory for a usage example.
+			</li>
             <li>
                 <b>json</b> attribute can have value "true" or "false".
                 It can be attached to classes and member variables.

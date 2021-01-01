@@ -13,7 +13,7 @@ namespace System.Xml.Serialization
     {
         UniquePtr<Element> T.ToXml(const string& fieldName);
     }
-
+ 
     public concept XmlExportableScalarType<T>
     {
         where
@@ -117,7 +117,7 @@ namespace System.Xml.Serialization
         }
         return element;
     }
-    
+
     public UniquePtr<Element> ToXml<T>(const List<SharedPtr<T>>& list, const string& fieldName)
         where T is XmlExportableClassType
     {
@@ -128,7 +128,7 @@ namespace System.Xml.Serialization
         }
         return element;
     }
-    
+
     public UniquePtr<Element> ToXml(const string& value, const string& fieldName)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));

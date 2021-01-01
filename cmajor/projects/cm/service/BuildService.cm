@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -74,6 +74,11 @@ namespace Cm.Service.Build
             saveRequestOnly = saveRequestOnly_;
             return *this;
         }
+        public nothrow BuildServiceArgs& TraceServer(bool traceServer_)
+        {
+            traceServer = traceServer_;
+            return *this;
+        }
         public nothrow BuildServiceArgs& DebugServer(bool debugServer_)
         {
             debugServer = debugServer_;
@@ -88,6 +93,7 @@ namespace Cm.Service.Build
         public bool saveRequestOnly;
         public int serverStartWaitSeconds;
         public int serverStopWaitSeconds;
+        public bool traceServer;
         public bool debugServer;
     }
 
@@ -113,7 +119,11 @@ namespace Cm.Service.Build
         private string MakeServerStartCommand()
         {
             string serverStartCommand = "cmbs";
-            if (args.debugServer)
+            if (args.traceServer)
+            {
+            serverStartCommand = "cmbst";
+            }
+            else if (args.debugServer)
             {
                 serverStartCommand = "cmbsd";
             }
