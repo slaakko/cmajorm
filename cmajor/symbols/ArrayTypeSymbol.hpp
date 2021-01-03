@@ -120,6 +120,7 @@ class SYMBOLS_API ArrayTypeDefaultConstructor : public FunctionSymbol
 public:
     ArrayTypeDefaultConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeDefaultConstructor_);
     std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
+    void SetTemporariesForElementTypeDefaultCtor(std::vector<std::unique_ptr<GenObject>>&& temporaries);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flag, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeDefaultConstructor"; }
@@ -127,6 +128,7 @@ public:
 private:
     ArrayTypeSymbol* arrayType;
     FunctionSymbol* elementTypeDefaultConstructor;
+    std::vector<std::unique_ptr<GenObject>> temporariesForElementTypeDefaultCtor;
 };
 
 class SYMBOLS_API ArrayTypeCopyConstructor : public FunctionSymbol
@@ -134,6 +136,7 @@ class SYMBOLS_API ArrayTypeCopyConstructor : public FunctionSymbol
 public:
     ArrayTypeCopyConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeCopyConstructor_);
     std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
+    void SetTemporariesForElementTypeCopyCtor(std::vector<std::unique_ptr<GenObject>>&& temporaries);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeCopyConstructor"; }
@@ -141,6 +144,7 @@ public:
 private:
     ArrayTypeSymbol* arrayType;
     FunctionSymbol* elementTypeCopyConstructor;
+    std::vector<std::unique_ptr<GenObject>> temporariesForElementTypeCopyConstructor;
 };
 
 class SYMBOLS_API ArrayTypeMoveConstructor : public FunctionSymbol
@@ -148,6 +152,7 @@ class SYMBOLS_API ArrayTypeMoveConstructor : public FunctionSymbol
 public:
     ArrayTypeMoveConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeMoveConstructor_);
     std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
+    void SetTemporariesForElementTypeMoveCtor(std::vector<std::unique_ptr<GenObject>>&& temporaries);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeMoveConstructor"; }
@@ -155,6 +160,7 @@ public:
 private:
     ArrayTypeSymbol* arrayType;
     FunctionSymbol* elementTypeMoveConstructor;
+    std::vector<std::unique_ptr<GenObject>> temporariesForElementTypeMoveConstructor;
 };
 
 class SYMBOLS_API ArrayTypeCopyAssignment : public FunctionSymbol
@@ -162,6 +168,7 @@ class SYMBOLS_API ArrayTypeCopyAssignment : public FunctionSymbol
 public:
     ArrayTypeCopyAssignment(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeCopyAssignment_);
     std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
+    void SetTemporariesForElementTypeCopyAssignment(std::vector<std::unique_ptr<GenObject>>&& temporaries);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeCopyAssignment"; }
@@ -169,6 +176,7 @@ public:
 private:
     ArrayTypeSymbol* arrayType;
     FunctionSymbol* elementTypeCopyAssignment;
+    std::vector<std::unique_ptr<GenObject>> temporariesForElementTypeCopyAssignment;
 };
 
 class SYMBOLS_API ArrayTypeMoveAssignment : public FunctionSymbol
@@ -176,6 +184,7 @@ class SYMBOLS_API ArrayTypeMoveAssignment : public FunctionSymbol
 public:
     ArrayTypeMoveAssignment(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeMoveAssignment_);
     std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
+    void SetTemporariesForElementTypeMoveAssignment(std::vector<std::unique_ptr<GenObject>>&& temporaries);
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeMoveAssignment"; }
@@ -183,6 +192,7 @@ public:
 private:
     ArrayTypeSymbol* arrayType;
     FunctionSymbol* elementTypeMoveAssignment;
+    std::vector<std::unique_ptr<GenObject>> temporariesForElementTypeMoveAssignment;
 };
 
 class SYMBOLS_API ArrayTypeElementAccess : public FunctionSymbol

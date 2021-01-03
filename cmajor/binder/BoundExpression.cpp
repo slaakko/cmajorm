@@ -834,6 +834,16 @@ bool BoundFunctionCall::ContainsExceptionCapture() const
     return false;
 }
 
+std::vector<std::unique_ptr<GenObject>> BoundFunctionCall::ReleaseTemporaries()
+{
+    std::vector<std::unique_ptr<GenObject>> temps;
+    for (std::unique_ptr<BoundLocalVariable>& temp : temporaries)
+    {
+        temps.push_back(std::move(temp));
+    }
+    return temps;
+}
+
 void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
 {
     if ((flags & OperationFlags::addr) != OperationFlags::none)

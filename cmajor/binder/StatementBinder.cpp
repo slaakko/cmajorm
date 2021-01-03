@@ -349,6 +349,10 @@ void StatementBinder::Visit(FunctionNode& functionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&functionNode);
     Assert(symbol->GetSymbolType() == SymbolType::functionSymbol, "function symbol expected");
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
+    if (functionSymbol->GroupName() == U"Identity")
+    {
+        int x = 0;
+    }
     if (!dontCheckDuplicateFunctionSymbols)
     {
         functionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();

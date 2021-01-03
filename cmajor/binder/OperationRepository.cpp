@@ -1572,7 +1572,9 @@ void ArrayDefaultConstructorOperation::CollectViableFunctions(ContainerScope* co
         std::unique_ptr<BoundFunctionCall> elementDefaultConstructor = ResolveOverload(U"@constructor", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, 
             span, moduleId);
         FunctionSymbol* elementTypeDefaultConstructor = elementDefaultConstructor->GetFunctionSymbol();
-        function = new ArrayTypeDefaultConstructor(arrayType, elementTypeDefaultConstructor);
+        ArrayTypeDefaultConstructor* arrayTypeDefaultConstructor = new ArrayTypeDefaultConstructor(arrayType, elementTypeDefaultConstructor);
+        arrayTypeDefaultConstructor->SetTemporariesForElementTypeDefaultCtor(elementDefaultConstructor->ReleaseTemporaries());
+        function = arrayTypeDefaultConstructor;
         function->SetModule(&GetBoundCompileUnit().GetModule());
         function->SetParent(&GetSymbolTable()->GlobalNs());
         functionMap[arrayType->TypeId()] = function;
@@ -1624,7 +1626,9 @@ void ArrayCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
             std::unique_ptr<BoundFunctionCall> elementCopyConstructor = ResolveOverload(U"@constructor", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, 
                 span, moduleId);
             FunctionSymbol* elementTypeCopyConstructor = elementCopyConstructor->GetFunctionSymbol();
-            function = new ArrayTypeCopyConstructor(arrayType, elementTypeCopyConstructor);
+            ArrayTypeCopyConstructor* arrayTypeCopyConstructor = new ArrayTypeCopyConstructor(arrayType, elementTypeCopyConstructor);
+            arrayTypeCopyConstructor->SetTemporariesForElementTypeCopyCtor(elementCopyConstructor->ReleaseTemporaries());
+            function = arrayTypeCopyConstructor;
             function->SetModule(&GetBoundCompileUnit().GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[arrayType->TypeId()] = function;
@@ -1677,7 +1681,9 @@ void ArrayMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
             std::unique_ptr<BoundFunctionCall> elementMoveConstructor = ResolveOverload(U"@constructor", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, 
                 span, moduleId);
             FunctionSymbol* elementTypeMoveConstructor = elementMoveConstructor->GetFunctionSymbol();
-            function = new ArrayTypeMoveConstructor(arrayType, elementTypeMoveConstructor);
+            ArrayTypeMoveConstructor* arrayTypeMoveConstructor = new ArrayTypeMoveConstructor(arrayType, elementTypeMoveConstructor);
+            arrayTypeMoveConstructor->SetTemporariesForElementTypeMoveCtor(elementMoveConstructor->ReleaseTemporaries());
+            function = arrayTypeMoveConstructor;
             function->SetModule(&GetBoundCompileUnit().GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[arrayType->TypeId()] = function;
@@ -1730,7 +1736,9 @@ void ArrayCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             std::unique_ptr<BoundFunctionCall> elementCopyAssignment = ResolveOverload(U"operator=", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, 
                 span, moduleId);
             FunctionSymbol* elementTypeCopyAssignment = elementCopyAssignment->GetFunctionSymbol();
-            function = new ArrayTypeCopyAssignment(arrayType, elementTypeCopyAssignment);
+            ArrayTypeCopyAssignment * arrayTypeCopyAssignment = new ArrayTypeCopyAssignment(arrayType, elementTypeCopyAssignment);
+            arrayTypeCopyAssignment->SetTemporariesForElementTypeCopyAssignment(elementCopyAssignment->ReleaseTemporaries());
+            function = arrayTypeCopyAssignment;
             function->SetModule(&GetBoundCompileUnit().GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[arrayType->TypeId()] = function;
@@ -1783,7 +1791,9 @@ void ArrayMoveAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             std::unique_ptr<BoundFunctionCall> elementMoveAssignment = ResolveOverload(U"operator=", containerScope, elementLookups, elementArguments, GetBoundCompileUnit(), currentFunction, 
                 span, moduleId);
             FunctionSymbol* elementTypeMoveAssignment = elementMoveAssignment->GetFunctionSymbol();
-            function = new ArrayTypeMoveAssignment(arrayType, elementTypeMoveAssignment);
+            ArrayTypeMoveAssignment* arrayTypeMoveAssignment = new ArrayTypeMoveAssignment(arrayType, elementTypeMoveAssignment);
+            arrayTypeMoveAssignment->SetTemporariesForElementTypeMoveAssignment(elementMoveAssignment->ReleaseTemporaries());
+            function = arrayTypeMoveAssignment;
             function->SetModule(&GetBoundCompileUnit().GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[arrayType->TypeId()] = function;
@@ -2143,6 +2153,10 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
     std::unique_ptr<Exception>& exception, const Span& span, const boost::uuids::uuid& moduleId)
 {
     ClassTypeSymbol* classType = defaultConstructor->ClassType();
+    if (classType->GroupName() == U"Matrix")
+    {
+        int x = 0;
+    }
     try
     {
         bool nothrow = true;

@@ -452,6 +452,11 @@ std::vector<LocalVariableSymbol*> ArrayTypeDefaultConstructor::CreateTemporaries
     return temporaries;
 }
 
+void ArrayTypeDefaultConstructor::SetTemporariesForElementTypeDefaultCtor(std::vector<std::unique_ptr<GenObject>>&& temporaries)
+{
+    temporariesForElementTypeDefaultCtor = std::move(temporaries);
+}
+
 void ArrayTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 2, "array type default constructor needs two objects: one array type object and one loop variable temporary");
@@ -477,6 +482,10 @@ void ArrayTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<Gen
     NativeValue elementPtrValue(elementPtr);
     std::vector<GenObject*> elementGenObjects;
     elementGenObjects.push_back(&elementPtrValue);
+    for (const std::unique_ptr<GenObject>& temp : temporariesForElementTypeDefaultCtor)
+    {
+        elementGenObjects.push_back(temp.get());
+    }
     elementTypeDefaultConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span, moduleId);
     void* nextI = emitter.CreateAdd(index2, emitter.CreateIrValueForLong(1));
     emitter.Stack().Push(nextI);
@@ -519,6 +528,11 @@ std::vector<LocalVariableSymbol*> ArrayTypeCopyConstructor::CreateTemporariesTo(
     return temporaries;
 }
 
+void ArrayTypeCopyConstructor::SetTemporariesForElementTypeCopyCtor(std::vector<std::unique_ptr<GenObject>>&& temporaries)
+{
+    temporariesForElementTypeCopyConstructor = std::move(temporaries);
+}
+
 void ArrayTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 3, "copy constructor needs three objects: two array type objects and one loop variable temporary");
@@ -555,6 +569,10 @@ void ArrayTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     }
     NativeValue sourceValue(sourceElementValue);
     elementGenObjects.push_back(&sourceValue);
+    for (const std::unique_ptr<GenObject>& temp : temporariesForElementTypeCopyConstructor)
+    {
+        elementGenObjects.push_back(temp.get());
+    }
     elementTypeCopyConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span, moduleId);
     void* nextI = emitter.CreateAdd(index2, emitter.CreateIrValueForLong(1));
     emitter.Stack().Push(nextI);
@@ -597,6 +615,11 @@ std::vector<LocalVariableSymbol*> ArrayTypeMoveConstructor::CreateTemporariesTo(
     return temporaries;
 }
 
+void ArrayTypeMoveConstructor::SetTemporariesForElementTypeMoveCtor(std::vector<std::unique_ptr<GenObject>>&& temporaries)
+{
+    temporariesForElementTypeMoveConstructor = std::move(temporaries);
+}
+
 void ArrayTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 3, "move constructor needs three objects: two array type objects and one loop variable temporary");
@@ -627,6 +650,10 @@ void ArrayTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     void* sourceElementPtr = emitter.CreateArrayIndexAddress(sourcePtr, index2);
     NativeValue sourcePtrValue(sourceElementPtr);
     elementGenObjects.push_back(&sourcePtrValue);
+    for (const std::unique_ptr<GenObject>& temp : temporariesForElementTypeMoveConstructor)
+    {
+        elementGenObjects.push_back(temp.get());
+    }
     elementTypeMoveConstructor->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span, moduleId);
     void* nextI = emitter.CreateAdd(index2, emitter.CreateIrValueForLong(1));
     emitter.Stack().Push(nextI);
@@ -671,6 +698,11 @@ std::vector<LocalVariableSymbol*> ArrayTypeCopyAssignment::CreateTemporariesTo(F
     return temporaries;
 }
 
+void ArrayTypeCopyAssignment::SetTemporariesForElementTypeCopyAssignment(std::vector<std::unique_ptr<GenObject>>&& temporaries)
+{
+    temporariesForElementTypeCopyAssignment = std::move(temporaries);
+}
+
 void ArrayTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 3, "copy assignment needs three objects: two array type objects and one loop variable temporary");
@@ -707,6 +739,10 @@ void ArrayTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     }
     NativeValue sourceValue(sourceElementValue);
     elementGenObjects.push_back(&sourceValue);
+    for (const std::unique_ptr<GenObject>& temp : temporariesForElementTypeCopyAssignment)
+    {
+        elementGenObjects.push_back(temp.get());
+    }
     elementTypeCopyAssignment->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span, moduleId);
     void* nextI = emitter.CreateAdd(index2, emitter.CreateIrValueForLong(1));
     emitter.Stack().Push(nextI);
@@ -751,6 +787,11 @@ std::vector<LocalVariableSymbol*> ArrayTypeMoveAssignment::CreateTemporariesTo(F
     return temporaries;
 }
 
+void ArrayTypeMoveAssignment::SetTemporariesForElementTypeMoveAssignment(std::vector<std::unique_ptr<GenObject>>&& temporaries)
+{
+    temporariesForElementTypeMoveAssignment = std::move(temporaries);
+}
+
 void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId)
 {
     Assert(genObjects.size() == 3, "move assignment needs three objects: two array type objects and one loop variable temporary");
@@ -783,6 +824,10 @@ void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     TypeSymbol* elementType = arrayType->ElementType();
     NativeValue sourcePtrValue(sourceElementPtr);
     elementGenObjects.push_back(&sourcePtrValue);
+    for (const std::unique_ptr<GenObject>& temp : temporariesForElementTypeMoveAssignment)
+    {
+        elementGenObjects.push_back(temp.get());
+    }
     elementTypeMoveAssignment->GenerateCall(emitter, elementGenObjects, OperationFlags::none, span, moduleId);
     void* nextI = emitter.CreateAdd(index2, emitter.CreateIrValueForLong(1));
     emitter.Stack().Push(nextI);

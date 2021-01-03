@@ -1,0 +1,192 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace GrMath
+{
+    public nothrow Matrix Translate(float tx, float ty, float tz)
+    {
+        Matrix tm = Matrix.Identity();
+        tm[0][3] = tx;
+        tm[1][3] = ty;
+        tm[2][3] = tz;
+        return tm;
+    }
+
+    public nothrow Matrix Scale(float sx, float sy, float sz)
+    {
+        Matrix sm;
+        sm[0][0] = sx;
+        sm[1][1] = sy;
+        sm[2][2] = sz;
+        sm[3][3] = 1;
+        return sm;
+    }
+
+    // scale (sx, sy, sz) relative to point (px, py, pz):
+
+    public nothrow Matrix Scale(float sx, float sy, float sz, float px, float py, float pz)
+    {
+        Matrix sm;
+        sm[0][0] = sx;
+        sm[0][3] = px * (1 - sx);
+        sm[1][1] = sy;
+        sm[1][3] = py * (1 - sy);
+        sm[2][2] = sz;
+        sm[2][3] = pz * (1 - sz);
+        sm[3][3] = 1;
+        return sm;
+    }
+
+    // roll = angle to rotate about Z axis
+    // pitch = angle to rotate about X axis
+    // yaw = angle to rotate about Y axis
+
+    public nothrow Matrix RotateAboutZ(float roll)
+    {
+        float cosRoll = cast<float>(Cos(roll));
+        float sinRoll = cast<float>(Sin(roll));
+        Matrix rm;
+        rm[0][0] = cosRoll;
+        rm[0][1] = -sinRoll;
+        rm[1][0] = sinRoll;
+        rm[1][1] = cosRoll;
+        rm[2][2] = 1;
+        rm[3][3] = 1;
+        return rm;
+    }
+
+    public nothrow Matrix RotateAboutX(float pitch)
+    {
+        float cosPitch = cast<float>(Cos(pitch));
+        float sinPitch = cast<float>(Sin(pitch));
+        Matrix rm;
+        rm[0][0] = 1;
+        rm[1][1] = cosPitch;
+        rm[1][2] = -sinPitch;
+        rm[2][1] = sinPitch;
+        rm[2][2] = cosPitch;
+        rm[3][3] = 1;
+        return rm;
+    }
+
+    public nothrow Matrix RotateAboutY(float yaw)
+    {
+        float cosYaw = cast<float>(Cos(yaw));
+        float sinYaw = cast<float>(Sin(yaw));
+        Matrix rm;
+        rm[0][0] = cosYaw;
+        rm[0][2] = sinYaw;
+        rm[1][1] = 1;
+        rm[2][0] = -sinYaw;
+        rm[2][2] = cosYaw;
+        rm[3][3] = 1;
+        return rm;
+    }
+
+    public nothrow Matrix Rotate(float roll, float pitch, float yaw)
+    {
+        return RotateAboutY(yaw) * RotateAboutX(pitch) * RotateAboutZ(roll);
+    }
+
+    // Rotation about axis n^ = ai + bj + ck with angle = alpha radians:
+    public nothrow Matrix Rotate(float a, float b, float c, float alpha)
+    {
+        float cosAlpha = cast<float>(Cos(alpha));
+        float sinAlpha = cast<float>(Sin(alpha));
+        float K = 1 - cosAlpha;
+        Matrix m;
+        m[0][0] = a * a * K + cosAlpha;
+        m[0][1] = a * b * K - c * sinAlpha;
+        m[0][2] = a * c * K + b * sinAlpha;
+        m[1][0] = a * b * K + c * sinAlpha;
+        m[1][1] = b * b * K + cosAlpha;
+        m[1][2] = b * c * K - a * sinAlpha;
+        m[2][0] = a * c * K - b * sinAlpha;
+        m[2][1] = b * c * K + a * sinAlpha;
+        m[2][2] = c * c * K + cosAlpha;
+        m[3][3] = 1;
+        return m;
+    }
+
+    public nothrow Matrix ReflectYZ()
+    {
+        Matrix rm = Matrix.Identity();
+        rm[0][0] = -1;
+        return rm;
+    }
+
+    public nothrow Matrix ReflectXZ()
+    {
+        Matrix rm = Matrix.Identity();
+        rm[1][1] = -1;
+        return rm;
+    }
+
+    public nothrow Matrix ReflectXY()
+    {
+        Matrix rm = Matrix.Identity();
+        rm[2][2] = -1;
+        return rm;
+    }
+
+    public nothrow Matrix Camera(float roll, float pitch, float yaw, float tx, float ty, float tz)
+    {
+        Matrix cm;
+        float cosRoll = cast<float>(Cos(roll));
+        float sinRoll = cast<float>(Sin(roll));
+        float cosPitch = cast<float>(Cos(pitch));
+        float sinPitch = cast<float>(Sin(pitch));
+        float cosYaw = cast<float>(Cos(yaw));
+        float sinYaw = cast<float>(Sin(yaw));
+        cm[0][0] = cosYaw * cosRoll + sinYaw * sinPitch * sinRoll;
+        cm[0][1] = cosPitch * sinRoll;
+        cm[0][2] = -sinYaw * cosRoll + cosYaw * sinPitch * sinRoll;
+        cm[0][3] = -(tx * cm[0][0] + ty * cm[0][1] + tz * cm[0][2]);
+        cm[1][0] = -cosYaw * sinRoll + sinYaw * sinPitch * cosRoll;
+        cm[1][1] = cosPitch * cosRoll;
+        cm[1][2] = -sinYaw * sinRoll + cosYaw * sinPitch * cosRoll;
+        cm[1][3] = -(tx * cm[1][0] + ty * cm[1][1] + tz * cm[1][2]);
+        cm[2][0] = sinYaw * cosPitch;
+        cm[2][1] = -sinPitch;
+        cm[2][2] = cosYaw * cosPitch;
+        cm[2][3] = -(tx * cm[2][0] + ty * cm[2][1] + tz * cm[2][2]);
+        cm[3][3] = 1;
+        return cm;
+    }
+
+    public nothrow Matrix Camera(const Vector& eye, const Vector& lookAt, const Vector& up)
+    {
+        Vector zaxis = Normalize(eye - lookAt);
+        Vector xaxis = Normalize(Cross(up, zaxis));
+        Vector yaxis = Normalize(Cross(zaxis, xaxis));
+        Matrix orientation;
+        orientation[0][0] = Dot(xaxis, I());
+        orientation[0][1] = Dot(xaxis, J());
+        orientation[0][2] = Dot(xaxis, K());
+        orientation[1][0] = Dot(yaxis, I());
+        orientation[1][1] = Dot(yaxis, J());
+        orientation[1][2] = Dot(yaxis, K());
+        orientation[2][0] = Dot(zaxis, I());
+        orientation[2][1] = Dot(zaxis, J());
+        orientation[2][2] = Dot(zaxis, K());
+        Matrix translation = Matrix.Identity();
+        translation[0][3] = -eye.x;
+        translation[1][3] = -eye.y;
+        translation[2][3] = -eye.z;
+        return orientation * translation;
+    }
+
+    public nothrow Matrix Project(float d)
+    {
+        Matrix pm;
+        pm[0][0] = -1;
+        pm[1][1] = 1;
+        pm[2][2] = 1;
+        pm[3][2] = 1 / d;
+        return pm;
+    }
+}

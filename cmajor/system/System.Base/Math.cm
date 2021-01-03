@@ -5,49 +5,62 @@
 
 using System;
 
-public nothrow double Pow(double x, int exponent)
+namespace System
 {
-    return RtPow(x, exponent);
-}
-
-public nothrow double Sqrt(double x)
-{
-    return RtSqrt(x);
-}
-
-public nothrow int Log10(int n)
-{
-    int log10 = 1;
-    int m = n / 10;
-    while (m > 0)
+    public nothrow double Pow(double x, int exponent)
     {
-        ++log10;
-        m = m / 10;
+        return RtPow(x, exponent);
     }
-    return log10;
-}
 
-public nothrow double PI()
-{
-    return RtPi();
-}
+    public nothrow double Sqrt(double x)
+    {
+        return RtSqrt(x);
+    }
 
-public nothrow double Cos(double angleRad)
-{
-    return RtCos(angleRad);
-}
+    public nothrow int Log10(int n)
+    {
+        int log10 = 1;
+        int m = n / 10;
+        while (m > 0)
+        {
+            ++log10;
+            m = m / 10;
+        }
+        return log10;
+    }
 
-public nothrow double Sin(double angleRad)
-{
-    return RtSin(angleRad);
-}
+    public nothrow double PI()
+    {
+        return RtPi();
+    }
 
-public nothrow double Atan2(double y, double x)
-{
-    return RtAtan2(y, x);
-}
+    public nothrow double DegToRad(double angleDeg)
+    {
+        return PI() * angleDeg / 180.0;
+    }
 
-public nothrow double Epsilon()
-{
-    return RtEpsilon();
+    public nothrow double RadToDeg(double angleRad)
+    {
+        return angleRad * 180.0 / PI();
+    }
+
+    public nothrow double Cos(double angleRad)
+    {
+        return RtCos(angleRad);
+    }
+
+    public nothrow double Sin(double angleRad)
+    {
+        return RtSin(angleRad);
+    }
+
+    public nothrow double Atan2(double y, double x)
+    {
+        return RtAtan2(y, x);
+    }
+
+    public nothrow double Epsilon()
+    {
+        return RtEpsilon();
+    }
 }

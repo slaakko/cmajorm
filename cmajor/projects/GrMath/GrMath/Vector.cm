@@ -1,0 +1,86 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace GrMath
+{
+    public class Vector
+    {
+        public nothrow Vector() : x(0), y(0), z(0), w(1)
+        {
+        }
+        public nothrow Vector(float x_, float y_, float z_, float w_) : x(x_), y(y_), z(z_), w(w_)
+        {
+        }
+        public nothrow Vector(float x, float y, float z) : this(x, y, z, 1)
+        {
+        }
+        public float x;
+        public float y;
+        public float z;
+        public float w;
+    }
+
+    public TextWriter& operator<<(TextWriter& w, const Vector& v)
+    {
+        return w << "(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
+    }
+
+    public nothrow Vector I()
+    {
+        return Vector(1, 0, 0);
+    }
+
+    public nothrow Vector J()
+    {
+        return Vector(0, 1, 0);
+    }
+
+    public nothrow Vector K()
+    {
+        return Vector(0, 0, 1);
+    }
+
+    // I x J = K
+    // J x K = I
+    // K x I = J
+
+    public nothrow inline float Norm(const Vector& v)
+    {
+        return cast<float>(Sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w));
+    }
+
+    public nothrow inline Vector operator+(const Vector& left, const Vector& right)
+    {
+        return Vector(left.x + right.x, left.y + right.y, left.z + right.z, left.w + right.w);
+    }
+
+    public nothrow inline Vector operator-(const Vector& left, const Vector& right)
+    {
+        return Vector(left.x - right.x, left.y - right.y, left.z - right.z, left.w - right.w);
+    }
+
+    public nothrow inline Vector operator*(float a, const Vector& v)
+    {
+        return Vector(a * v.x, a * v.y, a * v.z, a * v.w);
+    }
+
+    public nothrow inline Vector Normalize(const Vector& v)
+    {
+        return (1 / Norm(v)) * v;
+    }
+
+    public nothrow inline float Dot(const Vector& left, const Vector& right)
+    {
+        return left.x * right.x + left.y * right.y + left.z * right.z + left.w * right.w;
+    }
+
+    public nothrow inline Vector Cross(const Vector& left, const Vector& right)
+    {
+        return Vector(left.y * right.z - left.z * right.y, left.z * right.x - left.x * right.z, left.x * right.y - left.y * right.x);
+    }
+}

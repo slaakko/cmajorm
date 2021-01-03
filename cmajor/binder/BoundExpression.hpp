@@ -284,6 +284,7 @@ public:
     const std::vector<std::unique_ptr<BoundExpression>>& Arguments() const { return arguments; }
     void AddTemporary(std::unique_ptr<BoundLocalVariable>&& temporary);
     bool ContainsExceptionCapture() const override;
+    std::vector<std::unique_ptr<GenObject>> ReleaseTemporaries();
 private:
     FunctionSymbol* functionSymbol;
     std::vector<std::unique_ptr<BoundExpression>> arguments;
