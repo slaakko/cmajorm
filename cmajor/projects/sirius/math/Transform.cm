@@ -5,9 +5,9 @@
 
 using System;
 
-namespace GrMath
+namespace Sirius.Math
 {
-    public nothrow Matrix Translate(float tx, float ty, float tz)
+    public nothrow Matrix Translation(float tx, float ty, float tz)
     {
         Matrix tm = Matrix.Identity();
         tm[0][3] = tx;
@@ -16,7 +16,7 @@ namespace GrMath
         return tm;
     }
 
-    public nothrow Matrix Scale(float sx, float sy, float sz)
+    public nothrow Matrix Scaling(float sx, float sy, float sz)
     {
         Matrix sm;
         sm[0][0] = sx;
@@ -28,7 +28,7 @@ namespace GrMath
 
     // scale (sx, sy, sz) relative to point (px, py, pz):
 
-    public nothrow Matrix Scale(float sx, float sy, float sz, float px, float py, float pz)
+    public nothrow Matrix Scaling(float sx, float sy, float sz, float px, float py, float pz)
     {
         Matrix sm;
         sm[0][0] = sx;
@@ -45,7 +45,7 @@ namespace GrMath
     // pitch = angle to rotate about X axis
     // yaw = angle to rotate about Y axis
 
-    public nothrow Matrix RotateAboutZ(float roll)
+    public nothrow Matrix RotationAboutZ(float roll)
     {
         float cosRoll = cast<float>(Cos(roll));
         float sinRoll = cast<float>(Sin(roll));
@@ -59,7 +59,7 @@ namespace GrMath
         return rm;
     }
 
-    public nothrow Matrix RotateAboutX(float pitch)
+    public nothrow Matrix RotationAboutX(float pitch)
     {
         float cosPitch = cast<float>(Cos(pitch));
         float sinPitch = cast<float>(Sin(pitch));
@@ -73,7 +73,7 @@ namespace GrMath
         return rm;
     }
 
-    public nothrow Matrix RotateAboutY(float yaw)
+    public nothrow Matrix RotationAboutY(float yaw)
     {
         float cosYaw = cast<float>(Cos(yaw));
         float sinYaw = cast<float>(Sin(yaw));
@@ -87,13 +87,13 @@ namespace GrMath
         return rm;
     }
 
-    public nothrow Matrix Rotate(float roll, float pitch, float yaw)
+    public nothrow Matrix Rotation(float roll, float pitch, float yaw)
     {
-        return RotateAboutY(yaw) * RotateAboutX(pitch) * RotateAboutZ(roll);
+        return RotationAboutY(yaw) * RotationAboutX(pitch) * RotationAboutZ(roll);
     }
 
     // Rotation about axis n^ = ai + bj + ck with angle = alpha radians:
-    public nothrow Matrix Rotate(float a, float b, float c, float alpha)
+    public nothrow Matrix Rotation(float a, float b, float c, float alpha)
     {
         float cosAlpha = cast<float>(Cos(alpha));
         float sinAlpha = cast<float>(Sin(alpha));
@@ -112,28 +112,28 @@ namespace GrMath
         return m;
     }
 
-    public nothrow Matrix ReflectYZ()
+    public nothrow Matrix ReflectionYZ()
     {
         Matrix rm = Matrix.Identity();
         rm[0][0] = -1;
         return rm;
     }
 
-    public nothrow Matrix ReflectXZ()
+    public nothrow Matrix ReflectionXZ()
     {
         Matrix rm = Matrix.Identity();
         rm[1][1] = -1;
         return rm;
     }
 
-    public nothrow Matrix ReflectXY()
+    public nothrow Matrix ReflectionXY()
     {
         Matrix rm = Matrix.Identity();
         rm[2][2] = -1;
         return rm;
     }
 
-    public nothrow Matrix Camera(float roll, float pitch, float yaw, float tx, float ty, float tz)
+    public nothrow Matrix Viewing(float roll, float pitch, float yaw, float tx, float ty, float tz)
     {
         Matrix cm;
         float cosRoll = cast<float>(Cos(roll));
@@ -158,7 +158,7 @@ namespace GrMath
         return cm;
     }
 
-    public nothrow Matrix Camera(const Vector& eye, const Vector& lookAt, const Vector& up)
+    public nothrow Matrix Viewing(const Vector& eye, const Vector& lookAt, const Vector& up)
     {
         Vector zaxis = Normalize(eye - lookAt);
         Vector xaxis = Normalize(Cross(up, zaxis));
@@ -180,7 +180,7 @@ namespace GrMath
         return orientation * translation;
     }
 
-    public nothrow Matrix Project(float d)
+    public nothrow Matrix Projection(float d)
     {
         Matrix pm;
         pm[0][0] = -1;

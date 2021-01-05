@@ -1,0 +1,56 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace Sirius.Graphics
+{
+    public class Buffer
+    {
+        public Buffer(const Size& size, System.Windows.Graphics& graphics_) :
+            bitmap(size.w, size.h, graphics_), graphics(System.Windows.Graphics.FromImage(bitmap))
+        {
+        }
+        public nothrow inline System.Windows.Graphics& GetBitmapGraphics()
+        {
+            return graphics;
+        }
+        private Bitmap bitmap;
+        private System.Windows.Graphics graphics;
+    }
+
+    public class BufferPtr
+    {
+        public nothrow BufferPtr() : pool(null), buffer(null)
+        {
+        }
+        public nothrow BufferPtr(BufferPool* pool_) : pool(pool_), buffer(pool->GetBuffer())
+        {
+        }
+        suppress BufferPtr(const BufferPtr&);
+        suppress void operator=(const BufferPtr&);
+        public nothrow BufferPtr(BufferPtr&& that) : pool(that.pool), buffer(that.buffer)
+        {
+            that.pool = null;
+            that.buffer = null;
+        }
+        public default nothrow void operator=(BufferPtr&&);
+        public ~BufferPtr()
+        {
+            if (buffer != null && pool != null)
+            {
+                pool->PutBuffer(buffer);
+            }
+        }
+        public nothrow inline Buffer* operator->() const
+        {
+            return buffer;
+        }
+        private BufferPool* pool;
+        private Buffer* buffer;
+    }
+}
+

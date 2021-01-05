@@ -6,8 +6,10 @@
 using System;
 using System.IO;
 
-namespace GrMath
+namespace Sirius.Math
 {
+    public const float epsilon = 0.001f;
+
     public class Vector
     {
         public nothrow Vector() : x(0), y(0), z(0), w(1)
@@ -23,6 +25,12 @@ namespace GrMath
         public float y;
         public float z;
         public float w;
+    }
+
+    public nothrow bool operator==(const Vector& left, const Vector& right)
+    {
+        Vector d = left - right;
+        return Dot(d, d) < epsilon * epsilon;
     }
 
     public TextWriter& operator<<(TextWriter& w, const Vector& v)

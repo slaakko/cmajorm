@@ -1,0 +1,75 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace Sirius.Graphics
+{
+    public class BufferPool
+    {
+        static nothrow BufferPool() : instance(new BufferPool(Application.MainWindow()))
+        {
+        }
+        public static nothrow BufferPool& Instance()
+        {
+            return *instance;
+        }
+        public nothrow BufferPtr GetBufferPtr()
+        {
+            return BufferPtr(this);
+        }
+        public nothrow BufferPool(Window* window_) : window(window_)
+        {
+            window->SizeChangedEvent().AddHandler(WindowSizeChanged);
+        }
+        private nothrow void WindowSizeChanged(uint windowState)
+        {
+            FreeBuffers();
+        }
+        public nothrow void AllocateBuffers(int count)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                UniquePtr<Buffer> buffer = AllocateBuffer();
+                freeBuffers.Add(buffer.Get());
+                buffers.Add(Rvalue(buffer));
+            }
+        }
+        public nothrow void FreeBuffers()
+        {
+            freeBuffers.Clear();
+            buffers.Clear();
+        }
+        internal nothrow Buffer* GetBuffer()
+        {
+            if (freeBuffers.IsEmpty())
+            {
+                UniquePtr<Buffer> buffer = AllocateBuffer();
+                freeBuffers.Add(buffer.Get());
+                buffers.Add(Rvalue(buffer));
+            }
+            Buffer* freeBuffer = freeBuffers.Back();
+            freeBuffers.RemoveLast();
+            return freeBuffer;
+        }
+        internal nothrow void PutBuffer(Buffer* buffer)
+        {
+            freeBuffers.Add(buffer);
+        }
+        public nothrow UniquePtr<Buffer> AllocateBuffer()
+        {
+            System.Windows.Graphics graphics = System.Windows.Graphics.FromWindowHandle(window->Handle());
+            UniquePtr<Buffer> buffer(new Buffer(window->GetSize(), graphics));
+            return buffer;
+        }
+        private static UniquePtr<BufferPool> instance;
+        private Window* window;
+        private List<UniquePtr<Buffer>> buffers;
+        private List<Buffer*> freeBuffers;
+    }
+}
+

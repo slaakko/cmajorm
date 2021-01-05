@@ -1,0 +1,72 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using Sirius.Math;
+
+namespace Sirius.Graphics
+{
+    public class Vertex
+    {
+        public nothrow Vertex() : location()
+        {
+        }
+        public nothrow explicit Vertex(const Vector& location_) : location(location_)
+        {
+        }
+        public Vector location;
+    }
+
+    public class Edge
+    {
+        public nothrow Edge(int startVertex_, int endVertex_) : startVertex(startVertex_), endVertex(endVertex_)
+        {
+        }
+        public int startVertex;
+        public int endVertex;
+    }
+
+    public class Polygon
+    {
+        public nothrow inline void AddEdge(const Edge& edge)
+        {
+            edges.Add(edge);
+        }
+        private List<Edge> edges;
+    }
+
+    public abstract class Object
+    {
+        public default virtual ~Object();
+        public nothrow inline void AddVertex(const Vertex& vertex)
+        {
+            vertices.Add(vertex);
+        }
+        public nothrow inline void AddEdge(const Edge& edge)
+        {
+            edges.Add(edge);
+        }
+        public nothrow inline void AddPolygon(const Polygon& polygon)
+        {
+            polygons.Add(polygon);
+        }
+        public nothrow inline void AddPolygon(Polygon&& polygon)
+        {
+            polygons.Add(polygon);
+        }
+        public void Transform(const Matrix& transformation)
+        {
+            for (Vertex& vertex : vertices)
+            {
+                vertex.location = transformation * vertex.location;
+            }
+        }
+        private List<Vertex> vertices;
+        private List<Edge> edges;
+        private List<Polygon> polygons;
+    }
+}
+

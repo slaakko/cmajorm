@@ -1,0 +1,113 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace Sirius.Graphics
+{
+    public class Cube : Object
+    {
+        public nothrow Cube() : this(1)
+        {
+        }
+        public explicit nothrow Cube(float sideLength) : this(sideLength, 0, 0, 0)
+        {
+        }
+        public nothrow Cube(float sideLength, float roll, float pitch, float yaw) : this(sideLength, roll, pitch, yaw, Vector(0, 0, 0))
+        {
+        }
+        public nothrow Cube(float sideLength, float roll, float pitch, float yaw, const Vector& location)
+        {
+            AddVertex(Vertex(Vector(0, 0, 0))); // 0
+            AddVertex(Vertex(Vector(1, 0, 0))); // 1
+            AddVertex(Vertex(Vector(1, 1, 0))); // 2
+            AddVertex(Vertex(Vector(0, 1, 0))); // 3
+            AddVertex(Vertex(Vector(0, 0, 1))); // 4
+            AddVertex(Vertex(Vector(1, 0, 1))); // 5
+            AddVertex(Vertex(Vector(1, 1, 1))); // 6
+            AddVertex(Vertex(Vector(0, 1, 1))); // 7
+
+            AddEdge(Edge(0, 1)); // 0
+            AddEdge(Edge(1, 2)); // 1
+            AddEdge(Edge(2, 3)); // 2
+            AddEdge(Edge(3, 0)); // 3
+
+            Polygon back;
+            back.AddEdge(Edge(0, 1));
+            back.AddEdge(Edge(1, 2));
+            back.AddEdge(Edge(2, 3));
+            back.AddEdge(Edge(3, 0));
+            AddPolygon(Rvalue(back));
+
+            AddEdge(Edge(0, 4)); // 4
+            AddEdge(Edge(4, 5)); // 5
+            AddEdge(Edge(5, 1)); // 6
+            //AddEdge(Edge(1, 0));
+
+            Polygon bottom;
+            bottom.AddEdge(Edge(0, 4));
+            bottom.AddEdge(Edge(4, 5));
+            bottom.AddEdge(Edge(5, 1));
+            bottom.AddEdge(Edge(1, 0));
+            AddPolygon(Rvalue(bottom));
+
+            //AddEdge(Edge(4, 5)); // 5
+            AddEdge(Edge(5, 6)); // 7
+            AddEdge(Edge(6, 7)); // 8
+            AddEdge(Edge(7, 4)); // 9
+
+            Polygon front;
+            front.AddEdge(Edge(4, 5));
+            front.AddEdge(Edge(5, 6));
+            front.AddEdge(Edge(6, 7));
+            front.AddEdge(Edge(7, 4));
+            AddPolygon(Rvalue(front));
+
+            AddEdge(Edge(3, 7)); // 10
+            //AddEdge(Edge(7, 6)); // 8
+            AddEdge(Edge(6, 2)); // 11
+            //AddEdge(Edge(2, 3)); // 2
+
+            Polygon top;
+            top.AddEdge(Edge(3, 7));
+            top.AddEdge(Edge(7, 6));
+            top.AddEdge(Edge(6, 2));
+            top.AddEdge(Edge(2, 3));
+            AddPolygon(Rvalue(top));
+
+            //AddEdge(Edge(1, 2)); // 1
+            //AddEdge(Edge(2, 6)); // 11
+            //AddEdge(Edge(6, 5)); // 7
+            //AddEdge(Edge(5, 1)); // 6
+
+            Polygon left;
+            left.AddEdge(Edge(1, 2));
+            left.AddEdge(Edge(2, 6));
+            left.AddEdge(Edge(6, 5));
+            left.AddEdge(Edge(5, 1));
+            AddPolygon(Rvalue(left));
+
+            //AddEdge(Edge(0, 4)); // 4
+            //AddEdge(Edge(4, 7)); // 9
+            //AddEdge(Edge(7, 3)); // 10
+            //AddEdge(Edge(3, 0)); // 3
+
+            Polygon right;
+            right.AddEdge(Edge(0, 4));
+            right.AddEdge(Edge(4, 7));
+            right.AddEdge(Edge(7, 3));
+            right.AddEdge(Edge(3, 0));
+            AddPolygon(Rvalue(right));
+
+            Matrix moveToOrigin = Translation(-0.5f, -0.5f, -0.5f);
+            Matrix scaling = Scaling(sideLength, sideLength, sideLength);
+            Matrix orientation = Rotation(roll, pitch, yaw);
+            Matrix moveToLocation = Translation(location.x, location.y, location.z);
+            Matrix transformation = moveToLocation * orientation * scaling * moveToOrigin;
+            Transform(transformation);
+        }
+    }
+}
+

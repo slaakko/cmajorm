@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
-using GrMath;
+using Sirius.Math;
 
 void testScale()
 {
-    Matrix sm = Scale(2, 3, 4, 1, 1, 1);
+    Matrix sm = Scaling(2, 3, 4, 1, 1, 1);
     Console.Out() << sm << endl();
     Vector v(2, 2, 2);
     Vector u = sm * v;
@@ -13,16 +13,16 @@ void testScale()
 
 void testYawAndPitch()
 {
-    Matrix rm = GrMath.Rotate(0, cast<float>(DegToRad(90)), cast<float>(DegToRad(90)));
+    Matrix rm = Rotation(0, cast<float>(DegToRad(90)), cast<float>(DegToRad(90)));
     Console.Out() << rm << endl();
     Vector v(1, 1, 1);
     Vector u = rm * v;
     Console.Out() << u << endl() << endl();
 }
 
-void testCamera()
+void testView()
 {
-    Matrix cm = Camera(cast<float>(DegToRad(180.0f)), cast<float>(DegToRad(0.0f)), cast<float>(DegToRad(180.0f)), -10.0f, 0, 0);
+    Matrix cm = Viewing(cast<float>(DegToRad(180.0f)), cast<float>(DegToRad(0.0f)), cast<float>(DegToRad(180.0f)), -10.0f, 0, 0);
     Console.Out() << cm << endl();
     Vector v1(0, 0, 0);
     Vector vc1 = cm * v1;
@@ -34,7 +34,7 @@ void testCamera()
 
 void testRotate()
 {
-    Matrix rm = GrMath.Rotate(0.0f, cast<float>(1 / Sqrt(2)), cast<float>(1 / Sqrt(2)), cast<float>(DegToRad(180.0f)));
+    Matrix rm = Rotation(0.0f, cast<float>(1 / Sqrt(2)), cast<float>(1 / Sqrt(2)), cast<float>(DegToRad(180.0f)));
     Console.Out() << rm << endl();
     Vector v(1, 0, 0);
     Vector u = rm * v;
@@ -43,7 +43,7 @@ void testRotate()
 
 void testProject()
 {
-    Matrix pm = Project(20);
+    Matrix pm = Projection(20);
     Console.Out() << pm << endl();
     List<Vector> vertices;
     vertices.Add(Vector(0, 0, 10));
@@ -64,9 +64,9 @@ void testProject()
     Console.Out() << endl();
 }
 
-void testCameraLookAt()
+void testViewLookAt()
 {
-    Matrix cm = Camera(Vector(0, 0, 20), Vector(0, 0, 0), J());
+    Matrix cm = Viewing(Vector(0, 0, 20), Vector(0, 0, 0), J());
     Console.Out() << cm << endl();
 }
 
@@ -74,14 +74,12 @@ int main()
 {
     try
     {
-/*        
         testScale();
         testYawAndPitch();
-        testCamera();
+        testView();
         testRotate();
         testProject();
-*/
-        testCameraLookAt();
+        testViewLookAt();
     }
     catch (const Exception& ex)
     {
