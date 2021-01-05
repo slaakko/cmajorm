@@ -16,6 +16,7 @@ namespace sngxml { namespace xmlser {
 
 using date = soulng::util::Date;
 using datetime = soulng::util::DateTime;
+using timestamp = soulng::util::Timestamp;
 using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
@@ -52,6 +53,7 @@ SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, uuid& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, date& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, datetime& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, timestamp& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, time_point& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, duration& value);
 

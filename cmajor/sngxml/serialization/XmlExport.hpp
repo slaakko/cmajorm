@@ -21,6 +21,7 @@ using namespace soulng::unicode;
 
 using date = soulng::util::Date;
 using datetime = soulng::util::DateTime;
+using timestamp = soulng::util::Timestamp;
 using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
@@ -108,6 +109,11 @@ SNGXML_SERIALIZATION_API inline std::string ToString(const datetime& dateTime)
     return dateTime.ToString();
 }
 
+SNGXML_SERIALIZATION_API inline std::string ToString(const timestamp& ts)
+{
+    return ts.ToString();
+}
+
 SNGXML_SERIALIZATION_API inline std::string ToString(const time_point& tp)
 {
     return ToString(std::chrono::duration_cast<std::chrono::nanoseconds>(tp.time_since_epoch()).count());
@@ -139,6 +145,7 @@ SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const std::
 SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const uuid& value, const std::string& fieldName);
 SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const date& value, const std::string& fieldName);
 SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const datetime& value, const std::string& fieldName);
+SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const timestamp& value, const std::string& fieldName);
 SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const time_point& value, const std::string& fieldName);
 SNGXML_SERIALIZATION_API std::unique_ptr<sngxml::dom::Element> ToXml(const duration& value, const std::string& fieldName);
 

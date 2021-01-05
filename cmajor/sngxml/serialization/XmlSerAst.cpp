@@ -112,6 +112,11 @@ void DateTimeNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+void TimestampNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 void TimePointNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);

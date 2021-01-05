@@ -69,6 +69,7 @@ public:
     void Visit(UStringNode& node) override;
     void Visit(DateNode& node) override;
     void Visit(DateTimeNode& node) override;
+    void Visit(TimestampNode& node) override;
     void Visit(TimePointNode& node) override;
     void Visit(DurationNode& node) override;
     void Visit(ClassIdNode& node) override;
@@ -100,6 +101,7 @@ void HeaderGeneratorVisitor::Visit(SourceFileNode& node)
     formatter.WriteLine();
     formatter.WriteLine("using date = soulng::util::Date;");
     formatter.WriteLine("using datetime = soulng::util::DateTime;");
+    formatter.WriteLine("using timestamp = soulng::util::Timestamp;");
     formatter.WriteLine("using time_point = std::chrono::steady_clock::time_point;");
     formatter.WriteLine("using duration = std::chrono::steady_clock::duration;");
     formatter.WriteLine("using uuid = boost::uuids::uuid;");
@@ -279,6 +281,11 @@ void HeaderGeneratorVisitor::Visit(DateNode& node)
 void HeaderGeneratorVisitor::Visit(DateTimeNode& node) 
 {
     formatter.Write("datetime");
+}
+
+void HeaderGeneratorVisitor::Visit(TimestampNode& node)
+{
+    formatter.Write("timestamp");
 }
 
 void HeaderGeneratorVisitor::Visit(TimePointNode& node) 

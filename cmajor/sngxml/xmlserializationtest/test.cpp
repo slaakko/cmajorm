@@ -67,12 +67,12 @@ std::unique_ptr<sngxml::dom::Element> DerivedClass::ToXml(const std::string& fie
 }
 
 XmlTestClass::XmlTestClass()
-    : f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15(), time(), f16(), f17(), f18(), f19(), f20(), f21(), f22(), f23(), f24(), f25(), f26(), f27()
+    : f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15(), ts(), time(), f16(), f17(), f18(), f19(), f20(), f21(), f22(), f23(), f24(), f25(), f26(), f27()
 {
 }
 
 XmlTestClass::XmlTestClass(sngxml::dom::Element* element)
-    : f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15(), time(), f16(), f17(), f18(), f19(), f20(), f21(), f22(), f23(), f24(), f25(), f26(), f27()
+    : f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15(), ts(), time(), f16(), f17(), f18(), f19(), f20(), f21(), f22(), f23(), f24(), f25(), f26(), f27()
 {
     sngxml::xmlser::FromXml(element, "f0", f0);
     sngxml::xmlser::FromXml(element, "f1", f1);
@@ -90,6 +90,7 @@ XmlTestClass::XmlTestClass(sngxml::dom::Element* element)
     sngxml::xmlser::FromXml(element, "f13", f13);
     sngxml::xmlser::FromXml(element, "f14", f14);
     sngxml::xmlser::FromXml(element, "f15", f15);
+    sngxml::xmlser::FromXml(element, "ts", ts);
     sngxml::xmlser::FromXml(element, "time", time);
     sngxml::xmlser::FromXml(element, "f16", f16);
     sngxml::xmlser::FromXml(element, "f17", f17);
@@ -124,6 +125,7 @@ std::unique_ptr<sngxml::dom::Element> XmlTestClass::ToXml(const std::string& fie
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f13, "f13").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f14, "f14").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f15, "f15").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ts, "ts").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(time, "time").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f16, "f16").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f17, "f17").release()));

@@ -55,6 +55,13 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const datetime& value, const std::st
     return element;
 }
 
+std::unique_ptr<sngxml::dom::Element> ToXml(const timestamp& value, const std::string& fieldName)
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->SetAttribute(U"value", ToUtf32(ToString(value)));
+    return element;
+}
+
 std::unique_ptr<sngxml::dom::Element> ToXml(const time_point& value, const std::string& fieldName)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));

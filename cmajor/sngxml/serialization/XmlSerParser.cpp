@@ -3,7 +3,7 @@
 #include <sngxml/serialization/XmlSerTokens.hpp>
 #include <sngxml/serialization/XmlSerAst.hpp>
 
-// this file has been automatically generated from 'C:/work/soulng/sngxml/serialization/XmlSerParser.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngxml/serialization/XmlSerParser.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace XmlSerTokens;
@@ -1500,6 +1500,19 @@ soulng::parser::Match XmlSerParser::ScalarType(XmlSerLexer& lexer)
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ScalarType"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
                     return soulng::parser::Match(true, new sngxml::xmlser::DateTimeNode);
+                }
+            }
+            break;
+        }
+        case TIMESTAMP:
+        {
+            ++lexer;
+            {
+                {
+                    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                    if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ScalarType"));
+                    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                    return soulng::parser::Match(true, new sngxml::xmlser::TimestampNode);
                 }
             }
             break;

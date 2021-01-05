@@ -321,6 +321,15 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
     }
 }
 
+void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, timestamp& value)
+{
+    sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
+    if (element)
+    {
+        value = ParseTimestamp(ToUtf8(element->GetAttribute(U"value")));
+    }
+}
+
 void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, time_point& value)
 {
     sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);

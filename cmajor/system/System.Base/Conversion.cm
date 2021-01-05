@@ -107,7 +107,7 @@ namespace System
     public nothrow string ToString(double x, int maxNumDecimals)
     {
         return ToString(x, 0, maxNumDecimals);
-    }    
+    }
 
     public nothrow string ToString(double x)
     {
@@ -148,7 +148,7 @@ namespace System
         wstring s(c);
         return ToUtf8(s);
     }
-    
+
     public string ToString(uchar c)
     {
         ustring s(c);
@@ -247,7 +247,7 @@ namespace System
         {
             switch (state)
             {
-                case 0: 
+                case 0:
                 {
                     if (c == '+')
                     {
@@ -311,7 +311,7 @@ namespace System
             {
                 case 0:
                 {
-                    if (c == '+') 
+                    if (c == '+')
                     {
                         state = 1;
                     }
@@ -376,7 +376,7 @@ namespace System
         return true;
     }
 
-    public nothrow bool ParseFloating<T>(const string& s, T& x) 
+    public nothrow bool ParseFloating<T>(const string& s, T& x)
     {
         x = cast<T>(0.0);
         if (s.IsEmpty())
@@ -404,7 +404,7 @@ namespace System
             char c = s[i];
             switch (state)
             {
-                case 0: 
+                case 0:
                 {
                     if (c >= '0' && c <= '9')
                     {
@@ -457,7 +457,7 @@ namespace System
                         exponent = cast<int>(c) - cast<int>('0');
                         state = 3;
                     }
-                    else 
+                    else
                     {
                         return false;
                     }
@@ -469,7 +469,7 @@ namespace System
                     {
                         exponent = 10 * exponent + (cast<int>(c) - cast<int>('0'));
                     }
-                    else 
+                    else
                     {
                         return false;
                     }
@@ -790,7 +790,7 @@ namespace System
         }
         return 0u;
     }
-    
+
     public nothrow bool ParseOctal(const string& s, ulong& x)
     {
         x = 0u;
@@ -807,7 +807,7 @@ namespace System
         }
         return true;
     }
-    
+
     public nothrow ulong ParseOctal(const string& s)
     {
         ulong x = 0u;
@@ -821,13 +821,13 @@ namespace System
         }
         return 0u;
     }
-    
+
     public nothrow bool ParseDate(const string& dateStr, Date& date)
     {
         int dateEnd = 0;
         return ParseDate(dateStr, date, dateEnd);
     }
-    
+
     public nothrow bool ParseDate(const string& dateStr, Date& date, int& dateEnd)
     {
         short year;
@@ -879,7 +879,7 @@ namespace System
         date = Date(year, cast<Month>(month), day);
         return true;
     }
-    
+
     public Date ParseDate(const string& s)
     {
         Date date;
@@ -889,7 +889,7 @@ namespace System
         }
         return date;
     }
-    
+
     public bool ParseDateTime(const string& dateTimeStr, DateTime& dateTime)
     {
         Date date;
@@ -962,7 +962,27 @@ namespace System
         }
         return dateTime;
     }
-    
+
+    public nothrow bool ParseTimestamp(const string& s, Timestamp& timestamp)
+    {
+        if (s.Length() != 20 + 9)
+        {
+            return false;
+        }
+        DateTime dateTime;
+        if (!ParseDateTime(s.Substring(0, 19), dateTime))
+        {
+            return false;
+        }
+        int nanosecs = 0;
+        if (!ParseInt(s.Substring(20), nanosecs))
+        {
+            return false;
+        }
+        timestamp = Timestamp(dateTime, nanosecs);
+        return true;
+    }
+
     public Timestamp ParseTimestamp(const string& s)
     {
         if (s.Length() != 20 + 9)

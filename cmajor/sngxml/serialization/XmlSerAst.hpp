@@ -145,6 +145,12 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
+class SNGXML_SERIALIZATION_API TimestampNode : public TypeNode
+{
+public:
+    void Accept(Visitor& visitor) override;
+};
+
 class SNGXML_SERIALIZATION_API TimePointNode : public TypeNode
 {
 public:

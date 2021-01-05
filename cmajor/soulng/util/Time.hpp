@@ -47,6 +47,30 @@ private:
 
 UTIL_API Date GetCurrentDate();
 
+UTIL_API bool operator==(const Date& left, const Date& right);
+
+UTIL_API inline bool operator!=(const Date& left, const Date& right)
+{
+    return !(left == right);
+}
+
+UTIL_API bool operator<(const Date& left, const Date& right);
+
+UTIL_API inline bool operator>(const Date& left, const Date& right)
+{
+    return right < left;
+}
+
+UTIL_API inline bool operator<=(const Date& left, const Date& right)
+{
+    return !(right > left);
+}
+
+UTIL_API inline bool operator>=(const Date& left, const Date& right)
+{
+    return !(left < right);
+}
+
 UTIL_API Date ParseDate(const std::string& dateStr);
 
 class UTIL_API DateTime
@@ -86,13 +110,84 @@ private:
 
 UTIL_API DateTime GetCurrentDateTime();
 
+UTIL_API bool operator==(const DateTime& left, const DateTime& right);
+
+UTIL_API inline bool operator!=(const DateTime& left, const DateTime& right)
+{
+    return !(left == right);
+}
+
+UTIL_API bool operator<(const DateTime& left, const DateTime& right);
+
+UTIL_API inline bool operator>(const DateTime& left, const DateTime& right)
+{
+    return right < left;
+}
+
+UTIL_API inline bool operator<=(const DateTime& left, const DateTime& right)
+{
+    return !(right > left);
+}
+
+UTIL_API inline bool operator>=(const DateTime& left, const DateTime& right)
+{
+    return !(left < right);
+}
+
 UTIL_API DateTime ParseDateTime(const std::string& dateTimeStr);
+
+class UTIL_API Timestamp
+{
+public:
+    Timestamp() : dateTime(), nanosecs(0) {}
+    Timestamp(Date date_) : dateTime(date_), nanosecs(0) {}
+    Timestamp(Date date_, int32_t secs_) : dateTime(date_, secs_), nanosecs(0) {}
+    Timestamp(const DateTime& dateTime_) : dateTime(dateTime_), nanosecs(0) {}
+    Timestamp(const DateTime& dateTime_, int32_t nanosecs_) : dateTime(dateTime_), nanosecs(nanosecs_) {}
+    const DateTime& GetDateTime() const { return dateTime; }
+    int32_t Nanoseconds() const { return nanosecs; }
+    std::string ToString() const;
+private:
+    DateTime dateTime;
+    int32_t nanosecs;
+};
+
+UTIL_API bool operator==(const Timestamp& left, const Timestamp& right);
+
+UTIL_API inline bool operator!=(const Timestamp& left, const Timestamp& right)
+{
+    return !(left == right);
+}
+
+UTIL_API bool operator<(const Timestamp& left, const Timestamp& right);
+
+UTIL_API inline bool operator>(const Timestamp& left, const Timestamp& right)
+{
+    return right < left;
+}
+
+UTIL_API inline bool operator<=(const Timestamp& left, const Timestamp& right)
+{
+    return !(right > left);
+}
+
+UTIL_API inline bool operator>=(const Timestamp& left, const Timestamp& right)
+{
+    return !(left < right);
+}
+
+UTIL_API Timestamp GetCurrentTimestamp();
+
+UTIL_API Timestamp ParseTimestamp(const std::string& timestampStr);
 
 UTIL_API std::string FormatTimeMs(int32_t milliseconds);
 
 UTIL_API std::int64_t CurrentMs();
 
 UTIL_API int64_t GetCurrentTime();
+
+UTIL_API void TimeInit();
+UTIL_API void TimeDone();
 
 } } // namespace soulng::util
 

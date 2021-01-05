@@ -52,6 +52,7 @@ int main()
         testClass.f13 = U'z';
         testClass.f14 = soulng::util::GetCurrentDate();
         testClass.f15 = soulng::util::GetCurrentDateTime();
+        testClass.ts = soulng::util::GetCurrentTimestamp();
         testClass.time = soulng::util::GetCurrentTime();
         testClass.f16 = "f16.string";
         testClass.f17 = u"f17.wstring";

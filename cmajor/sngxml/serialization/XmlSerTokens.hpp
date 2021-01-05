@@ -1,7 +1,7 @@
 #ifndef XmlSerTokens_HPP
 #define XmlSerTokens_HPP
 
-// this file has been automatically generated from 'C:/work/soulng/sngxml/serialization/XmlSerLexer.lexer' using soulng lexer generator slg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngxml/serialization/XmlSerLexer.lexer' using soulng lexer generator slg version 3.0.0
 
 #include <sngxml/serialization/XmlSerApi.hpp>
 #include <string>
@@ -33,20 +33,21 @@ namespace XmlSerTokens
     const int USTRING = 22;
     const int DATE = 23;
     const int DATETIME = 24;
-    const int TIME_POINT = 25;
-    const int DURATION = 26;
-    const int LBRACKET = 27;
-    const int RBRACKET = 28;
-    const int LBRACE = 29;
-    const int RBRACE = 30;
-    const int SEMICOLON = 31;
-    const int COLON = 32;
-    const int AST = 33;
-    const int LPAREN = 34;
-    const int RPAREN = 35;
-    const int HASH = 36;
-    const int INCLUDE = 37;
-    const int FILEPATH = 38;
+    const int TIMESTAMP = 25;
+    const int TIME_POINT = 26;
+    const int DURATION = 27;
+    const int LBRACKET = 28;
+    const int RBRACKET = 29;
+    const int LBRACE = 30;
+    const int RBRACE = 31;
+    const int SEMICOLON = 32;
+    const int COLON = 33;
+    const int AST = 34;
+    const int LPAREN = 35;
+    const int RPAREN = 36;
+    const int HASH = 37;
+    const int INCLUDE = 38;
+    const int FILEPATH = 39;
 
     SNGXML_SERIALIZATION_API void InitTokenIdMap();
     SNGXML_SERIALIZATION_API int GetTokenId(const std::u32string& tokenName);

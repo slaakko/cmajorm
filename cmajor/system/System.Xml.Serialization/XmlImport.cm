@@ -15,7 +15,7 @@ namespace System.Xml.Serialization
         where DefaultConstructible<T>;
         T(Element* element);
     }
- 
+
     public concept XmlImportableScalarType<T>
     {
         where
@@ -317,7 +317,7 @@ namespace System.Xml.Serialization
         where T is XmlImportableScalarType
     {
         list.Clear();
-        Element* element = GetXmlFieldElement(fieldName, parentelement);
+        Element* element = GetXmlFieldElement(fieldName, parentElement);
         UniquePtr<XPathObject> result = Evaluate(u"item", element);
         if (!result.IsNull())
         {

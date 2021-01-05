@@ -8,6 +8,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Trace.hpp>
+#include <soulng/util/Time.hpp>
 
 namespace soulng { namespace util {
 
@@ -17,10 +18,12 @@ void Init()
     soulng::util::InitSocket();
     soulng::util::AnsiInit();
     soulng::util::InitTrace();
+    soulng::util::TimeInit();
 }
 
 void Done()
 {
+    soulng::util::TimeDone();
     soulng::util::DoneTrace();
     soulng::util::AnsiDone();
     soulng::util::DoneSocket();

@@ -29,6 +29,7 @@ class WStringNode;
 class UStringNode;
 class DateNode;
 class DateTimeNode;
+class TimestampNode;
 class TimePointNode;
 class DurationNode;
 class ClassIdNode;
@@ -62,6 +63,7 @@ public:
     virtual void Visit(UStringNode& node) {}
     virtual void Visit(DateNode& node) {}
     virtual void Visit(DateTimeNode& node) {}
+    virtual void Visit(TimestampNode& node) {}
     virtual void Visit(TimePointNode& node) {}
     virtual void Visit(DurationNode& node) {}
     virtual void Visit(ClassIdNode& node) {}
