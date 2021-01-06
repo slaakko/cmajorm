@@ -108,6 +108,13 @@ namespace Sirius.Graphics
             Matrix transformation = moveToLocation * orientation * scaling * moveToOrigin;
             Transform(transformation);
         }
+        public nothrow Cube(const Cube& that) : base(that.Vertices(), that.Edges(), that.Polygons())
+        {
+        }
+        public override nothrow Object* Clone() const
+        {
+            return new Cube(*this);
+        }
     }
 }
 

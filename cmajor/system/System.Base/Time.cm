@@ -19,7 +19,7 @@ namespace System
         }
         private long nanosecs;
     }
-    
+
     public class Duration
     {
         public nothrow Duration() : nanosecs(0)
@@ -148,12 +148,12 @@ namespace System
     {
         return TimePoint(tp.Rep() - d.Rep());
     }
-    
+
     public nothrow TimePoint Now()
     {
         return TimePoint(RtNow());
     }
-    
+
     public nothrow void Sleep(const Duration& duration)
     {
         RtSleep(duration.Rep());
@@ -185,12 +185,23 @@ namespace System
         s.Append(cast<char>(cast<byte>('0') + cast<byte>(us % 10)));
         return s;
     }
-    
+
     public enum Month : sbyte
     {
          january = 1, february, march, april, may, june, july, august, september, october, november, december
     }
+
+    public const int[] monthDays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     
+    public nothrow int GetMonthDays(Month month, int year)
+    {
+        if (month == Month.february && ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0))
+        {
+            return 29;
+        }
+        return monthDays[cast<sbyte>(month)];
+    }
+
     public class Date
     {
         public nothrow Date() : year(0), month(Month.january), day(1)
@@ -211,6 +222,109 @@ namespace System
         {
             return day;
         }
+        public nothrow Date AddDays(int n)
+        {
+            if (n > 0)
+            {
+                int d = day + n;
+                Month m = month;
+                short y = year;
+                int md = GetMonthDays(m, y);
+                while (d > md)
+                {
+                    d = d - md;
+                    if (m == Month.december)
+                    {
+                        m = Month.january;
+                        ++y;
+                    }
+                    else
+                    {
+                        m = cast<Month>(cast<sbyte>(m) + 1);
+                    }
+                    md = GetMonthDays(m, y);
+                }
+                return Date(y, m, cast<sbyte>(d));
+            }
+            else if (n < 0)
+            {
+                int d = day + n;
+                Month m = month;
+                short y = year;
+                while (d < 1)
+                {
+                    if (m == Month.january)
+                    {
+                        m = Month.december;
+                        --y;
+                    }
+                    else
+                    {
+                        m = cast<Month>(cast<sbyte>(m) - 1);
+                    }
+                    d = d + GetMonthDays(m, y);
+                }
+                return Date(y, m, cast<sbyte>(d));
+            }
+            else
+            {
+                return *this;
+            }
+        }
+        public nothrow Date AddMonths(int n)
+        {
+            if (n > 0)
+            {
+                int m = cast<int>(cast<sbyte>(month)) + n;
+                short y = year;
+                int d = day;
+                while (m > 12)
+                {
+                    m = m - 12;
+                    ++y;
+                }
+                Month mnth = cast<Month>(cast<sbyte>(m));
+                int md = GetMonthDays(mnth, y);
+                if (d > md)
+                {
+                    d = md;
+                }
+                return Date(y, mnth, cast<sbyte>(d));
+            }
+            else if (n < 0)
+            {
+                int m = cast<int>(cast<sbyte>(month)) + n;
+                short y = year;
+                int d = day;
+                while (m < 1)
+                {
+                    m = m + 12;
+                    --y;
+                }
+                Month mnth = cast<Month>(cast<sbyte>(m));
+                int md = GetMonthDays(mnth, y);
+                if (d > md)
+                {
+                    d = md;
+                }
+                return Date(y, mnth, cast<sbyte>(d));
+            }
+            else
+            {
+                return *this;
+            }
+        }
+        public nothrow Date AddYears(short n)
+        {
+            short y = year + n;
+            int d = day;
+            int md = GetMonthDays(month, y);
+            if (d > md)
+            {
+                d = md;
+            }
+            return Date(y, month, cast<sbyte>(d));
+        }
         public nothrow string ToString() const
         {
             return this->ToString(false);
@@ -225,13 +339,13 @@ namespace System
             if (!omitDashes)
             {
                 date.Append('-');
-            }        
+            }
             date.Append(cast<char>(cast<sbyte>('0') + ((cast<sbyte>(month) / 10) % 10)));
             date.Append(cast<char>(cast<sbyte>('0') + (cast<sbyte>(month) % 10)));
             if (!omitDashes)
             {
                 date.Append('-');
-            }        
+            }
             date.Append(cast<char>(cast<sbyte>('0') + ((day / 10) % 10)));
             date.Append(cast<char>(cast<sbyte>('0') + (day % 10)));
             return date;
@@ -240,7 +354,7 @@ namespace System
         private Month month;
         private sbyte day;
     }
-    
+
     public nothrow Date GetCurrentDate()
     {
         short y;
@@ -249,12 +363,12 @@ namespace System
         RtGetCurrentDate(&y, &m, &d);
         return Date(y, cast<Month>(m), d);
     }
-    
+
     public nothrow bool operator==(const Date& left, const Date& right)
     {
         return left.Year() == right.Year() && left.GetMonth() == right.GetMonth() && left.Day() == right.Day();
     }
-    
+
     public nothrow bool operator<(const Date& left, const Date& right)
     {
         if (left.Year() < right.Year()) return true;
@@ -263,7 +377,7 @@ namespace System
         if (left.GetMonth() > right.GetMonth()) return false;
         return left.Day() < right.Day();
     }
-    
+
     public class DateTime
     {
         public nothrow DateTime() : date(), secs(0)
@@ -326,7 +440,7 @@ namespace System
                 if (!omitColons)
                 {
                     dateTime.Append(':');
-                }        
+                }
                 dateTime.Append(cast<char>(cast<int>('0') + ((mm / 10) % 10)));
                 dateTime.Append(cast<char>(cast<int>('0') + (mm % 10)));
                 if (!omitSecs)
@@ -334,18 +448,20 @@ namespace System
                     if (!omitColons)
                     {
                         dateTime.Append(':');
-                    }        
+                    }
                     dateTime.Append(cast<char>(cast<int>('0') + ((ss / 10) % 10)));
                     dateTime.Append(cast<char>(cast<int>('0') + (ss % 10)));
-                }            
-            }            
+                }
+            }
             return dateTime;
         }
         private Date date;
         private int secs;
     }
-    
-    public nothrow DateTime GetCurrentDateTime() 
+
+    public const int secsInDay = cast<int>(24) * 3600;
+
+    public nothrow DateTime GetCurrentDateTime()
     {
         short y;
         sbyte m;
@@ -354,19 +470,19 @@ namespace System
         RtGetCurrentDateTime(&y, &m, &d, &secs);
         return DateTime(Date(y, cast<Month>(m), d), secs);
     }
-    
+
     public nothrow bool operator==(const DateTime& left, const DateTime& right)
     {
         return left.GetDate() == right.GetDate() && left.Seconds() == right.Seconds();
     }
-    
+
     public nothrow bool operator<(const DateTime& left, const DateTime& right)
     {
         if (left.GetDate() < right.GetDate()) return true;
         if (left.GetDate() > right.GetDate()) return false;
         return left.Seconds() < right.Seconds();
     }
-    
+
     public class Timestamp
     {
         public nothrow Timestamp() : dateTime(), nanosecs()
@@ -392,19 +508,19 @@ namespace System
         private DateTime dateTime;
         private int nanosecs;
     }
-    
+
     public nothrow bool operator==(const Timestamp& left, const Timestamp& right)
     {
         return left.GetDateTime() == right.GetDateTime() && left.GetNanoseconds() == right.GetNanoseconds();
     }
-    
+
     public nothrow bool operator<(const Timestamp& left, const Timestamp& right)
     {
         if (left.GetDateTime() < right.GetDateTime()) return true;
         if (left.GetDateTime() > right.GetDateTime()) return false;
         return left.GetNanoseconds() < right.GetNanoseconds();
     }
-    
+
     public class TimestampProvider
     {
         static nothrow TimestampProvider() : instance(new TimestampProvider())
@@ -426,9 +542,16 @@ namespace System
             }
             Duration elapsed = Now() - startTimePoint;
             long elapsedNanosecs = elapsed.Nanoseconds();
-            int secs = cast<int>(elapsedNanosecs / cast<long>(1000000000));
+            int elapsedSecs = cast<int>(elapsedNanosecs / cast<long>(1000000000));
             int nanosecs = cast<int>(elapsedNanosecs % cast<long>(1000000000));
-            Timestamp timestamp(DateTime(startDateTime.GetDate(), startDateTime.Seconds() + secs), nanosecs);
+            Date date = startDateTime.GetDate();
+            int secs = startDateTime.Seconds() + elapsedSecs;
+            if (secs >= secsInDay)
+            {
+                date = date.AddDays(1);
+                secs = secs - secsInDay; 
+            }
+            Timestamp timestamp(DateTime(date, secs), nanosecs);
             return timestamp;
         }
         private nothrow void Reset()
@@ -440,7 +563,7 @@ namespace System
         private DateTime startDateTime;
         private TimePoint startTimePoint;
     }
-    
+
     public nothrow Timestamp GetCurrentTimestamp()
     {
         return TimestampProvider.Instance().GetCurrentTimestamp();

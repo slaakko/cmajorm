@@ -40,7 +40,15 @@ namespace Sirius.Graphics
 
     public abstract class Object
     {
+        public nothrow Object() : vertices(), edges(), polygons()
+        {
+        }
+        public nothrow Object(const List<Vertex>& vertices_, const List<Edge>& edges_, const List<Polygon>& polygons_) :
+            vertices(vertices), edges(edges_), polygons(polygons_)
+        {
+        }
         public default virtual ~Object();
+        public abstract nothrow Object* Clone() const;
         public nothrow inline void AddVertex(const Vertex& vertex)
         {
             vertices.Add(vertex);
@@ -63,6 +71,18 @@ namespace Sirius.Graphics
             {
                 vertex.location = transformation * vertex.location;
             }
+        }
+        public nothrow inline const List<Vertex>& Vertices() const
+        {
+            return vertices;
+        }
+        public nothrow inline const List<Edge>& Edges() const
+        {
+            return edges;
+        }
+        public nothrow inline const List<Polygon>& Polygons() const
+        {
+            return polygons;
         }
         private List<Vertex> vertices;
         private List<Edge> edges;

@@ -12,6 +12,122 @@
 
 namespace soulng { namespace util {
 
+int GetMonthDays(Month month, int year) 
+{
+    static int monthDays[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    if (month == Month::february && ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0))
+    {
+        return 29;
+    }
+    return monthDays[static_cast<int>(month)];
+}
+
+Date Date::AddDays(int n)
+{
+    if (n > 0)
+    {
+        int d = day + n;
+        Month m = month;
+        int y = year;
+        int md = GetMonthDays(m, y);
+        while (d > md)
+        {
+            d = d - md;
+            if (m == Month::december)
+            {
+                m = Month::january;
+                ++y;
+            }
+            else
+            {
+                m = static_cast<Month>(static_cast<int>(m) + 1);
+            }
+            md = GetMonthDays(m, y);
+        }
+        return Date(y, m, d);
+    }
+    else if (n < 0)
+    {
+        int d = day + n;
+        Month m = month;
+        int y = year;
+        while (d < 1)
+        {
+            if (m == Month::january)
+            {
+                m = Month::december;
+                --y;
+            }
+            else
+            {
+                m = static_cast<Month>(static_cast<int>(m) - 1);
+            }
+            d = d + GetMonthDays(m, y);
+        }
+        return Date(y, m, d);
+    }
+    else
+    {
+        return *this;
+    }
+}
+
+Date Date::AddMonths(int n)
+{
+    if (n > 0)
+    {
+        int m = static_cast<int>(month) + n;
+        int y = year;
+        int d = day;
+        while (m > 12)
+        {
+            m = m - 12;
+            ++y;
+        }
+        Month mnth = static_cast<Month>(m);
+        int md = GetMonthDays(mnth, y);
+        if (d > md)
+        {
+            d = md;
+        }
+        return Date(y, mnth, d);
+    }
+    else if (n < 0)
+    {
+        int m = static_cast<int>(month) + n;
+        int y = year;
+        int d = day;
+        while (m < 1)
+        {
+            m = m + 12;
+            --y;
+        }
+        Month mnth = static_cast<Month>(m);
+        int md = GetMonthDays(mnth, y);
+        if (d > md)
+        {
+            d = md;
+        }
+        return Date(y, mnth, d);
+    }
+    else
+    {
+        return *this;
+    }
+}
+
+Date Date::AddYears(int n)
+{
+    int y = year + n;
+    int d = day;
+    int md = GetMonthDays(month, y);
+    if (d > md)
+    {
+        d = md;
+    }
+    return Date(y, month, d);
+}
+
 std::string Date::ToString() const
 {
     return ToString(false);
@@ -315,9 +431,16 @@ Timestamp TimestampProvider::GetCurrentTimestamp()
     }
     std::chrono::nanoseconds elapsed = std::chrono::steady_clock::now() - startTimePoint;
     int64_t elapsedNanosecs = elapsed.count();
-    int secs = static_cast<int>(elapsedNanosecs / 1000000000ll);
+    int elapsedSecs = static_cast<int>(elapsedNanosecs / 1000000000ll);
     int nanosecs = static_cast<int>(elapsedNanosecs % 1000000000ll);
-    Timestamp timestamp(DateTime(startDateTime.GetDate(), startDateTime.Seconds() + secs), nanosecs);
+    Date date = startDateTime.GetDate();
+    int secs = startDateTime.Seconds() + elapsedSecs;
+    if (secs >= secsInDay)
+    {
+        date = date.AddDays(1);
+        secs = secs - secsInDay;
+    }
+    Timestamp timestamp(DateTime(date, secs), nanosecs);
     return timestamp;
 }
 

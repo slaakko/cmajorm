@@ -4,7 +4,16 @@
 // =================================
 
 using System;
+using System.Collections;
 
 namespace Sirius.Graphics
 {
+    public class Schene
+    {
+        public nothrow void AddObject(Object* object)
+        {
+            objects.Add(UniquePtr<Object>(object));
+        }
+        private List<UniquePtr<Object>> objects;
+    }
 }

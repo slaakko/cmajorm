@@ -16,6 +16,8 @@ enum class Month : int8_t
     january = 1, february, march, april, may, june, july, august, september, october, november, december
 };
 
+UTIL_API int GetMonthDays(Month month, int year);
+
 class UTIL_API Date
 {
 public:
@@ -37,6 +39,9 @@ public:
     {
         return day;
     }
+    Date AddDays(int n);
+    Date AddMonths(int n);
+    Date AddYears(int n);
     std::string ToString() const;
     std::string ToString(bool omitDashes) const;
 private:
@@ -151,6 +156,8 @@ private:
     DateTime dateTime;
     int32_t nanosecs;
 };
+
+const int secsInDay = 24 * 3600;
 
 UTIL_API bool operator==(const Timestamp& left, const Timestamp& right);
 
