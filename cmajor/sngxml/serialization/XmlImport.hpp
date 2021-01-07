@@ -25,11 +25,17 @@ template<class T>
 concept XmlConstructible = requires(sngxml::dom::Element* element) { T(element); };
 
 template<class T>
-concept XmlImportableFundamentalType = std::is_fundamental_v<T>;
-
-template<class T>
 concept XmlImportable = 
-requires { XmlImportableFundamentalType<T>; } || requires { XmlConstructible<T>;  };
+std::is_fundamental_v<T> ||
+std::is_same_v<T, std::string> ||
+std::is_same_v<T, std::u16string> ||
+std::is_same_v<T, std::u32string> ||
+std::is_same_v<T, uuid> ||
+std::is_same_v<T, date> ||
+std::is_same_v<T, datetime> ||
+std::is_same_v<T, timestamp> ||
+std::is_same_v<T, time_point> ||
+std::is_same_v<T, duration>;
 
 SNGXML_SERIALIZATION_API sngxml::dom::Element* GetXmlFieldElement(const std::string& fieldName, sngxml::dom::Element* fromElement);
 
@@ -97,7 +103,7 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
     }
 }
 
-template<XmlImportableFundamentalType T>
+template<XmlImportable T>
 void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, std::vector<T>& v)
 {
     v.clear();

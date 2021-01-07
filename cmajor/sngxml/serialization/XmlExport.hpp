@@ -26,9 +26,6 @@ using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
 
-template<class T>
-concept XmlExportableFundamentalType = std::is_fundamental_v<T>;
-
 SNGXML_SERIALIZATION_API inline std::string ToString(int8_t value)
 {
     return std::to_string(value);
@@ -128,10 +125,23 @@ template<class T>
 concept XmlExportableClassType = requires(T t, const std::string& u) { t.ToXml(u); };
 
 template<class T>
-concept XmlExportable =
-requires { XmlExportableFundamentalType<T>; } || requires { XmlExportableClassType<T>;  };
+concept XmlExportableScalarType = 
+std::is_fundamental_v<T> ||
+std::is_same_v<T, std::string> ||
+std::is_same_v<T, std::u16string> ||
+std::is_same_v<T, std::u32string> ||
+std::is_same_v<T, uuid> ||
+std::is_same_v<T, date> ||
+std::is_same_v<T, datetime> ||
+std::is_same_v<T, timestamp> ||
+std::is_same_v<T, time_point> ||
+std::is_same_v<T, duration>;
 
-template<XmlExportableFundamentalType T>
+template<class T>
+concept XmlExportable =
+requires { XmlExportableScalarType<T>; } || requires { XmlExportableClassType<T>;  };
+
+template<XmlExportableScalarType T>
 std::unique_ptr<sngxml::dom::Element> ToXml(const T& value, const std::string& fieldName)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
@@ -206,7 +216,7 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<T>& v, const std::
     return element;
 }
 
-template<XmlExportableFundamentalType T>
+template<XmlExportableScalarType T>
 std::unique_ptr<sngxml::dom::Element> ToXml(const std::vector<T>& v, const std::string& fieldName)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
