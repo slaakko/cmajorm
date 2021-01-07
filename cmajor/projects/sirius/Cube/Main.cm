@@ -12,7 +12,7 @@ class MainWindow : System.Windows.Window
     public nothrow MainWindow() :
         base("cube"),
         whitePen(System.Windows.Color.White()),
-        camera(Sirius.Math.Vector(100, 100, 120), Sirius.Math.Vector(0, 0, 0), J(), 100.0f),
+        camera(Sirius.Math.Vector(0, 0, 0), Sirius.Math.Vector(0, 0, 0), J(), 200.0f),
         screen(800, 600),
         frame(0),
         frameIntervalMs(40u),
@@ -23,6 +23,8 @@ class MainWindow : System.Windows.Window
         SetSize(Size(screen.width, screen.height));
         UniquePtr<Cube> cube(new Cube(100));
         scene.AddObject(cube.Release());
+        UniquePtr<Grid> grid(new Grid(8, 400.0f, 0, cast<float>(PI() / 2), 0, Sirius.Math.Vector(0, -100, 0)));
+        scene.AddObject(grid.Release());
         SetTimer(0u, frameIntervalMs);
     }
     protected override void OnTimer(TimerEventArgs& args)
@@ -32,7 +34,7 @@ class MainWindow : System.Windows.Window
             TimePoint start = Now();
             float angle = 50 - 360.0f * frame / 100.0f;
             float t = cast<float>(DegToRad(angle));
-            float radius = 156;
+            float radius = 256;
             float x = cast<float>(radius * Cos(t));
             float y = 100;
             float z = cast<float>(radius * Sin(t));
@@ -55,7 +57,6 @@ class MainWindow : System.Windows.Window
         else
         {
             KillTimer(0u);
-            MessageBox.Show("max=" + ToString(maxUs) + ", min=" + ToString(minUs), "Map duration");
         }
     }
     protected override void OnPaint(PaintEventArgs& args)
@@ -75,6 +76,10 @@ class MainWindow : System.Windows.Window
                 maxUs = MinValue<int>();
                 minUs = MaxValue<int>();
                 SetTimer(0u, frameIntervalMs);
+            }
+            else if (args.keyChar == w'm')
+            {
+                MessageBox.Show("max=" + ToString(maxUs) + ", min=" + ToString(minUs), "Map duration");
             }
         }
     }

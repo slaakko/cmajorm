@@ -1,0 +1,54 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using Sirius.Math;
+
+namespace Sirius.Graphics
+{
+    public class Grid : Object
+    {
+        public nothrow Grid() : this(10)
+        {
+        }
+        public explicit nothrow Grid(int count) : this(count, 1)
+        {
+        }
+        public nothrow Grid(int count, float sideLength) : this(count, sideLength, 0, 0, 0)
+        {
+        }
+        public nothrow Grid(int count, float sideLength, float roll, float pitch, float yaw) : this(count, sideLength, roll, pitch, yaw, Vector(0, 0, 0))
+        {
+        }
+        public nothrow Grid(int count, float sideLength, float roll, float pitch, float yaw, const Vector& location)
+        {
+            float t = 1.0f / count;
+            for (int i = 0; i <= count; ++i)
+            {
+                AddVertex(Vertex(Vector(i * t, 0, 0)));
+                AddVertex(Vertex(Vector(i * t, 1.0f, 0)));
+                AddEdge(Edge(4 * i, 4 * i + 1));
+                AddVertex(Vertex(Vector(0, i * t, 0)));
+                AddVertex(Vertex(Vector(1.0f, i * t, 0)));
+                AddEdge(Edge(4 * i + 2, 4 * i + 3));
+            }
+            Matrix moveToOrigin = Translation(-0.5f, -0.5f, 0);
+            Matrix scaling = Scaling(sideLength, sideLength, 0);
+            Matrix orientation = Rotation(roll, pitch, yaw);
+            Matrix moveToLocation = Translation(location.x, location.y, location.z);
+            Matrix transformation = moveToLocation * orientation * scaling * moveToOrigin;
+            Transform(transformation);
+        }
+        public nothrow Grid(const Grid& that) : base(that.Vertices(), that.Edges(), that.Polygons())
+        {
+        }
+        public override nothrow Object* Clone() const
+        {
+            return new Grid(*this);
+        }
+    }
+}
+
