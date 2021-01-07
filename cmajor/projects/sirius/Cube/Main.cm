@@ -4,10 +4,102 @@
 // =================================
 
 using System;
+using Sirius.Graphics;
 using Sirius.Math;
 
-void main()
+class MainWindow : System.Windows.Window
 {
-    
+    public nothrow MainWindow() :
+        base("cube"),
+        whitePen(System.Windows.Color.White()),
+        camera(Sirius.Math.Vector(100, 100, 120), Sirius.Math.Vector(0, 0, 0), J(), 100.0f),
+        screen(800, 600),
+        frame(0),
+        frameIntervalMs(40u),
+        minUs(MaxValue<int>()),
+        maxUs(MinValue<int>())
+    {
+        SetBackgroundColor(Color.Black());
+        SetSize(Size(screen.width, screen.height));
+        UniquePtr<Cube> cube(new Cube(100));
+        scene.AddObject(cube.Release());
+        SetTimer(0u, frameIntervalMs);
+    }
+    protected override void OnTimer(TimerEventArgs& args)
+    {
+        if (frame < 200)
+        {
+            TimePoint start = Now();
+            float angle = 50 - 360.0f * frame / 100.0f;
+            float t = cast<float>(DegToRad(angle));
+            float radius = 156;
+            float x = cast<float>(radius * Cos(t));
+            float y = 100;
+            float z = cast<float>(radius * Sin(t));
+            camera.Move(Sirius.Math.Vector(x, y, z), camera.PointAt(), camera.Up(), camera.Distance());
+            scene.Map(camera, screen);
+            TimePoint end = Now();
+            Duration duration = end - start;
+            int us = cast<int>(duration.Microseconds());
+            if (us > maxUs)
+            {
+                maxUs = us;
+            }
+            if (us < minUs)
+            {
+                minUs = us;
+            }
+            ++frame;
+            Invalidate();
+        }
+        else
+        {
+            KillTimer(0u);
+            MessageBox.Show("max=" + ToString(maxUs) + ", min=" + ToString(minUs), "Map duration");
+        }
+    }
+    protected override void OnPaint(PaintEventArgs& args)
+    {
+        BufferPtr bufferPtr = BufferPool.Instance().GetBufferPtr();
+        scene.Draw(whitePen, System.Windows.Color.Black(), bufferPtr->BitmapGraphics());
+        bufferPtr->Draw(args.graphics);
+    }
+    protected override void OnKeyPress(KeyPressEventArgs& args)
+    {
+        base->OnKeyPress(args);
+        if (!args.handled)
+        {
+            if (args.keyChar == w't')
+            {
+                frame = 0;
+                maxUs = MinValue<int>();
+                minUs = MaxValue<int>();
+                SetTimer(0u, frameIntervalMs);
+            }
+        }
+    }
+    private System.Windows.Pen whitePen;
+    private Camera camera;
+    private Screen screen;
+    private Scene scene;
+    private int frame;
+    private uint frameIntervalMs;
+    private int minUs;
+    private int maxUs;
+}
+
+int main()
+{
+    try
+    {
+        MainWindow mainWindow;
+        return System.Windows.Application.Run(mainWindow);
+    }
+    catch (const Exception& ex)
+    {
+        System.Windows.MessageBox.Show(ex.Message());
+        return 1;
+    }
+    return 0;
 }
 

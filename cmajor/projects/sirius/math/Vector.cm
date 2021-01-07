@@ -59,7 +59,7 @@ namespace Sirius.Math
 
     public nothrow inline float Norm(const Vector& v)
     {
-        return cast<float>(Sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w));
+        return cast<float>(Sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
     }
 
     public nothrow inline Vector operator+(const Vector& left, const Vector& right)
@@ -79,12 +79,18 @@ namespace Sirius.Math
 
     public nothrow inline Vector Normalize(const Vector& v)
     {
-        return (1 / Norm(v)) * v;
+        Vector n = v;
+        float length = Norm(n);
+        if (length != 0)
+        {
+            n = (1 / length) * n;
+        }
+        return n;
     }
 
     public nothrow inline float Dot(const Vector& left, const Vector& right)
     {
-        return left.x * right.x + left.y * right.y + left.z * right.z + left.w * right.w;
+        return left.x * right.x + left.y * right.y + left.z * right.z;
     }
 
     public nothrow inline Vector Cross(const Vector& left, const Vector& right)

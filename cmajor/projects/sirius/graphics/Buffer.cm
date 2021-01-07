@@ -14,9 +14,14 @@ namespace Sirius.Graphics
             bitmap(size.w, size.h, graphics_), graphics(System.Windows.Graphics.FromImage(bitmap))
         {
         }
-        public nothrow inline System.Windows.Graphics& GetBitmapGraphics()
+        public nothrow inline System.Windows.Graphics& BitmapGraphics()
         {
             return graphics;
+        }
+        public void Draw(System.Windows.Graphics& graphics)
+        {
+            PointF topLeftCorner;
+            graphics.DrawImageChecked(bitmap, topLeftCorner);
         }
         private Bitmap bitmap;
         private System.Windows.Graphics graphics;

@@ -8,11 +8,26 @@ using System.Collections;
 
 namespace Sirius.Graphics
 {
-    public class Schene
+    public class Scene
     {
         public nothrow void AddObject(Object* object)
         {
             objects.Add(UniquePtr<Object>(object));
+        }
+        public nothrow void Map(const Camera& camera, const Screen& screen)
+        {
+            for (const UniquePtr<Object>& object : objects)
+            {
+                object->Map(camera, screen);
+            }
+        }
+        public void Draw(const System.Windows.Pen& pen, const System.Windows.Color& backgroundColor, System.Windows.Graphics& graphics)
+        {
+            graphics.Clear(backgroundColor);
+            for (const UniquePtr<Object>& object : objects)
+            {
+                object->Draw(pen, graphics);
+            }
         }
         private List<UniquePtr<Object>> objects;
     }

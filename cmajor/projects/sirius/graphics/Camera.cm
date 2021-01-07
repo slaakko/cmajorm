@@ -1,0 +1,65 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Sirius.Math;
+
+namespace Sirius.Graphics
+{
+    public class Camera
+    {
+        public nothrow Camera() : location(), pointAt(), up(), distance()
+        {
+        }
+        public nothrow Camera(const Vector& location_, const Vector& pointAt_, const Vector& up_, float distance_)
+        {
+            Move(location_, pointAt_, up_, distance_);
+        }
+        public nothrow void Move(const Vector& location_, const Vector& pointAt_, const Vector& up_, float distance_)
+        {
+            if (location != location_ || pointAt != pointAt_ || up != up_ || distance != distance_)
+            {
+                location = location_;
+                pointAt = pointAt_;
+                up = up_;
+                distance = distance_;
+                SetMapping();
+            }
+        }
+        public nothrow void SetMapping()
+        {
+            Matrix viewMatrix = View(location, pointAt, up);
+            Matrix projectionMatrix = Projection(distance);
+            Matrix mappingMatrix = projectionMatrix * viewMatrix;
+            mapping = mappingMatrix;
+        }
+        public nothrow inline const Matrix& Mapping() const
+        {
+            return mapping;
+        }
+        public nothrow inline const Vector& Location() const
+        {
+            return location;
+        }
+        public nothrow inline const Vector& PointAt() const
+        {
+            return pointAt;
+        }
+        public nothrow inline const Vector& Up() const
+        {
+            return up;
+        }
+        public nothrow inline float Distance() const
+        {
+            return distance;
+        }
+        private Vector location;
+        private Vector pointAt;
+        private Vector up;
+        private float distance;
+        private Matrix mapping;
+    }
+}
+

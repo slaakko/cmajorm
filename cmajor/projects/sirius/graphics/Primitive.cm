@@ -11,13 +11,16 @@ namespace Sirius.Graphics
 {
     public class Vertex
     {
-        public nothrow Vertex() : location()
+        public nothrow Vertex() : location(), mappedLocation(), mappedPoint(), screenPoint()
         {
         }
-        public nothrow explicit Vertex(const Vector& location_) : location(location_)
+        public nothrow explicit Vertex(const Vector& location_) : location(location_), mappedLocation(), mappedPoint(), screenPoint()
         {
         }
         public Vector location;
+        public Vector mappedLocation;
+        public System.Windows.PointF mappedPoint;
+        public System.Windows.Point screenPoint;
     }
 
     public class Edge
@@ -65,11 +68,31 @@ namespace Sirius.Graphics
         {
             polygons.Add(polygon);
         }
-        public void Transform(const Matrix& transformation)
+        public nothrow void Transform(const Matrix& transformation)
         {
             for (Vertex& vertex : vertices)
             {
                 vertex.location = transformation * vertex.location;
+            }
+        }
+        public nothrow void Map(const Camera& camera, const Screen& screen)
+        {
+            float halfWidth = screen.width / 2.0f;
+            float halfHeight = screen.height / 2.0f;
+            for (Vertex& vertex : vertices)
+            {
+                vertex.mappedLocation = camera.Mapping() * vertex.location;
+                vertex.mappedPoint = System.Windows.PointF(vertex.mappedLocation.x / vertex.mappedLocation.w, vertex.mappedLocation.y / vertex.mappedLocation.w);
+                vertex.screenPoint = System.Windows.Point(cast<int>(vertex.mappedPoint.x + halfWidth), cast<int>(vertex.mappedPoint.y + halfHeight));
+            }
+        }
+        public void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics)
+        {
+            for (const Edge& edge : edges)
+            {
+                const Vertex& start = vertices[edge.startVertex];
+                const Vertex& end = vertices[edge.endVertex];
+                graphics.DrawLineChecked(pen, start.screenPoint, end.screenPoint);
             }
         }
         public nothrow inline const List<Vertex>& Vertices() const
