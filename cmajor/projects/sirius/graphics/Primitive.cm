@@ -41,17 +41,82 @@ namespace Sirius.Graphics
         private List<Edge> edges;
     }
 
+    public class BoundingSphere
+    {
+        public nothrow BoundingSphere() : center(), radius(0)
+        {
+        }
+        public nothrow BoundingSphere(const Vector& center_, float radius_) : center(center_), radius(radius_)
+        {
+        }
+        public Vector center;
+        public float radius;
+    }
+
     public abstract class Object
     {
-        public nothrow Object() : vertices(), edges(), polygons()
-        {
-        }
-        public nothrow Object(const List<Vertex>& vertices_, const List<Edge>& edges_, const List<Polygon>& polygons_) :
-            vertices(vertices), edges(edges_), polygons(polygons_)
-        {
-        }
+        public nothrow Object() {}
         public default virtual ~Object();
         public abstract nothrow Object* Clone() const;
+        public abstract nothrow void Transform(const Matrix& transformation);
+        public abstract nothrow void Map(const Camera& camera, const Screen& screen);
+        public abstract void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics);
+    }
+
+    public abstract class CompositeObject : Object
+    {
+        public nothrow CompositeObject() : base()
+        {
+        }
+        public nothrow CompositeObject(List<UniquePtr<Object>>&& components_) : base(), components(components_)
+        {
+        }
+        public nothrow void AddComponent(Object* component)
+        {
+            components.Add(UniquePtr<Object>(component));
+        }
+        public nothrow List<UniquePtr<Object>> CloneComponents() const
+        {
+            List<UniquePtr<Object>> clonedComponents;
+            for (UniquePtr<Object>& component : components)
+            {
+                clonedComponents.Add(UniquePtr<Object>(component->Clone()));
+            }
+            return clonedComponents;
+        }
+        public override nothrow void Transform(const Matrix& transformation)
+        {
+            for (UniquePtr<Object>& component : components)
+            {
+                component->Transform(transformation);
+            }
+        }
+        public override nothrow void Map(const Camera& camera, const Screen& screen)
+        {
+            for (UniquePtr<Object>& component : components)
+            {
+                component->Map(camera, screen);
+            }
+        }
+        public override void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics)
+        {
+            for (UniquePtr<Object>& component : components)
+            {
+                component->Draw(pen, graphics);
+            }
+        }
+        private List<UniquePtr<Object>> components;
+    }
+
+    public abstract class PolygonMeshObject : Object
+    {
+        public nothrow PolygonMeshObject() : base(), vertices(), edges(), polygons()
+        {
+        }
+        public nothrow PolygonMeshObject(const List<Vertex>& vertices_, const List<Edge>& edges_, const List<Polygon>& polygons_) :
+            base(), vertices(vertices), edges(edges_), polygons(polygons_)
+        {
+        }
         public nothrow inline void AddVertex(const Vertex& vertex)
         {
             vertices.Add(vertex);
@@ -68,14 +133,14 @@ namespace Sirius.Graphics
         {
             polygons.Add(polygon);
         }
-        public nothrow void Transform(const Matrix& transformation)
+        public override nothrow void Transform(const Matrix& transformation)
         {
             for (Vertex& vertex : vertices)
             {
                 vertex.location = transformation * vertex.location;
             }
         }
-        public nothrow void Map(const Camera& camera, const Screen& screen)
+        public override nothrow void Map(const Camera& camera, const Screen& screen)
         {
             float halfWidth = screen.width / 2.0f;
             float halfHeight = screen.height / 2.0f;
@@ -86,7 +151,7 @@ namespace Sirius.Graphics
                 vertex.screenPoint = System.Windows.Point(cast<int>(vertex.mappedPoint.x + halfWidth), cast<int>(vertex.mappedPoint.y + halfHeight));
             }
         }
-        public void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics)
+        public override void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics)
         {
             for (const Edge& edge : edges)
             {

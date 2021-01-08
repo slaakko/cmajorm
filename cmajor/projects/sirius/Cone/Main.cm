@@ -10,7 +10,7 @@ using Sirius.Math;
 class MainWindow : System.Windows.Window
 {
     public nothrow MainWindow() :
-        base("Sphere"),
+        base("Cone"),
         whitePen(System.Windows.Color.White()),
         camera(Sirius.Math.Vector(0, 0, 0), Sirius.Math.Vector(0, 0, 0), J(), 200.0f),
         screen(800, 600),
@@ -21,8 +21,8 @@ class MainWindow : System.Windows.Window
     {
         SetBackgroundColor(Color.Black());
         SetSize(Size(screen.width, screen.height));
-        UniquePtr<Sphere> sphere(new Sphere(16, 16, 100, Sirius.Math.Vector(0, 50, 0)));
-        scene.AddObject(sphere.Release());
+        UniquePtr<Cone> cone(new Cone(16, 100, 100, Sirius.Math.Vector(0, 50, 0)));
+        scene.AddObject(cone.Release());
         UniquePtr<Grid> grid(new Grid(8, 400, 0, cast<float>(PI() / 2), 0, Sirius.Math.Vector(0, -100, 0)));
         scene.AddObject(grid.Release());
         SetTimer(0u, frameIntervalMs);
@@ -114,5 +114,6 @@ int main()
     }
     return 0;
 }
+
 
 

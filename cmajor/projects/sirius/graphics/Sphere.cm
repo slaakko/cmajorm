@@ -9,7 +9,7 @@ using Sirius.Math;
 
 namespace Sirius.Graphics
 {
-    public class Sphere : Object
+    public class Sphere : PolygonMeshObject
     {
         public nothrow Sphere() : this(10, 10)
         {
@@ -20,7 +20,7 @@ namespace Sirius.Graphics
         public nothrow Sphere(int ycount, int xzcount, float radius) : this(ycount, xzcount, radius, Vector(0, 0, 0))
         {
         }
-        public nothrow Sphere(int ycount, int xzcount, float radius, const Vector& location)
+        public nothrow Sphere(int ycount, int xzcount, float radius, const Vector& location) : base()
         {
             List<UniquePtr<Matrix>> ry;
             float t = cast<float>(2 * PI() / xzcount);
@@ -41,7 +41,7 @@ namespace Sirius.Graphics
                 float t = cast<float>(2 * PI() / xzcount);
                 for (int j = 0; j < xzcount; ++j)
                 {
-                    // i == 1, j == 0: vertex(1), edge(0, 1), edge(4, 1) 
+                    // i == 1, j == 0: vertex(1), edge(0, 1), edge(4, 1)
                     // i == 1, j == 1: vertex(2), edge(0, 2), edge(1, 2)
                     // i == 1, j == 2: vertex(3), edge(0, 3), edge(2, 3)
                     // i == 1, j == 3: vertex(4), edge(0, 4), edge(3, 4)

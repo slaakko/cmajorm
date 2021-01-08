@@ -8,27 +8,26 @@ using System.Collections;
 
 namespace Sirius.Graphics
 {
-    public class Scene
+    public class Scene : CompositeObject
     {
-        public nothrow void AddObject(Object* object)
+        public nothrow Scene() : base()
         {
-            objects.Add(UniquePtr<Object>(object));
         }
-        public nothrow void Map(const Camera& camera, const Screen& screen)
+        public nothrow Scene(const Scene& that) : base(that.CloneComponents())
         {
-            for (const UniquePtr<Object>& object : objects)
-            {
-                object->Map(camera, screen);
-            }
+        }
+        public nothrow override Object* Clone() const
+        {
+            return new Scene(*this);
+        }
+        public nothrow inline void AddObject(Object* object)
+        {
+            AddComponent(object);
         }
         public void Draw(const System.Windows.Pen& pen, const System.Windows.Color& backgroundColor, System.Windows.Graphics& graphics)
         {
             graphics.Clear(backgroundColor);
-            for (const UniquePtr<Object>& object : objects)
-            {
-                object->Draw(pen, graphics);
-            }
+            Draw(pen, graphics);
         }
-        private List<UniquePtr<Object>> objects;
     }
 }

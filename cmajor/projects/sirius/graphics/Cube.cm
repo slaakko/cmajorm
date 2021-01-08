@@ -4,10 +4,11 @@
 // =================================
 
 using System;
+using Sirius.Math;
 
 namespace Sirius.Graphics
 {
-    public class Cube : Object
+    public class Cube : PolygonMeshObject
     {
         public nothrow Cube() : this(1)
         {
@@ -18,7 +19,7 @@ namespace Sirius.Graphics
         public nothrow Cube(float sideLength, float roll, float pitch, float yaw) : this(sideLength, roll, pitch, yaw, Vector(0, 0, 0))
         {
         }
-        public nothrow Cube(float sideLength, float roll, float pitch, float yaw, const Vector& location)
+        public nothrow Cube(float sideLength, float roll, float pitch, float yaw, const Vector& location) : base()
         {
             AddVertex(Vertex(Vector(0, 0, 0))); // 0
             AddVertex(Vertex(Vector(1, 0, 0))); // 1

@@ -1,0 +1,30 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Sirius.Math;
+
+namespace Sirius.Graphics
+{
+    public class LineSegment : PolygonMeshObject
+    {
+        public nothrow LineSegment() : base(), start(), end()
+        {
+        }
+        public nothrow LineSegment(const Vector& start_, const Vector& end_) : base(), start(start_), end(end_)
+        {
+            AddVertex(Vertex(start));
+            AddVertex(Vertex(end));
+            AddEdge(Edge(0, 1));
+        }
+        public override nothrow Object* Clone() const
+        {
+            return new LineSegment(start, end);
+        }
+        private Vector start;
+        private Vector end;
+    }
+}
+
