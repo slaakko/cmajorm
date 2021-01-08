@@ -1,0 +1,103 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using Sirius.Math;
+
+namespace Sirius.Graphics
+{
+    public class Sphere : Object
+    {
+        public nothrow Sphere() : this(10, 10)
+        {
+        }
+        public nothrow Sphere(int ycount, int xzcount) : this(ycount, xzcount, 1)
+        {
+        }
+        public nothrow Sphere(int ycount, int xzcount, float radius) : this(ycount, xzcount, radius, Vector(0, 0, 0))
+        {
+        }
+        public nothrow Sphere(int ycount, int xzcount, float radius, const Vector& location)
+        {
+            List<UniquePtr<Matrix>> ry;
+            float t = cast<float>(2 * PI() / xzcount);
+            for (int j = 0; j < xzcount; ++j)
+            {
+                float xzangle = t * j;
+                UniquePtr<Matrix> m(new Matrix(RotationAboutY(xzangle)));
+                ry.Add(Rvalue(m));
+            }
+            AddVertex(Vertex(Vector(0, 1, 0))); // 0
+            float yt = cast<float>(PI() / ycount);
+            for (int i = 1; i < ycount; ++i)
+            {
+                float yangle = cast<float>((PI() / 2) - i * yt);
+                float x = cast<float>(Cos(yangle));
+                float y = cast<float>(Sin(yangle));
+                float z = 0;
+                float t = cast<float>(2 * PI() / xzcount);
+                for (int j = 0; j < xzcount; ++j)
+                {
+                    // i == 1, j == 0: vertex(1), edge(0, 1), edge(4, 1) 
+                    // i == 1, j == 1: vertex(2), edge(0, 2), edge(1, 2)
+                    // i == 1, j == 2: vertex(3), edge(0, 3), edge(2, 3)
+                    // i == 1, j == 3: vertex(4), edge(0, 4), edge(3, 4)
+                    // i == 2, j == 0: vertex(5), edge(1, 5), edge(8, 5)
+                    // i == 2, j == 1: vertex(6), edge(2, 6), edge(5, 6)
+                    // i == 2, j == 2: vertex(7), edge(3, 7), edge(6, 7)
+                    // i == 2, j == 3: vertex(8), edge(4, 8), edge(7, 8)
+                    // i == 3, j == 0: vertex(9), edge(5, 9), edge(12, 9)
+                    // i == 3, j == 1: vertex(10), edge(6, 10), edge(9, 10)
+                    // i == 3, j == 2: vertex(11), edge(7, 11), edge(10, 11)
+                    // i == 3, j == 3: vertex(12), edge(8, 12), edge(11, 12)
+                    Vector v(x, y, z);
+                    float xzangle = t * j;
+                    const Matrix& m = *ry[j];
+                    v = m * v;
+                    AddVertex(Vertex(Vector(v.x, v.y, v.z)));
+                    if (i == 1)
+                    {
+                        AddEdge(Edge(0, j + 1));
+                    }
+                    else
+                    {
+                        AddEdge(Edge(xzcount * (i - 2) + j + 1, xzcount * (i - 1) + j + 1));
+                    }
+                    if (j == 0)
+                    {
+                        AddEdge(Edge(xzcount * (i - 1) + ycount, xzcount * (i - 1) + j + 1));
+                    }
+                    else
+                    {
+                        AddEdge(Edge(xzcount * (i - 1) + j, xzcount * (i - 1) + j + 1));
+                    }
+                }
+            }
+            AddVertex(Vertex(Vector(0, -1, 0))); // xzcount * (ycount - 1) + 1
+            int e = xzcount * (ycount - 1) + 1;
+            for (int j = 0; j < xzcount; ++j)
+            {
+                // i == 3, j == 0: edge(9, e)
+                // i == 3, j == 1: edge(10, e)
+                // i == 3, j == 2: edge(11, e)
+                // i == 3, j == 3: edge(12, e)
+                AddEdge(Edge((xzcount - 1) * (ycount - 1) + j, e));
+            }
+            Matrix scaling = Scaling(radius, radius, radius);
+            Matrix moveToLocation = Translation(location.x, location.y, location.z);
+            Matrix transformation = moveToLocation * scaling;
+            Transform(transformation);
+        }
+        public nothrow Sphere(const Sphere& that) : base(that.Vertices(), that.Edges(), that.Polygons())
+        {
+        }
+        public override nothrow Object* Clone() const
+        {
+            return new Sphere(*this);
+        }
+    }
+}
+

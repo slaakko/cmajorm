@@ -21,8 +21,8 @@ class MainWindow : System.Windows.Window
     {
         SetBackgroundColor(Color.Black());
         SetSize(Size(screen.width, screen.height));
-        UniquePtr<Cube> cube(new Cube(100, 0, 0, 0, Sirius.Math.Vector(0, 0, 0)));
-        scene.AddObject(cube.Release());
+        UniquePtr<Sphere> sphere(new Sphere(16, 16, 100, Sirius.Math.Vector(0, 50, 0)));
+        scene.AddObject(sphere.Release());
         UniquePtr<Grid> grid(new Grid(8, 400, 0, cast<float>(PI() / 2), 0, Sirius.Math.Vector(0, -100, 0)));
         scene.AddObject(grid.Release());
         SetTimer(0u, frameIntervalMs);
@@ -114,4 +114,5 @@ int main()
     }
     return 0;
 }
+
 
