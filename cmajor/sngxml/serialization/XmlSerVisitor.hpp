@@ -36,6 +36,7 @@ class ClassIdNode;
 class PointerNode;
 class ArrayNode;
 class MemberVariableNode;
+class NamespaceNode;
 class ClassNode;
 class SourceFileNode;
 
@@ -70,6 +71,7 @@ public:
     virtual void Visit(PointerNode& node) {}
     virtual void Visit(ArrayNode& node) {}
     virtual void Visit(MemberVariableNode& node) {}
+    virtual void Visit(NamespaceNode& node) {}
     virtual void Visit(ClassNode& node) {}
     virtual void Visit(SourceFileNode& node) {}
 };
@@ -78,6 +80,7 @@ class DefaultVisitor : public Visitor
 {
 public:
     void Visit(SourceFileNode& node) override;
+    void Visit(NamespaceNode& node) override;
     void Visit(ClassNode& node) override;
     void Visit(MemberVariableNode& node) override;
     void Visit(ArrayNode& node) override;

@@ -19,6 +19,8 @@ class SNGXML_SERIALIZATION_API Node
 public:
     virtual ~Node();
     virtual void Accept(Visitor& visitor) = 0;
+    virtual bool IsNamespaceNode() const { return false; }
+    virtual bool ContainsNamespaces() const { return false; }
 };
 
 class SNGXML_SERIALIZATION_API TypeNode : public Node
@@ -205,6 +207,25 @@ private:
     std::string id;
 };
 
+class SNGXML_SERIALIZATION_API NamespaceNode : public Node
+{
+public:
+    NamespaceNode(const std::string& id_);
+    NamespaceNode(const NamespaceNode&) = delete;
+    NamespaceNode(NamespaceNode&&) = delete;
+    NamespaceNode& operator=(const NamespaceNode&) = delete;
+    NamespaceNode& operator=(NamespaceNode&&) = delete;
+    void Accept(Visitor& visitor) override;
+    const std::string& Id() const { return id; }
+    bool IsNamespaceNode() const override { return true; }
+    void AddNode(Node* node);
+    const std::vector<std::unique_ptr<Node>>& Nodes() const { return nodes; }
+    bool ContainsNamespaces() const override;
+private:
+    std::string id;
+    std::vector<std::unique_ptr<Node>> nodes;
+};
+
 class SNGXML_SERIALIZATION_API ClassNode : public Node
 {
 public:
@@ -244,11 +265,10 @@ public:
     void Accept(Visitor& visitor) override;
     void AddInclude(const std::string& includeDir);
     const std::vector<std::string>& IncludeDirs() const { return includeDirs; }
-    void AddClass(ClassNode* classNode);
-    const std::vector<std::unique_ptr<ClassNode>>& Classes() const { return classes; }
+    NamespaceNode* GlobalNs();
 private:
     std::vector<std::string> includeDirs;
-    std::vector<std::unique_ptr<ClassNode>> classes;
+    NamespaceNode globalNs;
 };
 
 } } // namespace sngxml::xmlser

@@ -15,9 +15,14 @@ Visitor::~Visitor()
 
 void DefaultVisitor::Visit(SourceFileNode& node)
 {
-    for (const std::unique_ptr<ClassNode>& classNode : node.Classes())
+    node.GlobalNs()->Accept(*this);
+}
+
+void DefaultVisitor::Visit(NamespaceNode& node) 
+{
+    for (const std::unique_ptr<Node>& n : node.Nodes())
     {
-        classNode->Accept(*this);
+        n->Accept(*this);
     }
 }
 

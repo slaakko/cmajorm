@@ -20,7 +20,7 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
             empty{ lexer.parsingIncludeDeclaration = true; } 
             (IncludeDirective:id{ sourceFile->AddInclude(id); })*
             empty{ lexer.parsingIncludeDeclaration = false; } 
-            (Class:cls{ sourceFile->AddClass(cls); })*)
+            NamespaceContent(sourceFile->GlobalNs()):nsContent)
         {
             return sourceFile.release();
         }
@@ -28,6 +28,22 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
 
     IncludeDirective : std::string
         ::= HASH INCLUDE FILEPATH{ return ToUtf8(lexer.GetMatch(span)); }
+        ;
+
+    NamespaceContent(sngxml::xmlser::NamespaceNode* ownerNs)
+        ::= (Definition:definition{ ownerNs->AddNode(definition); })*
+        ;
+        
+    Definition : sngxml::xmlser::Node*
+        ::= Class:cls{ return cls;}
+        |   Namespace:ns{ return ns; }
+        ;
+
+    Namespace(var std::unique_ptr<sngxml::xmlser::NamespaceNode> ns) : sngxml::xmlser::NamespaceNode*
+        ::= (NAMESPACE ID{ ns.reset(new sngxml::xmlser::NamespaceNode(ToUtf8(lexer.GetMatch(span)))); } LBRACE NamespaceContent(ns.get()):nsContent RBRACE)
+        {
+            return ns.release();
+        }
         ;
 
     Class(var std::unique_ptr<sngxml::xmlser::ClassNode> classNode, var std::string api_) : sngxml::xmlser::ClassNode*

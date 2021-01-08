@@ -163,6 +163,29 @@ void MemberVariableNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+NamespaceNode::NamespaceNode(const std::string& id_) : id(id_)
+{
+}
+
+void NamespaceNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void NamespaceNode::AddNode(Node* node)
+{
+    nodes.push_back(std::unique_ptr<Node>(node));
+}
+
+bool NamespaceNode::ContainsNamespaces() const
+{
+    for (const std::unique_ptr<Node>& node : nodes)
+    {
+        if (node->IsNamespaceNode() || node->ContainsNamespaces()) return true;
+    }
+    return false;
+}
+
 ClassNode::ClassNode(Key key_, const std::string& api_, const std::string& id_) : key(key_), api(api_), id(id_)
 {
 }
@@ -182,8 +205,13 @@ void ClassNode::AddMemberVariable(MemberVariableNode* memberVariable)
     memberVariables.push_back(std::unique_ptr<MemberVariableNode>(memberVariable));
 }
 
-SourceFileNode::SourceFileNode()
+SourceFileNode::SourceFileNode() : globalNs(std::string())
 {
+}
+
+NamespaceNode* SourceFileNode::GlobalNs()
+{
+    return &globalNs;
 }
 
 void SourceFileNode::Accept(Visitor& visitor)
@@ -194,11 +222,6 @@ void SourceFileNode::Accept(Visitor& visitor)
 void SourceFileNode::AddInclude(const std::string& includeDir)
 {
     includeDirs.push_back(includeDir);
-}
-
-void SourceFileNode::AddClass(ClassNode* classNode)
-{
-    classes.push_back(std::unique_ptr<ClassNode>(classNode));
 }
 
 } } // namespace sngxml::xmlser

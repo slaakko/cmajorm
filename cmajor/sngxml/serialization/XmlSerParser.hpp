@@ -15,6 +15,9 @@ struct SNGXML_SERIALIZATION_API XmlSerParser
     static std::unique_ptr<sngxml::xmlser::SourceFileNode> Parse(XmlSerLexer& lexer);
     static soulng::parser::Match SourceFile(XmlSerLexer& lexer);
     static soulng::parser::Match IncludeDirective(XmlSerLexer& lexer);
+    static soulng::parser::Match NamespaceContent(XmlSerLexer& lexer, sngxml::xmlser::NamespaceNode* ownerNs);
+    static soulng::parser::Match Definition(XmlSerLexer& lexer);
+    static soulng::parser::Match Namespace(XmlSerLexer& lexer);
     static soulng::parser::Match Class(XmlSerLexer& lexer);
     static soulng::parser::Match Api(XmlSerLexer& lexer);
     static soulng::parser::Match ClassKey(XmlSerLexer& lexer);

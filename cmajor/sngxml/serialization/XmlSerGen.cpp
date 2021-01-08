@@ -45,6 +45,7 @@ class HeaderGeneratorVisitor : public DefaultVisitor
 public:
     HeaderGeneratorVisitor(CodeFormatter& formatter_, const std::string& includeGuard_);
     void Visit(SourceFileNode& node) override;
+    void Visit(NamespaceNode& node) override;
     void Visit(ClassNode& node) override;
     void Visit(MemberVariableNode& node) override;
     void Visit(PointerNode& node) override;
@@ -98,16 +99,45 @@ void HeaderGeneratorVisitor::Visit(SourceFileNode& node)
     formatter.WriteLine("#include <string>");
     formatter.WriteLine("#include <memory>");
     formatter.WriteLine("#include <stdint.h>");
-    formatter.WriteLine();
-    formatter.WriteLine("using date = soulng::util::Date;");
-    formatter.WriteLine("using datetime = soulng::util::DateTime;");
-    formatter.WriteLine("using timestamp = soulng::util::Timestamp;");
-    formatter.WriteLine("using time_point = std::chrono::steady_clock::time_point;");
-    formatter.WriteLine("using duration = std::chrono::steady_clock::duration;");
-    formatter.WriteLine("using uuid = boost::uuids::uuid;");
     DefaultVisitor::Visit(node);
-    formatter.WriteLine();
     formatter.WriteLine("#endif // " + includeGuard);
+
+}
+
+void HeaderGeneratorVisitor::Visit(NamespaceNode& node)
+{
+    if (!node.Id().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("namespace " + node.Id() + " {");
+        formatter.WriteLine();
+        formatter.WriteLine("using date = soulng::util::Date;");
+        formatter.WriteLine("using datetime = soulng::util::DateTime;");
+        formatter.WriteLine("using timestamp = soulng::util::Timestamp;");
+        formatter.WriteLine("using time_point = std::chrono::steady_clock::time_point;");
+        formatter.WriteLine("using duration = std::chrono::steady_clock::duration;");
+        formatter.WriteLine("using uuid = boost::uuids::uuid;");
+    }
+    else
+    {
+        if (!node.ContainsNamespaces())
+        {
+            formatter.WriteLine();
+            formatter.WriteLine("using date = soulng::util::Date;");
+            formatter.WriteLine("using datetime = soulng::util::DateTime;");
+            formatter.WriteLine("using timestamp = soulng::util::Timestamp;");
+            formatter.WriteLine("using time_point = std::chrono::steady_clock::time_point;");
+            formatter.WriteLine("using duration = std::chrono::steady_clock::duration;");
+            formatter.WriteLine("using uuid = boost::uuids::uuid;");
+        }
+    }
+    DefaultVisitor::Visit(node);
+    if (!node.Id().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("} // namespace  " + node.Id());
+    }
+    formatter.WriteLine();
 }
 
 void HeaderGeneratorVisitor::Visit(ClassNode& node)
@@ -395,6 +425,7 @@ class SourceGeneratorVisitor : public DefaultVisitor
 public:
     SourceGeneratorVisitor(CodeFormatter& formatter_, const std::string& headerFilePath_);
     void Visit(SourceFileNode& node) override;
+    void Visit(NamespaceNode& noide) override;
     void Visit(ClassNode& node) override;
 private:
     CodeFormatter& formatter;
@@ -413,9 +444,27 @@ void SourceGeneratorVisitor::Visit(SourceFileNode& node)
     formatter.WriteLine("#include <sngxml/serialization/XmlImport.hpp>");
     formatter.WriteLine("#include <soulng/util/Unicode.hpp>");
     formatter.WriteLine();
-    formatter.WriteLine("using namespace soulng::unicode;");
-    formatter.WriteLine();
     DefaultVisitor::Visit(node);
+}
+
+void SourceGeneratorVisitor::Visit(NamespaceNode& node)
+{
+    if (!node.Id().empty())
+    {
+        formatter.WriteLine("namespace " + node.Id() + " {");
+        formatter.WriteLine();
+        formatter.WriteLine("using namespace soulng::unicode;");
+        formatter.WriteLine();
+    }
+    for (const std::unique_ptr<Node>& n : node.Nodes())
+    {
+        n->Accept(*this);
+    }
+    if (!node.Id().empty())
+    {
+        formatter.WriteLine();
+        formatter.WriteLine("} // namespace " + node.Id());
+    }
 }
 
 void SourceGeneratorVisitor::Visit(ClassNode& node)

@@ -32,6 +32,7 @@ namespace XmlSerTokens
         tokenIdMap[U"LBRACKET"] = 28;
         tokenIdMap[U"LONG"] = 12;
         tokenIdMap[U"LPAREN"] = 35;
+        tokenIdMap[U"NAMESPACE"] = 40;
         tokenIdMap[U"RBRACE"] = 31;
         tokenIdMap[U"RBRACKET"] = 29;
         tokenIdMap[U"RPAREN"] = 36;
@@ -105,7 +106,8 @@ namespace XmlSerTokens
         "RPAREN",
         "HASH",
         "INCLUDE",
-        "FILEPATH"
+        "FILEPATH",
+        "NAMESPACE"
     };
 
     const char* GetTokenName(int tokenId)
@@ -154,7 +156,8 @@ namespace XmlSerTokens
         "')'",
         "'#'",
         "'include'",
-        "'filepath'"
+        "'filepath'",
+        "'namespace'"
     };
 
     const char* GetTokenInfo(int tokenId)
