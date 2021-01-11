@@ -40,7 +40,7 @@ namespace Sirius.Graphics
             Matrix orientation = Rotation(roll, pitch, yaw);
             Matrix moveToLocation = Translation(location.x, location.y, location.z);
             Matrix transformation = moveToLocation * orientation * scaling * moveToOrigin;
-            Transform(transformation);
+            TransformLocal(transformation);
         }
         public nothrow Grid(const Grid& that) : base(that.Vertices(), that.Edges(), that.Polygons())
         {

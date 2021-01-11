@@ -10,7 +10,7 @@ using Sirius.Math;
 class MainWindow : System.Windows.Window
 {
     public nothrow MainWindow() :
-        base("Cone"),
+        base("Cylinder"),
         whitePen(System.Windows.Color.White()),
         camera(Sirius.Math.Vector(0, 0, 0), Sirius.Math.Vector(0, 0, 0), J(), 200.0f),
         screen(800, 600),
@@ -21,9 +21,9 @@ class MainWindow : System.Windows.Window
     {
         SetBackgroundColor(Color.Black());
         SetSize(Size(screen.width, screen.height));
-        UniquePtr<Cone> cone(new Cone(16, 100, 100, 0, 0, 0, Sirius.Math.Vector(0, 50, 0)));
-        cone->TransformWorld();
-        scene.AddObject(cone.Release());
+        UniquePtr<Cylinder> cylinder(new Cylinder(16, 200, 100, 0, 0, 0, Sirius.Math.Vector(0, 50, 0)));
+        cylinder->TransformWorld();
+        scene.AddObject(cylinder.Release());
         UniquePtr<Grid> grid(new Grid(8, 400, 0, cast<float>(PI() / 2), 0, Sirius.Math.Vector(0, -100, 0)));
         grid->TransformWorld();
         scene.AddObject(grid.Release());
@@ -116,6 +116,7 @@ int main()
     }
     return 0;
 }
+
 
 
 

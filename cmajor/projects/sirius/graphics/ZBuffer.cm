@@ -1,0 +1,40 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace Sirius.Graphics
+{
+    public class ZBuffer
+    {
+        public nothrow ZBuffer(int width_, int height_) : width(width_), height(height_), buffer(cast<float*>(MemAlloc(width * height * sizeof(float))))
+        {
+        }
+        public nothrow void Clear()
+        {
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
+                {
+                    SetZ(x, y, MaxValue<int>());
+                }
+            }
+        }
+        public nothrow void SetZ(int x, int y, float z)
+        {
+            float* buf = buffer.Get();
+            buf[x + y * width] = z;
+        }
+        public nothrow float GetZ(int x, int y) const
+        {
+            float* buf = buffer.Get();
+            return buf[x + y * width];
+        }
+        private int width;
+        private int height;
+        private UniquePtr<float> buffer;
+    }
+}
+

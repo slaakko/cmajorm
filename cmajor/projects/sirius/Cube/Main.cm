@@ -7,6 +7,11 @@ using System;
 using Sirius.Graphics;
 using Sirius.Math;
 
+public enum DrawKind
+{
+    wireFrame, shading
+}
+
 class MainWindow : System.Windows.Window
 {
     public nothrow MainWindow() :
@@ -17,15 +22,31 @@ class MainWindow : System.Windows.Window
         frame(0),
         frameIntervalMs(40u),
         minUs(MaxValue<int>()),
-        maxUs(MinValue<int>())
+        maxUs(MinValue<int>()),
+        drawKind(DrawKind.shading),
+        zbuffer(new ZBuffer(screen.width, screen.height))
     {
         SetBackgroundColor(Color.Black());
         SetSize(Size(screen.width, screen.height));
         UniquePtr<Cube> cube(new Cube(100, 0, 0, 0, Sirius.Math.Vector(0, 0, 0)));
+        cube->SetLightingFactors(20, 40, 20, 10);
+        cube->TransformWorld();
+        this->cube = cube.Get();
         scene.AddObject(cube.Release());
         UniquePtr<Grid> grid(new Grid(8, 400, 0, cast<float>(PI() / 2), 0, Sirius.Math.Vector(0, -100, 0)));
+        grid->TransformWorld();
         scene.AddObject(grid.Release());
-        SetTimer(0u, frameIntervalMs);
+        bool debug = true;
+        if (debug)
+        {
+            camera.Move(Sirius.Math.Vector(0, 0, 256), camera.PointAt(), camera.Up(), camera.Distance());
+            scene.View(camera, screen);
+            Invalidate();
+        }
+        else
+        {
+            SetTimer(0u, frameIntervalMs);
+        }
     }
     protected override void OnSizeChanged(uint windowState)
     {
@@ -33,6 +54,7 @@ class MainWindow : System.Windows.Window
         Size size = GetSize();
         screen.width = size.w;
         screen.height = size.h;
+        zbuffer.Reset(new ZBuffer(screen.width, screen.height));
     }
     protected override void OnTimer(TimerEventArgs& args)
     {
@@ -46,7 +68,7 @@ class MainWindow : System.Windows.Window
             float y = 100;
             float z = cast<float>(radius * Sin(t));
             camera.Move(Sirius.Math.Vector(x, y, z), camera.PointAt(), camera.Up(), camera.Distance());
-            scene.Map(camera, screen);
+            scene.View(camera, screen);
             TimePoint end = Now();
             Duration duration = end - start;
             int us = cast<int>(duration.Microseconds());
@@ -69,7 +91,11 @@ class MainWindow : System.Windows.Window
     protected override void OnPaint(PaintEventArgs& args)
     {
         BufferPtr bufferPtr = BufferPool.Instance().GetBufferPtr();
-        scene.Draw(whitePen, System.Windows.Color.Black(), bufferPtr->BitmapGraphics());
+        switch (drawKind)
+        {
+            case DrawKind.wireFrame: scene.Draw(whitePen, System.Windows.Color.Black(), bufferPtr->BitmapGraphics()); break;
+            case DrawKind.shading: scene.Paint(System.Windows.Color.Black(), bufferPtr->GetBitmap(), bufferPtr->BitmapGraphics(), *zbuffer, camera, screen); break;
+        }
         bufferPtr->Draw(args.graphics);
     }
     protected override void OnKeyPress(KeyPressEventArgs& args)
@@ -94,10 +120,13 @@ class MainWindow : System.Windows.Window
     private Camera camera;
     private Screen screen;
     private Scene scene;
+    private Cube* cube;
     private int frame;
     private uint frameIntervalMs;
     private int minUs;
     private int maxUs;
+    private DrawKind drawKind;
+    private UniquePtr<ZBuffer> zbuffer;
 }
 
 int main()

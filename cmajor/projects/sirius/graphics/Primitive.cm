@@ -11,15 +11,19 @@ namespace Sirius.Graphics
 {
     public class Vertex
     {
-        public nothrow Vertex() : location(), mappedLocation(), mappedPoint(), screenPoint()
+        public nothrow Vertex() :
+            location(), worldLocation(), viewLocation(), projectedLocation(), viewPoint(), screenPoint()
         {
         }
-        public nothrow explicit Vertex(const Vector& location_) : location(location_), mappedLocation(), mappedPoint(), screenPoint()
+        public nothrow explicit Vertex(const Vector& location_) :
+            location(location_), worldLocation(), viewLocation(), projectedLocation(), viewPoint(), screenPoint()
         {
         }
         public Vector location;
-        public Vector mappedLocation;
-        public System.Windows.PointF mappedPoint;
+        public Vector worldLocation;
+        public Vector viewLocation;
+        public Vector projectedLocation;
+        public System.Windows.PointF viewPoint;
         public System.Windows.Point screenPoint;
     }
 
@@ -32,13 +36,177 @@ namespace Sirius.Graphics
         public int endVertex;
     }
 
+    public class ScanLineData
+    {
+        public nothrow ScanLineData(float x_, float z_, float intensity_) : x(x_), z(z_), intensity(intensity_)
+        {
+        }
+        public float x;
+        public float z;
+        public float intensity;
+    }
+
     public class Polygon
     {
-        public nothrow inline void AddEdge(const Edge& edge)
+        public nothrow Polygon(PolygonMeshObject* object_) : object(object_)
         {
-            edges.Add(edge);
         }
-        private List<Edge> edges;
+        public nothrow void AddVertex(int vertexIndex)
+        {
+            vertexIndeces.Add(vertexIndex);
+        }
+        public nothrow void CalculateNormal()
+        {
+            if (vertexIndeces.Count() < 3) return;
+            const Vertex& v0 = object->Vertices()[vertexIndeces[0]];
+            const Vertex& v1 = object->Vertices()[vertexIndeces[1]];
+            const Vertex& v2 = object->Vertices()[vertexIndeces[2]];
+            Vector a = v1.location - v0.location;
+            Vector b = v2.location - v0.location;
+            normal = Normalize(Cross(a, b));
+        }
+        public nothrow bool IsVisible(const Camera& camera) const
+        {
+            float dp = Dot(camera.ViewVector(), worldNormal);
+            return dp > 0.0f;
+        }
+        public nothrow List<Pair<Vertex*, Vertex*>> Edges() const
+        {
+            List<Pair<Vertex*, Vertex*>> edges;
+            if (vertexIndeces.Count() < 3) return edges;
+            const Vertex& v0 = object->Vertices()[vertexIndeces.Front()];
+            Vertex* p0 = &v0;
+            for (long i = 1; i < vertexIndeces.Count(); ++i)
+            {
+                const Vertex& v1 = object->Vertices()[vertexIndeces[i]];
+                Vertex* p1 = &v1;
+                edges.Add(MakePair(p0, p1));
+                p0 = p1;
+            }
+            const Vertex& v1 = object->Vertices()[vertexIndeces.Front()];
+            edges.Add(MakePair(p0, &v1));
+            return edges;
+        }
+        public nothrow List<ScanLineData>& GetScanLineDataList(int iystart, int iy)
+        {
+            int index = iy - iystart;
+            while (scanLineDataLists.Count() <= index)
+            {
+                scanLineDataLists.Add(List<ScanLineData>());
+            }
+            List<ScanLineData>& scanLineDataList = scanLineDataLists[index];
+            return scanLineDataList;
+        }
+        public nothrow void Clear()
+        {
+            scanLineDataLists.Clear();
+        }
+        public nothrow Pair<Vertex*, Vertex*> GetMinMaxVertex() const
+        {
+            Vertex* minVertex = null;
+            Vertex* maxVertex = null;
+            int ymin = MaxValue<int>();
+            int ymax = MinValue<int>();
+            for (int i : vertexIndeces)
+            {
+                const Vertex& v = object->Vertices()[i];
+                if (v.screenPoint.y < ymin)
+                {
+                    minVertex = &v;
+                    ymin = v.screenPoint.y;
+                }
+                if (v.screenPoint.y > ymax)
+                {
+                    maxVertex = &v;
+                    ymax = v.screenPoint.y;
+                }
+            }
+            return MakePair(minVertex, maxVertex);
+        }
+        public nothrow void BuildScanLineData(const Pair<Vertex*, Vertex*>& minMaxVertex)
+        {
+            Clear();
+            List<Pair<Vertex* , Vertex*>> edges = Edges();
+            int iystart = minMaxVertex.first->screenPoint.y;
+            int iyend = minMaxVertex.second->screenPoint.y;
+            for (int iy = iystart; iy < iyend; ++iy)
+            {
+                for (Pair<Vertex*, Vertex*>& edge : edges)
+                {
+                    Vertex* v = edge.first;
+                    int y0 = v->screenPoint.y;
+                    Vertex* u = edge.second;
+                    int y1 = u->screenPoint.y;
+                    if (y0 == y1) continue;
+                    if (y0 > y1)
+                    {
+                        Swap(y0, y1);
+                        Swap(v, u);
+                    }
+                    if (iy < y0 || iy > y1) continue;
+                    int x0 = v->screenPoint.x;
+                    float z0 = v->viewLocation.z;
+                    int x1 = u->screenPoint.x;
+                    float z1 = u->viewLocation.z;
+                    float m = (iy - y0) / (y1 - y0);
+                    float x = x0 + m * (x1 - x0);
+                    float z = z0 + m * (z1 - z0);
+                    ScanLineData scanLineData(x, z, 0);
+                    List<ScanLineData>& scanLineDataList = GetScanLineDataList(iystart, iy);
+                    scanLineDataList.Add(scanLineData);
+                }
+            }
+        }
+        public nothrow void Rasterize(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer)
+        {
+            Pair<Vertex*, Vertex*> minMaxVertex = GetMinMaxVertex();
+            BuildScanLineData(minMaxVertex);
+            int iystart = minMaxVertex.first->screenPoint.y;
+            int iyend = minMaxVertex.second->screenPoint.y;
+            for (int iy = iystart; iy < iyend; ++iy)
+            {
+                const List<ScanLineData>& scanLineDataList = GetScanLineDataList(iystart, iy);
+                long n = scanLineDataList.Count();
+                #assert(n % 2 == 0);
+                long ndiv2 = n / 2;
+                for (long i = 0; i < ndiv2; ++i)
+                {
+                    const ScanLineData& left = scanLineDataList[2 * i];
+                    const ScanLineData& right = scanLineDataList[2 * i + 1];
+                    float xleft = left.x;
+                    float xright = right.x;
+                    float zleft = left.z;
+                    float zright = right.z;
+                    if (xleft > xright)
+                    {
+                        Swap(xleft, xright);
+                        Swap(zleft, zright);
+                    }
+                    int ixleft = cast<int>(xleft);
+                    int ixright = cast<int>(xright);
+                    int dix = ixright - ixleft;
+                    if (dix > 0)
+                    {
+                        for (int ix = ixleft; ix < ixright; ++ix)
+                        {
+                            float m = 1.0f * (ix - ixleft) / dix;
+                            float z = zleft + m * (zright - zleft);
+                            if (z < zbuffer.GetZ(ix, iy))
+                            {
+                                zbuffer.SetZ(ix, iy, z);
+                                System.Windows.Color color = System.Windows.Color.White();
+                                bitmap.SetPixelChecked(ix, iy, color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private PolygonMeshObject* object;
+        private List<int> vertexIndeces;
+        public Vector normal;
+        public Vector worldNormal;
+        private List<List<ScanLineData>> scanLineDataLists;
     }
 
     public class BoundingSphere
@@ -58,9 +226,12 @@ namespace Sirius.Graphics
         public nothrow Object() {}
         public default virtual ~Object();
         public abstract nothrow Object* Clone() const;
-        public abstract nothrow void Transform(const Matrix& transformation);
-        public abstract nothrow void Map(const Camera& camera, const Screen& screen);
+        public abstract nothrow void TransformLocal(const Matrix& localTransformation);
+        public abstract nothrow void TransformWorld();
+        public abstract nothrow void TransformWorld(const Matrix& worlTransformation);
+        public abstract nothrow void View(const Camera& camera, const Screen& screen);
         public abstract void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics);
+        public abstract void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen);
     }
 
     public abstract class CompositeObject : Object
@@ -84,18 +255,32 @@ namespace Sirius.Graphics
             }
             return clonedComponents;
         }
-        public override nothrow void Transform(const Matrix& transformation)
+        public override nothrow void TransformLocal(const Matrix& localTransformation)
         {
             for (UniquePtr<Object>& component : components)
             {
-                component->Transform(transformation);
+                component->TransformLocal(localTransformation);
             }
         }
-        public override nothrow void Map(const Camera& camera, const Screen& screen)
+        public override nothrow void TransformWorld()
         {
             for (UniquePtr<Object>& component : components)
             {
-                component->Map(camera, screen);
+                component->TransformWorld();
+            }
+        }
+        public override nothrow void TransformWorld(const Matrix& worldTransformation)
+        {
+            for (UniquePtr<Object>& component : components)
+            {
+                component->TransformWorld(worldTransformation);
+            }
+        }
+        public override nothrow void View(const Camera& camera, const Screen& screen)
+        {
+            for (UniquePtr<Object>& component : components)
+            {
+                component->View(camera, screen);
             }
         }
         public override void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics)
@@ -105,7 +290,29 @@ namespace Sirius.Graphics
                 component->Draw(pen, graphics);
             }
         }
+        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen)
+        {
+            for (UniquePtr<Object>& component : components)
+            {
+                component->Paint(bitmap, zbuffer, camera, screen);
+            }
+        }
         private List<UniquePtr<Object>> components;
+    }
+
+    public nothrow System.Windows.PointF ViewPointFromProjectedLocation(const Vector& projectedLocation)
+    {
+        return System.Windows.PointF(projectedLocation.x / projectedLocation.w, projectedLocation.y / projectedLocation.w);
+    }
+
+    public nothrow nothrow System.Windows.Point ScreenPointFromViewPoint(const System.Windows.PointF& viewPoint, float halfScreenWidth, float halfScreenHeight)
+    {
+        return System.Windows.Point(cast<int>(viewPoint.x + halfScreenWidth), cast<int>(viewPoint.y + halfScreenHeight));
+    }
+
+    public nothrow System.Windows.PointF ViewPointFromScreenPoint(const System.Windows.Point& screenPoint, float halfScreenWidth, float halfScreenHeight)
+    {
+        return System.Windows.PointF(screenPoint.x - halfScreenWidth, screenPoint.y - halfScreenHeight);
     }
 
     public abstract class PolygonMeshObject : Object
@@ -133,22 +340,45 @@ namespace Sirius.Graphics
         {
             polygons.Add(polygon);
         }
-        public override nothrow void Transform(const Matrix& transformation)
+        public override nothrow void TransformLocal(const Matrix& localTransformation)
         {
             for (Vertex& vertex : vertices)
             {
-                vertex.location = transformation * vertex.location;
+                vertex.location = localTransformation * vertex.location;
             }
         }
-        public override nothrow void Map(const Camera& camera, const Screen& screen)
+        public override nothrow void TransformWorld()
         {
-            float halfWidth = screen.width / 2.0f;
-            float halfHeight = screen.height / 2.0f;
             for (Vertex& vertex : vertices)
             {
-                vertex.mappedLocation = camera.Mapping() * vertex.location;
-                vertex.mappedPoint = System.Windows.PointF(vertex.mappedLocation.x / vertex.mappedLocation.w, vertex.mappedLocation.y / vertex.mappedLocation.w);
-                vertex.screenPoint = System.Windows.Point(cast<int>(vertex.mappedPoint.x + halfWidth), cast<int>(vertex.mappedPoint.y + halfHeight));
+                vertex.worldLocation = vertex.location;
+            }
+            for (Polygon& polygon : polygons)
+            {
+                polygon.worldNormal = polygon.normal;
+            }
+        }
+        public override nothrow void TransformWorld(const Matrix& worldTransformation)
+        {
+            for (Vertex& vertex : vertices)
+            {
+                vertex.worldLocation = worldTransformation * vertex.location;
+            }
+            for (Polygon& polygon : polygons)
+            {
+                polygon.worldNormal = Normalize(worldTransformation * polygon.normal);
+            }
+        }
+        public override nothrow void View(const Camera& camera, const Screen& screen)
+        {
+            float halfScreenWidth = screen.width / 2.0f;
+            float halfScreenHeight = screen.height / 2.0f;
+            for (Vertex& vertex : vertices)
+            {
+                vertex.viewLocation = camera.ViewMatrix() * vertex.worldLocation;
+                vertex.projectedLocation = camera.ProjectionMatrix() * vertex.viewLocation;
+                vertex.viewPoint = ViewPointFromProjectedLocation(vertex.projectedLocation);
+                vertex.screenPoint = ScreenPointFromViewPoint(vertex.viewPoint, halfScreenWidth, halfScreenHeight);
             }
         }
         public override void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics)
@@ -158,6 +388,16 @@ namespace Sirius.Graphics
                 const Vertex& start = vertices[edge.startVertex];
                 const Vertex& end = vertices[edge.endVertex];
                 graphics.DrawLineChecked(pen, start.screenPoint, end.screenPoint);
+            }
+        }
+        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen)
+        {
+            for (const Polygon& polygon : polygons)
+            {
+                if (polygon.IsVisible(camera))
+                {
+                    polygon.Rasterize(bitmap, zbuffer);
+                }
             }
         }
         public nothrow inline const List<Vertex>& Vertices() const
@@ -172,9 +412,37 @@ namespace Sirius.Graphics
         {
             return polygons;
         }
+        public nothrow void SetLightingFactors(float a, float d, float s, int n)
+        {
+            float sum = a + d + s;
+            ambientFactor = a / sum;
+            diffuseFactor = d / sum;
+            specularFactor = s / sum;
+            specularExponent = n;
+        }
+        public nothrow inline float AmbientFactor() const
+        {
+            return ambientFactor;
+        }
+        public nothrow inline float DiffuseFactor() const
+        {
+            return diffuseFactor;
+        }
+        public nothrow inline float SpecularFactor() const
+        {
+            return specularFactor;
+        }
+        public nothrow inline int SpecularExponent() const
+        {
+            return specularExponent;
+        }
         private List<Vertex> vertices;
         private List<Edge> edges;
         private List<Polygon> polygons;
+        private float ambientFactor;
+        private float diffuseFactor;
+        private float specularFactor;
+        private int specularExponent;
     }
 }
 

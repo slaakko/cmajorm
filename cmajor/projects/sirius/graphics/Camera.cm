@@ -23,17 +23,32 @@ namespace Sirius.Graphics
             {
                 location = location_;
                 pointAt = pointAt_;
+                viewVector = location - pointAt;
                 up = up_;
                 distance = distance_;
                 SetMapping();
             }
         }
+        public nothrow inline const Vector& ViewVector() const
+        {
+            return viewVector;
+        }
         public nothrow void SetMapping()
         {
-            Matrix viewMatrix = View(location, pointAt, up);
-            Matrix projectionMatrix = Projection(distance);
+            Matrix vm = View(location, pointAt, up);
+            viewMatrix = vm;
+            Matrix pm = Projection(distance);
+            projectionMatrix = pm;
             Matrix mappingMatrix = projectionMatrix * viewMatrix;
             mapping = mappingMatrix;
+        }
+        public nothrow inline const Matrix& ViewMatrix() const
+        {
+            return viewMatrix;
+        }
+        public nothrow inline const Matrix& ProjectionMatrix() const
+        {
+            return projectionMatrix;
         }
         public nothrow inline const Matrix& Mapping() const
         {
@@ -57,8 +72,11 @@ namespace Sirius.Graphics
         }
         private Vector location;
         private Vector pointAt;
+        private Vector viewVector;
         private Vector up;
         private float distance;
+        private Matrix viewMatrix;
+        private Matrix projectionMatrix;
         private Matrix mapping;
     }
 }

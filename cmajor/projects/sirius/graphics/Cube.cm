@@ -35,11 +35,12 @@ namespace Sirius.Graphics
             AddEdge(Edge(2, 3)); // 2
             AddEdge(Edge(3, 0)); // 3
 
-            Polygon back;
-            back.AddEdge(Edge(0, 1));
-            back.AddEdge(Edge(1, 2));
-            back.AddEdge(Edge(2, 3));
-            back.AddEdge(Edge(3, 0));
+            Polygon back(this);
+            back.AddVertex(0);
+            back.AddVertex(3);
+            back.AddVertex(2);
+            back.AddVertex(1);
+            back.CalculateNormal(); // (0, 0, -1)
             AddPolygon(Rvalue(back));
 
             AddEdge(Edge(0, 4)); // 4
@@ -47,11 +48,12 @@ namespace Sirius.Graphics
             AddEdge(Edge(5, 1)); // 6
             //AddEdge(Edge(1, 0));
 
-            Polygon bottom;
-            bottom.AddEdge(Edge(0, 4));
-            bottom.AddEdge(Edge(4, 5));
-            bottom.AddEdge(Edge(5, 1));
-            bottom.AddEdge(Edge(1, 0));
+            Polygon bottom(this);
+            bottom.AddVertex(0);
+            bottom.AddVertex(1);
+            bottom.AddVertex(5);
+            bottom.AddVertex(4);
+            bottom.CalculateNormal(); // (0, -1, 0)
             AddPolygon(Rvalue(bottom));
 
             //AddEdge(Edge(4, 5)); // 5
@@ -59,11 +61,12 @@ namespace Sirius.Graphics
             AddEdge(Edge(6, 7)); // 8
             AddEdge(Edge(7, 4)); // 9
 
-            Polygon front;
-            front.AddEdge(Edge(4, 5));
-            front.AddEdge(Edge(5, 6));
-            front.AddEdge(Edge(6, 7));
-            front.AddEdge(Edge(7, 4));
+            Polygon front(this);
+            front.AddVertex(4);
+            front.AddVertex(5);
+            front.AddVertex(6);
+            front.AddVertex(7);
+            front.CalculateNormal(); // (0, 0, 1)
             AddPolygon(Rvalue(front));
 
             AddEdge(Edge(3, 7)); // 10
@@ -71,11 +74,12 @@ namespace Sirius.Graphics
             AddEdge(Edge(6, 2)); // 11
             //AddEdge(Edge(2, 3)); // 2
 
-            Polygon top;
-            top.AddEdge(Edge(3, 7));
-            top.AddEdge(Edge(7, 6));
-            top.AddEdge(Edge(6, 2));
-            top.AddEdge(Edge(2, 3));
+            Polygon top(this);
+            top.AddVertex(3);
+            top.AddVertex(7);
+            top.AddVertex(6);
+            top.AddVertex(2);
+            top.CalculateNormal(); // (0, 1, 0)
             AddPolygon(Rvalue(top));
 
             //AddEdge(Edge(1, 2)); // 1
@@ -83,11 +87,12 @@ namespace Sirius.Graphics
             //AddEdge(Edge(6, 5)); // 7
             //AddEdge(Edge(5, 1)); // 6
 
-            Polygon left;
-            left.AddEdge(Edge(1, 2));
-            left.AddEdge(Edge(2, 6));
-            left.AddEdge(Edge(6, 5));
-            left.AddEdge(Edge(5, 1));
+            Polygon left(this);
+            left.AddVertex(1);
+            left.AddVertex(5);
+            left.AddVertex(6);
+            left.AddVertex(2);
+            left.CalculateNormal(); // (-1, 0, 0)
             AddPolygon(Rvalue(left));
 
             //AddEdge(Edge(0, 4)); // 4
@@ -95,11 +100,12 @@ namespace Sirius.Graphics
             //AddEdge(Edge(7, 3)); // 10
             //AddEdge(Edge(3, 0)); // 3
 
-            Polygon right;
-            right.AddEdge(Edge(0, 4));
-            right.AddEdge(Edge(4, 7));
-            right.AddEdge(Edge(7, 3));
-            right.AddEdge(Edge(3, 0));
+            Polygon right(this);
+            right.AddVertex(0);
+            right.AddVertex(3);
+            right.AddVertex(7);
+            right.AddVertex(4);
+            right.CalculateNormal(); // (1, 0, 0)
             AddPolygon(Rvalue(right));
 
             Matrix moveToOrigin = Translation(-0.5f, -0.5f, -0.5f);
@@ -107,7 +113,7 @@ namespace Sirius.Graphics
             Matrix orientation = Rotation(roll, pitch, yaw);
             Matrix moveToLocation = Translation(location.x, location.y, location.z);
             Matrix transformation = moveToLocation * orientation * scaling * moveToOrigin;
-            Transform(transformation);
+            TransformLocal(transformation);
         }
         public nothrow Cube(const Cube& that) : base(that.Vertices(), that.Edges(), that.Polygons())
         {

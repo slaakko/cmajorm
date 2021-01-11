@@ -1,0 +1,20 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace Sirius.Math
+{
+    public nothrow inline Vector LinearInterpolateVector(const Vector& u, const Vector& v, float t) // t : [0, 1]
+    {
+        return (1 - t) * u + t * v;
+    }
+
+    public nothrow inline float LinearInterpolateScalar(float a, float b, float t) // t : [0, 1]
+    {
+        return (1 - t) * a + t * b;
+    }
+}
+

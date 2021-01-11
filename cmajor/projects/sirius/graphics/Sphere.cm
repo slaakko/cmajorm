@@ -89,7 +89,7 @@ namespace Sirius.Graphics
             Matrix scaling = Scaling(radius, radius, radius);
             Matrix moveToLocation = Translation(location.x, location.y, location.z);
             Matrix transformation = moveToLocation * scaling;
-            Transform(transformation);
+            TransformLocal(transformation);
         }
         public nothrow Sphere(const Sphere& that) : base(that.Vertices(), that.Edges(), that.Polygons())
         {

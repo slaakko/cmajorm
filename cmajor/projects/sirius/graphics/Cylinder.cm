@@ -1,0 +1,71 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Sirius.Math;
+
+namespace Sirius.Graphics
+{
+    public class Cylinder : PolygonMeshObject
+    {
+        public nothrow Cylinder() : this(10)
+        {
+        }
+        public explicit nothrow Cylinder(int count) : this(count, 1)
+        {
+        }
+        public nothrow Cylinder(int count, float height) : this(count, height, 1)
+        {
+        }
+        public nothrow Cylinder(int count, float height, float radius) : this(count, height, radius, 0, 0, 0)
+        {
+        }
+        public nothrow Cylinder(int count, float height, float radius, float roll, float pitch, float yaw) :
+            this(count, height, radius, roll, pitch, yaw, Vector(0, 0, 0))
+        {
+        }
+        public nothrow Cylinder(int count, float height, float radius, float roll, float pitch, float yaw, const Vector& location) : base()
+        {
+            float t = cast<float>(2 * PI() / count);
+            for (int i = 0; i < count; ++i)
+            {
+                float angle = t * i;
+                float x0 = cast<float>(Cos(angle));
+                float y0 = 1;
+                float z0 = cast<float>(Sin(angle));
+                AddVertex(Vertex(Vector(x0, y0, z0)));
+                float x1 = x0;
+                float y1 = 0;
+                float z1 = z0;
+                AddVertex(Vertex(Vector(x1, y1, z1)));
+                AddEdge(Edge(2 * i, 2 * i + 1));
+                if (i > 0)
+                {
+                    AddEdge(Edge(2 * (i - 1), 2 * i));
+                    AddEdge(Edge(2 * (i - 1) + 1, 2 * i + 1));
+                }
+                else
+                {
+                    AddEdge(Edge(0, 2 * (count - 1)));
+                    AddEdge(Edge(1, 2 * (count - 1) + 1));
+                }
+            }
+            Matrix moveToOrigin = Translation(0, -0.5f, 0);
+            Matrix scaling = Scaling(radius, height, radius);
+            Matrix orientation = Rotation(roll, pitch, yaw);
+            Matrix moveToLocation = Translation(location.x, location.y, location.z);
+            Matrix transformation = moveToLocation * orientation * scaling * moveToOrigin;
+            TransformLocal(transformation);
+        }
+        public nothrow Cylinder(const Cylinder& that) : base(that.Vertices(), that.Edges(), that.Polygons())
+        {
+        }
+        public override nothrow Object* Clone() const
+        {
+            return new Cylinder(*this);
+        }
+    }
+}
+

@@ -29,5 +29,12 @@ namespace Sirius.Graphics
             graphics.Clear(backgroundColor);
             Draw(pen, graphics);
         }
+        public void Paint(const System.Windows.Color& backgroundColor, System.Windows.Bitmap& bitmap, System.Windows.Graphics& graphics,
+            ZBuffer& zbuffer, const Camera& camera, const Screen& screen)
+        {
+            graphics.Clear(backgroundColor);
+            zbuffer.Clear();
+            Paint(bitmap, zbuffer, camera, screen);
+        }
     }
 }

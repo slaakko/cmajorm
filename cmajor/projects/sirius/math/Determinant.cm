@@ -1,0 +1,20 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace Sirius.Math
+{
+    public inline nothrow float Determinant(float a1, float a2, float b1, float b2)
+    {
+        return a1 * b2 - b1 * a2;
+    }
+
+    public nothrow float Determinant(float a1, float a2, float a3, float b1, float b2, float b3, float c1, float c2, float c3)
+    {
+        return a1 * Determinant(b2, b3, c2, c3) - b1 * Determinant(a2, a3, c2, c3) + c1 * Determinant(a2, a3, b2, b3);
+    }
+}
+

@@ -22,8 +22,10 @@ class MainWindow : System.Windows.Window
         SetBackgroundColor(Color.Black());
         SetSize(Size(screen.width, screen.height));
         UniquePtr<Sphere> sphere(new Sphere(16, 16, 100, Sirius.Math.Vector(0, 50, 0)));
+        sphere->TransformWorld();
         scene.AddObject(sphere.Release());
         UniquePtr<Grid> grid(new Grid(8, 400, 0, cast<float>(PI() / 2), 0, Sirius.Math.Vector(0, -100, 0)));
+        grid->TransformWorld();
         scene.AddObject(grid.Release());
         SetTimer(0u, frameIntervalMs);
     }
@@ -46,7 +48,7 @@ class MainWindow : System.Windows.Window
             float y = 100;
             float z = cast<float>(radius * Sin(t));
             camera.Move(Sirius.Math.Vector(x, y, z), camera.PointAt(), camera.Up(), camera.Distance());
-            scene.Map(camera, screen);
+            scene.View(camera, screen);
             TimePoint end = Now();
             Duration duration = end - start;
             int us = cast<int>(duration.Microseconds());

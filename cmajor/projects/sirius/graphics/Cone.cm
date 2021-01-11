@@ -18,10 +18,14 @@ namespace Sirius.Graphics
         public nothrow Cone(int count, float height) : this(count, height, 1)
         {
         }
-        public nothrow Cone(int count, float height, float radius) : this(count, height, radius, Vector(0, 0, 0))
+        public nothrow Cone(int count, float height, float radius) : this(count, height, radius, 0, 0, 0)
         {
         }
-        public nothrow Cone(int count, float height, float radius, const Vector& location) : base()
+        public nothrow Cone(int count, float height, float radius, float roll, float pitch, float yaw) :
+            this(count, height, radius, roll, pitch, yaw, Vector(0, 0, 0))
+        {
+        }
+        public nothrow Cone(int count, float height, float radius, float roll, float pitch, float yaw, const Vector& location) : base()
         {
             AddVertex(Vertex(Vector(0, 1, 0)));
             float t = cast<float>(2 * PI() / count);
@@ -42,10 +46,12 @@ namespace Sirius.Graphics
                     AddEdge(Edge(i + 1, 1));
                 }
             }
+            Matrix moveToOrigin = Translation(0, -0.5f, 0);
             Matrix scaling = Scaling(radius, height, radius);
+            Matrix orientation = Rotation(roll, pitch, yaw);
             Matrix moveToLocation = Translation(location.x, location.y, location.z);
-            Matrix transformation = moveToLocation * scaling;
-            Transform(transformation);
+            Matrix transformation = moveToLocation * orientation * scaling * moveToOrigin;
+            TransformLocal(transformation);
         }
         public nothrow Cone(const Cone& that) : base(that.Vertices(), that.Edges(), that.Polygons())
         {
