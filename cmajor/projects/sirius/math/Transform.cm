@@ -133,6 +133,13 @@ namespace Sirius.Math
         return rm;
     }
 
+    // Reflect a vector v with respect to a plane whose normal is n:
+    
+    public nothrow Vector Reflect(const Vector& v, const Vector& n)
+    {
+        return v - 2 * (Dot(v, n) / Dot(n, n)) * n;
+    }
+
     public nothrow Matrix View(float roll, float pitch, float yaw, float tx, float ty, float tz)
     {
         Matrix cm;

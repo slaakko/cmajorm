@@ -25,14 +25,34 @@ namespace Sirius.Graphics
         }
     }
 
+    // Gouraud:
+    
     public nothrow float LightIntensity(const LightSource& lightSource, const Vertex& vertex)
     {
         float ambientIntensity = lightSource.incidentLightIntensity * vertex.object->AmbientFactor();
         Vector lightVector = Normalize(lightSource.location - vertex.worldLocation);
         Vector surfaceNormal = vertex.worldNormal;
-        float dotp = Dot(lightVector, surfaceNormal);
-        float diffuseIntensity = Max(0.0f, lightSource.incidentLightIntensity * dotp * (vertex.object->DiffuseFactor() + vertex.object->SpecularFactor()));
+        float lDotN = Dot(lightVector, surfaceNormal);
+        float diffuseIntensity = Max(0.0f, lightSource.incidentLightIntensity * lDotN * (vertex.object->DiffuseFactor() + vertex.object->SpecularFactor()));
         float intensity = ambientIntensity + diffuseIntensity;
+        return intensity;
+    }
+
+    // Phong:
+
+    public nothrow float LightIntensity(const LightSource& lightSource, const Camera& camera, const Vector& location, const Vector& surfaceNormal,
+        const PolygonMeshObject& object)
+    {
+        float ambientIntensity = lightSource.incidentLightIntensity * object.AmbientFactor();
+        Vector lightVector = Normalize(lightSource.location - location);
+        float lDotN = Dot(lightVector, surfaceNormal);
+        float diffuseIntensity = Max(0.0f, lightSource.incidentLightIntensity * lDotN * object.DiffuseFactor());
+        Vector r = Reflect(lightVector, surfaceNormal);
+        Vector v = camera.ViewVector();
+        float rDotV = Dot(r, v);
+        float s = cast<float>(Pow(rDotV, object.SpecularExponent()));
+        float specularIntensity = Max(0.0f, lightSource.incidentLightIntensity * s * object.SpecularFactor());
+        float intensity = ambientIntensity + diffuseIntensity + specularIntensity;
         return intensity;
     }
 }

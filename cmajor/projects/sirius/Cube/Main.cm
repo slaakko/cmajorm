@@ -28,6 +28,9 @@ class MainWindow : System.Windows.Window
         //drawKind(DrawKind.wireframe),
         zbuffer(new ZBuffer(screen.width, screen.height))
     {
+        Sirius.Math.Vector v(3, -1, 0);
+        Sirius.Math.Vector n(0, 2, 0);
+        Sirius.Math.Vector r = Reflect(v, n);
         SetBackgroundColor(Color.Black());
         SetSize(Size(screen.width, screen.height));
         UniquePtr<Cube> cube(new Cube(100, 0, 0, 0, Sirius.Math.Vector(0, 0, 0)));
