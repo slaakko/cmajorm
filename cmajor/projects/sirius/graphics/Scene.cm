@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using System.IO;
 
 namespace Sirius.Graphics
 {
@@ -22,6 +23,7 @@ namespace Sirius.Graphics
         }
         public nothrow inline void AddObject(Object* object)
         {
+            object->id = cast<int>(Components().Count());
             AddComponent(object);
         }
         public void Draw(const System.Windows.Pen& pen, const System.Windows.Color& backgroundColor, System.Windows.Graphics& graphics)
@@ -30,11 +32,15 @@ namespace Sirius.Graphics
             Draw(pen, graphics);
         }
         public void Paint(const System.Windows.Color& backgroundColor, System.Windows.Bitmap& bitmap, System.Windows.Graphics& graphics,
-            ZBuffer& zbuffer, const Camera& camera, const Screen& screen)
+            ZBuffer& zbuffer, const Camera& camera, const Screen& screen, LogWriter* log)
         {
             graphics.Clear(backgroundColor);
             zbuffer.Clear();
-            Paint(bitmap, zbuffer, camera, screen);
+            Paint(bitmap, zbuffer, camera, screen, log);
+            if (log != null && !Components().IsEmpty())
+            {
+                Components()[0]->Write(log->GetStreamWriter());
+            }
         }
     }
 }

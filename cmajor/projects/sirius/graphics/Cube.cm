@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Collections;
 using Sirius.Math;
 
 namespace Sirius.Graphics
@@ -30,83 +31,81 @@ namespace Sirius.Graphics
             AddVertex(Vertex(Vector(1, 1, 1))); // 6
             AddVertex(Vertex(Vector(0, 1, 1))); // 7
 
-            AddEdge(Edge(0, 1)); // 0
-            AddEdge(Edge(1, 2)); // 1
-            AddEdge(Edge(2, 3)); // 2
-            AddEdge(Edge(3, 0)); // 3
+            AddEdge(Edge(0, 1));
+            AddEdge(Edge(1, 2));
+            AddEdge(Edge(2, 3));
+            AddEdge(Edge(3, 0));
 
-            Polygon back(this);
+            Polygon back; // 0
             back.AddVertex(0);
             back.AddVertex(3);
             back.AddVertex(2);
             back.AddVertex(1);
-            back.CalculateNormal(); // (0, 0, -1)
             AddPolygon(Rvalue(back));
 
-            AddEdge(Edge(0, 4)); // 4
-            AddEdge(Edge(4, 5)); // 5
-            AddEdge(Edge(5, 1)); // 6
+            AddEdge(Edge(0, 4));
+            AddEdge(Edge(4, 5));
+            AddEdge(Edge(5, 1));
             //AddEdge(Edge(1, 0));
 
-            Polygon bottom(this);
+            Polygon bottom; // 1
             bottom.AddVertex(0);
             bottom.AddVertex(1);
             bottom.AddVertex(5);
             bottom.AddVertex(4);
-            bottom.CalculateNormal(); // (0, -1, 0)
             AddPolygon(Rvalue(bottom));
 
-            //AddEdge(Edge(4, 5)); // 5
-            AddEdge(Edge(5, 6)); // 7
-            AddEdge(Edge(6, 7)); // 8
-            AddEdge(Edge(7, 4)); // 9
+            //AddEdge(Edge(4, 5));
+            AddEdge(Edge(5, 6));
+            AddEdge(Edge(6, 7));
+            AddEdge(Edge(7, 4));
 
-            Polygon front(this);
+            Polygon front; // 2
             front.AddVertex(4);
             front.AddVertex(5);
             front.AddVertex(6);
             front.AddVertex(7);
-            front.CalculateNormal(); // (0, 0, 1)
             AddPolygon(Rvalue(front));
 
-            AddEdge(Edge(3, 7)); // 10
-            //AddEdge(Edge(7, 6)); // 8
-            AddEdge(Edge(6, 2)); // 11
-            //AddEdge(Edge(2, 3)); // 2
+            AddEdge(Edge(3, 7));
+            //AddEdge(Edge(7, 6));
+            AddEdge(Edge(6, 2));
+            //AddEdge(Edge(2, 3));
 
-            Polygon top(this);
+            Polygon top; // 3
             top.AddVertex(3);
             top.AddVertex(7);
             top.AddVertex(6);
             top.AddVertex(2);
-            top.CalculateNormal(); // (0, 1, 0)
             AddPolygon(Rvalue(top));
 
-            //AddEdge(Edge(1, 2)); // 1
-            //AddEdge(Edge(2, 6)); // 11
-            //AddEdge(Edge(6, 5)); // 7
-            //AddEdge(Edge(5, 1)); // 6
+            //AddEdge(Edge(1, 2));
+            //AddEdge(Edge(2, 6));
+            //AddEdge(Edge(6, 5));
+            //AddEdge(Edge(5, 1));
 
-            Polygon left(this);
-            left.AddVertex(1);
-            left.AddVertex(5);
-            left.AddVertex(6);
-            left.AddVertex(2);
-            left.CalculateNormal(); // (-1, 0, 0)
+            Polygon right; // 4
+            right.AddVertex(1);
+            right.AddVertex(2);
+            right.AddVertex(6);
+            right.AddVertex(5);
+            AddPolygon(Rvalue(right));
+
+            //AddEdge(Edge(0, 4));
+            //AddEdge(Edge(4, 7));
+            //AddEdge(Edge(7, 3));
+            //AddEdge(Edge(3, 0));
+
+            Polygon left; // 5
+            left.AddVertex(0);
+            left.AddVertex(4);
+            left.AddVertex(7);
+            left.AddVertex(3);
             AddPolygon(Rvalue(left));
 
-            //AddEdge(Edge(0, 4)); // 4
-            //AddEdge(Edge(4, 7)); // 9
-            //AddEdge(Edge(7, 3)); // 10
-            //AddEdge(Edge(3, 0)); // 3
-
-            Polygon right(this);
-            right.AddVertex(0);
-            right.AddVertex(3);
-            right.AddVertex(7);
-            right.AddVertex(4);
-            right.CalculateNormal(); // (1, 0, 0)
-            AddPolygon(Rvalue(right));
+            AddPolygonsToVertices();
+            CalculatePolygonNormals();
+            CalculateVertexNormals();
 
             Matrix moveToOrigin = Translation(-0.5f, -0.5f, -0.5f);
             Matrix scaling = Scaling(sideLength, sideLength, sideLength);

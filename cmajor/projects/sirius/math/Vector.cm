@@ -85,6 +85,7 @@ namespace Sirius.Math
         {
             n = (1 / length) * n;
         }
+        n.w = 1;
         return n;
     }
 
@@ -96,5 +97,10 @@ namespace Sirius.Math
     public nothrow inline Vector Cross(const Vector& left, const Vector& right)
     {
         return Vector(left.y * right.z - left.z * right.y, left.z * right.x - left.x * right.z, left.x * right.y - left.y * right.x);
+    }
+
+    public nothrow float AngleBetweenLineAndPlane(const Vector& v, const Vector& n)
+    {
+        return cast<float>(ArcCos(Dot(n, v) / (Norm(n) * Norm(v))));
     }
 }

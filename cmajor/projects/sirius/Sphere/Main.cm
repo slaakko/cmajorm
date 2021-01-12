@@ -7,11 +7,17 @@ using System;
 using Sirius.Graphics;
 using Sirius.Math;
 
+public enum DrawKind
+{
+    wireframe, shading
+}
+
 class MainWindow : System.Windows.Window
 {
     public nothrow MainWindow() :
         base("Sphere"),
         whitePen(System.Windows.Color.White()),
+        lightSource(Sirius.Math.Vector(0, 1000, 0), 1),
         camera(Sirius.Math.Vector(0, 0, 0), Sirius.Math.Vector(0, 0, 0), J(), 200.0f),
         screen(800, 600),
         frame(0),
@@ -48,7 +54,7 @@ class MainWindow : System.Windows.Window
             float y = 100;
             float z = cast<float>(radius * Sin(t));
             camera.Move(Sirius.Math.Vector(x, y, z), camera.PointAt(), camera.Up(), camera.Distance());
-            scene.View(camera, screen);
+            scene.View(camera, lightSource, screen);
             TimePoint end = Now();
             Duration duration = end - start;
             int us = cast<int>(duration.Microseconds());
@@ -93,6 +99,7 @@ class MainWindow : System.Windows.Window
         }
     }
     private System.Windows.Pen whitePen;
+    private PointLightSource lightSource;
     private Camera camera;
     private Screen screen;
     private Scene scene;
@@ -100,6 +107,8 @@ class MainWindow : System.Windows.Window
     private uint frameIntervalMs;
     private int minUs;
     private int maxUs;
+    private DrawKind drawKind;
+    private UniquePtr<ZBuffer> zbuffer;
 }
 
 int main()

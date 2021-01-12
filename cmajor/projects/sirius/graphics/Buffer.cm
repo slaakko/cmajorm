@@ -54,6 +54,10 @@ namespace Sirius.Graphics
                 pool->PutBuffer(buffer);
             }
         }
+        public nothrow inline bool HasBuffer() const
+        {
+            return pool != null && buffer != null;
+        }
         public nothrow inline Buffer* operator->() const
         {
             return buffer;

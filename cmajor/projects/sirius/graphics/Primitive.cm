@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using System.IO;
 using Sirius.Math;
 
 namespace Sirius.Graphics
@@ -12,19 +13,61 @@ namespace Sirius.Graphics
     public class Vertex
     {
         public nothrow Vertex() :
-            location(), worldLocation(), viewLocation(), projectedLocation(), viewPoint(), screenPoint()
+            id(-1), object(null), location(), worldLocation(), viewLocation(), projectedLocation(), viewPoint(), screenPoint(), intensity(0)
         {
         }
-        public nothrow explicit Vertex(const Vector& location_) :
-            location(location_), worldLocation(), viewLocation(), projectedLocation(), viewPoint(), screenPoint()
+        public explicit nothrow Vertex(const Vector& location_) :
+            id(-1), object(null), location(location_), worldLocation(), viewLocation(), projectedLocation(), viewPoint(), screenPoint(), intensity(0)
         {
         }
+        public nothrow inline void SetObject(PolygonMeshObject* object_)
+        {
+            object = object_;
+        }
+        public int id;
+        public PolygonMeshObject* object;
         public Vector location;
         public Vector worldLocation;
         public Vector viewLocation;
         public Vector projectedLocation;
         public System.Windows.PointF viewPoint;
         public System.Windows.Point screenPoint;
+        public List<int> polygonIndeces;
+        public Vector normal;
+        public Vector worldNormal;
+        public float intensity;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, const Vertex& vertex)
+    {
+        writer << "vertex " << vertex.id << ":" << endl();
+        writer << "--------------------------------" << endl();
+        writer << "location: " << vertex.location << endl();
+        writer << "worldLocation: " << vertex.worldLocation << endl();
+        writer << "viewLocation: " << vertex.viewLocation << endl();
+        writer << "projectedLocation: " << vertex.projectedLocation << endl();
+        writer << "viewPoint: " << vertex.viewPoint.ToString() << endl();
+        writer << "screenPoint: " << vertex.screenPoint.ToString() << endl();
+        writer << "polygons: [";
+        bool first = true;
+        for (int pi : vertex.polygonIndeces)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                writer << ", ";
+            }
+            writer << pi;
+        }
+        writer << "]" << endl();
+        writer << "normal: " << vertex.normal << endl();
+        writer << "worldNormal: " << vertex.worldNormal << endl();
+        writer << "intensity: " << vertex.intensity << endl();
+        writer << "--------------------------------" << endl();
+        return writer;
     }
 
     public class Edge
@@ -41,15 +84,52 @@ namespace Sirius.Graphics
         public nothrow ScanLineData(float x_, float z_, float intensity_) : x(x_), z(z_), intensity(intensity_)
         {
         }
+        public default nothrow ScanLineData(ScanLineData&& that);
+        public default nothrow void operator=(ScanLineData&& that);
         public float x;
         public float z;
         public float intensity;
     }
 
+    public nothrow bool operator==(const ScanLineData& left, const ScanLineData& right)
+    {
+        return left.x == right.x && left.z == right.z && left.intensity == right.intensity;
+    }
+
+    public nothrow bool operator<(const ScanLineData& left, const ScanLineData& right)
+    {
+        if (left.x < right.x) return true;
+        if (left.x > right.x) return false;
+        if (left.z < right.z) return true;
+        if (left.z > right.z) return false;
+        return left.intensity < right.intensity;
+    }
+
+    public class PolygonRasterizingContext
+    {
+        public int iystart;
+        public int iyend;
+        public nothrow List<ScanLineData>& GetScanLineDataList(int iy)
+        {
+            int index = iy - iystart;
+            while (scanLineDataLists.Count() <= index)
+            {
+                scanLineDataLists.Add(List<ScanLineData>());
+            }
+            List<ScanLineData>& scanLineDataList = scanLineDataLists[index];
+            return scanLineDataList;
+        }
+        private List<List<ScanLineData>> scanLineDataLists;
+    }
+
     public class Polygon
     {
-        public nothrow Polygon(PolygonMeshObject* object_) : object(object_)
+        public nothrow Polygon() : id(-1), object(null)
         {
+        }
+        public nothrow inline void SetObject(PolygonMeshObject* object_)
+        {
+            object = object_;
         }
         public nothrow void AddVertex(int vertexIndex)
         {
@@ -87,20 +167,6 @@ namespace Sirius.Graphics
             edges.Add(MakePair(p0, &v1));
             return edges;
         }
-        public nothrow List<ScanLineData>& GetScanLineDataList(int iystart, int iy)
-        {
-            int index = iy - iystart;
-            while (scanLineDataLists.Count() <= index)
-            {
-                scanLineDataLists.Add(List<ScanLineData>());
-            }
-            List<ScanLineData>& scanLineDataList = scanLineDataLists[index];
-            return scanLineDataList;
-        }
-        public nothrow void Clear()
-        {
-            scanLineDataLists.Clear();
-        }
         public nothrow Pair<Vertex*, Vertex*> GetMinMaxVertex() const
         {
             Vertex* minVertex = null;
@@ -123,13 +189,12 @@ namespace Sirius.Graphics
             }
             return MakePair(minVertex, maxVertex);
         }
-        public nothrow void BuildScanLineData(const Pair<Vertex*, Vertex*>& minMaxVertex)
+        public nothrow void BuildScanLineData(PolygonRasterizingContext& context, const Pair<Vertex*, Vertex*>& minMaxVertex)
         {
-            Clear();
             List<Pair<Vertex* , Vertex*>> edges = Edges();
-            int iystart = minMaxVertex.first->screenPoint.y;
-            int iyend = minMaxVertex.second->screenPoint.y;
-            for (int iy = iystart; iy < iyend; ++iy)
+            context.iystart = minMaxVertex.first->screenPoint.y;
+            context.iyend = minMaxVertex.second->screenPoint.y;
+            for (int iy = context.iystart; iy < context.iyend; ++iy)
             {
                 for (Pair<Vertex*, Vertex*>& edge : edges)
                 {
@@ -146,28 +211,54 @@ namespace Sirius.Graphics
                     if (iy < y0 || iy > y1) continue;
                     int x0 = v->screenPoint.x;
                     float z0 = v->viewLocation.z;
+                    float intensity0 = v->intensity;
                     int x1 = u->screenPoint.x;
                     float z1 = u->viewLocation.z;
-                    float m = (iy - y0) / (y1 - y0);
+                    float intensity1 = u->intensity;
+                    float m = 1.0f * (iy - y0) / (y1 - y0);
                     float x = x0 + m * (x1 - x0);
                     float z = z0 + m * (z1 - z0);
-                    ScanLineData scanLineData(x, z, 0);
-                    List<ScanLineData>& scanLineDataList = GetScanLineDataList(iystart, iy);
+                    float intensity = intensity0 + m * (intensity1 - intensity0);
+                    ScanLineData scanLineData(x, z, intensity);
+                    List<ScanLineData>& scanLineDataList = context.GetScanLineDataList(iy);
                     scanLineDataList.Add(scanLineData);
                 }
             }
         }
-        public nothrow void Rasterize(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer)
+        public nothrow void Rasterize(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, LogWriter* log)
         {
-            Pair<Vertex*, Vertex*> minMaxVertex = GetMinMaxVertex();
-            BuildScanLineData(minMaxVertex);
-            int iystart = minMaxVertex.first->screenPoint.y;
-            int iyend = minMaxVertex.second->screenPoint.y;
-            for (int iy = iystart; iy < iyend; ++iy)
+            PolygonRasterizingContext context;
+            LogWriter* lg = null;
+            if (id == 3)
             {
-                const List<ScanLineData>& scanLineDataList = GetScanLineDataList(iystart, iy);
+                lg = log;
+            }
+            Pair<Vertex*, Vertex*> minMaxVertex = GetMinMaxVertex();
+            if (log != null)
+            {
+                log->GetStreamWriter() << "min vertex: " << *(minMaxVertex.first) << endl();
+                log->GetStreamWriter() << "max vertex: " << *(minMaxVertex.second) << endl();
+            }
+            BuildScanLineData(context, minMaxVertex);
+            int iystart = context.iystart;
+            int iyend = context.iyend;
+            if (log != null)
+            {
+                log->GetStreamWriter() << "iystart = " << iystart << ", iyend = " << iyend << endl();
+            }
+            for (int iy = iystart; iy <= iyend; ++iy)
+            {
+                List<ScanLineData>& scanLineDataList = context.GetScanLineDataList(iy);
+                Sort(scanLineDataList);
                 long n = scanLineDataList.Count();
-                #assert(n % 2 == 0);
+                if (log != null)
+                {
+                    log->GetStreamWriter() << "iy = " << iy << ", n = " << n << endl();
+                }
+                if (n < 2)
+                {
+                    continue;
+                }
                 long ndiv2 = n / 2;
                 for (long i = 0; i < ndiv2; ++i)
                 {
@@ -177,24 +268,28 @@ namespace Sirius.Graphics
                     float xright = right.x;
                     float zleft = left.z;
                     float zright = right.z;
-                    if (xleft > xright)
-                    {
-                        Swap(xleft, xright);
-                        Swap(zleft, zright);
-                    }
+                    float intensityLeft = left.intensity;
+                    float intensityRight = right.intensity;
                     int ixleft = cast<int>(xleft);
                     int ixright = cast<int>(xright);
                     int dix = ixright - ixleft;
+                    if (log != null)
+                    {
+                        log->GetStreamWriter() << "dix=" << dix << ", xleft=" << xleft << ", xright=" << xright <<
+                        ", intensityLeft=" << intensityLeft << ", intensityRight=" << intensityRight << ", zleft=" << zleft << ", zright=" << zright << endl();
+                    }
                     if (dix > 0)
                     {
                         for (int ix = ixleft; ix < ixright; ++ix)
                         {
                             float m = 1.0f * (ix - ixleft) / dix;
                             float z = zleft + m * (zright - zleft);
+                            float intensity = intensityLeft + m * (intensityRight - intensityLeft);
                             if (z < zbuffer.GetZ(ix, iy))
                             {
                                 zbuffer.SetZ(ix, iy, z);
-                                System.Windows.Color color = System.Windows.Color.White();
+                                byte c = cast<byte>(255 * intensity);
+                                System.Windows.Color color(c, c, c);
                                 bitmap.SetPixelChecked(ix, iy, color);
                             }
                         }
@@ -202,11 +297,35 @@ namespace Sirius.Graphics
                 }
             }
         }
-        private PolygonMeshObject* object;
-        private List<int> vertexIndeces;
+        public int id;
+        public PolygonMeshObject* object;
+        public List<int> vertexIndeces;
         public Vector normal;
         public Vector worldNormal;
-        private List<List<ScanLineData>> scanLineDataLists;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, const Polygon& polygon)
+    {
+        writer << "polygon " << polygon.id << ":" << endl();
+        writer << "-------------------------------" << endl();
+        writer << "vertices: [";
+        bool first = true;
+        for (int vi : polygon.vertexIndeces)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                writer << ", ";
+            }
+            writer << vi;
+        }
+        writer << "]" << endl();
+        writer << "normal: " << polygon.normal << endl();
+        writer << "worldNormal: " << polygon.worldNormal << endl();
+        return writer;
     }
 
     public class BoundingSphere
@@ -223,15 +342,17 @@ namespace Sirius.Graphics
 
     public abstract class Object
     {
-        public nothrow Object() {}
+        public nothrow Object() : id(-1) {}
         public default virtual ~Object();
         public abstract nothrow Object* Clone() const;
         public abstract nothrow void TransformLocal(const Matrix& localTransformation);
         public abstract nothrow void TransformWorld();
         public abstract nothrow void TransformWorld(const Matrix& worlTransformation);
-        public abstract nothrow void View(const Camera& camera, const Screen& screen);
+        public abstract nothrow void View(const Camera& camera, const LightSource& lightSource, const Screen& screen);
         public abstract void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics);
-        public abstract void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen);
+        public abstract void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen, LogWriter* log);
+        public virtual void Write(TextWriter& writer) {}
+        public int id;
     }
 
     public abstract class CompositeObject : Object
@@ -276,11 +397,11 @@ namespace Sirius.Graphics
                 component->TransformWorld(worldTransformation);
             }
         }
-        public override nothrow void View(const Camera& camera, const Screen& screen)
+        public override nothrow void View(const Camera& camera, const LightSource& lightSource, const Screen& screen)
         {
             for (UniquePtr<Object>& component : components)
             {
-                component->View(camera, screen);
+                component->View(camera, lightSource, screen);
             }
         }
         public override void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics)
@@ -290,12 +411,16 @@ namespace Sirius.Graphics
                 component->Draw(pen, graphics);
             }
         }
-        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen)
+        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen, LogWriter* log)
         {
             for (UniquePtr<Object>& component : components)
             {
-                component->Paint(bitmap, zbuffer, camera, screen);
+                component->Paint(bitmap, zbuffer, camera, screen, log);
             }
+        }
+        public nothrow const List<UniquePtr<Object>>& Components() const
+        {
+            return components;
         }
         private List<UniquePtr<Object>> components;
     }
@@ -326,7 +451,9 @@ namespace Sirius.Graphics
         }
         public nothrow inline void AddVertex(const Vertex& vertex)
         {
+            vertex.id = cast<int>(vertices.Count());
             vertices.Add(vertex);
+            vertices.Back().SetObject(this);
         }
         public nothrow inline void AddEdge(const Edge& edge)
         {
@@ -335,10 +462,46 @@ namespace Sirius.Graphics
         public nothrow inline void AddPolygon(const Polygon& polygon)
         {
             polygons.Add(polygon);
+            polygons.Back().SetObject(this);
         }
         public nothrow inline void AddPolygon(Polygon&& polygon)
         {
+            polygon.id = cast<int>(polygons.Count());
             polygons.Add(polygon);
+            polygons.Back().SetObject(this);
+        }
+        public nothrow void AddPolygonsToVertices()
+        {
+            int n = cast<int>(polygons.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                Polygon& p = polygons[i];
+                for (int vi : p.vertexIndeces)
+                {
+                    Vertex& v = vertices[vi];
+                    v.polygonIndeces.Add(i);
+                }
+            }
+        }
+        public nothrow void CalculatePolygonNormals()
+        {
+            for (Polygon& p : polygons)
+            {
+                p.CalculateNormal();
+            }
+        }
+        public nothrow void CalculateVertexNormals()
+        {
+            for (Vertex& v : vertices)
+            {
+                Vector n;
+                for (int pi : v.polygonIndeces)
+                {
+                    Polygon& p = polygons[pi];
+                    n = n + p.normal;
+                }
+                v.normal = Normalize(n);
+            }
         }
         public override nothrow void TransformLocal(const Matrix& localTransformation)
         {
@@ -352,6 +515,7 @@ namespace Sirius.Graphics
             for (Vertex& vertex : vertices)
             {
                 vertex.worldLocation = vertex.location;
+                vertex.worldNormal = vertex.normal;
             }
             for (Polygon& polygon : polygons)
             {
@@ -363,13 +527,14 @@ namespace Sirius.Graphics
             for (Vertex& vertex : vertices)
             {
                 vertex.worldLocation = worldTransformation * vertex.location;
+                vertex.worldNormal = Normalize(worldTransformation * vertex.normal);
             }
             for (Polygon& polygon : polygons)
             {
                 polygon.worldNormal = Normalize(worldTransformation * polygon.normal);
             }
         }
-        public override nothrow void View(const Camera& camera, const Screen& screen)
+        public override nothrow void View(const Camera& camera, const LightSource& lightSource, const Screen& screen)
         {
             float halfScreenWidth = screen.width / 2.0f;
             float halfScreenHeight = screen.height / 2.0f;
@@ -379,6 +544,7 @@ namespace Sirius.Graphics
                 vertex.projectedLocation = camera.ProjectionMatrix() * vertex.viewLocation;
                 vertex.viewPoint = ViewPointFromProjectedLocation(vertex.projectedLocation);
                 vertex.screenPoint = ScreenPointFromViewPoint(vertex.viewPoint, halfScreenWidth, halfScreenHeight);
+                vertex.intensity = LightIntensity(lightSource, vertex);
             }
         }
         public override void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics)
@@ -390,13 +556,13 @@ namespace Sirius.Graphics
                 graphics.DrawLineChecked(pen, start.screenPoint, end.screenPoint);
             }
         }
-        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen)
+        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen, LogWriter* log)
         {
             for (const Polygon& polygon : polygons)
             {
                 if (polygon.IsVisible(camera))
                 {
-                    polygon.Rasterize(bitmap, zbuffer);
+                    polygon.Rasterize(bitmap, zbuffer, log);
                 }
             }
         }
@@ -411,6 +577,10 @@ namespace Sirius.Graphics
         public nothrow inline const List<Polygon>& Polygons() const
         {
             return polygons;
+        }
+        public nothrow void SetLightingFactors(float a, float d)
+        {
+            SetLightingFactors(a, d, 0, 0);
         }
         public nothrow void SetLightingFactors(float a, float d, float s, int n)
         {
@@ -435,6 +605,26 @@ namespace Sirius.Graphics
         public nothrow inline int SpecularExponent() const
         {
             return specularExponent;
+        }
+        public override void Write(TextWriter& writer)
+        {
+            writer << "object " << id << endl();
+            writer << "================================" << endl();
+            writer << "vertices:" << endl();
+            for (const Vertex& vertex : vertices)
+            {
+                writer << vertex << endl();
+            }
+            writer << "polygons:" << endl();
+            for (const Polygon& polygon : polygons)
+            {
+                writer << polygon << endl();
+            }
+            writer << "ambient factor " << ambientFactor << endl();
+            writer << "diffuse factor " << diffuseFactor << endl();
+            writer << "specular factor " << specularFactor << endl();
+            writer << "specular exponent " << specularExponent << endl();
+            writer << "================================" << endl();
         }
         private List<Vertex> vertices;
         private List<Edge> edges;

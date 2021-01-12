@@ -44,6 +44,16 @@ double RtSin(double angleRad)
     return std::sin(angleRad);
 }
 
+double RtArcCos(double x)
+{
+    return std::acos(x);
+}
+
+double RtArcSin(double x)
+{
+    return std::asin(x);
+}
+
 double RtAtan2(double y, double x)
 {
     return std::atan2(y, x);

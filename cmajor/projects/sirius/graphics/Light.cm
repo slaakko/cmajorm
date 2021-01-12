@@ -1,0 +1,39 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Sirius.Math;
+
+namespace Sirius.Graphics
+{
+    public abstract class LightSource
+    {
+        public nothrow LightSource(const Vector& location_, float incidentLightIntensity_) : location(location_), incidentLightIntensity(incidentLightIntensity_)
+        {
+        }
+        public default virtual ~LightSource();
+        public float incidentLightIntensity;
+        public Vector location;
+    }
+
+    public class PointLightSource : LightSource
+    {
+        public nothrow PointLightSource(const Vector& location, float incidentLightIntensity) : base(location, incidentLightIntensity)
+        {
+        }
+    }
+
+    public nothrow float LightIntensity(const LightSource& lightSource, const Vertex& vertex)
+    {
+        float ambientIntensity = lightSource.incidentLightIntensity * vertex.object->AmbientFactor();
+        Vector lightVector = Normalize(lightSource.location - vertex.worldLocation);
+        Vector surfaceNormal = vertex.worldNormal;
+        float dotp = Dot(lightVector, surfaceNormal);
+        float diffuseIntensity = Max(0.0f, lightSource.incidentLightIntensity * dotp * (vertex.object->DiffuseFactor() + vertex.object->SpecularFactor()));
+        float intensity = ambientIntensity + diffuseIntensity;
+        return intensity;
+    }
+}
+
