@@ -16,7 +16,6 @@ class MainWindow : System.Windows.Window
 {
     public nothrow MainWindow() :
         base("Sphere"),
-        whitePen(System.Windows.Color.White()),
         lightSource(Sirius.Math.Vector(0, 1000, 0), 1),
         camera(Sirius.Math.Vector(0, 0, 0), Sirius.Math.Vector(0, 0, 0), J(), 200.0f),
         screen(800, 600),
@@ -29,11 +28,12 @@ class MainWindow : System.Windows.Window
         SetSize(Size(screen.width, screen.height));
         UniquePtr<Sphere> sphere(new Sphere(16, 16, 100, Sirius.Math.Vector(0, 50, 0)));
         sphere->TransformWorld();
+        pen = System.Windows.Pen(sphere->GetColor());
         scene.AddObject(sphere.Release());
         UniquePtr<Grid> grid(new Grid(8, 400, 0, cast<float>(PI() / 2), 0, Sirius.Math.Vector(0, -100, 0)));
         grid->TransformWorld();
         scene.AddObject(grid.Release());
-        SetTimer(0u, frameIntervalMs);
+        Invalidate();
     }
     protected override void OnSizeChanged(uint windowState)
     {
@@ -43,6 +43,21 @@ class MainWindow : System.Windows.Window
         screen.height = size.h;
     }
     protected override void OnTimer(TimerEventArgs& args)
+    {
+        Invalidate();
+        Update();
+    }
+    protected override void OnPaint(PaintEventArgs& args)
+    {
+        if (!bufferPtr.HasBuffer())
+        {
+            DrawFrame();
+        }
+        bufferPtr->Draw(args.graphics);
+        ++frame;
+        DrawFrame();
+    }
+    private void DrawFrame()
     {
         if (frame < 200)
         {
@@ -55,6 +70,23 @@ class MainWindow : System.Windows.Window
             float z = cast<float>(radius * Sin(t));
             camera.Move(Sirius.Math.Vector(x, y, z), camera.PointAt(), camera.Up(), camera.Distance());
             scene.View(camera, lightSource, screen);
+            if (!bufferPtr.HasBuffer())
+            {
+                bufferPtr = BufferPool.Instance().GetBufferPtr();
+            }
+            switch (drawKind)
+            {
+                case DrawKind.wireframe:
+                {
+                    scene.Draw(pen, System.Windows.Color.Black(), bufferPtr->BitmapGraphics());
+                    break;
+                }
+                case DrawKind.shading:
+                {
+                    scene.Paint(System.Windows.Color.Black(), bufferPtr->GetBitmap(), bufferPtr->BitmapGraphics(), *zbuffer, camera, screen, null);
+                    break;
+                }
+            }
             TimePoint end = Now();
             Duration duration = end - start;
             int us = cast<int>(duration.Microseconds());
@@ -66,45 +98,56 @@ class MainWindow : System.Windows.Window
             {
                 minUs = us;
             }
-            ++frame;
-            Invalidate();
+            int ms = cast<int>(duration.Milliseconds());
+            uint waitMs = cast<uint>(Max(cast<int>(0), frameIntervalMs - ms));
+            SetTimer(0u, waitMs);
         }
         else
         {
             KillTimer(0u);
         }
     }
-    protected override void OnPaint(PaintEventArgs& args)
-    {
-        BufferPtr bufferPtr = BufferPool.Instance().GetBufferPtr();
-        scene.Draw(whitePen, System.Windows.Color.Black(), bufferPtr->BitmapGraphics());
-        bufferPtr->Draw(args.graphics);
-    }
     protected override void OnKeyPress(KeyPressEventArgs& args)
     {
         base->OnKeyPress(args);
         if (!args.handled)
         {
-            if (args.keyChar == w't')
+            switch (args.keyChar)
             {
-                frame = 0;
-                maxUs = MinValue<int>();
-                minUs = MaxValue<int>();
-                SetTimer(0u, frameIntervalMs);
-            }
-            else if (args.keyChar == w'm')
-            {
-                MessageBox.Show("max=" + ToString(maxUs) + ", min=" + ToString(minUs), "Map duration");
+                case w't':
+                {
+                    frame = 0;
+                    maxUs = MinValue<int>();
+                    minUs = MaxValue<int>();
+                    DrawFrame();
+                    break;
+                }
+                case w'm':
+                {
+                    MessageBox.Show("max=" + ToString(maxUs) + ", min=" + ToString(minUs), "Durations");
+                    break;
+                }
+                case w'w':
+                {
+                    drawKind = DrawKind.wireframe;
+                    break;
+                }
+                case w's':
+                {
+                    drawKind = DrawKind.shading;
+                    break;
+                }
             }
         }
     }
-    private System.Windows.Pen whitePen;
+    private System.Windows.Pen pen;
+    private BufferPtr bufferPtr;
     private PointLightSource lightSource;
     private Camera camera;
     private Screen screen;
     private Scene scene;
     private int frame;
-    private uint frameIntervalMs;
+    private int frameIntervalMs;
     private int minUs;
     private int maxUs;
     private DrawKind drawKind;

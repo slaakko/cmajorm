@@ -96,15 +96,15 @@ namespace System.Windows
             x = x + dx;
             y = y + dy;
         }
-        public int x; 
+        public int x;
         public int y;
     }
-    
+
     public nothrow inline bool operator==(const Point& left, const Point& right)
     {
         return left.x == right.x && left.y == right.y;
     }
-    
+
     public class Size
     {
         public nothrow Size() : h(0), w(0)
@@ -126,7 +126,7 @@ namespace System.Windows
         public int w;
         public int h;
     }
-    
+
     public nothrow inline bool operator==(const Size& left, const Size& right)
     {
         return left.w == right.w && left.h == right.h;
@@ -241,12 +241,12 @@ namespace System.Windows
 
     //  MainDirection returns:
     //      0, if angle between vector v and positive x axis is between 315 and 45 degrees clockwise
-    //      90, if angle between vector v and positive x axis is between 45 and 135 degrees clockwise 
+    //      90, if angle between vector v and positive x axis is between 45 and 135 degrees clockwise
     //      180, if angle between vector v and positive x axis is between 135 and 225 degrees clockwise
     //      270, if angle between vector v and positive x axis is between 225 and 315 degrees clockwise
     //      In this coordinate system x axis points to the right and y axis points downwards.
 
-    public nothrow int MainDirection(const Vector& v) 
+    public nothrow int MainDirection(const Vector& v)
     {
         if (v.x >= 0)
         {
@@ -335,7 +335,7 @@ namespace System.Windows
         public PointF end;
     }
 
-    public inline nothrow bool operator==(const Line& left, const Line& right) 
+    public inline nothrow bool operator==(const Line& left, const Line& right)
     {
         return left.start == right.start && left.end == right.end;
     }
@@ -1537,7 +1537,7 @@ namespace System.Windows
                 {
                     Color color = grayBitmap.GetPixelChecked(x, y);
                     Color gray = color.ToGray(bitmapTransparentColor);
-                    grayBitmap.SetPixelChecked(x, y, gray); 
+                    grayBitmap.SetPixelChecked(x, y, gray);
                 }
             }
             return grayBitmap;
@@ -1975,7 +1975,7 @@ namespace System.Windows
             SizeF& size, int* codePointsFitted, int* linesFilled)
         {
             return cast<GraphicsStatus>(WinGraphicsMeasureStringFormatSize(nativeGraphics, str.Chars(), font.NativeFont(),
-                layoutRectSize.w, layoutRectSize.h, format.NativeFormat(), 
+                layoutRectSize.w, layoutRectSize.h, format.NativeFormat(),
                 size.w, size.h, codePointsFitted, linesFilled));
         }
         public SizeF MeasureStringChecked(const string& str, const Font& font, const SizeF& layoutRectSize, const StringFormat& format, int* codePointsFitted, int* linesFilled)
@@ -1987,7 +1987,7 @@ namespace System.Windows
         public nothrow GraphicsStatus MeasureString(const string& str, const Font& font, const SizeF& layoutRectSize, const StringFormat& format, SizeF& size)
         {
             return cast<GraphicsStatus>(WinGraphicsMeasureStringFormatSize(nativeGraphics, str.Chars(), font.NativeFont(),
-                layoutRectSize.w, layoutRectSize.h, format.NativeFormat(), 
+                layoutRectSize.w, layoutRectSize.h, format.NativeFormat(),
                 size.w, size.h, null, null));
         }
         public SizeF MeasureStringChecked(const string& str, const Font& font, const SizeF& layoutRectSize, const StringFormat& format)
@@ -2000,7 +2000,7 @@ namespace System.Windows
             RectF& boundingBox, int* codePointsFitted, int* linesFilled)
         {
             return cast<GraphicsStatus>(WinGraphicsMeasureStringFormatRect(nativeGraphics, str.Chars(), font.NativeFont(),
-                layoutRect.location.x, layoutRect.location.y, layoutRect.size.w, layoutRect.size.h, format.NativeFormat(), 
+                layoutRect.location.x, layoutRect.location.y, layoutRect.size.w, layoutRect.size.h, format.NativeFormat(),
                 boundingBox.location.x, boundingBox.location.y, boundingBox.size.w, boundingBox.size.h,
                 codePointsFitted, linesFilled));
         }
@@ -2013,7 +2013,7 @@ namespace System.Windows
         public nothrow GraphicsStatus MeasureString(const string& str, const Font& font, const RectF& layoutRect, const StringFormat& format, RectF& boundingBox)
         {
             return cast<GraphicsStatus>(WinGraphicsMeasureStringFormatRect(nativeGraphics, str.Chars(), font.NativeFont(),
-                layoutRect.location.x, layoutRect.location.y, layoutRect.size.w, layoutRect.size.h, format.NativeFormat(), 
+                layoutRect.location.x, layoutRect.location.y, layoutRect.size.w, layoutRect.size.h, format.NativeFormat(),
                 boundingBox.location.x, boundingBox.location.y, boundingBox.size.w, boundingBox.size.h,
                 null, null));
         }
@@ -2025,7 +2025,7 @@ namespace System.Windows
         }
         public nothrow GraphicsStatus MeasureString(const string& str, const Font& font, const PointF& origin, const StringFormat& format, RectF& boundingBox)
         {
-            return cast<GraphicsStatus>(WinGraphicsMeasureStringFormatPoint(nativeGraphics, str.Chars(), font.NativeFont(), origin.x, origin.y, format.NativeFormat(), 
+            return cast<GraphicsStatus>(WinGraphicsMeasureStringFormatPoint(nativeGraphics, str.Chars(), font.NativeFont(), origin.x, origin.y, format.NativeFormat(),
                 boundingBox.location.x, boundingBox.location.y, boundingBox.size.w, boundingBox.size.h));
         }
         public RectF MeasureStringChecked(const string& str, const Font& font, const PointF& origin, const StringFormat& format)
@@ -2222,7 +2222,7 @@ namespace System.Windows
         }
         public nothrow GraphicsStatus SetTransform(Matrix& m)
         {
-            return cast<GraphicsStatus>(WinGraphicsSetTransform(m.NativeMatrix()));
+            return cast<GraphicsStatus>(WinGraphicsSetTransform(nativeGraphics, m.NativeMatrix()));
         }
         public void SetTransformChecked(Matrix& m)
         {

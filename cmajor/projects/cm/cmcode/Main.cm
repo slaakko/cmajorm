@@ -573,6 +573,7 @@ namespace cmcode
             outputTabPage = outputTabPagePtr.Get();
             UniquePtr<LogView> outputLogViewPtr(new LogView(Point(), Size(), Dock.none, Anchors.none));
             outputLogView = outputLogViewPtr.Get();
+            outputLogView->SetDoubleBuffered();
             UniquePtr<Control> scrollableOutputLogView(new ScrollableControl(outputLogViewPtr.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             outputTabPage->AddChild(scrollableOutputLogView.Release());
             outputTabControl->AddTabPage(outputTabPagePtr.Release());
@@ -580,6 +581,7 @@ namespace cmcode
             consoleTabPage = consoleTabPagePtr.Get();
             UniquePtr<Console> consolePtr(new Console(Point(), Size(), Dock.none, Anchors.none));
             console = consolePtr.Get();
+            console->SetDoubleBuffered();
             console->ConsoleInputReadyEvent().AddHandler(ConsoleInputReady);
             UniquePtr<Control> scrollableConsole(new ScrollableControl(consolePtr.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             consoleTabPage->AddChild(scrollableConsole.Release());
@@ -588,6 +590,7 @@ namespace cmcode
             UniquePtr<TabPage> logTabPagePtr(new TabPage("Log", "log"));
             logTabPage = logTabPagePtr.Get();
             UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.none, Anchors.none));
+            logView->SetDoubleBuffered();
             Application.SetLogView(logView.Get());
             UniquePtr<Control> scrollableLogView(new ScrollableControl(logView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             logTabPage->AddChild(scrollableLogView.Release());
@@ -2573,6 +2576,7 @@ namespace cmcode
                 solutionExplorerData->breakpointCollection.GetBreakpointList(filePath)));
             Cm.Views.CmajorEditor* editor = editorPtr.Get();
             Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
+            sourceCodeView->SetDoubleBuffered();
             sourceCodeView->RightClickEvent().AddHandler(SourceCodeViewRightClick);
             sourceCodeView->GotoCaretLineEvent().AddHandler(SourceCodeViewRunToCursor);
             sourceCodeView->ExpressionHoverEvent().AddHandler(ExpressionHovered);
@@ -2600,6 +2604,7 @@ namespace cmcode
             UniquePtr<Cm.Views.ResourceFileEditor> editorPtr(new Cm.Views.ResourceFileEditor(filePath));
             Cm.Views.ResourceFileEditor* editor = editorPtr.Get();
             TextView* textView = editor->GetTextView();
+            textView->SetDoubleBuffered();
             textView->SelectionChangedEvent().AddHandler(EditorSelectionChanged);
             textView->DirtyChangedEvent().AddHandler(EditorDirtyChanged);
             textView->CopyEvent().AddHandler(CopyClick);
@@ -2619,6 +2624,7 @@ namespace cmcode
             UniquePtr<Cm.Views.TextFileEditor> editorPtr(new Cm.Views.TextFileEditor(filePath));
             Cm.Views.TextFileEditor* editor = editorPtr.Get();
             TextView* textView = editor->GetTextView();
+            textView->SetDoubleBuffered();
             textView->SelectionChangedEvent().AddHandler(EditorSelectionChanged);
             textView->DirtyChangedEvent().AddHandler(EditorDirtyChanged);
             textView->CopyEvent().AddHandler(CopyClick);
@@ -2638,6 +2644,7 @@ namespace cmcode
             UniquePtr<Cm.Views.IntermediateCodeFileEditor> editorPtr(new Cm.Views.IntermediateCodeFileEditor(filePath));
             Cm.Views.IntermediateCodeFileEditor* editor = editorPtr.Get();
             TextView* textView = editor->GetTextView();
+            textView->SetDoubleBuffered();
             textView->CaretPosChangedEvent().AddHandler(EditorCaretPosChanged);
             gotoLineMenuItem->Enable();
             editorByTabPageMap[tabPage.Get()] = editor;

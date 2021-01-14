@@ -60,7 +60,7 @@ namespace Sirius.Graphics
             Matrix transformation = moveToLocation * orientation * scaling * moveToOrigin;
             TransformLocal(transformation);
         }
-        public nothrow Cylinder(const Cylinder& that) : base(that.Vertices(), that.Edges(), that.Polygons())
+        public nothrow Cylinder(const Cylinder& that) : base(that.Vertices(), that.Edges(), that.Polygons(), that.GetColor())
         {
         }
         public override nothrow Object* Clone() const

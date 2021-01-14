@@ -208,7 +208,7 @@ namespace Sirius.Graphics
                         Swap(y0, y1);
                         Swap(v, u);
                     }
-                    if (iy < y0 || iy > y1) continue;
+                    if (iy < y0 || iy >= y1) continue;
                     int x0 = v->screenPoint.x;
                     float z0 = v->viewLocation.z;
                     float intensity0 = v->intensity;
@@ -288,8 +288,10 @@ namespace Sirius.Graphics
                             if (z < zbuffer.GetZ(ix, iy))
                             {
                                 zbuffer.SetZ(ix, iy, z);
-                                byte c = cast<byte>(255 * intensity);
-                                System.Windows.Color color(c, c, c);
+                                System.Windows.Color color = object->GetColor();
+                                color.red = cast<byte>(intensity * color.red);
+                                color.green = cast<byte>(intensity * color.green);
+                                color.blue = cast<byte>(intensity * color.blue);
                                 bitmap.SetPixelChecked(ix, iy, color);
                             }
                         }
@@ -442,11 +444,11 @@ namespace Sirius.Graphics
 
     public abstract class PolygonMeshObject : Object
     {
-        public nothrow PolygonMeshObject() : base(), vertices(), edges(), polygons()
+        public nothrow PolygonMeshObject() : base(), vertices(), edges(), polygons(), color(System.Windows.Color.White())
         {
         }
-        public nothrow PolygonMeshObject(const List<Vertex>& vertices_, const List<Edge>& edges_, const List<Polygon>& polygons_) :
-            base(), vertices(vertices), edges(edges_), polygons(polygons_)
+        public nothrow PolygonMeshObject(const List<Vertex>& vertices_, const List<Edge>& edges_, const List<Polygon>& polygons_, const System.Windows.Color& color_) :
+            base(), vertices(vertices), edges(edges_), polygons(polygons_), color(color_)
         {
         }
         public nothrow inline void AddVertex(const Vertex& vertex)
@@ -578,6 +580,14 @@ namespace Sirius.Graphics
         {
             return polygons;
         }
+        public nothrow inline const System.Windows.Color& GetColor() const
+        {
+            return color;
+        }
+        public nothrow void SetColor(const System.Windows.Color& color_)
+        {
+            color = color_;
+        }
         public nothrow void SetLightingFactors(float a, float d)
         {
             SetLightingFactors(a, d, 0, 0);
@@ -633,6 +643,7 @@ namespace Sirius.Graphics
         private float diffuseFactor;
         private float specularFactor;
         private int specularExponent;
+        private System.Windows.Color color;
     }
 }
 

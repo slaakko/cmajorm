@@ -1,0 +1,49 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Sirius.Math;
+
+namespace Sirius.Graphics
+{
+    public class Arrow : CompositeObject
+    {
+        public nothrow Arrow() : this(3, 4)
+        {
+        }
+        public nothrow Arrow(int beamCylinderCount, int headConeCount) : this(beamCylinderCount, headConeCount, 1, 0.1f / 4, 0.1f)
+        {
+        }
+        public nothrow Arrow(int beamCylinderCount, int headConeCount, float beamLength, float beamCylinderRadius, float headSideLength) :
+            this(beamCylinderCount, headConeCount, beamLength, beamCylinderRadius, headSideLength, 0, 0, 0)
+        {
+        }
+        public nothrow Arrow(int beamCylinderCount, int headConeCount, float beamLength, float beamCylinderRadius, float headSideLength, float roll, float pitch, float yaw) :
+            this(beamCylinderCount, headConeCount, beamLength, beamCylinderRadius, headSideLength, roll, pitch, yaw, Vector(0, 0, 0))
+        {
+        }
+        public nothrow Arrow(int beamCylinderCount, int headConeCount, float beamLength, float beamCylinderRadius, float headSideLength,
+            float roll, float pitch, float yaw, const Vector& location) : base()
+        {
+            float headHeight = cast<float>(Sqrt(3) * headSideLength / 2);
+            UniquePtr<Object> beam(new Cylinder(beamCylinderCount, beamLength, beamCylinderRadius, cast<float>(-PI() / 2), 0, 0, Vector(beamLength / 2, 0, 0)));
+            AddComponent(beam.Release());
+            UniquePtr<Object> head(new Cone(headConeCount, headHeight, headSideLength / 2, cast<float>(-PI() / 2), 0, 0, Vector(beamLength, 0, 0)));
+            AddComponent(head.Release());
+            Matrix orientation = Rotation(roll, pitch, yaw);
+            Matrix moveToLocation = Translation(location.x, location.y, location.z);
+            Matrix transformation = moveToLocation * orientation;
+            TransformLocal(transformation);
+        }
+        public nothrow Arrow(const Arrow& that) : base(that.CloneComponents())
+        {
+        }
+        public override nothrow Object* Clone() const
+        {
+            return new Arrow(*this);
+        }
+    }
+}
+

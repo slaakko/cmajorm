@@ -91,7 +91,7 @@ namespace Sirius.Graphics
             Matrix transformation = moveToLocation * scaling;
             TransformLocal(transformation);
         }
-        public nothrow Sphere(const Sphere& that) : base(that.Vertices(), that.Edges(), that.Polygons())
+        public nothrow Sphere(const Sphere& that) : base(that.Vertices(), that.Edges(), that.Polygons(), that.GetColor())
         {
         }
         public override nothrow Object* Clone() const

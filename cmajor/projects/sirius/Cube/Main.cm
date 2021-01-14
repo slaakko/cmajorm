@@ -17,7 +17,7 @@ class MainWindow : System.Windows.Window
     public nothrow MainWindow() :
         base("Cube"),
         whitePen(System.Windows.Color.White()),
-        lightSource(Sirius.Math.Vector(0, 1000, 0), 1),
+        lightSource(Sirius.Math.Vector(-200, 1000, 0), 1),
         camera(Sirius.Math.Vector(0, 0, 0), Sirius.Math.Vector(0, 0, 0), J(), 200.0f),
         screen(800, 600),
         frame(0),
@@ -28,13 +28,11 @@ class MainWindow : System.Windows.Window
         //drawKind(DrawKind.wireframe),
         zbuffer(new ZBuffer(screen.width, screen.height))
     {
-        Sirius.Math.Vector v(3, -1, 0);
-        Sirius.Math.Vector n(0, 2, 0);
-        Sirius.Math.Vector r = Reflect(v, n);
         SetBackgroundColor(Color.Black());
         SetSize(Size(screen.width, screen.height));
         UniquePtr<Cube> cube(new Cube(100, 0, 0, 0, Sirius.Math.Vector(0, 0, 0)));
         cube->SetLightingFactors(0.2f, 0.8f);
+        cube->SetColor(System.Windows.Color.Green());
         cube->TransformWorld();
         this->cube = cube.Get();
         scene.AddObject(cube.Release());
@@ -61,17 +59,6 @@ class MainWindow : System.Windows.Window
         if (frame < 200)
         {
             TimePoint start = Now();
-            UniquePtr<LogWriter> logWriter;
-            LogWriter* log = null;
-            if (frame == 1 && drawKind == DrawKind.shading)
-            {
-                if (File.Exists("paint.log"))
-                {
-                    File.Remove("paint.log");
-                }
-                logWriter.Reset(new LogWriter("paint.log"));
-                log = logWriter.Get();
-            }
             float angle = 50 - 360.0f * frame / 100.0f;
             float t = cast<float>(DegToRad(angle));
             float radius = 256;
@@ -93,7 +80,7 @@ class MainWindow : System.Windows.Window
                 }
                 case DrawKind.shading:
                 {
-                    scene.Paint(System.Windows.Color.Black(), bufferPtr->GetBitmap(), bufferPtr->BitmapGraphics(), *zbuffer, camera, screen, log);
+                    scene.Paint(System.Windows.Color.Black(), bufferPtr->GetBitmap(), bufferPtr->BitmapGraphics(), *zbuffer, camera, screen, null);
                     break;
                 }
             }
