@@ -86,6 +86,78 @@ namespace Sirius.Graphics
                 // i == 3, j == 3: edge(12, e)
                 AddEdge(Edge((xzcount - 1) * (ycount - 1) + j, e));
             }
+            for (int i = 0; i < ycount; ++i)
+            {
+                for (int j = 0; j < xzcount; ++j)
+                {
+                    if (i == 0)
+                    {
+                        Polygon p;
+                        p.AddVertex(0);
+                        p.AddVertex(j + 1);
+                        if (j < xzcount - 1)
+                        {
+                            p.AddVertex(j + 2);
+                        }
+                        else
+                        {
+                            p.AddVertex(1);
+                        }
+                        AddPolygon(p);
+                    }
+                    else if (i < ycount - 1)
+                    {
+                        // (i - 1) * xzcount + j + 1, i * xzcount + j + 1, i * xzcount + j + 2, (i - 1) * xzcount + j + 2 (j < xzcount - 1)
+                        Polygon p;
+                        if (j == 0)
+                        {
+                            p.AddVertex((i - 1) * xzcount + ycount);
+                            p.AddVertex(i * xzcount + ycount);
+                            p.AddVertex(i * xzcount + 1);
+                            p.AddVertex((i - 1) * xzcount + 1);
+                        }
+                        else
+                        {
+                            p.AddVertex((i - 1) * xzcount + j);
+                            p.AddVertex(i * xzcount + j);
+                            p.AddVertex(i * xzcount + j + 1);
+                            p.AddVertex((i - 1) * xzcount + j + 1);
+                        }
+                        // i == 1:
+                        // (4, 8, 5, 1) (j == 0)
+                        // (1, 5, 6, 2) (j == 1)
+                        // (2, 6, 7, 3) (j == 2)
+                        // (3, 7, 8, 4) (J == 3)
+                        // i == 2:
+                        // (8, 12, 9, 5) (j == 0)
+                        // (5, 9, 10, 6) (j == 1)
+                        // (6, 10, 11, 7) (j == 2)
+                        // (7, 11, 12, 8) (j == 3)
+                        AddPolygon(p);
+                    }
+                    else // i == ycount - 1
+                    {
+                        int e = xzcount * (ycount - 1) + 1;
+                        // (xzcount - 1) * (ycount - 1) + j:  3 * 3 + 0
+                        // e
+                        // (xzcount - 1) * (ycount - 1) + j + 1: 3 * 3 + 1
+                        // (9, e, 10) i == 3, j == 0: edge(9, e) j == 0
+                        // (10, e, 11) i == 3, j == 1: edge(10, e) j == 1
+                        // (11, e, 12) i == 3, j == 2: edge(11, e) j == 2
+                        // (12, e, 13) i == 3, j == 3: edge(12, e) j == 3
+                        Polygon p;
+                        p.AddVertex((xzcount - 1) * (ycount - 1) + j);
+                        p.AddVertex(e);
+                        p.AddVertex((xzcount - 1) * (ycount - 1) + j + 1);
+                        AddPolygon(p);
+                    }
+                }
+            }
+
+            AddPolygonsToVertices();
+            CalculatePolygonNormals();
+            CalculateVertexNormals();
+
             Matrix scaling = Scaling(radius, radius, radius);
             Matrix moveToLocation = Translation(location.x, location.y, location.z);
             Matrix transformation = moveToLocation * scaling;

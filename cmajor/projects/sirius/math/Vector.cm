@@ -21,6 +21,10 @@ namespace Sirius.Math
         public nothrow Vector(float x, float y, float z) : this(x, y, z, 1)
         {
         }
+        public nothrow string ToString() const
+        {
+            return "(" + System.ToString(x) + ", " + System.ToString(y) + ", " + System.ToString(z) + ", " + System.ToString(w) + ")";
+        }
         public float x;
         public float y;
         public float z;
@@ -64,17 +68,17 @@ namespace Sirius.Math
 
     public nothrow inline Vector operator+(const Vector& left, const Vector& right)
     {
-        return Vector(left.x + right.x, left.y + right.y, left.z + right.z, left.w + right.w);
+        return Vector(left.x + right.x, left.y + right.y, left.z + right.z, 1);
     }
 
     public nothrow inline Vector operator-(const Vector& left, const Vector& right)
     {
-        return Vector(left.x - right.x, left.y - right.y, left.z - right.z, left.w - right.w);
+        return Vector(left.x - right.x, left.y - right.y, left.z - right.z, 1);
     }
 
     public nothrow inline Vector operator*(float a, const Vector& v)
     {
-        return Vector(a * v.x, a * v.y, a * v.z, a * v.w);
+        return Vector(a * v.x, a * v.y, a * v.z, 1);
     }
 
     public nothrow inline Vector Normalize(const Vector& v)

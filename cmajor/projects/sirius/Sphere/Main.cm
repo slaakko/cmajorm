@@ -16,19 +16,25 @@ class MainWindow : System.Windows.Window
 {
     public nothrow MainWindow() :
         base("Sphere"),
-        lightSource(Sirius.Math.Vector(0, 1000, 0), 1),
+        whitePen(System.Windows.Color.White()),
+        lightSource(Sirius.Math.Vector(200, 2000, 200), 1),
         camera(Sirius.Math.Vector(0, 0, 0), Sirius.Math.Vector(0, 0, 0), J(), 200.0f),
         screen(800, 600),
         frame(0),
         frameIntervalMs(40u),
         minUs(MaxValue<int>()),
-        maxUs(MinValue<int>())
+        maxUs(MinValue<int>()),
+        drawKind(DrawKind.wireframe),
+        zbuffer(new ZBuffer(screen.width, screen.height)),
+        shadingAlgorithm(ShadingAlgorithm.gouraudShading)
     {
         SetBackgroundColor(Color.Black());
         SetSize(Size(screen.width, screen.height));
         UniquePtr<Sphere> sphere(new Sphere(16, 16, 100, Sirius.Math.Vector(0, 50, 0)));
+        //UniquePtr<Sphere> sphere(new Sphere(4, 4, 100, Sirius.Math.Vector(0, 50, 0)));
+        sphere->SetLightingFactors(0.2f, 0.6f, 0.2f, 10);
+        sphere->SetColor(System.Windows.Color.Red());
         sphere->TransformWorld();
-        pen = System.Windows.Pen(sphere->GetColor());
         scene.AddObject(sphere.Release());
         UniquePtr<Grid> grid(new Grid(8, 400, 0, cast<float>(PI() / 2), 0, Sirius.Math.Vector(0, -100, 0)));
         grid->TransformWorld();
@@ -78,12 +84,13 @@ class MainWindow : System.Windows.Window
             {
                 case DrawKind.wireframe:
                 {
-                    scene.Draw(pen, System.Windows.Color.Black(), bufferPtr->BitmapGraphics());
+                    scene.Draw(whitePen, System.Windows.Color.Black(), bufferPtr->BitmapGraphics());
                     break;
                 }
                 case DrawKind.shading:
                 {
-                    scene.Paint(System.Windows.Color.Black(), bufferPtr->GetBitmap(), bufferPtr->BitmapGraphics(), *zbuffer, camera, screen, null);
+                    scene.Paint(System.Windows.Color.Black(), bufferPtr->GetBitmap(), bufferPtr->BitmapGraphics(), *zbuffer, lightSource, camera, screen,
+                        shadingAlgorithm, null);
                     break;
                 }
             }
@@ -137,10 +144,20 @@ class MainWindow : System.Windows.Window
                     drawKind = DrawKind.shading;
                     break;
                 }
+                case w'g':
+                {
+                    shadingAlgorithm = ShadingAlgorithm.gouraudShading;
+                    break;
+                }
+                case w'p':
+                {
+                    shadingAlgorithm = ShadingAlgorithm.phongShading;
+                    break;
+                }
             }
         }
     }
-    private System.Windows.Pen pen;
+    private System.Windows.Pen whitePen;
     private BufferPtr bufferPtr;
     private PointLightSource lightSource;
     private Camera camera;
@@ -152,6 +169,7 @@ class MainWindow : System.Windows.Window
     private int maxUs;
     private DrawKind drawKind;
     private UniquePtr<ZBuffer> zbuffer;
+    private ShadingAlgorithm shadingAlgorithm;
 }
 
 int main()

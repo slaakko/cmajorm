@@ -10,6 +10,11 @@ using Sirius.Math;
 
 namespace Sirius.Graphics
 {
+    public enum ShadingAlgorithm
+    {
+        gouraudShading, phongShading
+    }
+
     public class Vertex
     {
         public nothrow Vertex() :
@@ -81,7 +86,7 @@ namespace Sirius.Graphics
 
     public class ScanLineData
     {
-        public nothrow ScanLineData(float x_, float z_, float intensity_) : x(x_), z(z_), intensity(intensity_)
+        public nothrow ScanLineData(float x_, float z_, float intensity_, const Vector& normal_) : x(x_), z(z_), intensity(intensity_), normal(normal_)
         {
         }
         public default nothrow ScanLineData(ScanLineData&& that);
@@ -89,6 +94,7 @@ namespace Sirius.Graphics
         public float x;
         public float z;
         public float intensity;
+        public Vector normal;
     }
 
     public nothrow bool operator==(const ScanLineData& left, const ScanLineData& right)
@@ -134,6 +140,20 @@ namespace Sirius.Graphics
         public nothrow void AddVertex(int vertexIndex)
         {
             vertexIndeces.Add(vertexIndex);
+        }
+        public nothrow string ToString() const
+        {
+            string s = "(";
+            for (int i = 0; i < vertexIndeces.Count(); ++i)
+            {
+                if (i > 0)
+                {
+                    s.Append(", ");
+                }
+                s.Append(System.ToString(vertexIndeces[i]));
+            }
+            s.Append(")");
+            return s;
         }
         public nothrow void CalculateNormal()
         {
@@ -219,13 +239,15 @@ namespace Sirius.Graphics
                     float x = x0 + m * (x1 - x0);
                     float z = z0 + m * (z1 - z0);
                     float intensity = intensity0 + m * (intensity1 - intensity0);
-                    ScanLineData scanLineData(x, z, intensity);
+                    Vector normal = (1 - m) * v->normal + m * u->normal;
+                    ScanLineData scanLineData(x, z, intensity, normal);
                     List<ScanLineData>& scanLineDataList = context.GetScanLineDataList(iy);
                     scanLineDataList.Add(scanLineData);
                 }
             }
         }
-        public nothrow void Rasterize(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, LogWriter* log)
+        public nothrow void Rasterize(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const LightSource& lightSource, const Camera& camera,
+            ShadingAlgorithm shadingAlgorithm, LogWriter* log)
         {
             PolygonRasterizingContext context;
             LogWriter* lg = null;
@@ -248,6 +270,7 @@ namespace Sirius.Graphics
             }
             for (int iy = iystart; iy <= iyend; ++iy)
             {
+                float y = iy;
                 List<ScanLineData>& scanLineDataList = context.GetScanLineDataList(iy);
                 Sort(scanLineDataList);
                 long n = scanLineDataList.Count();
@@ -270,6 +293,8 @@ namespace Sirius.Graphics
                     float zright = right.z;
                     float intensityLeft = left.intensity;
                     float intensityRight = right.intensity;
+                    Vector normalLeft = left.normal;
+                    Vector normalRight = right.normal;
                     int ixleft = cast<int>(xleft);
                     int ixright = cast<int>(xright);
                     int dix = ixright - ixleft;
@@ -282,9 +307,20 @@ namespace Sirius.Graphics
                     {
                         for (int ix = ixleft; ix < ixright; ++ix)
                         {
+                            float x = ix;
                             float m = 1.0f * (ix - ixleft) / dix;
                             float z = zleft + m * (zright - zleft);
-                            float intensity = intensityLeft + m * (intensityRight - intensityLeft);
+                            float intensity = 0;
+                            Vector normal = (1 - m) * normalLeft + m * normalRight;
+                            if (shadingAlgorithm == ShadingAlgorithm.gouraudShading)
+                            {
+                                intensity = intensityLeft + m * (intensityRight - intensityLeft);
+                            }
+                            else if (shadingAlgorithm == ShadingAlgorithm.phongShading)
+                            {
+                                Vector location(x, y, z);
+                                intensity = LightIntensity(lightSource, camera, location, normal, *object);
+                            }
                             if (z < zbuffer.GetZ(ix, iy))
                             {
                                 zbuffer.SetZ(ix, iy, z);
@@ -352,7 +388,8 @@ namespace Sirius.Graphics
         public abstract nothrow void TransformWorld(const Matrix& worlTransformation);
         public abstract nothrow void View(const Camera& camera, const LightSource& lightSource, const Screen& screen);
         public abstract void Draw(const System.Windows.Pen& pen, System.Windows.Graphics& graphics);
-        public abstract void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen, LogWriter* log);
+        public abstract void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const LightSource& lightSource, const Camera& camera, const Screen& screen,
+            ShadingAlgorithm shadingAlgorithm, LogWriter* log);
         public virtual void Write(TextWriter& writer) {}
         public int id;
     }
@@ -413,11 +450,12 @@ namespace Sirius.Graphics
                 component->Draw(pen, graphics);
             }
         }
-        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen, LogWriter* log)
+        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const LightSource& lightSource, const Camera& camera, const Screen& screen,
+            ShadingAlgorithm shadingAlgorithm, LogWriter* log)
         {
             for (UniquePtr<Object>& component : components)
             {
-                component->Paint(bitmap, zbuffer, camera, screen, log);
+                component->Paint(bitmap, zbuffer, lightSource, camera, screen, shadingAlgorithm, log);
             }
         }
         public nothrow const List<UniquePtr<Object>>& Components() const
@@ -558,13 +596,14 @@ namespace Sirius.Graphics
                 graphics.DrawLineChecked(pen, start.screenPoint, end.screenPoint);
             }
         }
-        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const Camera& camera, const Screen& screen, LogWriter* log)
+        public override void Paint(System.Windows.Bitmap& bitmap, ZBuffer& zbuffer, const LightSource& lightSource, const Camera& camera, const Screen& screen,
+            ShadingAlgorithm shadingAlgorithm, LogWriter* log)
         {
             for (const Polygon& polygon : polygons)
             {
                 if (polygon.IsVisible(camera))
                 {
-                    polygon.Rasterize(bitmap, zbuffer, log);
+                    polygon.Rasterize(bitmap, zbuffer, lightSource, camera, shadingAlgorithm, log);
                 }
             }
         }

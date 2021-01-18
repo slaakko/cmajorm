@@ -48,7 +48,7 @@ namespace Sirius.Graphics
         float lDotN = Dot(lightVector, surfaceNormal);
         float diffuseIntensity = Max(0.0f, lightSource.incidentLightIntensity * lDotN * object.DiffuseFactor());
         Vector r = Reflect(lightVector, surfaceNormal);
-        Vector v = camera.ViewVector();
+        Vector v = Normalize(camera.ViewVector());
         float rDotV = Dot(r, v);
         float s = cast<float>(Pow(rDotV, object.SpecularExponent()));
         float specularIntensity = Max(0.0f, lightSource.incidentLightIntensity * s * object.SpecularFactor());
