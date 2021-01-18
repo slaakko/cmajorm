@@ -48,6 +48,7 @@ extern "C" RT_API bool RtFileExists(const char* filePath);
 extern "C" RT_API bool RtLastWriteTimeLess(const char* filePath1, const char* filePath2);
 extern "C" RT_API int32_t RtGetFileSize(const char* filePath, uint64_t* fileSize);
 extern "C" RT_API int32_t RtRemoveFile(const char* filePath);
+extern "C" RT_API int32_t RtRenameFile(const char* sourceFilePath, const char* targetFilePath);
 extern "C" RT_API int32_t RtCopyFile(const char* sourceFilePath, const char* targetFilePath);
 extern "C" RT_API void RtFlushAll();
 extern "C" RT_API bool RtIsConsoleHandle(int handle);

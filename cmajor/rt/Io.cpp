@@ -934,6 +934,24 @@ extern "C" RT_API int32_t RtRemoveFile(const char* filePath)
     return 0;
 }
 
+extern "C" RT_API int32_t RtRenameFile(const char* sourceFilePath, const char* targetFilePath)
+{
+    try
+    {
+        boost::system::error_code ec;
+        boost::filesystem::rename(sourceFilePath, targetFilePath, ec);
+        if (ec)
+        {
+            throw std::runtime_error(ec.message());
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        return cmajor::rt::InstallError(ex.what());
+    }
+    return 0;
+}
+
 extern "C" RT_API int32_t RtCopyFile(const char* sourceFilePath, const char* targetFilePath)
 {
     try
