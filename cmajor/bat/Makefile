@@ -1,6 +1,6 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 
-all: compiler cppbert sys cm tools examples 
+all: compiler cppbert sys cm tools examples cmsx
 	install.bat
 
 compiler: buildcomp install
@@ -38,6 +38,10 @@ tools:
 examples:
 	cmc -u -v ../projects/examples/examples.cms
 	cmc -u -v -c=release ../projects/examples/examples.cms
+
+cmsx:
+	cmc -u -v -st -bt=1 ../projects/cmsx/cmsx.cms
+	cmc -u -v -c=release -st -bt=1 ../projects/cmsx/cmsx.cms
 
 install:
 	install.bat
