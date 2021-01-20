@@ -656,6 +656,7 @@ Instruction* Context::CreateEndCatch(BasicBlock* nextDest)
 Instruction* Context::CreateResume()
 {
     Instruction* inst = new ResumeInstruction();
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {

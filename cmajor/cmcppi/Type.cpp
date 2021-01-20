@@ -330,11 +330,16 @@ std::vector<Type*> CreateTypeOrder(const std::vector<std::unique_ptr<Type>>& typ
             for (int i = 0; i < n; ++i)
             {
                 Type* memberType = structureType->GetMemberType(i);
-                if (memberType->IsStructureType())
+                if (memberType->IsStructureType() || memberType->IsArrayType())
                 {
                     dependencies[type.get()].insert(memberType);
                 }
             }
+        }
+        else if (type->IsArrayType())
+        {
+            ArrayType* arrayType = static_cast<ArrayType*>(type.get());
+            dependencies[type.get()].insert(arrayType->ElementType());
         }
     }
     std::vector<Type*> order;

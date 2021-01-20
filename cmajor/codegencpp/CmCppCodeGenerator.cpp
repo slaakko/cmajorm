@@ -1525,11 +1525,20 @@ void CmCppCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     if (generateLineNumbers)
     {
         resumeNodeId = emitter->AddControlFlowGraphNode();
+        emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::throwInst));
+    }
+    if (prevControlFlowGraphNodeId == -1)
+    {
+
     }
     emitter->CreateResume(nullptr);
     if (prevControlFlowGraphNodeId != -1)
     {
         emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, resumeNodeId);
+    }
+    if (generateLineNumbers)
+    {
+        emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::throwInst));
     }
     prevControlFlowGraphNodeId = resumeNodeId;
     currentFunction->GetFunctionSymbol()->SetHasCleanup();

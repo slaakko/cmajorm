@@ -503,7 +503,7 @@ extern "C" RT_API int64_t OsGetFileSize(void* fileHandle)
 extern "C" RT_API uint32_t OsGetFileAttributes(const char* filePath)
 {
     std::u16string fp = ToUtf16(std::string(filePath));
-    uint32_t attrs = GetFileAttributes((LPWSTR)fp.c_str());
+    uint32_t attrs = GetFileAttributesW((LPWSTR)fp.c_str());
     if (attrs != INVALID_FILE_ATTRIBUTES)
     {
         return attrs;
@@ -559,7 +559,7 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
     SYSTEMTIME systemTime;
     SYSTEMTIME localTime;
     std::u16string fp = ToUtf16(std::string(filePath));
-    if (GetFileAttributesEx((LPWSTR)fp.c_str(), GetFileExInfoStandard, &fileInfo))
+    if (GetFileAttributesExW((LPWSTR)fp.c_str(), GetFileExInfoStandard, &fileInfo))
     {
         if (FileTimeToSystemTime(&fileInfo.ftCreationTime, &systemTime))
         {
