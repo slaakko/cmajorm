@@ -18,9 +18,9 @@ CXXFLAGS += -L../lib
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ifeq ($(config),debug)
-exename=cmtrace2txtd
+exename=cmtrace2xmld
 else
-exename=cmtrace2txt
+exename=cmtrace2xml
 endif
 
 ../bin/$(exename): $(OBJECTS) $(LIBRARIES)

@@ -4,7 +4,7 @@ OBJECTS = Access.o AttributeBinder.o BoundClass.o BoundCompileUnit.o BoundConstr
 BoundNodeVisitor.o BoundStatement.o ClassTemplateRepository.o Concept.o ConceptRepository.o ConstExprFunctionRepository.o ConstantArrayRepository.o ConstantStructureRepository.o \
 ControlFlowAnalyzer.o Evaluator.o ExpressionBinder.o FunctionTemplateRepository.o InlineFunctionRepository.o \
 JsonAttributeProcessor.o OperationRepository.o OverloadResolution.o StatementBinder.o StringRepository.o SystemDefaultAttributeProcessor.o TypeBinder.o TypeResolver.o \
-UuidRepository.o
+UuidRepository.o XmlAttributeProcessor.o
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
