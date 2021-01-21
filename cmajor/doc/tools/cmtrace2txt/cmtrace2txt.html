@@ -140,4 +140,428 @@
 			<li>If the entry is an end function entry, the duration field shows the duration of the function call.
 		</ol>
 	</p>
+	
+	<h2>
+		Usage
+	</h2>
+	
+    <p>
+        Usage: <strong>cmtrace2txt [options] trace.bin</strong>
+    </p>
+    
+    <p class="indent">
+        Convert trace.bin to trace.txt.
+    </p>
+    
+    <p>
+        Options:
+    </p>
+    
+    <table class="opt">
+        <tr>
+            <th class="opt">Long option</th>
+            <th class="opt">Short option</th>
+            <th class="opt">Description</th>
+        </tr>
+        <tr>
+            <td class="opt">--help</td>
+            <td class="opt">-h</td>
+            <td class="opt">Print help and exit.</td>
+        </tr>
+        <tr>
+            <td class="opt">--verbose</td>
+            <td class="opt">-v</td>
+            <td class="opt">Be verbose.</td>
+        </tr>
+		<tr>
+			<td class="opt">--filter="EXPR"</td>
+			<td class="opt">-f="EXPR"</td>
+			<td class="opt">Filter the trace using given <a href="#filterexpr">filter expression</a>.</td>
+		</tr>
+    </table>
+	
+    <h2 id="filterexpr">Filter expressions</h2>
+	
+	<p>
+		Trace entries can be filtered using filter expressions.
+		Only trace entries matching the filter expression will be included in the converted trace.
+	</p>
+	
+	<h3>Syntax</h3>
+    
+	<table class="grammar">
+		<tr>
+			<td class="rule" id="rule.filter-expression">filter&#8209;expression</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.and-expr">and&#8209;expr</a></span>
+				(<span class="kw">or</span>
+				<span class="rule"><a href="#rule.and-expr">and&#8209;expr</a></span>)*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.and-expr">and&#8209;expr</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.boolean-expr">boolean&#8209;expr</a></span>
+				(<span class="kw">and</span>
+				<span class="rule"><a href="#rule.boolean-expr">boolean&#8209;expr</a></span>)*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.boolean-expr">boolean&#8209;expr</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.match-expr">match&#8209;expr</a></span> |
+				<span class="rule"><a href="#rule.relational-expr">relational&#8209;expr</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.match-expr">match&#8209;expr</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.primary-expr">primary&#8209;expr</a></span>
+				<span class="kw">match</span>
+				<span class="rule"><a href="#rule.primary-expr">primary&#8209;expr</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.relational-expr">relational&#8209;expr</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.primary-expr">primary&#8209;expr</a></span>
+				(<span class="rule"><a href="#rule.rel-op">rel&#8209;op</a></span>
+				<span class="rule"><a href="#rule.boolean-expr">primary&#8209;expr</a></span>)*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.rel-op">rel&#8209;op</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">==</span> |
+				<span class="mono">&lt;></span> |
+				<span class="mono">&lt;=</span> |
+				<span class="mono">>=</span> |
+				<span class="mono">&lt;</span> |
+				<span class="mono">></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.primary-expr">primary&#8209;expr</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">name</span> |
+				<span class="kw">thread</span> |
+				<span class="kw">duration</span> |
+				<span class="kw">time</span> |
+				<span class="kw">level</span> |
+				<span class="kw">message</span> |
+				<span class="kw">parent</span> |
+				<span class="kw">true</span> |
+				<span class="kw">false</span> |
+				<span class="rule"><a href="#rule.pattern">pattern</a></span> |
+				<span class="rule"><a href="#rule.string">string</a></span> |
+				<span class="rule"><a href="#rule.integer">integer</a></span> <span class="rule"><a href="#rule.unit">unit</a></span>? |
+				<span class="mono">(</span> <span class="rule"><a href="#rule.filter-expression">filter&#8209;expression</a></span> <span class="mono">)</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.pattern">pattern</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">'</span>
+				<span class="rule"><a href="#rule.pattern-expression">pattern&#8209;expression</a></span>
+				<span class="mono">'</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.string">string</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">"</span>
+				<span class="op">[^"]*</span>
+				<span class="mono">"</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.integer">integer</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="op">[0-9][0-9']*</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.unit">unit</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="kw">ns</span> |
+				<span class="kw">us</span> |
+				<span class="kw">ms</span> |
+				<span class="kw">s</span> 
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.pattern-expression">pattern&#8209;expression</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.alternative">alternative</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.alternative">alternative</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.catenation">catenation</a></span>
+				(<span class="mono">|</span>
+				<span class="rule"><a href="#rule.catenation">catenation</a></span>)*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.catenation">catenation</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.repetition">repetition</a></span>
+				<span class="rule"><a href="#rule.repetition">repetition</a></span>*
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.repetition">repetition</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">*</span> |
+				<span class="mono">?</span> |
+				<span class="rule"><a href="#rule.repetition">primary</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.primary">primary</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">(</span>
+				<span class="rule"><a href="#rule.alternative">alternative</a></span>
+				<span class="mono">)</span> |
+				<span class="rule"><a href="#rule.class">class</a></span> |
+				<span class="rule"><a href="#rule.char">char</a></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.class">class</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="mono">[</span>
+				<span class="mono">^</span>?
+				<span class="rule"><a href="#rule.range">range</a></span>*
+				<span class="mono">]</span>
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.range">range</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				<span class="rule"><a href="#rule.char">char</a></span>
+				(<span class="mono">-</span>
+				<span class="rule"><a href="#rule.char">char</a></span>)?
+			</td>
+		</tr>
+		<tr>
+			<td class="rule" id="rule.range">char</td>
+			<td class="sep">&rarr;</td>
+			<td class="rcontent">
+				'a character or an escape'
+			</td>
+		</tr>
+	</table>
+	
+	<h3>Components of filter expressions</h3>
+	
+	<p>
+		A filter expression is a sequence of <a href="#rule.boolean-expr"><span class="rule">boolean&#8209;expr</span></a>s combined with <strong>and</strong> and <strong>or</strong> operators.
+		The precedence of <strong>and</strong> is greater than the precedence of <strong>or</strong>.
+	</p>
+	
+	<h3>
+		Boolean expressions
+	</h3>
+	
+	<p>
+		A <a href="#rule.boolean-expr"><span class="rule">boolean&#8209;expr</span></a> is either a <a href="#rule.match-expr"><span class="rule">match&#8209;expr</span></a> or a 
+		<a href="#rule.relational-expr"><span class="rule">relational&#8209;expr</span></a>
+	</p>
+	
+	<h3>
+		Match expressions
+	</h3>
+	
+	<p>
+		A <a href="#rule.match-expr"><span class="rule">match&#8209;expr</span></a> is a <a href="#rule.primary-expr"><span class="rule">primary&#8209;expr</span></a>
+		combined with a <a href="#rule.pattern"><span class="rule">pattern</span></a> using a <strong>match</strong> operator.
+	</p>
+	
+	<p>
+		A pattern consists of character <a href="#rule.class"><span class="rule">class</span></a>es, characters that are not operator characters and wild cards 
+		<strong>*</strong> and <strong>?</strong>.
+	</p>
+	
+	<p>
+		Wild card <strong>*</strong> matches any string of characters including an empty string. 
+		Wild card <strong>?</strong> matches any single character.
+	</p>
+	
+	<p>
+		A character class begins with a left bracket and is followed by an optional inverse operator <strong>^</strong> followed by 
+		any number of character <a href="#rule.range"><span class="rule">range</span></a>s followed by a right bracket.
+		The inverse operator means "any but the following ranges".
+	</p>
+	
+	<p>
+		A character <a href="#rule.range"><span class="rule">range</span></a> is a ordinary character or an escape optionally followed by a dash character and another ordinary character or an escape.
+		It denotes a range of ordinary characters.
+	</p>
+	
+	<p>
+		An escape begins with the backslash and is similar to an escape sequence in the C programming language.
+	</p>
+	
+	<h3>
+		Relational expressions
+	</h3>
+	
+	<p>
+		A relational expression is a primary expresssion optionally followed by a sequence of relational operators and primary expressions.
+	</p>
+	
+	<p>
+		A relational operator is:
+		<ul>
+			<li>=, equal to</li>
+			<li>&lt;>, not equal to,</li>
+			<li>&lt;=, less than or equal to</li>
+			<li>>=, greater than or equal to</li>
+			<li>&lt;, less than, or</li>
+			<li>>, greater than</li>
+		</ul>
+	</p>
+	
+	<h4>
+		Primary expressions
+	</h4>
+	
+	<p>
+		A <a href="#rule.primary-expr"><span class="rule">primary&#8209;expr</span></a> selects a field from a trace entry, 
+		is a pattern, a string, an integer, or a parenthesized filter expression.
+	</p>
+	
+	<h5>
+		name
+	</h5>
+	
+	<p>
+		The <strong>name</strong> keyword selects the function name field from a trace entry.
+	</p>
+	
+	<h5>
+		thread
+	</h5>
+	
+	<p>
+		The <strong>thread</strong> keyword selects the thread name field from a trace entry.
+	</p>
+	
+	<h5>
+		duration
+	</h5>
+	
+	<p>
+		The <strong>duration</strong> keyword selects the duration field from a trace entry.
+	</p>
+	
+	<h5>
+		time
+	</h5>
+	
+	<p>
+		The <strong>time</strong> keyword selects the time field from a trace entry.
+	</p>
+	
+	<h5>
+		level
+	</h5>
+	
+	<p>
+		The <strong>level</strong> keyword selects the level of the trace entry. Level is an integer.
+	</p>
+	
+	<h5>
+		message
+	</h5>
+	
+	<p>
+		The <strong>message</strong> keyword selects Windows message name from a trace entry.
+	</p>
+	
+	<h5>
+		parent
+	</h5>
+	
+	<p>
+		The <strong>parent</strong> keyword evaluates to <strong>true</strong> if parent trace entry is selected, otherwise it evaluates to <strong>false</strong>.
+	</p>
+	
+	<h5>
+		Integers
+	</h5>
+	
+	<p>
+		A primary expression can be an unsigned integer optionally followed by a time unit.
+	</p>
+	
+	<p>
+		When the left side of a relational expression is either a <strong>duration</strong> or <strong>time</strong>, the right side can be an unsigned integer followed by a time unit.
+		The time unit can be:
+		<ul>
+			<li><strong>ns</strong>, nanoseconds</li>
+			<li><strong>us</strong>, microseconds</li>
+			<li><strong>ms</strong>, milliseconds</li>
+			<li><strong>s</strong>, seconds</li>
+		</ul>
+	</p>
+	
+	<p>
+		If a time unit is absent the time is assumed to be in nanoseconds.
+	</p>
+	
+	<h3>
+		Examples
+	</h3>
+	
+	<ol>
+	
+	<li>
+		<pre>
+			cmtrace2txt -v --filter="duration>=10ms" trace.bin
+		</pre>
+		<p>
+			Selects only those function trace entries whose duration is equal to or greater than 10 milliseconds.
+		</p>
+	</li>
+	
+	<li>
+		<pre>
+			cmtrace2txt -v --filter="name match 'System.*' and duration>=10ms" trace.bin
+		</pre>
+		<p>
+			Selects only those function trace entries whose function name starts with "System" followed by a period and duration is equal to or greater than 10 milliseconds.
+		</p>
+	</li>
+	
+	<li>
+		<pre>
+			cmtrace2txt -v --filter="level=0 and duration>=10ms or parent" trace.bin
+		</pre>
+		<p>
+			Selects only those function trace entries that are either top level (level=0) and whose duration is equal to or greater than 10 milliseconds, or whose parent entry is selected.
+			That is, the <strong>parent</strong> expression selects all child entries of included top level entries.
+		</p>
+	</li>
+	
 </body>
