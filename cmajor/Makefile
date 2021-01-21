@@ -41,6 +41,7 @@ build:
 	$(MAKE) -C cmdoc
 	$(MAKE) -C cmmdump
 	$(MAKE) -C cmfileredirector
+	$(MAKE) -C cmtrace
 	$(MAKE) -C cmtrace2txt
 	$(MAKE) -C eh
 	$(MAKE) -C rt
@@ -170,6 +171,7 @@ clean:
 	$(MAKE) -C cmdoc clean
 	$(MAKE) -C cmmdump clean
 	$(MAKE) -C cmfileredirector clean
+	$(MAKE) -C cmtrace clean
 	$(MAKE) -C cmtrace2txt clean
 	$(MAKE) -C eh clean
 	$(MAKE) -C rt clean
