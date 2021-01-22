@@ -19,7 +19,7 @@ namespace cmcode
 {
     public nothrow string Version()
     {
-        return "3.9.0";
+        return "3.10.0";
     }
 
     enum UserInterfaceAction
@@ -552,6 +552,7 @@ namespace cmcode
                 Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             UniquePtr<TreeView> solutionExplorerTreeViewPtr(new TreeView(Point(), Size(), Dock.fill, Anchors.none));
             solutionExplorerTreeView = solutionExplorerTreeViewPtr.Get();
+            solutionExplorerTreeView->SetDoubleBuffered();
             solutionExplorerTreeView->NodeClickEvent().AddHandler(TreeViewNodeClick);
             solutionExplorerTreeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
             UniquePtr<Control> paddedTreeView(new PaddedControl(solutionExplorerTreeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));

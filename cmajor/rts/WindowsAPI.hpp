@@ -250,6 +250,8 @@ extern "C" RT_API int64_t WinGetWindowLong(void* windowHandle, int index);
 extern "C" RT_API bool WinSetWindowLong(void* windowHandle, int index, int64_t newValue);
 extern "C" RT_API bool WinScrollWindow(void* windowHandle, int xAmount, int yAmount,
     int clientLocX, int clientLocY, int clientSizeW, int clientSizeH, int clipLocX, int clipLocY, int clipSizeW, int clipSizeH);
+extern "C" RT_API bool WinScrollWindowEx(void* windowHandle, int dx, int dy, int clientLocX, int clientLocY, int clientSizeW, int clientSizeH, int clipLocX, int clipLocY, int clipSizeW, int clipSizeH,
+    int x1, int y1, int x2, int y2);
 extern "C" RT_API bool WinGetScrollInfo(void* windowHandle, int nBar, uint32_t& nPage, int32_t& nPos, int32_t& nMin, int32_t& nMax, int32_t& nTrackPos);
 extern "C" RT_API int WinSetScrollInfo(void* windowHandle, int nBar, uint32_t fMask, bool redraw, uint32_t nPage, int32_t nPos, int32_t nMin, int32_t nMax);
 extern "C" RT_API bool WinShowScrollBar(void* windowHandle, int nBar, bool show);

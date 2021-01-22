@@ -36,6 +36,7 @@ namespace Cm.Views
         {
             UniquePtr<TreeView> treeViewPtr(new TreeView(Point(), Size(), Dock.none, Anchors.none));
             treeView = treeViewPtr.Get();
+            treeView->SetDoubleBuffered();
             treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
             UniquePtr<Control> paddedTreeView(new PaddedControl(treeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> scrollableTreeView(new ScrollableControl(paddedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));

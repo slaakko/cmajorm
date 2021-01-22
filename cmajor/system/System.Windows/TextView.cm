@@ -644,7 +644,7 @@ namespace System.Windows
                     charHeight = Max(charHeight, charRect.size.h);
                 }
             }
-            SetScrollUnits(cast<int>(charHeight), cast<int>(2 * charWidth));
+            SetScrollUnits(cast<int>(charHeight + 0.5), cast<int>(2 * (charWidth + 0.5)));
             SetTextExtent();
         }
         public void SetTextExtent()

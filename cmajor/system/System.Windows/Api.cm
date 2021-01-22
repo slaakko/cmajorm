@@ -26,14 +26,14 @@ namespace System.Windows.API
     public const long SE_ERR_OOM = 12;
     public const long SE_ERR_PNF = 13;
     public const long SE_ERR_SHARE = 14;
-    
+
     public string GetWindowsAPIErrorMessage(ulong errorCode)
     {
         wchar[4096] buffer;
         WinFormatMessage(errorCode, &buffer[0]);
         return ToUtf8(wstring(&buffer[0]));
     }
-    
+
     public class WindowsAPIException : Exception
     {
         public WindowsAPIException(ulong errorCode_) : base(GetWindowsAPIErrorMessage(errorCode_)), errorCode(errorCode_)
@@ -53,7 +53,7 @@ namespace System.Windows.API
         }
         private uint errorCode;
     }
-    
+
     public void* FindFirstChangeNotification(const string& directoryPath)
     {
         void* notificationHandle = WinFindFirstChangeNotification(directoryPath.Chars());
@@ -63,7 +63,7 @@ namespace System.Windows.API
         }
         return notificationHandle;
     }
-    
+
     public void FindNextChangeNotification(void* notificationHandle)
     {
         bool result = WinFindNextChangeNotification(notificationHandle);
@@ -72,7 +72,7 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
-    
+
     public void FindCloseChangeNotification(void* notificationHandle)
     {
         bool result = WinFindCloseChangeNotification(notificationHandle);
@@ -81,7 +81,7 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
-    
+
     public void* CreateEvent()
     {
         void* eventHandle = WinCreateEvent();
@@ -91,7 +91,7 @@ namespace System.Windows.API
         }
         return eventHandle;
     }
-    
+
     public void SetEvent(void* eventHandle)
     {
         bool result = WinSetEvent(eventHandle);
@@ -100,7 +100,7 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
-    
+
     public void ResetEvent(void* eventHandle)
     {
         bool result = WinResetEvent(eventHandle);
@@ -109,7 +109,7 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
-    
+
     public void WaitEvent(void* eventHandle)
     {
         bool result = WinWaitEvent(eventHandle);
@@ -118,7 +118,7 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
-    
+
     public void CloseHandle(void* handle)
     {
         bool result = WinCloseHandle(handle);
@@ -127,12 +127,12 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
-    
+
     public void CloseEvent(void* eventHandle)
     {
         CloseHandle(eventHandle);
     }
-    
+
     public int WaitForMultipleObjects(const List<void*>& handles)
     {
         int result = WinWaitForMultipleObjects(cast<uint>(handles.Count()), handles.Begin().Ptr());
@@ -145,7 +145,7 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
-    
+
     public void ShellExecute(const string& filePath)
     {
         long errorCode = 0;
@@ -229,7 +229,7 @@ namespace System.Windows.API
             throw Exception(errorMessage);
         }
     }
-    
+
     public ushort RegisterWindowClass(const char* windowClassName, uint style, int backgroundColor)
     {
         ushort windowClass = WinRegisterWindowClass(windowClassName, style, backgroundColor);
@@ -239,7 +239,7 @@ namespace System.Windows.API
         }
         return windowClass;
     }
-    
+
     public void* CreateWindowByClassAtom(ushort windowClass, const char* windowName, long style, long exStyle, Point location, Size size, Control* parent)
     {
         void* parentHandle = null;
@@ -275,7 +275,7 @@ namespace System.Windows.API
             return result;
         }
     }
-    
+
     public void MoveWindow(void* windowHandle, const Point& location, const Size& size, bool repaint)
     {
         bool succeeded = WinMoveWindow(windowHandle, location.x, location.y, size.w, size.h, repaint);
@@ -284,7 +284,7 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
-    
+
     public WinRect GetClientRect(void* windowHandle)
     {
         WinRect rect;
@@ -306,7 +306,7 @@ namespace System.Windows.API
         }
         return rect;
     }
-    
+
     public Point ClientToScreen(void* windowHandle, const Point& point)
     {
         Point pt(point);
@@ -317,7 +317,7 @@ namespace System.Windows.API
         }
         return pt;
     }
-    
+
     public Point ScreenToClient(void* windowHandle, const Point& point)
     {
         Point pt(point);
@@ -328,12 +328,12 @@ namespace System.Windows.API
         }
         return pt;
     }
-    
+
     public nothrow bool PtInRect(const Point& point, const WinRect& rect)
     {
         return WinPtInRect(&rect, &point);
     }
-    
+
     public void SetWindowText(void* windowHandle, const string& text)
     {
         bool succeeded = WinSetWindowText(windowHandle, text.Chars());
@@ -372,7 +372,7 @@ namespace System.Windows.API
         }
         return ToUtf8(buffer.Get());
     }
-    
+
     public void SetParentWindow(void* childWindowHandle, void* parentWindowHandle)
     {
         void* result = WinSetParent(childWindowHandle, parentWindowHandle);
@@ -831,7 +831,7 @@ namespace System.Windows.API
     {
         top = 0, bottom = 1, topmost = -1, noTopmost = -2
     }
-   
+
     public nothrow void* WindowPosHandle(WindowPos pos)
     {
         return cast<void*>(cast<ulong>(cast<int>(pos)));
@@ -960,6 +960,41 @@ namespace System.Windows.API
             clipSizeH = clipRect->size.h;
         }
         bool succeeded = WinScrollWindow(windowHandle, xAmount, yAmount, clientLocX, clientLocY, clientSizeW, clientSizeH, clipLocX, clipLocY, clipSizeW, clipSizeH);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void ScrollWindowEx(void* windowHandle, int dx, int dy, const Rect* clientRect, const Rect* clipRect, const Rect& updateRect)
+    {
+        int clientLocX = 0;
+        int clientLocY = 0;
+        int clientSizeW = 0;
+        int clientSizeH = 0;
+        if (clientRect != null)
+        {
+            clientLocX = clientRect->location.x;
+            clientLocY = clientRect->location.y;
+            clientSizeW = clientRect->size.w;
+            clientSizeH = clientRect->size.h;
+        }
+        int clipLocX = 0;
+        int clipLocY = 0;
+        int clipSizeW = 0;
+        int clipSizeH = 0;
+        if (clipRect != null)
+        {
+            clipLocX = clipRect->location.x;
+            clipLocY = clipRect->location.y;
+            clipSizeW = clipRect->size.w;
+            clipSizeH = clipRect->size.h;
+        }
+        int x1 = updateRect.location.x;
+        int y1 = updateRect.location.y;
+        int x2 = updateRect.location.x + updateRect.size.w;
+        int y2 = updateRect.location.y + updateRect.size.h;
+        bool succeeded = WinScrollWindowEx(windowHandle, dx, dy, clientLocX, clientLocY, clientSizeW, clientSizeH, clipLocX, clipLocY, clipSizeW, clipSizeH, x1, y1, x2, y2);
         if (!succeeded)
         {
             throw WindowsAPIException(WinGetLastError());

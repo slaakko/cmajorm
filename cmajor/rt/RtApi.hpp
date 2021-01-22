@@ -18,11 +18,11 @@
 #define RT_API __declspec(dllimport)
 
 #ifdef NDEBUG
-#pragma comment(lib, "cmrt390.lib")
+#pragma comment(lib, "cmrt3100.lib")
 #elif defined(TRACE)
-#pragma comment(lib, "cmrt390t.lib")
+#pragma comment(lib, "cmrt3100t.lib")
 #else
-#pragma comment(lib, "cmrt390d.lib")
+#pragma comment(lib, "cmrt3100d.lib")
 #endif
 
 #endif

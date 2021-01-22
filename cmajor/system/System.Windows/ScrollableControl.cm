@@ -150,7 +150,13 @@ namespace System.Windows
             if (prevHPos != hpos)
             {
                 scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
-                ScrollWindow(scrolledChild->Handle(), horizontalScrollUnit * (prevHPos - hpos), 0, null, null);
+                int xAmount = horizontalScrollUnit * (prevHPos - hpos);
+                Rect updateRect = MakeUpdateRect(xAmount, 0);
+                ScrollWindowEx(scrolledChild->Handle(), xAmount, 0, null, null, updateRect);
+                if (scrolledChild->IsDoubleBuffered())
+                {
+                    scrolledChild->Invalidate();
+                }
             }
         }
         public override void ScrollLineDown()
@@ -166,7 +172,13 @@ namespace System.Windows
                 if (prevVPos != vpos)
                 {
                     scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
-                    ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
+                    int yAmount = verticalScrollUnit * (prevVPos - vpos);
+                    Rect updateRect = MakeUpdateRect(0, yAmount);
+                    ScrollWindowEx(scrolledChild->Handle(), 0, yAmount, null, null, updateRect);
+                    if (scrolledChild->IsDoubleBuffered())
+                    {
+                        scrolledChild->Invalidate();
+                    }
                 }
             }
         }
@@ -183,7 +195,13 @@ namespace System.Windows
                 if (prevVPos != vpos)
                 {
                     scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
-                    ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
+                    int yAmount = verticalScrollUnit * (prevVPos - vpos);
+                    Rect updateRect = MakeUpdateRect(0, yAmount);
+                    ScrollWindowEx(scrolledChild->Handle(), 0, yAmount, null, null, updateRect);
+                    if (scrolledChild->IsDoubleBuffered())
+                    {
+                        scrolledChild->Invalidate();
+                    }
                 }
             }
         }
@@ -236,7 +254,13 @@ namespace System.Windows
             if (prevVPos != vpos)
             {
                 scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
-                ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
+                int yAmount = verticalScrollUnit * (prevVPos - vpos);
+                Rect updateRect = MakeUpdateRect(0, yAmount);
+                ScrollWindowEx(scrolledChild->Handle(), 0, yAmount, null, null, updateRect);
+                if (scrolledChild->IsDoubleBuffered())
+                {
+                    scrolledChild->Invalidate();
+                }
             }
         }
         protected override void OnMouseWheel(MouseWheelEventArgs& args)
@@ -254,8 +278,15 @@ namespace System.Windows
                     GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
                     if (prevVPos != vpos)
                     {
-                        scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
-                        ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
+                        Point contentLocation(horizontalScrollUnit * hpos, verticalScrollUnit * vpos);
+                        scrolledChild->SetContentLocationInternal(contentLocation);
+                        int yAmount = verticalScrollUnit * (prevVPos - vpos);
+                        Rect updateRect = MakeUpdateRect(0, yAmount);
+                        ScrollWindowEx(scrolledChild->Handle(), 0, yAmount, null, null, updateRect);
+                        if (scrolledChild->IsDoubleBuffered())
+                        {
+                            scrolledChild->Invalidate();
+                        }
                     }
                     args.handled = true;
                 }
@@ -291,6 +322,30 @@ namespace System.Windows
         internal nothrow override Control* GetLastEnabledTabStopControl() const
         {
             return child->GetLastEnabledTabStopControl();
+        }
+        private nothrow Rect MakeUpdateRect(int xAmount, int yAmount)
+        {
+            Point loc(0, 0);
+            Size size = scrolledChild->GetSize();
+            if (xAmount < 0)
+            {
+                loc.x = size.w + xAmount;
+            }
+            if (xAmount != 0)
+            {
+                size.w = Abs(xAmount);
+            }
+            if (yAmount < 0)
+            {
+                loc.y = size.h + yAmount;
+            }
+            if (yAmount != 0)
+            {
+                size.h = Abs(yAmount);
+            }
+            Rect updateRect(loc, size);
+            updateRect.Inflate(horizontalScrollUnit, verticalScrollUnit);
+            return updateRect;
         }
         private Container container;
         private Control* child;

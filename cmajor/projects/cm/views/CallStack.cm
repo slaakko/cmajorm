@@ -22,7 +22,7 @@ namespace Cm.Views
         public Cm.Service.Debug.Location* frame;
     }
 
-    public class delegate void FrameSelectedEventHandler(FrameSelectedEventArgs& args);   
+    public class delegate void FrameSelectedEventHandler(FrameSelectedEventArgs& args);
 
     public class Frame
     {
@@ -40,6 +40,7 @@ namespace Cm.Views
         {
             UniquePtr<TreeView> treeViewPtr(new TreeView(Point(), Size(), Dock.none, Anchors.none));
             treeView = treeViewPtr.Get();
+            treeView->SetDoubleBuffered();
             treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
             UniquePtr<Control> paddedTreeView(new PaddedControl(treeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> scrollableTreeView(new ScrollableControl(paddedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
@@ -95,7 +96,7 @@ namespace Cm.Views
         {
             UpdateCallStackEventArgs updateArgs;
             updateArgs.debugging = false;
-            updateArgs.targetStopped = false; 
+            updateArgs.targetStopped = false;
             OnUpdateCallStack(updateArgs);
             if (updateArgs.debugging && updateArgs.targetStopped)
             {

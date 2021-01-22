@@ -504,7 +504,7 @@ namespace System.Windows
             RectF activeTextRect = graphics.MeasureStringChecked(s, activeNodeFont, PointF(0, 0), format);
             textHeight = Max(textHeight, activeTextRect.size.h);
             stateIndicatorHeight = stateIndicatorPercentage * textHeight / 100.0f;
-            SetScrollUnits(cast<int>(textHeight), cast<int>(textHeight));
+            SetScrollUnits(cast<int>(textHeight + 0.5), cast<int>(textHeight + 0.5));
         }
         private void MakeStateIndicatorBitmaps(Graphics& graphics)
         {

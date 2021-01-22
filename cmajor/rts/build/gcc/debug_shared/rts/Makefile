@@ -10,7 +10,7 @@ Error.o Fiber.o InitDone.o Io.o Math.o Memory.o Multiprecision.o Mutex.o Process
 Statics.o String.o Thread.o Time.o Trace.o UnitTest.o Unwind.o 
 endif
 
-LIBRARY_NAME=libcmrt390cppd.dll
+LIBRARY_NAME=libcmrt3100cppd.dll
 
 SOURCE_PREFIX=../../../..
 

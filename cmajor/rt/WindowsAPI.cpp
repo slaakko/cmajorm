@@ -1775,8 +1775,45 @@ bool WinScrollWindow(void* windowHandle, int xAmount, int yAmount, int clientLoc
         clipRect.top = clipLocY;
         clipRect.right = clipLocX + clipSizeW;
         clipRect.bottom = clipLocY + clipSizeH;
+        pclipRect = &clipRect;
     }
     return ScrollWindow((HWND)windowHandle, xAmount, yAmount, pclientRect, pclipRect);
+}
+
+bool WinScrollWindowEx(void* windowHandle, int dx, int dy, int clientLocX, int clientLocY, int clientSizeW, int clientSizeH, int clipLocX, int clipLocY, int clipSizeW, int clipSizeH,
+    int x1, int y1, int x2, int y2)
+{
+    HRGN hrgnUpdate = CreateRectRgn(x1, y1, x2, y2);
+    const RECT* pclientRect = nullptr;
+    RECT clientRect;
+    if (clientSizeW != 0 && clientSizeH != 0)
+    {
+        clientRect.left = clientLocX;
+        clientRect.top = clientLocY;
+        clientRect.right = clientLocX + clientSizeW;
+        clientRect.bottom = clientLocY + clientSizeH;
+        pclientRect = &clientRect;
+    }
+    const RECT* pclipRect = nullptr;
+    RECT clipRect;
+    if (clipSizeW != 0 && clipSizeH != 0)
+    {
+        clipRect.left = clipLocX;
+        clipRect.top = clipLocY;
+        clipRect.right = clipLocX + clipSizeW;
+        clipRect.bottom = clipLocY + clipSizeH;
+        pclipRect = &clipRect;
+    }
+    int retVal = ScrollWindowEx((HWND)windowHandle, dx, dy, pclientRect, pclientRect, hrgnUpdate, nullptr, SW_INVALIDATE);
+    if (!DeleteObject(hrgnUpdate))
+    {
+        return false;
+    }
+    if (retVal == ERROR)
+    {
+        return false;
+    }
+    return true;
 }
 
 bool WinGetScrollInfo(void* windowHandle, int nBar, uint32_t& nPage, int32_t& nPos, int32_t& nMin, int32_t& nMax, int32_t& nTrackPos)

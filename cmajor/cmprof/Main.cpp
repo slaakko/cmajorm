@@ -790,7 +790,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     }
 }
 
-const char* version = "3.9.0";
+const char* version = "3.10.0";
 
 void PrintHelp()
 {
