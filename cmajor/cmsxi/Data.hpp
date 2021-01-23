@@ -16,6 +16,7 @@ public:
     std::string Name(Context& context) override;
     Type* GetType(Context& context) override;
     void SetInitializer(ConstantValue* initializer_) { initializer = initializer_; }
+    ConstantValue* Initializer() const { return initializer; }
     void Write(Context& context, CodeFormatter& formatter);
     void SetLinkOnce() { linkOnce = true; }
 private:

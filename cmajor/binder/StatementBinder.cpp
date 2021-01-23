@@ -421,6 +421,7 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
 
 void StatementBinder::GenerateEnterAndExitFunctionCode(BoundFunction* boundFunction)
 {
+    if (cmajor::symbols::GetBackEnd() == cmajor::symbols::BackEnd::cmsx) return;
     Span span;
     boost::uuids::uuid moduleId = boost::uuids::nil_uuid();
     if (boundFunction->GetFunctionSymbol()->DontThrow()) return;

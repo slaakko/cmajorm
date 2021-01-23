@@ -27,16 +27,18 @@ namespace cmsx.machine
         {
             return *instance;
         }
-        private Clock() : machine(GetMachine())
+        private Clock() : machine(GetMachine()), started(false), stopping(false)
         {
         }
         public void Start()
         {
             ThreadStartMethod tickMethod = Tick;
             thread = Thread.StartMethod(tickMethod);
+            started = true;
         }
         public void Stop()
         {
+            if (!started) return;
             stopping = true;
             stop.NotifyOne();
             thread.Join();
@@ -47,7 +49,6 @@ namespace cmsx.machine
             {
                 while (!stopping)
                 {
-                    LockGuard<RecursiveMutex> lock(mtx);
                     ConditionVariableStatus status = stop.WaitFor(mtx, Duration.FromMilliseconds(tick));
                     if (status == ConditionVariableStatus.timeout)
                     {
@@ -65,6 +66,7 @@ namespace cmsx.machine
         private RecursiveMutex mtx;
         private ConditionVariable stop;
         private Thread thread;
+        private bool started;
         private bool stopping;
     }
 }

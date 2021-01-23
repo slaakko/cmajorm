@@ -5,6 +5,8 @@
 
 #include <cmajor/cmsxi/Data.hpp>
 #include <cmajor/cmsxi/Context.hpp>
+#include <unordered_map>
+#include <set>
 
 namespace cmsxi {
 
@@ -76,13 +78,77 @@ GlobalVariable* DataRepository::CreateGlobalStringPtr(Context& context, const st
     return globalVariable;
 }
 
+void Visit(std::vector<GlobalVariable*>& order, GlobalVariable* variable, std::unordered_set<GlobalVariable*>& visited, std::unordered_set<GlobalVariable*>& tempVisit,
+    const std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies, Context& context)
+{
+    if (tempVisit.find(variable) == tempVisit.end())
+    {
+        if (visited.find(variable) == visited.end())
+        {
+            tempVisit.insert(variable);
+            auto i = dependencies.find(variable);
+            if (i != dependencies.end())
+            {
+                const std::set<GlobalVariable*>& dependsOn = i->second;
+                for (GlobalVariable* var : dependsOn)
+                {
+                    Visit(order, var, visited, tempVisit, dependencies, context);
+                }
+                tempVisit.erase(variable);
+                visited.insert(variable);
+                order.push_back(variable);
+            }
+            else
+            {
+                tempVisit.erase(variable);
+                visited.insert(variable);
+                order.push_back(variable);
+            }
+        }
+    }
+    else
+    {
+        throw std::runtime_error("circular type dependency '" + variable->Name(context) + "' detected");
+    }
+}
+
+std::vector<GlobalVariable*> CreateDataOrder(const std::vector<std::unique_ptr<GlobalVariable>>& globalVariables, Context& context)
+{
+    std::unordered_map<std::string, GlobalVariable*> nameMap;
+    std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>> dependencies;
+    for (const std::unique_ptr<GlobalVariable>& globalVariable : globalVariables)
+    {
+        nameMap[globalVariable->Name(context)] = globalVariable.get();
+    }
+    for (const std::unique_ptr<GlobalVariable>& globalVariable : globalVariables)
+    {
+        ConstantValue* initializer = globalVariable->Initializer();
+        if (initializer)
+        {
+            initializer->AddDependencies(globalVariable.get(), nameMap, dependencies, context);
+        }
+    }
+    std::vector<GlobalVariable*> order;
+    std::unordered_set<GlobalVariable*> visited;
+    std::unordered_set<GlobalVariable*> tempVisit;
+    for (const std::unique_ptr<GlobalVariable>& globalVariable : globalVariables)
+    {
+        if (visited.find(globalVariable.get()) == visited.end())
+        {
+            Visit(order, globalVariable.get(), visited, tempVisit, dependencies, context);
+        }
+    }
+    return order;
+}
+
 void DataRepository::Write(Context& context, CodeFormatter& formatter)
 {
     if (globalVariableDefinitions.empty()) return;
     formatter.WriteLine("data");
     formatter.WriteLine("{");
     formatter.IncIndent();
-    for (const auto& globalVariable : globalVariableDefinitions)
+    std::vector<GlobalVariable*> dataOrder = CreateDataOrder(globalVariableDefinitions, context);
+    for (const auto& globalVariable : dataOrder)
     {
         globalVariable->Write(context, formatter);
         formatter.WriteLine();

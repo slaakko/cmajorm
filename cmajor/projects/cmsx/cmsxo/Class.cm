@@ -19,11 +19,12 @@ namespace cmsx.object
                 {
                     Uuid typeId = reader.ReadUuid();
                     ulong classId = reader.ReadULong();
+                    ulong classIdHigh = reader.ReadULong();
                     classIdMap[typeId] = classId;
                 }
                 catch (const Exception& ex)
                 {
-                    throw Exception("error reading class id map: " + ToString(n) + " total entries, trying to read entry " + ToString(i) + ": " + ex.ToString()); 
+                    throw Exception("error reading class id map: " + ToString(n) + " total entries, trying to read entry " + ToString(i) + ": " + ex.ToString());
                 }
             }
         }

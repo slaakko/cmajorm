@@ -17,6 +17,11 @@ Value::~Value()
 {
 }
 
+void Value::AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap, std::unordered_map<GlobalVariable*,
+    std::set<GlobalVariable*>>&dependencies, Context& context)
+{
+}
+
 BoolValue::BoolValue() : ConstantValue(), value(false)
 {
 }
@@ -260,6 +265,23 @@ std::string ArrayValue::Name(Context& context)
     return name;
 }
 
+void ArrayValue::AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap,
+    std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies, Context& context)
+{
+    for (Value* element : elements)
+    {
+        if (element)
+        {
+            auto it = nameMap.find(element->Name(context));
+            if (it != nameMap.cend())
+            {
+                dependencies[variable].insert(it->second);
+            }
+            element->AddDependencies(variable, nameMap, dependencies, context);
+        }
+    }
+}
+
 void ArrayValue::AddElement(ConstantValue* element)
 {
     elements.push_back(element);
@@ -304,6 +326,20 @@ std::string StructureValue::Name(Context& context)
 void StructureValue::AddMember(ConstantValue* member)
 {
     members.push_back(member);
+}
+
+void StructureValue::AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap,
+    std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies, Context& context)
+{
+    for (Value* member : members)
+    {
+        auto it = nameMap.find(member->Name(context));
+        if (it != nameMap.cend())
+        {
+            dependencies[variable].insert(it->second);
+        }
+        member->AddDependencies(variable, nameMap, dependencies, context);
+    }
 }
 
 StringValue::StringValue(Type* type_, const std::string& value_) : ConstantValue(), type(type_), value(value_)
@@ -356,6 +392,16 @@ std::string ConversionValue::Name(Context& context)
 Type* ConversionValue::GetType(Context& context)
 {
     return type;
+}
+
+void ConversionValue::AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap, std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies,
+    Context& context)
+{
+    auto it = nameMap.find(from->Name(context));
+    if (it != nameMap.cend())
+    {
+        dependencies[variable].insert(it->second);
+    }
 }
 
 ClsIdValue::ClsIdValue(const std::string& typeId_) : ConstantValue(), typeId(typeId_)

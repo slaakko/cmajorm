@@ -8,6 +8,8 @@
 #include <cmajor/cmsxi/CmsxiApi.hpp>
 #include <vector>
 #include <string>
+#include <set>
+#include <unordered_map>
 #include <stdint.h>
 
 namespace cmsxi {
@@ -15,6 +17,7 @@ namespace cmsxi {
 class Type;
 class PtrType;
 class Context;
+class GlobalVariable;
 
 class CMSXI_API Value
 {
@@ -26,6 +29,8 @@ public:
     virtual bool IsLongValue() const { return false; }
     virtual bool IsAggregateValue() const { return false; }
     virtual bool IsStringValue() const { return false; }
+    virtual void AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap, std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies,
+        Context& context);
 };
 
 class CMSXI_API ConstantValue : public Value
@@ -175,6 +180,8 @@ public:
     Type* GetType(Context& context) override { return type; }
     void AddElement(ConstantValue* element);
     bool IsAggregateValue() const override { return true; }
+    void AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap, std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies,
+        Context& context) override;
 private:
     Type* type;
     std::vector<ConstantValue*> elements;
@@ -189,6 +196,8 @@ public:
     Type* GetType(Context& context) override;
     void AddMember(ConstantValue* member);
     bool IsAggregateValue() const override { return true; }
+    void AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap, std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies,
+        Context& context) override;
 private:
     Type* type;
     std::vector<ConstantValue*> members;
@@ -212,6 +221,8 @@ public:
     ConversionValue(Type* type_, ConstantValue* from_);
     std::string Name(Context& context) override;
     Type* GetType(Context& context) override;
+    void AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap, std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies,
+        Context& context) override;
 private:
     Type* type;
     ConstantValue* from;

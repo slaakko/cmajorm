@@ -911,6 +911,7 @@ void BoundCompileUnit::SetSystemRuntimeUnwindInfoSymbol(TypeSymbol* systemRuntim
 
 void BoundCompileUnit::GenerateInitUnwindInfoFunctionSymbol()
 {
+    if (cmajor::symbols::GetBackEnd() == cmajor::symbols::BackEnd::cmsx) return;
     std::string compileUnitId = compileUnitNode->Id();
     std::u32string groupName = U"InitUnwindInfo_" + ToUtf32(compileUnitId);
     FunctionSymbol* functionSymbol = new FunctionSymbol(Span(), boost::uuids::nil_uuid(), groupName);
@@ -928,6 +929,7 @@ void BoundCompileUnit::GenerateInitUnwindInfoFunctionSymbol()
 void BoundCompileUnit::GenerateCompileUnitInitialization()
 {
     if (module.IsCore()) return;
+    if (cmajor::symbols::GetBackEnd() == cmajor::symbols::BackEnd::cmsx) return;
     std::string compileUnitId = compileUnitNode->Id();
     std::u32string groupName = U"InitCompileUnit_" + ToUtf32(compileUnitId);
     FunctionSymbol* functionSymbol = new FunctionSymbol(Span(), boost::uuids::nil_uuid(), groupName);
@@ -988,6 +990,7 @@ void BoundCompileUnit::GenerateCompileUnitInitialization()
 
 void BoundCompileUnit::GenerateGlobalInitializationFunction()
 {
+    if (cmajor::symbols::GetBackEnd() == cmajor::symbols::BackEnd::cmsx) return;
     std::u32string groupName = U"GlobalInitCompileUnits";
     globalInitFunctionSymbol = new FunctionSymbol(Span(), boost::uuids::nil_uuid(), groupName);
     globalInitFunctionSymbol->SetParent(&symbolTable.GlobalNs());
