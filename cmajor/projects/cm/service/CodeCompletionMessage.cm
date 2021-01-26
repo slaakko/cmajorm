@@ -1,0 +1,81 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Concepts;
+using System.Xml.Serialization;
+
+namespace Cm.Service.CodeCompletion
+{
+    [xml]
+    public abstract class CodeCompletionRequest
+    {
+        public nothrow CodeCompletionRequest() : created(Now()), received()
+        {
+        }
+        public default virtual ~CodeCompletionRequest();
+        public abstract void Accept(Visitor& visitor);        
+        public TimePoint created;
+        public TimePoint received;
+    }
+
+    [xml]
+    public abstract class CodeCompletionReply
+    {
+        public nothrow CodeCompletionReply() : requestCreated(), requestReceived(), created(Now())
+        {
+        }
+        public default virtual ~CodeCompletionReply();
+        public TimePoint requestCreated;
+        public TimePoint requestReceived;
+        public TimePoint created;
+    }
+
+    [xml]
+    public class LoadEditModuleRequest : CodeCompletionRequest
+    {
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    [xml]
+    public class LoadEditModuleReply : CodeCompletionReply
+    {
+    }
+
+    [xml]
+    public class StopRequest : CodeCompletionRequest
+    {
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    [xml]
+    public class StopReply : CodeCompletionReply
+    {
+    }
+
+    [xml]
+    public class KeepAliveRequest
+    {
+    }
+
+    [xml]
+    public class KeepAliveReply
+    {
+    }
+
+    public class Visitor
+    {
+        public default virtual ~Visitor();
+        public virtual void Visit(LoadEditModuleRequest& request) {}
+        public virtual void Visit(StopRequest& request) {}
+    }
+}
+

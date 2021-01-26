@@ -444,6 +444,8 @@ void SourceGeneratorVisitor::Visit(SourceFileNode& node)
     formatter.WriteLine("#include <sngxml/serialization/XmlImport.hpp>");
     formatter.WriteLine("#include <soulng/util/Unicode.hpp>");
     formatter.WriteLine();
+    formatter.WriteLine("using namespace soulng::unicode;");
+    formatter.WriteLine();
     DefaultVisitor::Visit(node);
 }
 

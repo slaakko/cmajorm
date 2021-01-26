@@ -13,6 +13,7 @@ using Cm.Service;
 using Cm.Service.Build;
 using Cm.Service.Debug;
 using Cm.Service.Run;
+using Cm.Service.CodeCompletion;
 using cmcode;
 
 namespace cmcode
@@ -148,11 +149,15 @@ namespace cmcode
         return "Cmajor Code - " + System.ToString(WinGetCurrentProcessId());
     }
 
+    public const uint WM_CODE_COMPLETION_REPLY = WM_USER;
+    public const uint WM_CODE_COMPLETION_SERVICE_FETCH_LOG_MESSAGES = WM_USER + 1u;
+
     class MainWindow : Window
     {
         public MainWindow(const string& filePath) :
             base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), Title(), MainWindowLocation(), MainWindowSize(),
-            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true), toolTipWindow(new ToolTip()),
+            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), runService(), codeCompletionService(),
+            stopPending(false), targetStopped(true), toolTipWindow(new ToolTip()),
             clipboardListener(Handle()), cmajorCodeFormat("cmajor.code"), pid(WinGetCurrentProcessId()), disableBuildServerToolButton(false), locations(this)
         {
             UniquePtr<MenuBar> menuBarPtr(new MenuBar());
@@ -382,6 +387,9 @@ namespace cmcode
                 startStopTraceMenuItemPtr->SetShortcut(Keys.f2);
                 startStopTraceMenuItemPtr->ClickEvent().AddHandler(StartStopTraceClick);
                 traceMenuItem->AddMenuItem(startStopTraceMenuItemPtr.Release());
+                UniquePtr<MenuItem> testMenuItemPtr(new MenuItem("&Test"));
+                testMenuItemPtr->ClickEvent().AddHandler(TestClick);
+                traceMenuItem->AddMenuItem(testMenuItemPtr.Release());
                 menuBar->AddMenuItem(traceMenuItem.Release());
             }
 
@@ -636,6 +644,11 @@ namespace cmcode
                 {
                     debugService->Stop();
                     debugService.Reset();
+                }
+                if (!codeCompletionService.IsNull())
+                {
+                    codeCompletionService->Stop(true);
+                    codeCompletionService.Reset();
                 }
                 if (!CloseSolution())
                 {
@@ -1921,8 +1934,8 @@ namespace cmcode
         private BuildServiceArgs MakeBuildServiceArgs()
         {
         #if (DEBUG)
-            //BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).Wait(false).SaveRequestOnly(false).DebugServer(true);
-            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).Wait(false).SaveRequestOnly(false).TraceServer(true);
+            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).Wait(false).SaveRequestOnly(false).DebugServer(true);
+            //BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).Wait(false).SaveRequestOnly(false).TraceServer(true);
         #else
             BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(false).SaveRequestOnly(false).DebugServer(false);
         #endif
@@ -3626,6 +3639,105 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private CodeCompletionServiceArgs MakeCodeCompletionServiceArgs()
+        {
+        #if (DEBUG)
+            CodeCompletionServiceArgs args = CodeCompletionServiceArgs().ProgramName("cmcode").Pid(pid).DebugServer(true);
+        #else
+            CodeCompletionServiceArgs args = CodeCompletionServiceArgs().ProgramName("cmcode").Pid(pid).DebugServer(false);
+        #endif
+            return args;
+        }
+        private CodeCompletionService& GetCodeCompletionService()
+        {
+            if (codeCompletionService.IsNull())
+            {
+                codeCompletionService.Reset(new CodeCompletionService(MakeCodeCompletionServiceArgs()));
+                codeCompletionService->SetCodeCompletionServerStartNotificationFunction(CodeCompletionServerStarted);
+                codeCompletionService->SetCodeCompletionServerStopNotificationFunction(CodeCompletionServerStopped);
+                codeCompletionService->SetLogMessageNotificationFunction(CodeCompletionServiceLogMessagesAvailable);                
+                codeCompletionService->SetCodeCompletionReplyHandlerFunction(CodeCompletionReplyHandler);                
+                codeCompletionService->Start();                
+            }
+            return *codeCompletionService;
+        }
+        private void TestClick()
+        {
+            try
+            {
+                CodeCompletionRequest* request = new LoadEditModuleRequest();
+                GetCodeCompletionService().PutRequest(request);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void CodeCompletionServerStarted()
+        {
+            // todo
+        }
+        private void CodeCompletionServerStopped()
+        {
+            // todo
+        }
+        private void CodeCompletionServiceLogMessagesAvailable()
+        {
+            WinSendMessage(Handle(), WM_CODE_COMPLETION_SERVICE_FETCH_LOG_MESSAGES, 0u, 0);
+        }
+        private void CodeCompletionReplyHandler(CodeCompletionReply* reply)
+        {
+            void* replyPtr = reply;
+            ulong replyVal = cast<ulong>(replyPtr);
+            long lparam = cast<long>(replyVal);
+            WinSendMessage(Handle(), WM_CODE_COMPLETION_REPLY, 0u, lparam);
+        }
+        protected override bool ProcessMessage(Message& message)
+        {
+            base->ProcessMessage(message);
+            if (message.msg == WM_CODE_COMPLETION_REPLY)
+            {
+                void* replyPtr = cast<void*>(cast<ulong>(message.lparam));
+                UniquePtr<CodeCompletionReply> reply(cast<CodeCompletionReply*>(replyPtr));
+                TimePoint now = Now();
+                Duration msgDuration = now - reply->created;
+                string durStr = DurationStr(msgDuration);
+                string logMessage = "code completion reply: " + durStr;
+                GetOutputTabPage()->Select();
+                GetOutputLogView()->WriteLine(logMessage);
+                message.result = 0;
+                return true;
+            }
+            else if (message.msg == WM_CODE_COMPLETION_SERVICE_FETCH_LOG_MESSAGES)
+            {
+                FetchCodeCompletionServiceLogMessages();
+                message.result = 0;
+                return true;
+            }
+            return false;
+        }
+        private void FetchCodeCompletionServiceLogMessages()
+        {
+            try
+            {
+                while (!GetCodeCompletionService().MessageLogEmpty())
+                {
+                    string logMessage = GetCodeCompletionService().FetchLogMessage();
+                    if (!logMessage.IsEmpty())
+                    {
+                        GetOutputTabPage()->Select();
+                        GetOutputLogView()->WriteLine(logMessage);
+                    }
+                }
+                Application.ProcessMessages();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private bool GetIdentifierSourceLocationAt(const Point& loc, TextView* textView, string& identifier, SourceLocation& sourceLocation)
         {
             int line = 0;
@@ -4298,6 +4410,7 @@ namespace cmcode
         private UniquePtr<BuildService> buildService;
         private UniquePtr<DebugService> debugService;
         private UniquePtr<RunService> runService;
+        private UniquePtr<CodeCompletionService> codeCompletionService;
         private Cm.Service.Debug.Location latestDebugLocation;
         private Cm.Service.Debug.Location selectedFrameLocation;
         private bool stopPending;

@@ -1,0 +1,41 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+base class CodeCompletionRequest
+{
+    time_point created;
+    time_point received;
+}
+
+base class CodeCompletionReply
+{
+    time_point requestCreated;
+    time_point requestReceived;
+    time_point created;
+}
+
+class LoadEditModuleRequest : CodeCompletionRequest
+{
+}
+
+class LoadEditModuleReply : CodeCompletionReply
+{
+}
+
+class StopRequest : CodeCompletionRequest
+{
+}
+
+class StopReply : CodeCompletionReply
+{
+}
+
+class KeepAliveRequest
+{
+}
+
+class KeepAliveReply
+{
+}

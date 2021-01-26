@@ -3,6 +3,8 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmc.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmbsd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmbs.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmccsd.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmccs.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmclientd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmclient.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmserverd.exe ..\bin

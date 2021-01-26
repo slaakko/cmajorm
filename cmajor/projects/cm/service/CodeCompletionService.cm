@@ -1,0 +1,433 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Dom;
+using System.Net.Sockets;
+using System.Threading;
+using System.Text;
+
+namespace Cm.Service.CodeCompletion
+{
+    public const int defaultPort = 54327;
+    public const int defaultKeepAliveServerPort = 54328;
+    public const int defaultKeepAliveIntervalSeconds = 60;
+
+    public class delegate void CodeCompletionServerStartNotificationFunction();
+    public class delegate void CodeCompletionServerStopNotificationFunction();
+
+    public class KeepAliveServerGuard
+    {
+        public nothrow KeepAliveServerGuard(bool& keepAliveServerRunning_) : keepAliveServerRunning(keepAliveServerRunning_)
+        {
+            keepAliveServerRunning = true;
+        }
+        public ~KeepAliveServerGuard()
+        {
+            keepAliveServerRunning = false;
+        }
+        private bool& keepAliveServerRunning;
+    }
+    
+    public class CodeCompletionServiceArgs
+    {
+        public CodeCompletionServiceArgs() :
+            port(defaultPort), keepAliveServerPort(defaultKeepAliveServerPort),
+            serverStartWaitSeconds(1), serverStopWaitSeconds(10), debugServer(false)
+        {
+        }
+        public nothrow CodeCompletionServiceArgs& ProgramName(const string& programName_)
+        {
+            programName = programName_;
+            return *this;
+        }
+        public nothrow CodeCompletionServiceArgs& Pid(int pid_)
+        {
+            pid = pid_;
+            return *this;
+        }
+        public nothrow CodeCompletionServiceArgs& Port(int port_)
+        {
+            port = port_;
+            return *this;
+        }
+        public nothrow CodeCompletionServiceArgs& KeepAliveServerPort(int keepAliveServerPort_)
+        {
+            keepAliveServerPort = keepAliveServerPort_;
+            return *this;
+        }
+        public nothrow CodeCompletionServiceArgs& ServerStartWaitSeconds(int serverStartWaitSeconds_)
+        {
+            serverStartWaitSeconds = serverStartWaitSeconds_;
+            return *this;
+        }
+        public nothrow CodeCompletionServiceArgs& ServerStopWaitSeconds(int serverStopWaitSeconds_)
+        {
+            serverStopWaitSeconds = serverStopWaitSeconds_;
+            return *this;
+        }
+        public nothrow CodeCompletionServiceArgs& DebugServer(bool debugServer_)
+        {
+            debugServer = debugServer_;
+            return *this;
+        }
+        public string programName;
+        public int pid;
+        public int port;
+        public int keepAliveServerPort;
+        public int serverStartWaitSeconds;
+        public int serverStopWaitSeconds;
+        public bool debugServer;
+    }
+
+    public class delegate void CodeCompletionReplyHandlerFunction(CodeCompletionReply* reply);
+
+    public abstract class AbstractCodeCompletionReplyFactory
+    {
+        public default virtual ~AbstractCodeCompletionReplyFactory();
+        public abstract UniquePtr<CodeCompletionReply> Create(Element* element);
+    }
+
+    public class CodeCompletionReplyFactory<T> : AbstractCodeCompletionReplyFactory
+    {
+        public nothrow CodeCompletionReplyFactory()
+        {
+        }
+        public override UniquePtr<CodeCompletionReply> Create(Element* element)
+        {
+            UniquePtr<CodeCompletionReply> reply(new T(element));
+            return reply;
+        }
+    }
+
+    public class CodeCompletionRegistry
+    {
+        public void RegisterReply(const string& replyRootElementName, AbstractCodeCompletionReplyFactory* factory)
+        {
+            factoryMap[replyRootElementName] = factory;
+            factories.Add(UniquePtr<AbstractCodeCompletionReplyFactory>(factory));
+        }
+        public UniquePtr<CodeCompletionReply> CreateReply(Element* element)
+        {
+            Map<string, AbstractCodeCompletionReplyFactory*>.ConstIterator it = factoryMap.CFind(ToUtf8(element->Name()));
+            if (it != factoryMap.CEnd())
+            {
+                AbstractCodeCompletionReplyFactory* factory = it->second;
+                return factory->Create(element);
+            }
+            else
+            {
+                throw Exception("element '" + ToUtf8(element->Name()) + "' not registered to code completion registry");
+            }
+        }
+        private Map<string, AbstractCodeCompletionReplyFactory*> factoryMap;
+        private List<UniquePtr<AbstractCodeCompletionReplyFactory>> factories;
+    }
+
+    public class SetRootElementNameVisitor : Visitor
+    {
+        public override void Visit(LoadEditModuleRequest& request)
+        {
+            rootElementName = "loadEditModuleRequest";
+        }
+        public override void Visit(StopRequest& request)
+        {
+            rootElementName = "stopRequest";
+        }
+        public string rootElementName;
+    }
+
+    public class CodeCompletionService : ServiceBase
+    {
+        public nothrow CodeCompletionService(CodeCompletionServiceArgs& args_) :
+            port(defaultPort), args(args_), running(false), exiting(false), stopKeepAlives(false), keepAliveServerRunning(false)
+        {
+            replyRegistry.RegisterReply("loadEditModuleReply", new CodeCompletionReplyFactory<LoadEditModuleReply>());
+            replyRegistry.RegisterReply("stopReply", new CodeCompletionReplyFactory<StopReply>());
+        }
+        public nothrow void SetCodeCompletionReplyHandlerFunction(CodeCompletionReplyHandlerFunction codeCompletionReplyHandlerFunction_)
+        {
+            codeCompletionReplyHandlerFunction = codeCompletionReplyHandlerFunction_;
+        }
+        private string MakeServerStartCommand()
+        {
+            string serverStartCommand = "cmccs";
+            if (args.debugServer)
+            {
+                serverStartCommand = "cmccsd";
+            }
+            port = Cm.Service.PortMap.GetFreePortNumber(args.programName, args.pid, portMapServicePortNumber);
+            bool gotNoPort = false;
+            if (port == -1)
+            {
+                port = args.port;
+                LogMessage("CodeCompletionService: got no port from port map server, resorting to default port " + ToString(port));
+                gotNoPort = true;
+            }
+            serverStartCommand.Append(" --port=" + ToString(port));
+            if (!gotNoPort)
+            {
+                keepAliveServerPort = Cm.Service.PortMap.GetFreePortNumber(args.programName, args.pid, portMapServicePortNumber);
+            }
+            serverStartCommand.Append(" --keepAliveServerPort=" + ToString(keepAliveServerPort));
+            if (keepAliveServerPort == -1)
+            {
+                keepAliveServerPort = args.keepAliveServerPort;
+                LogMessage("CodeCompletionService: got no port from port map server, resorting to default keep alive server port " + ToString(keepAliveServerPort));
+            }
+            if (portMapServicePortNumber != -1)
+            {
+                serverStartCommand.Append(" --portMapServicePort=" + ToString(portMapServicePortNumber));
+            }
+            return serverStartCommand;
+        }
+        public void Start()
+        {
+            running = false;
+            exiting = false;
+            thread = Thread.StartMethod(Run);
+        }
+        public void Stop(bool quit)
+        {
+            if (!running) return;
+            this->quit = quit;
+            exiting = true;
+            requestWaitingOrExitingCondVar.NotifyOne();
+            thread.Join();
+            while (!queue.IsEmpty())
+            {
+                UniquePtr<CodeCompletionRequest> request = GetRequest();
+            }
+        }
+        public void PutRequest(CodeCompletionRequest* request)
+        {
+            LockGuard<RecursiveMutex> lock(mtx);
+            queue.Add(request);
+            requestWaitingOrExitingCondVar.NotifyOne();
+        }
+        public nothrow void SetCodeCompletionServerStartNotificationFunction(const CodeCompletionServerStartNotificationFunction& notifyCodeCompletionServerStart_)
+        {
+            notifyCodeCompletionServerStart = notifyCodeCompletionServerStart_;
+        }
+        public nothrow void SetCodeCompletionServerStopNotificationFunction(const CodeCompletionServerStopNotificationFunction& notifyCodeCompletionServerStop_)
+        {
+            notifyCodeCompletionServerStop = notifyCodeCompletionServerStop_;
+        }
+        public nothrow bool ServerRunning() const
+        {
+            if (codeCompletionServer.IsNull()) return false;
+            return codeCompletionServer->Running();
+        }
+        private bool StartServer()
+        {
+            try
+            {
+                if (ServerRunning())
+                {
+                    TerminateServer(true);
+                }
+                string serverStartCommand = MakeServerStartCommand();
+                LogMessage("CodeCompletionService: Starting Code Completion Server (port=" + ToString(port) + ", keep alive server port=" + ToString(keepAliveServerPort) + ")...");
+                codeCompletionServer.Reset(
+                    new Process(serverStartCommand,
+                    cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr)));
+                string line = codeCompletionServer->ReadLine(Process.StdHandle.stdOut);
+                if (line == "code-completion-server-error")
+                {
+                    line = codeCompletionServer->ReadLine(Process.StdHandle.stdOut);
+                    throw Exception("CodeCompletionServer failed: " + line);
+                }
+                LogMessage(line);
+                Sleep(Duration.FromSeconds(args.serverStartWaitSeconds));
+                if (!keepAliveServerRunning)
+                {
+                    keepAliveThread = Thread.StartMethod(KeepAliveServer);
+                }
+                LogMessage("CodeCompletionService: Code Completion Server started.");
+                socket.Connect("localhost", ToString(port));
+                notifyCodeCompletionServerStart();
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+                LogMessage("CodeCompletionService: " + ex.Message());
+                return false;
+            }
+            return true;
+        }
+        private void TerminateServer(bool logTerminate)
+        {
+            try
+            {
+                if (!ServerRunning()) return;
+                if (keepAliveServerRunning)
+                {
+                    stopKeepAlives = true;
+                    stopKeepAlivesVar.NotifyOne();
+                    keepAliveThread.Join();
+                }
+                codeCompletionServer->Terminate();
+                if (logTerminate)
+                {
+                    LogMessage("CodeCompletionService: Code Completion Server stopped.");
+                }
+                notifyCodeCompletionServerStop();
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+                if (logTerminate)
+                {
+                    LogMessage("CodeCompletionService: TerminateServer: " + ex.Message());
+                }
+            }
+        }
+        private void Quit()
+        {
+            TerminateServer(false);
+            if (keepAliveServerRunning)
+            {
+                stopKeepAlives = true;
+                stopKeepAlivesVar.NotifyOne();
+                keepAliveThread.Join();
+            }
+        }
+        private nothrow bool StopKeepAlives(void* arg)
+        {
+            return stopKeepAlives;
+        }
+        private void KeepAliveServer()
+        {
+            KeepAliveServerGuard keepAliveServerGuard(keepAliveServerRunning);
+            try
+            {
+                stopKeepAlives = false;
+                while (!stopKeepAlives)
+                {
+                    if (stopKeepAlivesVar.WaitFor(keepAliveMutex, StopKeepAlives, null, Duration.FromSeconds(defaultKeepAliveIntervalSeconds)))
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        SendReceiveKeepAliveRequest();
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+            }
+        }
+        private void SendReceiveKeepAliveRequest()
+        {
+            TcpSocket keepAliveSocket("localhost", ToString(keepAliveServerPort));
+            KeepAliveRequest keepAliveRequest;
+            UniquePtr<Element> requestElement = keepAliveRequest.ToXml("keepAliveRequest");
+            Document requestDoc;
+            requestDoc.AppendChild(UniquePtr<Node>(requestElement.Release()));
+            StringWriter stringWriter;
+            CodeFormatter formatter(stringWriter);
+            requestDoc.Write(formatter);
+            Write(keepAliveSocket, stringWriter.GetString());
+            string replyStr = ReadStr(keepAliveSocket);
+            UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+            string messageKind = ToUtf8(replyDoc->DocumentElement()->Name());
+            if (messageKind != "keepAliveReply")
+            {
+                throw Exception("keepAliveReply expected, unknown reply message kind '" + messageKind + "' received");
+            }
+            KeepAliveReply reply(replyDoc->DocumentElement());
+        }
+        private void Run()
+        {
+            try
+            {
+                running = true;                
+                if (!StartServer())
+                {
+                    return;
+                }
+                while (!exiting)
+                {
+                    requestWaitingOrExitingCondVar.Wait(mtx, RequestWaitingOrExiting, null);
+                    if (exiting) break;
+                    UniquePtr<CodeCompletionRequest> request = GetRequest();
+                    if (!request.IsNull())
+                    {
+                        HandleRequest(request.Get());
+                    }
+                }
+                if (quit)
+                {
+                    Quit();
+                }
+                else
+                {
+                    TerminateServer(true);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);                
+                Quit();
+            }
+        }
+        private void HandleRequest(CodeCompletionRequest* request)
+        {
+            request->received = Now();
+            SetRootElementNameVisitor visitor;
+            request->Accept(visitor);
+            UniquePtr<Element> requestElement = request->ToXml(visitor.rootElementName);
+            Document requestDoc;
+            requestDoc.AppendChild(UniquePtr<Node>(requestElement.Release()));
+            StringWriter stringWriter;
+            CodeFormatter formatter(stringWriter);
+            requestDoc.Write(formatter);
+            Write(socket, stringWriter.GetString());
+            string replyStr = ReadStr(socket);
+            UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+            UniquePtr<CodeCompletionReply> reply = replyRegistry.CreateReply(replyDoc->DocumentElement());
+            if (codeCompletionReplyHandlerFunction != CodeCompletionReplyHandlerFunction())
+            {
+                codeCompletionReplyHandlerFunction(reply.Release());
+            }
+        }
+        private UniquePtr<CodeCompletionRequest> GetRequest()
+        {
+            LockGuard<RecursiveMutex> lock(mtx);
+            if (!queue.IsEmpty())
+            {
+                CodeCompletionRequest* request = queue.Front();
+                queue.RemoveFirst();
+                return UniquePtr<CodeCompletionRequest>(request);
+            }
+            return UniquePtr<CodeCompletionRequest>();
+        }
+        private nothrow bool RequestWaitingOrExiting(void* arg)
+        {
+            return !queue.IsEmpty() || exiting;
+        }
+        private Thread thread;
+        private Thread keepAliveThread;
+        private RecursiveMutex mtx;
+        private ConditionVariable requestWaitingOrExitingCondVar;
+        private LinkedList<CodeCompletionRequest*> queue;
+        private bool running;
+        private bool exiting;
+        private bool quit;
+        private bool stopKeepAlives;
+        private bool keepAliveServerRunning;
+        private CodeCompletionReplyHandlerFunction codeCompletionReplyHandlerFunction;
+        private CodeCompletionServerStartNotificationFunction notifyCodeCompletionServerStart;
+        private CodeCompletionServerStopNotificationFunction notifyCodeCompletionServerStop;
+        private int port;
+        private int keepAliveServerPort;
+        private int portMapServicePortNumber;
+        private TcpSocket socket;
+        private CodeCompletionRegistry replyRegistry;
+        private CodeCompletionServiceArgs args;
+        private UniquePtr<Process> codeCompletionServer;
+        private ConditionVariable stopKeepAlivesVar;
+        private RecursiveMutex keepAliveMutex;
+    }
+}
