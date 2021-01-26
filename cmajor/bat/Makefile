@@ -15,7 +15,7 @@ cppbert:
 	
 sys:
 	cmc -u -v ../system/platform/windows/System.cms
-	cmc -u -v -c=release ../system/platform/windows/System.cms
+	cmc -u -v -st -c=release ../system/platform/windows/System.cms
 	cppcmc -u -v -st ../system/platform/windows/System.cms
 	cppcmc -u -v -st -c=release ../system/platform/windows/System.cms
 

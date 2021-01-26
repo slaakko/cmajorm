@@ -27,7 +27,7 @@ namespace Cm.Service.CodeCompletion
         }
         private bool& keepAliveServerRunning;
     }
-    
+
     public class CodeCompletionServiceArgs
     {
         public CodeCompletionServiceArgs() :
@@ -70,6 +70,11 @@ namespace Cm.Service.CodeCompletion
             debugServer = debugServer_;
             return *this;
         }
+        public nothrow CodeCompletionServiceArgs& Wait(bool wait_)
+        {
+            wait = wait_;
+            return *this;
+        }
         public string programName;
         public int pid;
         public int port;
@@ -77,6 +82,7 @@ namespace Cm.Service.CodeCompletion
         public int serverStartWaitSeconds;
         public int serverStopWaitSeconds;
         public bool debugServer;
+        public bool wait;
     }
 
     public class delegate void CodeCompletionReplyHandlerFunction(CodeCompletionReply* reply);
@@ -177,6 +183,10 @@ namespace Cm.Service.CodeCompletion
             if (portMapServicePortNumber != -1)
             {
                 serverStartCommand.Append(" --portMapServicePort=" + ToString(portMapServicePortNumber));
+            }
+            if (args.wait)
+            {
+                serverStartCommand.Append(" --wait");
             }
             return serverStartCommand;
         }
@@ -283,12 +293,19 @@ namespace Cm.Service.CodeCompletion
         }
         private void Quit()
         {
-            TerminateServer(false);
-            if (keepAliveServerRunning)
+            try
             {
-                stopKeepAlives = true;
-                stopKeepAlivesVar.NotifyOne();
-                keepAliveThread.Join();
+                TerminateServer(false);
+                if (keepAliveServerRunning)
+                {
+                    stopKeepAlives = true;
+                    stopKeepAlivesVar.NotifyOne();
+                    keepAliveThread.Join();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
             }
         }
         private nothrow bool StopKeepAlives(void* arg)
@@ -342,7 +359,7 @@ namespace Cm.Service.CodeCompletion
         {
             try
             {
-                running = true;                
+                running = true;
                 if (!StartServer())
                 {
                     return;
@@ -368,7 +385,7 @@ namespace Cm.Service.CodeCompletion
             }
             catch (const Exception& ex)
             {
-                LogException(ex);                
+                LogException(ex);
                 Quit();
             }
         }

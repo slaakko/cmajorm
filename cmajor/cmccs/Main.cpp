@@ -114,6 +114,7 @@ int main(int argc, const char** argv)
         int port = 54327;
         int keepAliveServerPort = cmccs::defaultKeepAliveServerPort;
         int portMapServicePort = -1;
+        bool wait = false;
         for (int i = 1; i < argc; ++i)
         {
             std::string arg = argv[i];
@@ -123,6 +124,10 @@ int main(int argc, const char** argv)
                 {
                     PrintHelp();
                     return 1;
+                }
+                else if (arg == "--wait")
+                {
+                    wait = true;
                 }
                 else if (arg.find('=') != std::string::npos)
                 {
@@ -195,6 +200,11 @@ int main(int argc, const char** argv)
                                 PrintHelp();
                                 return 1;
                             }
+                            case 'w':
+                            {
+                                wait = true;
+                                break;
+                            }
                             default:
                             {
                                 throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
@@ -207,6 +217,10 @@ int main(int argc, const char** argv)
             {
                 throw std::runtime_error("unknown option '" + arg + "'");
             }
+        }
+        if (wait)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds{ 60 });
         }
         KeepAliveServerRun runKeepAliveServer(keepAliveServerPort, &exitVar, &exiting);
         CodeCompletionServerRun runCodeCompletionServer(port, version, &exitVar, &exiting);

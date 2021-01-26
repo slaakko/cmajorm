@@ -3642,22 +3642,36 @@ namespace cmcode
         private CodeCompletionServiceArgs MakeCodeCompletionServiceArgs()
         {
         #if (DEBUG)
-            CodeCompletionServiceArgs args = CodeCompletionServiceArgs().ProgramName("cmcode").Pid(pid).DebugServer(true);
+            //CodeCompletionServiceArgs args = CodeCompletionServiceArgs().ProgramName("cmcode").Pid(pid).DebugServer(true).Wait(true);
+            CodeCompletionServiceArgs args = CodeCompletionServiceArgs().ProgramName("cmcode").Pid(pid).DebugServer(true).Wait(false);
         #else
-            CodeCompletionServiceArgs args = CodeCompletionServiceArgs().ProgramName("cmcode").Pid(pid).DebugServer(false);
+            CodeCompletionServiceArgs args = CodeCompletionServiceArgs().ProgramName("cmcode").Pid(pid).DebugServer(false).Wait(false);
         #endif
             return args;
         }
         private CodeCompletionService& GetCodeCompletionService()
         {
+            if (!codeCompletionServerStarting && !codeCompletionService.IsNull())
+            {
+                if (!codeCompletionService->ServerRunning())
+                {
+                    GetOutputTabPage()->Select();
+                    GetOutputLogView()->WriteLine("Code completion service started but code completion server not running, stopping code completion service...");
+                    codeCompletionService->Stop(true);
+                    codeCompletionService.Reset();
+                    GetOutputTabPage()->Select();
+                    GetOutputLogView()->WriteLine("Code completion service stopped.");
+                }
+            }
             if (codeCompletionService.IsNull())
             {
+                codeCompletionServerStarting = true;
                 codeCompletionService.Reset(new CodeCompletionService(MakeCodeCompletionServiceArgs()));
                 codeCompletionService->SetCodeCompletionServerStartNotificationFunction(CodeCompletionServerStarted);
                 codeCompletionService->SetCodeCompletionServerStopNotificationFunction(CodeCompletionServerStopped);
-                codeCompletionService->SetLogMessageNotificationFunction(CodeCompletionServiceLogMessagesAvailable);                
-                codeCompletionService->SetCodeCompletionReplyHandlerFunction(CodeCompletionReplyHandler);                
-                codeCompletionService->Start();                
+                codeCompletionService->SetLogMessageNotificationFunction(CodeCompletionServiceLogMessagesAvailable);
+                codeCompletionService->SetCodeCompletionReplyHandlerFunction(CodeCompletionReplyHandler);
+                codeCompletionService->Start();
             }
             return *codeCompletionService;
         }
@@ -3676,11 +3690,11 @@ namespace cmcode
         }
         private void CodeCompletionServerStarted()
         {
-            // todo
+            codeCompletionServerStarting = false;
         }
         private void CodeCompletionServerStopped()
         {
-            // todo
+            codeCompletionServerStarting = false;
         }
         private void CodeCompletionServiceLogMessagesAvailable()
         {
@@ -3701,7 +3715,7 @@ namespace cmcode
                 void* replyPtr = cast<void*>(cast<ulong>(message.lparam));
                 UniquePtr<CodeCompletionReply> reply(cast<CodeCompletionReply*>(replyPtr));
                 TimePoint now = Now();
-                Duration msgDuration = now - reply->created;
+                Duration msgDuration = now - reply->requestCreated;
                 string durStr = DurationStr(msgDuration);
                 string logMessage = "code completion reply: " + durStr;
                 GetOutputTabPage()->Select();
@@ -4422,6 +4436,7 @@ namespace cmcode
         private int pid;
         private bool disableBuildServerToolButton;
         private LocationList locations;
+        private bool codeCompletionServerStarting;
     }
 }
 

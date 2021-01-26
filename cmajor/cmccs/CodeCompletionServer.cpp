@@ -118,7 +118,6 @@ void CodeCompletionServer::Stop()
             requestDoc.Write(formatter);
             TcpSocket socket("localhost", std::to_string(port));
             Write(socket, s.str());
-            std::string replyStr = ReadStr(socket);
         }
         else
         {
