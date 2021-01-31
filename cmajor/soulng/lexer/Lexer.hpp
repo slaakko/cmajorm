@@ -17,7 +17,7 @@ namespace soulng { namespace lexer {
 
 enum class LexerFlags : int8_t
 {
-    none = 0, cursorSeen = 1 << 0
+    none = 0, synchronized = 1 << 0, synchronizedAtLeastOnce = 1 << 1, cursorSeen = 1 << 2
 };
 
 inline LexerFlags operator|(LexerFlags left, LexerFlags right)
@@ -74,7 +74,7 @@ public:
     void SetSeparatorChar(char32_t separatorChar_) { separatorChar = separatorChar_; }
     TokenLine TokenizeLine(const std::u32string& line, int lineNumber, int startState);
     void SetSyncTokens(const std::vector<int>& syncTokens_);
-    void Synchronize();
+    bool Synchronize();
     LexerFlags Flags() const { return flags; }
     bool GetFlag(LexerFlags flag) const { return (flags & flag) != LexerFlags::none; }
     void SetFlag(LexerFlags flag) { flags = flags | flag; }

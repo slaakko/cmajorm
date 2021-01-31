@@ -5,6 +5,7 @@
 
 [hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
 [hpp]#include <sngcm/ast/Class.hpp>
+[hpp]#include <sngcm/ast/SyncNode.hpp>
 [hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
 [cpp]#include <sngcm/cmnothrowparser/Attribute.hpp>
 [cpp]#include <sngcm/cmnothrowparser/Specifier.hpp>
@@ -82,8 +83,18 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowClassParser
         |   QualifiedId(moduleId):qid{ return qid; }
         ;
 
-    ClassContent(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::ClassNode* classNode)
-        ::= (ClassMember(moduleId, ctx, classNode):classMember{ classNode->AddMember(classMember); })*
+    ClassContent(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::ClassNode* classNode, var std::unique_ptr<sngcm::ast::Node> clsMem)
+        ::= (ClassMember(moduleId, ctx, classNode):classMember
+        { 
+            clsMem.reset(classMember);
+            bool isSyncNode = clsMem->GetNodeType() == sngcm::ast::NodeType::syncNode;
+            if (!isSyncNode) 
+            {  
+                lexer.ResetFlag(LexerFlags::synchronized);
+            }
+            classNode->AddMember(clsMem.release()); 
+        }
+        )*
         ;
 
     ClassMember(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::ClassNode* classNode) : Node*
@@ -99,6 +110,21 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowClassParser
         |   Constant(moduleId, ctx):constant{ return constant; }
         |   Delegate(moduleId, ctx):delegate{ return delegate; }
         |   ClassDelegate(moduleId, ctx):classDelegate{ return classDelegate; }
+        |   SyncMember:sync{ return new sngcm::ast::SyncNode(span, *moduleId); }
+        ;
+
+    SyncMember
+        ::= empty
+        { 
+            if (lexer.Synchronize())
+            {
+                ++lexer;
+            }
+            else
+            {
+                pass = false;
+            }
+        }
         ;
 
     StaticConstructor(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::ClassNode* classNode, var std::unique_ptr<StaticConstructorNode> staticConstructor, var Span s, var Span specifierSpan,

@@ -28,7 +28,7 @@ void SetTypeBindingFunction(TypeBindingFunction typeBindingFunc)
     typeBindingFunction = typeBindingFunc;
 }
 
-Source::Source(const std::string& filePath_) : filePath(filePath_), cursorScope(nullptr), cursorContainer(nullptr)
+Source::Source(const std::string& filePath_) : filePath(filePath_), cursorScope(nullptr), cursorContainer(nullptr), synchronized(false)
 {
 }
 
@@ -50,6 +50,7 @@ void Source::Parse(const boost::uuids::uuid& moduleId, int index)
     {
         errors.push_back(ex.what());
     }
+    synchronized = lexer.GetFlag(LexerFlags::synchronizedAtLeastOnce);
     compileUnit = std::move(parsedCompileUnit);
 }
 
@@ -375,6 +376,21 @@ int Sources::GetNumberOfErrors()
     return numberOfErrors;
 }
 
+bool Sources::Synchronized()
+{
+    bool synchronized = false;
+    for (int i = 0; i < sources.size(); ++i)
+    {
+        Source* source = GetSource(i);
+        if (source->Synchronized())
+        {
+            synchronized = true;
+            break;
+        }
+    }
+    return synchronized;
+}
+
 ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePath, const std::u32string& sourceCode)
 {
     ParseResult result;
@@ -411,6 +427,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         {
             result.errors.push_back(StringStr(error));
         }
+        result.synchronized = source->Synchronized();
         sources.push_back(std::move(source));
         MakeSourceIndexMap();
     }

@@ -113,6 +113,7 @@ public:
     bool ok;
     std::string error;
     std::vector<std::string> errors;
+    bool synchronized;
     time_point startParsing;
     time_point endParsing;
 };

@@ -184,17 +184,18 @@ std::unique_ptr<sngxml::dom::Element> ParseSourceRequest::ToXml(const std::strin
 
 ParseSourceReply::ParseSourceReply()
     : CodeCompletionReply()
-    , ok(), error(), errors(), startParsing(), endParsing()
+    , ok(), error(), errors(), synchronized(), startParsing(), endParsing()
 {
 }
 
 ParseSourceReply::ParseSourceReply(sngxml::dom::Element* element)
     : CodeCompletionReply(sngxml::xmlser::GetXmlFieldElement("base", element))
-    , ok(), error(), errors(), startParsing(), endParsing()
+    , ok(), error(), errors(), synchronized(), startParsing(), endParsing()
 {
     sngxml::xmlser::FromXml(element, "ok", ok);
     sngxml::xmlser::FromXml(element, "error", error);
     sngxml::xmlser::FromXml(element, "errors", errors);
+    sngxml::xmlser::FromXml(element, "synchronized", synchronized);
     sngxml::xmlser::FromXml(element, "startParsing", startParsing);
     sngxml::xmlser::FromXml(element, "endParsing", endParsing);
 }
@@ -206,6 +207,7 @@ std::unique_ptr<sngxml::dom::Element> ParseSourceReply::ToXml(const std::string&
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(errors, "errors").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(synchronized, "synchronized").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startParsing, "startParsing").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endParsing, "endParsing").release()));
     return element;

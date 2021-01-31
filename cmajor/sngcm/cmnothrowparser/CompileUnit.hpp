@@ -2,6 +2,7 @@
 #define COMPILEUNIT_HPP
 #include <sngcm/cmnothrowparser/ParserApi.hpp>
 #include <sngcm/ast/CompileUnit.hpp>
+#include <sngcm/ast/SyncNode.hpp>
 #include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
 #include <memory>
 #include <soulng/lexer/Token.hpp>
@@ -23,6 +24,7 @@ struct SNGCM_NOTHROW_PARSER_API NothrowCompileUnitParser
     static soulng::parser::Match UsingNamespaceDirective(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match Definitions(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns);
     static soulng::parser::Match Definition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns);
+    static soulng::parser::Match SyncDef(CmajorNothrowLexer& lexer);
     static soulng::parser::Match NamespaceDefinition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns);
     static soulng::parser::Match TypedefDeclaration(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match ConceptDefinition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);

@@ -228,11 +228,16 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const L
     {
         LoadEditModuleResult result = EditModuleCache::Instance().LoadEditModule(request.projectFilePath, request.backend, request.config);
         reply->key = result.key;
+        std::string synchronized;
+        if (result.synchronized)
+        {
+            synchronized = ", synchronized";
+        }
         switch (result.resultKind)
         {
             case LoadEditModuleResultKind::moduleUpToDate: reply->result = "up-to-date"; break;
-            case LoadEditModuleResultKind::moduleLoaded: reply->result = "loaded, number of errors: " + std::to_string(result.numberOfErrors); break;
-            case LoadEditModuleResultKind::moduleReloaded: reply->result = "reloaded, number of errors: " + std::to_string(result.numberOfErrors); break;
+            case LoadEditModuleResultKind::moduleLoaded: reply->result = "loaded, number of errors: " + std::to_string(result.numberOfErrors) + synchronized; break;
+            case LoadEditModuleResultKind::moduleReloaded: reply->result = "reloaded, number of errors: " + std::to_string(result.numberOfErrors) + synchronized; break;
         }
         reply->startLoading = result.startLoading;
         reply->startParsing = result.startParsing;
@@ -286,6 +291,7 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const P
                 reply->startParsing = result.start;
                 reply->endParsing = result.end;
                 reply->errors = result.errors;
+                reply->synchronized = result.synchronized;
             }
             else
             {

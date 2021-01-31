@@ -372,9 +372,16 @@ void Lexer::ThrowExpectationFailure(const Span& span, const std::u32string& name
 
 void Lexer::AddError(const Span& span, const std::u32string& name)
 {
-    Token token = GetToken(span.start);
-    ParsingException error("parsing error in '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
-    errors.push_back(std::move(error));
+    if (GetFlag(LexerFlags::synchronized))
+    {
+        SetFlag(LexerFlags::synchronizedAtLeastOnce);
+    }
+    else
+    {
+        Token token = GetToken(span.start);
+        ParsingException error("parsing error in '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
+        errors.push_back(std::move(error));
+    }
 }
 
 std::u32string Lexer::RestOfLine(int maxLineLength)
@@ -430,8 +437,10 @@ void Lexer::SetSyncTokens(const std::vector<int>& syncTokens_)
     syncTokens = syncTokens_;
 }
 
-void Lexer::Synchronize()
+bool Lexer::Synchronize()
 {
+    if (GetFlag(LexerFlags::synchronized)) return false;
+    SetFlag(LexerFlags::synchronized);
     while (pos != end)
     {
         int curToken = token.id;
@@ -439,11 +448,12 @@ void Lexer::Synchronize()
         {
             if (curToken == syncToken)
             {
-                return;
+                return true;
             }
         }
         ++*this;
     }
+    return false;
 }
 
 void WriteBeginRuleToLog(Lexer& lexer, const std::u32string& ruleName)

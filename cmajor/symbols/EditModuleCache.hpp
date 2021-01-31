@@ -23,11 +23,12 @@ enum class LoadEditModuleResultKind
 
 struct SYMBOLS_API LoadEditModuleResult
 {
-    LoadEditModuleResult() : ok(true), numberOfErrors(), error(), resultKind(LoadEditModuleResultKind::moduleUpToDate), startLoading(), startParsing(), endLoading()
+    LoadEditModuleResult() : ok(true), numberOfErrors(), synchronized(false), error(), resultKind(LoadEditModuleResultKind::moduleUpToDate), startLoading(), startParsing(), endLoading()
     {
     }
     bool ok;
     int numberOfErrors;
+    bool synchronized;
     std::string error;
     std::string key;
     LoadEditModuleResultKind resultKind;

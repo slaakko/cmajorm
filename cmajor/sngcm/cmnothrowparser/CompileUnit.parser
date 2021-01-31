@@ -5,6 +5,7 @@
 
 [hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
 [hpp]#include <sngcm/ast/CompileUnit.hpp>
+[hpp]#include <sngcm/ast/SyncNode.hpp>
 [hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
 [hpp]#include <memory>
 [cpp]#include <sngcm/cmnothrowparser/Typedef.hpp>
@@ -88,8 +89,18 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowCompileUnitParser
         }
         ;
 
-    Definitions(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns)
-        ::= (Definition(moduleId, ctx, cu, ns):definition{ ns->AddMember(definition); })*
+    Definitions(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns, var std::unique_ptr<Node> def)
+        ::= (Definition(moduleId, ctx, cu, ns):definition
+        { 
+            def.reset(definition);
+            bool isSyncNode = def->GetNodeType() == sngcm::ast::NodeType::syncNode;
+            if (!isSyncNode) 
+            {  
+                lexer.ResetFlag(LexerFlags::synchronized);
+            }
+            ns->AddMember(def.release()); 
+        }
+        )*
         ;
 
     Definition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns) : Node*
@@ -104,11 +115,26 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowCompileUnitParser
         |   DelegateDefinition(moduleId, ctx):delegateDefinition{ return delegateDefinition; }
         |   ClassDelegateDefinition(moduleId, ctx):classDelegateDefinition{ return classDelegateDefinition; }
         |   GlobalVariableDefinition(moduleId, ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+        |   SyncDef:sync{ return new sngcm::ast::SyncNode(span, *moduleId); }
+        ;
+
+    SyncDef
+        ::= empty
+        { 
+            if (lexer.Synchronize())
+            {
+                ++lexer;
+            }
+            else
+            {
+                pass = false;
+            }
+        }
         ;
 
     NamespaceDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns, var std::unique_ptr<NamespaceNode> nsNode, var Span s) : NamespaceNode*
         ::= NAMESPACE{ s = span; } (QualifiedId(moduleId):nsName{ s.end = span.end; nsNode.reset(new NamespaceNode(s, *moduleId, nsName)); } | empty{ nsNode.reset(new NamespaceNode(s, *moduleId, nullptr)); })
-            LBRACE! NamespaceContent(moduleId, ctx, cu, nsNode.get()):content! RBRACE!
+            LBRACE! NamespaceContent(moduleId, ctx, cu, nsNode.get()):content RBRACE!
         {
             nsNode->SetLexerFlags(lexer.Flags());
             return nsNode.release();

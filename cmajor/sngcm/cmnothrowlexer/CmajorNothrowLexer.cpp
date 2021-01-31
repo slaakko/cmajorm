@@ -6615,7 +6615,7 @@ int CmajorNothrowLexer::GetTokenId(int statementIndex)
         {
             Retract();
             SetFlag(LexerFlags::cursorSeen);
-            Synchronize();
+            ++*this;
             return token.id;
             break;
         }

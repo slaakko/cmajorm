@@ -116,6 +116,7 @@ LoadEditModuleResult EditModuleCache::LoadEditModule(const std::string& projectF
     ParseResult parseResult = module->ParseSources();
     result.ok = parseResult.ok;
     result.numberOfErrors = parseResult.numberOfErrors;
+    result.synchronized = parseResult.synchronized;
     result.error = parseResult.error;
     result.startParsing = parseResult.start;
     result.endParsing = parseResult.end;

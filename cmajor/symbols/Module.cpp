@@ -1929,6 +1929,7 @@ ParseResult Module::ParseSources()
         sources->GetScopes(this);
         sources->BindTypes(this);
         parseResult.numberOfErrors = sources->GetNumberOfErrors();
+        parseResult.synchronized = sources->Synchronized();
         return parseResult;
     }
     else
