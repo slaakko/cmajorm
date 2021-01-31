@@ -72,6 +72,16 @@ namespace cmcode
     }
 
     [json]
+    public class EditorSettings
+    {
+        public nothrow EditorSettings() : useCodeCompletion(true), parsingFrequency(1)
+        {
+        }
+        public bool useCodeCompletion;
+        public int parsingFrequency;
+    }
+
+    [json]
     public class MainConfig
     {
         public enum JsonWindowState : sbyte
@@ -82,7 +92,7 @@ namespace cmcode
             mainWindowWindowState(JsonWindowState.normal),
             normalVerticalSplitterDistance(0), normalHorizontalSplitterDistance(0),
             maximizedVerticalSplitterDistance(0), maximizedHorizontalSplitterDistance(0),
-            buildSettings()
+            buildSettings(), editorSettings()
         {
         }
         public System.Windows.WindowState GetMainWindowWindowState()
@@ -183,6 +193,14 @@ namespace cmcode
         {
             buildSettings = buildSettings_;
         }
+        public nothrow const EditorSettings& GetEditorSettings() const
+        {
+            return editorSettings;
+        }
+        public nothrow void SetEditorSettings(const EditorSettings& editorSettings_)
+        {
+            editorSettings = editorSettings_;
+        }
         private JsonWindowState mainWindowWindowState;
         private JsonPoint mainWindowNormalLocation;
         private JsonPoint mainWindowMaximizedLocation;
@@ -193,6 +211,7 @@ namespace cmcode
         private int maximizedVerticalSplitterDistance;
         private int maximizedHorizontalSplitterDistance;
         private BuildSettings buildSettings;
+        private EditorSettings editorSettings;
     }
 
     public nothrow void AddBuildSettingsValue(JsonValue* configurationValue)
@@ -206,6 +225,21 @@ namespace cmcode
                 BuildSettings buildSettings;
                 UniquePtr<JsonValue> buildSettingsValue = buildSettings.ToJson();
                 jsonObject->AddField("buildSettings", Rvalue(buildSettingsValue));
+            }
+        }
+    }
+
+    public nothrow void AddEditorSettingsValue(JsonValue* configurationValue)
+    {
+        if (configurationValue is JsonObject*)
+        {
+            JsonObject* jsonObject = cast<JsonObject*>(configurationValue);
+            JsonValue* editorSettingsField = jsonObject->GetField("editorSettings");
+            if (editorSettingsField == null)
+            {
+                EditorSettings editorSettings;
+                UniquePtr<JsonValue> editorSettingsValue = editorSettings.ToJson();
+                jsonObject->AddField("editorSettings", Rvalue(editorSettingsValue));
             }
         }
     }
@@ -276,6 +310,7 @@ namespace cmcode
                         string content = File.ReadAllText(jsonFilePath);
                         UniquePtr<JsonValue> mainConfigJsonValue = ParseJson(content);
                         AddBuildSettingsValue(mainConfigJsonValue.Get());
+                        AddEditorSettingsValue(mainConfigJsonValue.Get());
                         FromJson(mainConfigJsonValue.Get(), mainConfig);
                         loaded = true;
                     }
@@ -446,6 +481,15 @@ namespace cmcode
         {
            mainConfig.SetBuildSettings(buildSettings);
            SetChanged();
+        }
+        public nothrow const EditorSettings& GetEditorSettings() const
+        {
+            return mainConfig.GetEditorSettings();
+        }
+        public nothrow void SetEditorSettings(const EditorSettings& editorSettings)
+        {
+            mainConfig.SetEditorSettings(editorSettings);
+            SetChanged();
         }
         private void SetChanged()
         {

@@ -1,0 +1,46 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Constant.hpp>
+[hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Specifier.hpp>
+[cpp]#include <sngcm/cmnothrowparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Identifier.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Expression.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowConstantParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowSpecifierParser.Specifiers;
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowExpressionParser.Expression;
+    using NothrowIdentifierParser.Identifier;
+
+    Constant(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s, var Span v, var std::unique_ptr<Node> e) : ConstantNode*
+        ::= Specifiers:specifiers{ s = span; } CONST TypeExpr(moduleId, ctx):type! Identifier(moduleId):id!{ v = span; } ASSIGN Expression(moduleId, ctx):expr{ e.reset(expr); } SEMICOLON
+        {
+            e->SetFullSpan();
+            v.end = e->GetSpan().end;
+            s.end = e->GetSpan().end;
+            ConstantNode* value = new ConstantNode(s, *moduleId, specifiers, type, id, e.release());
+            value->SetLexerFlags(lexer.Flags());
+            value->SetStrValue(lexer.GetMatch(v));
+            return value;
+        }
+        ;
+
+    ruleinfo
+    {
+        (Constant, "constant")
+    }
+}

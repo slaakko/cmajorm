@@ -1,0 +1,169 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/CompileUnit.hpp>
+[hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
+[hpp]#include <memory>
+[cpp]#include <sngcm/cmnothrowparser/Typedef.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Identifier.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Concept.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Function.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Class.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Interface.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Enumeration.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Constant.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Delegate.hpp>
+[cpp]#include <sngcm/cmnothrowparser/GlobalVariable.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowCompileUnitParser
+{
+    main;
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowIdentifierParser.Identifier;
+    using NothrowIdentifierParser.QualifiedId;
+    using NothrowConceptParser.Concept;
+    using NothrowFunctionParser.Function;
+    using NothrowClassParser.Class;
+    using NothrowInterfaceParser.Interface;
+    using NothrowTypedefParser.Typedef;
+    using NothrowEnumerationParser.EnumType;
+    using NothrowConstantParser.Constant;
+    using NothrowDelegateParser.Delegate;
+    using NothrowDelegateParser.ClassDelegate;
+    using NothrowGlobalVariableParser.GlobalVariable;
+
+    CompileUnit(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<CompileUnitNode> compileUnit) : sngcm::ast::CompileUnitNode*
+        ::= empty
+            { 
+                compileUnit.reset(new CompileUnitNode(span, *moduleId, lexer.FileName())); 
+                std::vector<int> syncTokens; 
+                syncTokens.push_back(SEMICOLON); 
+                syncTokens.push_back(RBRACE); 
+                lexer.SetSyncTokens(syncTokens); 
+            }
+            NamespaceContent(moduleId, ctx, compileUnit.get(), compileUnit->GlobalNs()):content{ return compileUnit.release(); }
+        ;
+
+    NamespaceContent(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns)
+        ::= UsingDirectives(moduleId, ctx, ns):usingDirectives
+            Definitions(moduleId, ctx, cu, ns):definitions
+        ;
+
+    UsingDirectives(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::NamespaceNode* ns)
+        ::= UsingDirective(moduleId, ctx, ns):usingDirective*
+        ;
+
+    UsingDirective(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::NamespaceNode* ns)
+        ::= UsingAliasDirective(moduleId):usingAlias{ ns->AddMember(usingAlias); }
+        |   UsingNamespaceDirective(moduleId, ctx):usingNs{ ns->AddMember(usingNs); }
+        ;
+
+    UsingAliasDirective(boost::uuids::uuid* moduleId, var Span s) : Node*
+        ::= USING{ s = span; } Identifier(moduleId):id ASSIGN QualifiedId(moduleId):qid SEMICOLON!
+        {
+            s.end = span.end;
+            AliasNode* node = new AliasNode(s, *moduleId, id, qid);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    UsingNamespaceDirective(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } QualifiedId(moduleId):ns SEMICOLON!
+        {
+            s.end = span.end;
+            NamespaceImportNode* node = new NamespaceImportNode(s, *moduleId, ns);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    Definitions(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns)
+        ::= (Definition(moduleId, ctx, cu, ns):definition{ ns->AddMember(definition); })*
+        ;
+
+    Definition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns) : Node*
+        ::= NamespaceDefinition(moduleId, ctx, cu, ns):nsDefinition{ return nsDefinition; }
+        |   TypedefDeclaration(moduleId, ctx):typedefDeclaration{ return typedefDeclaration; }
+        |   ConceptDefinition(moduleId, ctx):conceptDefinition{ return conceptDefinition; }
+        |   FunctionDefinition(moduleId, ctx):functionDefinition{ return functionDefinition; }
+        |   ClassDefinition(moduleId, ctx):classDefinition{ return classDefinition; }
+        |   InterfaceDefinition(moduleId, ctx):interfaceDefinition{ return interfaceDefinition; }
+        |   EnumTypeDefinition(moduleId, ctx):enumTypeDefinition{ return enumTypeDefinition; }
+        |   ConstantDefinition(moduleId, ctx):constantDefinition{ return constantDefinition; }
+        |   DelegateDefinition(moduleId, ctx):delegateDefinition{ return delegateDefinition; }
+        |   ClassDelegateDefinition(moduleId, ctx):classDelegateDefinition{ return classDelegateDefinition; }
+        |   GlobalVariableDefinition(moduleId, ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+        ;
+
+    NamespaceDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns, var std::unique_ptr<NamespaceNode> nsNode, var Span s) : NamespaceNode*
+        ::= NAMESPACE{ s = span; } (QualifiedId(moduleId):nsName{ s.end = span.end; nsNode.reset(new NamespaceNode(s, *moduleId, nsName)); } | empty{ nsNode.reset(new NamespaceNode(s, *moduleId, nullptr)); })
+            LBRACE! NamespaceContent(moduleId, ctx, cu, nsNode.get()):content! RBRACE!
+        {
+            nsNode->SetLexerFlags(lexer.Flags());
+            return nsNode.release();
+        }
+        ;
+
+    TypedefDeclaration(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : TypedefNode*
+        ::= Typedef(moduleId, ctx):typedefDeclaration{ return typedefDeclaration; }
+        ;
+
+    ConceptDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : ConceptNode*
+        ::= Concept(moduleId, ctx):conceptDefinition{ return conceptDefinition; }
+        ;
+
+    FunctionDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : FunctionNode*
+        ::= Function(moduleId, ctx):functionDefinition{ return functionDefinition; }
+        ;
+
+    ClassDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : ClassNode*
+        ::= Class(moduleId, ctx):classDefinition{ return classDefinition; }
+        ;
+
+    InterfaceDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : InterfaceNode*
+        ::= Interface(moduleId, ctx):interfaceDefinition{ return interfaceDefinition; }
+        ;
+
+    EnumTypeDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : EnumTypeNode*
+        ::= EnumType(moduleId, ctx):enumTypeDefinition{ return enumTypeDefinition; }
+        ;
+
+    ConstantDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : ConstantNode*
+        ::= Constant(moduleId, ctx):constantDefinition{ return constantDefinition; }
+        ;
+
+    DelegateDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : DelegateNode*
+        ::= Delegate(moduleId, ctx):delegateDefinition{ return delegateDefinition; }
+        ;
+
+    ClassDelegateDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : ClassDelegateNode*
+        ::= ClassDelegate(moduleId, ctx):classDelegateDefinition{ return classDelegateDefinition; }
+        ;
+
+    GlobalVariableDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu) : GlobalVariableNode*
+        ::= GlobalVariable(moduleId, ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+        ;
+
+    ruleinfo
+    {
+        (CompileUnit, "compile unit"), (NamespaceContent, "namespace content"), (UsingDirectives, "using directives"), (UsingDirective, "using directive"),
+        (UsingAliasDirective, "using alias directive"), (UsingNamespaceDirective, "using namespace directive"), (Definitions, "definitions"),
+        (Definition, "definition"), (NamespaceDefinition, "namespace definition"), (TypedefDeclaration , "typedef declaration"), (ConceptDefinition, "concept definition"),
+        (FunctionDefinition, "function definition"), (ClassDefinition, "class definition"), (InterfaceDefinition, "interface definition"), (EnumTypeDefinition, "enumerated type definition"),
+        (ConstantDefinition, "constant definition"), (DelegateDefinition, "delegate definition"), (ClassDelegateDefinition, "class delegate definition"),
+        (GlobalVariableDefinition, "global variable definition")
+    }
+}
+
+

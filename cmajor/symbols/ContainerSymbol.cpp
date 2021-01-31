@@ -71,6 +71,7 @@ void ContainerSymbol::AddMember(Symbol* member)
         member->SetModule(GetModule());
     }
     member->SetParent(this);
+    member->SetSymbolIndex(members.size());
     members.push_back(std::unique_ptr<Symbol>(member));
     if (member->IsFunctionSymbol())
     {
@@ -134,6 +135,25 @@ void ContainerSymbol::AddOwnedMember(Symbol* ownedMember)
     {
         containerScope.Install(ownedMember);
     }
+}
+
+std::unique_ptr<Symbol> ContainerSymbol::RemoveMember(int symbolIndex)
+{
+    if (symbolIndex == -1)
+    {
+        throw std::runtime_error("internal error: ContainerSymboil::RemoveMember(): symbol index is -1");
+    }
+    std::unique_ptr<Symbol> symbol = std::move(members[symbolIndex]);
+    members.erase(members.begin() + symbolIndex);
+    for (int i = symbolIndex; i < members.size(); ++i)
+    {
+        members[i]->SetSymbolIndex(i);
+    }
+    if (symbol->IsInstalled())
+    {
+        containerScope.Uninstall(symbol.get());
+    }
+    return symbol;
 }
 
 void ContainerSymbol::Accept(SymbolCollector* collector)

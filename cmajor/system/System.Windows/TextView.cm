@@ -120,6 +120,10 @@ namespace System.Windows
     public class delegate void GotoCaretLineEventHandler(ControlEventArgs& args);
     public class delegate void SelectionChangedEventHandler();
     public class delegate void DirtyChangedEventHandler();
+    public class delegate void CCDirtyChangedEventHandler();
+    public class delegate void CCTextChangedEventHandler();
+    public class delegate void CCEventHandler();
+    public class delegate void EscapePressedHandler();
     public class delegate void CopyEventHandler();
     public class delegate void CutEventHandler();
     public class delegate void PasteEventHandler();
@@ -128,7 +132,7 @@ namespace System.Windows
     {
         private enum Flags : sbyte
         {
-            none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, mouseExtendSelection = 1 << 5
+            none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, ccdirty = 1 << 5, mouseExtendSelection = 1 << 6
         }
 
         public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Color& textColor_, const Point& location, const Size& size,
@@ -755,6 +759,12 @@ namespace System.Windows
                 int columnNumber = caretColumn;
                 switch (args.keyData)
                 {
+                    case Keys.escape:
+                    {
+                        OnEscape();
+                        args.handled = true;
+                        break;
+                    }
                     case Keys.home:
                     {
                         ResetSelection();
@@ -1257,6 +1267,11 @@ namespace System.Windows
                         Redo();
                         break;
                     }
+                    case cast<Keys>(Keys.controlModifier | Keys.space):
+                    {
+                        OnCC();
+                        break;
+                    }
                 }
                 if (args.handled && !scrolled)
                 {
@@ -1289,6 +1304,10 @@ namespace System.Windows
                 editCommandList.EndGroup();
                 args.handled = true;
             }
+        }
+        protected virtual void OnEscape()
+        {
+            escapePressedEvent.Fire();
         }
         private nothrow void AddInsertCharCommand(int lineIndex, int columnIndex, uchar c)
         {
@@ -1328,7 +1347,9 @@ namespace System.Windows
             SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength());
             KeyEventArgs rightArgs(Keys.right, Keys.none);
             OnKeyDown(rightArgs);
+            SetCCText(line, columnIndex);
             SetDirty();
+            SetCCDirty();
         }
         public void InsertText(int lineIndex, int columnIndex, const ustring& text)
         {
@@ -1366,6 +1387,7 @@ namespace System.Windows
                 ScrollToCaret();
                 InvalidateLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
                 SetDirty();
+                SetCCDirty();
             }
             else
             {
@@ -1389,6 +1411,7 @@ namespace System.Windows
                 Invalidate();
                 InvalidateLines(lineIndex + 1, cast<int>(lineIndex + linesToInsert.Count() + 1));
                 SetDirty();
+                SetCCDirty();
             }
         }
         public nothrow void DeleteLines(int lineIndex, int columnIndex, const List<ustring>& linesToDelete)
@@ -1415,6 +1438,7 @@ namespace System.Windows
             ScrollToCaret();
             Invalidate();
             SetDirty();
+            SetCCDirty();
         }
         private nothrow void AddDeleteCharCommand(int lineIndex, int columnIndex)
         {
@@ -1446,6 +1470,7 @@ namespace System.Windows
                 line.Remove(columnIndex, 1);
                 LineEventArgs args(lineIndex, -1);
                 OnLineChanged(args);
+                SetCCText(line, columnIndex);
             }
             else
             {
@@ -1463,10 +1488,12 @@ namespace System.Windows
                     LineEventArgs deletedArgs(lineIndex + 1, -1);
                     OnLineDeleted(deletedArgs);
                     SetTextExtent();
+                    ResetCCText();
                 }
             }
             SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength());
             SetDirty();
+            SetCCDirty();
         }
         private void Backspace(int lineIndex, int columnIndex)
         {
@@ -1571,6 +1598,7 @@ namespace System.Windows
             ScrollToCaret();
             Invalidate();
             SetDirty();
+            SetCCDirty();
         }
         public nothrow inline int IndentSize() const
         {
@@ -1604,6 +1632,7 @@ namespace System.Windows
             ScrollToCaret();
             InvalidateLineCol(lineIndex + 1, columnIndex + 1);
             SetDirty();
+            SetCCDirty();
         }
         private void AddBacktabCommand(int lineIndex, int columnIndex)
         {
@@ -1651,6 +1680,7 @@ namespace System.Windows
                 ScrollToCaret();
                 InvalidateLineCol(lineIndex + 1, 1 + col + LineNumberFieldLength());
                 SetDirty();
+                SetCCDirty();
             }
         }
         public nothrow void AddSpaces(int lineIndex, int columnIndex, int numSpaces)
@@ -1663,6 +1693,7 @@ namespace System.Windows
             ScrollToCaret();
             InvalidateLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
             SetDirty();
+            SetCCDirty();
         }
         public nothrow void RemoveSpaces(int lineIndex, int columnIndex, int numSpaces)
         {
@@ -1674,6 +1705,7 @@ namespace System.Windows
             ScrollToCaret();
             InvalidateLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
             SetDirty();
+            SetCCDirty();
         }
         protected virtual void OnCopy()
         {
@@ -1929,6 +1961,14 @@ namespace System.Windows
         {
             dirtyChangedEvent.Fire();
         }
+        protected virtual void OnCCDirtyChanged()
+        {
+            ccdirtyChangedEvent.Fire();
+        }
+        protected virtual void OnCC()
+        {
+            ccEvent.Fire();
+        }
         public void SaveText(const string& filePath)
         {
             StreamWriter writer = File.CreateText(filePath);
@@ -1936,6 +1976,58 @@ namespace System.Windows
             {
                 writer.WriteLine(line);
             }
+        }
+        public nothrow void SetCCText(const ustring& line, int columnIndex)
+        {
+            cctext.Clear();
+            while (columnIndex >= line.Length())
+            {
+                --columnIndex;
+            }
+            while (columnIndex >= 0)
+            {
+                if (line[columnIndex] == ' ')
+                {
+                    break;
+                }
+                cctext.Append(line[columnIndex]);
+                --columnIndex;
+            }
+            Reverse(cctext.Begin(), cctext.End());
+            OnCCTextChanged();
+        }
+        public nothrow void ResetCCText()
+        {
+            cctext.Clear();
+            OnCCTextChanged();
+        }
+        protected virtual nothrow void OnCCTextChanged()
+        {
+            cctextChangedEvent.Fire();
+        }
+        public nothrow inline const ustring& GetCCText() const
+        {
+            return cctext;
+        }
+        public nothrow ustring GetCursorText() const
+        {
+            ustring cursorText;
+            int caretIndex = Max(0, caretColumn - 1);
+            long n = lines.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                const ustring& line = lines[i];
+                int lineNumber = cast<int>(i + 1);
+                if (lineNumber == caretLine)
+                {
+                    cursorText.Append(line.Substring(0, caretIndex)).Append('$').Append(line.Substring(caretIndex)).Append('\n');
+                }
+                else
+                {
+                    cursorText.Append(line).Append('\n');
+                }
+            }
+            return cursorText;
         }
         public nothrow void SetSelection(const Selection& selection_)
         {
@@ -2096,6 +2188,7 @@ namespace System.Windows
             SetCaretLineCol(selection.end.line, selection.end.column + LineNumberFieldLength());
             Invalidate();
             SetDirty();
+            SetCCDirty();
         }
         public nothrow void AddRemoveSelectionCommand()
         {
@@ -2187,6 +2280,7 @@ namespace System.Windows
             ResetSelection();
             Invalidate();
             SetDirty();
+            SetCCDirty();
             SetFocus();
         }
         private nothrow void AddIndentSelectionCommand()
@@ -2209,6 +2303,7 @@ namespace System.Windows
             }
             InvalidateLines(selection.start.line, selection.end.line);
             SetDirty();
+            SetCCDirty();
         }
         public nothrow void AddUnindentSelectionCommand()
         {
@@ -2236,6 +2331,7 @@ namespace System.Windows
             }
             InvalidateLines(selection.start.line, selection.end.line);
             SetDirty();
+            SetCCDirty();
         }
         public nothrow void ExtendSelection(const SourcePos& start, const SourcePos& end)
         {
@@ -2376,6 +2472,26 @@ namespace System.Windows
                 OnDirtyChanged();
             }
         }
+        public nothrow inline bool IsCCDirty() const
+        {
+            return (flags & Flags.ccdirty) != Flags.none;
+        }
+        public nothrow void SetCCDirty()
+        {
+            if (!IsCCDirty())
+            {
+                flags = cast<Flags>(flags | Flags.ccdirty);
+                OnCCDirtyChanged();
+            }
+        }
+        public nothrow void ResetCCDirty()
+        {
+            if (IsCCDirty())
+            {
+                flags = cast<Flags>(flags & ~Flags.ccdirty);
+                OnCCDirtyChanged();
+            }
+        }
         private nothrow inline bool MouseExtendSelection() const
         {
             return (flags & Flags.mouseExtendSelection) != Flags.none;
@@ -2419,6 +2535,22 @@ namespace System.Windows
         public nothrow Event<DirtyChangedEventHandler>& DirtyChangedEvent() const
         {
             return dirtyChangedEvent;
+        }
+        public nothrow Event<CCDirtyChangedEventHandler>& CCDirtyChangedEvent() const
+        {
+            return ccdirtyChangedEvent;
+        }
+        public nothrow Event<CCTextChangedEventHandler>& CCTextChangedEvent() const
+        {
+            return cctextChangedEvent;
+        }
+        public nothrow Event<CCEventHandler>& CCEvent() const
+        {
+            return ccEvent;
+        }
+        public nothrow Event<EscapePressedHandler> EscapePressedEvent() const
+        {
+            return escapePressedEvent;
         }
         public nothrow Event<CopyEventHandler>& CopyEvent() const
         {
@@ -2506,6 +2638,10 @@ namespace System.Windows
         private Event<GotoCaretLineEventHandler, ControlEventArgs> gotoCaretLineEvent;
         private Event<SelectionChangedEventHandler> selectionChangedEvent;
         private Event<DirtyChangedEventHandler> dirtyChangedEvent;
+        private Event<CCDirtyChangedEventHandler> ccdirtyChangedEvent;
+        private Event<CCTextChangedEventHandler> cctextChangedEvent;
+        private Event<CCEventHandler> ccEvent;
+        private Event<EscapePressedHandler> escapePressedEvent;
         private Event<CopyEventHandler> copyEvent;
         private Event<CutEventHandler> cutEvent;
         private Event<PasteEventHandler> pasteEvent;
@@ -2517,6 +2653,7 @@ namespace System.Windows
         private EditCommandList editCommandList;
         private int indentSize;
         private string filePath;
+        private ustring cctext;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)

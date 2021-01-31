@@ -57,10 +57,20 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngcmlexerd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngcmlexer.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngcmlexer.lib ..\lib
 
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngcmnothrowlexerd.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngcmnothrowlexerd.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngcmnothrowlexer.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngcmnothrowlexer.lib ..\lib
+
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngcmparserd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngcmparserd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngcmparser.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngcmparser.lib ..\lib
+
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngcmnothrowparserd.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngcmnothrowparserd.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngcmnothrowparser.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngcmnothrowparser.lib ..\lib
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmlxmld.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngxmlxmld.lib ..\lib

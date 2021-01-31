@@ -6,6 +6,7 @@
 #ifndef SOULNG_UTIL_TIME_INCLUDED
 #define SOULNG_UTIL_TIME_INCLUDED
 #include <soulng/util/UtilApi.hpp>
+#include <chrono>
 #include <stdint.h>
 #include <string>
 
@@ -192,6 +193,8 @@ UTIL_API std::string FormatTimeMs(int32_t milliseconds);
 UTIL_API std::int64_t CurrentMs();
 
 UTIL_API int64_t GetCurrentTime();
+
+UTIL_API std::string DurationStr(const std::chrono::nanoseconds& duration);
 
 UTIL_API void TimeInit();
 UTIL_API void TimeDone();

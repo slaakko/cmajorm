@@ -80,7 +80,7 @@ void MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode, Symbol* sym
 SymbolTable::SymbolTable(Module* module_) : 
     module(module_), globalNs(Span(), boost::uuids::nil_uuid(), std::u32string()), currentCompileUnit(nullptr), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), 
     mainFunctionSymbol(nullptr), currentFunctionSymbol(nullptr), parameterIndex(0), declarationBlockIndex(0), conversionTable(ConversionTable::Owner::symbolTable, module), 
-    numSpecializationsNew(0), numSpecializationsCopied(0), createdFunctionSymbol(nullptr)
+    numSpecializationsNew(0), numSpecializationsCopied(0), createdFunctionSymbol(nullptr), cursorContainer(nullptr), axiomNumber(0)
 {
     globalNs.SetModule(module);
 }
@@ -385,6 +385,7 @@ NamespaceSymbol* SymbolTable::BeginNamespace(NamespaceNode& namespaceNode)
 {
     std::u32string nsName = namespaceNode.Id()->Str();
     NamespaceSymbol* ns = BeginNamespace(nsName, namespaceNode.GetSpan(), namespaceNode.ModuleId());
+    SetCursorContainer(namespaceNode);
     MapNode(&namespaceNode, container);
     return ns;
 }
@@ -469,6 +470,7 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode, int32_t functionInde
     }
     MapNode(&functionNode, functionSymbol);
     BeginContainer(functionSymbol);
+    SetCursorContainer(functionNode);
     parameterIndex = 0;
     ResetDeclarationBlockIndex();
 }
@@ -489,6 +491,7 @@ void SymbolTable::EndFunction(bool addMember)
 
 void SymbolTable::AddParameter(ParameterNode& parameterNode)
 {
+    SetCursorContainer(parameterNode);
     bool artificialId = false;
     std::u32string parameterName = ToUtf32("@p" + std::to_string(parameterIndex));
     if (parameterNode.Id())
@@ -522,6 +525,7 @@ void SymbolTable::BeginClass(ClassNode& classNode)
     MapNode(&classNode, classTypeSymbol);
     SetTypeIdFor(classTypeSymbol);
     BeginContainer(classTypeSymbol);
+    SetCursorContainer(classNode);
 }
 
 void SymbolTable::EndClass()
@@ -544,6 +548,7 @@ void SymbolTable::BeginClassTemplateSpecialization(ClassNode& classInstanceNode,
         SetTypeIdFor(classTemplateSpecialization);
     }
     BeginContainer(classTemplateSpecialization);
+    SetCursorContainer(classInstanceNode);
 }
 
 void SymbolTable::EndClassTemplateSpecialization()
@@ -555,6 +560,7 @@ void SymbolTable::EndClassTemplateSpecialization()
 
 void SymbolTable::AddTemplateParameter(TemplateParameterNode& templateParameterNode)
 {
+    SetCursorContainer(templateParameterNode);
     TemplateParameterSymbol* templateParameterSymbol = new TemplateParameterSymbol(templateParameterNode.GetSpan(), templateParameterNode.ModuleId(), templateParameterNode.Id()->Str());
     if (templateParameterNode.DefaultTemplateArgument())
     {
@@ -569,6 +575,7 @@ void SymbolTable::AddTemplateParameter(TemplateParameterNode& templateParameterN
 
 void SymbolTable::AddTemplateParameter(IdentifierNode& identifierNode)
 {
+    SetCursorContainer(identifierNode);
     TemplateParameterSymbol* templateParameterSymbol = new TemplateParameterSymbol(identifierNode.GetSpan(), identifierNode.ModuleId(), identifierNode.Str());
     templateParameterSymbol->SetCompileUnit(currentCompileUnit);
     templateParameterSymbol->SetModule(module);
@@ -588,6 +595,7 @@ void SymbolTable::BeginInterface(InterfaceNode& interfaceNode)
     SetTypeIdFor(interfaceTypeSymbol);
     container->AddMember(interfaceTypeSymbol);
     BeginContainer(interfaceTypeSymbol);
+    SetCursorContainer(interfaceNode);
 }
 
 void SymbolTable::EndInterface()
@@ -612,6 +620,7 @@ void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructo
     }
     MapNode(&staticConstructorNode, staticConstructorSymbol);
     BeginContainer(staticConstructorSymbol);
+    SetCursorContainer(staticConstructorNode);
     ResetDeclarationBlockIndex();
 }
 
@@ -648,6 +657,7 @@ void SymbolTable::BeginConstructor(ConstructorNode& constructorNode, int32_t fun
     }
     MapNode(&constructorNode, constructorSymbol);
     BeginContainer(constructorSymbol);
+    SetCursorContainer(constructorNode);
     parameterIndex = 0;
     ResetDeclarationBlockIndex();
     ParameterSymbol* thisParam = new ParameterSymbol(constructorNode.GetSpan(), constructorNode.ModuleId(), U"this");
@@ -694,6 +704,7 @@ void SymbolTable::BeginDestructor(DestructorNode& destructorNode, int32_t functi
     }
     MapNode(&destructorNode, destructorSymbol);
     BeginContainer(destructorSymbol);
+    SetCursorContainer(destructorNode);
     ResetDeclarationBlockIndex();
     ParameterSymbol* thisParam = new ParameterSymbol(destructorNode.GetSpan(), destructorNode.ModuleId(), U"this");
     TypeSymbol* thisParamType = nullptr;
@@ -744,6 +755,7 @@ void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode, in
     }
     MapNode(&memberFunctionNode, memberFunctionSymbol);
     BeginContainer(memberFunctionSymbol);
+    SetCursorContainer(memberFunctionNode);
     parameterIndex = 0;
     ResetDeclarationBlockIndex();
     if ((memberFunctionNode.GetSpecifiers() & Specifiers::static_) == Specifiers::none)
@@ -809,6 +821,7 @@ void SymbolTable::BeginConversionFunction(ConversionFunctionNode& conversionFunc
     }
     MapNode(&conversionFunctionNode, conversionFunctionSymbol);
     BeginContainer(conversionFunctionSymbol);
+    SetCursorContainer(conversionFunctionNode);
     ResetDeclarationBlockIndex();
     ParameterSymbol* thisParam = new ParameterSymbol(conversionFunctionNode.GetSpan(), conversionFunctionNode.ModuleId(), U"this");
     TypeSymbol* thisParamType = nullptr;
@@ -841,6 +854,7 @@ void SymbolTable::EndConversionFunction(bool addMember)
 
 void SymbolTable::AddMemberVariable(MemberVariableNode& memberVariableNode)
 {
+    SetCursorContainer(memberVariableNode);
     MemberVariableSymbol* memberVariableSymbol = new MemberVariableSymbol(memberVariableNode.GetSpan(), memberVariableNode.ModuleId(), memberVariableNode.Id()->Str());
     if ((memberVariableNode.GetSpecifiers() & Specifiers::static_) != Specifiers::none)
     {
@@ -860,6 +874,7 @@ void SymbolTable::BeginDelegate(DelegateNode& delegateNode)
     SetTypeIdFor(delegateTypeSymbol);
     container->AddMember(delegateTypeSymbol);
     BeginContainer(delegateTypeSymbol);
+    SetCursorContainer(delegateNode);
     parameterIndex = 0;
 }
 
@@ -877,6 +892,7 @@ void SymbolTable::BeginClassDelegate(ClassDelegateNode& classDelegateNode)
     SetTypeIdFor(classDelegateTypeSymbol);
     container->AddMember(classDelegateTypeSymbol);
     BeginContainer(classDelegateTypeSymbol);
+    SetCursorContainer(classDelegateNode);
     parameterIndex = 0;
 }
 
@@ -898,6 +914,7 @@ void SymbolTable::BeginConcept(ConceptNode& conceptNode, bool hasSource)
     MapNode(&conceptNode, conceptSymbol);
     SetTypeIdFor(conceptSymbol);
     BeginContainer(conceptSymbol);
+    SetCursorContainer(conceptNode);
 }
 
 void SymbolTable::EndConcept()
@@ -905,6 +922,30 @@ void SymbolTable::EndConcept()
     ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(container);
     EndContainer();
     container->AddMember(conceptSymbol);
+}
+
+void SymbolTable::BeginAxiom(AxiomNode& axiomNode)
+{
+    std::u32string axiomId; 
+    if (axiomNode.Id())
+    {
+        axiomId = axiomNode.Id()->Str();
+    }
+    else
+    {
+        axiomId = ToUtf32("@axiom" + std::to_string(NextAxiomNumber()));
+    }
+    AxiomSymbol* axiomSymbol = new AxiomSymbol(axiomNode.GetSpan(), axiomNode.ModuleId(), axiomId);
+    MapNode(&axiomNode, axiomSymbol);
+    BeginContainer(axiomSymbol);
+    SetCursorContainer(axiomNode);
+}
+
+void SymbolTable::EndAxiom()
+{
+    AxiomSymbol* axiomSymbol = static_cast<AxiomSymbol*>(container);
+    EndContainer();
+    container->AddMember(axiomSymbol);
 }
 
 void SymbolTable::BeginDeclarationBlock(Node& node)
@@ -915,6 +956,7 @@ void SymbolTable::BeginDeclarationBlock(Node& node)
     MapNode(&node, declarationBlock);
     container->AddMember(declarationBlock);
     BeginContainer(declarationBlock);
+    SetCursorContainer(node);
 }
 
 void SymbolTable::EndDeclarationBlock()
@@ -924,6 +966,8 @@ void SymbolTable::EndDeclarationBlock()
 
 void SymbolTable::AddLocalVariable(ConstructionStatementNode& constructionStatementNode)
 {
+    SetCursorContainer(constructionStatementNode);
+    if (!constructionStatementNode.Id()) return;
     if (GetGlobalFlag(GlobalFlags::profile) && constructionStatementNode.Id()->Str() == U"@functionProfiler")
     {
         for (LocalVariableSymbol* localVariableSymbol : currentFunctionSymbol->LocalVariables())
@@ -944,6 +988,7 @@ void SymbolTable::AddLocalVariable(ConstructionStatementNode& constructionStatem
 
 void SymbolTable::AddLocalVariable(IdentifierNode& identifierNode)
 {
+    SetCursorContainer(identifierNode);
     LocalVariableSymbol* localVariableSymbol = new LocalVariableSymbol(identifierNode.GetSpan(), identifierNode.ModuleId(), identifierNode.Str());
     localVariableSymbol->SetCompileUnit(currentCompileUnit);
     localVariableSymbol->SetModule(module);
@@ -951,27 +996,32 @@ void SymbolTable::AddLocalVariable(IdentifierNode& identifierNode)
     container->AddMember(localVariableSymbol);
 }
 
-void SymbolTable::AddTypedef(TypedefNode& typedefNode)
+TypedefSymbol* SymbolTable::AddTypedef(TypedefNode& typedefNode)
 {
+    SetCursorContainer(typedefNode);
     TypedefSymbol* typedefSymbol = new TypedefSymbol(typedefNode.GetSpan(), typedefNode.ModuleId(), typedefNode.Id()->Str());
     typedefSymbol->SetCompileUnit(currentCompileUnit);
     typedefSymbol->SetModule(module);
     MapNode(&typedefNode, typedefSymbol);
     container->AddMember(typedefSymbol);
+    return typedefSymbol;
 }
 
-void SymbolTable::AddConstant(ConstantNode& constantNode)
+ConstantSymbol* SymbolTable::AddConstant(ConstantNode& constantNode)
 {
+    SetCursorContainer(constantNode);
     ConstantSymbol* constantSymbol = new ConstantSymbol(constantNode.GetSpan(), constantNode.ModuleId(), constantNode.Id()->Str());
     constantSymbol->SetCompileUnit(currentCompileUnit);
     constantSymbol->SetModule(module);
     constantSymbol->SetStrValue(constantNode.StrValue());
     MapNode(&constantNode, constantSymbol);
     container->AddMember(constantSymbol);
+    return constantSymbol;
 }
 
-void SymbolTable::AddGlobalVariable(GlobalVariableNode& globalVariableNode)
+GlobalVariableSymbol* SymbolTable::AddGlobalVariable(GlobalVariableNode& globalVariableNode)
 {
+    SetCursorContainer(globalVariableNode);
     GlobalVariableSymbol* globalVariableSymbol = new GlobalVariableSymbol(globalVariableNode.GetSpan(), globalVariableNode.ModuleId(), globalVariableNode.Id()->Str(), globalVariableNode.CompileUnit()->Id(),
         globalVariableNode.CompileUnit()->FilePath());
     globalVariableSymbol->SetSpecifiers(globalVariableNode.GetSpecifiers());
@@ -979,6 +1029,7 @@ void SymbolTable::AddGlobalVariable(GlobalVariableNode& globalVariableNode)
     globalVariableSymbol->SetModule(module);
     MapNode(&globalVariableNode, globalVariableSymbol);
     container->AddMember(globalVariableSymbol);
+    return globalVariableSymbol;
 }
 
 void SymbolTable::BeginEnumType(EnumTypeNode& enumTypeNode)
@@ -990,6 +1041,7 @@ void SymbolTable::BeginEnumType(EnumTypeNode& enumTypeNode)
     SetTypeIdFor(enumTypeSymbol);
     container->AddMember(enumTypeSymbol);
     BeginContainer(enumTypeSymbol);
+    SetCursorContainer(enumTypeNode);
 }
 
 void SymbolTable::EndEnumType()
@@ -999,6 +1051,7 @@ void SymbolTable::EndEnumType()
 
 void SymbolTable::AddEnumConstant(EnumConstantNode& enumConstantNode)
 {
+    SetCursorContainer(enumConstantNode);
     EnumConstantSymbol* enumConstantSymbol = new EnumConstantSymbol(enumConstantNode.GetSpan(), enumConstantNode.ModuleId(), enumConstantNode.Id()->Str());
     enumConstantSymbol->SetCompileUnit(currentCompileUnit);
     enumConstantSymbol->SetModule(module);
@@ -1625,7 +1678,7 @@ FunctionSymbol* SymbolTable::GetInvoke(IdentifierNode* invokeId) const
     }
     else
     {
-        return nullptr;
+    return nullptr;
     }
 }
 
@@ -1659,7 +1712,7 @@ void SymbolTable::MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode
     }
 }
 
-SymbolLocation* SymbolTable::GetDefinitionLocation(const SymbolLocation& identifierLocation) 
+SymbolLocation* SymbolTable::GetDefinitionLocation(const SymbolLocation& identifierLocation)
 {
     auto it = symbolDefinitionMap.find(identifierLocation);
     if (it != symbolDefinitionMap.cend())
@@ -1717,6 +1770,20 @@ void SymbolTable::AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSy
 {
     std::lock_guard<std::recursive_mutex> lock(module->GetLock());
     functionSymbols.push_back(std::move(functionSymbol));
+}
+
+void SymbolTable::SetCursorContainer(const sngcm::ast::Node& node)
+{
+    if (cursorContainer == nullptr && (node.GetLexerFlags() & soulng::lexer::LexerFlags::cursorSeen) != soulng::lexer::LexerFlags::none)
+    {
+        cursorContainer = container;
+    }
+}
+
+void SymbolTable::ResetAliasNodesAndNamespaceImports()
+{
+    aliasNodes.clear();
+    namespaceImports.clear();
 }
 
 void SymbolTable::Check()

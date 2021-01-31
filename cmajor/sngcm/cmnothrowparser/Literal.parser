@@ -1,0 +1,111 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Literal.hpp>
+[hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Expression.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowLiteralParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowExpressionParser.Expression;
+
+    Literal(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : LiteralNode*
+        ::= SimpleLiteral(moduleId):simpleLiteral{ return simpleLiteral; }
+        |   ComplexLiteral(moduleId, ctx):complexLiteral{ return complexLiteral; }
+        ;
+
+    SimpleLiteral(boost::uuids::uuid* moduleId) : LiteralNode*
+        ::= TRUE
+        {
+            LiteralNode* value = new BooleanLiteralNode(span, *moduleId, true);
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        |   FALSE
+        {
+            LiteralNode* value = new BooleanLiteralNode(span, *moduleId, false);
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        |   FLOATINGLIT
+        {
+            ParseFloatingLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.floatingLit, lexer.floatingLitFloat);
+            LiteralNode* value = CreateFloatingLiteralNode(span, *moduleId, lexer.floatingLit, lexer.floatingLitFloat);
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        |   INTLIT
+        {
+            ParseIntegerLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.intLit, lexer.intLitUnsigned);
+            LiteralNode* value = CreateIntegerLiteralNode(span, *moduleId, lexer.intLit, lexer.intLitUnsigned);
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        |   CHARLIT
+        {
+            ParseCharacterLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.chrLit, lexer.chrLitPrefix);
+            LiteralNode* value = CreateCharacterLiteralNode(span, *moduleId, lexer.chrLit, lexer.chrLitPrefix);
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        |   STRINGLIT
+        {
+            ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix);
+            LiteralNode* value = CreateStringLiteralNode(span, *moduleId, lexer.strLit, lexer.strLitPrefix);
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        |   NULLLIT
+        {
+            LiteralNode* value = new NullLiteralNode(span, *moduleId);
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+
+    ComplexLiteral(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : LiteralNode*
+        ::= ArrayLiteral(moduleId, ctx):arrayLiteral{ return arrayLiteral; }
+        |   StructuredLiteral(moduleId, ctx):structuredLiteral{ return structuredLiteral; }
+        ;
+
+    ArrayLiteral(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<ArrayLiteralNode> arrayLiteral) : ArrayLiteralNode*
+        ::= LBRACKET{ arrayLiteral.reset(new ArrayLiteralNode(span, *moduleId)); } (Expression(moduleId, ctx):expr{ arrayLiteral->AddValue(expr); } % COMMA)? RBRACKET!
+        {
+            arrayLiteral->SetSpanEnd(span.end);
+            arrayLiteral->SetLexerFlags(lexer.Flags());
+            return arrayLiteral.release();
+        }
+        ;
+
+    StructuredLiteral(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<StructuredLiteralNode> structuredLiteral) : StructuredLiteralNode*
+        ::= LBRACE{ structuredLiteral.reset(new StructuredLiteralNode(span, *moduleId)); } (Expression(moduleId, ctx):expr{ structuredLiteral->AddMember(expr); } % COMMA)? RBRACE!
+        {
+            structuredLiteral->SetSpanEnd(span.end);
+            structuredLiteral->SetLexerFlags(lexer.Flags());
+            return structuredLiteral.release();
+        }
+        ;
+
+    ruleinfo
+    {
+        (Literal, "literal"), (SimpleLiteral, "simple literal"), (ComplexLiteral, "complex literal"), (ArrayLiteral, "array literal"), (StructuredLiteral, "structured literal")
+    }
+}

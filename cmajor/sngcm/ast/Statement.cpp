@@ -376,8 +376,14 @@ ForStatementNode::ForStatementNode(const Span& span_, const boost::uuids::uuid& 
     {
         condition->SetParent(this);
     }
-    loopS->SetParent(this);
-    actionS->SetParent(this);
+    if (loopS)
+    {
+        loopS->SetParent(this);
+    }
+    if (actionS)
+    {
+        actionS->SetParent(this);
+    }
 }
 
 Node* ForStatementNode::Clone(CloneContext& cloneContext) const
@@ -507,7 +513,10 @@ ConstructionStatementNode::ConstructionStatementNode(const Span& span_, const bo
     StatementNode(NodeType::constructionStatementNode, span_, moduleId_), typeExpr(typeExpr_), id(id_), arguments(), assignment(false), empty(false)
 {
     typeExpr->SetParent(this);
-    id->SetParent(this);
+    if (id)
+    {
+        id->SetParent(this);
+    }
 }
 
 Node* ConstructionStatementNode::Clone(CloneContext& cloneContext) const
@@ -553,8 +562,11 @@ void ConstructionStatementNode::Read(AstReader& reader)
 
 void ConstructionStatementNode::AddArgument(Node* argument)
 {
-    argument->SetParent(this);
-    arguments.Add(argument);
+    if (argument)
+    {
+        argument->SetParent(this);
+        arguments.Add(argument);
+    }
 }
 
 DeleteStatementNode::DeleteStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : StatementNode(NodeType::deleteStatementNode, span_, moduleId_), expression()

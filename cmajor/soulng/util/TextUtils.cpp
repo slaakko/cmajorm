@@ -310,12 +310,26 @@ bool StartsWith(const std::string& s, const std::string& prefix)
     return int(s.length()) >= n && s.substr(0, n) == prefix;
 }
 
+bool StartsWith(const std::u32string& s, const std::u32string& prefix)
+{
+    int n = int(prefix.length());
+    return int(s.length()) >= n && s.substr(0, n) == prefix;
+}
+
 bool EndsWith(const std::string& s, const std::string& suffix)
 {
     int n = int(suffix.length());
     int m = int(s.length());
     return m >= n && s.substr(m - n, n) == suffix;
 }
+
+bool EndsWith(const std::u32string& s, const std::u32string& suffix)
+{
+    int n = int(suffix.length());
+    int m = int(s.length());
+    return m >= n && s.substr(m - n, n) == suffix;
+}
+
 
 std::string NarrowString(const char* str, int length)
 {

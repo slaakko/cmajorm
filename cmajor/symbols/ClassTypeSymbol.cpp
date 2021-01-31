@@ -116,7 +116,21 @@ void ClassGroupTypeSymbol::AddClass(ClassTypeSymbol* classTypeSymbol)
                 classTypeSymbol->SourceModuleId());
         }
         arityClassMap[arity] = classTypeSymbol;
+        classTypeSymbol->SetClassGroup(this);
     }
+}
+
+void ClassGroupTypeSymbol::RemoveClass(ClassTypeSymbol* classTypeSymbol)
+{
+    for (int arity = classTypeSymbol->MinArity(); arity <= classTypeSymbol->MaxArity(); ++arity)
+    {
+        arityClassMap.erase(arity);
+    }
+}
+
+bool ClassGroupTypeSymbol::IsEmpty() const
+{
+    return arityClassMap.empty();
 }
 
 ClassTypeSymbol* ClassGroupTypeSymbol::GetClass(int arity) const
@@ -172,7 +186,7 @@ ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const boost::uuids::uuid& so
     TypeSymbol(SymbolType::classTypeSymbol, span_, sourceModuleId_, name_),
     minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
-    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), prototype(nullptr)
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), prototype(nullptr), classGroup(nullptr)
 {
 }
 
@@ -180,7 +194,7 @@ ClassTypeSymbol::ClassTypeSymbol(SymbolType symbolType_, const Span& span_, cons
     TypeSymbol(symbolType_, span_, sourceModuleId_, name_),
     minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),
     staticConstructor(nullptr), defaultConstructor(nullptr), copyConstructor(nullptr), moveConstructor(nullptr), copyAssignment(nullptr), moveAssignment(nullptr), 
-    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), prototype(nullptr)
+    constructors(), destructor(nullptr), memberFunctions(), vmtPtrIndex(-1), prototype(nullptr), classGroup(nullptr)
 {
 }
 
@@ -1684,6 +1698,20 @@ void ClassTypeSymbol::Check()
     {
         throw SymbolCheckException("class type symbol has empty group name", GetSpan(), SourceModuleId());
     }
+}
+
+std::unique_ptr<Symbol> ClassTypeSymbol::RemoveFromParent()
+{
+    std::unique_ptr<Symbol> symbol = TypeSymbol::RemoveFromParent();
+    if (classGroup)
+    {
+        classGroup->RemoveClass(this);
+        if (classGroup->IsEmpty())
+        {
+            std::unique_ptr<Symbol> classGroupSymbol = classGroup->RemoveFromParent();
+        }
+    }
+    return symbol;
 }
 
 struct ClassInfo

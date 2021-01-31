@@ -31,6 +31,8 @@ class Module;
 class FunctionSymbol;
 class TypeSymbol;
 class ConceptSymbol;
+class TypedefSymbol;
+class ConstantSymbol;
 
 struct TypeOrConceptRequest
 {
@@ -149,13 +151,15 @@ public:
     void EndClassDelegate();
     void BeginConcept(ConceptNode& conceptNode, bool hasSource);
     void EndConcept();
+    void BeginAxiom(AxiomNode& axiomNode);
+    void EndAxiom();
     void BeginDeclarationBlock(Node& node);
     void EndDeclarationBlock();
     void AddLocalVariable(ConstructionStatementNode& constructionStatementNode);
     void AddLocalVariable(IdentifierNode& identifierNode);
-    void AddTypedef(TypedefNode& typedefNode);
-    void AddConstant(ConstantNode& constantNode);
-    void AddGlobalVariable(GlobalVariableNode& globalVariableNode);
+    TypedefSymbol* AddTypedef(TypedefNode& typedefNode);
+    ConstantSymbol* AddConstant(ConstantNode& constantNode);
+    GlobalVariableSymbol* AddGlobalVariable(GlobalVariableNode& globalVariableNode);
     void BeginEnumType(EnumTypeNode& enumTypeNode);
     void EndEnumType();
     void AddEnumConstant(EnumConstantNode& enumConstantNode);
@@ -201,6 +205,7 @@ public:
     std::vector<TypeSymbol*> Types() const;
     void Copy(const SymbolTable& that);
     ClassTypeSymbol* CurrentClass() { return currentClass; }
+    InterfaceTypeSymbol* CurrentInterface() { return currentInterface; }
     void SetCurrentClass(ClassTypeSymbol* currentClass_) { currentClass = currentClass_; }
     void SetCurrentFunctionSymbol(FunctionSymbol* currentFunctionSymbol_) { currentFunctionSymbol = currentFunctionSymbol_; }
     void MapProfiledFunction(const boost::uuids::uuid& functionId, const std::u32string& profiledFunctionName);
@@ -222,15 +227,29 @@ public:
     void Check();
     FunctionSymbol* GetCreatedFunctionSymbol() { return createdFunctionSymbol; }
     void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
+    void ResetCursorContainer() { cursorContainer = nullptr; }
+    ContainerSymbol* CursorContainer() const { return cursorContainer; }
+    void SetCursorContainer(const sngcm::ast::Node& node);
+    int NextAxiomNumber() { return axiomNumber++; }
+    void ResetAxiomNumber() { axiomNumber = 0; }
+    void ResetAliasNodesAndNamespaceImports();
+    void ResetMainFunctionSymbol() { mainFunctionSymbol = nullptr; }
+    const std::vector<AliasNode*>& AliasNodes() const { return aliasNodes; }
+    void AddAliasNode(AliasNode* aliasNode) { aliasNodes.push_back(aliasNode); }
+    const std::vector<NamespaceImportNode*>& NamespaceImports() const { return namespaceImports; }
+    void AddNamespaceImport(NamespaceImportNode* namespaceImport) { namespaceImports.push_back(namespaceImport); }
 private:
     Module* module;
     std::vector<boost::uuids::uuid> derivationIds;
     std::vector<boost::uuids::uuid> positionIds;
     NamespaceSymbol globalNs;
+    std::vector<AliasNode*> aliasNodes;
+    std::vector<NamespaceImportNode*> namespaceImports;
     std::unordered_map<IdentifierNode*, Symbol*> identifierSymbolDefinitionMap;
     std::map<SymbolLocation, SymbolLocation> symbolDefinitionMap;
     CompileUnitNode* currentCompileUnit;
     ContainerSymbol* container;
+    ContainerSymbol* cursorContainer;
     ClassTypeSymbol* currentClass;
     std::stack<ClassTypeSymbol*> currentClassStack;
     InterfaceTypeSymbol* currentInterface;
@@ -241,6 +260,7 @@ private:
     FunctionSymbol* createdFunctionSymbol;
     int parameterIndex;
     int declarationBlockIndex;
+    int axiomNumber;
     std::unordered_map<NamespaceSymbol*, NamespaceSymbol*> nsMap;
     std::unordered_map<Node*, Symbol*> nodeSymbolMap;
     std::unordered_map<Symbol*, Node*> symbolNodeMap;

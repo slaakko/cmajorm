@@ -1,0 +1,41 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/BasicType.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowBasicTypeParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    BasicType(boost::uuids::uuid* moduleId) : Node*
+        ::= BOOL{ BoolNode* node = new BoolNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   SBYTE{ SByteNode* node = new SByteNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   BYTE{ ByteNode* node = new ByteNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   SHORT{ ShortNode* node = new ShortNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   USHORT{ UShortNode* node = new UShortNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   INT{ IntNode* node = new IntNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   UINT{ UIntNode* node = new UIntNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   LONG{ LongNode* node = new LongNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   ULONG{ ULongNode* node = new ULongNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   FLOAT{ FloatNode* node = new FloatNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   DOUBLE{ DoubleNode* node = new DoubleNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   CHAR{ CharNode* node = new CharNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   WCHAR{ WCharNode* node = new WCharNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   UCHAR{ UCharNode* node = new UCharNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   VOID{ VoidNode* node = new VoidNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }
+        ;
+
+    ruleinfo
+    {
+        (BasicType, "basic type")
+    }
+}

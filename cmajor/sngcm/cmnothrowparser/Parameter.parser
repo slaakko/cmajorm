@@ -1,0 +1,42 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Parameter.hpp>
+[hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
+[cpp]#include <sngcm/cmnothrowparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Identifier.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowParameterParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowIdentifierParser.Identifier;
+
+    ParameterList(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::Node* owner) 
+        ::= LPAREN (Parameter(moduleId, ctx):param{ owner->AddParameter(param); } % COMMA)? RPAREN!
+        ;
+
+    Parameter(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : ParameterNode*
+        ::= (TypeExpr(moduleId, ctx):type{ s = span; } (Identifier(moduleId):id{ s.end = span.end; })?)
+        { 
+            ParameterNode* node = new ParameterNode(s, *moduleId, type, id); 
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    ruleinfo
+    {
+        (ParameterList, "parameter list"), (Parameter, "parameter")
+    }
+}

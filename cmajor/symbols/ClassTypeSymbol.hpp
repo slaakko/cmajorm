@@ -31,6 +31,8 @@ public:
     void* IrType(Emitter& emitter) override;
     void* CreateDefaultIrValue(Emitter& emitter) override;
     void AddClass(ClassTypeSymbol* classTypeSymbol);
+    void RemoveClass(ClassTypeSymbol* classTypeSymbol);
+    bool IsEmpty() const;
     ClassTypeSymbol* GetClass(int arity) const;
     bool HasProjectMembers() const override;
     void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const override;
@@ -203,6 +205,8 @@ public:
     std::u32string Info() const override { return groupName; }
     const char* ClassName() const override { return "ClassTypeSymbol"; }
     void Check() override;
+    void SetClassGroup(ClassGroupTypeSymbol* classGroup_) { classGroup = classGroup_; }
+    std::unique_ptr<Symbol> RemoveFromParent() override;
 private:
     std::u32string groupName;
     int minArity;
@@ -231,6 +235,7 @@ private:
     std::unique_ptr<ClassNode> classNode;
     std::unique_ptr<ConstraintNode> constraint;
     ClassTemplateSpecializationSymbol* prototype;
+    ClassGroupTypeSymbol* classGroup;
     void InitVmt(std::vector<FunctionSymbol*>& vmtToInit);
     void* CreateImt(Emitter& emitter, int index);
     void* CreateImts(Emitter& emitter);

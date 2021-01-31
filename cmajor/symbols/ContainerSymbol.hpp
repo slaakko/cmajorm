@@ -23,6 +23,7 @@ public:
     void Read(SymbolReader& reader) override;
     virtual void AddMember(Symbol* member);
     void AddOwnedMember(Symbol* ownedMember);
+    std::unique_ptr<Symbol> RemoveMember(int symbolIndex) override;
     void Accept(SymbolCollector* collector) override;
     void Clear();
     std::string TypeString() const override { return "container"; }

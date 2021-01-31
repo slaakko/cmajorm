@@ -15,6 +15,26 @@
 
 namespace soulng { namespace lexer {
 
+enum class LexerFlags : int8_t
+{
+    none = 0, cursorSeen = 1 << 0
+};
+
+inline LexerFlags operator|(LexerFlags left, LexerFlags right)
+{
+    return static_cast<LexerFlags>(static_cast<int8_t>(left) | static_cast<int8_t>(right));
+}
+
+inline LexerFlags operator&(LexerFlags left, LexerFlags right)
+{
+    return static_cast<LexerFlags>(static_cast<int8_t>(left) & static_cast<int8_t>(right));
+}
+
+inline LexerFlags operator~(LexerFlags flag)
+{
+    return static_cast<LexerFlags>(~static_cast<int8_t>(flag));
+}
+
 class SOULNG_LEXER_API Lexer
 {
 public:
@@ -43,6 +63,8 @@ public:
     std::u32string ErrorLines(const Span& span) const;
     void GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) const;
     void ThrowExpectationFailure(const Span& span, const std::u32string& name);
+    void AddError(const Span& span, const std::u32string& name);
+    const std::vector<std::exception>& Errors() const { return errors; }
     const char32_t* Start() const { return start; }
     const char32_t* End() const { return end; }
     const char32_t* Pos() const { return pos; }
@@ -51,6 +73,12 @@ public:
     std::u32string RestOfLine(int maxLineLength);
     void SetSeparatorChar(char32_t separatorChar_) { separatorChar = separatorChar_; }
     TokenLine TokenizeLine(const std::u32string& line, int lineNumber, int startState);
+    void SetSyncTokens(const std::vector<int>& syncTokens_);
+    void Synchronize();
+    LexerFlags Flags() const { return flags; }
+    bool GetFlag(LexerFlags flag) const { return (flags & flag) != LexerFlags::none; }
+    void SetFlag(LexerFlags flag) { flags = flags | flag; }
+    void ResetFlag(LexerFlags flag) { flags = flags & ~flag; }
 protected:
     Lexeme lexeme;
     int32_t line;
@@ -64,9 +92,13 @@ private:
     const char32_t* pos;
     std::vector<Token> tokens;
     std::vector<Token>::iterator current;
+    std::vector<std::exception> errors;
+    std::vector<int> syncTokens;
     ParsingLog* log;
     bool countLines;
     char32_t separatorChar;
+    LexerFlags flags;
+    void* cursorNode;
     void NextToken();
 };
 

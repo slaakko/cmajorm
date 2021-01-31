@@ -4,3 +4,7 @@
 // =================================
 
 #include <soulng/parser/Match.hpp>
+
+namespace soulng { namespace parser {
+
+} } // namespace soulng::parser;

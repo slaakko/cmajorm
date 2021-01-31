@@ -468,6 +468,58 @@ int64_t GetCurrentTime()
     return currentTime;
 }
 
+int64_t Hours(int64_t nanosecs) 
+{
+    return nanosecs / (3600ll * int64_t(1000000000ll));
+}
+
+int64_t Minutes(int64_t nanosecs)
+{
+    return nanosecs / (60ll * int64_t(1000000000ll));
+}
+
+int64_t Seconds(int64_t nanosecs) 
+{
+    return nanosecs / int64_t(1000000000ll);
+}
+
+int64_t Milliseconds(int64_t nanosecs) 
+{
+    return nanosecs / int64_t(1000000ll);
+}
+
+int64_t Microseconds(int64_t nanosecs) 
+{
+    return nanosecs / int64_t(1000ll);
+}
+
+std::string DurationStr(const std::chrono::nanoseconds& duration)
+{
+    std::string s;
+    int64_t hh = Hours(duration.count()) % 24;
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(hh / 10 % 10)));
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(hh % 10)));
+    s.append(1, ':');
+    int64_t mm = Minutes(duration.count()) % 60;
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(mm / 10 % 10)));
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(mm % 10)));
+    s.append(1, ':');
+    int64_t ss = Seconds(duration.count()) % 60;
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(ss / 10 % 10)));
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(ss % 10)));
+    s.append(1, '.');
+    int64_t ms = Milliseconds(duration.count()) % 1000;
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(ms / 100 % 10)));
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(ms / 10 % 10)));
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(ms % 10)));
+    s.append(1, '.');
+    int64_t us = Microseconds(duration.count()) % 1000;
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(us / 100 % 10)));
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(us / 10 % 10)));
+    s.append(1, static_cast<char>(static_cast<uint8_t>('0') + static_cast<uint8_t>(us % 10)));
+    return s;
+}
+
 void TimeInit()
 {
     TimestampProvider::Init();

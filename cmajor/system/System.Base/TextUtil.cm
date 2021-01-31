@@ -19,7 +19,7 @@ namespace System
         }
         return s.Substring(b, e - b + 1);
     }
-    
+
     public wstring Trim(const wstring& s)
     {
         return ToUtf16(Trim(ToUtf32(s)));
@@ -39,7 +39,7 @@ namespace System
         }
         return s.Substring(b, e - b + 1);
     }
-    
+
     public string TrimAll(const string& s)
     {
         string result;
@@ -84,12 +84,12 @@ namespace System
         }
         return result;
     }
-    
+
     public wstring TrimAll(const wstring& s)
     {
         return ToUtf16(TrimAll(ToUtf32(s)));
     }
-    
+
     public ustring TrimAll(const ustring& s)
     {
         ustring result;
@@ -99,9 +99,9 @@ namespace System
         {
             switch (state)
             {
-                case 0: 
+                case 0:
                 {
-                    if (!IsWhiteSpace(c)) 
+                    if (!IsWhiteSpace(c))
                     {
                         result.Append(c);
                         state = 1;
@@ -134,22 +134,22 @@ namespace System
         }
         return result;
     }
-    
+
     public nothrow string HexEscape(char c)
     {
         return "\\x" + ToHexString(cast<byte>(c));
     }
-    
+
     public nothrow string HexEscape(wchar c)
     {
         return "\\x" + ToHexString(cast<ushort>(c));
     }
-    
+
     public nothrow string HexEscape(uchar c)
     {
         return "\\x" + ToHexString(cast<uint>(c));
     }
-    
+
     public nothrow string CharStr(char c)
     {
         switch (c)
@@ -179,7 +179,7 @@ namespace System
         }
         return string();
     }
-    
+
     public nothrow string MakeCharLiteral(char c)
     {
         if (c == '"')
@@ -188,8 +188,8 @@ namespace System
         }
         return "'" + CharStr(c) + "'";
     }
-    
-    
+
+
     public wstring CharStr(wchar c)
     {
         switch (c)
@@ -218,8 +218,8 @@ namespace System
             }
         }
         return wstring();
-    }   
-    
+    }
+
     public ustring CharStr(uchar c)
     {
         switch (c)
@@ -248,8 +248,8 @@ namespace System
             }
         }
         return ustring();
-    }   
-    
+    }
+
     public nothrow string StringStr(const string& s)
     {
         string result;
@@ -266,7 +266,7 @@ namespace System
         }
         return result;
     }
-    
+
     public ustring StringStr(const ustring& s)
     {
         ustring result;
@@ -291,7 +291,7 @@ namespace System
         result.Append('"');
         return result;
     }
-    
+
     public ustring MakeStringLiteral(const ustring& s)
     {
         ustring result = u"\"";
@@ -299,7 +299,107 @@ namespace System
         result.Append(u'"');
         return result;
     }
-    
+
+    public nothrow string Unescape(const string& stringStr)
+    {
+        string result;
+        int state = 0;
+        for (char c : stringStr)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (c == '\\')
+                    {
+                        state = 1;
+                    }
+                    else
+                    {
+                        result.Append(c);
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    switch (c)
+                    {
+                        case '\\':
+                        case '"':
+                        case '\'':
+                        {
+                            result.Append(c);
+                            break;
+                        }
+                        case 'n':
+                        {
+                            result.Append("\n");
+                            break;
+                        }
+                        default:
+                        {
+                            result.Append('\\').Append(c);
+                            break;
+                        }
+                    }
+                    state = 0;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public nothrow ustring Unescape(const ustring& stringStr)
+    {
+        ustring result;
+        int state = 0;
+        for (uchar c : stringStr)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (c == '\\')
+                    {
+                        state = 1;
+                    }
+                    else
+                    {
+                        result.Append(c);
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    switch (c)
+                    {
+                        case '\\':
+                        case '"':
+                        case '\'':
+                        {
+                            result.Append(c);
+                            break;
+                        }
+                        case 'n':
+                        {
+                            result.Append('\n');
+                            break;
+                        }
+                        default:
+                        {
+                            result.Append('\\').Append(c);
+                            break;
+                        }
+                    }
+                    state = 0;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     public enum FormatWidth
     {
         exact, min
@@ -309,7 +409,7 @@ namespace System
     {
         left, right
     }
-    
+
     public nothrow string Format(const string& s, int width)
     {
         return Format(s, width, FormatWidth.exact, FormatJustify.left);

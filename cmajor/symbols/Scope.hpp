@@ -50,6 +50,8 @@ public:
     virtual ~Scope();
     virtual Symbol* Lookup(const std::u32string& name) const = 0;
     virtual Symbol* Lookup(const std::u32string& name, ScopeLookup lookup) const = 0;
+    virtual std::vector<Symbol*> LookupBeginWith(const std::u32string& prefix) const = 0;
+    virtual std::vector<Symbol*> LookupBeginWith(const std::u32string& prefix, ScopeLookup lookup) const = 0;
 };
 
 class SYMBOLS_API ContainerScope : public Scope
@@ -62,20 +64,24 @@ public:
     ContainerSymbol* Container() { return container; }
     void SetContainer(ContainerSymbol* container_) { container = container_; }
     void Install(Symbol* symbol);
+    void Uninstall(Symbol* symbol);
     Symbol* Lookup(const std::u32string& name) const override;
     Symbol* Lookup(const std::u32string& name, ScopeLookup lookup) const override;
     Symbol* LookupQualified(const std::vector<std::u32string>& components, ScopeLookup lookup) const;
+    std::vector<Symbol*> LookupBeginWith(const std::u32string& prefix) const override;
+    std::vector<Symbol*> LookupBeginWith(const std::u32string& prefix, ScopeLookup lookup) const override;
+    std::vector<Symbol*> LookupQualifiedBeginWith(const std::vector<std::u32string>& components, ScopeLookup lookup) const;
     const NamespaceSymbol* Ns() const;
     NamespaceSymbol* Ns();
     void Clear();
     NamespaceSymbol* CreateNamespace(const std::u32string& qualifiedNsName, const Span& span, const boost::uuids::uuid& sourceModuleId);
     void CollectViableFunctions(int arity, const std::u32string& groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ScopeLookup scopeLookup, 
         ViableFunctionSet& viableFunctions, Module* module);
-    const std::unordered_map<std::u32string, Symbol*>& SymbolMap() const { return symbolMap; }
+    const std::map<std::u32string, Symbol*>& SymbolMap() const { return symbolMap; }
 private:
     ContainerSymbol* container;
     ContainerScope* parentScope;
-    std::unordered_map<std::u32string, Symbol*> symbolMap;
+    std::map<std::u32string, Symbol*> symbolMap;
 };
 
 class SYMBOLS_API FileScope : public Scope
@@ -87,11 +93,13 @@ public:
     void InstallNamespaceImport(ContainerScope* containerScope, NamespaceImportNode* namespaceImportNode);
     Symbol* Lookup(const std::u32string& name) const override;
     Symbol* Lookup(const std::u32string& name, ScopeLookup lookup) const override;
+    std::vector<Symbol*> LookupBeginWith(const std::u32string& prefix) const override;
+    std::vector<Symbol*> LookupBeginWith(const std::u32string& prefix, ScopeLookup lookup) const override;
     void CollectViableFunctions(int arity, const std::u32string&  groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ViableFunctionSet& viableFunctions,
         Module* module);
 private:
     std::vector<ContainerScope*> containerScopes;
-    std::unordered_map<std::u32string, Symbol*> aliasSymbolMap;
+    std::map<std::u32string, Symbol*> aliasSymbolMap;
 };
 
 } } // namespace cmajor::symbols

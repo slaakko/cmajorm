@@ -61,6 +61,14 @@ namespace Cm.Views
         {
             sourceCodeView->ResetDirty();
         }
+        public nothrow override bool IsCCDirty() const
+        {
+            return sourceCodeView->IsCCDirty();
+        }
+        public nothrow override void ResetCCDirty()
+        {
+            sourceCodeView->ResetCCDirty();
+        }
         public nothrow override void Select()
         {
             sourceCodeView->Select();

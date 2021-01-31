@@ -10,6 +10,7 @@
 #include <cmajor/symbols/FileIndex.hpp>
 #include <cmajor/symbols/FunctionIndex.hpp>
 #include <cmajor/symbols/TypeIndex.hpp>
+#include <cmajor/symbols/Sources.hpp>
 #include <cmajor/cmdebug/Container.hpp>
 #include <cmajor/cmdebug/DebugInfo.hpp>
 #ifdef _WIN32
@@ -53,7 +54,8 @@ const uint8_t moduleFormat_11 = uint8_t('B');
 const uint8_t moduleFormat_12 = uint8_t('C');
 const uint8_t moduleFormat_13 = uint8_t('D');
 const uint8_t moduleFormat_14 = uint8_t('E');
-const uint8_t currentModuleFormat = moduleFormat_14;
+const uint8_t moduleFormat_15 = uint8_t('F');
+const uint8_t currentModuleFormat = moduleFormat_15;
 
 enum class ModuleFlags : uint8_t
 {
@@ -78,6 +80,8 @@ inline ModuleFlags operator~(ModuleFlags flags)
 std::string ModuleFlagStr(ModuleFlags flags);
 
 class Module;
+class Sources;
+struct ParseResult;
 
 class SYMBOLS_API ModuleDependency
 {
@@ -224,6 +228,10 @@ public:
     int32_t GetFileIndexForFilePath(const std::string& filePath) const;
     void UpdateSourceFileModuleMap();
     std::recursive_mutex& Lock() { return lock; }
+    void SetSources(Sources* sources_) { sources.reset(sources_); }
+    Sources* GetSources() const { return sources.get(); }
+    ParseResult ParseSources();
+    ParseResult ParseSource(const std::string& sourceFilePath, const std::u32string& sourceCode);
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -277,6 +285,7 @@ private:
     FunctionIndex functionIndex;
     TypeIndex typeIndex;
     SourceFileCache sourceFileCache;
+    std::unique_ptr<Sources> sources;
     void CheckUpToDate();
 };
 

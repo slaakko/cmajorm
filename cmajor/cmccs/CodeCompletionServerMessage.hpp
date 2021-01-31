@@ -48,6 +48,9 @@ public:
     LoadEditModuleRequest(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
 public:
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
 };
 
 class LoadEditModuleReply : public CodeCompletionReply
@@ -57,6 +60,61 @@ public:
     LoadEditModuleReply(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
 public:
+    std::string key;
+    std::string result;
+    std::string error;
+    time_point startLoading;
+    time_point startParsing;
+    time_point endParsing;
+    time_point endLoading;
+};
+
+class ResetEditModuleCacheRequest : public CodeCompletionRequest
+{
+public:
+    ResetEditModuleCacheRequest();
+    ResetEditModuleCacheRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+public:
+};
+
+class ResetEditModuleCacheReply : public CodeCompletionReply
+{
+public:
+    ResetEditModuleCacheReply();
+    ResetEditModuleCacheReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+public:
+    std::string result;
+    std::string error;
+};
+
+class ParseSourceRequest : public CodeCompletionRequest
+{
+public:
+    ParseSourceRequest();
+    ParseSourceRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+public:
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+    std::string sourceFilePath;
+    std::u32string sourceCode;
+};
+
+class ParseSourceReply : public CodeCompletionReply
+{
+public:
+    ParseSourceReply();
+    ParseSourceReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+public:
+    bool ok;
+    std::string error;
+    std::vector<std::string> errors;
+    time_point startParsing;
+    time_point endParsing;
 };
 
 class StopRequest : public CodeCompletionRequest

@@ -6,6 +6,7 @@
 #ifndef SNGCM_AST_NODE_INCLUDED
 #define SNGCM_AST_NODE_INCLUDED
 #include <sngcm/ast/AstApi.hpp>
+#include <soulng/lexer/Lexer.hpp>
 #include <soulng/lexer/Span.hpp>
 #include <sngcm/ast/Clone.hpp>
 #include <sngcm/ast/Specifier.hpp>
@@ -88,11 +89,14 @@ public:
     Node* Parent() { return parent; }
     void SetParent(Node* parent_);
     const boost::uuids::uuid& ModuleId() const { return moduleId; }
+    void SetLexerFlags(soulng::lexer::LexerFlags lexerFlags_) { lexerFlags = lexerFlags_; }
+    LexerFlags GetLexerFlags() const { return lexerFlags; }
 private:
     NodeType nodeType;
     Span span;
     boost::uuids::uuid moduleId;
     Node* parent;
+    soulng::lexer::LexerFlags lexerFlags;
 };
 
 class SNGCM_AST_API UnaryNode : public Node

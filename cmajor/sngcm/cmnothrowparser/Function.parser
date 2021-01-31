@@ -1,0 +1,98 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Function.hpp>
+[hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Attribute.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Specifier.hpp>
+[cpp]#include <sngcm/cmnothrowparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Concept.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Identifier.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Template.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Parameter.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Statement.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowFunctionParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowAttributeParser.Attributes;
+    using NothrowSpecifierParser.Specifiers;
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowTemplateParser.TemplateParameterList;
+    using NothrowConceptParser.WhereConstraint;
+    using NothrowParameterParser.ParameterList;
+    using NothrowIdentifierParser.Identifier;
+    using NothrowStatementParser.CompoundStatement;
+
+    Function(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var Span specifierSpan) : FunctionNode*
+        ::= empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(moduleId, ctx):returnType FunctionGroupId(moduleId, ctx):functionGroupId
+        {
+            s.end = span.end;
+            fun.reset(new FunctionNode(s, *moduleId, specifiers, returnType, functionGroupId, attrs));
+            fun->SetSpecifierSpan(specifierSpan);
+            fun->SetGroupIdSpan(span);
+        }
+        TemplateParameterList(moduleId, ctx, fun.get()):templateParams?
+        ParameterList(moduleId, ctx, fun.get()):paramList
+        (WhereConstraint(moduleId, ctx):constraint{ fun->SetConstraint(constraint); })?
+        (CompoundStatement(moduleId, ctx):body{ fun->SetBody(body); } | SEMICOLON)
+        {
+            fun->SetLexerFlags(lexer.Flags());
+            return fun.release();
+        }
+        ;
+
+    FunctionGroupId(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : std::u32string
+        ::= ID{ return lexer.GetMatch(span); }
+        |   OperatorFunctionGroupId(moduleId, ctx):operatorFunctionGroupId{ return operatorFunctionGroupId; }
+        ;
+
+    OperatorFunctionGroupId(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : std::u32string
+        ::= empty{ lexer.parsingOperatorFunctionGroupId = true; }
+        (   OPERATOR
+            (   ((LANGLE LANGLE) - (LANGLE LANGLE (TypeExpr(moduleId, ctx):typeExpr % COMMA) RANGLE)){ lexer.parsingOperatorFunctionGroupId = false; return U"operator<<"; }
+            |   SHIFTRIGHT{ lexer.parsingOperatorFunctionGroupId = false; return U"operator>>"; }
+            |   EQ{ lexer.parsingOperatorFunctionGroupId = false; return U"operator=="; }
+            |   ASSIGN{ lexer.parsingOperatorFunctionGroupId = false; return U"operator="; }
+            |   LANGLE{ lexer.parsingOperatorFunctionGroupId = false; return U"operator<"; }
+            |   ARROW{ lexer.parsingOperatorFunctionGroupId = false; return U"operator->"; }
+            |   PLUSPLUS{ lexer.parsingOperatorFunctionGroupId = false; return U"operator++"; }
+            |   MINUSMINUS{ lexer.parsingOperatorFunctionGroupId = false; return U"operator--"; }
+            |   PLUS{ lexer.parsingOperatorFunctionGroupId = false; return U"operator+"; }
+            |   MINUS{ lexer.parsingOperatorFunctionGroupId = false; return U"operator-"; }
+            |   STAR{ lexer.parsingOperatorFunctionGroupId = false; return U"operator*"; }
+            |   DIV{ lexer.parsingOperatorFunctionGroupId = false; return U"operator/"; }
+            |   REM{ lexer.parsingOperatorFunctionGroupId = false; return U"operator%"; }
+            |   AMP{ lexer.parsingOperatorFunctionGroupId = false; return U"operator&"; }
+            |   BITOR{ lexer.parsingOperatorFunctionGroupId = false; return U"operator|"; }
+            |   BITXOR{ lexer.parsingOperatorFunctionGroupId = false; return U"operator^"; }
+            |   EXCLAMATION{ lexer.parsingOperatorFunctionGroupId = false; return U"operator!"; }
+            |   CPL{ lexer.parsingOperatorFunctionGroupId = false; return U"operator~"; }
+            |   LBRACKET RBRACKET{ lexer.parsingOperatorFunctionGroupId = false; return U"operator[]"; }
+            |   LPAREN RPAREN{ lexer.parsingOperatorFunctionGroupId = false; return U"operator()"; }
+            )
+        )
+        {
+            lexer.parsingOperatorFunctionGroupId = false;
+        }
+        /
+        {
+            lexer.parsingOperatorFunctionGroupId = false;
+        }
+        ;
+
+    ruleinfo
+    {
+        (Function, "function"), (FunctionGroupId, "function group identifier"), (OperatorFunctionGroupId, "operator function group identifier")
+    }
+}

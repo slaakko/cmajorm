@@ -1,0 +1,39 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Identifier.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowIdentifierParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    Identifier(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= ID{ IdentifierNode* node = new IdentifierNode(span, *moduleId, lexer.GetToken(pos)); node->SetLexerFlags(lexer.Flags()); return node; }
+        ;
+
+    QualifiedId(boost::uuids::uuid* moduleId, var std::u32string value, var Span s) : IdentifierNode*
+        ::=
+        (   ID{ s = span; Token token = lexer.GetToken(pos); value.append(std::u32string(token.match.begin, token.match.end)); }
+            (DOT ID{ s.end = span.end; Token token = lexer.GetToken(pos); value.append(1, '.'); value.append(std::u32string(token.match.begin, token.match.end)); })*
+        )
+        {
+            IdentifierNode* node = new IdentifierNode(s, *moduleId, value);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    ruleinfo
+    {
+        (Identifier, "identifier"), (QualifiedId, "identifier")
+    }
+}

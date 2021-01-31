@@ -1,0 +1,104 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace cmcode
+{
+    public nothrow bool IsValidParsingFrequency(const string& text)
+    {
+        if (text.IsEmpty()) return false;
+        int frequency = 0;
+        if (!ParseInt(text, frequency))
+        {
+            return false;
+        }
+        if (frequency < 1 || frequency > 100)
+        {
+            return false;
+        }
+        return true;
+    }
+    
+    public class OptionsDialog : Window
+    {
+        public OptionsDialog() : base("cmcode.OptionsDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(),
+            "Options", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(160), ScreenMetrics.Get().MMToVerticalPixels(100)), Dock.none, Anchors.none,
+            WindowState.normal)
+        {
+            Size s = GetSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            int borderWidth = DefaultSingleBorderWidth();
+
+            UniquePtr<GroupBox> groupBoxPtr(new GroupBox("Editor", Point(16, 16),
+                Size(ScreenMetrics.Get().MMToHorizontalPixels(120), ScreenMetrics.Get().MMToVerticalPixels(40)),
+                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            UniquePtr<CheckBox> useCodeCompletionCheckBoxPtr(new CheckBox("Use code completion", Point(16, 24), Size(0, 0), Dock.none, Anchors.none, true));
+            useCodeCompletionCheckBox = useCodeCompletionCheckBoxPtr.Get();
+            groupBoxPtr->AddChild(useCodeCompletionCheckBoxPtr.Release());
+            UniquePtr<Label> codeCompletionFrequencyLabelPtr(new Label("Source code parsing frequency for code completion (seconds):", Point(16, 24 + 24), defaultLabelSize, Dock.none,
+                Anchors.none, true));
+            groupBoxPtr->AddChild(codeCompletionFrequencyLabelPtr.Release());
+            UniquePtr<TextBox> parsingFrequencyTextBoxPtr(new TextBox("1",
+                Point(17, 24 + 24 + 25),
+                Size(ScreenMetrics.Get().MMToHorizontalPixels(20), ScreenMetrics.Get().MMToHorizontalPixels(5)), Dock.none, Anchors.none));
+            parsingFrequencyTextBox = parsingFrequencyTextBoxPtr.Get();
+            parsingFrequencyTextBox->TextChangedEvent().AddHandler(ParsingFrequencyTextBoxTextChanged);
+            UniquePtr<Control> borderedTextBox(new BorderedControl(
+                parsingFrequencyTextBoxPtr.Release(), Point(16, 24 + 24 + 24),
+                Size(ScreenMetrics.Get().MMToHorizontalPixels(20) + 2, ScreenMetrics.Get().MMToHorizontalPixels(5) + 2),
+                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            groupBoxPtr->AddChild(borderedTextBox.Release());
+            AddChild(groupBoxPtr.Release());
+
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            okButton = okButtonPtr.Get();
+            okButton->SetDialogResult(DialogResult.ok);
+            AddChild(okButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(okButton);
+            SetCancelButton(cancelButton);
+        }
+        public void SetEditorSettings(const EditorSettings& editorSettings)
+        {
+            useCodeCompletionCheckBox->SetChecked(editorSettings.useCodeCompletion);
+            parsingFrequencyTextBox->SetText(ToString(editorSettings.parsingFrequency));
+        }
+        public nothrow EditorSettings GetEditorSettings()
+        {
+            EditorSettings editorSettings;
+            editorSettings.useCodeCompletion = useCodeCompletionCheckBox->Checked();
+            editorSettings.parsingFrequency = ParseInt(parsingFrequencyTextBox->Text());
+            return editorSettings;
+        }
+        private void ParsingFrequencyTextBoxTextChanged()
+        {
+            if (IsValidParsingFrequency(parsingFrequencyTextBox->Text()))
+            {
+                okButton->Enable();
+            }
+            else
+            {
+                okButton->Disable();
+            }
+        }
+        private Button* okButton;
+        private Button* cancelButton;
+        private CheckBox* useCodeCompletionCheckBox;
+        private TextBox* parsingFrequencyTextBox; 
+    }
+}

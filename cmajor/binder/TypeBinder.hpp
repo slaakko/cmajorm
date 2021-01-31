@@ -89,6 +89,9 @@ public:
     void SetCurrentFunctionSymbol(FunctionSymbol* currentFunctionSymbol_) { currentFunctionSymbol = currentFunctionSymbol_; }
     void CreateMemberSymbols();
     BoundGlobalVariable* GetBoundGlobalVariable() const { return boundGlobalVariable; }
+
+    void SetEditMode() { editMode = true; }
+    std::vector<std::string> Errors() const { return errors; }
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
@@ -101,6 +104,8 @@ private:
     std::stack<bool> conditionalCompilationStack;
     TypeResolverFlags typeResolverFlags;
     BoundGlobalVariable* boundGlobalVariable;
+    bool editMode;
+    std::vector<std::string> errors;
 };
 
 } } // namespace cmajor::binder

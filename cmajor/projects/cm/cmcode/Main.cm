@@ -9,6 +9,7 @@ using System.IO;
 using System.Windows;
 using System.RegularExpressions;
 using System.Threading;
+using System.Xml.Serialization;
 using Cm.Service;
 using Cm.Service.Build;
 using Cm.Service.Debug;
@@ -151,6 +152,10 @@ namespace cmcode
 
     public const uint WM_CODE_COMPLETION_REPLY = WM_USER;
     public const uint WM_CODE_COMPLETION_SERVICE_FETCH_LOG_MESSAGES = WM_USER + 1u;
+    public const uint saveConfigurationTimerId = 1u;
+    public const uint startCodeCompletionServiceTimerId = 2u;
+    public const uint startCodeCompletionServiceDelay = 1000u;
+    public const uint codeCompletionParseTimerId = 3u;
 
     class MainWindow : Window
     {
@@ -239,6 +244,10 @@ namespace cmcode
             searchMenuItem->ClickEvent().AddHandler(SearchClick);
             searchMenuItem->Disable();
             editMenuItem->AddMenuItem(searchMenuItemPtr.Release());
+            UniquePtr<MenuItem> optionsMenuItemPtr(new MenuItem("&Options..."));
+            optionsMenuItem = optionsMenuItemPtr.Get();
+            optionsMenuItem->ClickEvent().AddHandler(OptionsClick);
+            editMenuItem->AddMenuItem(optionsMenuItemPtr.Release());
             menuBar->AddMenuItem(editMenuItem.Release());
 
             UniquePtr<MenuItem> viewMenuItem(new MenuItem("&View"));
@@ -612,6 +621,8 @@ namespace cmcode
             statusBar->AddItem(sourceFilePathStatusBarItem);
             dirtyStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
             statusBar->AddItem(dirtyStatusBarItem);
+            ccdirtyStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
+            statusBar->AddItem(ccdirtyStatusBarItem);
             caretLineStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
             statusBar->AddItem(caretLineStatusBarItem);
             caretColumnStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
@@ -620,7 +631,13 @@ namespace cmcode
             SetControlStatus(UserInterfaceAction.none);
             MainConfiguration.Instance().SetMainWindowLocation(Location());
             MainConfiguration.Instance().SetMainWindowSize(GetSize());
-            SetTimer(1u, defaultConfigSaveTimerPeriod);
+            SetTimer(saveConfigurationTimerId, defaultConfigSaveTimerPeriod);
+            SetTimer(startCodeCompletionServiceTimerId, startCodeCompletionServiceDelay);
+            int parsingFrequency = MainConfiguration.Instance().GetEditorSettings().parsingFrequency;
+            if (parsingFrequency > 0)
+            {
+                SetTimer(codeCompletionParseTimerId, cast<uint>(parsingFrequency) * 1000u);
+            }
             outputTabPage->Select();
             if (!filePath.IsEmpty())
             {
@@ -670,7 +687,33 @@ namespace cmcode
         {
             try
             {
-                MainConfiguration.Instance().Save(false);
+                switch (args.timerId)
+                {
+                    case saveConfigurationTimerId:
+                    {
+                        MainConfiguration.Instance().Save(false);
+                        break;
+                    }
+                    case startCodeCompletionServiceTimerId:
+                    {
+                        KillTimer(startCodeCompletionServiceTimerId);
+                        const EditorSettings& editorSettings = MainConfiguration.Instance().GetEditorSettings();
+                        if (editorSettings.useCodeCompletion)
+                        {
+                            GetCodeCompletionService();
+                        }
+                        break;
+                    }
+                    case codeCompletionParseTimerId:
+                    {
+                        const EditorSettings& editorSettings = MainConfiguration.Instance().GetEditorSettings();
+                        if (editorSettings.useCodeCompletion)
+                        {
+                            CodeCompletionParse();
+                        }
+                        break;
+                    }
+                }
             }
             catch (const Exception& ex)
             {
@@ -1053,6 +1096,7 @@ namespace cmcode
                         else
                         {
                             AddCmajorEditor(data->fileName, data->key, data->filePath);
+                            LoadEditModule(data->project->FilePath());
                         }
                     }
                     else if (ext == ".xml")
@@ -1190,6 +1234,7 @@ namespace cmcode
                     {
                         return;
                     }
+                    ResetEditModuleCache();
                     OpenProject(solutionFilePath);
                 }
             }
@@ -1312,6 +1357,7 @@ namespace cmcode
                         filePath = Path.Combine(currentDirectory, fileNames[0]);
                     }
                     ResetFocusedControl();
+                    ResetEditModuleCache();
                     OpenProject(GetFullPath(filePath));
                     Invalidate();
                 }
@@ -1371,6 +1417,7 @@ namespace cmcode
         }
         private void CloseSolutionClick()
         {
+            ResetEditModuleCache();
             CloseSolution();
         }
         private void AddFilePathsToProject(const string& newSourceFilePath, const string& newResourceFilePath, const string& newTextFilePath, Cm.Ast.Project* project, TreeViewNode* projectNode)
@@ -1477,6 +1524,7 @@ namespace cmcode
                     }
                     project->AddSourceFileName(sourceFileName, newSourceFilePath);
                     project->Save();
+                    LoadEditModule(project->FilePath());
                     AddFilePathsToProject(newSourceFilePath, "", "", project, projectNode);
                 }
             }
@@ -1518,6 +1566,7 @@ namespace cmcode
                             {
                                 project->AddSourceFileName(fileName, filePath);
                                 project->Save();
+                                LoadEditModule(project->FilePath());
                                 AddFilePathsToProject("", "", "", project, projectNode);
                             }
                         }
@@ -1684,6 +1733,7 @@ namespace cmcode
                 List<Cm.Ast.Project*> referencedProjects = dialog.GetReferencedProjects();
                 project->SetReferencedProjects(referencedProjects);
                 project->Save();
+                LoadEditModule(project->FilePath());
             }
         }
         internal void RemoveFile(Cm.Ast.Project* project, const string& filePath, const string& fileName, TreeViewNode* fileNode)
@@ -1706,6 +1756,10 @@ namespace cmcode
                 TreeViewNode* projectNode = fileNode->Parent();
                 project->RemoveFile(filePath, fileName);
                 project->Save();
+                if (filePath.EndsWith(".cm"))
+                {
+                    LoadEditModule(project->FilePath());
+                }
                 projectNode->RemoveChild(fileNode);
                 Invalidate();
             }
@@ -1744,6 +1798,7 @@ namespace cmcode
                 stepIntoToolButton->Disable();
                 stepIntoMenuItem->Disable();
                 toggleBreakpointMenuItem->Disable();
+                LoadEditModuleForCurrentFile();
             }
             catch (const Exception& ex)
             {
@@ -1766,6 +1821,7 @@ namespace cmcode
                     stepIntoMenuItem->Enable();
                     toggleBreakpointMenuItem->Enable();
                 }
+                LoadEditModuleForCurrentFile();
             }
             catch (const Exception& ex)
             {
@@ -1788,6 +1844,7 @@ namespace cmcode
                     stepIntoMenuItem->Enable();
                     toggleBreakpointMenuItem->Enable();
                 }
+                LoadEditModuleForCurrentFile();
             }
             catch (const Exception& ex)
             {
@@ -1807,6 +1864,7 @@ namespace cmcode
                 stepIntoToolButton->Disable();
                 stepIntoMenuItem->Disable();
                 toggleBreakpointMenuItem->Disable();
+                LoadEditModuleForCurrentFile();
             }
             catch (const Exception& ex)
             {
@@ -2597,6 +2655,8 @@ namespace cmcode
             sourceCodeView->ExpressionExitHoverEvent().AddHandler(ExpressionExitHover);
             sourceCodeView->SelectionChangedEvent().AddHandler(EditorSelectionChanged);
             sourceCodeView->DirtyChangedEvent().AddHandler(EditorDirtyChanged);
+            sourceCodeView->CCDirtyChangedEvent().AddHandler(EditorCCDirtyChanged);
+            sourceCodeView->CCTextChangedEvent().AddHandler(EditorCCTextChanged);
             sourceCodeView->CopyEvent().AddHandler(CopyClick);
             sourceCodeView->CutEvent().AddHandler(CutClick);
             sourceCodeView->PasteEvent().AddHandler(PasteClick);
@@ -3087,6 +3147,42 @@ namespace cmcode
                                 textView->SetFocus();
                                 textView->Invalidate();
                             }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void OptionsClick()
+        {
+            try
+            {
+                OptionsDialog dialog;
+                dialog.SetEditorSettings(MainConfiguration.Instance().GetEditorSettings());
+                if (dialog.ShowDialog(*this) == DialogResult.ok)
+                {
+                    MainConfiguration.Instance().SetEditorSettings(dialog.GetEditorSettings());
+                    const EditorSettings& editorSettings = MainConfiguration.Instance().GetEditorSettings();
+                    if (editorSettings.useCodeCompletion)
+                    {
+                        loadEditModuleRequestSent = false;
+                        GetCodeCompletionService();
+                        int parsingFrequency = editorSettings.parsingFrequency;
+                        SetTimer(codeCompletionParseTimerId, cast<uint>(parsingFrequency) * 1000u);
+                    }
+                    else
+                    {
+                        if (!codeCompletionService.IsNull())
+                        {
+                            loadEditModuleRequestSent = false;
+                            codeCompletionService->Stop(true);
+                            codeCompletionService.Reset();
+                            GetOutputTabPage()->Select();
+                            GetOutputLogView()->WriteLine("Code completion service stopped.");
                         }
                     }
                 }
@@ -3675,12 +3771,121 @@ namespace cmcode
             }
             return *codeCompletionService;
         }
+        private void LoadEditModuleForCurrentFile()
+        {
+            if (!solutionExplorerData.IsNull())
+            {
+                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                if (editor != null)
+                {
+                    string sourceFilePath = editor->FilePath();
+                    if (sourceFilePath.EndsWith(".cm"))
+                    {
+                        TreeViewNodeData* nodeData = solutionExplorerData->GetTreeViewNodeDataByKey(sourceFilePath);
+                        if (nodeData != null)
+                        {
+                            LoadEditModule(nodeData->project->FilePath());
+                        }
+                    }
+                }
+            }
+        }
+        private void LoadEditModule(const string& projectFilePath)
+        {
+            try
+            {
+                const EditorSettings& editorSettings = MainConfiguration.Instance().GetEditorSettings();
+                if (!editorSettings.useCodeCompletion) return;
+                UniquePtr<CodeCompletionRequest> request(new LoadEditModuleRequest(projectFilePath, GetBackend(), GetConfig()));
+                GetCodeCompletionService().PutRequest(request.Release());
+                loadEditModuleRequestSent = true;
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void ResetEditModuleCache()
+        {
+            try
+            {
+                const EditorSettings& editorSettings = MainConfiguration.Instance().GetEditorSettings();
+                if (!editorSettings.useCodeCompletion) return;
+                UniquePtr<CodeCompletionRequest> request(new ResetEditModuleCacheRequest());
+                GetCodeCompletionService().PutRequest(request.Release());
+                loadEditModuleRequestSent = false;
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void CodeCompletionParse()
+        {
+            try
+            {
+                if (codeCompletionServerStarting) return;
+                if (!solutionExplorerData.IsNull())
+                {
+                    TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                    Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                    if (editor != null)
+                    {
+                        string sourceFilePath = editor->FilePath();
+                        if (sourceFilePath.EndsWith(".cm"))
+                        {
+                            TextView* textView = editor->GetTextView();
+                            if (textView != null)
+                            {
+                                if (textView->IsCCDirty())
+                                {
+                                    textView->ResetCCDirty();
+                                    TreeViewNodeData* nodeData = solutionExplorerData->GetTreeViewNodeDataByKey(sourceFilePath);
+                                    if (nodeData != null)
+                                    {
+                                        Cm.Ast.Project* project = nodeData->project;
+                                        if (!loadEditModuleRequestSent)
+                                        {
+                                            LoadEditModule(project->FilePath());
+                                        }
+                                        UniquePtr<ParseSourceRequest> request(new ParseSourceRequest(project->FilePath(), GetBackend(), GetConfig(), sourceFilePath));
+                                        request->sourceCode = textView->GetCursorText();
+                                        GetCodeCompletionService().PutRequest(request.Release());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void TestClick()
         {
             try
             {
-                CodeCompletionRequest* request = new LoadEditModuleRequest();
-                GetCodeCompletionService().PutRequest(request);
+                ustring content = ToUtf32(File.ReadAllText("C:\\work\\cmajorm\\cmajor\\projects\\cm\\cmcode\\log\\reply.xml"));
+     		         UniquePtr<System.Dom.Document> doc = System.Dom.ParseDocument(content, "reply");
+                UniquePtr<System.XPath.XPathObject> result = System.XPath.Evaluate(u"/parseSourceReply", doc.Get());
+                if (result.Get() != null)
+                {
+                    System.XPath.XPathNodeSet* nodeSet = cast<System.XPath.XPathNodeSet*>(result.Get());
+                    System.Dom.Element* parentElement = cast<System.Dom.Element*>((*nodeSet)[0]);
+                    List<string> stringList;
+                    FromXml<string>(parentElement, string("errors"), stringList);
+                    for (const string& s : stringList)
+                    {
+                        string t = Unescape(s);
+                        int x = 0;
+                    }
+                }
             }
             catch (const Exception& ex)
             {
@@ -3714,12 +3919,18 @@ namespace cmcode
             {
                 void* replyPtr = cast<void*>(cast<ulong>(message.lparam));
                 UniquePtr<CodeCompletionReply> reply(cast<CodeCompletionReply*>(replyPtr));
-                TimePoint now = Now();
-                Duration msgDuration = now - reply->requestCreated;
-                string durStr = DurationStr(msgDuration);
-                string logMessage = "code completion reply: " + durStr;
-                GetOutputTabPage()->Select();
-                GetOutputLogView()->WriteLine(logMessage);
+                if (reply.Get() is LoadEditModuleReply*)
+                {
+                    HandleLoadEditModuleReply(cast<LoadEditModuleReply*>(reply.Get()));
+                }
+                else if (reply.Get() is ResetEditModuleCacheReply*)
+                {
+                    HandleResetEditModuleCacheReply(cast<ResetEditModuleCacheReply*>(reply.Get()));
+                }
+                if (reply.Get() is ParseSourceReply*)
+                {
+                    HandleParseSourceReply(cast<ParseSourceReply*>(reply.Get()));
+                }
                 message.result = 0;
                 return true;
             }
@@ -3730,6 +3941,115 @@ namespace cmcode
                 return true;
             }
             return false;
+        }
+        private void HandleLoadEditModuleReply(LoadEditModuleReply* reply)
+        {
+            try
+            {
+                GetOutputLogView()->Clear();
+                TimePoint now = Now();
+                string dispatchRequest = "\ndispatch request: " + DurationStr(reply->requestReceived - reply->requestCreated);
+                string requestReceived = "\nrequest received: " + DurationStr(reply->created - reply->requestReceived);
+                string started = "\nstarted: " + DurationStr(reply->startLoading - reply->created);
+                string loading;
+                string parsing;
+                if (reply->result == "up-to-date")
+                {
+                    loading = "\nloading: " + DurationStr(reply->endLoading - reply->startLoading);
+                    parsing = "\nparsing: " + DurationStr(reply->endLoading - reply->endLoading);
+                }
+                else
+                {
+                    loading = "\nloading: " + DurationStr(reply->startParsing - reply->startLoading);
+                    parsing = "\nparsing: " + DurationStr(reply->endLoading - reply->startParsing);
+                }
+                string dispatchReply = "\ndispatch reply: " + DurationStr(now - reply->endLoading);
+                string total = "\ntotal: " + DurationStr(now - reply->requestCreated);
+                string logMessage = reply->key;
+                logMessage.Append(" ").Append(reply->result).Append(dispatchRequest).Append(requestReceived).Append(started).Append(loading).Append(parsing).
+                    Append(dispatchReply).Append(total);
+                GetOutputTabPage()->Select();
+                GetOutputLogView()->WriteLine(logMessage);
+                Application.ProcessMessages();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void HandleResetEditModuleCacheReply(ResetEditModuleCacheReply* reply)
+        {
+            try
+            {
+                if (reply->result != "ok")
+                {
+                    GetOutputLogView()->Clear();
+                    GetOutputTabPage()->Select();
+                    string error = reply->error;
+                    GetOutputLogView()->WriteLine(error);
+                    Application.ProcessMessages();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void HandleParseSourceReply(ParseSourceReply* reply)
+        {
+            try
+            {
+                GetOutputLogView()->Clear();
+                GetOutputTabPage()->Select();
+                string logMessage = "source parsed:";
+                if (reply->ok)
+                {
+                    TimePoint now = Now();
+                    int errorCount = cast<int>(reply->errors.Count());
+                    logMessage.Append("\n").Append(ToString(errorCount)).Append(" errors");
+                    if (errorCount > 0)
+                    {
+                        logMessage.Append(":");
+                        bool insertNL = true;
+                        for (const string& error : reply->errors)
+                        {
+                            if (insertNL)
+                            {
+                                logMessage.Append("\n");
+                            }
+                            string uncapedError = Unescape(error);
+                            logMessage.Append(uncapedError);
+                            if (!uncapedError.EndsWith("\n"))
+                            {
+                                insertNL = true;
+                            }
+                            else
+                            {
+                                insertNL = false;
+                            }
+                        }
+                    }
+                    string dispatchRequest = "\ndispatch request: " + DurationStr(reply->requestReceived - reply->requestCreated);
+                    string requestReceived = "\nrequest received: " + DurationStr(reply->created - reply->requestReceived);
+                    string parsing = "\nparsing: " + DurationStr(reply->endParsing - reply->startParsing);
+                    string total = "\ntotal: " + DurationStr(now - reply->requestCreated);
+                    logMessage.Append(dispatchRequest).Append(requestReceived).Append(parsing).Append(total);
+                    GetOutputLogView()->WriteLine(logMessage);
+                }
+                else
+                {
+                    string error = reply->error;
+                    GetOutputLogView()->WriteLine(Unescape(error));
+                }
+                Application.ProcessMessages();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
         }
         private void FetchCodeCompletionServiceLogMessages()
         {
@@ -3989,6 +4309,45 @@ namespace cmcode
                     saveMenuItem->Disable();
                     dirtyStatusBarItem->SetText("");
                 }
+            }
+        }
+        private void EditorCCDirtyChanged()
+        {
+            TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+            Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+            if (editor != null)
+            {
+                if (editor->IsCCDirty())
+                {
+                    ccdirtyStatusBarItem->SetText("!");
+                }
+                else
+                {
+                    ccdirtyStatusBarItem->SetText("");
+                }
+            }
+        }
+        private void EditorCCTextChanged()
+        {
+            ustring cctext;
+            TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+            Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+            if (editor != null)
+            {
+                if (editor is Cm.Views.CmajorEditor*)
+                {
+                    Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                    SourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                    if (sourceCodeView != null)
+                    {
+                        cctext = sourceCodeView->GetCCText();
+                    }
+                }
+            }
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                logView->WriteLine("cc: " + ToUtf8(cctext));
             }
         }
         private void ReadTargetInput(string& inputLine, bool& eof)
@@ -4364,6 +4723,7 @@ namespace cmcode
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
         private StatusBarItem* sourceFilePathStatusBarItem;
         private StatusBarItem* dirtyStatusBarItem;
+        private StatusBarItem* ccdirtyStatusBarItem;
         private StatusBarItem* caretLineStatusBarItem;
         private StatusBarItem* caretColumnStatusBarItem;
         private HashMap<TabPage*, Cm.Views.Editor*> editorByTabPageMap;
@@ -4399,6 +4759,7 @@ namespace cmcode
         private MenuItem* redoMenuItem;
         private MenuItem* gotoLineMenuItem;
         private MenuItem* searchMenuItem;
+        private MenuItem* optionsMenuItem;
         private MenuItem* buildSettingsMenuItem;
 
         private ToolButton* prevToolButton;
@@ -4437,6 +4798,7 @@ namespace cmcode
         private bool disableBuildServerToolButton;
         private LocationList locations;
         private bool codeCompletionServerStarting;
+        private bool loadEditModuleRequestSent;
     }
 }
 

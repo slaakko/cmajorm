@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.Concepts;
 using System.Xml.Serialization;
 
@@ -16,7 +17,7 @@ namespace Cm.Service.CodeCompletion
         {
         }
         public default virtual ~CodeCompletionRequest();
-        public abstract void Accept(Visitor& visitor);        
+        public abstract void Accept(Visitor& visitor);
         public TimePoint created;
         public TimePoint received;
     }
@@ -36,6 +37,72 @@ namespace Cm.Service.CodeCompletion
     [xml]
     public class LoadEditModuleRequest : CodeCompletionRequest
     {
+        public nothrow LoadEditModuleRequest() : base(), projectFilePath(), backend(), config()
+        {
+        }
+        public nothrow LoadEditModuleRequest(const string& projectFilePath_, const string& backend_, const string& config_) :
+            base(), projectFilePath(projectFilePath_), backend(backend_), config(config_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public string projectFilePath;
+        public string backend;
+        public string config;
+    }
+
+    [xml]
+    public class LoadEditModuleReply : CodeCompletionReply
+    {
+        public nothrow LoadEditModuleReply() : base(), key(), result(), startLoading(), startParsing(), endLoading()
+        {
+        }
+        public string key;
+        public string result;
+        public TimePoint startLoading;
+        public TimePoint startParsing;
+        public TimePoint endLoading;
+    }
+
+    [xml]
+    public class ParseSourceRequest : CodeCompletionRequest
+    {
+        public nothrow ParseSourceRequest() : base(), projectFilePath(), backend(), config(), sourceFilePath(), sourceCode()
+        {
+        }
+        public nothrow ParseSourceRequest(const string& projectFilePath_, const string& backend_, const string& config_, const string& sourceFilePath_) :
+            base(), projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), sourceCode()
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public string projectFilePath;
+        public string backend;
+        public string config;
+        public string sourceFilePath;
+        public ustring sourceCode;
+    }
+
+    [xml]
+    public class ParseSourceReply : CodeCompletionReply
+    {
+        public bool ok;
+        public string error;
+        public List<string> errors;
+        public TimePoint startParsing;
+        public TimePoint endParsing;
+    }
+
+    [xml]
+    public class ResetEditModuleCacheRequest : CodeCompletionRequest
+    {
+        public nothrow ResetEditModuleCacheRequest() : base()
+        {
+        }
         public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
@@ -43,8 +110,13 @@ namespace Cm.Service.CodeCompletion
     }
 
     [xml]
-    public class LoadEditModuleReply : CodeCompletionReply
+    public class ResetEditModuleCacheReply : CodeCompletionReply
     {
+        public nothrow ResetEditModuleCacheReply() : base()
+        {
+        }
+        public string result;
+        public string error;
     }
 
     [xml]
@@ -75,6 +147,8 @@ namespace Cm.Service.CodeCompletion
     {
         public default virtual ~Visitor();
         public virtual void Visit(LoadEditModuleRequest& request) {}
+        public virtual void Visit(ResetEditModuleCacheRequest& request) {}
+        public virtual void Visit(ParseSourceRequest& request) {}
         public virtual void Visit(StopRequest& request) {}
     }
 }

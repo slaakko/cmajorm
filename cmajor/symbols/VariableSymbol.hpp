@@ -37,6 +37,7 @@ public:
     ParameterSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
+    bool IsExportSymbol() const override;
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     std::string TypeString() const override { return "parameter"; }
     std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
@@ -91,6 +92,8 @@ public:
     std::string TypeString() const override { return "global_variable_group"; }
     void ComputeMangledName() override;
     void AddGlobalVariable(GlobalVariableSymbol* globalVariableSymbol);
+    void RemoveGlobalVariable(GlobalVariableSymbol* globalVariableSymbol);
+    bool IsEmpty() const;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "GlobalVariableGroupSymbol"; }
     void CollectGlobalVariables(const std::string& compileUnitFilePath, std::vector<GlobalVariableSymbol*>& globalVariables) const;
@@ -120,10 +123,13 @@ public:
     void CreateIrObject(Emitter& emitter);
     const std::u32string& GroupName() const { return groupName; }
     const std::string& CompileUnitFilePath() const { return compileUnitFilePath; }
+    void SetGlobalVariableGroup(GlobalVariableGroupSymbol* globalVariableGroup_) { globalVariableGroup = globalVariableGroup_; }
+    std::unique_ptr<Symbol> RemoveFromParent() override;
 private:
     std::u32string groupName;
     std::string compileUnitFilePath;
     std::unique_ptr<Value> initializer;
+    GlobalVariableGroupSymbol* globalVariableGroup;
 };
 
 } } // namespace cmajor::symbols

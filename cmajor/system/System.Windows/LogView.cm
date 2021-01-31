@@ -33,6 +33,7 @@ namespace System.Windows
                 AddLine(line);
             }
             SetCaretLineCol(cast<int>(Lines().Count()), 1);
+            SetTextExtent();
             ScrollToCaret();
             SetChanged();
             InvalidateLines(startLineNumber, cast<int>(startLineNumber + lines.Count()));

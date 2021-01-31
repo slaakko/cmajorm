@@ -1,0 +1,49 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Attribute.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/NothrowTokenValueParsers.hpp>
+
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowAttributeParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    Attributes(boost::uuids::uuid* moduleId, var std::unique_ptr<sngcm::ast::Attributes> attributes) : sngcm::ast::Attributes*
+        ::= LBRACKET{ attributes.reset(new sngcm::ast::Attributes()); } (Attribute(attributes.get(), moduleId):attribute % COMMA)? RBRACKET!
+        {
+            return attributes.release();
+        }
+        ;
+
+    Attribute(sngcm::ast::Attributes* attributes, boost::uuids::uuid* moduleId, var Span s, var std::u32string name, var std::u32string value)
+        ::= 
+        (
+            empty{ value = U"true"; }
+            ID{ s = span; name = lexer.GetMatch(span); } 
+            (
+                ASSIGN STRINGLIT
+                { 
+                    s.end = span.end; 
+                    ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix);
+                    value = lexer.strLit;
+                }
+            )?
+        )
+        {
+            attributes->AddAttribute(s, *moduleId, name, value);
+        }
+        ;
+
+    ruleinfo
+    {
+        (Attributes, "attributes"), (Attribute, "attribute")
+    }
+}

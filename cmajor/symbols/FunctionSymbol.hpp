@@ -46,6 +46,7 @@ public:
     void ComputeMangledName() override;
     void AddFunction(FunctionSymbol* function);
     void RemoveFunction(FunctionSymbol* function);
+    bool IsEmpty() const;
     FunctionSymbol* GetFunction();
     void CollectViableFunctions(int arity, ViableFunctionSet& viableFunctions, Module* module);
     bool HasProjectMembers() const override;
@@ -274,6 +275,7 @@ public:
     int NextTemporaryIndex();
     void CopyFrom(const Symbol* that) override;
     virtual FunctionSymbol* Copy() const;
+    std::unique_ptr<Symbol> RemoveFromParent() override;
 private:
     FunctionSymbol* functionTemplate;
     FunctionSymbol* master;

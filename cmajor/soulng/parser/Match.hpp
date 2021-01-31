@@ -6,6 +6,7 @@
 #ifndef SOULNG_PARSER_MATCH_INCLUDED
 #define SOULNG_PARSER_MATCH_INCLUDED
 #include <soulng/parser/ParserApi.hpp>
+#include <soulng/lexer/Lexer.hpp>
 
 namespace soulng { namespace parser {
 

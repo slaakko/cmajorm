@@ -33,6 +33,18 @@ void ConceptGroupSymbol::AddConcept(ConceptSymbol* conceptSymbol)
         throw Exception("concept group '" + ToUtf8(FullName()) + "' already has concept with arity " + std::to_string(arity), GetSpan(), SourceModuleId());
     }
     arityConceptMap[arity] = conceptSymbol;
+    conceptSymbol->SetConceptGroup(this);
+}
+
+void ConceptGroupSymbol::RemoveConcept(ConceptSymbol* conceptSymbol)
+{
+    int arity = conceptSymbol->Arity();
+    arityConceptMap.erase(arity);
+}
+
+bool ConceptGroupSymbol::IsEmpty() const
+{
+    return arityConceptMap.empty();
 }
 
 ConceptSymbol* ConceptGroupSymbol::GetConcept(int arity)
@@ -87,7 +99,7 @@ void ConceptGroupSymbol::Check()
 }
 
 ConceptSymbol::ConceptSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
-    ContainerSymbol(SymbolType::conceptSymbol, span_, sourceModuleId_, name_), refinedConcept(nullptr), typeId(boost::uuids::nil_uuid()), hasSource(false)
+    ContainerSymbol(SymbolType::conceptSymbol, span_, sourceModuleId_, name_), refinedConcept(nullptr), typeId(boost::uuids::nil_uuid()), hasSource(false), conceptGroup(nullptr)
 {
 }
 
@@ -306,6 +318,25 @@ void ConceptSymbol::Check()
             throw SymbolCheckException("concept symbol has no template parameter", GetSpan(), SourceModuleId());
         }
     }
+}
+
+std::unique_ptr<Symbol> ConceptSymbol::RemoveFromParent()
+{
+    std::unique_ptr<Symbol> symbol = ContainerSymbol::RemoveFromParent();
+    if (conceptGroup)
+    {
+        conceptGroup->RemoveConcept(this);
+        if (conceptGroup->IsEmpty())
+        {
+            std::unique_ptr<Symbol> conceptGroupSymbol = conceptGroup->RemoveFromParent();
+        }
+    }
+    return symbol;
+}
+
+AxiomSymbol::AxiomSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId, const std::u32string& name_) : 
+    ContainerSymbol(SymbolType::axiomSymbol, span_, sourceModuleId, name_)
+{
 }
 
 } } // namespace cmajor::symbols

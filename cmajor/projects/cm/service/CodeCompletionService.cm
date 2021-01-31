@@ -135,6 +135,14 @@ namespace Cm.Service.CodeCompletion
         {
             rootElementName = "loadEditModuleRequest";
         }
+        public override void Visit(ResetEditModuleCacheRequest& request)
+        {
+            rootElementName = "resetEditModuleCacheRequest";
+        }
+        public override void Visit(ParseSourceRequest& request)
+        {
+            rootElementName = "parseSourceRequest";
+        }
         public override void Visit(StopRequest& request)
         {
             rootElementName = "stopRequest";
@@ -148,6 +156,8 @@ namespace Cm.Service.CodeCompletion
             port(defaultPort), args(args_), running(false), exiting(false), stopKeepAlives(false), keepAliveServerRunning(false)
         {
             replyRegistry.RegisterReply("loadEditModuleReply", new CodeCompletionReplyFactory<LoadEditModuleReply>());
+            replyRegistry.RegisterReply("resetEditModuleCacheReply", new CodeCompletionReplyFactory<ResetEditModuleCacheReply>());
+            replyRegistry.RegisterReply("parseSourceReply", new CodeCompletionReplyFactory<ParseSourceReply>());
             replyRegistry.RegisterReply("stopReply", new CodeCompletionReplyFactory<StopReply>());
         }
         public nothrow void SetCodeCompletionReplyHandlerFunction(CodeCompletionReplyHandlerFunction codeCompletionReplyHandlerFunction_)
@@ -386,27 +396,35 @@ namespace Cm.Service.CodeCompletion
             catch (const Exception& ex)
             {
                 LogException(ex);
-                Quit();
             }
         }
         private void HandleRequest(CodeCompletionRequest* request)
         {
-            request->received = Now();
-            SetRootElementNameVisitor visitor;
-            request->Accept(visitor);
-            UniquePtr<Element> requestElement = request->ToXml(visitor.rootElementName);
-            Document requestDoc;
-            requestDoc.AppendChild(UniquePtr<Node>(requestElement.Release()));
-            StringWriter stringWriter;
-            CodeFormatter formatter(stringWriter);
-            requestDoc.Write(formatter);
-            Write(socket, stringWriter.GetString());
-            string replyStr = ReadStr(socket);
-            UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
-            UniquePtr<CodeCompletionReply> reply = replyRegistry.CreateReply(replyDoc->DocumentElement());
-            if (codeCompletionReplyHandlerFunction != CodeCompletionReplyHandlerFunction())
+            try
             {
-                codeCompletionReplyHandlerFunction(reply.Release());
+                request->received = Now();
+                SetRootElementNameVisitor visitor;
+                request->Accept(visitor);
+                UniquePtr<Element> requestElement = request->ToXml(visitor.rootElementName);
+                Document requestDoc;
+                requestDoc.AppendChild(UniquePtr<Node>(requestElement.Release()));
+                SaveRequest(requestDoc);
+                StringWriter stringWriter;
+                CodeFormatter formatter(stringWriter);
+                requestDoc.Write(formatter);
+                Write(socket, stringWriter.GetString());
+                string replyStr = ReadStr(socket);
+                UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+                SaveReply(*replyDoc);
+                UniquePtr<CodeCompletionReply> reply = replyRegistry.CreateReply(replyDoc->DocumentElement());
+                if (codeCompletionReplyHandlerFunction != CodeCompletionReplyHandlerFunction())
+                {
+                    codeCompletionReplyHandlerFunction(reply.Release());
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
             }
         }
         private UniquePtr<CodeCompletionRequest> GetRequest()
@@ -419,6 +437,18 @@ namespace Cm.Service.CodeCompletion
                 return UniquePtr<CodeCompletionRequest>(request);
             }
             return UniquePtr<CodeCompletionRequest>();
+        }
+        private void SaveRequest(const Document& requestDoc)
+        {
+            StreamWriter writer = File.CreateText(Path.Combine(CmCodeLogDir(), "codeCompletionRequest.xml"));
+            CodeFormatter formatter(writer);
+            requestDoc.Write(formatter);
+        }
+        private void SaveReply(const Document& replyDoc)
+        {
+            StreamWriter writer = File.CreateText(Path.Combine(CmCodeLogDir(), "codeCompletionReply.xml"));
+            CodeFormatter formatter(writer);
+            replyDoc.Write(formatter);
         }
         private nothrow bool RequestWaitingOrExiting(void* arg)
         {

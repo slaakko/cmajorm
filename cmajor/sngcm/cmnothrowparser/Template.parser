@@ -1,0 +1,60 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Template.hpp>
+[hpp]#include <sngcm/cmnothrowparser/Identifier.hpp>
+[hpp]#include <sngcm/cmnothrowparser/TypeExpr.hpp>
+[hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowTemplateParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowIdentifierParser.Identifier;
+    using NothrowIdentifierParser.QualifiedId;
+    using NothrowTypeExprParser.TypeExpr;
+
+    TemplateId(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId, var Span e) : Node*
+        ::= empty{ ctx->BeginParsingTemplateId(); }
+            (QualifiedId(moduleId):primary{ templateId.reset(new TemplateIdNode(span, *moduleId, primary)); }
+            LANGLE{ ++lexer.leftAngleCount; }
+            ((TypeExpr(moduleId, ctx):templateArg{ templateId->AddTemplateArgument(templateArg); } % COMMA) RANGLE{ e = span; }){ --lexer.leftAngleCount; } / { --lexer.leftAngleCount; })
+        {
+            templateId->SetSpanEnd(e.end);
+            ctx->EndParsingTemplateId();
+            templateId->SetLexerFlags(lexer.Flags());
+            return templateId.release();
+        }
+        /
+        {
+            ctx->EndParsingTemplateId();
+        }
+        ;
+
+    TemplateParameter(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : TemplateParameterNode*
+        ::= (Identifier(moduleId):id (ASSIGN TypeExpr(moduleId, ctx):type)?)
+        { 
+            TemplateParameterNode* node = new TemplateParameterNode(span, *moduleId, id, type); 
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    TemplateParameterList(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::Node* owner)
+        ::= LANGLE (TemplateParameter(moduleId, ctx):tp{ owner->AddTemplateParameter(tp); } % COMMA) RANGLE!
+        ;
+
+    ruleinfo
+    {
+        (TemplateId, "template identifier"), (TemplateParameter, "template parameter"), (TemplateParameterList, "template parameter list")
+    }
+}

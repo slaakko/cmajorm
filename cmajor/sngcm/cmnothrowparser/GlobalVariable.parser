@@ -1,0 +1,44 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/GlobalVariable.hpp>
+[hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Specifier.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Identifier.hpp>
+[cpp]#include <sngcm/cmnothrowparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Expression.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowGlobalVariableParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowSpecifierParser.Specifiers;
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowIdentifierParser.Identifier;
+    using NothrowExpressionParser.Expression;
+
+    GlobalVariable(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, var Span s) : GlobalVariableNode*
+        ::= Specifiers:specifiers{ s = span; } TypeExpr(moduleId, ctx):type Identifier(moduleId):id (ASSIGN Expression(moduleId, ctx):initializer)? SEMICOLON
+        {
+            s.end = span.end;
+            GlobalVariableNode* value = new GlobalVariableNode(s, *moduleId, specifiers, type, id, cu);
+            value->SetInitializer(initializer);
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+
+    ruleinfo
+    {
+        (GlobalVariable, "global variable")
+    }
+}

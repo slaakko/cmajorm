@@ -66,7 +66,7 @@ std::string NodeTypeStr(NodeType nodeType)
     return nodeTypeStr[static_cast<size_t>(nodeType)];
 }
 
-Node::Node(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : nodeType(nodeType_), span(span_), moduleId(moduleId_), parent(nullptr)
+Node::Node(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : nodeType(nodeType_), span(span_), moduleId(moduleId_), parent(nullptr), lexerFlags()
 {
 }
 
@@ -76,7 +76,7 @@ Node::~Node()
 
 void Node::SetParent(Node* parent_)
 {
-    parent = parent_;
+     parent = parent_;
 }
 
 void Node::Write(AstWriter& writer)

@@ -13,6 +13,7 @@
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
 #include <cmajor/symbols/FunctionIndex.hpp>
+#include <cmajor/symbols/Sources.hpp>
 #include <cmajor/cmdebug/DebugInfoIo.hpp>
 #include <cmajor/cmdebug/DIVariable.hpp>
 #include <sngcm/ast/Project.hpp>
@@ -1916,6 +1917,41 @@ void Module::UpdateSourceFileModuleMap()
     for (int16_t i = 0; i < n; ++i)
     {
         MapSourceFileToModuleId(backend, config, fileTable.GetFilePath(i), Id());
+    }
+}
+
+ParseResult Module::ParseSources()
+{
+    if (sources)
+    {
+        ParseResult parseResult = sources->Parse(this);
+        sources->AddSymbols(this);
+        sources->GetScopes(this);
+        sources->BindTypes(this);
+        parseResult.numberOfErrors = sources->GetNumberOfErrors();
+        return parseResult;
+    }
+    else
+    {
+        ParseResult result;
+        result.ok =  false;
+        result.error = "sources not set";
+        return result;
+    }
+}
+
+ParseResult Module::ParseSource(const std::string& sourceFilePath, const std::u32string& sourceCode)
+{
+    if (sources)
+    {
+        return sources->ParseSource(this, sourceFilePath, sourceCode);
+    }
+    else
+    {
+        ParseResult result;
+        result.ok = false;
+        result.error = "sources not set";
+        return result;
     }
 }
 

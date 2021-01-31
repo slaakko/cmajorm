@@ -18,10 +18,48 @@ base class CodeCompletionReply
 
 class LoadEditModuleRequest : CodeCompletionRequest
 {
+    string projectFilePath;
+    string backend;
+    string config;
 }
 
 class LoadEditModuleReply : CodeCompletionReply
 {
+    string key;
+    string result;
+    string error;
+    time_point startLoading;
+    time_point startParsing;
+    time_point endParsing;
+    time_point endLoading;
+}
+
+class ResetEditModuleCacheRequest : CodeCompletionRequest
+{
+}
+
+class ResetEditModuleCacheReply : CodeCompletionReply
+{
+    string result;
+    string error;
+}
+
+class ParseSourceRequest : CodeCompletionRequest
+{
+    string projectFilePath;
+    string backend;
+    string config;
+    string sourceFilePath;
+    ustring sourceCode;
+}
+
+class ParseSourceReply : CodeCompletionReply
+{
+    bool ok;
+    string error;
+    string[] errors;
+    time_point startParsing;
+    time_point endParsing;
 }
 
 class StopRequest : CodeCompletionRequest

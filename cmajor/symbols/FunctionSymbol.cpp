@@ -212,6 +212,15 @@ void FunctionGroupSymbol::RemoveFunction(FunctionSymbol* function)
     functionList.erase(end, functionList.end());
 }
 
+bool FunctionGroupSymbol::IsEmpty() const
+{
+    for (const auto& p : arityFunctionListMap)
+    {
+        if (!p.second.empty()) return false;
+    }
+    return true;
+}
+
 FunctionSymbol* FunctionGroupSymbol::GetFunction()
 {
     if (arityFunctionListMap.size() == 1)
@@ -664,6 +673,10 @@ void FunctionSymbol::ComputeMangledName()
 std::u32string FunctionSymbol::FullName() const
 {
     std::u32string fullName;
+    if (!Parent())
+    {
+        throw Exception("function symbol has no parent", GetSpan(), SourceModuleId());
+    }
     std::u32string parentFullName = Parent()->FullName();
     fullName.append(parentFullName);
     if (!parentFullName.empty())
@@ -1456,6 +1469,20 @@ FunctionSymbol* FunctionSymbol::Copy() const
     FunctionSymbol* copy = new FunctionSymbol(GetSpan(), SourceModuleId(), Name());
     copy->CopyFrom(this);
     return copy;
+}
+
+std::unique_ptr<Symbol> FunctionSymbol::RemoveFromParent()
+{
+    std::unique_ptr<Symbol> symbol = ContainerSymbol::RemoveFromParent();
+    if (functionGroup)
+    {
+        functionGroup->RemoveFunction(this);
+        if (functionGroup->IsEmpty())
+        {
+            std::unique_ptr<Symbol> functionGroupSymbol = functionGroup->RemoveFromParent();
+        }
+    }
+    return symbol;
 }
 
 StaticConstructorSymbol::StaticConstructorSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 

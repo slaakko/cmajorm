@@ -15,13 +15,13 @@ using namespace soulng::unicode;
 
 Lexer::Lexer(const std::u32string& content_, const std::string& fileName_, int fileIndex_) :
     content(content_), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(nullptr), start(content.c_str()), end(content.c_str() + content.length()), pos(start), current(tokens.end()),
-    log(nullptr), countLines(true), separatorChar('\0')
+    log(nullptr), countLines(true), separatorChar('\0'), flags(), cursorNode(nullptr)
 {
 }
 
 Lexer::Lexer(const char32_t* start_, const char32_t* end_, const std::string& fileName_, int fileIndex_) :
     content(), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(nullptr), start(start_), end(end_), pos(start), current(tokens.end()),
-    log(nullptr), countLines(true), separatorChar('\0')
+    log(nullptr), countLines(true), separatorChar('\0'), flags(), cursorNode(nullptr)
 {
 }
 
@@ -370,6 +370,13 @@ void Lexer::ThrowExpectationFailure(const Span& span, const std::u32string& name
     throw ParsingException("parsing error in '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
 }
 
+void Lexer::AddError(const Span& span, const std::u32string& name)
+{
+    Token token = GetToken(span.start);
+    ParsingException error("parsing error in '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
+    errors.push_back(std::move(error));
+}
+
 std::u32string Lexer::RestOfLine(int maxLineLength)
 {
     std::u32string restOfLine(current->match.ToString() + std::u32string(current->match.end, pos) + std::u32string(pos, LineEnd(end, pos)));
@@ -416,6 +423,27 @@ TokenLine Lexer::TokenizeLine(const std::u32string& line, int lineNumber, int st
     }
     tokenLine.endState = state;
     return tokenLine;
+}
+
+void Lexer::SetSyncTokens(const std::vector<int>& syncTokens_)
+{
+    syncTokens = syncTokens_;
+}
+
+void Lexer::Synchronize()
+{
+    while (pos != end)
+    {
+        int curToken = token.id;
+        for (int syncToken : syncTokens)
+        {
+            if (curToken == syncToken)
+            {
+                return;
+            }
+        }
+        ++*this;
+    }
 }
 
 void WriteBeginRuleToLog(Lexer& lexer, const std::u32string& ruleName)

@@ -70,6 +70,11 @@ void ParameterSymbol::Read(SymbolReader& reader)
     artificialName = reader.GetBinaryReader().ReadBool();
 }
 
+bool ParameterSymbol::IsExportSymbol() const
+{
+    return VariableSymbol::IsExportSymbol();
+}
+
 std::u32string ParameterSymbol::CodeName() const
 {
     if (artificialName)
@@ -299,6 +304,7 @@ void GlobalVariableGroupSymbol::AddGlobalVariable(GlobalVariableSymbol* globalVa
     if (globalVariableSymbols.empty())
     {
         globalVariableSymbols.push_back(key);
+        globalVariableSymbol->SetGlobalVariableGroup(this);
     }
     else
     {
@@ -326,6 +332,7 @@ void GlobalVariableGroupSymbol::AddGlobalVariable(GlobalVariableSymbol* globalVa
         if (it == globalVariableSymbols.cend())
         {
             globalVariableSymbols.push_back(key);
+            globalVariableSymbol->SetGlobalVariableGroup(this);
         }
         else
         {
@@ -333,6 +340,18 @@ void GlobalVariableGroupSymbol::AddGlobalVariable(GlobalVariableSymbol* globalVa
                 globalVariableSymbol->GetSpan(), globalVariableSymbol->SourceModuleId(), GetSpan(), SourceModuleId());
         }
     }
+}
+
+void GlobalVariableGroupSymbol::RemoveGlobalVariable(GlobalVariableSymbol* globalVariableSymbol)
+{
+    std::pair<GlobalVariableSymbol*, std::string> key(globalVariableSymbol, globalVariableSymbol->CompileUnitFilePath());
+    auto end = std::remove(globalVariableSymbols.begin(), globalVariableSymbols.end(), key);
+    globalVariableSymbols.erase(end, globalVariableSymbols.end());
+}
+
+bool GlobalVariableGroupSymbol::IsEmpty() const
+{
+    return globalVariableSymbols.empty();
 }
 
 void GlobalVariableGroupSymbol::CollectGlobalVariables(const std::string& compileUnitFilePath, std::vector<GlobalVariableSymbol*>& globalVariables) const
@@ -367,12 +386,13 @@ std::u32string MakeGlobalVariableName(const std::u32string& groupName, const std
 }
 
 GlobalVariableSymbol::GlobalVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& groupName_, const std::string& compileUnitId, const std::string& compileUnitFilePath_) :
-    VariableSymbol(SymbolType::globalVariableSymbol, span_, sourceModuleId_, MakeGlobalVariableName(groupName_, compileUnitId)), groupName(groupName_), compileUnitFilePath(compileUnitFilePath_)
+    VariableSymbol(SymbolType::globalVariableSymbol, span_, sourceModuleId_, MakeGlobalVariableName(groupName_, compileUnitId)), groupName(groupName_), compileUnitFilePath(compileUnitFilePath_),
+    globalVariableGroup(nullptr)
 {
 }
 
 GlobalVariableSymbol::GlobalVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
-    VariableSymbol(SymbolType::globalVariableSymbol, span_, sourceModuleId_, name_)
+    VariableSymbol(SymbolType::globalVariableSymbol, span_, sourceModuleId_, name_), globalVariableGroup(nullptr)
 {
 }
 
@@ -540,6 +560,20 @@ void GlobalVariableSymbol::CreateIrObject(Emitter& emitter)
         init = initializer->IrValue(emitter);
     }
     emitter.SetInitializer(irObject, init);
+}
+
+std::unique_ptr<Symbol> GlobalVariableSymbol::RemoveFromParent()
+{
+    std::unique_ptr<Symbol> symbol = VariableSymbol::RemoveFromParent();
+    if (globalVariableGroup)
+    {
+        globalVariableGroup->RemoveGlobalVariable(this);
+        if (globalVariableGroup->IsEmpty())
+        {
+            std::unique_ptr<Symbol> globalVariableGroupSymbol = globalVariableGroup->RemoveFromParent();
+        }
+    }
+    return symbol;
 }
 
 } } // namespace cmajor::symbols

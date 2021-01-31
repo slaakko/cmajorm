@@ -6,6 +6,7 @@
 #ifndef SNGCM_AST_BASIC_TYPE_INCLUDED
 #define SNGCM_AST_BASIC_TYPE_INCLUDED
 #include <sngcm/ast/Node.hpp>
+#include <soulng/lexer/Lexer.hpp>
 
 namespace sngcm { namespace ast {
 

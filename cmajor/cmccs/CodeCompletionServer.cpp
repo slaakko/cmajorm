@@ -6,6 +6,9 @@
 #include <cmajor/cmccs/CodeCompletionServer.hpp>
 #include <cmajor/cmccs/KeepAliveServer.hpp>
 #include <cmajor/cmccs/CodeCompletionServerMessage.hpp>
+#include <cmajor/build/Build.hpp>
+#include <cmajor/binder/TypeBinding.hpp>
+#include <cmajor/symbols/EditModuleCache.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/Parser.hpp>
@@ -23,10 +26,11 @@ namespace cmccs {
 
 using namespace soulng::unicode;
 using namespace soulng::util;
+using namespace cmajor::symbols;
 
 enum class CodeCompletionRequestKind
 {
-    loadEditModuleRequest, stopRequest
+    loadEditModuleRequest, resetEditModuleCacheRequest, parseSourceRequest, stopRequest
 };
 
 class CodeCompletionServer
@@ -40,6 +44,8 @@ public:
     void Run();
     std::unique_ptr<CodeCompletionReply> HandleRequest(sngxml::dom::Element* requestElement, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const LoadEditModuleRequest& request, std::string& rootElementName);
+    std::unique_ptr<CodeCompletionReply> HandleRequest(const ResetEditModuleCacheRequest& request, std::string& rootElementName);
+    std::unique_ptr<CodeCompletionReply> HandleRequest(const ParseSourceRequest& request, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const StopRequest& request, std::string& rootElementName);
 private:
     static std::unique_ptr<CodeCompletionServer> instance;
@@ -72,7 +78,11 @@ void CodeCompletionServer::Done()
 CodeCompletionServer::CodeCompletionServer() : port(-1), version(), exit(false), exitVar(), exiting(), running(false), stopRequestReceived(false), listenSocket()
 {
     requestKindMap["loadEditModuleRequest"] = CodeCompletionRequestKind::loadEditModuleRequest;
+    requestKindMap["resetEditModuleCacheRequest"] = CodeCompletionRequestKind::resetEditModuleCacheRequest;
+    requestKindMap["parseSourceRequest"] = CodeCompletionRequestKind::parseSourceRequest;
     requestKindMap["stopRequest"] = CodeCompletionRequestKind::stopRequest;
+    SetReadProjectFunction(cmajor::build::ReadProject);
+    SetTypeBindingFunction(cmajor::binder::BindTypes);
 }
 
 void RunServer(CodeCompletionServer* server)
@@ -180,6 +190,16 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(sngxml:
                 LoadEditModuleRequest request(requestElement);
                 return HandleRequest(request, rootElementName);
             }
+            case CodeCompletionRequestKind::resetEditModuleCacheRequest:
+            {
+                ResetEditModuleCacheRequest request(requestElement);
+                return HandleRequest(request, rootElementName);
+            }
+            case CodeCompletionRequestKind::parseSourceRequest:
+            {
+                ParseSourceRequest request(requestElement);
+                return HandleRequest(request, rootElementName);
+            }
             case CodeCompletionRequestKind::stopRequest:
             {
                 StopRequest request(requestElement);
@@ -200,11 +220,90 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(sngxml:
 std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const LoadEditModuleRequest& request, std::string& rootElementName)
 {
     rootElementName = "loadEditModuleReply";
-    std::unique_ptr<CodeCompletionReply> reply(new LoadEditModuleReply());
+    std::unique_ptr<LoadEditModuleReply> reply(new LoadEditModuleReply());
     reply->created = std::chrono::steady_clock::now();
     reply->requestCreated = request.created;
     reply->requestReceived = request.received;
-    return reply;
+    try
+    {
+        LoadEditModuleResult result = EditModuleCache::Instance().LoadEditModule(request.projectFilePath, request.backend, request.config);
+        reply->key = result.key;
+        switch (result.resultKind)
+        {
+            case LoadEditModuleResultKind::moduleUpToDate: reply->result = "up-to-date"; break;
+            case LoadEditModuleResultKind::moduleLoaded: reply->result = "loaded, number of errors: " + std::to_string(result.numberOfErrors); break;
+            case LoadEditModuleResultKind::moduleReloaded: reply->result = "reloaded, number of errors: " + std::to_string(result.numberOfErrors); break;
+        }
+        reply->startLoading = result.startLoading;
+        reply->startParsing = result.startParsing;
+        reply->endParsing = result.endParsing;
+        reply->endLoading = result.endLoading;
+    }
+    catch (const std::exception& ex)
+    {
+        reply->result = "error";
+        reply->error = ex.what();
+    }
+    return std::unique_ptr<CodeCompletionReply>(reply.release());
+}
+
+std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const ResetEditModuleCacheRequest& request, std::string& rootElementName)
+{
+    rootElementName = "resetEditModuleCacheReply";
+    std::unique_ptr<ResetEditModuleCacheReply> reply(new ResetEditModuleCacheReply());
+    reply->created = std::chrono::steady_clock::now();
+    reply->requestCreated = request.created;
+    reply->requestReceived = request.received;
+    try
+    {
+        EditModuleCache::Init();
+        reply->result = "ok";
+    }
+    catch (const std::exception& ex)
+    {
+        reply->result = "error";
+        reply->error = ex.what();
+    }
+    return std::unique_ptr<CodeCompletionReply>(reply.release());
+}
+
+std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const ParseSourceRequest& request, std::string& rootElementName)
+{
+    rootElementName = "parseSourceReply";
+    std::unique_ptr<ParseSourceReply> reply(new ParseSourceReply());
+    reply->ok = true;
+    reply->created = std::chrono::steady_clock::now();
+    reply->requestCreated = request.created;
+    reply->requestReceived = request.received;
+    try
+    {
+        Module* module = EditModuleCache::Instance().GetEditModule(request.projectFilePath, request.backend, request.config);
+        if (module)
+        {
+            ParseResult result = module->ParseSource(request.sourceFilePath, request.sourceCode);
+            if (result.ok)
+            {
+                reply->startParsing = result.start;
+                reply->endParsing = result.end;
+                reply->errors = result.errors;
+            }
+            else
+            {
+                reply->ok = false;
+                reply->error = result.error;
+            }
+        }
+        else
+        {
+            throw std::runtime_error("edit module '" + MakeEditModuleKey(request.projectFilePath, request.backend, request.config) + " not found");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        reply->ok = false;
+        reply->error = ex.what();
+    }
+    return std::unique_ptr<CodeCompletionReply>(reply.release());
 }
 
 std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const StopRequest& request, std::string& rootElementName)

@@ -63,7 +63,7 @@ enum class SymbolType : uint8_t
     classDelegateTypeEquality, memberFunctionToClassDelegateSymbol, 
     arrayLengthFunctionSymbol, arrayBeginFunctionSymbol, arrayEndFunctionSymbol, arrayCBeginFunctionSymbol, arrayCEndFunctionSymbol,
     namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, variableValueSymbol, globalVariableSymbol, globalVariableGroupSymbol,
-    stringFunctionContainerSymbol, stringLengthFunctionSymbol,
+    stringFunctionContainerSymbol, stringLengthFunctionSymbol, axiomSymbol,
     maxSymbol
 };
 
@@ -237,6 +237,13 @@ public:
     virtual const char* ClassName() const { return "Symbol"; }
     bool GetLocation(SymbolLocation& definitionLocation) const;
     const boost::uuids::uuid& SourceModuleId() const { return sourceModuleId; }
+    int SymbolIndex() const { return symbolIndex; }
+    void SetSymbolIndex(int symbolIndex_) { symbolIndex = symbolIndex_; }
+    virtual std::unique_ptr<Symbol> RemoveMember(int symbolIndex);
+    virtual std::unique_ptr<Symbol> RemoveFromParent();
+    void SetInstalled() { installed = true; }
+    void ResetInstalled() { installed = false; }
+    bool IsInstalled() const { return installed; }
 private:
     SymbolType symbolType;
     Span span;
@@ -248,6 +255,8 @@ private:
     Module* module;
     CompileUnitNode* compileUnit;
     std::unique_ptr<Attributes> attributes;
+    int symbolIndex;
+    bool installed;
 };
 
 class SymbolCreator

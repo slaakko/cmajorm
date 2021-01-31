@@ -1,0 +1,41 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Typedef.hpp>
+[hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Specifier.hpp>
+[cpp]#include <sngcm/cmnothrowparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Identifier.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
+[cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorNothrowTokens;
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowTypedefParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowSpecifierParser.Specifiers;
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowIdentifierParser.Identifier;
+
+    Typedef(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : TypedefNode*
+        ::= Specifiers:specifiers{ s = span; } TYPEDEF TypeExpr(moduleId, ctx):type! Identifier(moduleId):id! SEMICOLON!
+        { 
+            s.end = span.end; 
+            TypedefNode* node = new TypedefNode(s, *moduleId, specifiers, type, id); 
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    ruleinfo
+    {
+        (Typedef, "typedef")
+    }
+}

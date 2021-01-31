@@ -21,6 +21,8 @@ public:
     bool IsExportSymbol() const override { return false; }
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void AddConcept(ConceptSymbol* conceptSymbol);
+    void RemoveConcept(ConceptSymbol* conceptSymbol);
+    bool IsEmpty() const;
     ConceptSymbol* GetConcept(int arity);
     bool HasProjectMembers() const override;
     void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const override;
@@ -62,6 +64,8 @@ public:
     bool HasSource() const { return hasSource; }
     void SetHasSource() { hasSource = true; }
     void Check() override;
+    void SetConceptGroup(ConceptGroupSymbol* conceptGroup_) { conceptGroup = conceptGroup_; }
+    std::unique_ptr<Symbol> RemoveFromParent() override;
 private:
     boost::uuids::uuid typeId;
     std::u32string groupName;
@@ -69,6 +73,17 @@ private:
     std::unique_ptr<ConceptNode> conceptNode;
     ConceptSymbol* refinedConcept;
     bool hasSource;
+    ConceptGroupSymbol* conceptGroup;
+};
+
+class AxiomSymbol : public ContainerSymbol
+{
+public:
+    AxiomSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId, const std::u32string& name_);
+    SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
+    bool IsExportSymbol() const override { return false; }
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "AxiomSymbol"; }
 };
 
 } } // namespace cmajor::symbols

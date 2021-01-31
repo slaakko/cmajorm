@@ -61,7 +61,7 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "classDelegateTypeEquality", "memberFunctionToClassDelegateSymbol", 
     "arrayLengthFunctionSymbol", "arrayBeginFunctionSymbol", "arrayEndFunctionSymbol", "arrayCBeginFunctionSymbol", "arrayCEndFunctionSymbol",
     "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "variableValueSymbol", "globalVariableSymbol", "globalVariableGroupSymbol",
-    "stringFunctionContainerSymbol", "stringLengthFunctionSymbol"
+    "stringFunctionContainerSymbol", "stringLengthFunctionSymbol", "axiomSymbol"
 };
 
 std::string SymbolTypeStr(SymbolType symbolType)
@@ -162,7 +162,8 @@ SymbolLocation MakeSymbolLocation(const Span& span, Module* module)
 }
 
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
-    symbolType(symbolType_), span(span_), sourceModuleId(sourceModuleId_), name(name_), flags(SymbolFlags::project), parent(nullptr), module(nullptr), compileUnit(nullptr)
+    symbolType(symbolType_), span(span_), sourceModuleId(sourceModuleId_), name(name_), flags(SymbolFlags::project), parent(nullptr), module(nullptr), compileUnit(nullptr), 
+    symbolIndex(-1), installed(false)
 {
 }
 
@@ -1024,6 +1025,17 @@ bool Symbol::GetLocation(SymbolLocation& definitionLocation) const
     return true;
 }
 
+std::unique_ptr<Symbol> Symbol::RemoveMember(int symbolIndex)
+{
+    return std::unique_ptr<Symbol>();
+}
+
+std::unique_ptr<Symbol> Symbol::RemoveFromParent()
+{
+    std::unique_ptr<Symbol> symbol = parent->RemoveMember(symbolIndex);
+    return symbol;
+}
+
 SymbolCreator::~SymbolCreator()
 {
 }
@@ -1189,6 +1201,7 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::globalVariableSymbol, new ConcreteSymbolCreator<GlobalVariableSymbol>());
     Register(SymbolType::stringFunctionContainerSymbol, new ConcreteSymbolCreator<StringFunctionContainerSymbol>());
     Register(SymbolType::stringLengthFunctionSymbol, new ConcreteSymbolCreator<StringLengthFunction>());
+    Register(SymbolType::axiomSymbol, new ConcreteSymbolCreator<AxiomSymbol>());
 #ifdef _WIN32
     Register(SymbolType::trap, new ConcreteSymbolCreator<TrapFunction>());
 #endif

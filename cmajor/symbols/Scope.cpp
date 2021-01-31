@@ -12,6 +12,7 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <sngcm/ast/Identifier.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Util.hpp>
 #include <algorithm>
@@ -100,6 +101,13 @@ void ContainerScope::Install(Symbol* symbol)
     {
         symbolMap[symbol->Name()] = symbol;
     }
+    symbol->SetInstalled();
+}
+
+void ContainerScope::Uninstall(Symbol* symbol)
+{
+    symbolMap.erase(symbol->Name());
+    symbol->ResetInstalled();
 }
 
 Symbol* ContainerScope::Lookup(const std::u32string& name) const
@@ -299,6 +307,87 @@ Symbol* ContainerScope::LookupQualified(const std::vector<std::u32string>& compo
         }
     }
     return s;
+}
+
+std::vector<Symbol*> ContainerScope::LookupBeginWith(const std::u32string& prefix) const
+{
+    return LookupBeginWith(prefix, ScopeLookup::this_);
+}
+
+std::vector<Symbol*> ContainerScope::LookupBeginWith(const std::u32string& prefix, ScopeLookup lookup) const
+{
+    int numQualifiedNameComponents = CountQualifiedNameComponents(prefix);
+    if (numQualifiedNameComponents > 1)
+    {
+        std::vector<std::u32string> components = ParseQualifiedName(prefix);
+        return LookupQualifiedBeginWith(components, lookup);
+    }
+    else
+    {
+        std::vector<Symbol*> matches;
+        auto it = symbolMap.lower_bound(prefix);
+        if (it != symbolMap.cend())
+        {
+            while (StartsWith(it->first, prefix))
+            {
+                matches.push_back(it->second);
+                ++it;
+            }
+        }
+        if ((lookup & ScopeLookup::base) != ScopeLookup::none)
+        {
+            ContainerScope* baseScope = BaseScope();
+            if (baseScope)
+            {
+                std::vector<Symbol*> m = baseScope->LookupBeginWith(prefix, lookup);
+                matches.insert(matches.end(), m.cbegin(), m.cend());
+            }
+        }
+        if ((lookup & ScopeLookup::parent) != ScopeLookup::none)
+        {
+            ContainerScope* parentScope = ParentScope();
+            if (parentScope)
+            {
+                std::vector<Symbol*> m = parentScope->LookupBeginWith(prefix, lookup);
+                matches.insert(matches.end(), m.cbegin(), m.cend());
+            }
+        }
+        return matches;
+    }
+}
+
+std::vector<Symbol*> ContainerScope::LookupQualifiedBeginWith(const std::vector<std::u32string>& components, ScopeLookup lookup) const
+{
+    std::vector<Symbol*> matches;
+    const ContainerScope* scope = this;
+    int n = int(components.size());
+    for (int i = 0; i < n - 1; ++i)
+    {
+        const std::u32string& component = components[i];
+        if (scope)
+        {
+            Symbol* s = scope->Lookup(component, ScopeLookup::this_);
+            if (s)
+            {
+                scope = s->GetContainerScope();
+            }
+        }
+    }
+    if (scope)
+    {
+        std::vector<Symbol*> m = scope->LookupBeginWith(components[n - 1]);
+        matches.insert(matches.end(), m.cbegin(), m.cend());
+    }
+    if ((lookup & ScopeLookup::parent) != ScopeLookup::none)
+    {
+        ContainerScope* parentScope = ParentScope();
+        if (parentScope)
+        {
+            std::vector<Symbol*> m = parentScope->LookupQualifiedBeginWith(components, lookup);
+            matches.insert(matches.end(), m.cbegin(), m.cend());
+        }
+    }
+    return matches;
 }
 
 const NamespaceSymbol* ContainerScope::Ns() const
@@ -505,6 +594,31 @@ Symbol* FileScope::Lookup(const std::u32string& name, ScopeLookup lookup) const
     {
         return *foundSymbols.begin();
     }
+}
+
+std::vector<Symbol*> FileScope::LookupBeginWith(const std::u32string& prefix) const
+{
+    return LookupBeginWith(prefix, ScopeLookup::this_);
+}
+
+std::vector<Symbol*> FileScope::LookupBeginWith(const std::u32string& prefix, ScopeLookup lookup) const
+{
+    std::vector<Symbol*> matches;
+    auto it = aliasSymbolMap.lower_bound(prefix);
+    if (it != aliasSymbolMap.cend())
+    {
+        while (StartsWith(it->first, prefix))
+        {
+            matches.push_back(it->second);
+            ++it;
+        }
+    }
+    for (ContainerScope* containerScope : containerScopes)
+    {
+        std::vector<Symbol*> m = containerScope->LookupBeginWith(prefix, ScopeLookup::this_);
+        matches.insert(matches.end(), m.cbegin(), m.cend());
+    }
+    return matches;
 }
 
 void FileScope::CollectViableFunctions(int arity, const std::u32string&  groupName, std::unordered_set<ContainerScope*>& scopesLookedUp, ViableFunctionSet& viableFunctions, 
