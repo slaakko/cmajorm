@@ -1,12 +1,30 @@
-System.Windows.API.WindowsAPIException: Ikkunakahva ei kelpaa.
-
+System.Exception: Either C++ or LLVM backend must be selected
 CALL STACK:
-System.Windows.API.WindowsAPIException.WindowsAPIException(ulong) C:/work/cmajorm/cmajor/system/System.Windows/Api.cm:39
-System.Windows.MessageBox.Show(const String<char>&, const String<char>&, Control*, System.Windows.MessageBoxType) C:/work/cmajorm/cmajor/system/System.Windows/MessageBox.cm:72
-cmcode.MainWindow.CloseSolution() C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:1423
-cmcode.MainWindow.OnWindowClosing(bool&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:677
-System.Windows.Window.ProcessMessage(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Window.cm:149
+cmcode.MainWindow.GetBackend() const C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:1923
+cmcode.MainWindow.CodeCompletionParse() C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:3899
+cmcode.MainWindow.OnTimer(TimerEventArgs&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:719
+System.Windows.Control.DoTimer(uint) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:1714
+System.Windows.Control.ProcessMessage(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:985
+System.Windows.ContainerControl.ProcessMessage(Message&) C:/work/cmajorm/cmajor/system/System.Windows/ContainerControl.cm:188
+System.Windows.Window.ProcessMessage(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Window.cm:172
 cmcode.MainWindow.ProcessMessage(Message&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:4014
+System.Windows.Control.ProcessMessageInternal(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:789
+System.Windows.Application.ProcessMessage(void*, uint, uint, long, long&, void*&) C:/work/cmajorm/cmajor/system/System.Windows/Application.cm:133
+System.Windows.Application.ProcessMessages() C:/work/cmajorm/cmajor/system/System.Windows/Application.cm:117
+cmcode.MainWindow.BuildServiceLogMessagesAvailable() C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:2224
+Cm.Service.ServiceBase.LogMessage(const String<char>&) C:/work/cmajorm/cmajor/projects/cm/service/ServiceBase.cm:53
+Cm.Service.Build.BuildService.StartServer() C:/work/cmajorm/cmajor/projects/cm/service/BuildService.cm:205
+Cm.Service.Build.BuildService.ProcessBuildRequest(const BuildRequest&) C:/work/cmajorm/cmajor/projects/cm/service/BuildService.cm:385
+cmcode.MainWindow.StartBuild(const BuildRequest&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:2011
+cmcode.MainWindow.BuildActiveProjectClick() C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:2115
+cmcode.MainWindow.StepOverClick() C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:3037
+System.Windows.MenuItem.OnClick() C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:2142
+System.Windows.MenuItem.DoClick() C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:2138
+System.Windows.MenuBar.OnKeyDown(KeyEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:353
+System.Windows.MenuBar.DoKeyDown(KeyEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:340
+System.Windows.Control.DoMenu(KeyEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:1371
+System.Windows.Control.DoKeyDown(int) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:1202
+System.Windows.Control.ProcessMessage(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:911
 System.Windows.Control.ProcessMessageInternal(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:789
 System.Windows.Application.ProcessMessage(void*, uint, uint, long, long&, void*&) C:/work/cmajorm/cmajor/system/System.Windows/Application.cm:133
 System.Windows.Application.Run(Window&) C:/work/cmajorm/cmajor/system/System.Windows/Application.cm:95

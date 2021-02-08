@@ -416,7 +416,7 @@ std::vector<CCSymbolEntry> MakeCCMatches(const std::vector<CCComponent>& compone
 
 void AddMatches(std::vector<CCSymbolEntry>& matches, std::vector<CCSymbolEntry>& matchesToAdd)
 {
-    for (const CCSymbolEntry& entry : matchesToAdd)
+    for (CCSymbolEntry& entry : matchesToAdd)
     {
         Symbol* s = entry.symbol;
         bool found = false;
@@ -608,14 +608,35 @@ std::vector<CCSymbolEntry> ContainerScope::LookupQualifiedBeginWith(const std::v
     }
     if (s && scope)
     {
-        if (components[n - 1].separator == CCComponentSeparator::arrow)
+        bool validAccess = true;
+        if (components[n - 1].separator == CCComponentSeparator::dot)
+        {
+            switch (s->GetSymbolType())
+            {
+                case SymbolType::localVariableSymbol:
+                case SymbolType::memberVariableSymbol:
+                case SymbolType::parameterSymbol:
+                {
+                    const VariableSymbol* variableSymbol = static_cast<const VariableSymbol*>(s);
+                    const TypeSymbol* type = variableSymbol->GetType();
+                    if (type && type->IsPointerType())
+                    {
+                        validAccess = false;
+                    }
+                }
+            }
+        }
+        else if (components[n - 1].separator == CCComponentSeparator::arrow)
         {
             const ContainerSymbol* containerSymbol = scope->Container();
             scope = containerSymbol->GetArrowScope();
         }
-        std::vector<CCSymbolEntry> m = MakeCCMatches(components, scope->LookupBeginWith(components[n - 1].str));
-        AddMatches(matches, m);
-        lookup = lookup & ~ScopeLookup::parent;
+        if (validAccess)
+        {
+            std::vector<CCSymbolEntry> m = MakeCCMatches(components, scope->LookupBeginWith(components[n - 1].str));
+            AddMatches(matches, m);
+            lookup = lookup & ~ScopeLookup::parent;
+        }
     }
     if ((lookup & ScopeLookup::base) != ScopeLookup::none)
     {
