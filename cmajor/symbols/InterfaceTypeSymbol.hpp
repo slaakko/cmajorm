@@ -30,6 +30,8 @@ public:
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "InterfaceTypeSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "IN"; }
+    std::string GetSymbolCategoryDescription() const override { return "interface"; }
 private:
     std::vector<MemberFunctionSymbol*> memberFunctions;
     InterfaceTypeCopyConstructor* copyConstructor;

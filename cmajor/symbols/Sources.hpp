@@ -22,6 +22,7 @@ class Symbol;
 class ContainerSymbol;
 class ContainerScope;
 class FileScope;
+struct CCSymbolEntry;
 
 using TypeBindingFunction = std::vector<std::string> (*)(Module* module, CompileUnitNode* compileUnit);
 
@@ -40,13 +41,15 @@ public:
     void Parse(const boost::uuids::uuid& moduleId, int index);
     const std::vector<std::string>& Errors() const { return errors; }
     bool Synchronized() const { return synchronized; }
+    ContainerSymbol* CursorContainer() const { return cursorContainer; }
     CompileUnitNode* CompileUnit() { return compileUnit.get(); }
     void AddSymbol(Symbol* symbol);
     void AddSymbols(Module* module);
     void RemoveSymbols();
     void GetScopes(Module* module);
     void BindTypes(Module* module);
-    std::vector<Symbol*> LookupSymbolsBeginningWith(const std::u32string& prefix);
+    std::vector<CCSymbolEntry> LookupSymbolsBeginningWith(const std::u32string& prefix);
+    std::string GetCCList(Module* module, const std::string& ccText);
 private:
     std::string filePath;
     std::u32string content;
@@ -68,6 +71,7 @@ struct SYMBOLS_API ParseResult
     std::string error;
     int numberOfErrors;
     bool synchronized;
+    std::string cursorContainer;
     std::vector<std::string> errors;
     std::chrono::steady_clock::time_point start;
     std::chrono::steady_clock::time_point end;
@@ -92,6 +96,7 @@ public:
     int GetNumberOfErrors();
     bool Synchronized();
     ParseResult ParseSource(Module* module, const std::string& sourceFilePath, const std::u32string& sourceCode);
+    std::string GetCCList(Module* module, const std::string& sourceFilePath, const std::string& ccText);
 private:
     std::vector<std::unique_ptr<Source>> sources;
     std::map<std::string, int> sourceIndexMap;

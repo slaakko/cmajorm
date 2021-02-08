@@ -37,6 +37,11 @@ private:
     std::unordered_set<FunctionSymbol*, FunctionSymbolHash, FunctionSymbolsEqual> set;
 };
 
+using AccessCheckFunction = bool(*)(FunctionSymbol* fromFunction, Symbol* toSymbol);
+
+SYMBOLS_API void SetAccessCheckFunction(AccessCheckFunction accessCheckFunc);
+SYMBOLS_API AccessCheckFunction GetAccessCheckFunction();
+
 class SYMBOLS_API FunctionGroupSymbol : public Symbol
 {
 public:
@@ -55,6 +60,10 @@ public:
     const char* ClassName() const override { return "FunctionGroupSymbol"; }
     void Check() override;
     void CheckDuplicateFunctionSymbols();
+    std::string GetSymbolCategoryStr() const override { return "FN"; }
+    std::string GetSymbolCategoryDescription() const override { return "function"; }
+    std::string GetSymbolHelp() const override;
+    bool IsValidCCFunctionGroup(FunctionSymbol* fromFunction) const;
 private:
     std::unordered_map<int, std::vector<FunctionSymbol*>> arityFunctionListMap;
     std::vector<FunctionSymbol*> varArgFunctions;
@@ -276,6 +285,9 @@ public:
     void CopyFrom(const Symbol* that) override;
     virtual FunctionSymbol* Copy() const;
     std::unique_ptr<Symbol> RemoveFromParent() override;
+    std::string GetSymbolCategoryStr() const override { return "FN"; }
+    std::string GetSymbolCategoryDescription() const override { return "function"; }
+    std::string GetSymbolHelp() const override;
 private:
     FunctionSymbol* functionTemplate;
     FunctionSymbol* master;

@@ -82,45 +82,78 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                                                 soulng::parser::Match match(false);
                                                 soulng::parser::Match* parentMatch11 = &match;
                                                 {
-                                                    int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = NothrowStatementParser::LabeledStatement(lexer, moduleId, ctx);
-                                                    labeledStatement.reset(static_cast<StatementNode*>(match.value));
-                                                    if (match.hit)
+                                                    int64_t save = lexer.GetPos();
+                                                    soulng::parser::Match match(false);
+                                                    soulng::parser::Match* parentMatch12 = &match;
                                                     {
+                                                        int64_t pos = lexer.GetPos();
+                                                        soulng::parser::Match match = NothrowStatementParser::LabeledStatement(lexer, moduleId, ctx);
+                                                        labeledStatement.reset(static_cast<StatementNode*>(match.value));
+                                                        if (match.hit)
                                                         {
-                                                            #ifdef SOULNG_PARSER_DEBUG_SUPPORT
-                                                            if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
-                                                            #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                            return soulng::parser::Match(true, labeledStatement.release());
+                                                            {
+                                                                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                                                                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
+                                                                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                                                                return soulng::parser::Match(true, labeledStatement.release());
+                                                            }
                                                         }
+                                                        *parentMatch12 = match;
                                                     }
                                                     *parentMatch11 = match;
+                                                    if (!match.hit)
+                                                    {
+                                                        soulng::parser::Match match(false);
+                                                        soulng::parser::Match* parentMatch13 = &match;
+                                                        lexer.SetPos(save);
+                                                        {
+                                                            soulng::parser::Match match(false);
+                                                            soulng::parser::Match* parentMatch14 = &match;
+                                                            {
+                                                                int64_t pos = lexer.GetPos();
+                                                                soulng::parser::Match match = NothrowStatementParser::ControlStatement(lexer, moduleId, ctx);
+                                                                controlStatement.reset(static_cast<StatementNode*>(match.value));
+                                                                if (match.hit)
+                                                                {
+                                                                    {
+                                                                        #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                                                                        if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
+                                                                        #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                                                                        return soulng::parser::Match(true, controlStatement.release());
+                                                                    }
+                                                                }
+                                                                *parentMatch14 = match;
+                                                            }
+                                                            *parentMatch13 = match;
+                                                        }
+                                                        *parentMatch11 = match;
+                                                    }
                                                 }
                                                 *parentMatch10 = match;
                                                 if (!match.hit)
                                                 {
                                                     soulng::parser::Match match(false);
-                                                    soulng::parser::Match* parentMatch12 = &match;
+                                                    soulng::parser::Match* parentMatch15 = &match;
                                                     lexer.SetPos(save);
                                                     {
                                                         soulng::parser::Match match(false);
-                                                        soulng::parser::Match* parentMatch13 = &match;
+                                                        soulng::parser::Match* parentMatch16 = &match;
                                                         {
                                                             int64_t pos = lexer.GetPos();
-                                                            soulng::parser::Match match = NothrowStatementParser::ControlStatement(lexer, moduleId, ctx);
-                                                            controlStatement.reset(static_cast<StatementNode*>(match.value));
+                                                            soulng::parser::Match match = NothrowStatementParser::ExpressionStatement(lexer, moduleId, ctx);
+                                                            expressionStatement.reset(static_cast<StatementNode*>(match.value));
                                                             if (match.hit)
                                                             {
                                                                 {
                                                                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                                                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                                    return soulng::parser::Match(true, controlStatement.release());
+                                                                    return soulng::parser::Match(true, expressionStatement.release());
                                                                 }
                                                             }
-                                                            *parentMatch13 = match;
+                                                            *parentMatch16 = match;
                                                         }
-                                                        *parentMatch12 = match;
+                                                        *parentMatch15 = match;
                                                     }
                                                     *parentMatch10 = match;
                                                 }
@@ -129,27 +162,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                                             if (!match.hit)
                                             {
                                                 soulng::parser::Match match(false);
-                                                soulng::parser::Match* parentMatch14 = &match;
+                                                soulng::parser::Match* parentMatch17 = &match;
                                                 lexer.SetPos(save);
                                                 {
                                                     soulng::parser::Match match(false);
-                                                    soulng::parser::Match* parentMatch15 = &match;
+                                                    soulng::parser::Match* parentMatch18 = &match;
                                                     {
                                                         int64_t pos = lexer.GetPos();
-                                                        soulng::parser::Match match = NothrowStatementParser::ExpressionStatement(lexer, moduleId, ctx);
-                                                        expressionStatement.reset(static_cast<StatementNode*>(match.value));
+                                                        soulng::parser::Match match = NothrowStatementParser::AssignmentStatement(lexer, moduleId, ctx);
+                                                        assignmentStatement.reset(static_cast<StatementNode*>(match.value));
                                                         if (match.hit)
                                                         {
                                                             {
                                                                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                                                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                                return soulng::parser::Match(true, expressionStatement.release());
+                                                                return soulng::parser::Match(true, assignmentStatement.release());
                                                             }
                                                         }
-                                                        *parentMatch15 = match;
+                                                        *parentMatch18 = match;
                                                     }
-                                                    *parentMatch14 = match;
+                                                    *parentMatch17 = match;
                                                 }
                                                 *parentMatch9 = match;
                                             }
@@ -158,27 +191,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                                         if (!match.hit)
                                         {
                                             soulng::parser::Match match(false);
-                                            soulng::parser::Match* parentMatch16 = &match;
+                                            soulng::parser::Match* parentMatch19 = &match;
                                             lexer.SetPos(save);
                                             {
                                                 soulng::parser::Match match(false);
-                                                soulng::parser::Match* parentMatch17 = &match;
+                                                soulng::parser::Match* parentMatch20 = &match;
                                                 {
                                                     int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = NothrowStatementParser::AssignmentStatement(lexer, moduleId, ctx);
-                                                    assignmentStatement.reset(static_cast<StatementNode*>(match.value));
+                                                    soulng::parser::Match match = NothrowStatementParser::ConstructionStatement(lexer, moduleId, ctx);
+                                                    constructionStatement.reset(static_cast<ConstructionStatementNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         {
                                                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                            return soulng::parser::Match(true, assignmentStatement.release());
+                                                            return soulng::parser::Match(true, constructionStatement.release());
                                                         }
                                                     }
-                                                    *parentMatch17 = match;
+                                                    *parentMatch20 = match;
                                                 }
-                                                *parentMatch16 = match;
+                                                *parentMatch19 = match;
                                             }
                                             *parentMatch8 = match;
                                         }
@@ -187,27 +220,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                                     if (!match.hit)
                                     {
                                         soulng::parser::Match match(false);
-                                        soulng::parser::Match* parentMatch18 = &match;
+                                        soulng::parser::Match* parentMatch21 = &match;
                                         lexer.SetPos(save);
                                         {
                                             soulng::parser::Match match(false);
-                                            soulng::parser::Match* parentMatch19 = &match;
+                                            soulng::parser::Match* parentMatch22 = &match;
                                             {
                                                 int64_t pos = lexer.GetPos();
-                                                soulng::parser::Match match = NothrowStatementParser::ConstructionStatement(lexer, moduleId, ctx);
-                                                constructionStatement.reset(static_cast<ConstructionStatementNode*>(match.value));
+                                                soulng::parser::Match match = NothrowStatementParser::DeleteStatement(lexer, moduleId, ctx);
+                                                deleteStatement.reset(static_cast<StatementNode*>(match.value));
                                                 if (match.hit)
                                                 {
                                                     {
                                                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                        return soulng::parser::Match(true, constructionStatement.release());
+                                                        return soulng::parser::Match(true, deleteStatement.release());
                                                     }
                                                 }
-                                                *parentMatch19 = match;
+                                                *parentMatch22 = match;
                                             }
-                                            *parentMatch18 = match;
+                                            *parentMatch21 = match;
                                         }
                                         *parentMatch7 = match;
                                     }
@@ -216,27 +249,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                                 if (!match.hit)
                                 {
                                     soulng::parser::Match match(false);
-                                    soulng::parser::Match* parentMatch20 = &match;
+                                    soulng::parser::Match* parentMatch23 = &match;
                                     lexer.SetPos(save);
                                     {
                                         soulng::parser::Match match(false);
-                                        soulng::parser::Match* parentMatch21 = &match;
+                                        soulng::parser::Match* parentMatch24 = &match;
                                         {
                                             int64_t pos = lexer.GetPos();
-                                            soulng::parser::Match match = NothrowStatementParser::DeleteStatement(lexer, moduleId, ctx);
-                                            deleteStatement.reset(static_cast<StatementNode*>(match.value));
+                                            soulng::parser::Match match = NothrowStatementParser::DestroyStatement(lexer, moduleId, ctx);
+                                            destroyStatement.reset(static_cast<StatementNode*>(match.value));
                                             if (match.hit)
                                             {
                                                 {
                                                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                    return soulng::parser::Match(true, deleteStatement.release());
+                                                    return soulng::parser::Match(true, destroyStatement.release());
                                                 }
                                             }
-                                            *parentMatch21 = match;
+                                            *parentMatch24 = match;
                                         }
-                                        *parentMatch20 = match;
+                                        *parentMatch23 = match;
                                     }
                                     *parentMatch6 = match;
                                 }
@@ -245,27 +278,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                             if (!match.hit)
                             {
                                 soulng::parser::Match match(false);
-                                soulng::parser::Match* parentMatch22 = &match;
+                                soulng::parser::Match* parentMatch25 = &match;
                                 lexer.SetPos(save);
                                 {
                                     soulng::parser::Match match(false);
-                                    soulng::parser::Match* parentMatch23 = &match;
+                                    soulng::parser::Match* parentMatch26 = &match;
                                     {
                                         int64_t pos = lexer.GetPos();
-                                        soulng::parser::Match match = NothrowStatementParser::DestroyStatement(lexer, moduleId, ctx);
-                                        destroyStatement.reset(static_cast<StatementNode*>(match.value));
+                                        soulng::parser::Match match = NothrowStatementParser::EmptyStatement(lexer, moduleId, ctx);
+                                        emptyStatement.reset(static_cast<StatementNode*>(match.value));
                                         if (match.hit)
                                         {
                                             {
                                                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                return soulng::parser::Match(true, destroyStatement.release());
+                                                return soulng::parser::Match(true, emptyStatement.release());
                                             }
                                         }
-                                        *parentMatch23 = match;
+                                        *parentMatch26 = match;
                                     }
-                                    *parentMatch22 = match;
+                                    *parentMatch25 = match;
                                 }
                                 *parentMatch5 = match;
                             }
@@ -274,27 +307,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                         if (!match.hit)
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch24 = &match;
+                            soulng::parser::Match* parentMatch27 = &match;
                             lexer.SetPos(save);
                             {
                                 soulng::parser::Match match(false);
-                                soulng::parser::Match* parentMatch25 = &match;
+                                soulng::parser::Match* parentMatch28 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
-                                    soulng::parser::Match match = NothrowStatementParser::EmptyStatement(lexer, moduleId, ctx);
-                                    emptyStatement.reset(static_cast<StatementNode*>(match.value));
+                                    soulng::parser::Match match = NothrowStatementParser::ThrowStatement(lexer, moduleId, ctx);
+                                    throwStatement.reset(static_cast<StatementNode*>(match.value));
                                     if (match.hit)
                                     {
                                         {
                                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                            return soulng::parser::Match(true, emptyStatement.release());
+                                            return soulng::parser::Match(true, throwStatement.release());
                                         }
                                     }
-                                    *parentMatch25 = match;
+                                    *parentMatch28 = match;
                                 }
-                                *parentMatch24 = match;
+                                *parentMatch27 = match;
                             }
                             *parentMatch4 = match;
                         }
@@ -303,27 +336,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                     if (!match.hit)
                     {
                         soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch26 = &match;
+                        soulng::parser::Match* parentMatch29 = &match;
                         lexer.SetPos(save);
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch27 = &match;
+                            soulng::parser::Match* parentMatch30 = &match;
                             {
                                 int64_t pos = lexer.GetPos();
-                                soulng::parser::Match match = NothrowStatementParser::ThrowStatement(lexer, moduleId, ctx);
-                                throwStatement.reset(static_cast<StatementNode*>(match.value));
+                                soulng::parser::Match match = NothrowStatementParser::TryStatement(lexer, moduleId, ctx);
+                                tryStatement.reset(static_cast<TryStatementNode*>(match.value));
                                 if (match.hit)
                                 {
                                     {
                                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                        return soulng::parser::Match(true, throwStatement.release());
+                                        return soulng::parser::Match(true, tryStatement.release());
                                     }
                                 }
-                                *parentMatch27 = match;
+                                *parentMatch30 = match;
                             }
-                            *parentMatch26 = match;
+                            *parentMatch29 = match;
                         }
                         *parentMatch3 = match;
                     }
@@ -332,27 +365,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                 if (!match.hit)
                 {
                     soulng::parser::Match match(false);
-                    soulng::parser::Match* parentMatch28 = &match;
+                    soulng::parser::Match* parentMatch31 = &match;
                     lexer.SetPos(save);
                     {
                         soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch29 = &match;
+                        soulng::parser::Match* parentMatch32 = &match;
                         {
                             int64_t pos = lexer.GetPos();
-                            soulng::parser::Match match = NothrowStatementParser::TryStatement(lexer, moduleId, ctx);
-                            tryStatement.reset(static_cast<TryStatementNode*>(match.value));
+                            soulng::parser::Match match = NothrowStatementParser::AssertStatement(lexer, moduleId, ctx);
+                            assertStatement.reset(static_cast<StatementNode*>(match.value));
                             if (match.hit)
                             {
                                 {
                                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                    return soulng::parser::Match(true, tryStatement.release());
+                                    return soulng::parser::Match(true, assertStatement.release());
                                 }
                             }
-                            *parentMatch29 = match;
+                            *parentMatch32 = match;
                         }
-                        *parentMatch28 = match;
+                        *parentMatch31 = match;
                     }
                     *parentMatch2 = match;
                 }
@@ -361,27 +394,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
             if (!match.hit)
             {
                 soulng::parser::Match match(false);
-                soulng::parser::Match* parentMatch30 = &match;
+                soulng::parser::Match* parentMatch33 = &match;
                 lexer.SetPos(save);
                 {
                     soulng::parser::Match match(false);
-                    soulng::parser::Match* parentMatch31 = &match;
+                    soulng::parser::Match* parentMatch34 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = NothrowStatementParser::AssertStatement(lexer, moduleId, ctx);
-                        assertStatement.reset(static_cast<StatementNode*>(match.value));
+                        soulng::parser::Match match = NothrowStatementParser::ConditionalCompilationStatement(lexer, moduleId, ctx);
+                        condCompStatement.reset(static_cast<ConditionalCompilationStatementNode*>(match.value));
                         if (match.hit)
                         {
                             {
                                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                return soulng::parser::Match(true, assertStatement.release());
+                                return soulng::parser::Match(true, condCompStatement.release());
                             }
                         }
-                        *parentMatch31 = match;
+                        *parentMatch34 = match;
                     }
-                    *parentMatch30 = match;
+                    *parentMatch33 = match;
                 }
                 *parentMatch1 = match;
             }
@@ -390,27 +423,27 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
         if (!match.hit)
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch32 = &match;
+            soulng::parser::Match* parentMatch35 = &match;
             lexer.SetPos(save);
             {
                 soulng::parser::Match match(false);
-                soulng::parser::Match* parentMatch33 = &match;
+                soulng::parser::Match* parentMatch36 = &match;
                 {
                     int64_t pos = lexer.GetPos();
-                    soulng::parser::Match match = NothrowStatementParser::ConditionalCompilationStatement(lexer, moduleId, ctx);
-                    condCompStatement.reset(static_cast<ConditionalCompilationStatementNode*>(match.value));
+                    soulng::lexer::Span span = lexer.GetSpan();
+                    soulng::parser::Match match = NothrowStatementParser::SyncStmt(lexer);
                     if (match.hit)
                     {
                         {
                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                            return soulng::parser::Match(true, condCompStatement.release());
+                            return soulng::parser::Match(true, new sngcm::ast::SyncNode(span, *moduleId));
                         }
                     }
-                    *parentMatch33 = match;
+                    *parentMatch36 = match;
                 }
-                *parentMatch32 = match;
+                *parentMatch35 = match;
             }
             *parentMatch0 = match;
         }
@@ -420,6 +453,54 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
     {
         if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
         else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("Statement"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    if (!match.hit)
+    {
+        match.value = nullptr;
+    }
+    return match;
+}
+
+soulng::parser::Match NothrowStatementParser::SyncStmt(CmajorNothrowLexer& lexer)
+{
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::Span parser_debug_match_span;
+    bool parser_debug_write_to_log = lexer.Log() != nullptr;
+    if (parser_debug_write_to_log)
+    {
+        parser_debug_match_span = lexer.GetSpan();
+        soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("SyncStmt"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::parser::Match match(false);
+    soulng::parser::Match* parentMatch0 = &match;
+    {
+        int64_t pos = lexer.GetPos();
+        bool pass = true;
+        soulng::parser::Match match(true);
+        if (match.hit)
+        {
+            if (lexer.Synchronize())
+            {
+                ++lexer;
+            }
+            else
+            {
+                pass = false;
+            }
+        }
+        if (match.hit && !pass)
+        {
+            match = soulng::parser::Match(false);
+        }
+        *parentMatch0 = match;
+    }
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    if (parser_debug_write_to_log)
+    {
+        if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("SyncStmt"));
+        else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("SyncStmt"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     if (!match.hit)
@@ -1055,7 +1136,8 @@ soulng::parser::Match NothrowStatementParser::CompoundStatement(CmajorNothrowLex
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     std::unique_ptr<CompoundStatementNode> compoundStatement = std::unique_ptr<CompoundStatementNode>();
-    std::unique_ptr<StatementNode> stmt;
+    std::unique_ptr<StatementNode> stmt = std::unique_ptr<StatementNode>();
+    std::unique_ptr<StatementNode> statement;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -1102,9 +1184,15 @@ soulng::parser::Match NothrowStatementParser::CompoundStatement(CmajorNothrowLex
                                 {
                                     int64_t pos = lexer.GetPos();
                                     soulng::parser::Match match = NothrowStatementParser::Statement(lexer, moduleId, ctx);
-                                    stmt.reset(static_cast<StatementNode*>(match.value));
+                                    statement.reset(static_cast<StatementNode*>(match.value));
                                     if (match.hit)
                                     {
+                                        stmt.reset(statement.release());
+                                        bool isSyncNode = stmt->GetNodeType() == sngcm::ast::NodeType::syncNode;
+                                        if (!isSyncNode)
+                                        {
+                                            lexer.ResetFlag(LexerFlags::synchronized);
+                                        }
                                         compoundStatement->AddStatement(stmt.release());
                                     }
                                     *parentMatch6 = match;

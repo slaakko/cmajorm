@@ -17,7 +17,7 @@ namespace soulng { namespace lexer {
 
 enum class LexerFlags : int8_t
 {
-    none = 0, synchronized = 1 << 0, synchronizedAtLeastOnce = 1 << 1, cursorSeen = 1 << 2
+    none = 0, synchronize = 1 << 0, synchronized = 1 << 1, synchronizedAtLeastOnce = 1 << 2, cursorSeen = 1 << 3
 };
 
 inline LexerFlags operator|(LexerFlags left, LexerFlags right)

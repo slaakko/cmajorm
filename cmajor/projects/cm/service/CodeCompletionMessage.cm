@@ -90,12 +90,50 @@ namespace Cm.Service.CodeCompletion
     [xml]
     public class ParseSourceReply : CodeCompletionReply
     {
+        public nothrow ParseSourceReply() : base(), ok(false), error(), errors(), synchronized(false), cursorContainer(), startParsing(), endParsing()
+        {
+        }
         public bool ok;
         public string error;
         public List<string> errors;
         public bool synchronized;
+        public string cursorContainer;
         public TimePoint startParsing;
         public TimePoint endParsing;
+    }
+
+    [xml]
+    public class GetCCListRequest : CodeCompletionRequest
+    {
+        public nothrow GetCCListRequest() : base(), projectFilePath(), backend(), config(), sourceFilePath(), ccText()
+        {
+        }
+        public nothrow GetCCListRequest(const string& projectFilePath_, const string& backend_, const string& config_, const string& sourceFilePath_,
+            const string& ccText_) : base(), projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), ccText(ccText_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public string projectFilePath;
+        public string backend;
+        public string config;
+        public string sourceFilePath;
+        public string ccText;
+    }
+
+    [xml]
+    public class GetCCListReply : CodeCompletionReply
+    {
+        public nothrow GetCCListReply() : ok(false), error(), ccList(), startGetCCList(), endGetCCList()
+        {
+        }
+        public bool ok;
+        public string error;
+        public string ccList;
+        public TimePoint startGetCCList;
+        public TimePoint endGetCCList;
     }
 
     [xml]
@@ -150,6 +188,7 @@ namespace Cm.Service.CodeCompletion
         public virtual void Visit(LoadEditModuleRequest& request) {}
         public virtual void Visit(ResetEditModuleCacheRequest& request) {}
         public virtual void Visit(ParseSourceRequest& request) {}
+        public virtual void Visit(GetCCListRequest& request) {}
         public virtual void Visit(StopRequest& request) {}
     }
 }

@@ -367,7 +367,28 @@ void DelegateTypeSymbol::Check()
     {
         throw SymbolCheckException("delegate type symbol has no return type", GetSpan(), SourceModuleId());
     }
+}
 
+std::string DelegateTypeSymbol::GetSymbolHelp() const
+{
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(ReturnType()->FullName())).append(" ").append(ToUtf8(FullName())).append("(");
+    bool first = true;
+    for (ParameterSymbol* param : parameters)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            help.append(", ");
+        }
+        help.append(ToUtf8(param->GetType()->FullName())).append(" ").append(ToUtf8(param->Name()));
+    }
+    help.append(")");
+    return help;
 }
 
 DelegateTypeDefaultConstructor::DelegateTypeDefaultConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
@@ -748,6 +769,28 @@ std::string ClassDelegateTypeSymbol::Syntax() const
     }
     syntax.append(");");
     return syntax;
+}
+
+std::string ClassDelegateTypeSymbol::GetSymbolHelp() const
+{
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(ReturnType()->FullName())).append(" ").append(ToUtf8(FullName())).append("(");
+    bool first = true;
+    for (ParameterSymbol* param : parameters)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            help.append(", ");
+        }
+        help.append(ToUtf8(param->GetType()->FullName())).append(" ").append(ToUtf8(param->Name()));
+    }
+    help.append(")");
+    return help;
 }
 
 std::u32string ClassDelegateTypeSymbol::Id() const

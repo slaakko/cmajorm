@@ -210,6 +210,26 @@ ContainerScope* Symbol::GetContainerScope()
     return parent ? parent->GetContainerScope() : nullptr;
 }
 
+const ContainerScope* Symbol::GetTypeScope() const
+{
+    return GetContainerScope();
+}
+
+ContainerScope* Symbol::GetTypeScope()
+{
+    return GetContainerScope();
+}
+
+ContainerScope* Symbol::GetArrowScope()
+{
+    return module->GetSymbolTable().GlobalNs().GetContainerScope();
+}
+
+const ContainerScope* Symbol::GetArrowScope() const
+{
+    return module->GetSymbolTable().GlobalNs().GetContainerScope();
+}
+
 std::u32string Symbol::FullName() const
 {
     std::u32string fullName;
@@ -1012,6 +1032,25 @@ std::unique_ptr<sngxml::dom::Element> Symbol::ToDomElement(TypeMap& typeMap)
 std::unique_ptr<sngxml::dom::Element> Symbol::CreateDomElement(TypeMap& typeMap)
 {
     return std::unique_ptr<sngxml::dom::Element>(new sngxml::dom::Element(ToUtf32(ClassName())));
+}
+
+sngxml::dom::Element* Symbol::ToCCElement(int ccPrefixLength, const std::u32string& replacement) const
+{
+    sngxml::dom::Element* ccElement = new sngxml::dom::Element(U"symbol");
+    ccElement->SetAttribute(U"prefixLength", ToUtf32(std::to_string(ccPrefixLength)));
+    ccElement->SetAttribute(U"category", ToUtf32(GetSymbolCategoryStr()));
+    ccElement->SetAttribute(U"help", ToUtf32(GetSymbolHelp()));
+    ccElement->SetAttribute(U"completion", Name());
+    ccElement->SetAttribute(U"replacement", replacement);
+    return ccElement;
+}
+
+std::string Symbol::GetSymbolHelp() const
+{
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(FullName()));
+    return help;
 }
 
 bool Symbol::GetLocation(SymbolLocation& definitionLocation) const

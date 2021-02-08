@@ -38,6 +38,9 @@ public:
     void SetStrValue(const std::u32string& strValue_) { strValue = strValue_; }
     const std::u32string& StrValue() const { return strValue; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "CN"; }
+    std::string GetSymbolCategoryDescription() const override { return "constant"; }
+    std::string GetSymbolHelp() const override;
 private:
     TypeSymbol* type;
     std::unique_ptr<Value> value;

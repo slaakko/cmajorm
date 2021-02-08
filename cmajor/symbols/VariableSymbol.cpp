@@ -44,6 +44,30 @@ void VariableSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     type = typeSymbol;
 }
 
+const ContainerScope* VariableSymbol::GetTypeScope() const
+{
+    if (type)
+    {
+        return type->BaseType()->GetContainerScope();
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+ContainerScope* VariableSymbol::GetTypeScope()
+{
+    if (type)
+    {
+        return type->BaseType()->GetContainerScope();
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 void VariableSymbol::Check()
 {
     Symbol::Check();
@@ -51,6 +75,16 @@ void VariableSymbol::Check()
     {
         throw SymbolCheckException("variable symbol contains null type pointer", GetSpan(), SourceModuleId());
     }
+}
+
+std::string VariableSymbol::GetSymbolHelp() const
+{
+    if (!type) return std::string();
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(type->FullName())).append(" ");
+    help.append(ToUtf8(FullName()));
+    return help;
 }
 
 ParameterSymbol::ParameterSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
@@ -105,6 +139,16 @@ ParameterSymbol* ParameterSymbol::Clone() const
     return clone;
 }
 
+std::string ParameterSymbol::GetSymbolHelp() const
+{
+    if (!GetType()) return std::string();
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(GetType()->FullName())).append(" ");
+    help.append(ToUtf8(Name()));
+    return help;
+}
+
 LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
     VariableSymbol(SymbolType::localVariableSymbol, span_, sourceModuleId_, name_)
 {
@@ -121,6 +165,16 @@ std::unique_ptr<sngxml::dom::Element> LocalVariableSymbol::CreateDomElement(Type
         element->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
     }
     return element;
+}
+
+std::string LocalVariableSymbol::GetSymbolHelp() const
+{
+    if (!GetType()) return std::string();
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(GetType()->FullName())).append(" ");
+    help.append(ToUtf8(Name()));
+    return help;
 }
 
 MemberVariableSymbol::MemberVariableSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
@@ -376,6 +430,36 @@ void GlobalVariableGroupSymbol::CollectGlobalVariables(const std::string& compil
     {
         globalVariables.push_back(p.first);
     }
+}
+
+const ContainerScope* GlobalVariableGroupSymbol::GetTypeScope() const
+{
+    for (const std::pair<GlobalVariableSymbol*, std::string>& p : globalVariableSymbols)
+    {
+        return p.first->GetTypeScope();
+    }
+    return nullptr;
+}
+
+ContainerScope* GlobalVariableGroupSymbol::GetTypeScope()
+{
+    for (const std::pair<GlobalVariableSymbol*, std::string>& p : globalVariableSymbols)
+    {
+        return p.first->GetTypeScope();
+    }
+    return nullptr;
+}
+
+std::string GlobalVariableGroupSymbol::GetSymbolHelp() const
+{
+    if (globalVariableSymbols.size() == 1)
+    {
+        return globalVariableSymbols.front().first->GetSymbolHelp();
+    }
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(FullName())).append(" (").append(std::to_string(globalVariableSymbols.size())).append(" global variables)");
+    return help;
 }
 
 std::u32string MakeGlobalVariableName(const std::u32string& groupName, const std::string& compileUnitId)

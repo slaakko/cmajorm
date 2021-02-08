@@ -140,6 +140,30 @@ void* ClassTemplateSpecializationSymbol::IrType(Emitter& emitter)
     }
 }
 
+const ContainerScope* ClassTemplateSpecializationSymbol::GetArrowScope() const
+{
+    if (classTemplate->GroupName() == U"UniquePtr" || classTemplate->GroupName() == U"SharedPtr")
+    {
+        if (templateArgumentTypes.size() == 1)
+        {
+            return templateArgumentTypes[0]->GetContainerScope();
+        }
+    }
+    return Symbol::GetArrowScope();
+}
+
+ContainerScope* ClassTemplateSpecializationSymbol::GetArrowScope()
+{
+    if (classTemplate->GroupName() == U"UniquePtr" || classTemplate->GroupName() == U"SharedPtr")
+    {
+        if (templateArgumentTypes.size() == 1)
+        {
+            return templateArgumentTypes[0]->GetContainerScope();
+        }
+    }
+    return Symbol::GetArrowScope();
+}
+
 void ClassTemplateSpecializationSymbol::SetGlobalNs(std::unique_ptr<Node>&& globalNs_)
 {
     globalNs = std::move(globalNs_); 

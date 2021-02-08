@@ -184,18 +184,19 @@ std::unique_ptr<sngxml::dom::Element> ParseSourceRequest::ToXml(const std::strin
 
 ParseSourceReply::ParseSourceReply()
     : CodeCompletionReply()
-    , ok(), error(), errors(), synchronized(), startParsing(), endParsing()
+    , ok(), error(), errors(), synchronized(), cursorContainer(), startParsing(), endParsing()
 {
 }
 
 ParseSourceReply::ParseSourceReply(sngxml::dom::Element* element)
     : CodeCompletionReply(sngxml::xmlser::GetXmlFieldElement("base", element))
-    , ok(), error(), errors(), synchronized(), startParsing(), endParsing()
+    , ok(), error(), errors(), synchronized(), cursorContainer(), startParsing(), endParsing()
 {
     sngxml::xmlser::FromXml(element, "ok", ok);
     sngxml::xmlser::FromXml(element, "error", error);
     sngxml::xmlser::FromXml(element, "errors", errors);
     sngxml::xmlser::FromXml(element, "synchronized", synchronized);
+    sngxml::xmlser::FromXml(element, "cursorContainer", cursorContainer);
     sngxml::xmlser::FromXml(element, "startParsing", startParsing);
     sngxml::xmlser::FromXml(element, "endParsing", endParsing);
 }
@@ -208,8 +209,67 @@ std::unique_ptr<sngxml::dom::Element> ParseSourceReply::ToXml(const std::string&
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(errors, "errors").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(synchronized, "synchronized").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(cursorContainer, "cursorContainer").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startParsing, "startParsing").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endParsing, "endParsing").release()));
+    return element;
+}
+
+GetCCListRequest::GetCCListRequest()
+    : CodeCompletionRequest()
+    , projectFilePath(), backend(), config(), sourceFilePath(), ccText()
+{
+}
+
+GetCCListRequest::GetCCListRequest(sngxml::dom::Element* element)
+    : CodeCompletionRequest(sngxml::xmlser::GetXmlFieldElement("base", element))
+    , projectFilePath(), backend(), config(), sourceFilePath(), ccText()
+{
+    sngxml::xmlser::FromXml(element, "projectFilePath", projectFilePath);
+    sngxml::xmlser::FromXml(element, "backend", backend);
+    sngxml::xmlser::FromXml(element, "config", config);
+    sngxml::xmlser::FromXml(element, "sourceFilePath", sourceFilePath);
+    sngxml::xmlser::FromXml(element, "ccText", ccText);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetCCListRequest::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(CodeCompletionRequest::ToXml("base").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceFilePath, "sourceFilePath").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ccText, "ccText").release()));
+    return element;
+}
+
+GetCCListReply::GetCCListReply()
+    : CodeCompletionReply()
+    , ok(), error(), ccList(), startGetCCList(), endGetCCList()
+{
+}
+
+GetCCListReply::GetCCListReply(sngxml::dom::Element* element)
+    : CodeCompletionReply(sngxml::xmlser::GetXmlFieldElement("base", element))
+    , ok(), error(), ccList(), startGetCCList(), endGetCCList()
+{
+    sngxml::xmlser::FromXml(element, "ok", ok);
+    sngxml::xmlser::FromXml(element, "error", error);
+    sngxml::xmlser::FromXml(element, "ccList", ccList);
+    sngxml::xmlser::FromXml(element, "startGetCCList", startGetCCList);
+    sngxml::xmlser::FromXml(element, "endGetCCList", endGetCCList);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetCCListReply::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(CodeCompletionReply::ToXml("base").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ccList, "ccList").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startGetCCList, "startGetCCList").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endGetCCList, "endGetCCList").release()));
     return element;
 }
 

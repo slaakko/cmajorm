@@ -41,6 +41,9 @@ public:
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "DelegateTypeSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "DG"; }
+    std::string GetSymbolCategoryDescription() const override { return "delegate"; }
+    std::string GetSymbolHelp() const override;
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;
@@ -208,6 +211,9 @@ public:
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ClassDelegateTypeSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "CD"; }
+    std::string GetSymbolCategoryDescription() const override { return "class delegate"; }
+    std::string GetSymbolHelp() const override;
 private:
     TypeSymbol* returnType;
     std::vector<ParameterSymbol*> parameters;

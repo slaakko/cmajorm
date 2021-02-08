@@ -609,4 +609,12 @@ namespace cmcode
         Directory.CreateDirectories(cmajorConfigDir);
         return Path.Combine(cmajorConfigDir, "cmcode.trace.flag");
     }
+
+    public nothrow string CmcodeLogFlagFileName()
+    {
+        string cmajorRootDir = Cm.Ast.CmajorRootDir();
+        string cmajorConfigDir = Path.Combine(cmajorRootDir, "config");
+        Directory.CreateDirectories(cmajorConfigDir);
+        return Path.Combine(cmajorConfigDir, "cmcode.log.flag");
+    }
 }

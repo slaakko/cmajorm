@@ -15,6 +15,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <thread>
 #include <mutex>
+#include <sstream>
 
 namespace cmajor { namespace symbols {
 
@@ -26,6 +27,38 @@ TypeBindingFunction typeBindingFunction;
 void SetTypeBindingFunction(TypeBindingFunction typeBindingFunc)
 {
     typeBindingFunction = typeBindingFunc;
+}
+
+bool IsValidCCSymbol(Symbol* symbol, Module* module, FunctionSymbol* fromFunction)
+{
+    AccessCheckFunction hasAccess = GetAccessCheckFunction();
+    switch (symbol->GetSymbolType())
+    {
+        case SymbolType::functionGroupSymbol:
+        {
+            FunctionGroupSymbol* group = static_cast<FunctionGroupSymbol*>(symbol);
+            return group->IsValidCCFunctionGroup(fromFunction);
+        }
+        case SymbolType::classGroupTypeSymbol:
+        {
+            ClassGroupTypeSymbol* group = static_cast<ClassGroupTypeSymbol*>(symbol);
+            return group->IsValidCCClassGroup(module, fromFunction);
+        }
+        case SymbolType::templateParameterSymbol:
+        case SymbolType::boundTemplateParameterSymbol:
+        {
+            return false;
+        }
+        case SymbolType::memberVariableSymbol:
+        {
+            return hasAccess(fromFunction, symbol);
+        }
+        default:
+        {
+            return !StartsWith(symbol->Name(), U"@");
+        }
+    }
+    return true;
 }
 
 Source::Source(const std::string& filePath_) : filePath(filePath_), cursorScope(nullptr), cursorContainer(nullptr), synchronized(false)
@@ -46,11 +79,23 @@ void Source::Parse(const boost::uuids::uuid& moduleId, int index)
     NothrowParsingContext parsingContext;
     std::unique_ptr<CompileUnitNode> parsedCompileUnit = NothrowCompileUnitParser::Parse(lexer, &mid, &parsingContext);
     std::vector<std::exception> parsingErrors = lexer.Errors();
+    if (!parsingErrors.empty())
+    {
+        CmajorNothrowLexer lexer(Start(), End(), FilePath(), index);
+        lexer.SetFlag(LexerFlags::synchronize);
+        NothrowParsingContext parsingContext;
+        parsedCompileUnit = NothrowCompileUnitParser::Parse(lexer, &mid, &parsingContext);
+        parsingErrors = lexer.Errors();
+        synchronized = lexer.GetFlag(LexerFlags::synchronizedAtLeastOnce);
+    }
+    else
+    {
+        synchronized = lexer.GetFlag(LexerFlags::synchronizedAtLeastOnce);
+    }
     for (const std::exception& ex : parsingErrors)
     {
         errors.push_back(ex.what());
     }
-    synchronized = lexer.GetFlag(LexerFlags::synchronizedAtLeastOnce);
     compileUnit = std::move(parsedCompileUnit);
 }
 
@@ -185,13 +230,42 @@ void Source::BindTypes(Module* module)
     }
 }
 
-std::vector<Symbol*> Source::LookupSymbolsBeginningWith(const std::u32string& prefix)
+std::vector<CCSymbolEntry> Source::LookupSymbolsBeginningWith(const std::u32string& prefix)
 {
-    if (!cursorScope || !fileScope) return std::vector<Symbol*>();
-    std::vector<Symbol*> matches = cursorScope->LookupBeginWith(prefix, ScopeLookup::this_and_base_and_parent);
-    std::vector<Symbol*> m = fileScope->LookupBeginWith(prefix);
-    matches.insert(matches.end(), m.cbegin(), m.cend());
+    if (!cursorScope || !fileScope) return std::vector<CCSymbolEntry>();
+    std::vector<CCSymbolEntry> matches = cursorScope->LookupBeginWith(prefix, ScopeLookup::this_and_base_and_parent);
+    std::vector<CCSymbolEntry> m = fileScope->LookupBeginWith(prefix);
+    AddMatches(matches, m);
     return matches;
+}
+
+std::string Source::GetCCList(Module* module, const std::string& ccText)
+{
+    FunctionSymbol* fromFunction = nullptr;
+    if (cursorContainer)
+    {
+        fromFunction = cursorContainer->FunctionNoThrow();
+    }
+    std::u32string prefix = ToUtf32(ccText);
+    std::vector<CCSymbolEntry> ccSymbolEntries = LookupSymbolsBeginningWith(prefix);
+    sngxml::dom::Document ccListDoc;
+    sngxml::dom::Element* ccListElement = new sngxml::dom::Element(U"ccList");
+    ccListDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(ccListElement));
+    for (const CCSymbolEntry& ccSymbolEntry : ccSymbolEntries)
+    {
+        Symbol* symbol = ccSymbolEntry.symbol;
+        int ccPrefixLength = ccSymbolEntry.ccPrefixLen;
+        const std::u32string& replacement = ccSymbolEntry.replacement;
+        if (IsValidCCSymbol(symbol, module, fromFunction))
+        {
+            sngxml::dom::Element* ccElement = symbol->ToCCElement(ccPrefixLength, replacement);
+            ccListElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(ccElement));
+        }
+    }
+    std::stringstream s;
+    CodeFormatter formatter(s);
+    ccListDoc.Write(formatter);
+    return s.str();
 }
 
 struct ParserData
@@ -428,6 +502,10 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
             result.errors.push_back(StringStr(error));
         }
         result.synchronized = source->Synchronized();
+        if (source->CursorContainer())
+        {
+            result.cursorContainer = ToUtf8(source->CursorContainer()->FullName());
+        }
         sources.push_back(std::move(source));
         MakeSourceIndexMap();
     }
@@ -451,6 +529,17 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
     }
     result.end = std::chrono::steady_clock::now();
     return result;
+}
+
+std::string Sources::GetCCList(Module* module, const std::string& sourceFilePath, const std::string& ccText)
+{
+    int index = GetSourceIndex(sourceFilePath);
+    if (index == -1)
+    {
+        throw std::runtime_error("source file path '" + sourceFilePath + "' not found");
+    }
+    Source* source = GetSource(index);
+    return source->GetCCList(module, ccText);
 }
 
 } } // namespace cmajor::symbols

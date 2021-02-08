@@ -21,6 +21,8 @@ public:
     std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "NamespaceSymbol"; }
+    std::string GetSymbolCategoryStr() const override { return "NS"; }
+    std::string GetSymbolCategoryDescription() const override { return "namespace"; }
 };
 
 } } // namespace cmajor::symbols

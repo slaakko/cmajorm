@@ -24,9 +24,12 @@ public:
     const TypeSymbol* GetType() const { return type; }
     TypeSymbol* GetType() { return type; }
     void SetType(TypeSymbol* typeSymbol) { type = typeSymbol; }
+    const ContainerScope* GetTypeScope() const override;
+    ContainerScope* GetTypeScope() override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "VariableSymbol"; }
     void Check() override;
+    std::string GetSymbolHelp() const override;
 private:
     TypeSymbol* type;
 };
@@ -46,6 +49,9 @@ public:
     void SetArtificialName() { artificialName = true; }
     std::u32string CodeName() const override;
     ParameterSymbol* Clone() const;
+    std::string GetSymbolCategoryStr() const override { return "PA"; }
+    std::string GetSymbolCategoryDescription() const override { return "parameter"; }
+    std::string GetSymbolHelp() const override;
 private:
     bool artificialName;
 };
@@ -58,6 +64,9 @@ public:
     bool IsExportSymbol() const override { return false; }
     std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     const char* ClassName() const override { return "LocalVariableSymbol"; }
+    std::string GetSymbolCategoryStr() const override { return "LV"; }
+    std::string GetSymbolCategoryDescription() const override { return "local variable"; }
+    std::string GetSymbolHelp() const override;
 };
 
 class SYMBOLS_API MemberVariableSymbol : public VariableSymbol
@@ -78,6 +87,8 @@ public:
     std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     const char* ClassName() const override { return "MemberVariableSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "MV"; }
+    std::string GetSymbolCategoryDescription() const override { return "member variable"; }
 private:
     int32_t layoutIndex;
 };
@@ -97,6 +108,11 @@ public:
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "GlobalVariableGroupSymbol"; }
     void CollectGlobalVariables(const std::string& compileUnitFilePath, std::vector<GlobalVariableSymbol*>& globalVariables) const;
+    std::string GetSymbolCategoryStr() const override { return "GV"; }
+    std::string GetSymbolCategoryDescription() const override { return "global variable"; }
+    const ContainerScope* GetTypeScope() const override;
+    ContainerScope* GetTypeScope() override;
+    std::string GetSymbolHelp() const override;
 private:
     std::vector<std::pair<GlobalVariableSymbol*, std::string>> globalVariableSymbols;
 };
@@ -125,6 +141,8 @@ public:
     const std::string& CompileUnitFilePath() const { return compileUnitFilePath; }
     void SetGlobalVariableGroup(GlobalVariableGroupSymbol* globalVariableGroup_) { globalVariableGroup = globalVariableGroup_; }
     std::unique_ptr<Symbol> RemoveFromParent() override;
+    std::string GetSymbolCategoryStr() const override { return "GV"; }
+    std::string GetSymbolCategoryDescription() const override { return "global variable"; }
 private:
     std::u32string groupName;
     std::string compileUnitFilePath;

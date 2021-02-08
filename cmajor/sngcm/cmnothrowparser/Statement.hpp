@@ -2,6 +2,7 @@
 #define STATEMENT_HPP
 #include <sngcm/cmnothrowparser/ParserApi.hpp>
 #include <sngcm/ast/Statement.hpp>
+#include <sngcm/ast/SyncNode.hpp>
 #include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
 #include <soulng/lexer/Token.hpp>
 #include <soulng/parser/Match.hpp>
@@ -14,6 +15,7 @@ class CmajorNothrowLexer;
 struct SNGCM_NOTHROW_PARSER_API NothrowStatementParser
 {
     static soulng::parser::Match Statement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
+    static soulng::parser::Match SyncStmt(CmajorNothrowLexer& lexer);
     static soulng::parser::Match Label(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId);
     static soulng::parser::Match LabeledStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match ControlStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);

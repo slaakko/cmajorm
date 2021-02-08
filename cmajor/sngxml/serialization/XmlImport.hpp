@@ -39,28 +39,51 @@ std::is_same_v<T, duration>;
 
 SNGXML_SERIALIZATION_API sngxml::dom::Element* GetXmlFieldElement(const std::string& fieldName, sngxml::dom::Element* fromElement);
 
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, bool& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, bool& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, int8_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, int8_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, uint8_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, uint8_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, int16_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, int16_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, uint16_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, uint16_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, int32_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, int32_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, uint32_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, uint32_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, int64_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, int64_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, uint64_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, uint64_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, float& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, float& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, double& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, double& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, char& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, char& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, char16_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, char16_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, char32_t& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, char32_t& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, std::string& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, std::string& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, std::u16string& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, std::u16string& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, std::u32string& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, std::u32string& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, uuid& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, uuid& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, date& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, date& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, datetime& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, datetime& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, timestamp& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, timestamp& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, time_point& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, time_point& value);
+SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* element, duration& value);
 SNGXML_SERIALIZATION_API void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, duration& value);
 
 template<XmlConstructible T>
@@ -108,22 +131,25 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
 {
     v.clear();
     sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
-    std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
-    if (result)
+    if (element)
     {
-        if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
+        if (result)
         {
-            sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
-            int n = nodeSet->Length();
-            for (int i = 0; i < n; ++i)
+            if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
             {
-                sngxml::dom::Node* node = (*nodeSet)[i];
-                if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
                 {
-                    sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
-                    T value;
-                    FromXml(element, "value", value);
-                    v.push_back(std::move(value));
+                    sngxml::dom::Node* node = (*nodeSet)[i];
+                    if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                    {
+                        sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                        T value;
+                        FromXml(element, value);
+                        v.push_back(std::move(value));
+                    }
                 }
             }
         }
@@ -135,21 +161,24 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
 {
     v.clear();
     sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
-    std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
-    if (result)
+    if (element)
     {
-        if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
+        if (result)
         {
-            sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
-            int n = nodeSet->Length();
-            for (int i = 0; i < n; ++i)
+            if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
             {
-                sngxml::dom::Node* node = (*nodeSet)[i];
-                if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
                 {
-                    sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
-                    T object(element);
-                    v.push_back(std::move(object));
+                    sngxml::dom::Node* node = (*nodeSet)[i];
+                    if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                    {
+                        sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                        T object(element);
+                        v.push_back(std::move(object));
+                    }
                 }
             }
         }
@@ -161,26 +190,29 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
 {
     v.clear();
     sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
-    std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
-    if (result)
+    if (element)
     {
-        if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
+        if (result)
         {
-            sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
-            int n = nodeSet->Length();
-            for (int i = 0; i < n; ++i)
+            if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
             {
-                sngxml::dom::Node* node = (*nodeSet)[i];
-                if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
                 {
-                    sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
-                    std::unique_ptr<T> object;
-                    std::u32string value = element->GetAttribute(U"value");
-                    if (value != U"null")
+                    sngxml::dom::Node* node = (*nodeSet)[i];
+                    if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
                     {
-                        object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(element)));
+                        sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                        std::unique_ptr<T> object;
+                        std::u32string value = element->GetAttribute(U"value");
+                        if (value != U"null")
+                        {
+                            object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(element)));
+                        }
+                        v.push_back(std::move(object));
                     }
-                    v.push_back(std::move(object));
                 }
             }
         }
@@ -192,26 +224,29 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
 {
     v.clear();
     sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
-    std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
-    if (result)
+    if (element)
     {
-        if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
+        if (result)
         {
-            sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
-            int n = nodeSet->Length();
-            for (int i = 0; i < n; ++i)
+            if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
             {
-                sngxml::dom::Node* node = (*nodeSet)[i];
-                if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
                 {
-                    sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
-                    std::shared_ptr<T> object;
-                    std::u32string value = element->GetAttribute(U"value");
-                    if (value != U"null")
+                    sngxml::dom::Node* node = (*nodeSet)[i];
+                    if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
                     {
-                        object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(element)));
+                        sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                        std::shared_ptr<T> object;
+                        std::u32string value = element->GetAttribute(U"value");
+                        if (value != U"null")
+                        {
+                            object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(element)));
+                        }
+                        v.push_back(std::move(object));
                     }
-                    v.push_back(std::move(object));
                 }
             }
         }

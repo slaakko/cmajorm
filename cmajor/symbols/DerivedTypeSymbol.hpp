@@ -85,6 +85,8 @@ public:
     bool IsVoidPtrType() const override;
     bool IsCharacterPointerType() const override;
     int PointerCount() const override;
+    const ContainerScope* GetArrowScope() const override;
+    ContainerScope* GetArrowScope() override;
     bool ContainsTemplateParameter() const override { return baseType->ContainsTemplateParameter(); }
     const TypeDerivationRec& DerivationRec() const override { return derivationRec; }
     TypeSymbol* RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span, const boost::uuids::uuid& moduleId) override;

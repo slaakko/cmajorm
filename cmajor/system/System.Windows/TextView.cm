@@ -123,6 +123,11 @@ namespace System.Windows
     public class delegate void CCDirtyChangedEventHandler();
     public class delegate void CCTextChangedEventHandler();
     public class delegate void CCEventHandler();
+    public class delegate void CCNextEventHandler();
+    public class delegate void CCPrevEventHandler();
+    public class delegate void CCNextPageEventHandler();
+    public class delegate void CCPrevPageEventHandler();
+    public class delegate void CCSelectEventHandler();
     public class delegate void EscapePressedHandler();
     public class delegate void CopyEventHandler();
     public class delegate void CutEventHandler();
@@ -132,7 +137,8 @@ namespace System.Windows
     {
         private enum Flags : sbyte
         {
-            none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, ccdirty = 1 << 5, mouseExtendSelection = 1 << 6
+            none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, ccdirty = 1 << 5, mouseExtendSelection = 1 << 6,
+            ccOpen = 1 << 7
         }
 
         public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Color& textColor_, const Point& location, const Size& size,
@@ -257,6 +263,20 @@ namespace System.Windows
                 caretColumn = column;
                 SetCaretLocation();
             }
+        }
+        public nothrow Point CaretPos() const
+        {
+            int x = cast<int>(padding.left + (caretColumn - 1) * charWidth);
+            int y = cast<int>(padding.top + (caretLine - 1) * charHeight);
+            Point loc(x, y);
+            TranslateContentLocation(loc);
+            return loc;
+        }
+        public nothrow Point CCPos() const
+        {
+            Point ccPos = CaretPos();
+            ccPos.Offset(0, cast<int>(charHeight + 0.5));
+            return ccPos;
         }
         public nothrow inline int TopLine() const
         {
@@ -887,17 +907,24 @@ namespace System.Windows
                     }
                     case Keys.down:
                     {
-                        ResetSelection();
-                        if (lineNumber < lines.Count())
+                        if (CCOpen())
                         {
-                            ++lineNumber;
-                            int lineLength = GetLineLength(lineNumber);
-                            columnNumber = Min(columnNumber, lineLength + 1 + LineNumberFieldLength());
+                            OnCCNext();
                         }
                         else
                         {
-                            lineNumber = cast<int>(lines.Count()) + 1;
-                            columnNumber = 1 + LineNumberFieldLength();
+                            ResetSelection();
+                            if (lineNumber < lines.Count())
+                            {
+                                ++lineNumber;
+                                int lineLength = GetLineLength(lineNumber);
+                                columnNumber = Min(columnNumber, lineLength + 1 + LineNumberFieldLength());
+                            }
+                            else
+                            {
+                                lineNumber = cast<int>(lines.Count()) + 1;
+                                columnNumber = 1 + LineNumberFieldLength();
+                            }
                         }
                         args.handled = true;
                         break;
@@ -928,12 +955,19 @@ namespace System.Windows
                     }
                     case Keys.up:
                     {
-                        ResetSelection();
-                        if (lineNumber > 1)
+                        if (CCOpen())
                         {
-                            --lineNumber;
-                            int lineLength = GetLineLength(lineNumber);
-                            columnNumber = Min(columnNumber, lineLength + 1 + LineNumberFieldLength());
+                            OnCCPrev();
+                        }
+                        else
+                        {
+                            ResetSelection();
+                            if (lineNumber > 1)
+                            {
+                                --lineNumber;
+                                int lineLength = GetLineLength(lineNumber);
+                                columnNumber = Min(columnNumber, lineLength + 1 + LineNumberFieldLength());
+                            }
                         }
                         args.handled = true;
                         break;
@@ -957,11 +991,18 @@ namespace System.Windows
                     }
                     case Keys.pageDown:
                     {
-                        ResetSelection();
-                        Size size = GetSize();
-                        int windowLines = cast<int>(size.h / charHeight);
-                        lineNumber = lineNumber + windowLines;
-                        lineNumber = Min(lineNumber, cast<int>(lines.Count()) + 1);
+                        if (CCOpen())
+                        {
+                            OnCCNextPage();
+                        }
+                        else
+                        {
+                            ResetSelection();
+                            Size size = GetSize();
+                            int windowLines = cast<int>(size.h / charHeight);
+                            lineNumber = lineNumber + windowLines;
+                            lineNumber = Min(lineNumber, cast<int>(lines.Count()) + 1);
+                        }
                         args.handled = true;
                         break;
                     }
@@ -982,11 +1023,18 @@ namespace System.Windows
                     }
                     case Keys.pageUp:
                     {
-                        ResetSelection();
-                        Size size = GetSize();
-                        int windowLines = cast<int>(size.h / charHeight);
-                        lineNumber = lineNumber - windowLines;
-                        lineNumber = Max(lineNumber, 1);
+                        if (CCOpen())
+                        {
+                            OnCCPrevPage();
+                        }
+                        else
+                        {
+                            ResetSelection();
+                            Size size = GetSize();
+                            int windowLines = cast<int>(size.h / charHeight);
+                            lineNumber = lineNumber - windowLines;
+                            lineNumber = Max(lineNumber, 1);
+                        }
                         args.handled = true;
                         break;
                     }
@@ -1179,15 +1227,24 @@ namespace System.Windows
                     }
                     case Keys.enter:
                     {
-                        if (!IsReadOnly())
+                        if (CCOpen())
                         {
-                            ResetSelection();
-                            int lineIndex = caretLine - 1;
-                            int columnIndex = CaretColumn() - 1;
-                            AddNewLineCommand(lineIndex, columnIndex);
-                            NewLine(lineIndex, columnIndex);
+                            OnCCSelect();
                             args.handled = true;
                             return;
+                        }
+                        else
+                        {
+                            if (!IsReadOnly())
+                            {
+                                ResetSelection();
+                                int lineIndex = caretLine - 1;
+                                int columnIndex = CaretColumn() - 1;
+                                AddNewLineCommand(lineIndex, columnIndex);
+                                NewLine(lineIndex, columnIndex);
+                                args.handled = true;
+                                return;
+                            }
                         }
                         break;
                     }
@@ -1267,11 +1324,6 @@ namespace System.Windows
                         Redo();
                         break;
                     }
-                    case cast<Keys>(Keys.controlModifier | Keys.space):
-                    {
-                        OnCC();
-                        break;
-                    }
                 }
                 if (args.handled && !scrolled)
                 {
@@ -1284,6 +1336,12 @@ namespace System.Windows
         {
             base->OnKeyPress(args);
             if (IsReadOnly()) return;
+            if (!args.handled && WinKeyPressed(VK_CONTROL) && args.keyChar == ' ')
+            {
+                OnCC();
+                args.handled = true;
+                return;
+            }
             if (!WinKeyPressed(VK_MENU) && WinKeyPressed(VK_CONTROL))
             {
                 return;
@@ -1308,6 +1366,26 @@ namespace System.Windows
         protected virtual void OnEscape()
         {
             escapePressedEvent.Fire();
+        }
+        protected virtual void OnCCNext()
+        {
+            ccNextEvent.Fire();
+        }
+        protected virtual void OnCCPrev()
+        {
+            ccPrevEvent.Fire();
+        }
+        protected virtual void OnCCNextPage()
+        {
+            ccNextPageEvent.Fire();
+        }
+        protected virtual void OnCCPrevPage()
+        {
+            ccPrevPageEvent.Fire();
+        }
+        protected virtual void OnCCSelect()
+        {
+            ccSelectEvent.Fire();
         }
         private nothrow void AddInsertCharCommand(int lineIndex, int columnIndex, uchar c)
         {
@@ -2009,6 +2087,42 @@ namespace System.Windows
         {
             return cctext;
         }
+        public nothrow void ReplaceCCText(const ustring& replacement)
+        {
+            int caretLineIndex = Max(0, caretLine - 1);
+            int caretColumnIndex = Max(0, caretColumn - 1);
+            if (caretLineIndex < lines.Count())
+            {
+                ustring& line = lines[caretLineIndex];
+                while (caretColumnIndex > line.Length())
+                {
+                    --caretColumnIndex;
+                }
+                int endColumnIndex = Max(0, caretColumnIndex);
+                while (caretColumnIndex > 0)
+                {
+                    if (caretColumnIndex < line.Length())
+                    {
+                        if (line[caretColumnIndex] == ' ')
+                        {
+                            ++caretColumnIndex;
+                            break;
+                        }
+                    }
+                    --caretColumnIndex;
+                }
+                int startColumndIndex = Max(0, caretColumnIndex);
+                line = line.Substring(0, startColumndIndex) + replacement + line.Substring(endColumnIndex);
+                int newEndColumnIndex = startColumndIndex + cast<int>(replacement.Length());
+                LineEventArgs args(caretLineIndex, -1);
+                OnLineChanged(args);
+                SetCaretLineCol(caretLineIndex + 1, newEndColumnIndex + 1 + LineNumberFieldLength());
+                ScrollToCaret();
+                Invalidate();
+                SetDirty();
+                SetCCDirty();
+            }
+        }
         public nothrow ustring GetCursorText() const
         {
             ustring cursorText;
@@ -2020,7 +2134,31 @@ namespace System.Windows
                 int lineNumber = cast<int>(i + 1);
                 if (lineNumber == caretLine)
                 {
-                    cursorText.Append(line.Substring(0, caretIndex)).Append('$').Append(line.Substring(caretIndex)).Append('\n');
+                    int startIndex = caretIndex;
+                    while (startIndex > 0)
+                    {
+                        if (startIndex < line.Length())
+                        {
+                            bool exit = false;
+                            switch (line[startIndex])
+                            {
+                                case ';':
+                                case '{':
+                                case '}':
+                                {
+                                    ++startIndex;
+                                    exit = true;
+                                    break;
+                                }
+                            }
+                            if (exit)
+                            {
+                                break;
+                            }
+                        }
+                        --startIndex;
+                    }
+                    cursorText.Append(line.Substring(0, startIndex)).Append('$').Append(line.Substring(caretIndex)).Append('\n');
                 }
                 else
                 {
@@ -2504,6 +2642,18 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags & ~Flags.mouseExtendSelection);
         }
+        public nothrow inline bool CCOpen() const
+        {
+            return (flags & Flags.ccOpen) != Flags.none;
+        }
+        public nothrow void SetCCOpen()
+        {
+            flags = cast<Flags>(flags | Flags.ccOpen);
+        }
+        public nothrow void ResetCCOpen()
+        {
+            flags = cast<Flags>(flags & ~Flags.ccOpen);
+        }
         public nothrow Event<CaretPosChangedEventHandler>& CaretPosChangedEvent() const
         {
             return caretPosChangedEvent;
@@ -2548,9 +2698,29 @@ namespace System.Windows
         {
             return ccEvent;
         }
-        public nothrow Event<EscapePressedHandler> EscapePressedEvent() const
+        public nothrow Event<EscapePressedHandler>& EscapePressedEvent() const
         {
             return escapePressedEvent;
+        }
+        public nothrow Event<CCNextEventHandler>& CCNextEvent() const
+        {
+            return ccNextEvent;
+        }
+        public nothrow Event<CCPrevEventHandler>& CCPrevEvent() const
+        {
+            return ccPrevEvent;
+        }
+        public nothrow Event<CCNextPageEventHandler>& CCNextPageEvent() const
+        {
+            return ccNextPageEvent;
+        }
+        public nothrow Event<CCPrevPageEventHandler>& CCPrevPageEvent() const
+        {
+            return ccPrevPageEvent;
+        }
+        public nothrow Event<CCSelectEventHandler>& CCSelectEvent() const
+        {
+            return ccSelectEvent;
         }
         public nothrow Event<CopyEventHandler>& CopyEvent() const
         {
@@ -2641,6 +2811,11 @@ namespace System.Windows
         private Event<CCDirtyChangedEventHandler> ccdirtyChangedEvent;
         private Event<CCTextChangedEventHandler> cctextChangedEvent;
         private Event<CCEventHandler> ccEvent;
+        private Event<CCNextEventHandler> ccNextEvent;
+        private Event<CCPrevEventHandler> ccPrevEvent;
+        private Event<CCNextPageEventHandler> ccNextPageEvent;
+        private Event<CCPrevPageEventHandler> ccPrevPageEvent;
+        private Event<CCSelectEventHandler> ccSelectEvent;
         private Event<EscapePressedHandler> escapePressedEvent;
         private Event<CopyEventHandler> copyEvent;
         private Event<CutEventHandler> cutEvent;

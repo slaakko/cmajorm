@@ -29,6 +29,9 @@ public:
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ConceptGroupSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "CO"; }
+    std::string GetSymbolCategoryDescription() const override { return "concept"; }
+    std::string GetSymbolHelp() const override;
 private:
     std::unordered_map<int, ConceptSymbol*> arityConceptMap;
 };
@@ -66,6 +69,8 @@ public:
     void Check() override;
     void SetConceptGroup(ConceptGroupSymbol* conceptGroup_) { conceptGroup = conceptGroup_; }
     std::unique_ptr<Symbol> RemoveFromParent() override;
+    std::string GetSymbolCategoryStr() const override { return "CO"; }
+    std::string GetSymbolCategoryDescription() const override { return "concept"; }
 private:
     boost::uuids::uuid typeId;
     std::u32string groupName;

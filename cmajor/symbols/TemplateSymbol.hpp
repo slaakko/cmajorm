@@ -28,6 +28,8 @@ public:
     TypeSymbol* UnifyTemplateArgumentType(SymbolTable& symbolTable, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMap, const Span& span, const boost::uuids::uuid& moduleId) override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "TemplateParameterSymbol"; }
+    std::string GetSymbolCategoryStr() const override { return "TP"; }
+    std::string GetSymbolCategoryDescription() const override { return "template parameter"; }
 private:
     bool hasDefault;
     TypeSymbol* defaultType;

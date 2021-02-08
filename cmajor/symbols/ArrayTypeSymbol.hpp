@@ -28,6 +28,8 @@ public:
     Value* MakeValue() const override;
     const char* ClassName() const override { return "ArrayTypeSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "AR"; }
+    std::string GetSymbolCategoryDescription() const override { return "array type"; }
 private:
     TypeSymbol* elementType;
     int64_t size;

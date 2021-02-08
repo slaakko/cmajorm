@@ -1,9 +1,11 @@
 #include <cmajor/build/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/EditModuleCache.hpp>
+#include <cmajor/symbols/Scope.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <sngcm/ast/InitDone.hpp>
 #include <cmajor/build/Build.hpp>
+#include <cmajor/binder/Access.hpp>
 #include <cmajor/binder/TypeBinding.hpp>
 #include <cmajor/symbols/Sources.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
@@ -56,6 +58,7 @@ int main(int argc, const char** argv)
     InitDone initDone;
     SetReadProjectFunction(cmajor::build::ReadProject);
     SetTypeBindingFunction(cmajor::binder::BindTypes);
+    SetAccessCheckFunction(cmajor::binder::HasAccess);
     try
     {
         std::vector<std::string> cmFiles;
@@ -154,7 +157,7 @@ int main(int argc, const char** argv)
                         if (index != -1)
                         {
                             Source* source = sources->GetSource(index);
-                            std::vector<Symbol*> matches = source->LookupSymbolsBeginningWith(U"System.Collections.List");
+                            std::vector<cmajor::symbols::CCSymbolEntry> matches = source->LookupSymbolsBeginningWith(U"System.Collections.List");
                         }
                     }
                 }

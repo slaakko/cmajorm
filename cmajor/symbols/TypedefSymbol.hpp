@@ -29,6 +29,9 @@ public:
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "TypedefSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "TY"; }
+    std::string GetSymbolCategoryDescription() const override { return "typedef"; }
+    std::string GetSymbolHelp() const override;
 private:
     TypeSymbol* type;
 };

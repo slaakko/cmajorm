@@ -59,8 +59,27 @@ class ParseSourceReply : CodeCompletionReply
     string error;
     string[] errors;
     bool synchronized;
+    string cursorContainer;
     time_point startParsing;
     time_point endParsing;
+}
+
+class GetCCListRequest : CodeCompletionRequest
+{
+    string projectFilePath;
+    string backend;
+    string config;
+    string sourceFilePath;
+    string ccText;
+}
+
+class GetCCListReply : CodeCompletionReply
+{
+    bool ok;
+    string error;
+    string ccList;
+    time_point startGetCCList;
+    time_point endGetCCList;
 }
 
 class StopRequest : CodeCompletionRequest

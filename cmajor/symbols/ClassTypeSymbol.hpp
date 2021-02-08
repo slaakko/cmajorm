@@ -32,6 +32,8 @@ public:
     void* CreateDefaultIrValue(Emitter& emitter) override;
     void AddClass(ClassTypeSymbol* classTypeSymbol);
     void RemoveClass(ClassTypeSymbol* classTypeSymbol);
+    const ContainerScope* GetTypeScope() const override;
+    ContainerScope* GetTypeScope() override;
     bool IsEmpty() const;
     ClassTypeSymbol* GetClass(int arity) const;
     bool HasProjectMembers() const override;
@@ -39,6 +41,10 @@ public:
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ClassGroupTypeSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "CL"; }
+    std::string GetSymbolCategoryDescription() const override { return "class"; }
+    std::string GetSymbolHelp() const override;
+    bool IsValidCCClassGroup(Module* module, FunctionSymbol* fromFunction) const;
 private:
     std::unordered_map<int, ClassTypeSymbol*> arityClassMap;
 };
@@ -107,6 +113,8 @@ public:
     std::string GetSpecifierStr() const override;
     bool HasNontrivialDestructor() const override;
     void Accept(SymbolCollector* collector) override;
+    const ContainerScope* GetArrowScope() const override;
+    ContainerScope* GetArrowScope() override;
     void CollectMembers(SymbolCollector* collector);
     void Dump(CodeFormatter& formatter) override;
     bool IsRecursive(TypeSymbol* type, std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>>& tested) override;
@@ -207,6 +215,8 @@ public:
     void Check() override;
     void SetClassGroup(ClassGroupTypeSymbol* classGroup_) { classGroup = classGroup_; }
     std::unique_ptr<Symbol> RemoveFromParent() override;
+    std::string GetSymbolCategoryStr() const override { return "CL"; }
+    std::string GetSymbolCategoryDescription() const override { return "class"; }
 private:
     std::u32string groupName;
     int minArity;

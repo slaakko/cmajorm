@@ -232,6 +232,7 @@ public:
     Sources* GetSources() const { return sources.get(); }
     ParseResult ParseSources();
     ParseResult ParseSource(const std::string& sourceFilePath, const std::u32string& sourceCode);
+    std::string GetCCList(const std::string& sourceFilePath, const std::string& ccText);
 private:
     uint8_t format;
     ModuleFlags flags;

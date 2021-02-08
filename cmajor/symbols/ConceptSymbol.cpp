@@ -98,6 +98,19 @@ void ConceptGroupSymbol::Check()
     }
 }
 
+std::string ConceptGroupSymbol::GetSymbolHelp() const
+{
+    if (arityConceptMap.size() == 1)
+    {
+        ConceptSymbol* cs = arityConceptMap.begin()->second;
+        return cs->GetSymbolHelp();
+    }
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(FullName())).append(" (").append(std::to_string(arityConceptMap.size())).append(" concepts)");
+    return help;
+}
+
 ConceptSymbol::ConceptSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
     ContainerSymbol(SymbolType::conceptSymbol, span_, sourceModuleId_, name_), refinedConcept(nullptr), typeId(boost::uuids::nil_uuid()), hasSource(false), conceptGroup(nullptr)
 {

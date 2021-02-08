@@ -50,7 +50,7 @@ namespace Calculator
             throw ParsingException("invalid input");
         }
     }
-    
+
     internal double Expr(Scanner& scanner)
     {
         double value = Term(scanner);
@@ -78,7 +78,7 @@ namespace Calculator
         }
         return value;
     }
-    
+
     internal double Term(Scanner& scanner)
     {
         double value = Factor(scanner);
@@ -110,7 +110,7 @@ namespace Calculator
         }
         return value;
     }
-    
+
     internal double Factor(Scanner& scanner)
     {
         Token* token = scanner.CurrentToken();
@@ -131,7 +131,7 @@ namespace Calculator
         }
         return value;
     }
-    
+
     internal double Primary(Scanner& scanner)
     {
         Token* token = scanner.CurrentToken();

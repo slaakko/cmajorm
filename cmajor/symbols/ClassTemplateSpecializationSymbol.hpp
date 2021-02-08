@@ -46,6 +46,8 @@ public:
     bool IsPrototypeTemplateSpecialization() const override;
     void* IrType(Emitter& emitter) override;
     ClassTypeSymbol* GetClassTemplate() { return classTemplate; }
+    const ContainerScope* GetArrowScope() const override;
+    ContainerScope* GetArrowScope() override;
     const std::vector<TypeSymbol*>& TemplateArgumentTypes() const { return templateArgumentTypes; }
     std::vector<TypeSymbol*>& TemplateArgumentTypes() { return templateArgumentTypes; }
     void SetGlobalNs(std::unique_ptr<Node>&& globalNs_);
@@ -63,6 +65,8 @@ public:
     std::u32string Id() const override;
     const char* ClassName() const override { return "ClassTemplateSpecializationSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "CL"; }
+    std::string GetSymbolCategoryDescription() const override { return "class"; }
 private:
     ClassTypeSymbol* classTemplate;
     std::vector<TypeSymbol*> templateArgumentTypes;

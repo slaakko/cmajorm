@@ -114,8 +114,37 @@ public:
     std::string error;
     std::vector<std::string> errors;
     bool synchronized;
+    std::string cursorContainer;
     time_point startParsing;
     time_point endParsing;
+};
+
+class GetCCListRequest : public CodeCompletionRequest
+{
+public:
+    GetCCListRequest();
+    GetCCListRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+public:
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+    std::string sourceFilePath;
+    std::string ccText;
+};
+
+class GetCCListReply : public CodeCompletionReply
+{
+public:
+    GetCCListReply();
+    GetCCListReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+public:
+    bool ok;
+    std::string error;
+    std::string ccList;
+    time_point startGetCCList;
+    time_point endGetCCList;
 };
 
 class StopRequest : public CodeCompletionRequest

@@ -128,6 +128,26 @@ void ClassGroupTypeSymbol::RemoveClass(ClassTypeSymbol* classTypeSymbol)
     }
 }
 
+const ContainerScope* ClassGroupTypeSymbol::GetTypeScope() const
+{
+    if (arityClassMap.size() == 1)
+    {
+        ClassTypeSymbol* cls = arityClassMap.begin()->second;
+        return cls->GetTypeScope();
+    }
+    return nullptr;
+}
+
+ContainerScope* ClassGroupTypeSymbol::GetTypeScope()
+{
+    if (arityClassMap.size() == 1)
+    {
+        ClassTypeSymbol* cls = arityClassMap.begin()->second;
+        return cls->GetTypeScope();
+    }
+    return nullptr;
+}
+
 bool ClassGroupTypeSymbol::IsEmpty() const
 {
     return arityClassMap.empty();
@@ -180,6 +200,33 @@ void ClassGroupTypeSymbol::Check()
             throw SymbolCheckException("class group type symbol has no class type symbol", GetSpan(), SourceModuleId());
         }
     }
+}
+
+std::string ClassGroupTypeSymbol::GetSymbolHelp() const
+{
+    if (arityClassMap.size() == 1)
+    {
+        ClassTypeSymbol* cls = arityClassMap.begin()->second;
+        return cls->GetSymbolHelp();
+    }
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(FullName())).append(" (").append(std::to_string(arityClassMap.size())).append(" classes)");
+    return help;
+}
+
+bool ClassGroupTypeSymbol::IsValidCCClassGroup(Module* module, FunctionSymbol* fromFunction) const
+{
+    if (StartsWith(Name(), U"@")) return false;
+    AccessCheckFunction canAccess = GetAccessCheckFunction();
+    for (const auto& p : arityClassMap)
+    {
+        ClassTypeSymbol* cls = p.second;
+        if (cls->Access() == SymbolAccess::public_) return true;
+        if (cls->Access() == SymbolAccess::internal_ && module == cls->GetModule()) return true;
+        if (fromFunction && canAccess(fromFunction, cls)) return true;
+    }
+    return false;
 }
 
 ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
@@ -549,9 +596,12 @@ bool ClassTypeSymbol::HasNontrivialDestructor() const
     for (int i = 0; i < n; ++i)
     {
         MemberVariableSymbol* memberVariable = memberVariables[i];
-        if (memberVariable->GetType()->HasNontrivialDestructor())
+        if (memberVariable->GetType())
         {
-            return true;
+            if (memberVariable->GetType()->HasNontrivialDestructor())
+            {
+                return true;
+            }
         }
     }
     return false;
@@ -579,6 +629,16 @@ void ClassTypeSymbol::Accept(SymbolCollector* collector)
             }
         }
     }
+}
+
+const ContainerScope* ClassTypeSymbol::GetArrowScope() const
+{
+    return GetContainerScope();
+}
+
+ContainerScope* ClassTypeSymbol::GetArrowScope()
+{
+    return GetContainerScope();
 }
 
 void ClassTypeSymbol::CollectMembers(SymbolCollector* collector)

@@ -58,6 +58,15 @@ private:
     std::unique_ptr<StatementNode> stmt;
 };
 
+class SNGCM_AST_API SyncStatementNode : public StatementNode
+{
+public:
+    SyncStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+};
+
+
 class SNGCM_AST_API CompoundStatementNode : public StatementNode
 {
 public:

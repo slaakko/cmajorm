@@ -193,6 +193,7 @@ class Attributes;
 class CommentNode;
 
 class SyncNode;
+class SyncStatementNode;
 
 class SNGCM_AST_API Visitor
 {
@@ -384,6 +385,7 @@ public:
     virtual void Visit(CommentNode& commentNode) {}
 
     virtual void Visit(SyncNode& syncNode) {}
+    virtual void Visit(SyncStatementNode& syncStatementNode) {}
 };
 
 } } // namespace sngcm::ast

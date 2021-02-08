@@ -170,4 +170,12 @@ void TypedefSymbol::Check()
     }
 }
 
+std::string TypedefSymbol::GetSymbolHelp() const
+{
+    if (!type) return std::string();
+    std::string help = Symbol::GetSymbolHelp();
+    help.append(" = ").append(ToUtf8(type->FullName()));
+    return help;
+}
+
 } } // namespace cmajor::symbols

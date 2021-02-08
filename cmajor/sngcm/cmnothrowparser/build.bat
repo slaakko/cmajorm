@@ -1,2 +1,2 @@
 @echo off
-spg -v CmajorParsers.spg
+spg -vl CmajorParsers.spg

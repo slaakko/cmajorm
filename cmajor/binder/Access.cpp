@@ -13,24 +13,25 @@ namespace cmajor { namespace binder {
 
 using namespace soulng::unicode;
 
-void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol) 
+bool HasAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
 {
+    if (!fromFunction) return false;
     FunctionSymbol* toContainingFunction = toSymbol->ContainingFunctionNoThrow();
     if (toContainingFunction)
     {
         if (fromFunction == toContainingFunction || FunctionSymbolsEqual()(fromFunction, toContainingFunction))
         {
-            return;
+            return true;
         }
     }
     ClassTypeSymbol* toContainingClass = toSymbol->ContainingClassNoThrow();
     if (toContainingClass)
     {
-        CheckAccess(fromFunction, toContainingClass);
+        if (!HasAccess(fromFunction, toContainingClass)) return false;
     }
     switch (toSymbol->DeclaredAccess())
     {
-        case SymbolAccess::public_: return;
+        case SymbolAccess::public_: return true;
         case SymbolAccess::protected_:
         {
             ClassTypeSymbol* fromContainingClass = fromFunction->ContainingClassNoThrow();
@@ -38,11 +39,11 @@ void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
             {
                 if (toContainingClass && toContainingClass->IsSameParentOrAncestorOf(fromContainingClass))
                 {
-                    return;
+                    return true;
                 }
                 if (fromContainingClass->HasBaseClass(toContainingClass))
                 {
-                    return;
+                    return true;
                 }
             }
             break;
@@ -51,7 +52,7 @@ void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
         {
             if (fromFunction->GetModule() == toSymbol->GetModule())
             {
-                return;
+                return true;;
             }
             break;
         }
@@ -64,15 +65,23 @@ void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol)
                 {
                     if (toContainingClass->IsSameParentOrAncestorOf(fromContainingClass))
                     {
-                        return;
+                        return true;
                     }
                 }
             }
             break;
         }
     }
-    throw Exception(toSymbol->TypeString() + " '" + ToUtf8(toSymbol->FullName()) + "' is inaccessible due to its protection level", 
-        fromFunction->GetSpan(), fromFunction->SourceModuleId(), toSymbol->GetSpan(), toSymbol->SourceModuleId());
+    return false;
+}
+
+void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol) 
+{
+    if (!HasAccess(fromFunction, toSymbol))
+    {
+        throw Exception(toSymbol->TypeString() + " '" + ToUtf8(toSymbol->FullName()) + "' is inaccessible due to its protection level",
+            fromFunction->GetSpan(), fromFunction->SourceModuleId(), toSymbol->GetSpan(), toSymbol->SourceModuleId());
+    }
 }
 
 } } // namespace cmajor::binder

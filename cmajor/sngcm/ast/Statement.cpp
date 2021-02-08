@@ -98,6 +98,20 @@ void LabeledStatementNode::SetLabelNode(LabelNode* labelNode_)
     labelNode->SetParent(this);
 }
 
+SyncStatementNode::SyncStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : StatementNode(NodeType::syncStatementNode, span_, moduleId_)
+{
+}
+
+Node* SyncStatementNode::Clone(CloneContext& cloneContext) const
+{
+    return new SyncStatementNode(GetSpan(), ModuleId());
+}
+
+void SyncStatementNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 CompoundStatementNode::CompoundStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
     StatementNode(NodeType::compoundStatementNode, span_, moduleId_), statements(), beginBraceSpan(), endBraceSpan(), tracerInserted(false)
 {

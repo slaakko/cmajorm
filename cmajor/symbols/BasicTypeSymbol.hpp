@@ -36,6 +36,8 @@ public:
     void SetEqualityOp(FunctionSymbol* equalityOp_) { equalityOp = equalityOp_; }
     const char* ClassName() const override { return "BasicTypeSymbol"; }
     void Check() override;
+    std::string GetSymbolCategoryStr() const override { return "BT"; }
+    std::string GetSymbolCategoryDescription() const override { return "basic type"; }
 private:
     FunctionSymbol* defaultConstructor;
     FunctionSymbol* copyConstructor;

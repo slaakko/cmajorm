@@ -5,6 +5,7 @@
 
 [hpp]#include <sngcm/cmnothrowparser/ParserApi.hpp>
 [hpp]#include <sngcm/ast/Statement.hpp>
+[hpp]#include <sngcm/ast/SyncNode.hpp>
 [hpp]#include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
 [cpp]#include <sngcm/cmnothrowparser/Expression.hpp>
 [cpp]#include <sngcm/cmnothrowparser/TypeExpr.hpp>
@@ -38,7 +39,23 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
         |   TryStatement(moduleId, ctx):tryStatement{ return tryStatement; }
         |   AssertStatement(moduleId, ctx):assertStatement{ return assertStatement; }
         |   ConditionalCompilationStatement(moduleId, ctx):condCompStatement{ return condCompStatement; }
+        |   SyncStmt:sync{ return new sngcm::ast::SyncStatementNode(span, *moduleId); }
         ;
+
+    SyncStmt
+        ::= empty
+        { 
+            if (lexer.Synchronize())
+            {
+                ++lexer;
+            }
+            else
+            {
+                pass = false;
+            }
+        }
+        ;
+
 
     Label(boost::uuids::uuid* moduleId, var Span s, var std::u32string label) : LabelNode*
         ::= (ID{ s = span; label = lexer.GetMatch(span); } COLON{ s.end = span.end; })
@@ -75,9 +92,19 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
         |   GotoDefaultStatement(moduleId, ctx):gotoDefaultStatement{ return gotoDefaultStatement; }
         ;
 
-    CompoundStatement(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<CompoundStatementNode> compoundStatement) : CompoundStatementNode*
+    CompoundStatement(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<CompoundStatementNode> compoundStatement, var std::unique_ptr<StatementNode> stmt) : CompoundStatementNode*
         ::= LBRACE{ compoundStatement.reset(new CompoundStatementNode(span, *moduleId)); compoundStatement->SetBeginBraceSpan(span); }
-            (Statement(moduleId, ctx):stmt{ compoundStatement->AddStatement(stmt); })* RBRACE!
+            (Statement(moduleId, ctx):statement
+            { 
+                stmt.reset(statement);
+                bool isSyncNode = stmt->GetNodeType() == sngcm::ast::NodeType::syncNode;
+                if (!isSyncNode) 
+                {  
+                    lexer.ResetFlag(LexerFlags::synchronized);
+                }
+                compoundStatement->AddStatement(stmt.release()); }
+            )* 
+            RBRACE!
         {
             compoundStatement->SetEndBraceSpan(span);
             compoundStatement->SetSpanEnd(span.end);
@@ -357,6 +384,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
                 ctx->PopParsingExpressionStatement();
             }
         ;
+
 
     EmptyStatement(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : StatementNode*
         ::= SEMICOLON

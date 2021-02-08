@@ -149,6 +149,10 @@ public:
     virtual void Accept(SymbolCollector* collector) {}
     virtual const ContainerScope* GetContainerScope() const;
     virtual ContainerScope* GetContainerScope();
+    virtual const ContainerScope* GetTypeScope() const;
+    virtual ContainerScope* GetTypeScope();
+    virtual ContainerScope* GetArrowScope();
+    virtual const ContainerScope* GetArrowScope() const;
     virtual std::u32string FullName() const;
     virtual std::u32string FullNameWithSpecifiers() const;
     virtual std::u32string SimpleName() const { return Name(); }
@@ -231,6 +235,10 @@ public:
     Attributes* GetAttributes() const { return attributes.get(); }
     std::unique_ptr<sngxml::dom::Element> ToDomElement(TypeMap& typeMap);
     virtual std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap);
+    virtual sngxml::dom::Element* ToCCElement(int ccPrefixLength, const std::u32string& replacement) const;
+    virtual std::string GetSymbolCategoryStr() const { return "SY"; }
+    virtual std::string GetSymbolCategoryDescription() const { return "symbol"; }
+    virtual std::string GetSymbolHelp() const;
     virtual std::u32string Info() const { return std::u32string(); }
     virtual void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const {}
     virtual bool HasProjectMembers() const { return false; }

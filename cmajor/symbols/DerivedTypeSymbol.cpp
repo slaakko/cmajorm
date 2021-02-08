@@ -451,6 +451,16 @@ int DerivedTypeSymbol::PointerCount() const
     return CountPointerDerivations(derivationRec.derivations);
 }
 
+const ContainerScope* DerivedTypeSymbol::GetArrowScope() const
+{
+    return baseType->GetContainerScope();
+}
+
+ContainerScope* DerivedTypeSymbol::GetArrowScope()
+{
+    return baseType->GetContainerScope();
+}
+
 TypeSymbol* DerivedTypeSymbol::PlainType(const Span& span, const boost::uuids::uuid& moduleId)
 {
     return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(baseType, MakePlainDerivationRec(derivationRec), span, moduleId);

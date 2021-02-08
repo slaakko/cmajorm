@@ -871,15 +871,15 @@ namespace Cm.Ast
     {
         switch (chrLitPrefix)
         {
-            case 0: 
+            case 0:
             {
                 return new CharLiteralNode(span, cast<char>(value));
             }
-            case 1: 
+            case 1:
             {
                 return new WCharLiteralNode(span, cast<wchar>(value));
             }
-            case 2: 
+            case 2:
             {
                 return new UCharLiteralNode(span, value);
             }
@@ -890,15 +890,15 @@ namespace Cm.Ast
     {
         switch (strLitPrefix)
         {
-            case 0: 
+            case 0:
             {
                 return new StringLiteralNode(span, ToUtf8(value));
             }
-            case 1: 
+            case 1:
             {
                 return new WStringLiteralNode(span, ToUtf16(value));
             }
-            case 2: 
+            case 2:
             {
                 return new UStringLiteralNode(span, value);
             }

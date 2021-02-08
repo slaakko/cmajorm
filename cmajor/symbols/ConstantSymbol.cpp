@@ -278,4 +278,12 @@ void ConstantSymbol::Check()
     }
 }
 
+std::string ConstantSymbol::GetSymbolHelp() const
+{
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    help.append(ToUtf8(GetType()->FullName())).append(" ").append(ToUtf8(FullName()));
+    return help;
+}
+
 } } // namespace cmajor::symbols

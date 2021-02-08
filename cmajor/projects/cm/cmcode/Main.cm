@@ -604,16 +604,17 @@ namespace cmcode
             UniquePtr<Control> scrollableConsole(new ScrollableControl(consolePtr.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             consoleTabPage->AddChild(scrollableConsole.Release());
             outputTabControl->AddTabPage(consoleTabPagePtr.Release());
-#if (DEBUG)
-            UniquePtr<TabPage> logTabPagePtr(new TabPage("Log", "log"));
-            logTabPage = logTabPagePtr.Get();
-            UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.none, Anchors.none));
-            logView->SetDoubleBuffered();
-            Application.SetLogView(logView.Get());
-            UniquePtr<Control> scrollableLogView(new ScrollableControl(logView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-            logTabPage->AddChild(scrollableLogView.Release());
-            outputTabControl->AddTabPage(logTabPagePtr.Release());
-#endif
+            if (File.Exists(CmcodeLogFlagFileName()))
+            {
+                UniquePtr<TabPage> logTabPagePtr(new TabPage("Log", "log"));
+                logTabPage = logTabPagePtr.Get();
+                UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.none, Anchors.none));
+                logView->SetDoubleBuffered();
+                Application.SetLogView(logView.Get());
+                UniquePtr<Control> scrollableLogView(new ScrollableControl(logView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+                logTabPage->AddChild(scrollableLogView.Release());
+                outputTabControl->AddTabPage(logTabPagePtr.Release());
+            }
             verticalSplitContainer->Pane2Container()->AddChild(borderedOutputTabControl.Release());
             AddChild(verticalSplitContainerPtr.Release());
             StatusBar* statusBar = new StatusBar();
@@ -628,6 +629,12 @@ namespace cmcode
             caretColumnStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
             statusBar->AddItem(caretColumnStatusBarItem);
             AddChild(statusBar);
+            UniquePtr<Cm.Views.CodeCompletionListView> codeCompletionListViewPtr = CreateCodeCompletionListView();
+            codeCompletionListView = codeCompletionListViewPtr.Get();
+            AddChild(codeCompletionListViewPtr.Release());
+            UniquePtr<Cm.Views.CodeCompletionSymbolHelpView> codeCompletionSymbolHelpViewPtr = CreateCodeCompletionSymbolHelpView();
+            codeCompletionSymbolHelpView = codeCompletionSymbolHelpViewPtr.Get();
+            AddChild(codeCompletionSymbolHelpViewPtr.Release());
             SetControlStatus(UserInterfaceAction.none);
             MainConfiguration.Instance().SetMainWindowLocation(Location());
             MainConfiguration.Instance().SetMainWindowSize(GetSize());
@@ -798,21 +805,49 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private nothrow UniquePtr<Cm.Views.CodeCompletionListView> CreateCodeCompletionListView()
+        {
+            UniquePtr<Cm.Views.CodeCompletionListView> ccListView(new Cm.Views.CodeCompletionListView(Point(100, 100), Size(100, 100), Dock.none, Anchors.none));
+            return ccListView;
+        }
+        private nothrow UniquePtr<Cm.Views.CodeCompletionSymbolHelpView> CreateCodeCompletionSymbolHelpView()
+        {
+            UniquePtr<Cm.Views.CodeCompletionSymbolHelpView> symbolHelpView(new Cm.Views.CodeCompletionSymbolHelpView(Point(100, 100), Size(100, 100), Dock.none, Anchors.none));
+            return symbolHelpView;
+        }
+        private nothrow TextView* GetCurrentTextView() const
+        {
+            TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+            Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+            if (editor != null)
+            {
+                TextView* textView = editor->GetTextView();
+                return textView;
+            }
+            return null;
+        }
+        private void SetFocusToEditor()
+        {
+            try
+            {
+                TextView* currentTextView = GetCurrentTextView();
+                if (currentTextView != null)
+                {
+                    currentTextView->SetFocus();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+                LogException(ex);
+            }
+        }
         protected override void OnGotFocus()
         {
             try
             {
                 base->OnGotFocus();
-                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
-                Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
-                if (editor != null)
-                {
-                    TextView* textView = editor->GetTextView();
-                    if (textView != null)
-                    {
-                        textView->SetFocus();
-                    }
-                }
+                SetFocusToEditor();
             }
             catch (const Exception& ex)
             {
@@ -871,6 +906,7 @@ namespace cmcode
         }
         private void CodeTabPageRemoved(ControlEventArgs& args)
         {
+            HideCodeCompletionList();
             Control* removedControl = args.control;
             if (removedControl is TabPage*)
             {
@@ -2657,6 +2693,13 @@ namespace cmcode
             sourceCodeView->DirtyChangedEvent().AddHandler(EditorDirtyChanged);
             sourceCodeView->CCDirtyChangedEvent().AddHandler(EditorCCDirtyChanged);
             sourceCodeView->CCTextChangedEvent().AddHandler(EditorCCTextChanged);
+            sourceCodeView->CCEvent().AddHandler(EditorCCKeyPressed);
+            sourceCodeView->CCNextEvent().AddHandler(EditorCCNext);
+            sourceCodeView->CCPrevEvent().AddHandler(EditorCCPrev);
+            sourceCodeView->CCNextPageEvent().AddHandler(EditorCCNextPage);
+            sourceCodeView->CCPrevPageEvent().AddHandler(EditorCCPrevPage);
+            sourceCodeView->CCSelectEvent().AddHandler(EditorCCReplace);
+            sourceCodeView->EscapePressedEvent().AddHandler(EditorEscapePressed);
             sourceCodeView->CopyEvent().AddHandler(CopyClick);
             sourceCodeView->CutEvent().AddHandler(CutClick);
             sourceCodeView->PasteEvent().AddHandler(PasteClick);
@@ -3827,6 +3870,8 @@ namespace cmcode
         {
             try
             {
+                const EditorSettings& editorSettings = MainConfiguration.Instance().GetEditorSettings();
+                if (!editorSettings.useCodeCompletion) return;
                 if (codeCompletionServerStarting) return;
                 if (!solutionExplorerData.IsNull())
                 {
@@ -3867,25 +3912,77 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private void ShowCodeCompletionList(const Point& location, const List<Cm.Views.CCEntry>& ccList)
+        {
+            if (ccList.IsEmpty())
+            {
+                HideCodeCompletionList();
+            }
+            else
+            {
+                codeCompletionListView->SetContent(ccList);
+                codeCompletionListView->SetLocation(location);
+                codeCompletionListView->BringToFront();
+                codeCompletionListView->Show();
+                codeCompletionListView->Invalidate();
+                codeCompletionListView->Update();
+                codeCompletionListView->SetDefaultSize();
+                ShowCodeCompletionSymbolHelp();
+                TextView* textView = GetCurrentTextView();
+                if (textView != null)
+                {
+                    textView->SetCCOpen();
+                }
+            }
+        }
+        private void HideCodeCompletionList()
+        {
+            codeCompletionListView->Hide();
+            HideCodeCompletionSymbolHelp();
+            TextView* textView = GetCurrentTextView();
+            if (textView != null)
+            {
+                textView->ResetCCOpen();
+            }
+        }
+        private void ShowCodeCompletionSymbolHelp()
+        {
+            if (codeCompletionListView->IsVisible())
+            {
+                int selectedEntryIndex = codeCompletionListView->SelectedEntryIndex();
+                if (selectedEntryIndex != -1)
+                {
+                    const Cm.Views.CCEntry& entry = codeCompletionListView->GetSelectedCCEntry();
+                    if (!entry.help.IsEmpty())
+                    {
+                        codeCompletionSymbolHelpView->SetContentAndLocation(entry.help, codeCompletionListView->GetSymbolHelpLocation());
+                    }
+                    else
+                    {
+                        HideCodeCompletionSymbolHelp();
+                    }
+                }
+                else
+                {
+                    HideCodeCompletionSymbolHelp();
+                }
+            }
+            else
+            {
+                HideCodeCompletionSymbolHelp();
+            }
+        }
+        private void HideCodeCompletionSymbolHelp()
+        {
+            codeCompletionSymbolHelpView->Hide();
+        }
         private void TestClick()
         {
             try
             {
-                ustring content = ToUtf32(File.ReadAllText("C:\\work\\cmajorm\\cmajor\\projects\\cm\\cmcode\\log\\reply.xml"));
-     		         UniquePtr<System.Dom.Document> doc = System.Dom.ParseDocument(content, "reply");
-                UniquePtr<System.XPath.XPathObject> result = System.XPath.Evaluate(u"/parseSourceReply", doc.Get());
-                if (result.Get() != null)
-                {
-                    System.XPath.XPathNodeSet* nodeSet = cast<System.XPath.XPathNodeSet*>(result.Get());
-                    System.Dom.Element* parentElement = cast<System.Dom.Element*>((*nodeSet)[0]);
-                    List<string> stringList;
-                    FromXml<string>(parentElement, string("errors"), stringList);
-                    for (const string& s : stringList)
-                    {
-                        string t = Unescape(s);
-                        int x = 0;
-                    }
-                }
+                Point pt(200, 400);
+                List<Cm.Views.CCEntry> ccList;
+                ShowCodeCompletionList(pt, ccList);
             }
             catch (const Exception& ex)
             {
@@ -3927,10 +4024,15 @@ namespace cmcode
                 {
                     HandleResetEditModuleCacheReply(cast<ResetEditModuleCacheReply*>(reply.Get()));
                 }
-                if (reply.Get() is ParseSourceReply*)
+                else if (reply.Get() is ParseSourceReply*)
                 {
                     HandleParseSourceReply(cast<ParseSourceReply*>(reply.Get()));
                 }
+                else if (reply.Get() is GetCCListReply*)
+                {
+                    HandleGetCCListReply(cast<GetCCListReply*>(reply.Get()));
+                }
+                SetFocusToEditor();
                 message.result = 0;
                 return true;
             }
@@ -3966,10 +4068,17 @@ namespace cmcode
                 string dispatchReply = "\ndispatch reply: " + DurationStr(now - reply->endLoading);
                 string total = "\ntotal: " + DurationStr(now - reply->requestCreated);
                 string logMessage = reply->key;
-                logMessage.Append(" ").Append(reply->result).Append(dispatchRequest).Append(requestReceived).Append(started).Append(loading).Append(parsing).
-                    Append(dispatchReply).Append(total);
+                logMessage.Append(" ").Append(reply->result);
                 GetOutputTabPage()->Select();
                 GetOutputLogView()->WriteLine(logMessage);
+                LogView* logView = Application.GetLogView();
+                if (logView != null)
+                {
+                    string times = "load ";
+                    times.Append(reply->key).Append(" ").Append(reply->result);
+                    times.Append(dispatchRequest).Append(requestReceived).Append(started).Append(loading).Append(parsing).Append(dispatchReply).Append(total);
+                    logView->WriteLine(times);
+                }
                 Application.ProcessMessages();
             }
             catch (const Exception& ex)
@@ -4035,11 +4144,21 @@ namespace cmcode
                     {
                         logMessage.Append("\n(synchronized)");
                     }
+                    if (!reply->cursorContainer.IsEmpty())
+                    {
+                        logMessage.Append("\ncursor container: " + reply->cursorContainer);
+                    }
                     string dispatchRequest = "\ndispatch request: " + DurationStr(reply->requestReceived - reply->requestCreated);
                     string requestReceived = "\nrequest received: " + DurationStr(reply->created - reply->requestReceived);
                     string parsing = "\nparsing: " + DurationStr(reply->endParsing - reply->startParsing);
                     string total = "\ntotal: " + DurationStr(now - reply->requestCreated);
-                    logMessage.Append(dispatchRequest).Append(requestReceived).Append(parsing).Append(total);
+                    LogView* logView = Application.GetLogView();
+                    if (logView != null)
+                    {
+                        string times = "parse:";
+                        times.Append(dispatchRequest).Append(requestReceived).Append(parsing).Append(total);
+                        logView->WriteLine(times);
+                    }
                     GetOutputLogView()->WriteLine(logMessage);
                 }
                 else
@@ -4053,6 +4172,54 @@ namespace cmcode
             {
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
                 LogException(ex);
+            }
+        }
+        private void HandleGetCCListReply(GetCCListReply* reply)
+        {
+            bool hideCodeCompletionList = true;
+            try
+            {
+                GetOutputTabPage()->Select();
+                LogView* logView = Application.GetLogView();
+                string logMessage = "cc list:";
+                if (reply->ok)
+                {
+                    TimePoint now = Now();
+                    logMessage.Append('\n').Append(reply->ccList);
+                    string dispatchRequest = "\ndispatch request: " + DurationStr(reply->requestReceived - reply->requestCreated);
+                    string requestReceived = "\nrequest received: " + DurationStr(reply->created - reply->requestReceived);
+                    string query = "\nquery " + DurationStr(reply->endGetCCList - reply->startGetCCList);
+                    string total = "\ntotal: " + DurationStr(now - reply->requestCreated);
+                    logMessage.Append(dispatchRequest).Append(requestReceived).Append(query).Append(total);
+                    if (logView != null)
+                    {
+                        logView->WriteLine(logMessage);
+                    }
+                    TextView* currentTextView = GetCurrentTextView();
+                    if (currentTextView != null)
+                    {
+                        List<Cm.Views.CCEntry> ccList = Cm.Views.ParseCCList(reply->ccList);
+                        Point ccPos = currentTextView->CCPos();
+                        Point screenPos = currentTextView->ClientToScreen(ccPos);
+                        Point ccListPos = ScreenToClient(screenPos);
+                        ShowCodeCompletionList(ccListPos, ccList);
+                        hideCodeCompletionList = false;
+                    }
+                }
+                else
+                {
+                    string error = reply->error;
+                    GetOutputLogView()->WriteLine(Unescape(error));
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+            if (hideCodeCompletionList)
+            {
+                HideCodeCompletionList();
             }
         }
         private void FetchCodeCompletionServiceLogMessages()
@@ -4333,25 +4500,132 @@ namespace cmcode
         }
         private void EditorCCTextChanged()
         {
-            ustring cctext;
-            TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
-            Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
-            if (editor != null)
+            try
             {
-                if (editor is Cm.Views.CmajorEditor*)
+                const EditorSettings& editorSettings = MainConfiguration.Instance().GetEditorSettings();
+                if (!editorSettings.useCodeCompletion) return;
+                ustring ccText;
+                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                if (editor != null)
                 {
-                    Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
-                    SourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
-                    if (sourceCodeView != null)
+                    if (editor is Cm.Views.CmajorEditor*)
                     {
-                        cctext = sourceCodeView->GetCCText();
+                        Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                        string sourceFilePath = cmajorEditor->FilePath();
+                        TreeViewNodeData* nodeData = solutionExplorerData->GetTreeViewNodeDataByKey(sourceFilePath);
+                        if (nodeData != null)
+                        {
+                            Cm.Ast.Project* project = nodeData->project;
+                            SourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                            if (sourceCodeView != null)
+                            {
+                                ccText = sourceCodeView->GetCCText();
+                                UniquePtr<GetCCListRequest> request(new GetCCListRequest(project->FilePath(), GetBackend(), GetConfig(), sourceFilePath, ToUtf8(ccText)));
+                                GetCodeCompletionService().PutRequest(request.Release());
+                            }
+                        }
                     }
                 }
+                LogView* logView = Application.GetLogView();
+                if (logView != null)
+                {
+                    logView->WriteLine("cc: " + ToUtf8(ccText));
+                }
             }
-            LogView* logView = Application.GetLogView();
-            if (logView != null)
+            catch (const Exception& ex)
             {
-                logView->WriteLine("cc: " + ToUtf8(cctext));
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void EditorCCKeyPressed()
+        {
+            EditorCCTextChanged();
+        }
+        private void EditorCCNext()
+        {
+            try
+            {
+                codeCompletionListView->Next();
+                ShowCodeCompletionSymbolHelp();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void EditorCCPrev()
+        {
+            try
+            {
+                codeCompletionListView->Prev();
+                ShowCodeCompletionSymbolHelp();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void EditorCCNextPage()
+        {
+            try
+            {
+                codeCompletionListView->NextPage();
+                ShowCodeCompletionSymbolHelp();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void EditorCCPrevPage()
+        {
+            try
+            {
+                codeCompletionListView->PrevPage();
+                ShowCodeCompletionSymbolHelp();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void EditorCCReplace()
+        {
+            try
+            {
+                TextView* currentTextView = GetCurrentTextView();
+                if (currentTextView != null)
+                {
+                    if (codeCompletionListView->SelectedEntryIndex() != -1)
+                    {
+                        const Cm.Views.CCEntry& entry = codeCompletionListView->GetSelectedCCEntry();
+                        currentTextView->ReplaceCCText(ToUtf32(entry.replacement));
+                    }
+                }
+                HideCodeCompletionList();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void EditorEscapePressed()
+        {
+            try
+            {
+                HideCodeCompletionList();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
             }
         }
         private void ReadTargetInput(string& inputLine, bool& eof)
@@ -4785,6 +5059,9 @@ namespace cmcode
         private ToolButton* stepOutToolButton;
 
         private ToolTip* toolTipWindow;
+
+        private Cm.Views.CodeCompletionListView* codeCompletionListView;
+        private Cm.Views.CodeCompletionSymbolHelpView* codeCompletionSymbolHelpView;
 
         private UniquePtr<BuildService> buildService;
         private UniquePtr<DebugService> debugService;

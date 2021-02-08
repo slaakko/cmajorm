@@ -143,6 +143,10 @@ namespace Cm.Service.CodeCompletion
         {
             rootElementName = "parseSourceRequest";
         }
+        public override void Visit(GetCCListRequest& request)
+        {
+            rootElementName = "getCCListRequest";
+        }
         public override void Visit(StopRequest& request)
         {
             rootElementName = "stopRequest";
@@ -158,6 +162,7 @@ namespace Cm.Service.CodeCompletion
             replyRegistry.RegisterReply("loadEditModuleReply", new CodeCompletionReplyFactory<LoadEditModuleReply>());
             replyRegistry.RegisterReply("resetEditModuleCacheReply", new CodeCompletionReplyFactory<ResetEditModuleCacheReply>());
             replyRegistry.RegisterReply("parseSourceReply", new CodeCompletionReplyFactory<ParseSourceReply>());
+            replyRegistry.RegisterReply("getCCListReply", new CodeCompletionReplyFactory<GetCCListReply>());
             replyRegistry.RegisterReply("stopReply", new CodeCompletionReplyFactory<StopReply>());
         }
         public nothrow void SetCodeCompletionReplyHandlerFunction(CodeCompletionReplyHandlerFunction codeCompletionReplyHandlerFunction_)

@@ -10,6 +10,10 @@ namespace System.Windows
 {
     public class Panel : ContainerControl
     {
+        private enum Flags : sbyte
+        {
+            none = 0, dontPaint = 1 << 0
+        }
         public Panel(const char* windowClassName, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, const Color& backgroundColor) :
             base(windowClassName, DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, text, location, size, dock, anchors)
         {
@@ -40,6 +44,7 @@ namespace System.Windows
         {
             try
             {
+                if (DontPaint()) return;
                 if (Debug.Paint())
                 {
                     Rect r(Location(), GetSize());
@@ -57,5 +62,18 @@ namespace System.Windows
                 MessageBox.Show(ex.Message());
             }
         }
+        public nothrow inline bool DontPaint() const
+        {
+            return (flags & Flags.dontPaint) != Flags.none;
+        }
+        public nothrow void SetDontPaint()
+        {
+            flags = cast<Flags>(flags | Flags.dontPaint);
+        }
+        public nothrow void ResetDontPaint()
+        {
+            flags = cast<Flags>(flags & ~Flags.dontPaint);
+        }
+        private Flags flags;
     }
 }

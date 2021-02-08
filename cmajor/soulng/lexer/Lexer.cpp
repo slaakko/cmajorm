@@ -372,7 +372,7 @@ void Lexer::ThrowExpectationFailure(const Span& span, const std::u32string& name
 
 void Lexer::AddError(const Span& span, const std::u32string& name)
 {
-    if (GetFlag(LexerFlags::synchronized))
+    if (GetFlag(LexerFlags::synchronize) && GetFlag(LexerFlags::synchronized))
     {
         SetFlag(LexerFlags::synchronizedAtLeastOnce);
     }
@@ -439,19 +439,22 @@ void Lexer::SetSyncTokens(const std::vector<int>& syncTokens_)
 
 bool Lexer::Synchronize()
 {
-    if (GetFlag(LexerFlags::synchronized)) return false;
-    SetFlag(LexerFlags::synchronized);
-    while (pos != end)
+    if (GetFlag(LexerFlags::synchronize))
     {
-        int curToken = token.id;
-        for (int syncToken : syncTokens)
+        if (GetFlag(LexerFlags::synchronized)) return false;
+        SetFlag(LexerFlags::synchronized);
+        while (pos != end)
         {
-            if (curToken == syncToken)
+            int curToken = token.id;
+            for (int syncToken : syncTokens)
             {
-                return true;
+                if (curToken == syncToken)
+                {
+                    return true;
+                }
             }
+            ++*this;
         }
-        ++*this;
     }
     return false;
 }

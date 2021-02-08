@@ -1,0 +1,654 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+using System.Dom;
+using System.XPath;
+
+namespace Cm.Views
+{
+    public nothrow System.Windows.Color CCListBorderColor()
+    {
+        return System.Windows.Color(204u, 206u, 219u);
+    }
+
+    public nothrow System.Windows.Color CCListNormalBackgroundColor()
+    {
+        return System.Windows.Color(245u, 245u, 245u);
+    }
+
+    public nothrow System.Windows.Color CCListSelectedBackgroundColor()
+    {
+        return System.Windows.Color(0u, 122u, 204u);
+    }
+
+    public nothrow string DefaultCCListFontFamilyName()
+    {
+        return "Segoe UI";
+    }
+
+    public nothrow float DefaultCCListFontSize()
+    {
+        return 9.0f;
+    }
+
+    public const int defaultNumberOfCCLines = 8;
+
+    public class CCEntry
+    {
+        public nothrow CCEntry(int prefixLength_, const string& category_, const string& completion_, const string& help_, string& replacement_) :
+            prefixLength(prefixLength_), category(category_), completion(completion_), help(help_), replacement(replacement_)
+        {
+        }
+        public int prefixLength;
+        public string category;
+        public string completion;
+        public string help;
+        public string replacement;
+    }
+
+    public List<CCEntry> ParseCCList(const string& ccList)
+    {
+        List<CCEntry> ccEntries;
+        UniquePtr<Document> doc = ParseDocument(ToUtf32(ccList), "string");
+        UniquePtr<XPathObject> result = Evaluate(u"/ccList/symbol", doc.Get());
+        if (result.Get() != null)
+        {
+            if (result.Get() is XPathNodeSet*)
+            {
+                XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    Node* node = (*nodeSet)[i];
+                    if (node is Element*)
+                    {
+                        Element* element = cast<Element*>(node);
+                        ustring prefixLength = element->GetAttribute(u"prefixLength");
+                        ustring category = element->GetAttribute(u"category");
+                        ustring completion = element->GetAttribute(u"completion");
+                        ustring help = element->GetAttribute(u"help");
+                        ustring replacement = element->GetAttribute(u"replacement");
+                        if (prefixLength.IsEmpty())
+                        {
+                            throw Exception("invalid CC list (empty symbol prefix length attribute)");
+                        }
+                        if (category.IsEmpty())
+                        {
+                            throw Exception("invalid CC list (empty symbol category attribute)");
+                        }
+                        if (completion.IsEmpty())
+                        {
+                            throw Exception("invalid CC list (empty symbol completion attribute)");
+                        }
+                        if (replacement.IsEmpty())
+                        {
+                            throw Exception("invalid CC list (empty symbol replacement attribute)");
+                        }
+                        CCEntry entry(ParseInt(ToUtf8(prefixLength)), ToUtf8(category), ToUtf8(completion), ToUtf8(help), ToUtf8(replacement));
+                        ccEntries.Add(Rvalue(entry));
+                    }
+                }
+            }
+        }
+        return ccEntries;
+    }
+
+    public class CCList : Control
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, changed = 1 << 0, measured = 1 << 1
+        }
+        public CCList(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("Cm.Views.CCList", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), CCListNormalBackgroundColor(),
+            "code completion list", location, size, dock, anchors), fontFamily(FontFamily(DefaultCCListFontFamilyName())),
+            fontSize(DefaultCCListFontSize()), normalFont(fontFamily, fontSize), boldFont(fontFamily, fontSize, FontStyle.bold, Unit.point),
+            format(StringAlignment.near, StringAlignment.near),
+            normalBackgroundColor(CCListNormalBackgroundColor()), selectedBackgroundColor(CCListSelectedBackgroundColor()),
+            normalTextColor(Color.Black()), selectedTextColor(Color.White()),
+            normalBackgroundBrush(normalBackgroundColor), selectedBackgroundBrush(selectedBackgroundColor),
+            normalTextBrush(normalTextColor), selectedTextBrush(selectedTextColor),
+            topEntryIndex(0), selectedEntryIndex(-1)
+        {
+            SetChanged();
+        }
+        public nothrow Size DefaultSize() const
+        {
+            return Size(cast<int>(normalCharWidth * 80), cast<int>(defaultNumberOfCCLines * lineHeight));
+        }
+        public nothrow inline float LineHeight() const
+        {
+            return lineHeight;
+        }
+        public nothrow inline int SelectedEntryIndex() const
+        {
+            return selectedEntryIndex;
+        }
+        public nothrow inline int TopEntryIndex() const
+        {
+            return topEntryIndex;
+        }
+        public nothrow const CCEntry& GetSelectedCCEntry() const
+        {
+            return entries[selectedEntryIndex];
+        }
+        private void SetContentLocation()
+        {
+            SetContentLocation(Point(0, topEntryIndex * cast<int>(lineHeight + 0.5)));
+        }
+        public void Next()
+        {
+            if (selectedEntryIndex == -1)
+            {
+                selectedEntryIndex = 0;
+                topEntryIndex = 0;
+            }
+            else if (selectedEntryIndex < entries.Count() - 1)
+            {
+                ++selectedEntryIndex;
+                int n = GetNumberOfVisibleLines();
+                if (topEntryIndex <= selectedEntryIndex - n)
+                {
+                    topEntryIndex = Min(cast<int>(entries.Count() - 1), selectedEntryIndex - n + 1);
+                }
+            }
+            SetContentLocation();
+            Invalidate();
+        }
+        public void Prev()
+        {
+            if (selectedEntryIndex == -1)
+            {
+                selectedEntryIndex = 0;
+                topEntryIndex = 0;
+            }
+            else if (selectedEntryIndex > 0)
+            {
+                --selectedEntryIndex;
+                if (topEntryIndex > selectedEntryIndex)
+                {
+                    topEntryIndex = selectedEntryIndex;
+                }
+            }
+            SetContentLocation();
+            Invalidate();
+        }
+        public void NextPage()
+        {
+            if (selectedEntryIndex == -1)
+            {
+                selectedEntryIndex = 0;
+                topEntryIndex = 0;
+            }
+            else if (selectedEntryIndex < entries.Count() - 1)
+            {
+                int n = GetNumberOfVisibleLines();
+                selectedEntryIndex = Min(cast<int>(entries.Count() - 1), selectedEntryIndex + n);
+                topEntryIndex = Max(cast<int>(0), selectedEntryIndex - n + 1);
+            }
+            SetContentLocation();
+            Invalidate();
+        }
+        public void PrevPage()
+        {
+            if (selectedEntryIndex == -1)
+            {
+                selectedEntryIndex = 0;
+                topEntryIndex = 0;
+            }
+            else if (selectedEntryIndex > 0)
+            {
+                int n = GetNumberOfVisibleLines();
+                selectedEntryIndex = Max(cast<int>(0), selectedEntryIndex - n);
+                if (topEntryIndex > selectedEntryIndex)
+                {
+                    topEntryIndex = selectedEntryIndex;
+                }
+            }
+            SetContentLocation();
+            Invalidate();
+        }
+        public nothrow inline const Color& NormalBackgroundColor() const
+        {
+            return normalBackgroundColor;
+        }
+        public nothrow inline const Color& SelectedBackgroundColor() const
+        {
+            return selectedBackgroundColor;
+        }
+        public nothrow inline const Color& NormalTextColor() const
+        {
+            return normalTextColor;
+        }
+        public nothrow inline const Color& SelectedTextColor() const
+        {
+            return selectedTextColor;
+        }
+        public nothrow void SetColors(const Color& normalBackgroundColor_, const Color& selectedBackgroundColor_,
+            const Color& normalTextColor_, const Color& selectedTextColor_)
+        {
+            normalBackgroundColor = normalBackgroundColor_;
+            selectedBackgroundColor = selectedBackgroundColor_;
+            normalTextColor = normalTextColor_;
+            selectedTextColor = selectedTextColor_;
+            normalBackgroundBrush = SolidBrush(normalBackgroundColor);
+            selectedBackgroundBrush = SolidBrush(selectedBackgroundColor);
+            normalTextBrush = SolidBrush(normalTextColor);
+            selectedTextBrush = SolidBrush(selectedTextColor);
+            SetChanged();
+            ResetMeasured();
+            Invalidate();
+        }
+        public void SetFonts(const FontFamily& fontFamily_, float fontSize_)
+        {
+            fontFamily = fontFamily_;
+            fontSize = fontSize_;
+            normalFont = Font(fontFamily, fontSize);
+            boldFont = Font(fontFamily, fontSize, FontStyle.bold, Unit.point);
+            SetChanged();
+            ResetMeasured();
+            Invalidate();
+        }
+        public void SetContent(const List<CCEntry>& entries_)
+        {
+            entries = entries_;
+            Size contentSize = GetSize();
+            contentSize.h = cast<int>(entries.Count() * cast<int>(lineHeight + 0.5));
+            topEntryIndex = 0;
+            selectedEntryIndex = 0;
+            SetContentLocation();
+            SetContentSize(contentSize);
+            Invalidate();
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            try
+            {
+                if (Changed())
+                {
+                    ResetChanged();
+                    Measure(args.graphics);
+                }
+                args.graphics.Clear(normalBackgroundColor);
+                Size size = GetSize();
+                int n = topEntryIndex + GetNumberOfVisibleLines();
+                for (int i = topEntryIndex; i < n; ++i)
+                {
+                    string line;
+                    if (i >= 0 && i < entries.Count())
+                    {
+                        const CCEntry& entry = entries[i];
+                        line.Append(entry.category).Append(' ').Append(entry.completion);
+                    }
+                    PointF origin(0, cast<int>(lineHeight + 0.5) * i);
+                    SizeF sz(size.w, lineHeight + 0.5f);
+                    RectF rect(origin, sz);
+                    Brush* backgroundBrush = &normalBackgroundBrush;
+                    Brush* textBrush = &normalTextBrush;
+                    if (i == selectedEntryIndex)
+                    {
+                        backgroundBrush = &selectedBackgroundBrush;
+                        textBrush = &selectedTextBrush;
+                    }
+                    args.graphics.FillRectangleChecked(*backgroundBrush, rect);
+                    args.graphics.DrawStringChecked(line, normalFont, origin, *textBrush);
+                }
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        private nothrow int GetNumberOfVisibleLines() const
+        {
+            Size size = GetSize();
+            return cast<int>(size.h / cast<int>(lineHeight + 0.5));
+        }
+        private void Measure(Graphics& graphics)
+        {
+            try
+            {
+                string testString = "This is a test string";
+                PointF origin;
+                RectF nr = graphics.MeasureStringChecked(testString, normalFont, origin, format);
+                RectF br = graphics.MeasureStringChecked(testString, boldFont, origin, format);
+                lineHeight = Max(nr.size.h, br.size.h);
+                normalCharWidth = nr.size.w / testString.Length();
+                boldCharWidth = br.size.w / testString.Length();
+                SetScrollUnits(cast<int>(lineHeight + 0.5), cast<int>(2 * (normalCharWidth + 0.5)));
+                SetMeasured();
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        private nothrow inline bool Changed() const
+        {
+            return (flags & Flags.changed) != Flags.none;
+        }
+        private nothrow void SetChanged()
+        {
+            flags = cast<Flags>(flags | Flags.changed);
+        }
+        private nothrow void ResetChanged()
+        {
+            flags = cast<Flags>(flags & ~Flags.changed);
+        }
+        public nothrow inline bool Measured() const
+        {
+            return (flags & Flags.measured) != Flags.none;
+        }
+        public nothrow void SetMeasured()
+        {
+            flags = cast<Flags>(flags | Flags.measured);
+        }
+        public nothrow void ResetMeasured()
+        {
+            flags = cast<Flags>(flags & ~Flags.measured);
+        }
+        private List<CCEntry> entries;
+        private int topEntryIndex;
+        private int selectedEntryIndex;
+        private FontFamily fontFamily;
+        private float fontSize;
+        private Font normalFont;
+        private Font boldFont;
+        private Color normalBackgroundColor;
+        private Color selectedBackgroundColor;
+        private Color normalTextColor;
+        private Color selectedTextColor;
+        private StringFormat format;
+        private SolidBrush normalBackgroundBrush;
+        private SolidBrush selectedBackgroundBrush;
+        private SolidBrush normalTextBrush;
+        private SolidBrush selectedTextBrush;
+        private Flags flags;
+        private float lineHeight;
+        private float normalCharWidth;
+        private float boldCharWidth;
+    }
+
+    public class CodeCompletionListView : Control
+    {
+        public CodeCompletionListView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("Cm.Views.CodeCompletionListView", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), CCListNormalBackgroundColor(),
+            "code completion list view", location, size, dock, anchors), container(this), ccList(null)
+        {
+            UniquePtr<CCList> ccListPtr(new CCList(Point(), Size(), Dock.none, Anchors.none));
+            ccList = ccListPtr.Get();
+            ccList->SetDoubleBuffered();
+            UniquePtr<PaddedControl> paddedCCList(new PaddedControl(ccListPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            paddedCCList->SetBackgroundColor(CCListNormalBackgroundColor());
+            UniquePtr<ScrollableControl> scrollableCCList(new ScrollableControl(paddedCCList.Release(), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            scrollableCCList->SetBackgroundColor(CCListNormalBackgroundColor());
+            UniquePtr<BorderedControl> borderedCCList(new BorderedControl(scrollableCCList.Release(), BorderStyle.single, CCListBorderColor(), CCListBorderColor(),
+                Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            borderedCCList->SetBackgroundColor(CCListNormalBackgroundColor());
+            child = borderedCCList.Get();
+            container.AddChild(borderedCCList.Release());
+        }
+        public void SetDefaultSize()
+        {
+            if (ccList->Measured())
+            {
+                ccList->ResetMeasured();
+                Size sz = ccList->DefaultSize();
+                Rect r(Point(), sz);
+                r.Inflate(6, 6);
+                SetSize(r.size);
+            }
+        }
+        public void SetContent(const List<CCEntry>& entries)
+        {
+            ccList->SetContent(entries);
+        }
+        public void Next()
+        {
+            ccList->Next();
+        }
+        public void Prev()
+        {
+            ccList->Prev();
+        }
+        public void NextPage()
+        {
+            ccList->NextPage();
+        }
+        public void PrevPage()
+        {
+            ccList->PrevPage();
+        }
+        public nothrow inline int TopEntryIndex() const
+        {
+            return ccList->TopEntryIndex();
+        }
+        public nothrow inline int SelectedEntryIndex() const
+        {
+            return ccList->SelectedEntryIndex();
+        }
+        public nothrow const CCEntry& GetSelectedCCEntry() const
+        {
+            return ccList->GetSelectedCCEntry();
+        }
+        public nothrow Point GetSymbolHelpLocation() const
+        {
+            Point loc = Location();
+            Size sz = GetSize();
+            loc.Offset(sz.w, cast<int>(5 + (SelectedEntryIndex() - TopEntryIndex()) * ccList->LineHeight() + ccList->LineHeight() / 2));
+            return loc;
+        }
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+            SetChildPos();
+        }
+        protected override void OnSizeChanged(uint windowState)
+        {
+            base->OnSizeChanged(windowState);
+            SetChildPos();
+        }
+        private void SetChildPos()
+        {
+            Point loc;
+            Size size = GetSize();
+            Rect childRect(loc, size);
+            child->SetLocation(childRect.location);
+            child->SetSize(childRect.size);
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            try
+            {
+                child->Invalidate();
+                ccList->Invalidate();
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        public nothrow inline CCList* GetCCList() const
+        {
+            return ccList;
+        }
+        private Container container;
+        private CCList* ccList;
+        private Control* child;
+    }
+
+    public nothrow System.Windows.Color CCSymbolHelpBorderColor()
+    {
+        return System.Windows.Color(204u, 206u, 219u);
+    }
+
+    public nothrow System.Windows.Color CCSymbolHelpBackgroundColor()
+    {
+        return System.Windows.Color(245u, 245u, 245u);
+    }
+
+    public nothrow string DefaultCCSymbolHelpFontFamilyName()
+    {
+        return "Segoe UI";
+    }
+
+    public nothrow float DefaultCCSymbolHelpFontSize()
+    {
+        return 9.0f;
+    }
+
+    public class CCSymbolHelp : Control
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, changed = 1 << 0, measured = 1 << 1
+        }
+        public CCSymbolHelp(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("Cm.Vies.CCSymbolHelp", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), CCSymbolHelpBackgroundColor(),
+            "code completion symbol help", location, size, dock, anchors), fontFamily(FontFamily(DefaultCCSymbolHelpFontFamilyName())),
+            fontSize(DefaultCCSymbolHelpFontSize()), font(fontFamily, fontSize), format(StringAlignment.near, StringAlignment.near),
+            textBrush(Color.Black())
+        {
+            SetDoubleBuffered();
+        }
+        public nothrow void SetContent(const string& helpText_)
+        {
+            helpText = helpText_;
+            SetChanged();
+            Invalidate();
+        }
+        public nothrow inline Size Sz() const
+        {
+            return sz;
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            try
+            {
+                if (Changed())
+                {
+                    ResetChanged();
+                    Measure(args.graphics);
+                }
+                args.graphics.Clear(BackgroundColor());
+                PointF origin;
+                args.graphics.DrawStringChecked(helpText, font, origin, textBrush);
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        private void Measure(Graphics& graphics)
+        {
+            PointF origin;
+            RectF r = graphics.MeasureStringChecked(helpText, font, origin, format);
+            sz = Size(cast<int>(r.size.w), cast<int>(r.size.h));
+            SetMeasured();
+        }
+        private nothrow inline bool Changed() const
+        {
+            return (flags & Flags.changed) != Flags.none;
+        }
+        private nothrow void SetChanged()
+        {
+            flags = cast<Flags>(flags | Flags.changed);
+        }
+        private nothrow void ResetChanged()
+        {
+            flags = cast<Flags>(flags & ~Flags.changed);
+        }
+        public nothrow inline bool Measured() const
+        {
+            return (flags & Flags.measured) != Flags.none;
+        }
+        public nothrow void SetMeasured()
+        {
+            flags = cast<Flags>(flags | Flags.measured);
+        }
+        public nothrow void ResetMeasured()
+        {
+            flags = cast<Flags>(flags & ~Flags.measured);
+        }
+        private Flags flags;
+        private FontFamily fontFamily;
+        private float fontSize;
+        private Font font;
+        private SolidBrush textBrush;
+        private StringFormat format;
+        private string helpText;
+        private Size sz;
+    }
+
+    public class CodeCompletionSymbolHelpView : Control
+    {
+        public CodeCompletionSymbolHelpView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("Cm.Views.CodeCompletionSymbolHelpView", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            CCSymbolHelpBackgroundColor(), "code completion symbol help view", location, size, dock, anchors), container(this), helpControl(null), child(null)
+        {
+            UniquePtr<CCSymbolHelp> helpPtr(new CCSymbolHelp(Point(), Size(), Dock.none, Anchors.none));
+            helpControl = helpPtr.Get();
+            helpControl->SetDoubleBuffered();
+            UniquePtr<PaddedControl> paddedHelp(new PaddedControl(helpPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            paddedHelp->SetBackgroundColor(CCSymbolHelpBackgroundColor());
+            UniquePtr<BorderedControl> borderedHelp(new BorderedControl(paddedHelp.Release(), BorderStyle.single, CCSymbolHelpBorderColor(), CCSymbolHelpBorderColor(),
+                Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            borderedHelp->SetBackgroundColor(CCSymbolHelpBackgroundColor());
+            child = borderedHelp.Get();
+            container.AddChild(borderedHelp.Release());
+        }
+        public void SetContentAndLocation(const string& helpText, const Point& location)
+        {
+            helpControl->SetContent(helpText);
+            BringToFront();
+            Show();
+            Invalidate();
+            Update();
+            if (helpControl->Measured())
+            {
+                helpControl->ResetMeasured();
+                Size sz = helpControl->Sz();
+                Rect r(Point(), sz);
+                r.Inflate(5, 5);
+                SetSize(r.size);
+                Point loc(location);
+                loc.Offset(0, -r.size.h / 2);
+                SetLocation(loc);
+            }
+        }
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+            SetChildPos();
+        }
+        protected override void OnSizeChanged(uint windowState)
+        {
+            base->OnSizeChanged(windowState);
+            SetChildPos();
+        }
+        private void SetChildPos()
+        {
+            Point loc;
+            Size size = GetSize();
+            Rect childRect(loc, size);
+            child->SetLocation(childRect.location);
+            child->SetSize(childRect.size);
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            try
+            {
+                child->Invalidate();
+                helpControl->Invalidate();
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        private Container container;
+        private CCSymbolHelp* helpControl;
+        private Control* child;
+    }
+}
+

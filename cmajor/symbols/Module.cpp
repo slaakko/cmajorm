@@ -1956,6 +1956,18 @@ ParseResult Module::ParseSource(const std::string& sourceFilePath, const std::u3
     }
 }
 
+std::string Module::GetCCList(const std::string& sourceFilePath, const std::string& ccText)
+{
+    if (sources)
+    {
+        return sources->GetCCList(this, sourceFilePath, ccText);
+    }
+    else
+    { 
+        throw std::runtime_error("sources not set");
+    }
+}
+
 #ifdef _WIN32
     __declspec(thread) Module* rootModule = nullptr;
 #else

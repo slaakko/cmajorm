@@ -225,6 +225,216 @@ std::vector<std::u32string> ParseQualifiedName(const std::u32string& qualifiedNa
     return components;
 }
 
+std::vector<CCComponent> ParseCCName(const std::u32string& qualifiedName)
+{
+    std::vector<CCComponent> components;
+    int state = 0;
+    std::u32string str;
+    int angleBracketCount = 0;
+    CCComponentSeparator separator = CCComponentSeparator::dot;
+    for (char32_t c : qualifiedName)
+    {
+        switch (state)
+        {
+            case 0:
+            {
+                if (c == '.')
+                {
+                    components.push_back(CCComponent(separator, str));
+                    separator = CCComponentSeparator::dot;
+                    str.clear();
+                }
+                else if (c == '-')
+                {
+                    state = 2;
+                }
+                else if (c == '<')
+                {
+                    str.append(1, c);
+                    angleBracketCount = 1;
+                    state = 1;
+                }
+                else
+                {
+                    str.append(1, c);
+                }
+                break;
+            }
+            case 1:
+            {
+                str.append(1, c);
+                if (c == '<')
+                {
+                    ++angleBracketCount;
+                }
+                else if (c == '>')
+                {
+                    --angleBracketCount;
+                    if (angleBracketCount == 0)
+                    {
+                        state = 0;
+                    }
+                }
+                break;
+            }
+            case 2:
+            {
+                if (c == '>')
+                {
+                    components.push_back(CCComponent(separator, str));
+                    separator = CCComponentSeparator::arrow;
+                    str.clear();
+                    state = 0;
+                }
+                else if (c != '-')
+                {
+                    state = 0;
+                }
+                break;
+            }
+        }
+    }
+    components.push_back(CCComponent(separator, str));
+    return components;
+}
+
+int CountCCComponents(const std::u32string& qualifiedName)
+{
+    int numComponents = 0;
+    int state = 0;
+    int angleBracketCount = 0;
+    for (char32_t c : qualifiedName)
+    {
+        switch (state)
+        {
+            case 0:
+            {
+                if (c == '.')
+                {
+                    ++numComponents;
+                }
+                else if (c == '-')
+                {
+                    state = 2;
+                }
+                else if (c == '<')
+                {
+                    angleBracketCount = 1;
+                    state = 1;
+                }
+                break;
+            }
+            case 1:
+            {
+                if (c == '<')
+                {
+                    ++angleBracketCount;
+                }
+                else if (c == '>')
+                {
+                    --angleBracketCount;
+                    if (angleBracketCount == 0)
+                    {
+                        state = 0;
+                    }
+                }
+                break;
+            }
+            case 2:
+            {
+                if (c == '>')
+                {
+                    ++numComponents;
+                    state = 0;
+                }
+                else if (c != '-')
+                {
+                    state = 0;
+                }
+                break;
+            }
+        }
+    }
+    ++numComponents;
+    return numComponents;
+}
+
+std::u32string MakeCCMatch(const std::vector<CCComponent>& components, const std::u32string& last)
+{
+    std::u32string ccMatch;
+    int n = components.size();
+    bool first = true;
+    for (int i = 0; i < n - 1; ++i)
+    {
+        const CCComponent& component = components[i];
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            if (component.separator == CCComponentSeparator::dot)
+            {
+                ccMatch.append(1, '.');
+            }
+            else if (component.separator == CCComponentSeparator::arrow)
+            {
+                ccMatch.append(U"->");
+            }
+        }
+        ccMatch.append(component.str);
+    }
+    const CCComponent& component = components[n - 1];
+    if (first)
+    {
+        first = false;
+    }
+    else
+    {
+        if (component.separator == CCComponentSeparator::dot)
+        {
+            ccMatch.append(1, '.');
+        }
+        else if (component.separator == CCComponentSeparator::arrow)
+        {
+            ccMatch.append(U"->");
+        }
+    }
+    ccMatch.append(last);
+    return ccMatch;
+}
+
+std::vector<CCSymbolEntry> MakeCCMatches(const std::vector<CCComponent>& components, const std::vector<CCSymbolEntry>& matches)
+{
+    std::vector<CCSymbolEntry> ccMatches;
+    for (const CCSymbolEntry& match : matches)
+    {
+        ccMatches.push_back(CCSymbolEntry(match.symbol, match.ccPrefixLen, MakeCCMatch(components, match.replacement)));
+    }
+    return ccMatches;
+}
+
+void AddMatches(std::vector<CCSymbolEntry>& matches, std::vector<CCSymbolEntry>& matchesToAdd)
+{
+    for (const CCSymbolEntry& entry : matchesToAdd)
+    {
+        Symbol* s = entry.symbol;
+        bool found = false;
+        for (CCSymbolEntry& m : matches)
+        {
+            if (s == m.symbol)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            matches.push_back(std::move(entry));
+        }
+    }
+}
+
 Symbol* ContainerScope::Lookup(const std::u32string& name, ScopeLookup lookup) const
 {
     int numQualifiedNameComponents = CountQualifiedNameComponents(name);
@@ -309,38 +519,35 @@ Symbol* ContainerScope::LookupQualified(const std::vector<std::u32string>& compo
     return s;
 }
 
-std::vector<Symbol*> ContainerScope::LookupBeginWith(const std::u32string& prefix) const
+std::vector<CCSymbolEntry> ContainerScope::LookupBeginWith(const std::u32string& prefix) const
 {
     return LookupBeginWith(prefix, ScopeLookup::this_);
 }
 
-std::vector<Symbol*> ContainerScope::LookupBeginWith(const std::u32string& prefix, ScopeLookup lookup) const
+std::vector<CCSymbolEntry> ContainerScope::LookupBeginWith(const std::u32string& prefix, ScopeLookup lookup) const
 {
-    int numQualifiedNameComponents = CountQualifiedNameComponents(prefix);
+    int numQualifiedNameComponents = CountCCComponents(prefix);
     if (numQualifiedNameComponents > 1)
     {
-        std::vector<std::u32string> components = ParseQualifiedName(prefix);
+        std::vector<CCComponent> components = ParseCCName(prefix);
         return LookupQualifiedBeginWith(components, lookup);
     }
     else
     {
-        std::vector<Symbol*> matches;
+        std::vector<CCSymbolEntry> matches;
         auto it = symbolMap.lower_bound(prefix);
-        if (it != symbolMap.cend())
+        while (it != symbolMap.cend() && StartsWith(it->first, prefix))
         {
-            while (StartsWith(it->first, prefix))
-            {
-                matches.push_back(it->second);
-                ++it;
-            }
+            matches.push_back(CCSymbolEntry(it->second, prefix.length(), it->second->Name()));
+            ++it;
         }
         if ((lookup & ScopeLookup::base) != ScopeLookup::none)
         {
             ContainerScope* baseScope = BaseScope();
             if (baseScope)
             {
-                std::vector<Symbol*> m = baseScope->LookupBeginWith(prefix, lookup);
-                matches.insert(matches.end(), m.cbegin(), m.cend());
+                std::vector<CCSymbolEntry> m = baseScope->LookupBeginWith(prefix, lookup);
+                AddMatches(matches, m);
             }
         }
         if ((lookup & ScopeLookup::parent) != ScopeLookup::none)
@@ -348,43 +555,84 @@ std::vector<Symbol*> ContainerScope::LookupBeginWith(const std::u32string& prefi
             ContainerScope* parentScope = ParentScope();
             if (parentScope)
             {
-                std::vector<Symbol*> m = parentScope->LookupBeginWith(prefix, lookup);
-                matches.insert(matches.end(), m.cbegin(), m.cend());
+                std::vector<CCSymbolEntry> m = parentScope->LookupBeginWith(prefix, lookup);
+                AddMatches(matches, m);
             }
         }
         return matches;
     }
 }
 
-std::vector<Symbol*> ContainerScope::LookupQualifiedBeginWith(const std::vector<std::u32string>& components, ScopeLookup lookup) const
+std::vector<CCSymbolEntry> ContainerScope::LookupQualifiedBeginWith(const std::vector<CCComponent>& components, ScopeLookup lookup) const
 {
-    std::vector<Symbol*> matches;
+    std::vector<CCSymbolEntry> matches;
     const ContainerScope* scope = this;
     int n = int(components.size());
+    const Symbol* s = nullptr;
     for (int i = 0; i < n - 1; ++i)
     {
-        const std::u32string& component = components[i];
+        const CCComponent& component = components[i];
         if (scope)
         {
-            Symbol* s = scope->Lookup(component, ScopeLookup::this_);
+            if (component.separator == CCComponentSeparator::arrow)
+            {
+                const ContainerSymbol* containerSymbol = scope->Container();
+                scope = containerSymbol->GetArrowScope();
+            }
+            if (component.str == U"this")
+            {
+                const ContainerSymbol* containerSymbol = Container();
+                const FunctionSymbol* f = containerSymbol->FunctionNoThrow();
+                if (f && f->GetSymbolType() == SymbolType::memberFunctionSymbol)
+                {
+                    s = f->Parameters()[0];
+                }
+                else
+                {
+                    s = nullptr;
+                }
+            }
+            else
+            {
+                s = scope->Lookup(component.str, ScopeLookup::this_);
+            }
             if (s)
             {
-                scope = s->GetContainerScope();
+                scope = s->GetTypeScope();
             }
         }
+        else
+        {
+            s = nullptr;
+        }
     }
-    if (scope)
+    if (s && scope)
     {
-        std::vector<Symbol*> m = scope->LookupBeginWith(components[n - 1]);
-        matches.insert(matches.end(), m.cbegin(), m.cend());
+        if (components[n - 1].separator == CCComponentSeparator::arrow)
+        {
+            const ContainerSymbol* containerSymbol = scope->Container();
+            scope = containerSymbol->GetArrowScope();
+        }
+        std::vector<CCSymbolEntry> m = MakeCCMatches(components, scope->LookupBeginWith(components[n - 1].str));
+        AddMatches(matches, m);
+        lookup = lookup & ~ScopeLookup::parent;
+    }
+    if ((lookup & ScopeLookup::base) != ScopeLookup::none)
+    {
+        ContainerScope* baseScope = BaseScope();
+        if (baseScope)
+        {
+            std::vector<CCSymbolEntry> m = baseScope->LookupQualifiedBeginWith(components, ScopeLookup::this_and_base);
+            AddMatches(matches, m);
+        }
     }
     if ((lookup & ScopeLookup::parent) != ScopeLookup::none)
     {
         ContainerScope* parentScope = ParentScope();
         if (parentScope)
         {
-            std::vector<Symbol*> m = parentScope->LookupQualifiedBeginWith(components, lookup);
-            matches.insert(matches.end(), m.cbegin(), m.cend());
+            std::vector<CCSymbolEntry> m = parentScope->LookupQualifiedBeginWith(components, ScopeLookup::this_and_base_and_parent);
+            AddMatches(matches, m);
         }
     }
     return matches;
@@ -596,27 +844,27 @@ Symbol* FileScope::Lookup(const std::u32string& name, ScopeLookup lookup) const
     }
 }
 
-std::vector<Symbol*> FileScope::LookupBeginWith(const std::u32string& prefix) const
+std::vector<CCSymbolEntry> FileScope::LookupBeginWith(const std::u32string& prefix) const
 {
     return LookupBeginWith(prefix, ScopeLookup::this_);
 }
 
-std::vector<Symbol*> FileScope::LookupBeginWith(const std::u32string& prefix, ScopeLookup lookup) const
+std::vector<CCSymbolEntry> FileScope::LookupBeginWith(const std::u32string& prefix, ScopeLookup lookup) const
 {
-    std::vector<Symbol*> matches;
+    std::vector<CCSymbolEntry> matches;
     auto it = aliasSymbolMap.lower_bound(prefix);
     if (it != aliasSymbolMap.cend())
     {
-        while (StartsWith(it->first, prefix))
+        while (it != aliasSymbolMap.cend() && StartsWith(it->first, prefix))
         {
-            matches.push_back(it->second);
+            matches.push_back(CCSymbolEntry(it->second, prefix.length(), it->second->Name()));
             ++it;
         }
     }
     for (ContainerScope* containerScope : containerScopes)
     {
-        std::vector<Symbol*> m = containerScope->LookupBeginWith(prefix, ScopeLookup::this_);
-        matches.insert(matches.end(), m.cbegin(), m.cend());
+        std::vector<CCSymbolEntry> m = containerScope->LookupBeginWith(prefix, ScopeLookup::this_);
+        AddMatches(matches, m);
     }
     return matches;
 }

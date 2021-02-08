@@ -1,24 +1,138 @@
 <parseSourceRequest>
     <base>
-        <created value="41915228905800"/>
-        <received value="41915228922300"/>
+        <created value="704022206308600"/>
+        <received value="704022206346500"/>
     </base>
-    <projectFilePath value="C:/work/cmajorm/cmajor/projects/test/test/test.cmp"/>
+    <projectFilePath value="C:/work/cmajorm/cmajor/projects/examples/HexDump/hexdump.cmp"/>
     <backend value="cpp"/>
     <config value="debug"/>
-    <sourceFilePath value="C:/work/cmajorm/cmajor/projects/test/test/test.cm"/>
+    <sourceFilePath value="C:/work/cmajorm/cmajor/projects/examples/HexDump/main.cm"/>
     <sourceCode value="using System;
 using System.Collections;
+using System.IO;
 
-namespace Foo
+void PrintHelp()
 {
-    class Bar
+    Console.WriteLine(&quot;Usage: hexdump [options] { &lt;filename> }&quot;);
+    Console.WriteLine(&quot;options:&quot;);
+    Console.WriteLine(&quot;--help | -h&quot;);
+    Console.WriteLine(&quot;     print this help&quot;);
+}
+
+const uint bytesInLine = 16u;
+
+string HexDumpLine(uint addr, byte* bytes, uint numBytes)
+{
+    #assert(numBytes > 0 &amp;&amp; numBytes &lt;= bytesInLine);
+    string line(ToHexString(addr));
+    line.Append(&quot;: &quot;);
+    for (uint i = 0u; i &lt; bytesInLine; ++i)
     {
-        void foo()
+        if (i == bytesInLine / 2)
         {
-            int x = 0;$
+            line.Append(&quot;- &quot;);
+        }
+        if (i &lt; numBytes)
+        {
+            line.Append(ToHexString(bytes[i]));
+        }
+        else
+        {
+            line.Append(&quot;  &quot;);
+        }
+        line.Append(' ');
+    }
+    line.Append('|');
+    for (uint i = 0u; i &lt; bytesInLine; ++i)
+    {
+        char c = ' ';
+        if (i &lt; numBytes)
+        {
+            char b = cast&lt;char>(bytes[i]);
+            if (IsPrintable(b))
+            {
+                c = b;
+            }
+        }
+        line.Append(c);
+    }
+    line.Append('|');
+    return line;
+}
+
+void HexDump(const string&amp; fileName)
+{
+    Console.WriteLine(GetFullPath(fileName) + &quot;:&quot;);
+    ulong fileSize = File.Size(fileName);
+    BinaryReader reader = File.OpenBinary(fileName);
+    byte[bytesInLine] bytes;
+    uint addr = 0u;
+    ulong numRows = fileSize / bytesInLine;
+    for (ulong i = 0u; i &lt; numRows; ++i)
+    {
+        for (uint j = 0u; j &lt; bytesInLine; ++j)
+        {
+            bytes[j] = reader.ReadByte();
+        }
+        Console.WriteLine(HexDumpLine(addr, &amp;bytes[0], bytesInLine));
+        addr = addr + bytesInLine;
+    }
+    uint rest = cast&lt;uint>(fileSize % bytesInLine);
+    for (uint j = 0u; j &lt; rest; ++j)
+    {
+        bytes[j] = reader.ReadByte();
+    }
+    Console.WriteLine(HexDumpLine(addr, &amp;bytes[0], rest));
+    addr = addr + rest;
+    uint size = addr;
+    string sizeLine = ToHexString(size);
+    sizeLine.Append(';');
+    Console.WriteLine(sizeLine);
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        List&lt;string> fileNames;
+        for (int i = 1; i &lt; argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith(&quot;-&quot;))
+            {
+                if (arg == &quot;--help&quot; || arg == &quot;-h&quot;)
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else
+                {
+                    throw Exception(&quot;unknown arguent '&quot; + arg + &quot;'&quot;);
+                }
+            }
+            else
+            {
+                fileNames.Add(arg);
+            }
+        }
+        if (fileNames.IsEmpty())
+        {
+            throw Exception(&quot;no files given&quot;);
+        }
+        else
+        {
+$        for (const string&amp; fileName : fileNames)
+            {
+                HexDump(fileName);
+            }
         }
     }
+    catch (const Exception&amp; ex)
+    {
+        Console.Error() &lt;&lt; ex.ToString() &lt;&lt; endl();
+        return 1;
+    }
+    return 0;
 }
 "/>
 </parseSourceRequest>

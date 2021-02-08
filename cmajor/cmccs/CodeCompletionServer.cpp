@@ -7,6 +7,7 @@
 #include <cmajor/cmccs/KeepAliveServer.hpp>
 #include <cmajor/cmccs/CodeCompletionServerMessage.hpp>
 #include <cmajor/build/Build.hpp>
+#include <cmajor/binder/Access.hpp>
 #include <cmajor/binder/TypeBinding.hpp>
 #include <cmajor/symbols/EditModuleCache.hpp>
 #include <sngxml/dom/Document.hpp>
@@ -30,7 +31,7 @@ using namespace cmajor::symbols;
 
 enum class CodeCompletionRequestKind
 {
-    loadEditModuleRequest, resetEditModuleCacheRequest, parseSourceRequest, stopRequest
+    loadEditModuleRequest, resetEditModuleCacheRequest, parseSourceRequest, getCCListRequest, stopRequest
 };
 
 class CodeCompletionServer
@@ -46,6 +47,7 @@ public:
     std::unique_ptr<CodeCompletionReply> HandleRequest(const LoadEditModuleRequest& request, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const ResetEditModuleCacheRequest& request, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const ParseSourceRequest& request, std::string& rootElementName);
+    std::unique_ptr<CodeCompletionReply> HandleRequest(const GetCCListRequest& request, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const StopRequest& request, std::string& rootElementName);
 private:
     static std::unique_ptr<CodeCompletionServer> instance;
@@ -80,9 +82,11 @@ CodeCompletionServer::CodeCompletionServer() : port(-1), version(), exit(false),
     requestKindMap["loadEditModuleRequest"] = CodeCompletionRequestKind::loadEditModuleRequest;
     requestKindMap["resetEditModuleCacheRequest"] = CodeCompletionRequestKind::resetEditModuleCacheRequest;
     requestKindMap["parseSourceRequest"] = CodeCompletionRequestKind::parseSourceRequest;
+    requestKindMap["getCCListRequest"] = CodeCompletionRequestKind::getCCListRequest;
     requestKindMap["stopRequest"] = CodeCompletionRequestKind::stopRequest;
     SetReadProjectFunction(cmajor::build::ReadProject);
     SetTypeBindingFunction(cmajor::binder::BindTypes);
+    SetAccessCheckFunction(cmajor::binder::HasAccess);
 }
 
 void RunServer(CodeCompletionServer* server)
@@ -200,6 +204,11 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(sngxml:
                 ParseSourceRequest request(requestElement);
                 return HandleRequest(request, rootElementName);
             }
+            case CodeCompletionRequestKind::getCCListRequest:
+            {
+                GetCCListRequest request(requestElement);
+                return HandleRequest(request, rootElementName);
+            }
             case CodeCompletionRequestKind::stopRequest:
             {
                 StopRequest request(requestElement);
@@ -292,6 +301,7 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const P
                 reply->endParsing = result.end;
                 reply->errors = result.errors;
                 reply->synchronized = result.synchronized;
+                reply->cursorContainer = result.cursorContainer;
             }
             else
             {
@@ -311,6 +321,37 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const P
     }
     return std::unique_ptr<CodeCompletionReply>(reply.release());
 }
+
+std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const GetCCListRequest& request, std::string& rootElementName)
+{
+    rootElementName = "getCCListReply";
+    std::unique_ptr<GetCCListReply> reply(new GetCCListReply());
+    reply->ok = true;
+    reply->created = std::chrono::steady_clock::now();
+    reply->requestCreated = request.created;
+    reply->requestReceived = request.received;
+    try
+    {
+        Module* module = EditModuleCache::Instance().GetEditModule(request.projectFilePath, request.backend, request.config);
+        if (module)
+        {
+            reply->startGetCCList = std::chrono::steady_clock::now();
+            reply->ccList = module->GetCCList(request.sourceFilePath, request.ccText);
+            reply->endGetCCList = std::chrono::steady_clock::now();
+        }
+        else
+        {
+            throw std::runtime_error("edit module '" + MakeEditModuleKey(request.projectFilePath, request.backend, request.config) + " not found");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        reply->ok = false;
+        reply->error = ex.what();
+    }
+    return std::unique_ptr<CodeCompletionReply>(reply.release());
+}
+
 
 std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const StopRequest& request, std::string& rootElementName)
 {

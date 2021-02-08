@@ -17,11 +17,28 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Sha1.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
 namespace cmajor { namespace symbols {
+
+AccessCheckFunction hasAccess;
+
+void SetAccessCheckFunction(AccessCheckFunction accessCheckFunc)
+{
+    hasAccess = accessCheckFunc;
+}
+
+AccessCheckFunction GetAccessCheckFunction()
+{
+    if (!hasAccess)
+    {
+        throw std::runtime_error("access check functio not set");
+    }
+    return hasAccess;
+}
 
 bool FunctionSymbolsEqual::operator()(FunctionSymbol* left, FunctionSymbol* right) const
 {
@@ -318,6 +335,43 @@ void FunctionGroupSymbol::CheckDuplicateFunctionSymbols()
             }
         }
     }
+}
+
+std::string FunctionGroupSymbol::GetSymbolHelp() const
+{
+    if (arityFunctionListMap.size() == 1)
+    {
+        const std::vector<FunctionSymbol*>& v = arityFunctionListMap.begin()->second;
+        if (v.size() == 1)
+        {
+            FunctionSymbol* fun = v.front();
+            return fun->GetSymbolHelp();
+        }
+    }
+    int n = 0;
+    for (const auto& p : arityFunctionListMap)
+    {
+        n = n + p.second.size();
+    }
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ").append(ToUtf8(FullName())).append(" (").append(std::to_string(n)).append(" overloads)");
+    return help;
+}
+
+bool FunctionGroupSymbol::IsValidCCFunctionGroup(FunctionSymbol* fromFunction) const
+{
+    AccessCheckFunction canAccess = GetAccessCheckFunction();
+    if (!fromFunction) return false;
+    if (StartsWith(Name(), U"@")) return false;
+    if (StartsWith(Name(), U"operator")) return false;
+    for (const auto& p : arityFunctionListMap)
+    {
+        for (auto functionSymbol : p.second)
+        {
+            if (canAccess(fromFunction, functionSymbol)) return true;
+        }
+    }
+    return false;
 }
 
 std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
@@ -1483,6 +1537,18 @@ std::unique_ptr<Symbol> FunctionSymbol::RemoveFromParent()
         }
     }
     return symbol;
+}
+
+std::string FunctionSymbol::GetSymbolHelp() const
+{
+    std::string help = "(";
+    help.append(GetSymbolCategoryDescription()).append(") ");
+    if (returnType)
+    {
+        help.append(ToUtf8(returnType->FullName())).append(" ");
+    }
+    help.append(ToUtf8(FullName()));
+    return help;
 }
 
 StaticConstructorSymbol::StaticConstructorSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
