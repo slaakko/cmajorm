@@ -488,6 +488,15 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         {
             Source* s = GetSource(i);
             s->AddSymbols(module);
+        }
+        for (int i = index + 1; i < sources.size(); ++i)
+        {
+            Source* s = GetSource(i);
+            s->GetScopes(module);
+        }
+        for (int i = index + 1; i < sources.size(); ++i)
+        {
+            Source* s = GetSource(i);
             s->BindTypes(module);
         }
         std::unique_ptr<Source> source = std::move(sources[index]);
