@@ -40,8 +40,9 @@ namespace Cm.Views
 
     public class CCEntry
     {
-        public nothrow CCEntry(int prefixLength_, const string& category_, const string& completion_, const string& help_, string& replacement_) :
-            prefixLength(prefixLength_), category(category_), completion(completion_), help(help_), replacement(replacement_)
+        public nothrow CCEntry(int prefixLength_, const string& category_, const string& completion_, const string& help_, const string& replacement_,
+            const string& functionGroup_) :
+            prefixLength(prefixLength_), category(category_), completion(completion_), help(help_), replacement(replacement_), functionGroup(functionGroup_)
         {
         }
         public int prefixLength;
@@ -49,6 +50,7 @@ namespace Cm.Views
         public string completion;
         public string help;
         public string replacement;
+        public string functionGroup;
     }
 
     public List<CCEntry> ParseCCList(const string& ccList)
@@ -73,6 +75,7 @@ namespace Cm.Views
                         ustring completion = element->GetAttribute(u"completion");
                         ustring help = element->GetAttribute(u"help");
                         ustring replacement = element->GetAttribute(u"replacement");
+                        ustring functionGroup = element->GetAttribute(u"functionGroup");
                         if (prefixLength.IsEmpty())
                         {
                             throw Exception("invalid CC list (empty symbol prefix length attribute)");
@@ -89,7 +92,7 @@ namespace Cm.Views
                         {
                             throw Exception("invalid CC list (empty symbol replacement attribute)");
                         }
-                        CCEntry entry(ParseInt(ToUtf8(prefixLength)), ToUtf8(category), ToUtf8(completion), ToUtf8(help), ToUtf8(replacement));
+                        CCEntry entry(ParseInt(ToUtf8(prefixLength)), ToUtf8(category), ToUtf8(completion), ToUtf8(help), ToUtf8(replacement), ToUtf8(functionGroup));
                         ccEntries.Add(Rvalue(entry));
                     }
                 }
@@ -649,6 +652,44 @@ namespace Cm.Views
         private Container container;
         private CCSymbolHelp* helpControl;
         private Control* child;
+    }
+
+    public class OverloadEntry
+    {
+        public nothrow OverloadEntry(const string& overload)
+        {
+        }
+        public string overload;
+    }
+
+    public List<OverloadEntry> ParseOverloadList(const string& overloadList)
+    {
+        List<OverloadEntry> entries;
+        UniquePtr<Document> doc = ParseDocument(ToUtf32(overloadList), "string");
+        UniquePtr<XPathObject> result = Evaluate(u"/overloadList/overload", doc.Get());
+        if (result.Get() != null)
+        {
+            if (result.Get() is XPathNodeSet*)
+            {
+                XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    Node* node = (*nodeSet)[i];
+                    if (node is Element*)
+                    {
+                        Element* element = cast<Element*>(node);
+                        ustring overloadName = element->GetAttribute(u"name");
+                        if (overloadName.IsEmpty())
+                        {
+                            throw Exception("invalid overload list (name attribute empty)");
+                        }
+                        entries.Add(OverloadEntry(ToUtf8(overloadName)));
+                    }
+                }
+            }
+        }
+        return entries;
     }
 }
 

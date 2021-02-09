@@ -29,7 +29,7 @@ void SetTypeBindingFunction(TypeBindingFunction typeBindingFunc)
     typeBindingFunction = typeBindingFunc;
 }
 
-bool IsValidCCSymbol(Symbol* symbol, Module* module, FunctionSymbol* fromFunction)
+bool IsValidCCSymbol(Symbol* symbol, Module* module, FunctionSymbol* fromFunction, std::u32string& functionGroup)
 {
     AccessCheckFunction hasAccess = GetAccessCheckFunction();
     switch (symbol->GetSymbolType())
@@ -37,7 +37,15 @@ bool IsValidCCSymbol(Symbol* symbol, Module* module, FunctionSymbol* fromFunctio
         case SymbolType::functionGroupSymbol:
         {
             FunctionGroupSymbol* group = static_cast<FunctionGroupSymbol*>(symbol);
-            return group->IsValidCCFunctionGroup(fromFunction);
+            if (group->IsValidCCFunctionGroup(fromFunction))
+            {
+                functionGroup = group->FullName();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         case SymbolType::classGroupTypeSymbol:
         {
@@ -256,9 +264,10 @@ std::string Source::GetCCList(Module* module, const std::string& ccText)
         Symbol* symbol = ccSymbolEntry.symbol;
         int ccPrefixLength = ccSymbolEntry.ccPrefixLen;
         const std::u32string& replacement = ccSymbolEntry.replacement;
-        if (IsValidCCSymbol(symbol, module, fromFunction))
+        std::u32string functionGroup;
+        if (IsValidCCSymbol(symbol, module, fromFunction, functionGroup))
         {
-            sngxml::dom::Element* ccElement = symbol->ToCCElement(ccPrefixLength, replacement);
+            sngxml::dom::Element* ccElement = symbol->ToCCElement(ccPrefixLength, replacement, functionGroup);
             ccListElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(ccElement));
         }
     }
@@ -479,25 +488,37 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
             result.error = "source file path '" + sourceFilePath + "' not found";
             return result;
         }
-        for (int i = sources.size() - 1; i >= index; --i)
+        if (index < sources.size() - 1)
         {
-            Source* s = GetSource(i);
-            s->RemoveSymbols();
-        }
-        for (int i = index + 1; i < sources.size(); ++i)
-        {
-            Source* s = GetSource(i);
-            s->AddSymbols(module);
-        }
-        for (int i = index + 1; i < sources.size(); ++i)
-        {
-            Source* s = GetSource(i);
-            s->GetScopes(module);
-        }
-        for (int i = index + 1; i < sources.size(); ++i)
-        {
-            Source* s = GetSource(i);
-            s->BindTypes(module);
+            for (int i = sources.size() - 1; i >= 0; --i)
+            {
+                Source* s = GetSource(i);
+                s->RemoveSymbols();
+            }
+            for (int i = 0; i < sources.size(); ++i)
+            {
+                if (i != index)
+                {
+                    Source* s = GetSource(i);
+                    s->AddSymbols(module);
+                }
+            }
+            for (int i = 0; i < sources.size(); ++i)
+            {
+                if (i != index)
+                {
+                    Source* s = GetSource(i);
+                    s->GetScopes(module);
+                }
+            }
+            for (int i = 0; i < sources.size(); ++i)
+            {
+                if (i != index)
+                {
+                    Source* s = GetSource(i);
+                    s->BindTypes(module);
+                }
+            }
         }
         std::unique_ptr<Source> source = std::move(sources[index]);
         sources.erase(sources.begin() + index);

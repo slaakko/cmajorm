@@ -555,21 +555,24 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
             Node* member = classNode->Members()[i];
             member->Accept(*this);
         }
-        boundCompileUnit.GetAttributeBinder()->BindAttributes(classNode->GetAttributes(), classTypeSymbol, boundCompileUnit, containerScope);
-        classTypeSymbol->InitVmt();
-        classTypeSymbol->InitImts();
-        classTypeSymbol->CreateLayouts();
-        if (classTypeSymbol->IsPolymorphic() && !classTypeSymbol->IsPrototypeTemplateSpecialization())
+        if (!editMode)
         {
-            symbolTable.AddPolymorphicClass(classTypeSymbol);
-        }
-        if (classTypeSymbol->StaticConstructor())
-        {
-            symbolTable.AddClassHavingStaticConstructor(classTypeSymbol);
-        }
-        if (classTypeSymbol->HasNontrivialDestructor())
-        {
-            classTypeSymbol->CreateDestructorSymbol();
+            boundCompileUnit.GetAttributeBinder()->BindAttributes(classNode->GetAttributes(), classTypeSymbol, boundCompileUnit, containerScope);
+            classTypeSymbol->InitVmt();
+            classTypeSymbol->InitImts();
+            classTypeSymbol->CreateLayouts();
+            if (classTypeSymbol->IsPolymorphic() && !classTypeSymbol->IsPrototypeTemplateSpecialization())
+            {
+                symbolTable.AddPolymorphicClass(classTypeSymbol);
+            }
+            if (classTypeSymbol->StaticConstructor())
+            {
+                symbolTable.AddClassHavingStaticConstructor(classTypeSymbol);
+            }
+            if (classTypeSymbol->HasNontrivialDestructor())
+            {
+                classTypeSymbol->CreateDestructorSymbol();
+            }
         }
         containerScope = prevContainerScope;
         currentClassTypeSymbol = prevClassTypeSymbol;

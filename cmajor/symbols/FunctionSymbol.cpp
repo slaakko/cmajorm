@@ -21,6 +21,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Sha1.hpp>
 #include <boost/uuid/uuid_generators.hpp>
+#include <sstream>
 
 namespace cmajor { namespace symbols {
 
@@ -374,6 +375,28 @@ bool FunctionGroupSymbol::IsValidCCFunctionGroup(FunctionSymbol* fromFunction) c
     return false;
 }
 
+std::string FunctionGroupSymbol::GetOverloadList() const
+{
+    sngxml::dom::Document doc;
+    sngxml::dom::Element* root = new sngxml::dom::Element(U"overloadList");
+    doc.AppendChild(std::unique_ptr<sngxml::dom::Node>(root));
+    for (const auto& p : arityFunctionListMap)
+    {
+        for (auto functionSymbol : p.second)
+        {
+            sngxml::dom::Element* overloadElement = new sngxml::dom::Element(U"overload");
+            std::u32string overloadName = functionSymbol->FullName(true);
+            overloadElement->SetAttribute(U"name", overloadName);
+            root->AppendChild(std::unique_ptr<sngxml::dom::Node>(overloadElement));
+        }
+    }
+    std::stringstream s;
+    CodeFormatter formatter(s);
+    formatter.SetIndentSize(1);
+    doc.Write(formatter);
+    return s.str();
+}
+
 std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 {
     std::string s;
@@ -724,7 +747,7 @@ void FunctionSymbol::ComputeMangledName()
     SetMangledName(mangledName);
 }
 
-std::u32string FunctionSymbol::FullName() const
+std::u32string FunctionSymbol::FullName(bool withParamNames) const
 {
     std::u32string fullName;
     if (!Parent())
@@ -760,6 +783,10 @@ std::u32string FunctionSymbol::FullName() const
         }
         ParameterSymbol* parameter = parameters[i];
         fullName.append(parameter->GetType()->FullName());
+        if (withParamNames)
+        {
+            fullName.append(U" ").append(parameter->Name());
+        }
     }
     fullName.append(1, U')');
     if (IsConst())
@@ -767,6 +794,11 @@ std::u32string FunctionSymbol::FullName() const
         fullName.append(U" const");
     }
     return fullName;
+}
+
+std::u32string FunctionSymbol::FullName() const
+{
+    return FullName(false);
 }
 
 std::u32string FunctionSymbol::FullNameWithSpecifiers() const
@@ -1547,7 +1579,7 @@ std::string FunctionSymbol::GetSymbolHelp() const
     {
         help.append(ToUtf8(returnType->FullName())).append(" ");
     }
-    help.append(ToUtf8(FullName()));
+    help.append(ToUtf8(FullName(true)));
     return help;
 }
 

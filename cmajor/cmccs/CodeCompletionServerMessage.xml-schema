@@ -82,6 +82,23 @@ class GetCCListReply : CodeCompletionReply
     time_point endGetCCList;
 }
 
+class GetOverloadListRequest : CodeCompletionRequest
+{
+    string projectFilePath;
+    string backend;
+    string config;
+    string functionGroup;
+}
+
+class GetOverloadListReply : CodeCompletionReply
+{
+    bool ok;
+    string error;
+    string overloadList;
+    time_point startGetOverloadList;
+    time_point endGetOverloadList;
+}
+
 class StopRequest : CodeCompletionRequest
 {
 }

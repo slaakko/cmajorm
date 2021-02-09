@@ -7,8 +7,8 @@ namespace BigNumCalc
     {
         bigInt, bigRational, bigFloat
     }
-    
-    public nothrow BigNumKind CommonType(BigNumKind left, BigNumKind right) 
+
+    public nothrow BigNumKind CommonType(BigNumKind left, BigNumKind right)
     {
         switch (left)
         {
@@ -45,7 +45,7 @@ namespace BigNumCalc
         }
         return BigNumKind.bigInt;
     }
-    
+
     public abstract class BigValue
     {
         public virtual default ~BigValue();
@@ -53,7 +53,7 @@ namespace BigNumCalc
         public abstract BigValue* As(BigNumKind kind) const;
         public abstract string ToString() const;
     }
-    
+
     public class BigIntValue : BigValue
     {
         public typedef BigInt OperandType;
@@ -63,24 +63,24 @@ namespace BigNumCalc
         public explicit nothrow BigIntValue(const BigInt& value_) : value(value_)
         {
         }
-        public nothrow override BigNumKind Kind() const 
-        { 
-            return BigNumKind.bigInt; 
+        public nothrow override BigNumKind Kind() const
+        {
+            return BigNumKind.bigInt;
         }
         public override BigValue* As(BigNumKind kind) const
         {
             switch (kind)
             {
-                case BigNumKind.bigInt: 
+                case BigNumKind.bigInt:
                 {
                     return new BigIntValue(value);
                 }
-                case BigNumKind.bigRational: 
+                case BigNumKind.bigRational:
                 {
                     BigRational val(value);
                     return new BigRationalValue(val);
-                }                
-                case BigNumKind.bigFloat: 
+                }
+                case BigNumKind.bigFloat:
                 {
                     BigFloat val(value);
                     return new BigFloatValue(val);
@@ -98,7 +98,7 @@ namespace BigNumCalc
         }
         private BigInt value;
     }
-    
+
     public class BigRationalValue : BigValue
     {
         public typedef BigRational OperandType;
@@ -107,7 +107,7 @@ namespace BigNumCalc
         }
         public explicit nothrow BigRationalValue(const BigRational& value_) : value(value_)
         {
-        }    
+        }
         public nothrow override BigNumKind Kind() const
         {
             return BigNumKind.bigRational;
@@ -120,7 +120,7 @@ namespace BigNumCalc
                 {
                     return new BigRationalValue(value);
                 }
-                case BigNumKind.bigFloat: 
+                case BigNumKind.bigFloat:
                 {
                     BigFloat val(value);
                     return new BigFloatValue(val);
@@ -138,7 +138,7 @@ namespace BigNumCalc
         }
         private BigRational value;
     }
-    
+
     public class BigFloatValue : BigValue
     {
         public typedef BigFloat OperandType;
@@ -156,7 +156,7 @@ namespace BigNumCalc
         {
             switch (kind)
             {
-                case BigNumKind.bigFloat: 
+                case BigNumKind.bigFloat:
                 {
                     return new BigFloatValue(value);
                 }

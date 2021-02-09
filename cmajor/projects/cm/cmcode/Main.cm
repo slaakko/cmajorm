@@ -2006,6 +2006,7 @@ namespace cmcode
                 }
                 GetOutputLogView()->Clear();
                 GetOutputTabPage()->Select();
+                ResetEditModuleCache();
                 BuildGuard buildGuard(this);
                 Application.ProcessMessages();
                 List<CompileError> errors = GetBuildService().ProcessBuildRequest(buildRequest);
@@ -3976,6 +3977,10 @@ namespace cmcode
         {
             codeCompletionSymbolHelpView->Hide();
         }
+        private void ShowOverloadList(const Point& location, const List<Cm.Views.OverloadEntry>& overloadList)
+        {
+            // todo
+        }
         private void TestClick()
         {
             try
@@ -4032,6 +4037,10 @@ namespace cmcode
                 {
                     HandleGetCCListReply(cast<GetCCListReply*>(reply.Get()));
                 }
+                else if (reply.Get() is GetOverloadListReply*)
+                {
+                    HandleGetOverloadListReply(cast<GetOverloadListReply*>(reply.Get()));
+                }
                 SetFocusToEditor();
                 message.result = 0;
                 return true;
@@ -4067,8 +4076,17 @@ namespace cmcode
                 }
                 string dispatchReply = "\ndispatch reply: " + DurationStr(now - reply->endLoading);
                 string total = "\ntotal: " + DurationStr(now - reply->requestCreated);
-                string logMessage = reply->key;
-                logMessage.Append(" ").Append(reply->result);
+                string logMessage;
+                if (reply->result == "error")
+                {
+                    logMessage = reply->result;
+                    logMessage.Append(": ").Append(reply->error);
+                }
+                else
+                {
+                    logMessage = reply->key;
+                    logMessage.Append(" ").Append(reply->result);
+                }
                 GetOutputTabPage()->Select();
                 GetOutputLogView()->WriteLine(logMessage);
                 LogView* logView = Application.GetLogView();
@@ -4220,6 +4238,48 @@ namespace cmcode
             if (hideCodeCompletionList)
             {
                 HideCodeCompletionList();
+            }
+        }
+        private void HandleGetOverloadListReply(GetOverloadListReply* reply)
+        {
+            try
+            {
+                GetOutputTabPage()->Select();
+                LogView* logView = Application.GetLogView();
+                string logMessage = "overload list:";
+                if (reply->ok)
+                {
+                    TimePoint now = Now();
+                    logMessage.Append('\n').Append(reply->overloadList);
+                    string dispatchRequest = "\ndispatch request: " + DurationStr(reply->requestReceived - reply->requestCreated);
+                    string requestReceived = "\nrequest received: " + DurationStr(reply->created - reply->requestReceived);
+                    string query = "\nquery " + DurationStr(reply->endGetOverloadList - reply->startGetOverloadList);
+                    string total = "\ntotal: " + DurationStr(now - reply->requestCreated);
+                    logMessage.Append(dispatchRequest).Append(requestReceived).Append(query).Append(total);
+                    if (logView != null)
+                    {
+                        logView->WriteLine(logMessage);
+                    }
+                    TextView* currentTextView = GetCurrentTextView();
+                    if (currentTextView != null)
+                    {
+                        List<Cm.Views.OverloadEntry> overloadList = Cm.Views.ParseOverloadList(reply->overloadList);
+                        Point ccPos = currentTextView->CCPos();
+                        Point screenPos = currentTextView->ClientToScreen(ccPos);
+                        Point overloadListPos = ScreenToClient(screenPos);
+                        ShowOverloadList(overloadListPos, overloadList);
+                    }
+                }
+                else
+                {
+                    string error = reply->error;
+                    GetOutputLogView()->WriteLine(Unescape(error));
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
             }
         }
         private void FetchCodeCompletionServiceLogMessages()
@@ -4521,8 +4581,22 @@ namespace cmcode
                             if (sourceCodeView != null)
                             {
                                 ccText = sourceCodeView->GetCCText();
-                                UniquePtr<GetCCListRequest> request(new GetCCListRequest(project->FilePath(), GetBackend(), GetConfig(), sourceFilePath, ToUtf8(ccText)));
-                                GetCodeCompletionService().PutRequest(request.Release());
+                                long lparenPos = ccText.Find('(');
+                                if (lparenPos == -1)
+                                {
+                                    UniquePtr<GetCCListRequest> request(new GetCCListRequest(project->FilePath(), GetBackend(), GetConfig(), sourceFilePath, ToUtf8(ccText)));
+                                    GetCodeCompletionService().PutRequest(request.Release());
+                                }
+                                else
+                                {
+                                    string functionGroup = ToUtf8(ccText.Substring(0, lparenPos));
+                                    if (!ccFunctionGroup.IsEmpty())
+                                    {
+                                        functionGroup = ccFunctionGroup;
+                                    }
+                                    UniquePtr<GetOverloadListRequest> request(new GetOverloadListRequest(project->FilePath(), GetBackend(), GetConfig(), functionGroup));
+                                    GetCodeCompletionService().PutRequest(request.Release());
+                                }
                             }
                         }
                     }
@@ -4538,10 +4612,12 @@ namespace cmcode
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
                 LogException(ex);
             }
+            ccFunctionGroup.Clear();
         }
         private void EditorCCKeyPressed()
         {
             EditorCCTextChanged();
+            ccFunctionGroup.Clear();
         }
         private void EditorCCNext()
         {
@@ -4549,6 +4625,7 @@ namespace cmcode
             {
                 codeCompletionListView->Next();
                 ShowCodeCompletionSymbolHelp();
+                ccFunctionGroup.Clear();
             }
             catch (const Exception& ex)
             {
@@ -4562,6 +4639,7 @@ namespace cmcode
             {
                 codeCompletionListView->Prev();
                 ShowCodeCompletionSymbolHelp();
+                ccFunctionGroup.Clear();
             }
             catch (const Exception& ex)
             {
@@ -4575,6 +4653,7 @@ namespace cmcode
             {
                 codeCompletionListView->NextPage();
                 ShowCodeCompletionSymbolHelp();
+                ccFunctionGroup.Clear();
             }
             catch (const Exception& ex)
             {
@@ -4588,6 +4667,7 @@ namespace cmcode
             {
                 codeCompletionListView->PrevPage();
                 ShowCodeCompletionSymbolHelp();
+                ccFunctionGroup.Clear();
             }
             catch (const Exception& ex)
             {
@@ -4606,6 +4686,7 @@ namespace cmcode
                     {
                         const Cm.Views.CCEntry& entry = codeCompletionListView->GetSelectedCCEntry();
                         currentTextView->ReplaceCCText(ToUtf32(entry.replacement));
+                        ccFunctionGroup = entry.functionGroup;
                     }
                 }
                 HideCodeCompletionList();
@@ -4621,6 +4702,7 @@ namespace cmcode
             try
             {
                 HideCodeCompletionList();
+                ccFunctionGroup.Clear();
             }
             catch (const Exception& ex)
             {
@@ -5080,6 +5162,7 @@ namespace cmcode
         private LocationList locations;
         private bool codeCompletionServerStarting;
         private bool loadEditModuleRequestSent;
+        private string ccFunctionGroup;
     }
 }
 

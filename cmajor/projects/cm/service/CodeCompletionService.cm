@@ -147,6 +147,10 @@ namespace Cm.Service.CodeCompletion
         {
             rootElementName = "getCCListRequest";
         }
+        public override void Visit(GetOverloadListRequest& request)
+        {
+            rootElementName = "getOverloadListRequest";
+        }
         public override void Visit(StopRequest& request)
         {
             rootElementName = "stopRequest";
@@ -163,6 +167,7 @@ namespace Cm.Service.CodeCompletion
             replyRegistry.RegisterReply("resetEditModuleCacheReply", new CodeCompletionReplyFactory<ResetEditModuleCacheReply>());
             replyRegistry.RegisterReply("parseSourceReply", new CodeCompletionReplyFactory<ParseSourceReply>());
             replyRegistry.RegisterReply("getCCListReply", new CodeCompletionReplyFactory<GetCCListReply>());
+            replyRegistry.RegisterReply("getOverloadListReply", new CodeCompletionReplyFactory<GetOverloadListReply>());
             replyRegistry.RegisterReply("stopReply", new CodeCompletionReplyFactory<StopReply>());
         }
         public nothrow void SetCodeCompletionReplyHandlerFunction(CodeCompletionReplyHandlerFunction codeCompletionReplyHandlerFunction_)

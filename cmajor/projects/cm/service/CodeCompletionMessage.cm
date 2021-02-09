@@ -61,6 +61,7 @@ namespace Cm.Service.CodeCompletion
         }
         public string key;
         public string result;
+        public string error;
         public TimePoint startLoading;
         public TimePoint startParsing;
         public TimePoint endLoading;
@@ -137,6 +138,39 @@ namespace Cm.Service.CodeCompletion
     }
 
     [xml]
+    public class GetOverloadListRequest : CodeCompletionRequest
+    {
+        public nothrow GetOverloadListRequest() : base(), projectFilePath(), backend(), config(), functionGroup()
+        {
+        }
+        public nothrow GetOverloadListRequest(const string& projectFilePath_, const string& backend_, const string& config_, const string& functionGroup_) :
+            base(), projectFilePath(projectFilePath_), backend(backend_), config(config_), functionGroup(functionGroup_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public string projectFilePath;
+        public string backend;
+        public string config;
+        public string functionGroup;
+    }
+
+    [xml]
+    public class GetOverloadListReply : CodeCompletionReply
+    {
+        public nothrow GetOverloadListReply() : base(), ok(false), error(), overloadList(), startGetOverloadList(), endGetOverloadList()
+        {
+        }
+        public bool ok;
+        public string error;
+        public string overloadList;
+        public TimePoint startGetOverloadList;
+        public TimePoint endGetOverloadList;
+    }
+
+    [xml]
     public class ResetEditModuleCacheRequest : CodeCompletionRequest
     {
         public nothrow ResetEditModuleCacheRequest() : base()
@@ -189,6 +223,7 @@ namespace Cm.Service.CodeCompletion
         public virtual void Visit(ResetEditModuleCacheRequest& request) {}
         public virtual void Visit(ParseSourceRequest& request) {}
         public virtual void Visit(GetCCListRequest& request) {}
+        public virtual void Visit(GetOverloadListRequest& request) {}
         public virtual void Visit(StopRequest& request) {}
     }
 }

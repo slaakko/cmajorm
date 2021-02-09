@@ -64,6 +64,7 @@ public:
     std::string GetSymbolCategoryDescription() const override { return "function"; }
     std::string GetSymbolHelp() const override;
     bool IsValidCCFunctionGroup(FunctionSymbol* fromFunction) const;
+    std::string GetOverloadList() const;
 private:
     std::unordered_map<int, std::vector<FunctionSymbol*>> arityFunctionListMap;
     std::vector<FunctionSymbol*> varArgFunctions;
@@ -149,6 +150,7 @@ public:
     bool IsExportSymbol() const override;
     virtual void ComputeName();
     std::u32string FullName() const override;
+    std::u32string FullName(bool withParamNames) const;
     std::u32string FullNameWithSpecifiers() const override;
     std::u32string DocName() const override;
     std::u32string CodeName() const override { return groupName; }

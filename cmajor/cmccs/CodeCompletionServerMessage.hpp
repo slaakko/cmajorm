@@ -147,6 +147,33 @@ public:
     time_point endGetCCList;
 };
 
+class GetOverloadListRequest : public CodeCompletionRequest
+{
+public:
+    GetOverloadListRequest();
+    GetOverloadListRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+public:
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+    std::string functionGroup;
+};
+
+class GetOverloadListReply : public CodeCompletionReply
+{
+public:
+    GetOverloadListReply();
+    GetOverloadListReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+public:
+    bool ok;
+    std::string error;
+    std::string overloadList;
+    time_point startGetOverloadList;
+    time_point endGetOverloadList;
+};
+
 class StopRequest : public CodeCompletionRequest
 {
 public:

@@ -521,24 +521,27 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
                 }
             }
             std::string moduleFilePath = GetFullPath(mfp.generic_string());
-            Module* referencedModule = GetModuleFromModuleCache(moduleFilePath);
-            if (referencedModule->GetFlag(ModuleFlags::readFromModuleFile))
+            if (readMap.find(moduleFilePath) == readMap.cend()) // CHANGED 9.2.2021 !!!!!
             {
-                referencedModule->ResetFlag(ModuleFlags::readFromModuleFile);
-                referencedModule = ResetCachedModule(moduleFilePath);
+                Module* referencedModule = GetModuleFromModuleCache(moduleFilePath);
+                if (referencedModule->GetFlag(ModuleFlags::readFromModuleFile))
+                {
+                    referencedModule->ResetFlag(ModuleFlags::readFromModuleFile);
+                    referencedModule = ResetCachedModule(moduleFilePath);
+                }
+                rootModule->AllRefModules().push_back(referencedModule);
+                readMap[moduleFilePath] = referencedModule;
+                importSet.insert(moduleFilePath);
+                SymbolReader reader(moduleFilePath);
+                reader.GetAstReader().SetModuleMaps(rootModule->Id(), referencedModule->GetModuleNameTable(), rootModule->GetModuleIdMap());
+                referencedModule->ReadHeader(target, reader, rootModule, importSet, modules, moduleDependencyMap, readMap, first);
+                module->AddReferencedModule(referencedModule);
+                if (module != rootModule)
+                {
+                    module->RegisterFileTable(&referencedModule->GetFileTable(), referencedModule);
+                }
+                Import(target, rootModule, module, referencedModule->ReferenceFilePaths(), importSet, modules, moduleDependencyMap, readMap, first);
             }
-            rootModule->AllRefModules().push_back(referencedModule);
-            readMap[moduleFilePath] = referencedModule;
-            importSet.insert(moduleFilePath);
-            SymbolReader reader(moduleFilePath);
-            reader.GetAstReader().SetModuleMaps(rootModule->Id(), referencedModule->GetModuleNameTable(), rootModule->GetModuleIdMap());
-            referencedModule->ReadHeader(target, reader, rootModule, importSet, modules, moduleDependencyMap, readMap, first);
-            module->AddReferencedModule(referencedModule);
-            if (module != rootModule)
-            {
-                module->RegisterFileTable(&referencedModule->GetFileTable(), referencedModule); 
-            }
-            Import(target, rootModule, module, referencedModule->ReferenceFilePaths(), importSet, modules, moduleDependencyMap, readMap, first);
         }
         else
         {
@@ -1966,6 +1969,17 @@ std::string Module::GetCCList(const std::string& sourceFilePath, const std::stri
     { 
         throw std::runtime_error("sources not set");
     }
+}
+
+std::string Module::GetOverloadList(const std::string& functionGroup)
+{
+    Symbol* symbol = symbolTable->GlobalNs().GetContainerScope()->Lookup(ToUtf32(functionGroup));
+    if (symbol->GetSymbolType() == SymbolType::functionGroupSymbol)
+    {
+        FunctionGroupSymbol* functionGroupSymbol = static_cast<FunctionGroupSymbol*>(symbol);
+        return functionGroupSymbol->GetOverloadList();
+    }
+    return std::string();
 }
 
 #ifdef _WIN32

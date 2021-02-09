@@ -1034,7 +1034,7 @@ std::unique_ptr<sngxml::dom::Element> Symbol::CreateDomElement(TypeMap& typeMap)
     return std::unique_ptr<sngxml::dom::Element>(new sngxml::dom::Element(ToUtf32(ClassName())));
 }
 
-sngxml::dom::Element* Symbol::ToCCElement(int ccPrefixLength, const std::u32string& replacement) const
+sngxml::dom::Element* Symbol::ToCCElement(int ccPrefixLength, const std::u32string& replacement, const std::u32string& functionGroup) const
 {
     sngxml::dom::Element* ccElement = new sngxml::dom::Element(U"symbol");
     ccElement->SetAttribute(U"prefixLength", ToUtf32(std::to_string(ccPrefixLength)));
@@ -1042,6 +1042,7 @@ sngxml::dom::Element* Symbol::ToCCElement(int ccPrefixLength, const std::u32stri
     ccElement->SetAttribute(U"help", ToUtf32(GetSymbolHelp()));
     ccElement->SetAttribute(U"completion", Name());
     ccElement->SetAttribute(U"replacement", replacement);
+    ccElement->SetAttribute(U"functionGroup", functionGroup);
     return ccElement;
 }
 
