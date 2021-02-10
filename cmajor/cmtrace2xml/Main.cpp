@@ -63,7 +63,7 @@ int main(int argc, const char** argv)
                         {
                             param.append(std::string(1, '=')).append(components[i]);
                         }
-                        if (option == "-f")
+                        if (option == "--filter")
                         {
                             filterExpr = param;
                         }

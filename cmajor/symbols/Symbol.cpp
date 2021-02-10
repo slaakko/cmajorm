@@ -245,6 +245,21 @@ std::u32string Symbol::FullName() const
     return fullName;
 }
 
+std::u32string Symbol::FullNameNoThrow() const
+{
+    std::u32string fullName;
+    if (parent)
+    {
+        fullName.append(parent->FullNameNoThrow());
+    }
+    if (!fullName.empty())
+    {
+        fullName.append(1, '.');
+    }
+    fullName.append(Name());
+    return fullName;
+}
+
 std::u32string Symbol::FullNameWithSpecifiers() const
 {
     std::u32string fullNameWithSpecifiers = ToUtf32(SymbolFlagStr(flags));

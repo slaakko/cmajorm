@@ -70,9 +70,11 @@ void SymbolCreatorVisitor::Visit(CompileUnitNode& compileUnitNode)
 
 void SymbolCreatorVisitor::Visit(NamespaceNode& namespaceNode)
 {
+    bool namespaceAdded = false;
     try
     {
         symbolTable.BeginNamespace(namespaceNode);
+        namespaceAdded = true;
         if (namespaceNode.Id())
         {
             namespaceNode.Id()->Accept(*this);
@@ -91,6 +93,10 @@ void SymbolCreatorVisitor::Visit(NamespaceNode& namespaceNode)
     {
         if (editMode)
         {
+            if (namespaceAdded)
+            {
+                symbolTable.EndNamespace();
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -102,6 +108,10 @@ void SymbolCreatorVisitor::Visit(NamespaceNode& namespaceNode)
     {
         if (editMode)
         {
+            if (namespaceAdded)
+            {
+                symbolTable.EndNamespace();
+            }
             errors.push_back(ex.what());
         }
         else
@@ -232,10 +242,12 @@ void SymbolCreatorVisitor::Visit(TemplateIdNode& templateIdNode)
 
 void SymbolCreatorVisitor::Visit(FunctionNode& functionNode)
 {
+    bool functionAdded = false;
     try
     {
         symbolTable.BeginFunction(functionNode, functionIndex++);
         ++level;
+        functionAdded = true;
         if (functionNode.ReturnTypeExpr())
         {
             functionNode.ReturnTypeExpr()->Accept(*this);
@@ -274,6 +286,11 @@ void SymbolCreatorVisitor::Visit(FunctionNode& functionNode)
     {
         if (editMode)
         {
+            if (functionAdded)
+            {
+                --level;
+                symbolTable.EndFunction(!leaveFunction);
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -285,6 +302,11 @@ void SymbolCreatorVisitor::Visit(FunctionNode& functionNode)
     {
         if (editMode)
         {
+            if (functionAdded)
+            {
+                --level;
+                symbolTable.EndFunction(!leaveFunction);
+            }
             errors.push_back(ex.what());
         }
         else
@@ -301,6 +323,7 @@ void SymbolCreatorVisitor::Visit(FunctionPtrNode& functionPtrNode)
 
 void SymbolCreatorVisitor::Visit(ClassNode& classNode)
 {
+    bool classAdded = false;
     try
     {
         if (&classNode == classInstanceNode)
@@ -312,6 +335,7 @@ void SymbolCreatorVisitor::Visit(ClassNode& classNode)
             symbolTable.BeginClass(classNode);
         }
         ++level;
+        classAdded = true;
         classNode.Id()->Accept(*this);
         int nt = classNode.TemplateParameters().Count();
         for (int i = 0; i < nt; ++i)
@@ -351,6 +375,18 @@ void SymbolCreatorVisitor::Visit(ClassNode& classNode)
     {
         if (editMode)
         {
+            if (classAdded)
+            {
+                --level;
+                if (&classNode == classInstanceNode)
+                {
+                    symbolTable.EndClassTemplateSpecialization();
+                }
+                else
+                {
+                    symbolTable.EndClass();
+                }
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -362,6 +398,18 @@ void SymbolCreatorVisitor::Visit(ClassNode& classNode)
     {
         if (editMode)
         {
+            if (classAdded)
+            {
+                --level;
+                if (&classNode == classInstanceNode)
+                {
+                    symbolTable.EndClassTemplateSpecialization();
+                }
+                else
+                {
+                    symbolTable.EndClass();
+                }
+            }
             errors.push_back(ex.what());
         }
         else
@@ -479,10 +527,12 @@ void SymbolCreatorVisitor::Visit(MemberInitializerNode& memberInitializerNode)
 
 void SymbolCreatorVisitor::Visit(StaticConstructorNode& staticConstructorNode)
 {
+    bool staticConstructorAdded = false;
     try
     {
         symbolTable.BeginStaticConstructor(staticConstructorNode, functionIndex++);
         ++level;
+        staticConstructorAdded = true;
         int ni = staticConstructorNode.Initializers().Count();
         for (int i = 0; i < ni; ++i)
         {
@@ -505,6 +555,11 @@ void SymbolCreatorVisitor::Visit(StaticConstructorNode& staticConstructorNode)
     {
         if (editMode)
         {
+            if (staticConstructorAdded)
+            {
+                --level;
+                symbolTable.EndStaticConstructor(!leaveFunction);
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -516,6 +571,11 @@ void SymbolCreatorVisitor::Visit(StaticConstructorNode& staticConstructorNode)
     {
         if (editMode)
         {
+            if (staticConstructorAdded)
+            {
+                --level;
+                symbolTable.EndStaticConstructor(!leaveFunction);
+            }
             errors.push_back(ex.what());
         }
         else
@@ -527,10 +587,12 @@ void SymbolCreatorVisitor::Visit(StaticConstructorNode& staticConstructorNode)
 
 void SymbolCreatorVisitor::Visit(ConstructorNode& constructorNode)
 {
+    bool constructorAdded = false;
     try
     {
         symbolTable.BeginConstructor(constructorNode, functionIndex++);
         ++level;
+        constructorAdded = true;
         int ni = constructorNode.Initializers().Count();
         for (int i = 0; i < ni; ++i)
         {
@@ -559,6 +621,11 @@ void SymbolCreatorVisitor::Visit(ConstructorNode& constructorNode)
     {
         if (editMode)
         {
+            if (constructorAdded)
+            {
+                --level;
+                symbolTable.EndConstructor(!leaveFunction);
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -570,6 +637,11 @@ void SymbolCreatorVisitor::Visit(ConstructorNode& constructorNode)
     {
         if (editMode)
         {
+            if (constructorAdded)
+            {
+                --level;
+                symbolTable.EndConstructor(!leaveFunction);
+            }
             errors.push_back(ex.what());
         }
         else
@@ -581,10 +653,12 @@ void SymbolCreatorVisitor::Visit(ConstructorNode& constructorNode)
 
 void SymbolCreatorVisitor::Visit(DestructorNode& destructorNode)
 {
+    bool destructorAdded = false;
     try
     {
         symbolTable.BeginDestructor(destructorNode, functionIndex++);
         ++level;
+        destructorAdded = true;
         if (destructorNode.Body())
         {
             InsertTracer(destructorNode.Body());
@@ -598,6 +672,11 @@ void SymbolCreatorVisitor::Visit(DestructorNode& destructorNode)
     {
         if (editMode)
         {
+            if (destructorAdded)
+            {
+                --level;
+                symbolTable.EndDestructor(!leaveFunction);
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -609,6 +688,11 @@ void SymbolCreatorVisitor::Visit(DestructorNode& destructorNode)
     {
         if (editMode)
         {
+            if (destructorAdded)
+            {
+                --level;
+                symbolTable.EndDestructor(!leaveFunction);
+            }
             errors.push_back(ex.what());
         }
         else
@@ -620,10 +704,12 @@ void SymbolCreatorVisitor::Visit(DestructorNode& destructorNode)
 
 void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
 {
+    bool memberFunctionAdded = false;
     try
     {
         symbolTable.BeginMemberFunction(memberFunctionNode, functionIndex++);
         ++level;
+        memberFunctionAdded = true;
         if (memberFunctionNode.WhereConstraint())
         {
             memberFunctionNode.WhereConstraint()->Accept(*this);
@@ -651,6 +737,11 @@ void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
     {
         if (editMode)
         {
+            if (memberFunctionAdded)
+            {
+                --level;
+                symbolTable.EndMemberFunction(!leaveFunction);
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -662,6 +753,11 @@ void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
     {
         if (editMode)
         {
+            if (memberFunctionAdded)
+            {
+                --level;
+                symbolTable.EndMemberFunction(!leaveFunction);
+            }
             errors.push_back(ex.what());
         }
         else
@@ -673,10 +769,12 @@ void SymbolCreatorVisitor::Visit(MemberFunctionNode& memberFunctionNode)
 
 void SymbolCreatorVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
 {
+    bool conversionFunctionAdded = false;
     try
     {
         symbolTable.BeginConversionFunction(conversionFunctionNode, functionIndex++);
         ++level;
+        conversionFunctionAdded = true;
         if (conversionFunctionNode.WhereConstraint())
         {
             conversionFunctionNode.WhereConstraint()->Accept(*this);
@@ -698,6 +796,11 @@ void SymbolCreatorVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
     {
         if (editMode)
         {
+            if (conversionFunctionAdded)
+            {
+                --level;
+                symbolTable.EndConversionFunction(!leaveFunction);
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -709,6 +812,11 @@ void SymbolCreatorVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
     {
         if (editMode)
         {
+            if (conversionFunctionAdded)
+            {
+                --level;
+                symbolTable.EndConversionFunction(!leaveFunction);
+            }
             errors.push_back(ex.what());
         }
         else
@@ -753,10 +861,12 @@ void SymbolCreatorVisitor::Visit(MemberVariableNode& memberVariableNode)
 
 void SymbolCreatorVisitor::Visit(InterfaceNode& interfaceNode)
 {
+    bool interfaceAdded = false;
     try
     {
         symbolTable.BeginInterface(interfaceNode);
         ++level;
+        interfaceAdded = true;
         interfaceNode.Id()->Accept(*this);
         int n = interfaceNode.Members().Count();
         for (int i = 0; i < n; ++i)
@@ -776,6 +886,11 @@ void SymbolCreatorVisitor::Visit(InterfaceNode& interfaceNode)
     {
         if (editMode)
         {
+            if (interfaceAdded)
+            {
+                --level;
+                symbolTable.EndInterface();
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -787,6 +902,11 @@ void SymbolCreatorVisitor::Visit(InterfaceNode& interfaceNode)
     {
         if (editMode)
         {
+            if (interfaceAdded)
+            {
+                --level;
+                symbolTable.EndInterface();
+            }
             errors.push_back(ex.what());
         }
         else
@@ -798,10 +918,12 @@ void SymbolCreatorVisitor::Visit(InterfaceNode& interfaceNode)
 
 void SymbolCreatorVisitor::Visit(DelegateNode& delegateNode)
 {
+    bool delegateAdded = false;
     try
     {
         symbolTable.BeginDelegate(delegateNode);
         ++level;
+        delegateAdded = true;
         delegateNode.ReturnTypeExpr()->Accept(*this);
         delegateNode.Id()->Accept(*this);
         int n = delegateNode.Parameters().Count();
@@ -822,6 +944,11 @@ void SymbolCreatorVisitor::Visit(DelegateNode& delegateNode)
     {
         if (editMode)
         {
+            if (delegateAdded)
+            {
+                --level;
+                symbolTable.EndDelegate();
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -833,6 +960,11 @@ void SymbolCreatorVisitor::Visit(DelegateNode& delegateNode)
     {
         if (editMode)
         {
+            if (delegateAdded)
+            {
+                --level;
+                symbolTable.EndDelegate();
+            }
             errors.push_back(ex.what());
         }
         else
@@ -844,10 +976,12 @@ void SymbolCreatorVisitor::Visit(DelegateNode& delegateNode)
 
 void SymbolCreatorVisitor::Visit(ClassDelegateNode& classDelegateNode)
 {
+    bool classDelegateAdded = false;
     try
     {
         symbolTable.BeginClassDelegate(classDelegateNode);
         ++level;
+        classDelegateAdded = true;
         classDelegateNode.ReturnTypeExpr()->Accept(*this);
         classDelegateNode.Id()->Accept(*this);
         int n = classDelegateNode.Parameters().Count();
@@ -868,6 +1002,11 @@ void SymbolCreatorVisitor::Visit(ClassDelegateNode& classDelegateNode)
     {
         if (editMode)
         {
+            if (classDelegateAdded)
+            {
+                --level;
+                symbolTable.EndClassDelegate();
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -879,6 +1018,11 @@ void SymbolCreatorVisitor::Visit(ClassDelegateNode& classDelegateNode)
     {
         if (editMode)
         {
+            if (classDelegateAdded)
+            {
+                --level;
+                symbolTable.EndClassDelegate();
+            }
             errors.push_back(ex.what());
         }
         else
@@ -1317,10 +1461,12 @@ void SymbolCreatorVisitor::Visit(AxiomStatementNode& axiomStatementNode)
 
 void SymbolCreatorVisitor::Visit(AxiomNode& axiomNode) 
 {
+    bool axiomAdded = false;
     try
     {
         symbolTable.BeginAxiom(axiomNode);
         ++level;
+        axiomAdded = true;
         if (axiomNode.Id())
         {
             axiomNode.Id()->Accept(*this);
@@ -1343,6 +1489,11 @@ void SymbolCreatorVisitor::Visit(AxiomNode& axiomNode)
     {
         if (editMode)
         {
+            if (axiomAdded)
+            {
+                --level;
+                symbolTable.EndAxiom();
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -1354,6 +1505,11 @@ void SymbolCreatorVisitor::Visit(AxiomNode& axiomNode)
     {
         if (editMode)
         {
+            if (axiomAdded)
+            {
+                --level;
+                symbolTable.EndAxiom();
+            }
             errors.push_back(ex.what());
         }
         else
@@ -1431,10 +1587,12 @@ void SymbolCreatorVisitor::Visit(NonreferenceTypeConstraintNode& nonreferenceTyp
 
 void SymbolCreatorVisitor::Visit(ConceptNode& conceptNode)
 {
+    bool conceptAdded = false;
     try
     {
         symbolTable.BeginConcept(conceptNode, true);
         ++level;
+        conceptAdded = true;
         conceptNode.Id()->Accept(*this);
         int n = conceptNode.TypeParameters().Count();
         for (int i = 0; i < n; ++i)
@@ -1468,6 +1626,11 @@ void SymbolCreatorVisitor::Visit(ConceptNode& conceptNode)
     {
         if (editMode)
         {
+            if (conceptAdded)
+            {
+                --level;
+                symbolTable.EndConcept();
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -1479,6 +1642,11 @@ void SymbolCreatorVisitor::Visit(ConceptNode& conceptNode)
     {
         if (editMode)
         {
+            if (conceptAdded)
+            {
+                --level;
+                symbolTable.EndConcept();
+            }
             errors.push_back(ex.what());
         }
         else
@@ -1501,10 +1669,12 @@ void SymbolCreatorVisitor::Visit(LabeledStatementNode& labeledStatementNode)
 
 void SymbolCreatorVisitor::Visit(CompoundStatementNode& compoundStatementNode)
 {
+    bool declarationBlockAdded = false;
     try
     {
         symbolTable.BeginDeclarationBlock(compoundStatementNode);
         ++level;
+        declarationBlockAdded = true;
         int n = compoundStatementNode.Statements().Count();
         for (int i = 0; i < n; ++i)
         {
@@ -1519,6 +1689,11 @@ void SymbolCreatorVisitor::Visit(CompoundStatementNode& compoundStatementNode)
     {
         if (editMode)
         {
+            if (declarationBlockAdded)
+            {
+                --level;
+                symbolTable.EndDeclarationBlock();
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -1530,6 +1705,11 @@ void SymbolCreatorVisitor::Visit(CompoundStatementNode& compoundStatementNode)
     {
         if (editMode)
         {
+            if (declarationBlockAdded)
+            {
+                --level;
+                symbolTable.EndDeclarationBlock();
+            }
             errors.push_back(ex.what());
         }
         else
@@ -1679,10 +1859,12 @@ void SymbolCreatorVisitor::Visit(DoStatementNode& doStatementNode)
 
 void SymbolCreatorVisitor::Visit(ForStatementNode& forStatementNode)
 {
+    bool declarationBlockAdded = false;
     try
     {
         symbolTable.BeginDeclarationBlock(forStatementNode);
         ++level;
+        declarationBlockAdded = true;
         forStatementNode.InitS()->Accept(*this);
         if (forStatementNode.Condition())
         {
@@ -1715,6 +1897,11 @@ void SymbolCreatorVisitor::Visit(ForStatementNode& forStatementNode)
     {
         if (editMode)
         {
+            if (declarationBlockAdded)
+            {
+                --level;
+                symbolTable.EndDeclarationBlock();
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -1726,6 +1913,11 @@ void SymbolCreatorVisitor::Visit(ForStatementNode& forStatementNode)
     {
         if (editMode)
         {
+            if (declarationBlockAdded)
+            {
+                --level;
+                symbolTable.EndDeclarationBlock();
+            }
             errors.push_back(ex.what());
         }
         else
@@ -2149,6 +2341,7 @@ void SymbolCreatorVisitor::Visit(CatchNode& catchNode)
     {
         if (editMode)
         {
+            symbolTable.EndDeclarationBlock();
             errors.push_back(ex.Message());
         }
         else
@@ -2471,10 +2664,12 @@ void SymbolCreatorVisitor::Visit(ConstantNode& constantNode)
 
 void SymbolCreatorVisitor::Visit(EnumTypeNode& enumTypeNode) 
 {
+    bool enumTypeAdded = false;
     try
     {
         symbolTable.BeginEnumType(enumTypeNode);
         ++level;
+        enumTypeAdded = true;
         enumTypeNode.Id()->Accept(*this);
         if (enumTypeNode.GetUnderlyingType())
         {
@@ -2497,6 +2692,11 @@ void SymbolCreatorVisitor::Visit(EnumTypeNode& enumTypeNode)
     {
         if (editMode)
         {
+            if (enumTypeAdded)
+            {
+                --level;
+                symbolTable.EndEnumType();
+            }
             errors.push_back(ex.Message());
         }
         else
@@ -2508,6 +2708,11 @@ void SymbolCreatorVisitor::Visit(EnumTypeNode& enumTypeNode)
     {
         if (editMode)
         {
+            if (enumTypeAdded)
+            {
+                --level;
+                symbolTable.EndEnumType();
+            }
             errors.push_back(ex.what());
         }
         else

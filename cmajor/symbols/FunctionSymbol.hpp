@@ -150,7 +150,8 @@ public:
     bool IsExportSymbol() const override;
     virtual void ComputeName();
     std::u32string FullName() const override;
-    std::u32string FullName(bool withParamNames) const;
+    std::u32string FullNameNoThrow() const override;
+    std::u32string FullName(bool withParamNames, bool nothrow) const;
     std::u32string FullNameWithSpecifiers() const override;
     std::u32string DocName() const override;
     std::u32string CodeName() const override { return groupName; }

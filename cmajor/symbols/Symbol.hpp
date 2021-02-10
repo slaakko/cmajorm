@@ -154,6 +154,7 @@ public:
     virtual ContainerScope* GetArrowScope();
     virtual const ContainerScope* GetArrowScope() const;
     virtual std::u32string FullName() const;
+    virtual std::u32string FullNameNoThrow() const;
     virtual std::u32string FullNameWithSpecifiers() const;
     virtual std::u32string SimpleName() const { return Name(); }
     virtual std::u32string DocName() const { return Name(); }

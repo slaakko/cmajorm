@@ -488,9 +488,11 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
             result.error = "source file path '" + sourceFilePath + "' not found";
             return result;
         }
+        bool moveSource = false;
         Source* src = sources[index].get();
         if (index < sources.size() - 1)
         {
+            moveSource = true;
             for (int i = sources.size() - 1; i >= 0; --i)
             {
                 Source* s = GetSource(i);
@@ -501,7 +503,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         {
             src->RemoveSymbols();
         }
-        if (index < sources.size() - 1)
+        if (moveSource)
         {
             std::unique_ptr<Source> source = std::move(sources[index]);
             sources.erase(sources.begin() + index);
@@ -510,7 +512,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         }
         src->SetContent(sourceCode);
         src->Parse(module->Id(), sources.size());
-        if (index < sources.size() - 1)
+        if (moveSource)
         {
             for (int i = 0; i < sources.size(); ++i)
             {
@@ -522,7 +524,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         {
             src->AddSymbols(module);
         }
-        if (index < sources.size() - 1)
+        if (moveSource)
         {
             for (int i = 0; i < sources.size(); ++i)
             {
@@ -534,7 +536,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         {
             src->GetScopes(module);
         }
-        if (index < sources.size() - 1)
+        if (moveSource)
         {
             for (int i = 0; i < sources.size(); ++i)
             {
@@ -554,7 +556,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         result.synchronized = src->Synchronized();
         if (src->CursorContainer())
         {
-            result.cursorContainer = ToUtf8(src->CursorContainer()->FullName());
+            result.cursorContainer = ToUtf8(src->CursorContainer()->FullNameNoThrow());
         }
     }
     catch (const Exception& ex)

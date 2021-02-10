@@ -243,13 +243,14 @@ namespace cmcode
             searchMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.f));
             searchMenuItem->ClickEvent().AddHandler(SearchClick);
             searchMenuItem->Disable();
+            searchMenuItem = saveAllMenuItemPtr.Get();
             editMenuItem->AddMenuItem(searchMenuItemPtr.Release());
             UniquePtr<MenuItem> optionsMenuItemPtr(new MenuItem("&Options..."));
             optionsMenuItem = optionsMenuItemPtr.Get();
             optionsMenuItem->ClickEvent().AddHandler(OptionsClick);
             editMenuItem->AddMenuItem(optionsMenuItemPtr.Release());
             menuBar->AddMenuItem(editMenuItem.Release());
-
+            
             UniquePtr<MenuItem> viewMenuItem(new MenuItem("&View"));
             UniquePtr<MenuItem> debugWindowsMenuItem(new MenuItem("&Debug Windows"));
             UniquePtr<MenuItem> callStackMenuItemPtr(new MenuItem("&Call Stack"));
@@ -3915,6 +3916,8 @@ namespace cmcode
         }
         private void ShowCodeCompletionList(const Point& location, const List<Cm.Views.CCEntry>& ccList)
         {
+            ccFunctionGroup.Clear();
+            ccOverloadListFetched = false;
             if (ccList.IsEmpty())
             {
                 HideCodeCompletionList();
@@ -3938,6 +3941,8 @@ namespace cmcode
         }
         private void HideCodeCompletionList()
         {
+            ccFunctionGroup.Clear();
+            ccOverloadListFetched = false;
             codeCompletionListView->Hide();
             HideCodeCompletionSymbolHelp();
             TextView* textView = GetCurrentTextView();
@@ -3948,6 +3953,7 @@ namespace cmcode
         }
         private void ShowCodeCompletionSymbolHelp()
         {
+            ccFunctionGroup.Clear();
             if (codeCompletionListView->IsVisible())
             {
                 int selectedEntryIndex = codeCompletionListView->SelectedEntryIndex();
@@ -3975,6 +3981,8 @@ namespace cmcode
         }
         private void HideCodeCompletionSymbolHelp()
         {
+            ccFunctionGroup.Clear();
+            ccOverloadListFetched = false;
             codeCompletionSymbolHelpView->Hide();
         }
         private void ShowOverloadList(const Point& location, const List<Cm.Views.OverloadEntry>& overloadList)
@@ -4558,8 +4566,23 @@ namespace cmcode
                 }
             }
         }
+        private int CountParens(const ustring& ccText)
+        {
+            int parenCount = 0;
+            for (uchar c : ccText)
+            {
+                if (c == '(') ++parenCount;
+                else if (c == ')') --parenCount;
+            }
+            return parenCount;
+        }
         private void EditorCCTextChanged()
         {
+            EditorCCTextChanged(false);
+        }
+        private void EditorCCTextChanged(bool allowEmpty)
+        {
+            bool hideCodeCompletionList = true;
             try
             {
                 const EditorSettings& editorSettings = MainConfiguration.Instance().GetEditorSettings();
@@ -4581,21 +4604,27 @@ namespace cmcode
                             if (sourceCodeView != null)
                             {
                                 ccText = sourceCodeView->GetCCText();
-                                long lparenPos = ccText.Find('(');
-                                if (lparenPos == -1)
+                                if (allowEmpty || !ccText.IsEmpty())
                                 {
-                                    UniquePtr<GetCCListRequest> request(new GetCCListRequest(project->FilePath(), GetBackend(), GetConfig(), sourceFilePath, ToUtf8(ccText)));
-                                    GetCodeCompletionService().PutRequest(request.Release());
-                                }
-                                else
-                                {
-                                    string functionGroup = ToUtf8(ccText.Substring(0, lparenPos));
-                                    if (!ccFunctionGroup.IsEmpty())
+                                    long lparenPos = ccText.Find('(');
+                                    if (lparenPos == -1)
                                     {
-                                        functionGroup = ccFunctionGroup;
+                                        UniquePtr<GetCCListRequest> request(new GetCCListRequest(project->FilePath(), GetBackend(), GetConfig(), sourceFilePath, ToUtf8(ccText)));
+                                        GetCodeCompletionService().PutRequest(request.Release());
+                                        hideCodeCompletionList = false;
                                     }
-                                    UniquePtr<GetOverloadListRequest> request(new GetOverloadListRequest(project->FilePath(), GetBackend(), GetConfig(), functionGroup));
-                                    GetCodeCompletionService().PutRequest(request.Release());
+                                    else
+                                    {
+                                        if (CountParens(ccText) == 1)
+                                        {
+                                            if (!ccOverloadListFetched && !ccFunctionGroup.IsEmpty())
+                                            {
+                                                ccOverloadListFetched = true;
+                                                UniquePtr<GetOverloadListRequest> request(new GetOverloadListRequest(project->FilePath(), GetBackend(), GetConfig(), ccFunctionGroup));
+                                                GetCodeCompletionService().PutRequest(request.Release());
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -4613,11 +4642,16 @@ namespace cmcode
                 LogException(ex);
             }
             ccFunctionGroup.Clear();
+            if (hideCodeCompletionList)
+            {
+                HideCodeCompletionList();
+            }
         }
         private void EditorCCKeyPressed()
         {
-            EditorCCTextChanged();
+            EditorCCTextChanged(true);
             ccFunctionGroup.Clear();
+            ccOverloadListFetched = false;
         }
         private void EditorCCNext()
         {
@@ -4626,6 +4660,7 @@ namespace cmcode
                 codeCompletionListView->Next();
                 ShowCodeCompletionSymbolHelp();
                 ccFunctionGroup.Clear();
+                ccOverloadListFetched = false;
             }
             catch (const Exception& ex)
             {
@@ -4640,6 +4675,7 @@ namespace cmcode
                 codeCompletionListView->Prev();
                 ShowCodeCompletionSymbolHelp();
                 ccFunctionGroup.Clear();
+                ccOverloadListFetched = false;
             }
             catch (const Exception& ex)
             {
@@ -4654,6 +4690,7 @@ namespace cmcode
                 codeCompletionListView->NextPage();
                 ShowCodeCompletionSymbolHelp();
                 ccFunctionGroup.Clear();
+                ccOverloadListFetched = false;
             }
             catch (const Exception& ex)
             {
@@ -4668,6 +4705,7 @@ namespace cmcode
                 codeCompletionListView->PrevPage();
                 ShowCodeCompletionSymbolHelp();
                 ccFunctionGroup.Clear();
+                ccOverloadListFetched = false;
             }
             catch (const Exception& ex)
             {
@@ -4687,6 +4725,7 @@ namespace cmcode
                         const Cm.Views.CCEntry& entry = codeCompletionListView->GetSelectedCCEntry();
                         currentTextView->ReplaceCCText(ToUtf32(entry.replacement));
                         ccFunctionGroup = entry.functionGroup;
+                        ccOverloadListFetched = false;
                     }
                 }
                 HideCodeCompletionList();
@@ -5163,6 +5202,7 @@ namespace cmcode
         private bool codeCompletionServerStarting;
         private bool loadEditModuleRequestSent;
         private string ccFunctionGroup;
+        private bool ccOverloadListFetched;
     }
 }
 

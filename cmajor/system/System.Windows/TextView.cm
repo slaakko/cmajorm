@@ -27,6 +27,23 @@ namespace System.Windows
         return WordSeparators.IsWordSeparatorChar(c);
     }
 
+    public static class CCStopChars
+    {
+        static CCStopChars()
+        {
+            ccStopChars = u" ,()[]{};\"'<=|&^!+/%~:";
+        }
+        public static nothrow bool IsCCStopChar(uchar c)
+        {
+            return ccStopChars.Find(c) != -1;
+        }
+        private static ustring ccStopChars;
+    }
+
+    public nothrow bool IsCCStopChar(uchar c)
+    {
+        return CCStopChars.IsCCStopChar(c);
+    }
     public nothrow bool IsEmptyOrSpaceLine(const ustring& line)
     {
         if (line.IsEmpty()) return true;
@@ -2064,7 +2081,7 @@ namespace System.Windows
             }
             while (columnIndex >= 0)
             {
-                if (line[columnIndex] == ' ')
+                if (IsCCStopChar(line[columnIndex]))
                 {
                     break;
                 }
@@ -2103,7 +2120,7 @@ namespace System.Windows
                 {
                     if (caretColumnIndex < line.Length())
                     {
-                        if (line[caretColumnIndex] == ' ')
+                        if (IsCCStopChar(line[caretColumnIndex]))
                         {
                             ++caretColumnIndex;
                             break;

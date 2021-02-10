@@ -385,7 +385,7 @@ std::string FunctionGroupSymbol::GetOverloadList() const
         for (auto functionSymbol : p.second)
         {
             sngxml::dom::Element* overloadElement = new sngxml::dom::Element(U"overload");
-            std::u32string overloadName = functionSymbol->FullName(true);
+            std::u32string overloadName = functionSymbol->FullName(true, false);
             overloadElement->SetAttribute(U"name", overloadName);
             root->AppendChild(std::unique_ptr<sngxml::dom::Node>(overloadElement));
         }
@@ -747,14 +747,26 @@ void FunctionSymbol::ComputeMangledName()
     SetMangledName(mangledName);
 }
 
-std::u32string FunctionSymbol::FullName(bool withParamNames) const
+std::u32string FunctionSymbol::FullName(bool withParamNames, bool nothrow) const
 {
     std::u32string fullName;
     if (!Parent())
     {
+        if (nothrow)
+        {
+            return std::u32string();
+        }
         throw Exception("function symbol has no parent", GetSpan(), SourceModuleId());
     }
-    std::u32string parentFullName = Parent()->FullName();
+    std::u32string parentFullName;
+    if (nothrow)
+    {
+        parentFullName = Parent()->FullNameNoThrow();
+    }
+    else
+    {
+        parentFullName = Parent()->FullName();
+    }
     fullName.append(parentFullName);
     if (!parentFullName.empty())
     {
@@ -782,7 +794,21 @@ std::u32string FunctionSymbol::FullName(bool withParamNames) const
             fullName.append(U", ");
         }
         ParameterSymbol* parameter = parameters[i];
-        fullName.append(parameter->GetType()->FullName());
+        if (nothrow)
+        {
+            if (!parameter->GetType())
+            {
+                return std::u32string();
+            }
+        }
+        if (nothrow)
+        {
+            fullName.append(parameter->GetType()->FullNameNoThrow());
+        }
+        else
+        {
+            fullName.append(parameter->GetType()->FullName());
+        }
         if (withParamNames)
         {
             fullName.append(U" ").append(parameter->Name());
@@ -798,7 +824,12 @@ std::u32string FunctionSymbol::FullName(bool withParamNames) const
 
 std::u32string FunctionSymbol::FullName() const
 {
-    return FullName(false);
+    return FullName(false, false);
+}
+
+std::u32string FunctionSymbol::FullNameNoThrow() const
+{
+    return FullName(false, true);
 }
 
 std::u32string FunctionSymbol::FullNameWithSpecifiers() const
@@ -1579,7 +1610,7 @@ std::string FunctionSymbol::GetSymbolHelp() const
     {
         help.append(ToUtf8(returnType->FullName())).append(" ");
     }
-    help.append(ToUtf8(FullName(true)));
+    help.append(ToUtf8(FullName(true, false)));
     return help;
 }
 
