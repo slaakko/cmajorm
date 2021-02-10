@@ -488,6 +488,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
             result.error = "source file path '" + sourceFilePath + "' not found";
             return result;
         }
+        Source* src = sources[index].get();
         if (index < sources.size() - 1)
         {
             for (int i = sources.size() - 1; i >= 0; --i)
@@ -495,50 +496,66 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
                 Source* s = GetSource(i);
                 s->RemoveSymbols();
             }
+        }
+        else
+        {
+            src->RemoveSymbols();
+        }
+        if (index < sources.size() - 1)
+        {
+            std::unique_ptr<Source> source = std::move(sources[index]);
+            sources.erase(sources.begin() + index);
+            sources.push_back(std::move(source));
+            MakeSourceIndexMap();
+        }
+        src->SetContent(sourceCode);
+        src->Parse(module->Id(), sources.size());
+        if (index < sources.size() - 1)
+        {
             for (int i = 0; i < sources.size(); ++i)
             {
-                if (i != index)
-                {
-                    Source* s = GetSource(i);
-                    s->AddSymbols(module);
-                }
-            }
-            for (int i = 0; i < sources.size(); ++i)
-            {
-                if (i != index)
-                {
-                    Source* s = GetSource(i);
-                    s->GetScopes(module);
-                }
-            }
-            for (int i = 0; i < sources.size(); ++i)
-            {
-                if (i != index)
-                {
-                    Source* s = GetSource(i);
-                    s->BindTypes(module);
-                }
+                Source* s = GetSource(i);
+                s->AddSymbols(module);
             }
         }
-        std::unique_ptr<Source> source = std::move(sources[index]);
-        sources.erase(sources.begin() + index);
-        source->SetContent(sourceCode);
-        source->Parse(module->Id(), sources.size());
-        source->AddSymbols(module);
-        source->GetScopes(module);
-        source->BindTypes(module);
-        result.numberOfErrors = source->Errors().size();
-        for (const std::string& error : source->Errors())
+        else
+        {
+            src->AddSymbols(module);
+        }
+        if (index < sources.size() - 1)
+        {
+            for (int i = 0; i < sources.size(); ++i)
+            {
+                Source* s = GetSource(i);
+                s->GetScopes(module);
+            }
+        }
+        else
+        {
+            src->GetScopes(module);
+        }
+        if (index < sources.size() - 1)
+        {
+            for (int i = 0; i < sources.size(); ++i)
+            {
+                Source* s = GetSource(i);
+                s->BindTypes(module);
+            }
+        }
+        else
+        {
+            src->BindTypes(module);
+        }
+        result.numberOfErrors = src->Errors().size();
+        for (const std::string& error : src->Errors())
         {
             result.errors.push_back(StringStr(error));
         }
-        result.synchronized = source->Synchronized();
-        if (source->CursorContainer())
+        result.synchronized = src->Synchronized();
+        if (src->CursorContainer())
         {
-            result.cursorContainer = ToUtf8(source->CursorContainer()->FullName());
+            result.cursorContainer = ToUtf8(src->CursorContainer()->FullName());
         }
-        sources.push_back(std::move(source));
-        MakeSourceIndexMap();
     }
     catch (const Exception& ex)
     {
