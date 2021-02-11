@@ -15,13 +15,13 @@ using namespace soulng::unicode;
 
 Lexer::Lexer(const std::u32string& content_, const std::string& fileName_, int fileIndex_) :
     content(content_), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(nullptr), start(content.c_str()), end(content.c_str() + content.length()), pos(start), current(tokens.end()),
-    log(nullptr), countLines(true), separatorChar('\0'), flags(), cursorNode(nullptr)
+    log(nullptr), countLines(true), separatorChar('\0'), flags()
 {
 }
 
 Lexer::Lexer(const char32_t* start_, const char32_t* end_, const std::string& fileName_, int fileIndex_) :
     content(), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(nullptr), start(start_), end(end_), pos(start), current(tokens.end()),
-    log(nullptr), countLines(true), separatorChar('\0'), flags(), cursorNode(nullptr)
+    log(nullptr), countLines(true), separatorChar('\0'), flags()
 {
 }
 

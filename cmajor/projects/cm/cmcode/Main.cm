@@ -243,7 +243,6 @@ namespace cmcode
             searchMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.f));
             searchMenuItem->ClickEvent().AddHandler(SearchClick);
             searchMenuItem->Disable();
-            searchMenuItem = saveAllMenuItemPtr.Get();
             editMenuItem->AddMenuItem(searchMenuItemPtr.Release());
             UniquePtr<MenuItem> optionsMenuItemPtr(new MenuItem("&Options..."));
             optionsMenuItem = optionsMenuItemPtr.Get();

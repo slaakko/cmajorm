@@ -98,7 +98,6 @@ private:
     bool countLines;
     char32_t separatorChar;
     LexerFlags flags;
-    void* cursorNode;
     void NextToken();
 };
 
