@@ -5,7 +5,7 @@ using System.Parsing;
 using Cm.Ast;
 using ParserFileTokens;
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scmpg/build/Statement.parser' using soulcm parser generator scmpg version 3.8.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scmpg/build/Statement.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class StatementParser
 {
@@ -431,7 +431,7 @@ public static class StatementParser
         }
         return match;
     }
-    public static Match Label(ParserFileLexer& lexer)
+    public static Match Label(ParserFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -508,7 +508,7 @@ public static class StatementParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Label");
                     #endif
-                    return Match(true, new LabelNode(s, label));
+                    return Match(true, new LabelNode(s, ctx->ModuleId(), label));
                 }
             }
             *parentMatch0 = match;
@@ -549,7 +549,7 @@ public static class StatementParser
         Match match(false);
         Match* parentMatch0 = &match;
         {
-            Match match = StatementParser.Label(lexer);
+            Match match = StatementParser.Label(lexer, ctx);
             lbl.Reset(cast<LabelNode*>(match.value));
             *parentMatch0 = match;
         }
@@ -567,7 +567,7 @@ public static class StatementParser
                     s.Reset(cast<StatementNode*>(match.value));
                     if (match.hit)
                     {
-                        stmt.Reset(new LabeledStatementNode(span, s.Release()));
+                        stmt.Reset(new LabeledStatementNode(span, ctx->ModuleId(), s.Release()));
                         stmt->SetLabelNode(lbl.Release());
                         {
                             #if (DEBUG)
@@ -1089,7 +1089,7 @@ public static class StatementParser
                     }
                     if (match.hit)
                     {
-                        compoundStatement.Reset(new CompoundStatementNode(span));
+                        compoundStatement.Reset(new CompoundStatementNode(span, ctx->ModuleId()));
                     }
                     *parentMatch2 = match;
                 }
@@ -1306,7 +1306,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ReturnStatement");
                             #endif
-                            return Match(true, new ReturnStatementNode(s, expr.Release()));
+                            return Match(true, new ReturnStatementNode(s, ctx->ModuleId(), expr.Release()));
                         }
                     }
                     *parentMatch6 = match;
@@ -1561,7 +1561,7 @@ public static class StatementParser
             }
             if (match.hit)
             {
-                IfStatementNode* value = new IfStatementNode(s, cond.Release(), thenS.Release(), elseS.Release());
+                IfStatementNode* value = new IfStatementNode(s, ctx->ModuleId(), cond.Release(), thenS.Release(), elseS.Release());
                 value->SetLeftParenSpan(leftParenSpan);
                 value->SetRightParenSpan(rightParenSpan);
                 value->SetElseSpan(elseSpan);
@@ -1794,7 +1794,7 @@ public static class StatementParser
             }
             if (match.hit)
             {
-                WhileStatementNode* value = new WhileStatementNode(s, cond.Release(), stmt.Release());
+                WhileStatementNode* value = new WhileStatementNode(s, ctx->ModuleId(), cond.Release(), stmt.Release());
                 value->SetLeftParenSpan(leftParenSpan);
                 value->SetRightParenSpan(rightParenSpan);
                 {
@@ -2104,7 +2104,7 @@ public static class StatementParser
             }
             if (match.hit)
             {
-                DoStatementNode* value = new DoStatementNode(s, stmt.Release(), cond.Release());
+                DoStatementNode* value = new DoStatementNode(s, ctx->ModuleId(), stmt.Release(), cond.Release());
                 value->SetWhileSpan(whileSpan);
                 value->SetLeftParenSpan(leftParenSpan);
                 value->SetRightParenSpan(rightParenSpan);
@@ -2417,7 +2417,7 @@ public static class StatementParser
             }
             if (match.hit)
             {
-                ForStatementNode* value = new ForStatementNode(s, init.Release(), cond.Release(), loop.Release(), stmt.Release());
+                ForStatementNode* value = new ForStatementNode(s, ctx->ModuleId(), init.Release(), cond.Release(), loop.Release(), stmt.Release());
                 value->SetLeftParenSpan(leftParenSpan);
                 value->SetRightParenSpan(rightParenSpan);
                 {
@@ -2622,7 +2622,7 @@ public static class StatementParser
                                     #if (DEBUG)
                                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ForLoopStatementExpr");
                                     #endif
-                                    return Match(true, new ExpressionStatementNode(span, expr.Release()));
+                                    return Match(true, new ExpressionStatementNode(span, ctx->ModuleId(), expr.Release()));
                                 }
                             }
                             *parentMatch4 = match;
@@ -2651,7 +2651,7 @@ public static class StatementParser
                                 #if (DEBUG)
                                     if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ForLoopStatementExpr");
                                 #endif
-                                return Match(true, new EmptyStatementNode(span));
+                                return Match(true, new EmptyStatementNode(span, ctx->ModuleId()));
                             }
                         }
                         *parentMatch6 = match;
@@ -2792,7 +2792,7 @@ public static class StatementParser
                                     Match match(false);
                                     Match* parentMatch13 = &match;
                                     {
-                                        Match match = IdentifierParser.Identifier(lexer);
+                                        Match match = IdentifierParser.Identifier(lexer, ctx);
                                         id.Reset(cast<IdentifierNode*>(match.value));
                                         *parentMatch13 = match;
                                     }
@@ -2921,7 +2921,7 @@ public static class StatementParser
             }
             if (match.hit)
             {
-                RangeForStatementNode* value = new RangeForStatementNode(s, type.Release(), id.Release(), container.Release(), action.Release());
+                RangeForStatementNode* value = new RangeForStatementNode(s, ctx->ModuleId(), type.Release(), id.Release(), container.Release(), action.Release());
                 value->SetLeftParenSpan(leftParenSpan);
                 value->SetRightParenSpan(rightParenSpan);
                 value->SetColonSpan(colonSpan);
@@ -3023,7 +3023,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BreakStatement");
                             #endif
-                            return Match(true, new BreakStatementNode(s));
+                            return Match(true, new BreakStatementNode(s, ctx->ModuleId()));
                         }
                     }
                     *parentMatch3 = match;
@@ -3121,7 +3121,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ContinueStatement");
                             #endif
-                            return Match(true, new ContinueStatementNode(s));
+                            return Match(true, new ContinueStatementNode(s, ctx->ModuleId()));
                         }
                     }
                     *parentMatch3 = match;
@@ -3251,7 +3251,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"GotoStatement");
                             #endif
-                            return Match(true, new GotoStatementNode(s, label));
+                            return Match(true, new GotoStatementNode(s, ctx->ModuleId(), label));
                         }
                     }
                     *parentMatch6 = match;
@@ -3432,7 +3432,7 @@ public static class StatementParser
                         if (match.hit)
                         {
                             rightParenSpan = span;
-                            switchStatement.Reset(new SwitchStatementNode(span, cond.Release()));
+                            switchStatement.Reset(new SwitchStatementNode(span, ctx->ModuleId(), cond.Release()));
                             switchStatement->SetLeftParenSpan(leftParenSpan);
                             switchStatement->SetRightParenSpan(rightParenSpan);
                         }
@@ -3649,7 +3649,7 @@ public static class StatementParser
                 Match match(true);
                 if (match.hit)
                 {
-                    caseS.Reset(new CaseStatementNode(span));
+                    caseS.Reset(new CaseStatementNode(span, ctx->ModuleId()));
                     s = span;
                 }
                 *parentMatch1 = match;
@@ -4038,7 +4038,7 @@ public static class StatementParser
                                 if (match.hit)
                                 {
                                     s.end = span.end;
-                                    defaultS.Reset(new DefaultStatementNode(s));
+                                    defaultS.Reset(new DefaultStatementNode(s, ctx->ModuleId()));
                                 }
                                 *parentMatch6 = match;
                             }
@@ -4232,7 +4232,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"GotoCaseStatement");
                             #endif
-                            return Match(true, new GotoCaseStatementNode(s, caseExpr.Release()));
+                            return Match(true, new GotoCaseStatementNode(s, ctx->ModuleId(), caseExpr.Release()));
                         }
                     }
                     *parentMatch7 = match;
@@ -4350,7 +4350,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"GotoDefaultStatement");
                             #endif
-                            return Match(true, new GotoDefaultStatementNode(s));
+                            return Match(true, new GotoDefaultStatementNode(s, ctx->ModuleId()));
                         }
                     }
                     *parentMatch5 = match;
@@ -4479,7 +4479,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"AssignmentStatementExpr");
                             #endif
-                            return Match(true, new AssignmentStatementNode(s, target.Release(), source.Release()));
+                            return Match(true, new AssignmentStatementNode(s, ctx->ModuleId(), target.Release(), source.Release()));
                         }
                     }
                     *parentMatch8 = match;
@@ -4624,7 +4624,7 @@ public static class StatementParser
                                 Match* parentMatch6 = &match;
                                 {
                                     System.Lex.Span span = lexer.GetSpan();
-                                    Match match = IdentifierParser.Identifier(lexer);
+                                    Match match = IdentifierParser.Identifier(lexer, ctx);
                                     id.Reset(cast<IdentifierNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -4643,7 +4643,7 @@ public static class StatementParser
                     }
                     if (match.hit)
                     {
-                        constructionStatement.Reset(new ConstructionStatementNode(span, type.Release(), id.Release()));
+                        constructionStatement.Reset(new ConstructionStatementNode(span, ctx->ModuleId(), type.Release(), id.Release()));
                     }
                     *parentMatch2 = match;
                 }
@@ -4972,7 +4972,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"DeleteStatement");
                             #endif
-                            return Match(true, new DeleteStatementNode(s, ptr.Release()));
+                            return Match(true, new DeleteStatementNode(s, ctx->ModuleId(), ptr.Release()));
                         }
                     }
                     *parentMatch6 = match;
@@ -5100,7 +5100,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"DestroyStatement");
                             #endif
-                            return Match(true, new DestroyStatementNode(s, ptr.Release()));
+                            return Match(true, new DestroyStatementNode(s, ctx->ModuleId(), ptr.Release()));
                         }
                     }
                     *parentMatch6 = match;
@@ -5222,7 +5222,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ExpressionStatement");
                             #endif
-                            return Match(true, new ExpressionStatementNode(s, expr.Release()));
+                            return Match(true, new ExpressionStatementNode(s, ctx->ModuleId(), expr.Release()));
                         }
                     }
                     else
@@ -5282,7 +5282,7 @@ public static class StatementParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"EmptyStatement");
                     #endif
-                    return Match(true, new EmptyStatementNode(span));
+                    return Match(true, new EmptyStatementNode(span, ctx->ModuleId()));
                 }
             }
             *parentMatch0 = match;
@@ -5406,7 +5406,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ThrowStatement");
                             #endif
-                            return Match(true, new ThrowStatementNode(s, exception.Release()));
+                            return Match(true, new ThrowStatementNode(s, ctx->ModuleId(), exception.Release()));
                         }
                     }
                     *parentMatch6 = match;
@@ -5492,7 +5492,7 @@ public static class StatementParser
                         }
                         if (match.hit)
                         {
-                            tryStatement.Reset(new TryStatementNode(span, tryBlock.Release()));
+                            tryStatement.Reset(new TryStatementNode(span, ctx->ModuleId(), tryBlock.Release()));
                         }
                         *parentMatch3 = match;
                     }
@@ -5725,7 +5725,7 @@ public static class StatementParser
                         long save = lexer.GetPos();
                         Match* parentMatch12 = &match;
                         {
-                            Match match = IdentifierParser.Identifier(lexer);
+                            Match match = IdentifierParser.Identifier(lexer, ctx);
                             catchId.Reset(cast<IdentifierNode*>(match.value));
                             if (match.hit)
                             {
@@ -5798,7 +5798,7 @@ public static class StatementParser
                     if (match.hit)
                     {
                         s.end = span.end;
-                        CatchNode* value = new CatchNode(s, catchType.Release(), catchId.Release(), catchBlock.Release());
+                        CatchNode* value = new CatchNode(s, ctx->ModuleId(), catchType.Release(), catchId.Release(), catchBlock.Release());
                         value->SetLeftParenSpan(leftParenSpan);
                         value->SetRightParenSpan(rightParenSpan);
                         {
@@ -5953,7 +5953,7 @@ public static class StatementParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"AssertStatement");
                             #endif
-                            return Match(true, new AssertStatementNode(s, expr.Release()));
+                            return Match(true, new AssertStatementNode(s, ctx->ModuleId(), expr.Release()));
                         }
                     }
                     *parentMatch8 = match;
@@ -6128,12 +6128,12 @@ public static class StatementParser
                                         {
                                             long pos = lexer.GetPos();
                                             Span span = lexer.GetSpan();
-                                            Match match = StatementParser.ConditionalCompilationExpression(lexer);
+                                            Match match = StatementParser.ConditionalCompilationExpression(lexer, ctx);
                                             ifExpr.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
                                             if (match.hit)
                                             {
                                                 s.end = span.end;
-                                                condCompStmt.Reset(new ConditionalCompilationStatementNode(s, ifExpr.Release()));
+                                                condCompStmt.Reset(new ConditionalCompilationStatementNode(s, ctx->ModuleId(), ifExpr.Release()));
                                                 condCompStmt->IfPart()->SetKeywordSpan(keywordSpan);
                                             }
                                             *parentMatch16 = match;
@@ -6362,11 +6362,11 @@ public static class StatementParser
                                                             {
                                                                 long pos = lexer.GetPos();
                                                                 Span span = lexer.GetSpan();
-                                                                Match match = StatementParser.ConditionalCompilationExpression(lexer);
+                                                                Match match = StatementParser.ConditionalCompilationExpression(lexer, ctx);
                                                                 elifExpr.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
                                                                 if (match.hit)
                                                                 {
-                                                                    condCompStmt->AddElifExpr(span, elifExpr.Release());
+                                                                    condCompStmt->AddElifExpr(span, ctx->ModuleId(), elifExpr.Release());
                                                                 }
                                                                 *parentMatch39 = match;
                                                             }
@@ -6566,7 +6566,7 @@ public static class StatementParser
                                                                 elseS.Reset(cast<StatementNode*>(match.value));
                                                                 if (match.hit)
                                                                 {
-                                                                    condCompStmt->AddElseStatement(span, elseS.Release());
+                                                                    condCompStmt->AddElseStatement(span, ctx->ModuleId(), elseS.Release());
                                                                 }
                                                                 *parentMatch58 = match;
                                                             }
@@ -6720,7 +6720,7 @@ public static class StatementParser
         }
         return match;
     }
-    public static Match ConditionalCompilationExpression(ParserFileLexer& lexer)
+    public static Match ConditionalCompilationExpression(ParserFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -6736,7 +6736,7 @@ public static class StatementParser
         Match* parentMatch0 = &match;
         {
             long pos = lexer.GetPos();
-            Match match = StatementParser.ConditionalCompilationDisjunction(lexer);
+            Match match = StatementParser.ConditionalCompilationDisjunction(lexer, ctx);
             disjunction.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
             if (match.hit)
             {
@@ -6768,7 +6768,7 @@ public static class StatementParser
         }
         return match;
     }
-    public static Match ConditionalCompilationDisjunction(ParserFileLexer& lexer)
+    public static Match ConditionalCompilationDisjunction(ParserFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -6798,7 +6798,7 @@ public static class StatementParser
                     {
                         long pos = lexer.GetPos();
                         Span span = lexer.GetSpan();
-                        Match match = StatementParser.ConditionalCompilationConjunction(lexer);
+                        Match match = StatementParser.ConditionalCompilationConjunction(lexer, ctx);
                         left.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
                         if (match.hit)
                         {
@@ -6845,12 +6845,12 @@ public static class StatementParser
                                                 {
                                                     long pos = lexer.GetPos();
                                                     Span span = lexer.GetSpan();
-                                                    Match match = StatementParser.ConditionalCompilationConjunction(lexer);
+                                                    Match match = StatementParser.ConditionalCompilationConjunction(lexer, ctx);
                                                     right.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        condCompExpr.Reset(new ConditionalCompilationDisjunctionNode(s, condCompExpr.Release(), right.Release()));
+                                                        condCompExpr.Reset(new ConditionalCompilationDisjunctionNode(s, ctx->ModuleId(), condCompExpr.Release(), right.Release()));
                                                     }
                                                     *parentMatch9 = match;
                                                 }
@@ -6908,7 +6908,7 @@ public static class StatementParser
         }
         return match;
     }
-    public static Match ConditionalCompilationConjunction(ParserFileLexer& lexer)
+    public static Match ConditionalCompilationConjunction(ParserFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -6938,7 +6938,7 @@ public static class StatementParser
                     {
                         long pos = lexer.GetPos();
                         Span span = lexer.GetSpan();
-                        Match match = StatementParser.ConditionalCompilationPrefix(lexer);
+                        Match match = StatementParser.ConditionalCompilationPrefix(lexer, ctx);
                         left.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
                         if (match.hit)
                         {
@@ -6985,12 +6985,12 @@ public static class StatementParser
                                                 {
                                                     long pos = lexer.GetPos();
                                                     Span span = lexer.GetSpan();
-                                                    Match match = StatementParser.ConditionalCompilationPrefix(lexer);
+                                                    Match match = StatementParser.ConditionalCompilationPrefix(lexer, ctx);
                                                     right.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        condCompExpr.Reset(new ConditionalCompilationConjunctionNode(s, condCompExpr.Release(), right.Release()));
+                                                        condCompExpr.Reset(new ConditionalCompilationConjunctionNode(s, ctx->ModuleId(), condCompExpr.Release(), right.Release()));
                                                     }
                                                     *parentMatch9 = match;
                                                 }
@@ -7048,7 +7048,7 @@ public static class StatementParser
         }
         return match;
     }
-    public static Match ConditionalCompilationPrefix(ParserFileLexer& lexer)
+    public static Match ConditionalCompilationPrefix(ParserFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -7106,12 +7106,12 @@ public static class StatementParser
                             {
                                 long pos = lexer.GetPos();
                                 Span span = lexer.GetSpan();
-                                Match match = StatementParser.ConditionalCompilationPrefix(lexer);
+                                Match match = StatementParser.ConditionalCompilationPrefix(lexer, ctx);
                                 prefix.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
                                 if (match.hit)
                                 {
                                     s.end = span.end;
-                                    condCompExpr.Reset(new ConditionalCompilationNotNode(s, prefix.Release()));
+                                    condCompExpr.Reset(new ConditionalCompilationNotNode(s, ctx->ModuleId(), prefix.Release()));
                                 }
                                 *parentMatch6 = match;
                             }
@@ -7134,7 +7134,7 @@ public static class StatementParser
                                 Match* parentMatch9 = &match;
                                 {
                                     System.Lex.Span span = lexer.GetSpan();
-                                    Match match = StatementParser.ConditionalCompilationPrimary(lexer);
+                                    Match match = StatementParser.ConditionalCompilationPrimary(lexer, ctx);
                                     primary.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -7188,7 +7188,7 @@ public static class StatementParser
         }
         return match;
     }
-    public static Match ConditionalCompilationPrimary(ParserFileLexer& lexer)
+    public static Match ConditionalCompilationPrimary(ParserFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -7223,7 +7223,7 @@ public static class StatementParser
                         #if (DEBUG)
                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ConditionalCompilationPrimary");
                         #endif
-                        return Match(true, new ConditionalCompilationPrimaryNode(span, symbol));
+                        return Match(true, new ConditionalCompilationPrimaryNode(span, ctx->ModuleId(), symbol));
                     }
                 }
                 *parentMatch1 = match;
@@ -7254,7 +7254,7 @@ public static class StatementParser
                             Match match(false);
                             Match* parentMatch5 = &match;
                             {
-                                Match match = StatementParser.ConditionalCompilationExpression(lexer);
+                                Match match = StatementParser.ConditionalCompilationExpression(lexer, ctx);
                                 expr.Reset(cast<ConditionalCompilationExpressionNode*>(match.value));
                                 *parentMatch5 = match;
                             }
@@ -7297,7 +7297,7 @@ public static class StatementParser
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ConditionalCompilationPrimary");
                                         #endif
-                                        return Match(true, new ParenthesizedConditionalCompilationExpressionNode(span, expr.Release()));
+                                        return Match(true, new ParenthesizedConditionalCompilationExpressionNode(span, ctx->ModuleId(), expr.Release()));
                                     }
                                 }
                                 *parentMatch7 = match;

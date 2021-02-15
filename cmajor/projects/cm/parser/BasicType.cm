@@ -4,13 +4,14 @@ using System.Lex;
 using System.Parsing;
 using System;
 using Cm.Ast;
+using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/BasicType.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/BasicType.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class BasicTypeParser
 {
-    public static Match BasicType(CmajorLexer& lexer)
+    public static Match BasicType(CmajorLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -33,7 +34,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new BoolNode(span));
+                    return Match(true, new BoolNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -44,7 +45,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new SByteNode(span));
+                    return Match(true, new SByteNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -55,7 +56,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new ByteNode(span));
+                    return Match(true, new ByteNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -66,7 +67,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new ShortNode(span));
+                    return Match(true, new ShortNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -77,7 +78,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new UShortNode(span));
+                    return Match(true, new UShortNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -88,7 +89,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new IntNode(span));
+                    return Match(true, new IntNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -99,7 +100,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new UIntNode(span));
+                    return Match(true, new UIntNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -110,7 +111,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new LongNode(span));
+                    return Match(true, new LongNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -121,7 +122,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new ULongNode(span));
+                    return Match(true, new ULongNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -132,7 +133,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new FloatNode(span));
+                    return Match(true, new FloatNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -143,7 +144,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new DoubleNode(span));
+                    return Match(true, new DoubleNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -154,7 +155,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new CharNode(span));
+                    return Match(true, new CharNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -165,7 +166,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new WCharNode(span));
+                    return Match(true, new WCharNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -176,7 +177,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new UCharNode(span));
+                    return Match(true, new UCharNode(span, ctx->ModuleId()));
                 }
                 break;
             }
@@ -187,7 +188,7 @@ public static class BasicTypeParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BasicType");
                     #endif
-                    return Match(true, new VoidNode(span));
+                    return Match(true, new VoidNode(span, ctx->ModuleId()));
                 }
                 break;
             }

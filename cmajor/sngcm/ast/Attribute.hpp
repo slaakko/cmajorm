@@ -5,61 +5,46 @@
 
 #ifndef SNGCM_AST_ATTRIBUTE_INCLUDED
 #define SNGCM_AST_ATTRIBUTE_INCLUDED
-#include <sngcm/ast/AstApi.hpp>
-#include <sngcm/ast/Visitor.hpp>
-#include <soulng/lexer/Span.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <stdexcept>
-#include <memory>
-#include <string>
-#include <map>
-#include <vector>
+#include <sngcm/ast/Node.hpp>
 
 namespace sngcm { namespace ast {
 
-using soulng::lexer::Span;
-class AstWriter;
-class AstReader;
-
-class SNGCM_AST_API Attribute
+class SNGCM_AST_API AttributeNode : public Node
 {
 public:
-    Attribute();
-    Attribute(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& name_, const std::u32string& value_);
-    Attribute(const Attribute&) = delete;
-    Attribute& operator=(const Attribute&) = delete;
-    const Span& GetSpan() const { return span; }
-    const boost::uuids::uuid& ModuleId() const { return moduleId; }
+    AttributeNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    AttributeNode(const Span& span_, const boost::uuids::uuid& moduleId_, const std::u32string& name_, const std::u32string& value_);
+    AttributeNode(const AttributeNode&) = delete;
+    AttributeNode& operator=(const AttributeNode&) = delete;
     const std::u32string& Name() const { return name; }
     const std::u32string& Value() const { return value; }
-    void Accept(Visitor& visitor);
-    void Write(AstWriter& writer);
-    void Read(AstReader& reader);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
 private:
-    Span span;
-    boost::uuids::uuid moduleId;
     std::u32string name;
     std::u32string value;
 };
 
-class SNGCM_AST_API Attributes
+class SNGCM_AST_API AttributesNode : public Node
 {
 public:
-    Attributes();
-    Attributes(const Attributes&) = delete;
-    Attributes& operator=(const Attributes&) = delete;
-    const std::vector<std::unique_ptr<Attribute>>& GetAttributes() const { return attributes; }
+    AttributesNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    AttributesNode(const AttributesNode&) = delete;
+    AttributesNode& operator=(const AttributesNode&) = delete;
+    const std::vector<std::unique_ptr<AttributeNode>>& GetAttributes() const { return attributes; }
     void AddAttribute(const Span& span, const boost::uuids::uuid& moduleId, const std::u32string& name);
     void AddAttribute(const Span& span, const boost::uuids::uuid& moduleId, const std::u32string& name, const std::u32string& value);
-    Attribute* GetAttribute(const std::u32string& name) const;
-    Attributes* Clone() const;
-    void Accept(Visitor& visitor);
-    void Write(AstWriter& writer);
-    void Read(AstReader& reader);
+    AttributeNode* GetAttribute(const std::u32string& name) const;
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
 private:
-    std::vector<std::unique_ptr<Attribute>> attributes;
-    std::map<std::u32string, Attribute*> attributeMap;
-    void AddAttribute(Attribute* attribute);
+    std::vector<std::unique_ptr<AttributeNode>> attributes;
+    std::map<std::u32string, AttributeNode*> attributeMap;
+    void AddAttribute(AttributeNode* attribute);
 };
 
 class AttributeNotUniqueException : public std::runtime_error

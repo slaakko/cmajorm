@@ -1,0 +1,214 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/nothrowparser/Constant.parser' using soulcm parser generator scmpg version 3.10.0
+
+public static class NothrowConstantParser
+{
+    public static nothrow Match Constant(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Constant");
+            }
+        #endif
+        Span s;
+        Span v;
+        UniquePtr<Node> e;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<Node> type;
+        UniquePtr<IdentifierNode> id;
+        UniquePtr<Node> expr;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Span span = lexer.GetSpan();
+                                    Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                    specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s = span;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    Match match(false);
+                                    if (*lexer == CONST)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch8 = &match;
+                            {
+                                Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                                type.Reset(cast<Node*>(match.value));
+                                *parentMatch8 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch9 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch10 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Span span = lexer.GetSpan();
+                                Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                                id.Reset(cast<IdentifierNode*>(match.value));
+                                if (match.hit)
+                                {
+                                    v = span;
+                                }
+                                *parentMatch10 = match;
+                            }
+                            *parentMatch9 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch11 = &match;
+                    {
+                        Match match(false);
+                        if (*lexer == ASSIGN)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        *parentMatch11 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch12 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch13 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = NothrowExpressionParser.Expression(lexer, ctx);
+                        expr.Reset(cast<Node*>(match.value));
+                        if (match.hit)
+                        {
+                            e.Reset(expr.Release());
+                        }
+                        *parentMatch13 = match;
+                    }
+                    *parentMatch12 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch14 = &match;
+            {
+                Match match(false);
+                Match* parentMatch15 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(false);
+                    if (*lexer == SEMICOLON)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        e->SetFullSpan();
+                        v.end = e->GetSpan().end;
+                        s.end = e->GetSpan().end;
+                        ConstantNode* value = new ConstantNode(s, ctx->ModuleId(), specifiers->value, type.Release(), id.Release(), e.Release());
+                        value->SetLexerFlags(lexer.Flags());
+                        value->SetStrValue(lexer.GetMatch(v));
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Constant");
+                            #endif
+                            return Match(true, value);
+                        }
+                    }
+                    *parentMatch15 = match;
+                }
+                *parentMatch14 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Constant");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Constant");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

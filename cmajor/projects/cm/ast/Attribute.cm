@@ -10,11 +10,11 @@ namespace Cm.Ast
     public class AttributeNode : Node
     {
         public suppress nothrow AttributeNode(const AttributeNode& );
-        public nothrow AttributeNode(const System.Lex.Span& span_) : base(NodeType.attributeNode, span_), name(), value()
+        public nothrow AttributeNode(const System.Lex.Span& span_, const Uuid& moduleId_) : base(NodeType.attributeNode, span_, moduleId_), name(), value()
         {
         }
-        public nothrow AttributeNode(const System.Lex.Span& span_, const ustring& name_, const ustring& value_) :
-            base(NodeType.attributeNode, span_), name(name_), value(value_)
+        public nothrow AttributeNode(const System.Lex.Span& span_, const Uuid& moduleId_, const ustring& name_, const ustring& value_) :
+            base(NodeType.attributeNode, span_, moduleId_), name(name_), value(value_)
         {
         }
         public suppress nothrow AttributeNode& operator=(const AttributeNode& );
@@ -28,7 +28,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new AttributeNode(GetSpan(), name, value);
+            return new AttributeNode(GetSpan(), ModuleId(), name, value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -52,7 +52,7 @@ namespace Cm.Ast
     public class AttributesNode : Node
     {
         public suppress nothrow AttributesNode(const AttributesNode& );
-        public nothrow AttributesNode(const System.Lex.Span& span_) : base(NodeType.attributesNode, span_)
+        public nothrow AttributesNode(const System.Lex.Span& span_, const Uuid& moduleId_) : base(NodeType.attributesNode, span_, moduleId_)
         {
         }
         public suppress nothrow AttributesNode& operator=(const AttributesNode& );
@@ -69,18 +69,18 @@ namespace Cm.Ast
             }
             return null;
         }
-        public void AddAttribute(const System.Lex.Span& span, const ustring& name)
+        public void AddAttribute(const System.Lex.Span& span, const Uuid& moduleId, const ustring& name)
         {
-            AddAttribute(span, name, u"true");
+            AddAttribute(span, moduleId, name, u"true");
         }
-        public void AddAttribute(const System.Lex.Span& span, const ustring& name, const ustring& value)
+        public void AddAttribute(const System.Lex.Span& span, const Uuid& moduleId, const ustring& name, const ustring& value)
         {
             AttributeNode* prev = GetAttribute(name);
             if (prev != null)
             {
                 throw AttributeNotUniqueException("attribute \'" + ToUtf8(name) + "\' not unique", span, prev->GetSpan());
             }
-            AttributeNode* attribute = new AttributeNode(span, name, value);
+            AttributeNode* attribute = new AttributeNode(span, moduleId, name, value);
             AddAttribute(attribute);
         }
         public void AddAttribute(AttributeNode* attribute)
@@ -90,10 +90,10 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            UniquePtr<AttributesNode> clone(new AttributesNode(GetSpan()));
+            UniquePtr<AttributesNode> clone(new AttributesNode(GetSpan(), ModuleId()));
             for (const UniquePtr<AttributeNode>& attribute : attributes)
             {
-                clone->AddAttribute(attribute->GetSpan(), attribute->Name(), attribute->Value());
+                clone->AddAttribute(attribute->GetSpan(), attribute->ModuleId(), attribute->Name(), attribute->Value());
             }
             return clone.Release();
         }
@@ -107,7 +107,7 @@ namespace Cm.Ast
             writer.GetBinaryWriter().WriteULEB128UInt(cast<uint>(attributes.Count()));
             for (const UniquePtr<AttributeNode>& attribute : attributes)
             {
-                attribute->Write(writer);
+                writer.Write(attribute.Get());
             }
         }
         public void Read(AstReader& reader)
@@ -116,8 +116,7 @@ namespace Cm.Ast
             uint n = reader.GetBinaryReader().ReadULEB128UInt();
             for (uint i = 0u; i < n; ++i)
             {
-                AttributeNode* attribute = new AttributeNode();
-                attribute->Read(reader);
+                AttributeNode* attribute = reader.ReadAttributeNode();
                 AddAttribute(attribute);
             }
         }

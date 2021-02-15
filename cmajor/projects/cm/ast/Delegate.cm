@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class DelegateNode : Node
     {
-        public nothrow DelegateNode(const System.Lex.Span& span_) :
-            base(NodeType.delegateNode, span_), specifiers(Specifiers.none), returnTypeExpr(), id(), parameters()
+        public nothrow DelegateNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.delegateNode, span_, moduleId_), specifiers(Specifiers.none), returnTypeExpr(), id(), parameters()
         {
         }
-        public nothrow DelegateNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_) :
-            base(NodeType.delegateNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), id(id_), parameters()
+        public nothrow DelegateNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_) :
+            base(NodeType.delegateNode, span_, moduleId_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), id(id_), parameters()
         {
             returnTypeExpr->SetParent(this);
             id->SetParent(this);
@@ -37,7 +37,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            DelegateNode* clone = new DelegateNode(GetSpan(), specifiers, returnTypeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)));
+            DelegateNode* clone = new DelegateNode(GetSpan(), ModuleId(), specifiers, returnTypeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)));
             int n = parameters.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -80,12 +80,12 @@ namespace Cm.Ast
     }
     public class ClassDelegateNode : Node
     {
-        public nothrow ClassDelegateNode(const System.Lex.Span& span_) :
-            base(NodeType.classDelegateNode, span_), specifiers(Specifiers.none), returnTypeExpr(), id(), parameters()
+        public nothrow ClassDelegateNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.classDelegateNode, span_, moduleId_), specifiers(Specifiers.none), returnTypeExpr(), id(), parameters()
         {
         }
-        public nothrow ClassDelegateNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_) :
-            base(NodeType.classDelegateNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), id(id_), parameters()
+        public nothrow ClassDelegateNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* id_) :
+            base(NodeType.classDelegateNode, span_, moduleId_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), id(id_), parameters()
         {
             returnTypeExpr->SetParent(this);
             id->SetParent(this);
@@ -108,7 +108,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ClassDelegateNode* clone = new ClassDelegateNode(GetSpan(), specifiers, returnTypeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)));
+            ClassDelegateNode* clone = new ClassDelegateNode(GetSpan(), ModuleId(), specifiers, returnTypeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)));
             int n = parameters.Count();
             for (int i = 0; i < n; ++i)
             {

@@ -1,0 +1,359 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Ast;
+using LexerFileTokens;
+
+parser LexExpressionParser
+{
+    uselexer LexerFileLexer;
+
+    using LexLiteralParser.Literal;
+    using LexBasicTypeParser.BasicType;
+    using LexTemplateParser.TemplateId;
+    using LexTypeExprParser.TypeExpr;
+    using LexIdentifierParser.Identifier;
+
+    Expression(ParsingContext* ctx) : Node*
+        ::= Equivalence(ctx):equivalence{ return equivalence; }
+        ;
+
+    Equivalence(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::=
+        (   Implication(ctx):left{ s = span; expr.Reset(left); }
+            (   EQUIVALENCE{ if (!ctx->parsingConcept || ctx->parsingTemplateId) pass = false; }
+                Implication(ctx):right!{ s.end = span.end; expr.Reset(new EquivalenceNode(s, ctx->ModuleId(), expr.Release(), right)); }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Implication(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::=
+        (   Disjunction(ctx):left{ s = span; expr.Reset(left); }
+            (   IMPLICATION{ if (!ctx->parsingConcept || ctx->parsingTemplateId) pass = false; }
+                Implication(ctx):right!{ s.end = span.end; expr.Reset(new ImplicationNode(s, ctx->ModuleId(), expr.Release(), right)); }
+            )?
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Disjunction(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::=
+        (   Conjunction(ctx):left{ s = span; expr.Reset(left); }
+            (   DISJUNCTION{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                Conjunction(ctx):right!{ s.end = span.end; expr.Reset(new DisjunctionNode(s, ctx->ModuleId(), expr.Release(), right)); }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Conjunction(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::=
+        (   BitOr(ctx):left{ s = span; expr.Reset(left); }
+            (   AMPAMP{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                BitOr(ctx):right!{ s.end = span.end; expr.Reset(new ConjunctionNode(s, ctx->ModuleId(), expr.Release(), right)); }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    BitOr(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::=
+        (   BitXor(ctx):left{ s = span; expr.Reset(left); }
+            (   BITOR{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                BitXor(ctx):right!{ s.end = span.end; expr.Reset(new BitOrNode(s, ctx->ModuleId(), expr.Release(), right)); }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    BitXor(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::=
+        (   BitAnd(ctx):left{ s = span; expr.Reset(left); }
+            (   BITXOR{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                BitAnd(ctx):right!{ s.end = span.end; expr.Reset(new BitXorNode(s, ctx->ModuleId(), expr.Release(), right)); }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    BitAnd(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::=
+        (   Equality(ctx):left{ s = span; expr.Reset(left); }
+            (   AMP{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                Equality(ctx):right!{ s.end = span.end; expr.Reset(new BitAndNode(s, ctx->ModuleId(), expr.Release(), right)); }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Equality(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Relational(ctx):left{ s = span; expr.Reset(left); }
+            (
+                (   EQ{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator.eq; }
+                |   NEQ{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator.neq; }
+                )
+                Relational(ctx):right!
+                {
+                    switch (op)
+                    {
+                        case Operator.eq: s.end = span.end; expr.Reset(new EqualNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.neq: s.end = span.end; expr.Reset(new NotEqualNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Relational(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Shift(ctx):left{ s = span; expr.Reset(left); }
+            (
+                (   LEQ{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator.lessOrEq; ctx->PushParsingIsOrAs(false); } }
+                |   GEQ{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator.greaterOrEq; ctx->PushParsingIsOrAs(false); } }
+                |   LANGLE{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator.less; ctx->PushParsingIsOrAs(false); } }
+                |   RANGLE{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator.greater; ctx->PushParsingIsOrAs(false); } }
+                |   IS{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator.is_; ctx->PushParsingIsOrAs(true); } }
+                    TypeExpr(ctx):isType
+                |   AS{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator.as_; ctx->PushParsingIsOrAs(true); } }
+                    TypeExpr(ctx):asType
+                )
+                (Shift(ctx):right | empty{ if (!ctx->parsingIsOrAs) pass = false; })
+                {
+                    ctx->PopParsingIsOrAs();
+                    switch (op)
+                    {
+                        case Operator.lessOrEq: s.end = span.end; expr.Reset(new LessOrEqualNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.greaterOrEq: s.end = span.end; expr.Reset(new GreaterOrEqualNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.less: s.end = span.end; expr.Reset(new LessNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.greater: s.end = span.end; expr.Reset(new GreaterNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.is_: s.end = span.end; expr.Reset(new IsNode(s, ctx->ModuleId(), expr.Release(), isType)); break;
+                        case Operator.as_: s.end = span.end; expr.Reset(new AsNode(s, ctx->ModuleId(), expr.Release(), asType)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Shift(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Additive(ctx):left{ s = span; expr.Reset(left); }
+            (
+                (   SHIFTLEFT{ if (ctx->parsingLvalue) pass = false; else op = Operator.shiftLeft; }
+                |   SHIFTRIGHT{ if (ctx->parsingLvalue) pass = false; else op = Operator.shiftRight; }
+                )
+                empty{ ctx->BeginParsingArguments(); } Additive(ctx):right!
+                {
+                    switch (op)
+                    {
+                        case Operator.shiftLeft: s.end = span.end; expr.Reset(new ShiftLeftNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.shiftRight: s.end = span.end; expr.Reset(new ShiftRightNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                    }
+                    ctx->EndParsingArguments();
+                }
+                /
+                {
+                    ctx->EndParsingArguments();
+                }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Additive(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Multiplicative(ctx):left{ s = span; expr.Reset(left); }
+            (
+                (   PLUS{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator.plus; }
+                |   MINUS{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator.minus; }
+                )
+                Multiplicative(ctx):right!
+                {
+                    switch (op)
+                    {
+                        case Operator.plus: s.end = span.end; expr.Reset(new AddNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.minus: s.end = span.end; expr.Reset(new SubNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Multiplicative(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Prefix(ctx):left{ s = span; expr.Reset(left); }
+            (
+                (   STAR{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator.mul; }
+                |   DIV{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator.div; }
+                |   REM{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator.rem; }
+                )
+                Prefix(ctx):right!
+                {
+                    switch (op)
+                    {
+                        case Operator.mul: s.end = span.end; expr.Reset(new MulNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.div: s.end = span.end;  expr.Reset(new DivNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.rem: s.end = span.end; expr.Reset(new RemNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Prefix(ParsingContext* ctx, var UniquePtr<Node> prefix, var Span s, var Operator op) : Node*
+        ::=
+        (   (   PLUSPLUS{ s = span; op = Operator.plusplus; }
+            |   MINUSMINUS{ s = span; op = Operator.minusminus; }
+            |   PLUS{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator.plus; } }
+            |   MINUS{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator.minus; } }
+            |   EXCLAMATION{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator.not_; } }
+            |   CPL{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator.complement; } }
+            |   STAR{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator.deref; } }
+            |   AMP{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator.addrOf; } }
+            )
+            Prefix(ctx):p
+            {
+                prefix.Reset(p);
+                s.end = span.end;
+                switch (op)
+                {
+                    case Operator.plusplus: return new PrefixIncrementNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.minusminus: return new PrefixDecrementNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.plus: return new UnaryPlusNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.minus: return new UnaryMinusNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.not_: return new NotNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.complement: return new ComplementNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.deref: return new DerefNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.addrOf: return new AddrOfNode(s, ctx->ModuleId(), prefix.Release());
+                }
+            }
+        |   Postfix(ctx):postfix{ return postfix; }
+        )
+        ;
+
+    Postfix(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::=
+        (   Primary(ctx):primary{ s = span; expr.Reset(primary); }
+            (   PLUSPLUS{ s.end = span.end; expr.Reset(new PostfixIncrementNode(s, ctx->ModuleId(), expr.Release())); }
+            |   MINUSMINUS{ s.end = span.end; expr.Reset(new PostfixDecrementNode(s, ctx->ModuleId(), expr.Release())); }
+            |   DOT Identifier(ctx):dotMember{ s.end = span.end; expr.Reset(new DotNode(s, ctx->ModuleId(), expr.Release(), dotMember)); }
+            |   ARROW Identifier(ctx):arrowMember{ s.end = span.end; expr.Reset(new ArrowNode(s, ctx->ModuleId(), expr.Release(), arrowMember)); }
+            |   LBRACKET{ ctx->PushParsingLvalue(false); ctx->PushParsingExpressionStatement(false); }
+                Expression(ctx):index{ ctx->PopParsingExpressionStatement(); ctx->PopParsingLvalue(); }
+                RBRACKET!{ s.end = span.end; expr.Reset(new IndexingNode(s, ctx->ModuleId(), expr.Release(), index)); }
+            |   LPAREN{ expr.Reset(new InvokeNode(s, ctx->ModuleId(), expr.Release())); } ArgumentList(ctx, expr.Get()):args RPAREN!{ expr->SetSpanEnd(span.end); }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Primary(ParsingContext* ctx, var Span s) : Node*
+        ::= (LPAREN{ s = span; } Expression(ctx):expr RPAREN{ s.end = span.end; }){ return new ParenthesizedExpressionNode(s, ctx->ModuleId(), expr); }
+        |   Literal(ctx):literal{ return literal; }
+        |   BasicType(ctx):basicType{ return basicType; }
+        |   TemplateId(ctx):templateId{ return templateId; }
+        |   Identifier(ctx):id{ return id; }
+        |   THIS{ return new ThisNode(span, ctx->ModuleId()); }
+        |   BASE{ return new BaseNode(span, ctx->ModuleId()); }
+        |   SizeOfExpr(ctx):sizeOf{ return sizeOf; }
+        |   TypeNameExpr(ctx):typeName{ return typeName; }
+        |   TypeIdExpr(ctx):typeId{ return typeId; }
+        |   CastExpr(ctx):castExpr{ return castExpr; }
+        |   ConstructExpr(ctx):constructExpr{ return constructExpr; }
+        |   NewExpr(ctx):newExpr{ return newExpr; }
+        ;
+
+    SizeOfExpr(ParsingContext* ctx, var Span s) : Node*
+        ::= (SIZEOF{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new SizeOfNode(s, ctx->ModuleId(), expr); }
+        ;
+
+    TypeNameExpr(ParsingContext* ctx, var Span s) : Node*
+        ::= (TYPENAME{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new TypeNameNode(s, ctx->ModuleId(), expr); }
+        ;
+
+    TypeIdExpr(ParsingContext* ctx, var Span s) : Node*
+        ::= (TYPEID{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new TypeIdNode(s, ctx->ModuleId(), expr); }
+        ;
+
+    CastExpr(ParsingContext* ctx, var Span s) : Node*
+        ::= (CAST{ s = span; } LANGLE! TypeExpr(ctx):typeExpr! RANGLE! LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new CastNode(s, ctx->ModuleId(), typeExpr, expr); }
+        ;
+
+    ConstructExpr(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::= (CONSTRUCT{ s = span; } LANGLE! TypeExpr(ctx):typeExpr! RANGLE!){ expr.Reset(new ConstructNode(s, ctx->ModuleId(), typeExpr)); } LPAREN! ExpressionList(ctx, expr.Get()):exprList! RPAREN!
+        {
+            expr->SetSpanEnd(span.end);
+            return expr.Release();
+        }
+        ;
+
+    NewExpr(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::= (NEW{ s = span; } TypeExpr(ctx):typeExpr!{ s.end = span.end; expr.Reset(new NewNode(s, ctx->ModuleId(), typeExpr)); } (LPAREN ArgumentList(ctx, expr.Get()):argList RPAREN{ expr->SetSpanEnd(span.end); })?)
+        {
+            return expr.Release();
+        }
+        ;
+
+    ArgumentList(ParsingContext* ctx, Node* node)
+        ::= (ExpressionList(ctx, node):exprList?)
+        ;
+
+    ExpressionList(ParsingContext* ctx, Node* node)
+        ::= empty{ ctx->BeginParsingArguments(); }
+        (   (Expression(ctx):arg{ node->AddArgument(arg); }) % COMMA){ ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
+        ;
+
+    InvokeExpr(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
+        ::= ((TemplateId(ctx):templateId{ s = span; expr.Reset(templateId); } | Identifier(ctx):id{ s = span; expr.Reset(id); })
+        (   DOT Identifier(ctx):dotMemberId!{ s.end = span.end; expr.Reset(new DotNode(s, ctx->ModuleId(), expr.Release(), dotMemberId)); }   )*
+        LPAREN{ expr.Reset(new InvokeNode(s, ctx->ModuleId(), expr.Release())); } ArgumentList(ctx, expr.Get()):argList RPAREN!{ expr->SetSpanEnd(span.end); })
+        {
+            return expr.Release();
+        }
+        ;
+
+    ruleinfo
+    {
+        (Expression, "expression"), (Equivalence, "equivalence expression"), (Implication, "implication expression"), (Disjunction, "disjunctive expression"),
+        (Conjunction, "conjunctive expression"), (BitOr, "bitwise or expression "),
+        (BitXor, "bitwise exclusive or expression"), (BitAnd, "bitwise and expression"), (Equality, "equality expression"), (Relational, "relational expression"),
+        (Shift, "shift expression"), (Additive, "additive expression"), (Multiplicative, "multiplicative expression"),
+        (Prefix, "prefix expression"), (Postfix, "postfix expression"), (Primary, "primary expression"), (SizeOfExpr, "sizeof expression"), (TypeNameExpr, "typename expression"),
+        (TypeIdExpr, "typeid expression"), (CastExpr, "cast expression"), (ConstructExpr, "construct expression"), (NewExpr, "new expression"),
+        (ArgumentList, "argument list"), (ExpressionList, "expression list"), (InvokeExpr, "invoke expression")
+    }
+}

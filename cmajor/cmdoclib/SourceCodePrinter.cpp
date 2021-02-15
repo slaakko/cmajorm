@@ -148,7 +148,7 @@ public:
     void Other(const std::u32string& token) override;
 
     void WriteSpecifiers(const Span& specifierSpan, Specifiers specifiers);
-    void WriteAttributes(Attributes* attributes);
+    void WriteAttributes(AttributesNode* attributes);
 
     void Visit(BoolNode& boolNode) override;
     void Visit(SByteNode& sbyteNode) override;
@@ -869,7 +869,7 @@ void SourceCodePrinter::WriteSpecifiers(const Span& specifierSpan, Specifiers sp
     }
 }
 
-void SourceCodePrinter::WriteAttributes(Attributes* attributes)
+void SourceCodePrinter::WriteAttributes(AttributesNode* attributes)
 {
     Other(U"[");
     int n = attributes->GetAttributes().size();
@@ -879,7 +879,7 @@ void SourceCodePrinter::WriteAttributes(Attributes* attributes)
         {
             Other(U", ");
         }
-        Attribute* attribute = attributes->GetAttributes()[i].get();
+        AttributeNode* attribute = attributes->GetAttributes()[i].get();
         MoveTo(attribute->GetSpan());
         Identifier(attribute->Name());
         if (!attribute->Value().empty())

@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -26,28 +26,28 @@ parser ParserFileParser
         ;
 
     Declaration(soulcm.scmpg.ParserFile* parserFile, ParsingContext* parsingContext)
-        ::= UsingDirective:usingDirective{ parserFile->AddUsingDirective(usingDirective); }
+        ::= UsingDirective(parsingContext):usingDirective{ parserFile->AddUsingDirective(usingDirective); }
         |   ParserDeclaration(parsingContext):parserDeclaration{ parserFile->AddParser(parserDeclaration); }
         ;
 
-    UsingDirective : Node*
-        ::= UsingAliasDirective:usingAlias{ return usingAlias; }
-        |   UsingNamespaceDirective:usingNs{ return usingNs; }
+    UsingDirective(ParsingContext* ctx) : Node*
+        ::= UsingAliasDirective(ctx):usingAlias{ return usingAlias; }
+        |   UsingNamespaceDirective(ctx):usingNs{ return usingNs; }
         ;
 
-    UsingAliasDirective(var Span s) : Node*
-        ::= USING{ s = span; } Identifier:id ASSIGN QualifiedId:qid! SEMICOLON!
+    UsingAliasDirective(ParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } Identifier(ctx):id ASSIGN QualifiedId(ctx):qid! SEMICOLON!
         {
             s.end = span.end;
-            return new AliasNode(s, id, qid);
+            return new AliasNode(s, ctx->ModuleId(), id, qid);
         }
         ;
 
-    UsingNamespaceDirective(var Span s) : Node*
-        ::= USING{ s = span; } QualifiedId:ns! SEMICOLON!
+    UsingNamespaceDirective(ParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } QualifiedId(ctx):ns! SEMICOLON!
         {
             s.end = span.end;
-            return new NamespaceImportNode(s, ns);
+            return new NamespaceImportNode(s, ctx->ModuleId(), ns);
         }
         ;
 
@@ -60,6 +60,8 @@ parser ParserFileParser
 
     Statement(soulcm.scmpg.GrammarParser* grammarParser, ParsingContext* parsingContext)
         ::= MainStatement(grammarParser):mainStatement
+        |   StartStatement(grammarParser):startStatement
+        |   NothrowStatement(grammarParser):nothrowStatement
         |   UsingStatement(grammarParser):usingStatement
         |   LexerStatement(grammarParser):lexerStatement
         |   RuleInfoStatement(grammarParser):ruleInfoStatement
@@ -68,6 +70,14 @@ parser ParserFileParser
 
     MainStatement(soulcm.scmpg.GrammarParser* grammarParser)
         ::= MAIN SEMICOLON!{ grammarParser->SetMain(); }
+        ;
+
+    StartStatement(soulcm.scmpg.GrammarParser* grammarParser)
+        ::= START SEMICOLON!{ grammarParser->SetStart(); }
+        ;
+
+    NothrowStatement(soulcm.scmpg.GrammarParser* grammarParser)
+        ::= NOTHROW SEMICOLON!{ grammarParser->SetNothrow(); }
         ;
 
     UsingStatement(soulcm.scmpg.GrammarParser* grammarParser)
@@ -108,8 +118,8 @@ parser ParserFileParser
         ;
 
     ParamOrVariable(ParsingContext* parsingContext) : soulcm.scmpg.Parameter*
-        ::= VAR TypeExpr(parsingContext):varType Identifier:varName{ return new soulcm.scmpg.Variable(varType, varName); }
-        |   TypeExpr(parsingContext):paramType Identifier:paramName{ return new soulcm.scmpg.Parameter(paramType, paramName); }
+        ::= VAR TypeExpr(parsingContext):varType Identifier(parsingContext):varName{ return new soulcm.scmpg.Variable(varType, varName); }
+        |   TypeExpr(parsingContext):paramType Identifier(parsingContext):paramName{ return new soulcm.scmpg.Parameter(paramType, paramName); }
         ;
 
     ReturnType(ParsingContext* parsingContext) : Node*
@@ -154,7 +164,7 @@ parser ParserFileParser
             (   STAR{ value.Reset(new soulcm.scmpg.KleeneParser(value.Release())); }
             |   PLUS{ value.Reset(new soulcm.scmpg.PositiveParser(value.Release())); }
             |   QUEST{ value.Reset(new soulcm.scmpg.OptionalParser(value.Release())); }
-            )?    
+            )?
         )
         {
             return value.Release();
@@ -171,7 +181,7 @@ parser ParserFileParser
             (
                 EXCLAMATION{ value.Reset(new soulcm.scmpg.ExpectationParser(value.Release())); }
             )?
-            (   
+            (
                 (
                     (CompoundStatement(parsingContext):successCode
                     (DIV CompoundStatement(parsingContext):failureCode)?){ value.Reset(new soulcm.scmpg.ActionParser(successCode, failureCode, value.Release())); }
@@ -184,7 +194,7 @@ parser ParserFileParser
         ;
 
     RuleCall(ParsingContext* parsingContext, var ustring ruleName, var UniquePtr<InvokeNode> invoke, var long nonterminalPos) : soulcm.scmpg.Parser*
-        ::= Nonterminal:nt{ ruleName = nt; nonterminalPos = pos; invoke.Reset(new InvokeNode(Span())); } 
+        ::= Nonterminal:nt{ ruleName = nt; nonterminalPos = pos; invoke.Reset(new InvokeNode(Span(), parsingContext->ModuleId())); }
             (LPAREN{ pass = NoWhiteSpaceBetweenTokens(lexer.GetToken(nonterminalPos), lexer.GetToken(pos)); }
             ExpressionList(parsingContext, invoke.Get()):args RPAREN)? COLON ID!
         {

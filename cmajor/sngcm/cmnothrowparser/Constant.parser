@@ -27,7 +27,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConstantParser
     using NothrowIdentifierParser.Identifier;
 
     Constant(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s, var Span v, var std::unique_ptr<Node> e) : ConstantNode*
-        ::= Specifiers:specifiers{ s = span; } CONST TypeExpr(moduleId, ctx):type! Identifier(moduleId):id!{ v = span; } ASSIGN Expression(moduleId, ctx):expr{ e.reset(expr); } SEMICOLON
+        ::= Specifiers:specifiers{ s = span; } CONST TypeExpr(moduleId, ctx):type Identifier(moduleId):id{ v = span; } ASSIGN Expression(moduleId, ctx):expr{ e.reset(expr); } SEMICOLON
         {
             e->SetFullSpan();
             v.end = e->GetSpan().end;

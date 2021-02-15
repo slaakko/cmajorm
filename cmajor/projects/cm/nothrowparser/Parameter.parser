@@ -1,0 +1,31 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowParameterParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowIdentifierParser.Identifier;
+
+    ParameterList(NothrowParsingContext* ctx, Node* owner)
+        ::= LPAREN (Parameter(ctx):param{ owner->AddParameter(param); } % COMMA)? RPAREN!
+        ;
+
+    Parameter(NothrowParsingContext* ctx, var Span s) : ParameterNode*
+        ::= (TypeExpr(ctx):type{ s = span; } (Identifier(ctx):id{ s.end = span.end; })?)
+        {
+            ParameterNode* node = new ParameterNode(s, ctx->ModuleId(), type, id);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+}

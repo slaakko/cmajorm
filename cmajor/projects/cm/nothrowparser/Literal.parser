@@ -1,0 +1,118 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowLiteralParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+    using NothrowExpressionParser.Expression;
+
+    Literal(NothrowParsingContext* ctx) : LiteralNode*
+        ::= SimpleLiteral(ctx):simpleLiteral{ return simpleLiteral; }
+        |   ComplexLiteral(ctx):complexLiteral{ return complexLiteral; }
+        ;
+
+    SimpleLiteral(NothrowParsingContext* ctx) : LiteralNode*
+        ::= TRUE
+        {
+            LiteralNode* value = new BooleanLiteralNode(span, ctx->ModuleId(), true);
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        |   FALSE
+        {
+            LiteralNode* value = new BooleanLiteralNode(span, ctx->ModuleId(), false);
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        |   FLOATINGLIT
+        {
+            if (!Cm.NothrowLexer.ParseFloatingLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.floatingLit, lexer.floatingLitFloat)) pass = false;
+            else
+            {
+                LiteralNode* value = CreateFloatingLiteralNode(span, ctx->ModuleId(), lexer.floatingLit, lexer.floatingLitFloat);
+                value->SetText(lexer.GetMatch(span));
+                value->SetLexerFlags(lexer.Flags());
+                return value;
+            }
+        }
+        |   INTLIT
+        {
+            if (!Cm.NothrowLexer.ParseIntegerLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.intLit, lexer.intLitUnsigned)) pass = false;
+            else
+            {
+                LiteralNode* value = CreateIntegerLiteralNode(span, ctx->ModuleId(), lexer.intLit, lexer.intLitUnsigned);
+                value->SetText(lexer.GetMatch(span));
+                value->SetLexerFlags(lexer.Flags());
+                return value;
+            }
+        }
+        |   CHARLIT
+        {
+            if (!Cm.NothrowLexer.ParseCharacterLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.chrLit, lexer.chrLitPrefix)) pass = false;
+            else
+            {
+                LiteralNode* value = CreateCharacterLiteralNode(span, ctx->ModuleId(), lexer.chrLit, lexer.chrLitPrefix);
+                value->SetText(lexer.GetMatch(span));
+                value->SetLexerFlags(lexer.Flags());
+                return value;
+            }
+        }
+        |   STRINGLIT
+        {
+            if (!Cm.NothrowLexer.ParseStringLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix)) pass = false;
+            else
+            {
+                LiteralNode* value = CreateStringLiteralNode(span, ctx->ModuleId(), lexer.strLit, lexer.strLitPrefix);
+                value->SetText(lexer.GetMatch(span));
+                value->SetLexerFlags(lexer.Flags());
+                return value;
+            }
+        }
+        |   NULLLIT
+        {
+            LiteralNode* value = new NullLiteralNode(span, ctx->ModuleId());
+            value->SetText(lexer.GetMatch(span));
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+
+    ComplexLiteral(NothrowParsingContext* ctx) : LiteralNode*
+        ::= ArrayLiteral(ctx):arrayLiteral{ return arrayLiteral; }
+        |   StructuredLiteral(ctx):structuredLiteral{ return structuredLiteral; }
+        ;
+
+    ArrayLiteral(NothrowParsingContext* ctx, var UniquePtr<ArrayLiteralNode> arrayLiteral) : ArrayLiteralNode*
+        ::=
+        (   LBRACKET{ arrayLiteral.Reset(new ArrayLiteralNode(span, ctx->ModuleId())); }
+            (Expression(ctx):expr{ arrayLiteral->AddValue(expr); } % COMMA)?
+            RBRACKET!
+        )
+        {
+            arrayLiteral->SetLexerFlags(lexer.Flags());
+            return arrayLiteral.Release();
+        }
+        ;
+
+    StructuredLiteral(NothrowParsingContext* ctx, var UniquePtr<StructuredLiteralNode> structuredLiteral) : StructuredLiteralNode*
+        ::=
+        (   LBRACE{ structuredLiteral.Reset(new StructuredLiteralNode(span, ctx->ModuleId())); }
+            (Expression(ctx):expr{ structuredLiteral->AddMember(expr); } % COMMA)?
+            RBRACE!
+        )
+        {
+            structuredLiteral->SetLexerFlags(lexer.Flags());
+            return structuredLiteral.Release();
+        }
+        ;
+}

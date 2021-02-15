@@ -8,7 +8,7 @@ using Cm.Lexer;
 using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/Template.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/Template.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class TemplateParser
 {
@@ -66,11 +66,11 @@ public static class TemplateParser
                                 {
                                     long pos = lexer.GetPos();
                                     Span span = lexer.GetSpan();
-                                    Match match = IdentifierParser.QualifiedId(lexer);
+                                    Match match = IdentifierParser.QualifiedId(lexer, ctx);
                                     primary.Reset(cast<IdentifierNode*>(match.value));
                                     if (match.hit)
                                     {
-                                        templateId.Reset(new TemplateIdNode(span, primary.Release()));
+                                        templateId.Reset(new TemplateIdNode(span, ctx->ModuleId(), primary.Release()));
                                     }
                                     *parentMatch7 = match;
                                 }
@@ -302,7 +302,7 @@ public static class TemplateParser
         Match match(false);
         Match* parentMatch0 = &match;
         {
-            Match match = IdentifierParser.Identifier(lexer);
+            Match match = IdentifierParser.Identifier(lexer, ctx);
             id.Reset(cast<IdentifierNode*>(match.value));
             *parentMatch0 = match;
         }
@@ -367,7 +367,7 @@ public static class TemplateParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TemplateParameter");
                             #endif
-                            return Match(true, new TemplateParameterNode(span, id.Release(), defaultTemplateArg.Release()));
+                            return Match(true, new TemplateParameterNode(span, ctx->ModuleId(), id.Release(), defaultTemplateArg.Release()));
                         }
                     }
                     *parentMatch2 = match;

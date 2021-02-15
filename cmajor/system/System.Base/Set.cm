@@ -9,7 +9,7 @@ using System.IO;
 
 namespace System.Collections
 {
-    public class Set<T, C = Less<T>> 
+    public class Set<T, C = Less<T>>
         where T is Semiregular and C is Relation and C.Domain is T
     {
         public typedef T ValueType;
@@ -20,7 +20,7 @@ namespace System.Collections
         private typedef Set<ValueType, Compare> Self;
         private typedef RedBlackTree<KeyType, ValueType, Identity<ValueType>, Compare> TreeType;
 
-        public inline nothrow Iterator Begin() 
+        public inline nothrow Iterator Begin()
         {
             return tree.Begin();
         }
@@ -32,7 +32,7 @@ namespace System.Collections
         {
             return tree.CBegin();
         }
-        public inline nothrow Iterator End() 
+        public inline nothrow Iterator End()
         {
             return tree.End();
         }
@@ -68,7 +68,19 @@ namespace System.Collections
         {
             return tree.CFind(key);
         }
-        public inline Pair<Iterator, bool> Insert(const ValueType& value) 
+        public inline nothrow Iterator LowerBound(const KeyType& key)
+        {
+            return tree.LowerBound(key);
+        }
+        public inline nothrow ConstIterator LowerBound(const KeyType& key) const
+        {
+            return tree.CLowerBound(key);
+        }
+        public inline nothrow ConstIterator CLowerBound(const KeyType& key) const
+        {
+            return tree.CLowerBound(key);
+        }
+        public inline Pair<Iterator, bool> Insert(const ValueType& value)
             where T is Copyable
         {
             return tree.Insert(value);
@@ -84,13 +96,13 @@ namespace System.Collections
         private TreeType tree;
     }
 
-    public inline nothrow bool operator==<T, C>(const Set<T, C>& left, const Set<T, C>& right) 
+    public inline nothrow bool operator==<T, C>(const Set<T, C>& left, const Set<T, C>& right)
         where T is Regular and C is Relation and C.Domain is T
     {
         return left.Count() == right.Count() && Equal(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), EqualTo<T>());
     }
 
-    public inline nothrow bool operator<<T, C>(const Set<T, C>& left, const Set<T, C>& right) 
+    public inline nothrow bool operator<<T, C>(const Set<T, C>& left, const Set<T, C>& right)
         where T is Semiregular and C is Relation and C.Domain is T
     {
         return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), C());

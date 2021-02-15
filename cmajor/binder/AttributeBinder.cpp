@@ -25,17 +25,17 @@ AttributeProcessor::~AttributeProcessor()
 {
 }
 
-void AttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
+void AttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbol)
 {
     throw Exception("attribute '" + ToUtf8(attribute->Name()) + "' for symbol type '" + symbol->TypeString() + "' not supported", attribute->GetSpan(), attribute->ModuleId(), 
         symbol->GetSpan(), symbol->SourceModuleId());
 }
 
-void AttributeProcessor::GenerateSymbols(Attribute* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void AttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
 }
 
-void AttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol* symbol, StatementBinder* statementBinder)
+void AttributeProcessor::GenerateImplementation(AttributeNode* attribute, Symbol* symbol, StatementBinder* statementBinder)
 {
 }
 
@@ -55,11 +55,11 @@ AttributeBinder::AttributeBinder(Module* module)
     }
 }
 
-void AttributeBinder::BindAttributes(Attributes* attrs, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void AttributeBinder::BindAttributes(AttributesNode* attrs, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     if (!attrs) return;
-    const std::vector<std::unique_ptr<Attribute>>& attributes = attrs->GetAttributes();
-    for (const std::unique_ptr<Attribute>& attribute : attributes)
+    const std::vector<std::unique_ptr<AttributeNode>>& attributes = attrs->GetAttributes();
+    for (const std::unique_ptr<AttributeNode>& attribute : attributes)
     {
         const std::u32string& attrName = attribute->Name();
         auto it = attributeProcessorMap.find(attrName);
@@ -74,14 +74,15 @@ void AttributeBinder::BindAttributes(Attributes* attrs, Symbol* symbol, BoundCom
             throw Exception("unknown attribute '" + ToUtf8(attrName) + "'", attribute->GetSpan(), attribute->ModuleId());
         }
     }
-    symbol->SetAttributes(std::unique_ptr<Attributes>(attrs->Clone()));
+    CloneContext cloneContext;
+    symbol->SetAttributes(std::unique_ptr<AttributesNode>(static_cast<AttributesNode*>(attrs->Clone(cloneContext))));
 }
 
-void AttributeBinder::GenerateImplementation(Attributes* attrs, Symbol* symbol, StatementBinder* statementBinder)
+void AttributeBinder::GenerateImplementation(AttributesNode* attrs, Symbol* symbol, StatementBinder* statementBinder)
 {
     if (!attrs) return;
-    const std::vector<std::unique_ptr<Attribute>>& attributes = attrs->GetAttributes();
-    for (const std::unique_ptr<Attribute>& attribute : attributes)
+    const std::vector<std::unique_ptr<AttributeNode>>& attributes = attrs->GetAttributes();
+    for (const std::unique_ptr<AttributeNode>& attribute : attributes)
     {
         const std::u32string& attrName = attribute->Name();
         auto it = attributeProcessorMap.find(attrName);

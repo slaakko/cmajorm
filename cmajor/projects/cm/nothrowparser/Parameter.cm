@@ -1,0 +1,308 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/nothrowparser/Parameter.parser' using soulcm parser generator scmpg version 3.10.0
+
+public static class NothrowParameterParser
+{
+    public static nothrow Match ParameterList(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx, Node* owner)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ParameterList");
+            }
+        #endif
+        UniquePtr<ParameterNode> param;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                if (*lexer == LPAREN)
+                {
+                    ++lexer;
+                    match.hit = true;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(true);
+                    long save = lexer.GetPos();
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowParameterParser.Parameter(lexer, ctx);
+                                    param.Reset(cast<ParameterNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        owner->AddParameter(param.Release());
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    Match match(true);
+                                    Match* parentMatch8 = &match;
+                                    {
+                                        while (true)
+                                        {
+                                            long save = lexer.GetPos();
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch9 = &match;
+                                                {
+                                                    Match match(false);
+                                                    if (*lexer == COMMA)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch10 = &match;
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch11 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match = NothrowParameterParser.Parameter(lexer, ctx);
+                                                            param.Reset(cast<ParameterNode*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                owner->AddParameter(param.Release());
+                                                            }
+                                                            *parentMatch11 = match;
+                                                        }
+                                                        *parentMatch10 = match;
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    *parentMatch8 = match;
+                                                }
+                                                else
+                                                {
+                                                    lexer.SetPos(save);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch3 = match;
+                        }
+                        else
+                        {
+                            lexer.SetPos(save);
+                        }
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch12 = &match;
+            {
+                Match match(true);
+                Match* parentMatch13 = &match;
+                {
+                    System.Lex.Span span = lexer.GetSpan();
+                    Match match(false);
+                    if (*lexer == RPAREN)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        *parentMatch13 = match;
+                    }
+                    else
+                    {
+                        match.hit = true;
+                        *parentMatch13 = match;
+                        lexer.AddError(span, GetTokenName(RPAREN));
+                    }
+                }
+                *parentMatch12 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ParameterList");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ParameterList");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match Parameter(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Parameter");
+            }
+        #endif
+        Span s;
+        UniquePtr<Node> type;
+        UniquePtr<IdentifierNode> id;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Span span = lexer.GetSpan();
+                        Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                        type.Reset(cast<Node*>(match.value));
+                        if (match.hit)
+                        {
+                            s = span;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(true);
+                        long save = lexer.GetPos();
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Span span = lexer.GetSpan();
+                                    Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                                    id.Reset(cast<IdentifierNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s.end = span.end;
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch5 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                            }
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                ParameterNode* node = new ParameterNode(s, ctx->ModuleId(), type.Release(), id.Release());
+                node->SetLexerFlags(lexer.Flags());
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Parameter");
+                    #endif
+                    return Match(true, node);
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Parameter");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Parameter");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

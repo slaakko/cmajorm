@@ -10,22 +10,22 @@ parser BasicTypeParser
 {
     uselexer ParserFileLexer;
 
-    BasicType : Node*
-        ::= BOOL{ return new BoolNode(span); }
-        |   SBYTE{ return new SByteNode(span); }
-        |   BYTE{ return new ByteNode(span); }
-        |   SHORT{ return new ShortNode(span); }
-        |   USHORT{ return new UShortNode(span); }
-        |   INT{ return new IntNode(span); }
-        |   UINT{ return new UIntNode(span); }
-        |   LONG{ return new LongNode(span); }
-        |   ULONG{ return new ULongNode(span); }
-        |   FLOAT{ return new FloatNode(span); }
-        |   DOUBLE{ return new DoubleNode(span); }
-        |   CHAR{ return new CharNode(span); }
-        |   WCHAR{ return new WCharNode(span); }
-        |   UCHAR{ return new UCharNode(span); }
-        |   VOID{ return new VoidNode(span); }
+    BasicType(ParsingContext* ctx) : Node*
+        ::= BOOL{ return new BoolNode(span, ctx->ModuleId()); }
+        |   SBYTE{ return new SByteNode(span, ctx->ModuleId()); }
+        |   BYTE{ return new ByteNode(span, ctx->ModuleId()); }
+        |   SHORT{ return new ShortNode(span, ctx->ModuleId()); }
+        |   USHORT{ return new UShortNode(span, ctx->ModuleId()); }
+        |   INT{ return new IntNode(span, ctx->ModuleId()); }
+        |   UINT{ return new UIntNode(span, ctx->ModuleId()); }
+        |   LONG{ return new LongNode(span, ctx->ModuleId()); }
+        |   ULONG{ return new ULongNode(span, ctx->ModuleId()); }
+        |   FLOAT{ return new FloatNode(span, ctx->ModuleId()); }
+        |   DOUBLE{ return new DoubleNode(span, ctx->ModuleId()); }
+        |   CHAR{ return new CharNode(span, ctx->ModuleId()); }
+        |   WCHAR{ return new WCharNode(span, ctx->ModuleId()); }
+        |   UCHAR{ return new UCharNode(span, ctx->ModuleId()); }
+        |   VOID{ return new VoidNode(span, ctx->ModuleId()); }
         ;
 
     ruleinfo

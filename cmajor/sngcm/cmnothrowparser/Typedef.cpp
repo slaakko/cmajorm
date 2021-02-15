@@ -76,23 +76,8 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
                 soulng::parser::Match match(false);
                 soulng::parser::Match* parentMatch6 = &match;
                 {
-                    soulng::parser::Match match(true);
-                    soulng::parser::Match* parentMatch7 = &match;
-                    {
-                        soulng::lexer::Span span = lexer.GetSpan();
-                        soulng::parser::Match match = NothrowTypeExprParser::TypeExpr(lexer, moduleId, ctx);
-                        type.reset(static_cast<sngcm::ast::Node*>(match.value));
-                        if (match.hit)
-                        {
-                            *parentMatch7 = match;
-                        }
-                        else
-                        {
-                            match.hit = true;
-                            *parentMatch7 = match;
-                            lexer.AddError(span, U"type expression");
-                        }
-                    }
+                    soulng::parser::Match match = NothrowTypeExprParser::TypeExpr(lexer, moduleId, ctx);
+                    type.reset(static_cast<sngcm::ast::Node*>(match.value));
                     *parentMatch6 = match;
                 }
                 *parentMatch2 = match;
@@ -102,26 +87,11 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
         if (match.hit)
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch8 = &match;
+            soulng::parser::Match* parentMatch7 = &match;
             {
-                soulng::parser::Match match(true);
-                soulng::parser::Match* parentMatch9 = &match;
-                {
-                    soulng::lexer::Span span = lexer.GetSpan();
-                    soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
-                    id.reset(static_cast<IdentifierNode*>(match.value));
-                    if (match.hit)
-                    {
-                        *parentMatch9 = match;
-                    }
-                    else
-                    {
-                        match.hit = true;
-                        *parentMatch9 = match;
-                        lexer.AddError(span, U"identifier");
-                    }
-                }
-                *parentMatch8 = match;
+                soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+                id.reset(static_cast<IdentifierNode*>(match.value));
+                *parentMatch7 = match;
             }
             *parentMatch1 = match;
         }
@@ -130,15 +100,15 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch10 = &match;
+        soulng::parser::Match* parentMatch8 = &match;
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch11 = &match;
+            soulng::parser::Match* parentMatch9 = &match;
             {
                 int64_t pos = lexer.GetPos();
                 soulng::lexer::Span span = lexer.GetSpan();
                 soulng::parser::Match match(true);
-                soulng::parser::Match* parentMatch12 = &match;
+                soulng::parser::Match* parentMatch10 = &match;
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
                     soulng::parser::Match match(false);
@@ -149,12 +119,12 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
                     }
                     if (match.hit)
                     {
-                        *parentMatch12 = match;
+                        *parentMatch10 = match;
                     }
                     else
                     {
                         match.hit = true;
-                        *parentMatch12 = match;
+                        *parentMatch10 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }
                 }
@@ -170,9 +140,9 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
                         return soulng::parser::Match(true, node);
                     }
                 }
-                *parentMatch11 = match;
+                *parentMatch9 = match;
             }
-            *parentMatch10 = match;
+            *parentMatch8 = match;
         }
         *parentMatch0 = match;
     }

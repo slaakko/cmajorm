@@ -24,7 +24,7 @@ parser ExpressionParser
         ::=
         (   Implication(ctx):left{ s = span; expr.Reset(left); }
             (   EQUIVALENCE{ if (!ctx->parsingConcept || ctx->parsingTemplateId) pass = false; }
-                Implication(ctx):right!{ s.end = span.end; expr.Reset(new EquivalenceNode(s, expr.Release(), right)); }
+                Implication(ctx):right!{ s.end = span.end; expr.Reset(new EquivalenceNode(s, ctx->ModuleId(), expr.Release(), right)); }
             )*
         )
         {
@@ -36,7 +36,7 @@ parser ExpressionParser
         ::=
         (   Disjunction(ctx):left{ s = span; expr.Reset(left); }
             (   IMPLICATION{ if (!ctx->parsingConcept || ctx->parsingTemplateId) pass = false; }
-                Implication(ctx):right!{ s.end = span.end; expr.Reset(new ImplicationNode(s, expr.Release(), right)); }
+                Implication(ctx):right!{ s.end = span.end; expr.Reset(new ImplicationNode(s, ctx->ModuleId(), expr.Release(), right)); }
             )?
         )
         {
@@ -48,7 +48,7 @@ parser ExpressionParser
         ::=
         (   Conjunction(ctx):left{ s = span; expr.Reset(left); }
             (   DISJUNCTION{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
-                Conjunction(ctx):right!{ s.end = span.end; expr.Reset(new DisjunctionNode(s, expr.Release(), right)); }
+                Conjunction(ctx):right!{ s.end = span.end; expr.Reset(new DisjunctionNode(s, ctx->ModuleId(), expr.Release(), right)); }
             )*
         )
         {
@@ -60,7 +60,7 @@ parser ExpressionParser
         ::=
         (   BitOr(ctx):left{ s = span; expr.Reset(left); }
             (   AMPAMP{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
-                BitOr(ctx):right!{ s.end = span.end; expr.Reset(new ConjunctionNode(s, expr.Release(), right)); }
+                BitOr(ctx):right!{ s.end = span.end; expr.Reset(new ConjunctionNode(s, ctx->ModuleId(), expr.Release(), right)); }
             )*
         )
         {
@@ -72,7 +72,7 @@ parser ExpressionParser
         ::=
         (   BitXor(ctx):left{ s = span; expr.Reset(left); }
             (   BITOR{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
-                BitXor(ctx):right!{ s.end = span.end; expr.Reset(new BitOrNode(s, expr.Release(), right)); }
+                BitXor(ctx):right!{ s.end = span.end; expr.Reset(new BitOrNode(s, ctx->ModuleId(), expr.Release(), right)); }
             )*
         )
         {
@@ -84,7 +84,7 @@ parser ExpressionParser
         ::=
         (   BitAnd(ctx):left{ s = span; expr.Reset(left); }
             (   BITXOR{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
-                BitAnd(ctx):right!{ s.end = span.end; expr.Reset(new BitXorNode(s, expr.Release(), right)); }
+                BitAnd(ctx):right!{ s.end = span.end; expr.Reset(new BitXorNode(s, ctx->ModuleId(), expr.Release(), right)); }
             )*
         )
         {
@@ -96,7 +96,7 @@ parser ExpressionParser
         ::=
         (   Equality(ctx):left{ s = span; expr.Reset(left); }
             (   AMP{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
-                Equality(ctx):right!{ s.end = span.end; expr.Reset(new BitAndNode(s, expr.Release(), right)); }
+                Equality(ctx):right!{ s.end = span.end; expr.Reset(new BitAndNode(s, ctx->ModuleId(), expr.Release(), right)); }
             )*
         )
         {
@@ -115,8 +115,8 @@ parser ExpressionParser
                 {
                     switch (op)
                     {
-                        case Operator.eq: s.end = span.end; expr.Reset(new EqualNode(s, expr.Release(), right)); break;
-                        case Operator.neq: s.end = span.end; expr.Reset(new NotEqualNode(s, expr.Release(), right)); break; 
+                        case Operator.eq: s.end = span.end; expr.Reset(new EqualNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.neq: s.end = span.end; expr.Reset(new NotEqualNode(s, ctx->ModuleId(), expr.Release(), right)); break;
                     }
                 }
             )*
@@ -144,12 +144,12 @@ parser ExpressionParser
                     ctx->PopParsingIsOrAs();
                     switch (op)
                     {
-                        case Operator.lessOrEq: s.end = span.end; expr.Reset(new LessOrEqualNode(s, expr.Release(), right)); break;
-                        case Operator.greaterOrEq: s.end = span.end; expr.Reset(new GreaterOrEqualNode(s, expr.Release(), right)); break;
-                        case Operator.less: s.end = span.end; expr.Reset(new LessNode(s, expr.Release(), right)); break;
-                        case Operator.greater: s.end = span.end; expr.Reset(new GreaterNode(s, expr.Release(), right)); break;
-                        case Operator.is_: s.end = span.end; expr.Reset(new IsNode(s, expr.Release(), isType)); break;
-                        case Operator.as_: s.end = span.end; expr.Reset(new AsNode(s, expr.Release(), asType)); break;
+                        case Operator.lessOrEq: s.end = span.end; expr.Reset(new LessOrEqualNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.greaterOrEq: s.end = span.end; expr.Reset(new GreaterOrEqualNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.less: s.end = span.end; expr.Reset(new LessNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.greater: s.end = span.end; expr.Reset(new GreaterNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.is_: s.end = span.end; expr.Reset(new IsNode(s, ctx->ModuleId(), expr.Release(), isType)); break;
+                        case Operator.as_: s.end = span.end; expr.Reset(new AsNode(s, ctx->ModuleId(), expr.Release(), asType)); break;
                     }
                 }
             )*
@@ -170,8 +170,8 @@ parser ExpressionParser
                 {
                     switch (op)
                     {
-                        case Operator.shiftLeft: s.end = span.end; expr.Reset(new ShiftLeftNode(s, expr.Release(), right)); break;
-                        case Operator.shiftRight: s.end = span.end; expr.Reset(new ShiftRightNode(s, expr.Release(), right)); break;
+                        case Operator.shiftLeft: s.end = span.end; expr.Reset(new ShiftLeftNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.shiftRight: s.end = span.end; expr.Reset(new ShiftRightNode(s, ctx->ModuleId(), expr.Release(), right)); break;
                     }
                     ctx->EndParsingArguments();
                 }
@@ -197,8 +197,8 @@ parser ExpressionParser
                 {
                     switch (op)
                     {
-                        case Operator.plus: s.end = span.end; expr.Reset(new AddNode(s, expr.Release(), right)); break;
-                        case Operator.minus: s.end = span.end; expr.Reset(new SubNode(s, expr.Release(), right)); break;
+                        case Operator.plus: s.end = span.end; expr.Reset(new AddNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.minus: s.end = span.end; expr.Reset(new SubNode(s, ctx->ModuleId(), expr.Release(), right)); break;
                     }
                 }
             )*
@@ -220,9 +220,9 @@ parser ExpressionParser
                 {
                     switch (op)
                     {
-                        case Operator.mul: s.end = span.end; expr.Reset(new MulNode(s, expr.Release(), right)); break;
-                        case Operator.div: s.end = span.end;  expr.Reset(new DivNode(s, expr.Release(), right)); break;
-                        case Operator.rem: s.end = span.end; expr.Reset(new RemNode(s, expr.Release(), right)); break;
+                        case Operator.mul: s.end = span.end; expr.Reset(new MulNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.div: s.end = span.end;  expr.Reset(new DivNode(s, ctx->ModuleId(), expr.Release(), right)); break;
+                        case Operator.rem: s.end = span.end; expr.Reset(new RemNode(s, ctx->ModuleId(), expr.Release(), right)); break;
                     }
                 }
             )*
@@ -249,14 +249,14 @@ parser ExpressionParser
                 s.end = span.end;
                 switch (op)
                 {
-                    case Operator.plusplus: return new PrefixIncrementNode(s, prefix.Release());
-                    case Operator.minusminus: return new PrefixDecrementNode(s, prefix.Release());
-                    case Operator.plus: return new UnaryPlusNode(s, prefix.Release());
-                    case Operator.minus: return new UnaryMinusNode(s, prefix.Release());
-                    case Operator.not_: return new NotNode(s, prefix.Release());
-                    case Operator.complement: return new ComplementNode(s, prefix.Release());
-                    case Operator.deref: return new DerefNode(s, prefix.Release());
-                    case Operator.addrOf: return new AddrOfNode(s, prefix.Release());
+                    case Operator.plusplus: return new PrefixIncrementNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.minusminus: return new PrefixDecrementNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.plus: return new UnaryPlusNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.minus: return new UnaryMinusNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.not_: return new NotNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.complement: return new ComplementNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.deref: return new DerefNode(s, ctx->ModuleId(), prefix.Release());
+                    case Operator.addrOf: return new AddrOfNode(s, ctx->ModuleId(), prefix.Release());
                 }
             }
         |   Postfix(ctx):postfix{ return postfix; }
@@ -266,14 +266,14 @@ parser ExpressionParser
     Postfix(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
         ::=
         (   Primary(ctx):primary{ s = span; expr.Reset(primary); }
-            (   PLUSPLUS{ s.end = span.end; expr.Reset(new PostfixIncrementNode(s, expr.Release())); }
-            |   MINUSMINUS{ s.end = span.end; expr.Reset(new PostfixDecrementNode(s, expr.Release())); }
-            |   DOT Identifier:dotMember{ s.end = span.end; expr.Reset(new DotNode(s, expr.Release(), dotMember)); }
-            |   ARROW Identifier:arrowMember{ s.end = span.end; expr.Reset(new ArrowNode(s, expr.Release(), arrowMember)); }
+            (   PLUSPLUS{ s.end = span.end; expr.Reset(new PostfixIncrementNode(s, ctx->ModuleId(), expr.Release())); }
+            |   MINUSMINUS{ s.end = span.end; expr.Reset(new PostfixDecrementNode(s, ctx->ModuleId(), expr.Release())); }
+            |   DOT Identifier(ctx):dotMember{ s.end = span.end; expr.Reset(new DotNode(s, ctx->ModuleId(), expr.Release(), dotMember)); }
+            |   ARROW Identifier(ctx):arrowMember{ s.end = span.end; expr.Reset(new ArrowNode(s, ctx->ModuleId(), expr.Release(), arrowMember)); }
             |   LBRACKET{ ctx->PushParsingLvalue(false); ctx->PushParsingExpressionStatement(false); }
                 Expression(ctx):index{ ctx->PopParsingExpressionStatement(); ctx->PopParsingLvalue(); }
-                RBRACKET!{ s.end = span.end; expr.Reset(new IndexingNode(s, expr.Release(), index)); }
-            |   LPAREN{ expr.Reset(new InvokeNode(s, expr.Release())); } ArgumentList(ctx, expr.Get()):args RPAREN!{ expr->SetSpanEnd(span.end); }
+                RBRACKET!{ s.end = span.end; expr.Reset(new IndexingNode(s, ctx->ModuleId(), expr.Release(), index)); }
+            |   LPAREN{ expr.Reset(new InvokeNode(s, ctx->ModuleId(), expr.Release())); } ArgumentList(ctx, expr.Get()):args RPAREN!{ expr->SetSpanEnd(span.end); }
             )*
         )
         {
@@ -282,13 +282,13 @@ parser ExpressionParser
         ;
 
     Primary(ParsingContext* ctx, var Span s) : Node*
-        ::= (LPAREN{ s = span; } Expression(ctx):expr RPAREN{ s.end = span.end; }){ return new ParenthesizedExpressionNode(s, expr); }
+        ::= (LPAREN{ s = span; } Expression(ctx):expr RPAREN{ s.end = span.end; }){ return new ParenthesizedExpressionNode(s, ctx->ModuleId(), expr); }
         |   Literal(ctx):literal{ return literal; }
-        |   BasicType:basicType{ return basicType; }
+        |   BasicType(ctx):basicType{ return basicType; }
         |   TemplateId(ctx):templateId{ return templateId; }
-        |   Identifier:id{ return id; }
-        |   THIS{ return new ThisNode(span); }
-        |   BASE{ return new BaseNode(span); }
+        |   Identifier(ctx):id{ return id; }
+        |   THIS{ return new ThisNode(span, ctx->ModuleId()); }
+        |   BASE{ return new BaseNode(span, ctx->ModuleId()); }
         |   SizeOfExpr(ctx):sizeOf{ return sizeOf; }
         |   TypeNameExpr(ctx):typeName{ return typeName; }
         |   TypeIdExpr(ctx):typeId{ return typeId; }
@@ -298,23 +298,23 @@ parser ExpressionParser
         ;
 
     SizeOfExpr(ParsingContext* ctx, var Span s) : Node*
-        ::= (SIZEOF{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new SizeOfNode(s, expr); }
+        ::= (SIZEOF{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new SizeOfNode(s, ctx->ModuleId(), expr); }
         ;
 
     TypeNameExpr(ParsingContext* ctx, var Span s) : Node*
-        ::= (TYPENAME{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new TypeNameNode(s, expr); }
+        ::= (TYPENAME{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new TypeNameNode(s, ctx->ModuleId(), expr); }
         ;
 
     TypeIdExpr(ParsingContext* ctx, var Span s) : Node*
-        ::= (TYPEID{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new TypeIdNode(s, expr); }
+        ::= (TYPEID{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new TypeIdNode(s, ctx->ModuleId(), expr); }
         ;
 
     CastExpr(ParsingContext* ctx, var Span s) : Node*
-        ::= (CAST{ s = span; } LANGLE! TypeExpr(ctx):typeExpr! RANGLE! LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new CastNode(s, typeExpr, expr); }
+        ::= (CAST{ s = span; } LANGLE! TypeExpr(ctx):typeExpr! RANGLE! LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new CastNode(s, ctx->ModuleId(), typeExpr, expr); }
         ;
 
     ConstructExpr(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
-        ::= (CONSTRUCT{ s = span; } LANGLE! TypeExpr(ctx):typeExpr! RANGLE!){ expr.Reset(new ConstructNode(s, typeExpr)); } LPAREN! ExpressionList(ctx, expr.Get()):exprList! RPAREN!
+        ::= (CONSTRUCT{ s = span; } LANGLE! TypeExpr(ctx):typeExpr! RANGLE!){ expr.Reset(new ConstructNode(s, ctx->ModuleId(), typeExpr)); } LPAREN! ExpressionList(ctx, expr.Get()):exprList! RPAREN!
         {
             expr->SetSpanEnd(span.end);
             return expr.Release();
@@ -322,7 +322,7 @@ parser ExpressionParser
         ;
 
     NewExpr(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
-        ::= (NEW{ s = span; } TypeExpr(ctx):typeExpr!{ s.end = span.end; expr.Reset(new NewNode(s, typeExpr)); } (LPAREN ArgumentList(ctx, expr.Get()):argList RPAREN{ expr->SetSpanEnd(span.end); })?)
+        ::= (NEW{ s = span; } TypeExpr(ctx):typeExpr!{ s.end = span.end; expr.Reset(new NewNode(s, ctx->ModuleId(), typeExpr)); } (LPAREN ArgumentList(ctx, expr.Get()):argList RPAREN{ expr->SetSpanEnd(span.end); })?)
         {
             return expr.Release();
         }
@@ -338,10 +338,10 @@ parser ExpressionParser
         ;
 
     InvokeExpr(ParsingContext* ctx, var UniquePtr<Node> expr, var Span s) : Node*
-        ::= ((TemplateId(ctx):templateId{ s = span; expr.Reset(templateId); } | Identifier:id{ s = span; expr.Reset(id); })
-        (   DOT Identifier:dotMemberId!{ s.end = span.end; expr.Reset(new DotNode(s, expr.Release(), dotMemberId)); }   )*
-        LPAREN{ expr.Reset(new InvokeNode(s, expr.Release())); } ArgumentList(ctx, expr.Get()):argList RPAREN!{ expr->SetSpanEnd(span.end); })
-        { 
+        ::= ((TemplateId(ctx):templateId{ s = span; expr.Reset(templateId); } | Identifier(ctx):id{ s = span; expr.Reset(id); })
+        (   DOT Identifier(ctx):dotMemberId!{ s.end = span.end; expr.Reset(new DotNode(s, ctx->ModuleId(), expr.Release(), dotMemberId)); }   )*
+        LPAREN{ expr.Reset(new InvokeNode(s, ctx->ModuleId(), expr.Release())); } ArgumentList(ctx, expr.Get()):argList RPAREN!{ expr->SetSpanEnd(span.end); })
+        {
             return expr.Release();
         }
         ;

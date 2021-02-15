@@ -1,0 +1,37 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowIdentifierParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    Identifier(NothrowParsingContext* ctx) : IdentifierNode*
+        ::= ID
+        {
+            IdentifierNode* node = new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos));
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    QualifiedId(NothrowParsingContext* ctx, var ustring value, var Span s) : IdentifierNode*
+        ::=
+        (
+            ID{ s = span; Token token = lexer.GetToken(pos); value.Append(token.match.ToString()); }
+            (DOT ID{ s.end = span.end; Token token = lexer.GetToken(pos); value.Append('.').Append(token.match.ToString()); })*
+        )
+        {
+            IdentifierNode* node = new IdentifierNode(s, ctx->ModuleId(), value);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+}

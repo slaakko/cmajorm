@@ -9,7 +9,7 @@ namespace soulcm.scm2html
     public class Project
     {
         public Project(Scm2htmlXml* xml_, Element* element_) :
-            xml(xml_), element(element_), lexerContext(IdentifierClassKind.unicode)
+            xml(xml_), element(element_), lexerContext(IdentifierClassKind.unicode), moduleId(Uuid.Random())
         {
         }
         public void Process(bool verbose)
@@ -49,6 +49,7 @@ namespace soulcm.scm2html
                                 }
                                 LexerFileLexer lexer(ToUtf32(File.ReadAllText(lexerFilePath)), lexerFilePath, index++);
                                 ParsingContext parsingContext;
+                                parsingContext.SetModuleId(moduleId);
                                 UniquePtr<LexerFile> lexerFile = LexLexerFileParser.Parse(lexer, &parsingContext);
                                 lexerMap[lexerFile->GetLexer()->Name()] = lexerFile.Get();
                                 lexerFiles.Add(Rvalue(lexerFile));
@@ -90,6 +91,7 @@ namespace soulcm.scm2html
                                 }
                                 ParserFileLexer lexer(ToUtf32(File.ReadAllText(parserFilePath)), parserFilePath, index++);
                                 ParsingContext parsingContext;
+                                parsingContext.SetModuleId(moduleId);
                                 UniquePtr<ParserFile> parserFile = ParserFileParser.Parse(lexer, &parsingContext);
                                 domain.AddParserFile(parserFile.Get());
                                 parserFiles.Add(Rvalue(parserFile));
@@ -312,5 +314,6 @@ namespace soulcm.scm2html
         private List<UniquePtr<Grammar>> grammars;
         private Domain domain;
         private List<UniquePtr<ParserFile>> parserFiles;
+        private Uuid moduleId;
     }
 } // namespace soulcm.scm2html

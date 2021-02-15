@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class ConstantNode : Node
     {
-        public nothrow ConstantNode(const System.Lex.Span& span_) :
-            base(NodeType.constantNode, span_), specifiers(Specifiers.none)
+        public nothrow ConstantNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.constantNode, span_, moduleId_), specifiers(Specifiers.none)
         {
         }
-        public nothrow ConstantNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Node* value_) :
-            base(NodeType.constantNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), value(value_)
+        public nothrow ConstantNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Node* value_) :
+            base(NodeType.constantNode, span_, moduleId_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), value(value_)
         {
             typeExpr->SetParent(this);
             id->SetParent(this);
@@ -66,7 +66,7 @@ namespace Cm.Ast
             {
                 clonedValue = value->Clone(cloneContext);
             }
-            return new ConstantNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), clonedValue);
+            return new ConstantNode(GetSpan(), ModuleId(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), clonedValue);
         }
         public override void Accept(Visitor& visitor)
         {

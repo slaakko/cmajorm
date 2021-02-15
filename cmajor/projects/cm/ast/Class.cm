@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class ClassNode : Node
     {
-        public nothrow ClassNode(const System.Lex.Span& span_) :
-            base(NodeType.classNode, span_), specifiers(Specifiers.none), id(), templateParameters(), baseClassOrInterfaces(), members()
+        public nothrow ClassNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.classNode, span_, moduleId_), specifiers(Specifiers.none), id(), templateParameters(), baseClassOrInterfaces(), members()
         {
         }
-        public nothrow ClassNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_, AttributesNode* attributes_) :
-            base(NodeType.classNode, span_), specifiers(specifiers_), id(id_), templateParameters(), baseClassOrInterfaces(), members(), attributes(attributes_)
+        public nothrow ClassNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_, AttributesNode* attributes_) :
+            base(NodeType.classNode, span_, moduleId_), specifiers(specifiers_), id(id_), templateParameters(), baseClassOrInterfaces(), members(), attributes(attributes_)
         {
         }
         public nothrow void SetSpecifiers(Specifiers specifiers_)
@@ -185,7 +185,7 @@ namespace Cm.Ast
             {
                 clonedAttributes = cast<AttributesNode*>(attributes->Clone(cloneContext));
             }
-            ClassNode* clone = new ClassNode(GetSpan(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+            ClassNode* clone = new ClassNode(GetSpan(), ModuleId(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
             if (!cloneContext.InstantiateClassNode())
             {
                 int tn = templateParameters.Count();
@@ -232,10 +232,11 @@ namespace Cm.Ast
             templateParameters.Write(writer);
             baseClassOrInterfaces.Write(writer);
             members.Write(writer);
-            writer.Write(specifierSpan);
-            writer.Write(classSpan);
-            writer.Write(beginBraceSpan);
-            writer.Write(endBraceSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(specifierSpan, convertExternal);
+            writer.Write(classSpan, convertExternal);
+            writer.Write(beginBraceSpan, convertExternal);
+            writer.Write(endBraceSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -279,8 +280,8 @@ namespace Cm.Ast
     }
     public abstract class InitializerNode : Node
     {
-        public nothrow InitializerNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_)
+        public nothrow InitializerNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_)
         {
         }
         public nothrow const NodeList<Node>& Arguments() const
@@ -307,13 +308,13 @@ namespace Cm.Ast
     }
     public class ThisInitializerNode : InitializerNode
     {
-        public nothrow ThisInitializerNode(const System.Lex.Span& span_) :
-            base(NodeType.thisInitializerNode, span_)
+        public nothrow ThisInitializerNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.thisInitializerNode, span_, moduleId_)
         {
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ThisInitializerNode* clone = new ThisInitializerNode(GetSpan());
+            ThisInitializerNode* clone = new ThisInitializerNode(GetSpan(), ModuleId());
             int n = Arguments().Count();
             for (int i = 0; i < n; ++i)
             {
@@ -328,13 +329,13 @@ namespace Cm.Ast
     }
     public class BaseInitializerNode : InitializerNode
     {
-        public nothrow BaseInitializerNode(const System.Lex.Span& span_) :
-            base(NodeType.baseInitializerNode, span_)
+        public nothrow BaseInitializerNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.baseInitializerNode, span_, moduleId_)
         {
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            BaseInitializerNode* clone = new BaseInitializerNode(GetSpan());
+            BaseInitializerNode* clone = new BaseInitializerNode(GetSpan(), ModuleId());
             int n = Arguments().Count();
             for (int i = 0; i < n; ++i)
             {
@@ -349,12 +350,12 @@ namespace Cm.Ast
     }
     public class MemberInitializerNode : InitializerNode
     {
-        public nothrow MemberInitializerNode(const System.Lex.Span& span_) :
-            base(NodeType.memberInitializerNode, span_), memberId()
+        public nothrow MemberInitializerNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.memberInitializerNode, span_, moduleId_), memberId()
         {
         }
-        public nothrow MemberInitializerNode(const System.Lex.Span& span_, IdentifierNode* memberId_) :
-            base(NodeType.memberInitializerNode, span_), memberId(memberId_)
+        public nothrow MemberInitializerNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* memberId_) :
+            base(NodeType.memberInitializerNode, span_, moduleId_), memberId(memberId_)
         {
             memberId->SetParent(this);
         }
@@ -368,7 +369,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            MemberInitializerNode* clone = new MemberInitializerNode(GetSpan(), cast<IdentifierNode*>(memberId->Clone(cloneContext)));
+            MemberInitializerNode* clone = new MemberInitializerNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(memberId->Clone(cloneContext)));
             int n = Arguments().Count();
             for (int i = 0; i < n; ++i)
             {
@@ -395,12 +396,12 @@ namespace Cm.Ast
     }
     public class StaticConstructorNode : FunctionNode
     {
-        public nothrow StaticConstructorNode(const System.Lex.Span& span_) :
-            base(NodeType.staticConstructorNode, span_, Specifiers.none, null, u"@static_constructor", null), initializers()
+        public nothrow StaticConstructorNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.staticConstructorNode, span_, moduleId_, Specifiers.none, null, u"@static_constructor", null), initializers()
         {
         }
-        public nothrow StaticConstructorNode(const System.Lex.Span& span_, Specifiers specifiers_, AttributesNode* attributes_) :
-            base(NodeType.staticConstructorNode, span_, specifiers_, null, u"@static_constructor", attributes_), initializers()
+        public nothrow StaticConstructorNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, AttributesNode* attributes_) :
+            base(NodeType.staticConstructorNode, span_, moduleId_, specifiers_, null, u"@static_constructor", attributes_), initializers()
         {
         }
         public nothrow const NodeList<InitializerNode>& Initializers() const
@@ -422,7 +423,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            StaticConstructorNode* clone = new StaticConstructorNode(GetSpan(), GetSpecifiers(), null);
+            StaticConstructorNode* clone = new StaticConstructorNode(GetSpan(), ModuleId(), GetSpecifiers(), null);
             int n = initializers.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -454,12 +455,12 @@ namespace Cm.Ast
     }
     public class ConstructorNode : FunctionNode
     {
-        public nothrow ConstructorNode(const System.Lex.Span& span_) :
-            base(NodeType.constructorNode, span_, Specifiers.none, null, u"@constructor", null), initializers()
+        public nothrow ConstructorNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.constructorNode, span_, moduleId_, Specifiers.none, null, u"@constructor", null), initializers()
         {
         }
-        public nothrow ConstructorNode(const System.Lex.Span& span_, Specifiers specifiers_, AttributesNode* attributes_) :
-            base(NodeType.constructorNode, span_, specifiers_, null, u"@constructor", attributes_), initializers()
+        public nothrow ConstructorNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, AttributesNode* attributes_) :
+            base(NodeType.constructorNode, span_, moduleId_, specifiers_, null, u"@constructor", attributes_), initializers()
         {
         }
         public nothrow const NodeList<InitializerNode>& Initializers() const
@@ -481,7 +482,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ConstructorNode* clone = new ConstructorNode(GetSpan(), GetSpecifiers(), null);
+            ConstructorNode* clone = new ConstructorNode(GetSpan(), ModuleId(), GetSpecifiers(), null);
             int n = initializers.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -513,12 +514,12 @@ namespace Cm.Ast
     }
     public class DestructorNode : FunctionNode
     {
-        public nothrow DestructorNode(const System.Lex.Span& span_) :
-            base(NodeType.destructorNode, span_)
+        public nothrow DestructorNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.destructorNode, span_, moduleId_)
         {
         }
-        public nothrow DestructorNode(const System.Lex.Span& span_, Specifiers specifiers_, AttributesNode* attributes_) :
-            base(NodeType.destructorNode, span_, specifiers_, null, u"@destructor", attributes_)
+        public nothrow DestructorNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, AttributesNode* attributes_) :
+            base(NodeType.destructorNode, span_, moduleId_, specifiers_, null, u"@destructor", attributes_)
         {
         }
         public nothrow void SetClassId(IdentifierNode* classId_)
@@ -531,7 +532,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            DestructorNode* clone = new DestructorNode(GetSpan(), GetSpecifiers(), null);
+            DestructorNode* clone = new DestructorNode(GetSpan(), ModuleId(), GetSpecifiers(), null);
             clone->classId.Reset(cast<IdentifierNode*>(classId->Clone(cloneContext)));
             CloneContent(clone, cloneContext);
             return clone;
@@ -554,12 +555,12 @@ namespace Cm.Ast
     }
     public class MemberFunctionNode : FunctionNode
     {
-        public nothrow MemberFunctionNode(const System.Lex.Span& span_) :
-            base(NodeType.memberFunctionNode, span_)
+        public nothrow MemberFunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.memberFunctionNode, span_, moduleId_)
         {
         }
-        public nothrow MemberFunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, AttributesNode* attributes_) :
-            base(NodeType.memberFunctionNode, span_, specifiers_, returnTypeExpr_, groupId_, attributes_)
+        public nothrow MemberFunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, AttributesNode* attributes_) :
+            base(NodeType.memberFunctionNode, span_, moduleId_, specifiers_, returnTypeExpr_, groupId_, attributes_)
         {
         }
         public nothrow bool IsConst() const
@@ -572,7 +573,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            MemberFunctionNode* clone = new MemberFunctionNode(GetSpan());
+            MemberFunctionNode* clone = new MemberFunctionNode(GetSpan(), ModuleId());
             CloneContent(clone, cloneContext);
             if (IsConst())
             {
@@ -587,12 +588,12 @@ namespace Cm.Ast
     }
     public class ConversionFunctionNode : FunctionNode
     {
-        public nothrow ConversionFunctionNode(const System.Lex.Span& span_) :
-            base(NodeType.conversionFunctionNode, span_)
+        public nothrow ConversionFunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conversionFunctionNode, span_, moduleId_)
         {
         }
-        public nothrow ConversionFunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, AttributesNode* attributes_) :
-            base(NodeType.conversionFunctionNode, span_, specifiers_, returnTypeExpr_, u"@operator_conv", attributes_)
+        public nothrow ConversionFunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, AttributesNode* attributes_) :
+            base(NodeType.conversionFunctionNode, span_, moduleId_, specifiers_, returnTypeExpr_, u"@operator_conv", attributes_)
         {
         }
         public nothrow bool IsConst() const
@@ -605,7 +606,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ConversionFunctionNode* clone = new ConversionFunctionNode(GetSpan());
+            ConversionFunctionNode* clone = new ConversionFunctionNode(GetSpan(), ModuleId());
             CloneContent(clone, cloneContext);
             if (IsConst())
             {
@@ -620,12 +621,12 @@ namespace Cm.Ast
     }
     public class MemberVariableNode : Node
     {
-        public nothrow MemberVariableNode(const System.Lex.Span& span_) :
-            base(NodeType.memberVariableNode, span_), specifiers()
+        public nothrow MemberVariableNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.memberVariableNode, span_, moduleId_), specifiers()
         {
         }
-        public nothrow MemberVariableNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, AttributesNode* attributes_) :
-            base(NodeType.memberVariableNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), attributes(attributes_)
+        public nothrow MemberVariableNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, AttributesNode* attributes_) :
+            base(NodeType.memberVariableNode, span_, moduleId_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), attributes(attributes_)
         {
             typeExpr->SetParent(this);
             id->SetParent(this);
@@ -661,7 +662,7 @@ namespace Cm.Ast
             {
                 clonedAttributes = cast<AttributesNode*>(attributes->Clone(cloneContext));
             }
-            MemberVariableNode* clone = new MemberVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+            MemberVariableNode* clone = new MemberVariableNode(GetSpan(), ModuleId(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
             clone->SetSpecifierSpan(specifierSpan);
             return clone;
         }
@@ -681,7 +682,8 @@ namespace Cm.Ast
             writer.Write(specifiers);
             writer.Write(typeExpr.Get());
             writer.Write(id.Get());
-            writer.Write(specifierSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(specifierSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {

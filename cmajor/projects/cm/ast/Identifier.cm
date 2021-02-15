@@ -9,20 +9,20 @@ namespace Cm.Ast
 {
     public class IdentifierNode : Node
     {
-        public nothrow IdentifierNode(const System.Lex.Span& span_) :
-            base(NodeType.identifierNode, span_), identifier()
+        public nothrow IdentifierNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.identifierNode, span_, moduleId_), identifier()
         {
         }
-        public nothrow IdentifierNode(const System.Lex.Span& span_, NodeType nodeType_) :
-            base(nodeType_, span_), identifier()
+        public nothrow IdentifierNode(const System.Lex.Span& span_, const Uuid& moduleId_, NodeType nodeType_) :
+            base(nodeType_, span_, moduleId_), identifier()
         {
         }
-        public nothrow IdentifierNode(const System.Lex.Span& span_, const ustring& identifier_) :
-            base(NodeType.identifierNode, span_), identifier(identifier_)
+        public nothrow IdentifierNode(const System.Lex.Span& span_, const Uuid& moduleId_, const ustring& identifier_) :
+            base(NodeType.identifierNode, span_, moduleId_), identifier(identifier_)
         {
         }
-        public nothrow IdentifierNode(const System.Lex.Span& span_, NodeType nodeType_, const ustring& identifier_) :
-            base(nodeType_, span_), identifier(identifier_)
+        public nothrow IdentifierNode(const System.Lex.Span& span_, const Uuid& moduleId_, NodeType nodeType_, const ustring& identifier_) :
+            base(nodeType_, span_, moduleId_), identifier(identifier_)
         {
             ustring result;
             for (uchar c : identifier)
@@ -34,8 +34,8 @@ namespace Cm.Ast
             }
             Swap(result, identifier);
         }
-        public nothrow IdentifierNode(const System.Lex.Span& span_, const System.Lex.Token& token) :
-            base(NodeType.identifierNode, span_)
+        public nothrow IdentifierNode(const System.Lex.Span& span_, const Uuid& moduleId_, const System.Lex.Token& token) :
+            base(NodeType.identifierNode, span_, moduleId_)
         {
             identifier = ustring(token.match.begin, token.match.end);
         }
@@ -49,7 +49,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new IdentifierNode(GetSpan(), identifier);
+            return new IdentifierNode(GetSpan(), ModuleId(), identifier);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -73,17 +73,17 @@ namespace Cm.Ast
     }
     public class CursorIdNode : IdentifierNode
     {
-        public nothrow CursorIdNode(const System.Lex.Span& span_) :
-            base(span_, NodeType.cursorIdNode)
+        public nothrow CursorIdNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(span_, moduleId_, NodeType.cursorIdNode)
         {
         }
-        public nothrow CursorIdNode(const System.Lex.Span& span_, const ustring& identifier_) :
-            base(span_, NodeType.cursorIdNode, identifier_)
+        public nothrow CursorIdNode(const System.Lex.Span& span_, const Uuid& moduleId_, const ustring& identifier_) :
+            base(span_, moduleId_, NodeType.cursorIdNode, identifier_)
         {
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new CursorIdNode(GetSpan(), Str());
+            return new CursorIdNode(GetSpan(), ModuleId(), Str());
         }
         public override void Accept(Visitor& visitor)
         {

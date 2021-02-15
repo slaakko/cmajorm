@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class TypedefNode : Node
     {
-        public nothrow TypedefNode(const System.Lex.Span& span_) :
-            base(NodeType.typedefNode, span_), specifiers(Specifiers.none), typeExpr(), id()
+        public nothrow TypedefNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.typedefNode, span_, moduleId_), specifiers(Specifiers.none), typeExpr(), id()
         {
         }
-        public nothrow TypedefNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_) :
-            base(NodeType.typedefNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_)
+        public nothrow TypedefNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_) :
+            base(NodeType.typedefNode, span_, moduleId_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_)
         {
             typeExpr->SetParent(this);
             id->SetParent(this);
@@ -33,7 +33,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new TypedefNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)));
+            return new TypedefNode(GetSpan(), ModuleId(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {

@@ -10,17 +10,17 @@ parser IdentifierParser
 {
     uselexer LexerFileLexer;
 
-    Identifier : IdentifierNode*
-        ::= ID{ return new IdentifierNode(span, lexer.GetToken(pos)); }
+    Identifier(ParsingContext* ctx) : IdentifierNode*
+        ::= ID{ return new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos)); }
         ;
 
-    QualifiedId(var ustring value, var Span s) : IdentifierNode*
+    QualifiedId(ParsingContext* ctx, var ustring value, var Span s) : IdentifierNode*
         ::=
         (   ID{ s = span; Token token = lexer.GetToken(pos); value.Append(ustring(token.match.begin, token.match.end)); }
             (DOT ID{ s.end = span.end; Token token = lexer.GetToken(pos); value.Append('.'); value.Append(ustring(token.match.begin, token.match.end)); })*
         )
         {
-            return new IdentifierNode(s, value);
+            return new IdentifierNode(s, ctx->ModuleId(), value);
         }
         ;
 

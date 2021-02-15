@@ -379,8 +379,8 @@ void Lexer::AddError(const Span& span, const std::u32string& name)
     else
     {
         Token token = GetToken(span.start);
-        ParsingException error("parsing error in '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
-        errors.push_back(std::move(error));
+        ParsingException* error(new ParsingException("parsing error in '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span));
+        errors.push_back(std::unique_ptr<std::exception>(error));
     }
 }
 

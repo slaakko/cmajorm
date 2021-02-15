@@ -1,9 +1,17 @@
 using System;
 using System.Collections;
 
-class Foo
+void main()
 {
-    void foo()
+    Map<string, string> map;
+    map["abc"] = "abc";
+    map["bar"] = "bar";
+    map["foo"] = "foo";
+    Map<string, string>.ConstIterator it = map.CLowerBound("abc");
+    while (it != map.CEnd())
     {
+        const string& s = it->second;
+        Console.Out() << s << endl();
+        ++it;
     }
 }

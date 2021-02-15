@@ -17,7 +17,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Class.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Class.parser' using soulng parser generator spg version 3.10.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -40,7 +40,7 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
     Span classSpan = Span();
     Span beginBraceSpan = Span();
     Span endBraceSpan = Span();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<WhereConstraintNode> constraint;
@@ -98,7 +98,7 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                                                 soulng::parser::Match* parentMatch12 = &match;
                                                 {
                                                     soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
-                                                    attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                                    attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         *parentMatch12 = match;
@@ -1162,7 +1162,7 @@ soulng::parser::Match ClassParser::StaticConstructor(CmajorLexer& lexer, boost::
     Span s = Span();
     Span specifierSpan = Span();
     std::u32string className = std::u32string();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<InitializerNode> initializer;
@@ -1223,7 +1223,7 @@ soulng::parser::Match ClassParser::StaticConstructor(CmajorLexer& lexer, boost::
                                                 soulng::parser::Match* parentMatch12 = &match;
                                                 {
                                                     soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
-                                                    attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                                    attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         *parentMatch12 = match;
@@ -1606,7 +1606,7 @@ soulng::parser::Match ClassParser::Constructor(CmajorLexer& lexer, boost::uuids:
     std::unique_ptr<ConstructorNode> ctor = std::unique_ptr<ConstructorNode>();
     Span s = Span();
     Span specifierSpan = Span();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<InitializerNode> initializer;
@@ -1664,7 +1664,7 @@ soulng::parser::Match ClassParser::Constructor(CmajorLexer& lexer, boost::uuids:
                                             soulng::parser::Match* parentMatch11 = &match;
                                             {
                                                 soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
-                                                attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                                attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                                 if (match.hit)
                                                 {
                                                     *parentMatch11 = match;
@@ -2015,7 +2015,7 @@ soulng::parser::Match ClassParser::Destructor(CmajorLexer& lexer, boost::uuids::
     Span s = Span();
     Span specifierSpan = Span();
     std::u32string className = std::u32string();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<WhereConstraintNode> contraint;
@@ -2075,7 +2075,7 @@ soulng::parser::Match ClassParser::Destructor(CmajorLexer& lexer, boost::uuids::
                                                 soulng::parser::Match* parentMatch12 = &match;
                                                 {
                                                     soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
-                                                    attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                                    attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         *parentMatch12 = match;
@@ -2778,7 +2778,7 @@ soulng::parser::Match ClassParser::MemberFunction(CmajorLexer& lexer, boost::uui
     Span s = Span();
     Span specifierSpan = Span();
     Span groupIdSpan = Span();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<sngcm::ast::Node> returnType;
     std::unique_ptr<soulng::parser::Value<std::u32string>> groupId;
@@ -2839,7 +2839,7 @@ soulng::parser::Match ClassParser::MemberFunction(CmajorLexer& lexer, boost::uui
                                                 soulng::parser::Match* parentMatch12 = &match;
                                                 {
                                                     soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
-                                                    attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                                    attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         *parentMatch12 = match;
@@ -3107,7 +3107,7 @@ soulng::parser::Match ClassParser::ConversionFunction(CmajorLexer& lexer, boost:
     std::unique_ptr<ConversionFunctionNode> conversionFun = std::unique_ptr<ConversionFunctionNode>();
     Span s = Span();
     Span specifierSpan = Span();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<sngcm::ast::Node> type;
     std::unique_ptr<WhereConstraintNode> constraint;
@@ -3170,7 +3170,7 @@ soulng::parser::Match ClassParser::ConversionFunction(CmajorLexer& lexer, boost:
                                                     soulng::parser::Match* parentMatch13 = &match;
                                                     {
                                                         soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
-                                                        attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                                        attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                                         if (match.hit)
                                                         {
                                                             *parentMatch13 = match;
@@ -3487,7 +3487,7 @@ soulng::parser::Match ClassParser::MemberVariable(CmajorLexer& lexer, boost::uui
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     Span s = Span();
     Span specifierSpan = Span();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<sngcm::ast::Node> type;
     std::unique_ptr<IdentifierNode> id;
@@ -3530,7 +3530,7 @@ soulng::parser::Match ClassParser::MemberVariable(CmajorLexer& lexer, boost::uui
                             soulng::parser::Match* parentMatch7 = &match;
                             {
                                 soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
-                                attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                 if (match.hit)
                                 {
                                     *parentMatch7 = match;

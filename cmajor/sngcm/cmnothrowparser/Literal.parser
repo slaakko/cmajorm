@@ -42,35 +42,47 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowLiteralParser
         }
         |   FLOATINGLIT
         {
-            ParseFloatingLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.floatingLit, lexer.floatingLitFloat);
-            LiteralNode* value = CreateFloatingLiteralNode(span, *moduleId, lexer.floatingLit, lexer.floatingLitFloat);
-            value->SetText(lexer.GetMatch(span));
-            value->SetLexerFlags(lexer.Flags());
-            return value;
+            if (!ParseFloatingLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.floatingLit, lexer.floatingLitFloat)) pass = false; 
+            else
+            {
+                LiteralNode* value = CreateFloatingLiteralNode(span, *moduleId, lexer.floatingLit, lexer.floatingLitFloat);
+                value->SetText(lexer.GetMatch(span));
+                value->SetLexerFlags(lexer.Flags());
+                return value;
+            }
         }
         |   INTLIT
         {
-            ParseIntegerLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.intLit, lexer.intLitUnsigned);
-            LiteralNode* value = CreateIntegerLiteralNode(span, *moduleId, lexer.intLit, lexer.intLitUnsigned);
-            value->SetText(lexer.GetMatch(span));
-            value->SetLexerFlags(lexer.Flags());
-            return value;
+            if (!ParseIntegerLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.intLit, lexer.intLitUnsigned)) pass = false;
+            else
+            {
+                LiteralNode* value = CreateIntegerLiteralNode(span, *moduleId, lexer.intLit, lexer.intLitUnsigned);
+                value->SetText(lexer.GetMatch(span));
+                value->SetLexerFlags(lexer.Flags());
+                return value;
+            }
         }
         |   CHARLIT
         {
-            ParseCharacterLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.chrLit, lexer.chrLitPrefix);
-            LiteralNode* value = CreateCharacterLiteralNode(span, *moduleId, lexer.chrLit, lexer.chrLitPrefix);
-            value->SetText(lexer.GetMatch(span));
-            value->SetLexerFlags(lexer.Flags());
-            return value;
+            if (!ParseCharacterLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.chrLit, lexer.chrLitPrefix)) pass = false;
+            else
+            {
+                LiteralNode* value = CreateCharacterLiteralNode(span, *moduleId, lexer.chrLit, lexer.chrLitPrefix);
+                value->SetText(lexer.GetMatch(span));
+                value->SetLexerFlags(lexer.Flags());
+                return value;
+            }
         }
         |   STRINGLIT
         {
-            ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix);
-            LiteralNode* value = CreateStringLiteralNode(span, *moduleId, lexer.strLit, lexer.strLitPrefix);
-            value->SetText(lexer.GetMatch(span));
-            value->SetLexerFlags(lexer.Flags());
-            return value;
+            if (!ParseStringLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix)) pass = false;
+            else
+            {
+                LiteralNode* value = CreateStringLiteralNode(span, *moduleId, lexer.strLit, lexer.strLitPrefix);
+                value->SetText(lexer.GetMatch(span));
+                value->SetLexerFlags(lexer.Flags());
+                return value;
+            }
         }
         |   NULLLIT
         {

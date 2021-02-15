@@ -1,0 +1,36 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using Cm.Ast;
+
+namespace Cm.Symbols
+{
+    public class SymbolReader
+    {
+        public SymbolReader(const string& filePath) : astReader(filePath), setProjectBit(false)
+        {
+        }
+        public nothrow inline AstReader& GetAstReader()
+        {
+            return astReader;
+        }
+        public nothrow inline BinaryReader& GetBinaryReader()
+        {
+            return astReader.GetBinaryReader();
+        }
+        public nothrow inline bool SetProjectBit() const
+        {
+            return setProjectBit;
+        }
+        public nothrow void SetProjectBitForSymbols()
+        {
+            setProjectBit = true;
+        }
+        private AstReader astReader;
+        private bool setProjectBit;
+    }
+}

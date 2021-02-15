@@ -4,7 +4,7 @@
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 #include <sngcm/cmlexer/TokenValueParsers.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Attribute.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Attribute.parser' using soulng parser generator spg version 3.10.0
 
 using namespace soulng::unicode;
 using namespace CmajorTokens;
@@ -20,7 +20,7 @@ soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer, boost::uui
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Attributes"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    std::unique_ptr<sngcm::ast::Attributes> attributes = std::unique_ptr<sngcm::ast::Attributes>();
+    std::unique_ptr<sngcm::ast::AttributesNode> attributes = std::unique_ptr<sngcm::ast::AttributesNode>();
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -31,6 +31,7 @@ soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer, boost::uui
             soulng::parser::Match* parentMatch2 = &match;
             {
                 int64_t pos = lexer.GetPos();
+                soulng::lexer::Span span = lexer.GetSpan();
                 soulng::parser::Match match(false);
                 if (*lexer == LBRACKET)
                 {
@@ -39,7 +40,7 @@ soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer, boost::uui
                 }
                 if (match.hit)
                 {
-                    attributes.reset(new sngcm::ast::Attributes);
+                    attributes.reset(new sngcm::ast::AttributesNode(span, *moduleId));
                 }
                 *parentMatch2 = match;
             }
@@ -186,7 +187,7 @@ soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer, boost::uui
     return match;
 }
 
-soulng::parser::Match AttributeParser::Attribute(CmajorLexer& lexer, sngcm::ast::Attributes* attributes, boost::uuids::uuid* moduleId)
+soulng::parser::Match AttributeParser::Attribute(CmajorLexer& lexer, sngcm::ast::AttributesNode* attributes, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;

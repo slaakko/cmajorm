@@ -1,0 +1,159 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Ast;
+using LexerFileTokens;
+
+parser LexLexerFileParser
+{
+    uselexer LexerFileLexer;
+
+    using LexIdentifierParser.Identifier;
+    using LexIdentifierParser.QualifiedId;
+    using LexTypeExprParser.TypeExpr;
+    using LexStatementParser.CompoundStatement;
+
+    main;
+
+    LexerFile(var UniquePtr<soulcm.scm2html.LexerFile> lexerFile, ParsingContext* parsingContext) : soulcm.scm2html.LexerFile*
+        ::= empty{ lexerFile.Reset(new soulcm.scm2html.LexerFile()); }
+        (
+            (Declaration(parsingContext):declaration{ lexerFile->Add(declaration); })*
+        )
+        {
+            return lexerFile.Release();
+        }
+        ;
+
+    Declaration(ParsingContext* parsingContext) : soulcm.scm2html.Declaration*
+        ::= ClassMap:classMapDeclaration{ return classMapDeclaration; }
+        |   Usings(parsingContext):usingDeclarations{ return usingDeclarations; }
+        |   Tokens:tokensDeclaration{ return tokensDeclaration; }
+        |   Keywords:keywordsDeclaration{ return keywordsDeclaration; }
+        |   Expressions:expressionsDeclaration{ return expressionsDeclaration; }
+        |   Lexer(parsingContext):lexerDeclaration{ return lexerDeclaration; }
+        ;
+
+    ClassMap(var ustring classMapName) : soulcm.scm2html.ClassMap*
+        ::= CLASSMAP ID!{ classMapName = lexer.GetMatch(span); } SEMICOLON!{ return new soulcm.scm2html.ClassMap(classMapName); }
+        ;
+
+    Usings(ParsingContext* ctx, var UniquePtr<soulcm.scm2html.Usings> usings) : soulcm.scm2html.Usings*
+        ::= empty{ usings.Reset(new soulcm.scm2html.Usings()); } UsingDirectives(ctx, usings.Get()):usingDirectives{ return usings.Release(); }
+        ;
+
+    UsingDirectives(ParsingContext* ctx, soulcm.scm2html.Usings* usings)
+        ::= UsingDirective(ctx, usings):usingDirective+
+        ;
+
+    UsingDirective(ParsingContext* ctx, soulcm.scm2html.Usings* usings)
+        ::= UsingAliasDirective(ctx):usingAlias{ usings->AddMember(usingAlias); }
+        |   UsingNamespaceDirective(ctx):usingNs{ usings->AddMember(usingNs); }
+        ;
+
+    UsingAliasDirective(ParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } Identifier(ctx):id ASSIGN QualifiedId(ctx):qid! SEMICOLON!
+        {
+            s.end = span.end;
+            return new AliasNode(s, ctx->ModuleId(), id, qid);
+        }
+        ;
+
+    UsingNamespaceDirective(ParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } QualifiedId(ctx):ns! SEMICOLON!
+        {
+            s.end = span.end;
+            return new NamespaceImportNode(s, ctx->ModuleId(), ns);
+        }
+        ;
+
+    Tokens(var ustring tokensDeclarationName, var UniquePtr<soulcm.scm2html.Tokens> tokens) : soulcm.scm2html.Tokens*
+        ::= TOKENS ID!{ tokensDeclarationName = lexer.GetMatch(span); } LBRACE!{ tokens.Reset(new soulcm.scm2html.Tokens(tokensDeclarationName)); }
+            (Token:token{ tokens->Add(token); } % COMMA)? RBRACE!
+        {
+            return tokens.Release();
+        }
+        ;
+
+    Token(var ustring tokenName, var ustring tokenInfo) : soulcm.scm2html.Token
+        ::= LPAREN ID!{ tokenName = lexer.GetMatch(span); } COMMA! STRINGLIT!{ tokenInfo = soulcm.scm2html.MakeStrValue(lexer.FileName(), lexer.GetToken(pos)); } RPAREN!
+        {
+            return soulcm.scm2html.Token(tokenName, ToUtf8(tokenInfo));
+        }
+        ;
+
+    Keywords(var ustring keywordsDeclarationName, var UniquePtr<soulcm.scm2html.Keywords> keywords) : soulcm.scm2html.Keywords*
+        ::= KEYWORDS ID!{ keywordsDeclarationName = lexer.GetMatch(span); } LBRACE!{ keywords.Reset(new soulcm.scm2html.Keywords(keywordsDeclarationName)); }
+            (Keyword:keyword{ keywords->Add(keyword); } % COMMA)? RBRACE!
+        {
+            return keywords.Release();
+        }
+        ;
+
+    Keyword(var ustring kw, var ustring tokenName) : soulcm.scm2html.Keyword*
+        ::= LPAREN STRINGLIT!{ kw = soulcm.scm2html.MakeStrValue(lexer.FileName(), lexer.GetToken(pos)); } COMMA! ID!{ tokenName = lexer.GetMatch(span); } RPAREN!
+        {
+            return new soulcm.scm2html.Keyword(kw, tokenName);
+        }
+        ;
+
+    Expressions(var int index, var UniquePtr<soulcm.scm2html.Expressions> expressions) : soulcm.scm2html.Expressions*
+        ::= EXPRESSIONS{ index = 0; expressions.Reset(new soulcm.scm2html.Expressions()); } LBRACE!
+            (Expression(index):expr{ expressions->Add(expr); index = index + 1; })* RBRACE!
+        {
+            return expressions.Release();
+        }
+        ;
+
+    Expression(int index, var ustring exprName, var int line) : soulcm.scm2html.Expression*
+        ::= ID{ exprName = lexer.GetMatch(span); } ASSIGN ExprString:exprValue!{ line = lexer.GetToken(pos).line; } SEMICOLON!
+        {
+            return new soulcm.scm2html.Expression(index, exprName, exprValue, line);
+        }
+        ;
+
+    ExprString : ustring
+        ::= STRINGLIT{ return soulcm.scm2html.MakeExprStringValue(lexer.FileName(), lexer.GetToken(pos)); }
+        ;
+
+    Lexer(ParsingContext* parsingContext, var ustring lexerDeclarationName, var UniquePtr<soulcm.scm2html.Lexer> currentLexer) : soulcm.scm2html.Lexer*
+        ::= LEXER ID!{ lexerDeclarationName = lexer.GetMatch(span); } LBRACE!{ currentLexer.Reset(new soulcm.scm2html.Lexer(u"", lexerDeclarationName)); }
+            (LexerClause(currentLexer.Get(), parsingContext):lexerClause)* RBRACE!
+        {
+            return currentLexer.Release();
+        }
+        ;
+
+    LexerClause(soulcm.scm2html.Lexer* currentLexer, ParsingContext* parsingContext, var int line)
+        ::= (ExprString:expr{ line = lexer.GetToken(pos).line; } Action:action CompoundStatement(parsingContext):stmt!){ currentLexer->AddStatement(new soulcm.scm2html.LexerStatement(expr, stmt, action, line)); }
+        |   Variables(currentLexer, parsingContext):variables
+        |   Actions(currentLexer, parsingContext):actions
+        ;
+
+    Variables(soulcm.scm2html.Lexer* currentLexer, ParsingContext* parsingContext)
+        ::= VARIABLES LBRACE! (Variable(parsingContext):variable{ currentLexer->AddVariable(variable); })* RBRACE!
+        ;
+
+    Variable(ParsingContext* parsingContext, var ustring name) : soulcm.scm2html.LexerVariable*
+        ::= TypeExpr(parsingContext):type ID{ name = lexer.GetMatch(span); } SEMICOLON{ return new soulcm.scm2html.LexerVariable(type, name); }
+        ;
+
+    Actions(soulcm.scm2html.Lexer* currentLexer, ParsingContext* parsingContext)
+        ::= ACTIONS LBRACE! ((Action:action{ pass = action != -1; } ASSIGN CompoundStatement(parsingContext):stmt!){ currentLexer->AddAction(new soulcm.scm2html.Action(action, stmt)); })* RBRACE!
+        ;
+
+    Action(var int actionId) : int
+        ::= (DOLLAR LPAREN! INTLIT!{ actionId = soulcm.scm2html.MakeActionIntValue(lexer.FileName(), lexer.GetToken(pos)); } RPAREN!){ return actionId; }
+        |   empty{ return -1; }
+        ;
+
+    ruleinfo
+    {
+        (LexerFile, "lexer file"), (Declaration, "lexer file declaration"), (ClassMap, "class map declaration"), (Tokens, "tokens declaration"), (Token, "token declaration"),
+        (Keywords, "keywords declaration"), (Keyword, "keyword declaration"), (Expressions, "regular expressions declaration"),
+        (Expression, "regular expression declaration"), (ExprString, "regular expression string"), (Lexer, "lexer declaration"), (LexerClause, "lexer clause"),
+        (Variables, "variables"), (Variable, "variable"), (Actions, "actions"), (Action, "action identifier")
+    }
+}

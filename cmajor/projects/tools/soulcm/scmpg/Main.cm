@@ -23,6 +23,7 @@ public int main(int argc, const char** argv)
 {
     try
     {
+        Uuid moduleId = Uuid.Random();
         bool verbose = false;
         bool noParserDebugSupport = false;
         bool debug = false;
@@ -126,6 +127,7 @@ public int main(int argc, const char** argv)
                 lexer.SetLog(&log);
             }
             ParsingContext parsingContext;
+            parsingContext.SetModuleId(moduleId);
             UniquePtr<soulcm.scmpg.ParserFile> parserFile = ParserFileParser.Parse(lexer, &parsingContext);
             ++index;
             parserFiles.Add(Rvalue(parserFile));
@@ -137,7 +139,7 @@ public int main(int argc, const char** argv)
         }
         soulcm.scmpg.LinkerVisitor linkerVisitor;
         domain.Accept(linkerVisitor);
-        soulcm.scmpg.CodeGeneratorVisitor codeGeneratorVisitor(verbose, debug, noParserDebugSupport);
+        soulcm.scmpg.CodeGeneratorVisitor codeGeneratorVisitor(verbose, debug, noParserDebugSupport, moduleId);
         domain.Accept(codeGeneratorVisitor);
     }
     catch (const Exception& ex)

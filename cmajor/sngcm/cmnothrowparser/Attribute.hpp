@@ -13,7 +13,7 @@ class CmajorNothrowLexer;
 struct SNGCM_NOTHROW_PARSER_API NothrowAttributeParser
 {
     static soulng::parser::Match Attributes(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId);
-    static soulng::parser::Match Attribute(CmajorNothrowLexer& lexer, sngcm::ast::Attributes* attributes, boost::uuids::uuid* moduleId);
+    static soulng::parser::Match Attribute(CmajorNothrowLexer& lexer, sngcm::ast::AttributesNode* attributes, boost::uuids::uuid* moduleId);
 };
 
 #endif // ATTRIBUTE_HPP

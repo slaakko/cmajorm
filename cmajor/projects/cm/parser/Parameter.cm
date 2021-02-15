@@ -8,7 +8,7 @@ using Cm.Lexer;
 using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/Parameter.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/Parameter.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class ParameterParser
 {
@@ -247,7 +247,7 @@ public static class ParameterParser
                                 {
                                     long pos = lexer.GetPos();
                                     Span span = lexer.GetSpan();
-                                    Match match = IdentifierParser.Identifier(lexer);
+                                    Match match = IdentifierParser.Identifier(lexer, ctx);
                                     id.Reset(cast<IdentifierNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -278,7 +278,7 @@ public static class ParameterParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Parameter");
                     #endif
-                    return Match(true, new ParameterNode(s, type.Release(), id.Release()));
+                    return Match(true, new ParameterNode(s, ctx->ModuleId(), type.Release(), id.Release()));
                 }
             }
             *parentMatch0 = match;

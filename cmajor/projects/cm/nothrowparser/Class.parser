@@ -1,0 +1,244 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowClassParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowAttributeParser.Attributes;
+    using NothrowSpecifierParser.Specifiers;
+    using NothrowIdentifierParser.Identifier;
+    using NothrowIdentifierParser.QualifiedId;
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowConceptParser.WhereConstraint;
+    using NothrowExpressionParser.ArgumentList;
+    using NothrowStatementParser.CompoundStatement;
+    using NothrowParameterParser.ParameterList;
+    using NothrowFunctionParser.FunctionGroupId;
+    using NothrowTemplateParser.TemplateId;
+    using NothrowTemplateParser.TemplateParameterList;
+    using NothrowTypedefParser.Typedef;
+    using NothrowEnumerationParser.EnumType;
+    using NothrowConstantParser.Constant;
+    using NothrowDelegateParser.Delegate;
+    using NothrowDelegateParser.ClassDelegate;
+
+    Class(NothrowParsingContext* ctx, var UniquePtr<ClassNode> cls, var Span s, var Span specifierSpan, var Span classSpan, var Span beginBraceSpan, var Span endBraceSpan) : ClassNode*
+        ::= empty{ s = span; }
+            Attributes(ctx):attrs?
+            Specifiers:specifiers{ specifierSpan = span; }
+            CLASS{ classSpan = span; }
+            Identifier(ctx):id
+        {
+            s.end = span.end;
+            cls.Reset(new ClassNode(s, ctx->ModuleId(), specifiers, id, attrs));
+            cls->SetSpecifierSpan(specifierSpan);
+            cls->SetClassSpan(classSpan);
+        }
+            TemplateParameterList(ctx, cls.Get()):templateParams?
+            InheritanceAndInterfaces(ctx, cls.Get()):inheritance?
+            (WhereConstraint(ctx):constraint{ cls->SetConstraint(constraint); })?
+            LBRACE!{ beginBraceSpan = span; }
+            ClassContent(ctx, cls.Get()):content
+            RBRACE!
+        {
+            endBraceSpan = span;
+            cls->SetBeginBraceSpan(beginBraceSpan);
+            cls->SetEndBraceSpan(endBraceSpan);
+            cls->SetLexerFlags(lexer.Flags());
+            return cls.Release();
+        }
+        ;
+
+    InheritanceAndInterfaces(NothrowParsingContext* ctx, ClassNode* classNode)
+        ::= COLON
+        (   empty{ ctx->BeginParsingTypeExpr(); }
+            BaseClassOrInterface(ctx):baseOrIntf{ classNode->AddBaseClassOrInterface(baseOrIntf); ctx->EndParsingTypeExpr(); } / { ctx->EndParsingTypeExpr(); }
+        ) % COMMA
+        ;
+
+    BaseClassOrInterface(NothrowParsingContext* ctx) : Node*
+        ::= TemplateId(ctx):templateId{ return templateId; }
+        |   QualifiedId(ctx):qid{ return qid; }
+        ;
+
+    ClassContent(NothrowParsingContext* ctx, ClassNode* classNode, var UniquePtr<Node> clsMem)
+        ::= (ClassMember(ctx, classNode):classMember
+        {
+            clsMem.Reset(classMember);
+            bool isSyncNode = (clsMem.Get() is SyncNode*);
+            if (!isSyncNode)
+            {
+                lexer.ResetFlag(LexerFlags.synchronized);
+            }
+            classNode->AddMember(clsMem.Release()); }
+        )*
+        ;
+
+    ClassMember(NothrowParsingContext* ctx, ClassNode* classNode) : Node*
+        ::= StaticConstructor(ctx, classNode):staticConstructor{ return staticConstructor; }
+        |   Constructor(ctx, classNode):constructor{ return constructor; }
+        |   Destructor(ctx, classNode):destructor{ return destructor; }
+        |   MemberFunction(ctx):memberFunction{ return memberFunction; }
+        |   ConversionFunction(ctx):conversionFunction{ return conversionFunction; }
+        |   MemberVariable(ctx):memberVariable{ return memberVariable; }
+        |   Typedef(ctx):typeDefinition{ return typeDefinition; }
+        |   Class(ctx):cls{ return cls; }
+        |   EnumType(ctx):enumType{ return enumType; }
+        |   Constant(ctx):constant{ return constant; }
+        |   Delegate(ctx):dlg{ return dlg; }
+        |   ClassDelegate(ctx):classDelegate{ return classDelegate; }
+        |   SyncMember:sync{ return new SyncNode(span, ctx->ModuleId()); }
+        ;
+
+    SyncMember
+        ::= empty
+        {
+            if (lexer.Synchronize())
+            {
+                ++lexer;
+            }
+            else
+            {
+                pass = false;
+            }
+        }
+        ;
+
+    StaticConstructor(NothrowParsingContext* ctx, ClassNode* classNode, var UniquePtr<StaticConstructorNode> staticConstructor, var Span s, var Span specifierSpan,
+        var ustring className) : StaticConstructorNode*
+        ::=
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier(ctx):id{ className = lexer.GetMatch(span); } LPAREN RPAREN
+            {
+                s.end = span.end;
+                if (className != classNode->Id()->Str()) pass = false; else if (!StaticConstructorSpecifiers(specifiers)) pass = false; else
+                {
+                    staticConstructor.Reset(new StaticConstructorNode(s, ctx->ModuleId(), specifiers, attrs));
+                    staticConstructor->SetClassId(id);
+                    staticConstructor->SetSpecifierSpan(specifierSpan);
+                }
+            }
+            (COLON (Initializer(ctx):initializer{ staticConstructor->AddInitializer(initializer); } % COMMA))?
+            (WhereConstraint(ctx):constraint{ staticConstructor->SetConstraint(constraint); })?
+            (CompoundStatement(ctx):body{ staticConstructor->SetBody(body); } | SEMICOLON)
+        )
+        {
+            staticConstructor->SetLexerFlags(lexer.Flags());
+            return staticConstructor.Release();
+        }
+        ;
+
+    Constructor(NothrowParsingContext* ctx, ClassNode* classNode, var UniquePtr<ConstructorNode> ctor, var Span s, var Span specifierSpan) : Node*
+        ::=
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier(ctx):id
+            {
+                ustring className = lexer.GetMatch(span);
+                s.end = span.end;
+                if (className != classNode->Id()->Str()) pass = false; else
+                {
+                    ctor.Reset(new ConstructorNode(s, ctx->ModuleId(), specifiers, attrs));
+                    ctor->SetClassId(id);
+                    ctor->SetSpecifierSpan(specifierSpan);
+                }
+            }
+            ParameterList(ctx, ctor.Get()):paramList
+            (COLON (Initializer(ctx):initializer{ ctor->AddInitializer(initializer); } % COMMA))?
+            (WhereConstraint(ctx):constraint{ ctor->SetConstraint(constraint); })?
+            (CompoundStatement(ctx):body{ ctor->SetBody(body); } | SEMICOLON)
+        )
+        {
+            ctor->SetLexerFlags(lexer.Flags());
+            return ctor.Release();
+        }
+        ;
+
+    Destructor(NothrowParsingContext* ctx, ClassNode* classNode, var UniquePtr<DestructorNode> dtor, var Span s, var Span specifierSpan, var ustring className) : Node*
+        ::=
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } CPL Identifier(ctx):id{ className = lexer.GetMatch(span); } LPAREN! RPAREN!
+            {
+                s.end = span.end;
+                if (className != classNode->Id()->Str()) pass = false; else
+                {
+                    dtor.Reset(new DestructorNode(s, ctx->ModuleId(), specifiers, attrs));
+                    dtor->SetClassId(id);
+                    dtor->SetSpecifierSpan(specifierSpan);
+                }
+            }
+            (WhereConstraint(ctx):constraint{ dtor->SetConstraint(constraint); })?
+            (CompoundStatement(ctx):body{ dtor->SetBody(body); } | SEMICOLON)
+        )
+        {
+            dtor->SetLexerFlags(lexer.Flags());
+            return  dtor.Release();
+        }
+        ;
+
+    Initializer(NothrowParsingContext* ctx, var UniquePtr<InitializerNode> initializer) : InitializerNode*
+        ::=
+        (   THIS{ initializer.Reset(new ThisInitializerNode(span, ctx->ModuleId())); } LPAREN! ArgumentList(ctx, initializer.Get()):thisArgs RPAREN!
+        |   BASE{ initializer.Reset(new BaseInitializerNode(span, ctx->ModuleId())); } LPAREN! ArgumentList(ctx, initializer.Get()):baseArgs RPAREN!
+        |   Identifier(ctx):id{ initializer.Reset(new MemberInitializerNode(span, ctx->ModuleId(), id)); } LPAREN! ArgumentList(ctx, initializer.Get()):memberArgs RPAREN!
+        )
+        {
+            initializer->SetLexerFlags(lexer.Flags());
+            return initializer.Release();
+        }
+        ;
+
+    MemberFunction(NothrowParsingContext* ctx, var UniquePtr<MemberFunctionNode> memFun, var Span s, var Span specifierSpan, var Span groupIdSpan) : Node*
+        ::=
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):returnType FunctionGroupId(ctx):groupId
+            {
+                s.end = span.end;
+                groupIdSpan = span;
+                memFun.Reset(new MemberFunctionNode(s, ctx->ModuleId(), specifiers, returnType, groupId, attrs));
+                memFun->SetSpecifierSpan(specifierSpan);
+                memFun->SetGroupIdSpan(groupIdSpan);
+            }
+            ParameterList(ctx, memFun.Get()):paramList (CONST{ memFun->SetConst(); })?
+            (WhereConstraint(ctx):constraint{ memFun->SetConstraint(constraint); })?
+            (CompoundStatement(ctx):body{ memFun->SetBody(body); } | SEMICOLON)
+        )
+        {
+            memFun->SetLexerFlags(lexer.Flags());
+            return memFun.Release();
+        }
+        ;
+
+    ConversionFunction(NothrowParsingContext* ctx, var UniquePtr<ConversionFunctionNode> conversionFun, var Span s, var Span specifierSpan) : Node*
+        ::=
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } OPERATOR TypeExpr(ctx):type LPAREN! RPAREN!
+            {
+                s.end = span.end;
+                conversionFun.Reset(new ConversionFunctionNode(s, ctx->ModuleId(), specifiers, type, attrs));
+                conversionFun->SetSpecifierSpan(specifierSpan);
+            }
+            (CONST{ conversionFun->SetConst(); })?
+            (WhereConstraint(ctx):constraint{ conversionFun->SetConstraint(constraint); })?
+            (CompoundStatement(ctx):body{ conversionFun->SetBody(body); } | SEMICOLON)
+        )
+        {
+            conversionFun->SetLexerFlags(lexer.Flags());
+            return conversionFun.Release();
+        }
+        ;
+
+    MemberVariable(NothrowParsingContext* ctx, var Span s, var Span specifierSpan) : Node*
+        ::= empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):type Identifier(ctx):id SEMICOLON
+        {
+            s.end = span.end;
+            MemberVariableNode* value = new MemberVariableNode(s, ctx->ModuleId(), specifiers, type, id, attrs);
+            value->SetSpecifierSpan(specifierSpan);
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+}

@@ -1,0 +1,257 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Span = System.Lex.Span;
+using Cm.Ast;
+
+namespace Cm.Symbols
+{
+    public enum SymbolType : byte
+    {
+        boolTypeSymbol, sbyteTypeSymbol, byteTypeSymbol, shortTypeSymbol, ushortTypeSymbol, intTypeSymbol, uintTypeSymbol, longTypeSymbol, ulongTypeSymbol,
+        floatTypeSymbol, doubleTypeSymbol, charTypeSymbol, wcharTypeSymbol, ucharTypeSymbol, voidTypeSymbol, nullPtrTypeSymbol, arrayTypeSymbol, derivedTypeSymbol,
+        namespaceSymbol, functionSymbol, staticConstructorSymbol, constructorSymbol, destructorSymbol, memberFunctionSymbol, conversionFunctionSymbol,
+        functionGroupSymbol, classGroupTypeSymbol, classTypeSymbol, classTemplateSpecializationSymbol, interfaceTypeSymbol, conceptGroupSymbol, conceptSymbol,
+        delegateTypeSymbol, classDelegateTypeSymbol, declarationBlock, typedefSymbol, constantSymbol, enumTypeSymbol, enumConstantSymbol,
+        templateParameterSymbol, boundTemplateParameterSymbol, parameterSymbol, localVariableSymbol, memberVariableSymbol,
+        basicTypeUnaryPlus, basicTypeIntUnaryMinus, basicTypeFloatUnaryMinus, basicTypeComplement, basicTypeAdd, basicTypeFAdd, basicTypeSub, basicTypeFSub,
+        basicTypeMul, basicTypeFMul, basicTypeSDiv, basicTypeUDiv, basicTypeFDiv, basicTypeSRem, basicTypeURem, basicTypeAnd, basicTypeOr, basicTypeXor,
+        basicTypeShl, basicTypeAShr, basicTypeLShr, basicTypeNot, basicTypeIntegerEquality, basicTypeUnsignedIntegerLessThan, basicTypeSignedIntegerLessThan,
+        basicTypeFloatingEquality, basicTypeFloatingLessThan, defaultInt1, defaultSInt8, defaultUInt8, defaultSInt16, defaultUInt16, defaultSInt32, defaultUInt32,
+        defaultSInt64, defaultUInt64, defaultChar, defaultWChar, defaultUChar, defaultFloat, defaultDouble, basicTypeCopyCtor, basicTypeMoveCtor,
+        basicTypeCopyAssignment, basicTypeMoveAssignment, basicTypeReturn, basicTypeImplicitSignExtension, basicTypeImplicitZeroExtension,
+        basicTypeExplicitSignExtension, basicTypeExplicitZeroExtension, basicTypeTruncation, basicTypeBitCast, basicTypeImplicitUnsignedIntToFloating,
+        basicTypeImplicitSignedIntToFloating, basicTypeExplicitUnsignedIntToFloating, basicTypeExplicitSignedIntToFloating, basicTypeFloatingToUnsignedInt,
+        basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation, trap, enumTypeDefaultConstructor, enumTypeCopyConstructor,
+        enumTypeMoveConstructor, enumTypeCopyAssignment, enumTypeMoveAssignment, enumTypeReturn, enumTypeEquality, enumTypeToUnderlyingType, underlyingToEnumType,
+        delegateTypeDefaultConstructor, delegateTypeCopyConstructor, delegateTypeMoveConstructor, delegateTypeCopyAssignment, delegateTypeMoveAssignment,
+        delegateTypeReturn, delegateTypeEquality, functionToDelegateSymbol, classDelegateTypeDefaultConstructor, classDelegateTypeCopyConstructor,
+        classDelegateTypeMoveConstructor, classDelegateTypeCopyAssignment, classDelegateTypeMoveAssignment, classDelegateTypeEquality,
+        memberFunctionToClassDelegateSymbol, arrayLengthFunctionSymbol, arrayBeginFunctionSymbol, arrayEndFunctionSymbol, arrayCBeginFunctionSymbol,
+        arrayCEndFunctionSymbol, namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, variableValueSymbol, globalVariableSymbol,
+        globalVariableGroupSymbol, stringFunctionContainerSymbol, stringLengthFunctionSymbol, axiomSymbol,
+        maxSymbol
+    }
+
+    public const char*[] symbolTypeStr =
+    [
+        "boolTypeSymbol", "sbyteTypeSymbol", "byteTypeSymbol", "shortTypeSymbol", "ushortTypeSymbol", "intTypeSymbol", "uintTypeSymbol", "longTypeSymbol",
+        "ulongTypeSymbol", "floatTypeSymbol", "doubleTypeSymbol", "charTypeSymbol", "wcharTypeSymbol", "ucharTypeSymbol", "voidTypeSymbol", "nullPtrTypeSymbol",
+        "arrayTypeSymbol", "derivedTypeSymbol", "namespaceSymbol", "functionSymbol", "staticConstructorSymbol", "constructorSymbol", "destructorSymbol",
+        "memberFunctionSymbol", "conversionFunctionSymbol", "functionGroupSymbol", "classGroupTypeSymbol", "classTypeSymbol", "interfaceTypeSymbol",
+        "conceptGroupSymbol", "conceptSymbol", "delegateTypeSymbol", "classDelegateTypeSymbol", "declarationBlock", "typedefSymbol", "constantSymbol",
+        "enumTypeSymbol", "enumConstantSymbol", "templateParameterSymbol", "boundTemplateParameterSymbol", "parameterSymbol", "localVariableSymbol",
+        "memberVariableSymbol", "basicTypeUnaryPlus", "basicTypeIntUnaryMinus", "basicTypeFloatUnaryMinus", "basicTypeComplement", "basicTypeAdd",
+        "basicTypeFAdd", "basicTypeSub", "basicTypeFSub", "basicTypeMul", "basicTypeFMul", "basicTypeSDiv", "basicTypeUDiv", "basicTypeFDiv",
+        "basicTypeSRem", "basicTypeURem", "basicTypeAnd", "basicTypeOr", "basicTypeXor", "basicTypeShl", "basicTypeAShr", "basicTypeLShr", "basicTypeNot",
+        "basicTypeIntegerEquality", "basicTypeUnsignedIntegerLessThan", "basicTypeSignedIntegerLessThan", "basicTypeFloatingEquality", "basicTypeFloatingLessThan",
+        "defaultInt1", "defaultInt8", "defaultInt16", "defaultInt32", "defaultInt64", "defaultFloat", "defaultDouble", "basicTypeCopyCtor", "basicTypeMoveCtor",
+        "basicTypeCopyAssignment", "basicTypeMoveAssignment", "basicTypeReturn", "basicTypeImplicitSignExtension", "basicTypeImplicitZeroExtension",
+        "basicTypeExplicitSignExtension", "basicTypeExplicitZeroExtension", "basicTypeTruncation", "basicTypeBitCast", "basicTypeImplicitUnsignedIntToFloating",
+        "basicTypeImplicitSignedIntToFloating", "basicTypeExplicitUnsignedIntToFloating", "basicTypeExplicitSignedIntToFloating", "basicTypeFloatingToUnsignedInt",
+        "basicTypeFloatingToSignedInt", "basicTypeFloatingExtension", "basicTypeFloatingTruncation", "trap", "enumTypeDefaultConstructor", "enumTypeCopyConstructor",
+        "enumTypeMoveConstructor", "enumTypeCopyAssignment", "enumTypeMoveAssignment", "enumTypeReturn", "enumTypeEquality", "enumTypeToUnderlyingType",
+        "underlyingToEnumType", "delegateTypeDefaultConstructor", "delegateTypeCopyConstructor", "delegateTypeMoveConstructor", "delegateTypeCopyAssignment",
+        "delegateTypeMoveAssignment", "delegateTypeReturn", "delegateTypeEquality", "functionToDelegateSymbol", "classDelegateTypeDefaultConstructor",
+        "classDelegateTypeCopyConstructor", "classDelegateTypeMoveConstructor", "classDelegateTypeCopyAssignment", "classDelegateTypeMoveAssignment",
+        "classDelegateTypeEquality", "memberFunctionToClassDelegateSymbol", "arrayLengthFunctionSymbol", "arrayBeginFunctionSymbol", "arrayEndFunctionSymbol",
+        "arrayCBeginFunctionSymbol", "arrayCEndFunctionSymbol", "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "variableValueSymbol",
+        "globalVariableSymbol", "globalVariableGroupSymbol", "stringFunctionContainerSymbol", "stringLengthFunctionSymbol", "axiomSymbol"
+    ];
+
+    public nothrow string SymbolTypeStr(SymbolType symbolType)
+    {
+        return symbolTypeStr[cast<long>(cast<byte>(symbolType))];
+    }
+
+    public enum SymbolAccess : byte
+    {
+        private_ = 0u, protected_ = 1u, internal_ = 2u, public_ = 3u
+    }
+
+    public enum SymbolFlags : byte
+    {
+        none = 0u, access = 1u << 0u | 1u << 1u,
+        static_ = 1u << 2u, external_ = 1u << 3u, nothrow_ = 1u << 4u, project_ = 1u << 5u, bound_ = 1u << 6u, installed_ = 1u << 7u
+    }
+
+    public nothrow string SymbolFlagStr(SymbolFlags symbolFlags)
+    {
+        return SymbolFlagStr(symbolFlags, false);
+    }
+
+    public nothrow string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess)
+    {
+        string s;
+        if (!noAccess)
+        {
+            SymbolAccess access = cast<SymbolAccess>(symbolFlags & SymbolFlags.access);
+            switch (access)
+            {
+                case SymbolAccess.private_: s.Append("private"); break;
+                case SymbolAccess.protected_: s.Append("protected"); break;
+                case SymbolAccess.internal_: s.Append("internal"); break;
+                case SymbolAccess.public_: s.Append("public"); break;
+            }
+        }
+        if ((symbolFlags & SymbolFlags.static_) != SymbolFlags.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append("static");
+        }
+        if ((symbolFlags & SymbolFlags.external_) != SymbolFlags.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append("extern");
+        }
+        if ((symbolFlags & SymbolFlags.nothrow_) != SymbolFlags.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append("nothrow");
+        }
+        if ((symbolFlags & SymbolFlags.project_) != SymbolFlags.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append("project");
+        }
+        if ((symbolFlags & SymbolFlags.bound_) != SymbolFlags.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append("bound");
+        }
+        if ((symbolFlags & SymbolFlags.installed_) != SymbolFlags.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append(' ');
+            }
+            s.Append("installed");
+        }
+        return s;
+    }
+
+    public abstract class Symbol
+    {
+        public nothrow Symbol(SymbolType symbolType_, const Span& span_, const Uuid& sourceModuleId_, const ustring& name_) :
+            symbolType(symbolType_), span(span_), sourceModuleId(sourceModuleId_), name(name_), flags(SymbolFlags.project_),
+            mangledName(), parent(null), module(null), compileUnit(null), attributes(), symbolIndex(-1)
+        {
+        }
+        public default virtual ~Symbol();
+        public virtual void Write(SymbolWriter& writer)
+        {
+            SymbolFlags f = cast<SymbolFlags>(flags & ~(SymbolFlags.project_ | SymbolFlags.installed_));
+            writer.GetBinaryWriter().Write(cast<byte>(f));
+            writer.GetBinaryWriter().Write(mangledName);
+            bool hasAttributes = !attributes.IsNull();
+            writer.GetBinaryWriter().Write(hasAttributes);
+            if (hasAttributes)
+            {
+                writer.GetAstWriter().Write(attributes.Get());
+            }
+        }
+        public virtual void Read(SymbolReader& reader)
+        {
+            flags = cast<SymbolFlags>(reader.GetBinaryReader().ReadByte());
+            if (reader.SetProjectBit())
+            {
+                flags = cast<SymbolFlags>(flags | SymbolFlags.project_);
+            }
+            mangledName = reader.GetBinaryReader().ReadUString();
+            bool hasAttributes = reader.GetBinaryReader().ReadBool();
+            if (hasAttributes)
+            {
+                attributes.Reset(reader.GetAstReader().ReadAttributesNode());
+            }
+        }
+        public nothrow inline SymbolType GetSymbolType() const
+        {
+            return symbolType;
+        }
+        public nothrow inline const Span& GetSpan() const
+        {
+            return span;
+        }
+        public nothrow inline const Uuid& SourceModuleId() const
+        {
+            return sourceModuleId;
+        }
+        public nothrow inline const ustring& Name() const
+        {
+            return name;
+        }
+        public nothrow inline SymbolAccess Access() const
+        {
+            return cast<SymbolAccess>(flags & SymbolFlags.access);
+        }
+        public nothrow inline SymbolFlags GetSymbolFlags() const
+        {
+            return flags;
+        }
+        public nothrow inline SymbolFlags GetStableSymbolFlags() const
+        {
+            return cast<SymbolFlags>(flags & ~(SymbolFlags.project_ | SymbolFlags.bound_ | SymbolFlags.installed_));
+        }
+        public nothrow inline bool GetFlag(SymbolFlags flag) const
+        {
+            return (flags & flag) != SymbolFlags.none;
+        }
+        public nothrow inline void SetFlag(SymbolFlags flag)
+        {
+            flags = cast<SymbolFlags>(flags | flag);
+        }
+        public nothrow inline void ResetFlag(SymbolFlags flag)
+        {
+            flags = cast<SymbolFlags>(flags & ~flag);
+        }
+        public nothrow inline const ustring& MangledName() const
+        {
+            return mangledName;
+        }
+        public nothrow inline Symbol* Parent() const
+        {
+            return parent;
+        }
+        public nothrow inline Module* GetModule() const
+        {
+            return module;
+        }
+        public nothrow inline CompileUnitNode* GetCompileUnit() const
+        {
+            return compileUnit;
+        }
+        public nothrow inline int SymbolIndex() const
+        {
+            return symbolIndex;
+        }
+        private SymbolType symbolType;
+        private Span span;
+        private Uuid sourceModuleId;
+        private ustring name;
+        private SymbolFlags flags;
+        private ustring mangledName;
+        private Symbol* parent;
+        private Module* module;
+        private CompileUnitNode* compileUnit;
+        private UniquePtr<AttributesNode> attributes;
+        private int symbolIndex;
+    }
+}

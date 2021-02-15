@@ -16,7 +16,7 @@ class SystemDefaultAttributeProcessor : public AttributeProcessor
 {
 public:
     SystemDefaultAttributeProcessor();
-    void TypeCheck(Attribute* attribute, Symbol* symbol) override;
+    void TypeCheck(AttributeNode* attribute, Symbol* symbol) override;
 };
 
 } } // namespace cmajor::binder

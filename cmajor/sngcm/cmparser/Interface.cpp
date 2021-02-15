@@ -8,7 +8,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Interface.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Interface.parser' using soulng parser generator spg version 3.10.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -30,7 +30,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, boost::uuid
     Span specifierSpan = Span();
     Span beginBraceSpan = Span();
     Span endBraceSpan = Span();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<IdentifierNode> id;
     soulng::parser::Match match(false);
@@ -85,7 +85,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, boost::uuid
                                             soulng::parser::Match* parentMatch11 = &match;
                                             {
                                                 soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
-                                                attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                                attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                                 if (match.hit)
                                                 {
                                                     *parentMatch11 = match;
@@ -377,7 +377,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, boost
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     std::unique_ptr<MemberFunctionNode> memFun = std::unique_ptr<MemberFunctionNode>();
     Span s = Span();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<sngcm::ast::Node> returnType;
     std::unique_ptr<soulng::parser::Value<std::u32string>> groupId;
     soulng::parser::Match match(false);
@@ -419,7 +419,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, boost
                             soulng::parser::Match* parentMatch7 = &match;
                             {
                                 soulng::parser::Match match = AttributeParser::Attributes(lexer, moduleId);
-                                attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                 if (match.hit)
                                 {
                                     *parentMatch7 = match;

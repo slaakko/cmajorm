@@ -1,0 +1,31 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Ast;
+using LexerFileTokens;
+
+parser LexIdentifierParser
+{
+    uselexer LexerFileLexer;
+
+    Identifier(ParsingContext* ctx) : IdentifierNode*
+        ::= ID{ return new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos)); }
+        ;
+
+    QualifiedId(ParsingContext* ctx, var ustring value, var Span s) : IdentifierNode*
+        ::=
+        (   ID{ s = span; Token token = lexer.GetToken(pos); value.Append(ustring(token.match.begin, token.match.end)); }
+            (DOT ID{ s.end = span.end; Token token = lexer.GetToken(pos); value.Append('.'); value.Append(ustring(token.match.begin, token.match.end)); })*
+        )
+        {
+            return new IdentifierNode(s, ctx->ModuleId(), value);
+        }
+        ;
+
+    ruleinfo
+    {
+        (Identifier, "identifier"), (QualifiedId, "identifier")
+    }
+}

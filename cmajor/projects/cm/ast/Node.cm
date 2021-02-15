@@ -5,13 +5,13 @@ namespace Cm.Ast
 {
     public enum NodeType : byte
     {
-        boolNode, sbyteNode, byteNode, shortNode, ushortNode, intNode, uintNode, longNode, ulongNode, floatNode, doubleNode, charNode, wcharNode, ucharNode, voidNode, booleanLiteralNode, sbyteLiteralNode, byteLiteralNode, shortLiteralNode, ushortLiteralNode, intLiteralNode, uintLiteralNode, longLiteralNode, ulongLiteralNode, floatLiteralNode, doubleLiteralNode, charLiteralNode, wcharLiteralNode, ucharLiteralNode, stringLiteralNode, wstringLiteralNode, ustringLiteralNode, nullLiteralNode, arrayLiteralNode, structuredLiteralNode, compileUnitNode, namespaceNode, aliasNode, namespaceImportNode, identifierNode, templateIdNode, functionNode, classNode, thisInitializerNode, baseInitializerNode, memberInitializerNode, staticConstructorNode, constructorNode, destructorNode, memberFunctionNode, conversionFunctionNode, memberVariableNode, interfaceNode, delegateNode, classDelegateNode, parenthesizedConstraintNode, disjunctiveConstraintNode, conjunctiveConstraintNode, whereConstraintNode, predicateConstraintNode, isConstraintNode, multiParamConstraintNode, typeNameConstraintNode, constructorConstraintNode, destructorConstraintNode, memberFunctionConstraintNode, functionConstraintNode, sameConstraintNode, derivedConstraintNode, convertibleConstraintNode, explicitlyConvertibleConstraintNode, commonConstraintNode, nonreferenceTypeConstraintNode, axiomStatementNode, axiomNode, conceptIdNode, conceptNode, sameConceptNode, derivedConceptNode, convertibleConceptNode, explicitlyConvertibleConceptNode, commonConceptNode, nonreferenceTypeConceptNode, labelNode, compoundStatementNode, returnStatementNode, ifStatementNode, whileStatementNode, doStatementNode, forStatementNode, breakStatementNode, continueStatementNode, gotoStatementNode, constructionStatementNode, deleteStatementNode, destroyStatementNode, assignmentStatementNode, expressionStatementNode, emptyStatementNode, rangeForStatementNode, switchStatementNode, caseStatementNode, defaultStatementNode, gotoCaseStatementNode, gotoDefaultStatementNode, throwStatementNode, catchNode, tryStatementNode, assertStatementNode, typedefNode, constantNode, enumTypeNode, enumConstantNode, parameterNode, templateParameterNode, constNode, lvalueRefNode, rvalueRefNode, pointerNode, arrayNode, dotNode, arrowNode, equivalenceNode, implicationNode, disjunctionNode, conjunctionNode, bitOrNode, bitXorNode, bitAndNode, equalNode, notEqualNode, lessNode, greaterNode, lessOrEqualNode, greaterOrEqualNode, shiftLeftNode, shiftRightNode, addNode, subNode, mulNode, divNode, remNode, notNode, unaryPlusNode, unaryMinusNode, prefixIncrementNode, prefixDecrementNode, complementNode, derefNode, addrOfNode, isNode, asNode, indexingNode, invokeNode, postfixIncrementNode, postfixDecrementNode, sizeOfNode, typeNameNode, typeIdNode, castNode, constructNode, newNode, thisNode, baseNode, conditionalCompilationDisjunctionNode, conditionalCompilationConjunctionNode, conditionalCompilationNotNode, conditionalCompilationPrimaryNode, conditionalCompilationPartNode, conditionalCompilationStatementNode, uuidLiteralNode, cursorIdNode, parenthesizedExpressionNode, globalVariableNode, parenthesizedCondCompExpressionNode, labeledStatementNode, commentNode, attributeNode, attributesNode, maxNode
+        boolNode, sbyteNode, byteNode, shortNode, ushortNode, intNode, uintNode, longNode, ulongNode, floatNode, doubleNode, charNode, wcharNode, ucharNode, voidNode, booleanLiteralNode, sbyteLiteralNode, byteLiteralNode, shortLiteralNode, ushortLiteralNode, intLiteralNode, uintLiteralNode, longLiteralNode, ulongLiteralNode, floatLiteralNode, doubleLiteralNode, charLiteralNode, wcharLiteralNode, ucharLiteralNode, stringLiteralNode, wstringLiteralNode, ustringLiteralNode, nullLiteralNode, arrayLiteralNode, structuredLiteralNode, compileUnitNode, namespaceNode, aliasNode, namespaceImportNode, identifierNode, templateIdNode, functionNode, classNode, thisInitializerNode, baseInitializerNode, memberInitializerNode, staticConstructorNode, constructorNode, destructorNode, memberFunctionNode, conversionFunctionNode, memberVariableNode, interfaceNode, delegateNode, classDelegateNode, parenthesizedConstraintNode, disjunctiveConstraintNode, conjunctiveConstraintNode, whereConstraintNode, predicateConstraintNode, isConstraintNode, multiParamConstraintNode, typeNameConstraintNode, constructorConstraintNode, destructorConstraintNode, memberFunctionConstraintNode, functionConstraintNode, sameConstraintNode, derivedConstraintNode, convertibleConstraintNode, explicitlyConvertibleConstraintNode, commonConstraintNode, nonreferenceTypeConstraintNode, axiomStatementNode, axiomNode, conceptIdNode, conceptNode, sameConceptNode, derivedConceptNode, convertibleConceptNode, explicitlyConvertibleConceptNode, commonConceptNode, nonreferenceTypeConceptNode, labelNode, compoundStatementNode, returnStatementNode, ifStatementNode, whileStatementNode, doStatementNode, forStatementNode, breakStatementNode, continueStatementNode, gotoStatementNode, constructionStatementNode, deleteStatementNode, destroyStatementNode, assignmentStatementNode, expressionStatementNode, emptyStatementNode, rangeForStatementNode, switchStatementNode, caseStatementNode, defaultStatementNode, gotoCaseStatementNode, gotoDefaultStatementNode, throwStatementNode, catchNode, tryStatementNode, assertStatementNode, typedefNode, constantNode, enumTypeNode, enumConstantNode, parameterNode, templateParameterNode, constNode, lvalueRefNode, rvalueRefNode, pointerNode, arrayNode, dotNode, arrowNode, equivalenceNode, implicationNode, disjunctionNode, conjunctionNode, bitOrNode, bitXorNode, bitAndNode, equalNode, notEqualNode, lessNode, greaterNode, lessOrEqualNode, greaterOrEqualNode, shiftLeftNode, shiftRightNode, addNode, subNode, mulNode, divNode, remNode, notNode, unaryPlusNode, unaryMinusNode, prefixIncrementNode, prefixDecrementNode, complementNode, derefNode, addrOfNode, isNode, asNode, indexingNode, invokeNode, postfixIncrementNode, postfixDecrementNode, sizeOfNode, typeNameNode, typeIdNode, castNode, constructNode, newNode, thisNode, baseNode, conditionalCompilationDisjunctionNode, conditionalCompilationConjunctionNode, conditionalCompilationNotNode, conditionalCompilationPrimaryNode, conditionalCompilationPartNode, conditionalCompilationStatementNode, uuidLiteralNode, cursorIdNode, parenthesizedExpressionNode, globalVariableNode, parenthesizedCondCompExpressionNode, labeledStatementNode, commentNode, functionPtrNode, syncNode, syncStatementNode, attributeNode, attributesNode, maxNode
     }
     public abstract class Node
     {
         public suppress nothrow Node(const Node&);
-        public nothrow Node(NodeType nodeType_, const System.Lex.Span& span_) :
-            nodeType(nodeType_), span(span_), parent(null)
+        public nothrow Node(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            nodeType(nodeType_), span(span_), moduleId(moduleId_), parent(null)
         {
         }
         public virtual ~Node()
@@ -37,6 +37,10 @@ namespace Cm.Ast
         public nothrow void SetSpanEnd(int end)
         {
             span.end = end;
+        }
+        public nothrow inline const Uuid& ModuleId() const
+        {
+            return moduleId;
         }
         public nothrow const Node* Parent() const
         {
@@ -109,18 +113,45 @@ namespace Cm.Ast
         public virtual nothrow void SetFullSpan()
         {
         }
+        public inline nothrow const System.Lex.LexerFlags GetLexerFlags() const
+        {
+            return lexerFlags;
+        }
+        public inline nothrow void SetLexerFlags(const System.Lex.LexerFlags& lexerFlags_)
+        {
+            lexerFlags = lexerFlags_;
+        }
         private NodeType nodeType;
         private System.Lex.Span span;
+        private Uuid moduleId;
         private Node* parent;
+        private System.Lex.LexerFlags lexerFlags;
     }
-    public abstract class UnaryNode : Node
+
+    public class SyncNode : Node
     {
-        public nothrow UnaryNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_), subject()
+        public nothrow SyncNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.syncNode, span_, moduleId_)
         {
         }
-        public nothrow UnaryNode(NodeType nodeType_, const System.Lex.Span& span_, Node* subject_) :
-            base(nodeType_, span_), subject(subject_)
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new SyncNode(GetSpan(), ModuleId());
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public abstract class UnaryNode : Node
+    {
+        public nothrow UnaryNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_), subject()
+        {
+        }
+        public nothrow UnaryNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_, Node* subject_) :
+            base(nodeType_, span_, moduleId_), subject(subject_)
         {
         }
         public nothrow const Node* Subject() const
@@ -155,14 +186,15 @@ namespace Cm.Ast
         }
         private UniquePtr<Node> subject;
     }
+    
     public abstract class BinaryNode : Node
     {
-        public nothrow BinaryNode(NodeType nodeType, const System.Lex.Span& span_) :
-            base(nodeType, span_), left(), right()
+        public nothrow BinaryNode(NodeType nodeType, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType, span_, moduleId_), left(), right()
         {
         }
-        public nothrow BinaryNode(NodeType nodeType, const System.Lex.Span& span_, Node* left_, Node* right_) :
-            base(nodeType, span_), left(left_), right(right_)
+        public nothrow BinaryNode(NodeType nodeType, const System.Lex.Span& span_, const Uuid& moduleId_, Node* left_, Node* right_) :
+            base(nodeType, span_, moduleId_), left(left_), right(right_)
         {
             left->SetParent(this);
             right->SetParent(this);
@@ -220,7 +252,7 @@ namespace Cm.Ast
         {
         }
         public suppress nothrow NodeCreator& operator=(const NodeCreator&);
-        public abstract Node* CreateNode(const System.Lex.Span& span);
+        public abstract Node* CreateNode(const System.Lex.Span& span, const Uuid& moduleId);
     }
     public class NodeFactory
     {
@@ -422,12 +454,12 @@ namespace Cm.Ast
         {
             creators[cast<long>(cast<byte>(nodeType))] = UniquePtr<NodeCreator>(creator);
         }
-        public Node* CreateNode(NodeType nodeType, const System.Lex.Span& span)
+        public Node* CreateNode(NodeType nodeType, const System.Lex.Span& span, const Uuid& moduleId)
         {
             const UniquePtr<NodeCreator>& creator = creators[cast<long>(cast<byte>(nodeType))];
             if (!creator.IsNull())
             {
-                Node* value = creator->CreateNode(span);
+                Node* value = creator->CreateNode(span, moduleId);
                 if ((value != null))
                 {
                     return value;
@@ -452,9 +484,9 @@ namespace Cm.Ast
         }
         public suppress nothrow ConcreteNodeCreator(const ConcreteNodeCreator&);
         public suppress nothrow ConcreteNodeCreator& operator=(const ConcreteNodeCreator&);
-        public override Node* CreateNode(const System.Lex.Span& span)
+        public override Node* CreateNode(const System.Lex.Span& span, const Uuid& moduleId)
         {
-            return new T(span);
+            return new T(span, moduleId);
         }
     }
     public string NodeTypeStr(NodeType nodeType)

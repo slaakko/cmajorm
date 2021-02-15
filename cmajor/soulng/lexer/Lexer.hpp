@@ -11,6 +11,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <memory>
 #include <stdint.h>
 
 namespace soulng { namespace lexer {
@@ -40,6 +41,10 @@ class SOULNG_LEXER_API Lexer
 public:
     Lexer(const std::u32string& content_, const std::string& fileName_, int fileIndex_);
     Lexer(const char32_t* start_, const char32_t* end_, const std::string& fileName_, int fileIndex_);
+    Lexer(const Lexer&) = delete;
+    Lexer(Lexer&&) = delete;
+    Lexer& operator=(const Lexer&) = delete;
+    Lexer& operator=(Lexer&&) = delete;
     virtual ~Lexer();
     int operator*() const { return current->id; }
     void operator++();
@@ -64,7 +69,7 @@ public:
     void GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) const;
     void ThrowExpectationFailure(const Span& span, const std::u32string& name);
     void AddError(const Span& span, const std::u32string& name);
-    const std::vector<std::exception>& Errors() const { return errors; }
+    std::vector<std::unique_ptr<std::exception>> Errors() { return std::move(errors); }
     const char32_t* Start() const { return start; }
     const char32_t* End() const { return end; }
     const char32_t* Pos() const { return pos; }
@@ -92,7 +97,7 @@ private:
     const char32_t* pos;
     std::vector<Token> tokens;
     std::vector<Token>::iterator current;
-    std::vector<std::exception> errors;
+    std::vector<std::unique_ptr<std::exception>> errors;
     std::vector<int> syncTokens;
     ParsingLog* log;
     bool countLines;

@@ -11,7 +11,7 @@ namespace System.Collections
     public class RedBlackTreeNodeBase
     {
         public enum Color { red, black }
-        
+
         public nothrow RedBlackTreeNodeBase(RedBlackTreeNodeBase* parent_) : color(Color.black), parent(parent_), left(null), right(null)
         {
         }
@@ -121,7 +121,7 @@ namespace System.Collections
             {
                 return Min(n->right);
             }
-            else 
+            else
             {
                 RedBlackTreeNodeBase* u = n->parent;
                 while (n == u->right)
@@ -477,16 +477,16 @@ namespace System.Collections
     {
         public typedef T ValueType;
 
-        public RedBlackTreeNode(const ValueType& value_, RedBlackTreeNode<T>* parent_) : base(parent_), value(value_) 
+        public RedBlackTreeNode(const ValueType& value_, RedBlackTreeNode<T>* parent_) : base(parent_), value(value_)
         {
         }
-        public inline nothrow const ValueType& Value() const 
-        { 
-            return value; 
+        public inline nothrow const ValueType& Value() const
+        {
+            return value;
         }
-        public inline nothrow ValueType& Value() 
-        { 
-            return value; 
+        public inline nothrow ValueType& Value()
+        {
+            return value;
         }
         private ValueType value;
     }
@@ -547,7 +547,7 @@ namespace System.Collections
 
         public RedBlackTree() : header(), count(0), keyOf(), comp()
         {
-            Init(); 
+            Init();
         }
         public RedBlackTree(const Self& that) : header(), count(0), keyOf(), comp()
             where ValueType is Copyable
@@ -560,14 +560,14 @@ namespace System.Collections
         {
             that.count = 0;
         }
-        public void operator=(const Self& that) 
+        public void operator=(const Self& that)
             where ValueType is Copyable
         {
             Clear();
             Init();
             CopyFrom(that);
         }
-        public nothrow void operator=(Self&& that) 
+        public nothrow void operator=(Self&& that)
             where ValueType is Movable
         {
             Swap(header, that.header);
@@ -588,7 +588,7 @@ namespace System.Collections
             else
             {
                 return ConstIterator(Leftmost());
-            }            
+            }
         }
         public inline nothrow Iterator Begin()
         {
@@ -599,7 +599,7 @@ namespace System.Collections
             else
             {
                 return Iterator(Leftmost());
-            }            
+            }
         }
         public inline nothrow ConstIterator CBegin() const
         {
@@ -610,7 +610,7 @@ namespace System.Collections
             else
             {
                 return ConstIterator(Leftmost());
-            }            
+            }
         }
         public inline nothrow ConstIterator End() const
         {
@@ -638,7 +638,7 @@ namespace System.Collections
         {
             if (header.IsNull())
             {
-                return;        
+                return;
             }
             RedBlackTreeNode<ValueType>* root = Root();
             if (root != null)
@@ -677,7 +677,7 @@ namespace System.Collections
         public nothrow ConstIterator Find(const KeyType& key) const
         {
             if (IsEmpty())
-            {                
+            {
                 return CEnd();
             }
             RedBlackTreeNode<ValueType>* x = Root();
@@ -722,7 +722,73 @@ namespace System.Collections
             }
             return CEnd();
         }
-        public Pair<Iterator, bool> Insert(const ValueType& value) 
+        public nothrow Iterator LowerBound(const KeyType& key)
+        {
+            if (IsEmpty())
+            {
+                return End();
+            }
+            RedBlackTreeNode<ValueType>* y = header.Get();
+            RedBlackTreeNode<ValueType>* x = Root();
+            while (x != null)
+            {
+                if (!Comp(KeyOf(x->Value()), key))
+                {
+                    y = x;
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
+                }
+                else
+                {
+                     x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
+                }
+            }
+            return Iterator(y);
+        }
+        public nothrow ConstIterator LowerBound(const KeyType& key) const
+        {
+            if (IsEmpty())
+            {
+                return CEnd();
+            }
+            RedBlackTreeNode<ValueType>* y = header.Get();
+            RedBlackTreeNode<ValueType>* x = Root();
+            while (x != null)
+            {
+                if (!Comp(KeyOf(x->Value()), key))
+                {
+                    y = x;
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
+                }
+                else
+                {
+                     x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
+                }
+            }
+            return ConstIterator(y);
+        }
+        public nothrow ConstIterator CLowerBound(const KeyType& key) const
+        {
+            if (IsEmpty())
+            {
+                return CEnd();
+            }
+            RedBlackTreeNode<ValueType>* y = header.Get();
+            RedBlackTreeNode<ValueType>* x = Root();
+            while (x != null)
+            {
+                if (!Comp(KeyOf(x->Value()), key))
+                {
+                    y = x;
+                    x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
+                }
+                else
+                {
+                     x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
+                }
+            }
+            return ConstIterator(y);
+        }
+        public Pair<Iterator, bool> Insert(const ValueType& value)
             where ValueType is Copyable
         {
             if (header.IsNull())
@@ -740,7 +806,7 @@ namespace System.Collections
                 {
                     x = cast<RedBlackTreeNode<ValueType>*>(x->Left());
                 }
-                else 
+                else
                 {
                     x = cast<RedBlackTreeNode<ValueType>*>(x->Right());
                 }
@@ -763,7 +829,7 @@ namespace System.Collections
             }
             return MakePair(j, false);
         }
-        private Iterator Insert(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p, const ValueType& value) 
+        private Iterator Insert(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p, const ValueType& value)
             where ValueType is Copyable
         {
             if (header.IsNull())
@@ -847,7 +913,7 @@ namespace System.Collections
             SetLeftmost(header.Get());
             SetRightmost(header.Get());
         }
-        private void CopyFrom(const Self& that) 
+        private void CopyFrom(const Self& that)
             where ValueType is Copyable
         {
             if (that.Root() != null)

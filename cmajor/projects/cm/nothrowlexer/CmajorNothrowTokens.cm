@@ -1,0 +1,683 @@
+using System;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/nothrowlexer/CmNothrowLexer.lexer' using soulcm lexer generator scmlg version 3.10.0
+
+namespace CmajorNothrowTokens
+{
+    public const int END = 0;
+
+    public const int ASSERT = 1;
+
+    public const int ELIF = 2;
+
+    public const int ENDIF = 3;
+
+    public const int BOOL = 4;
+
+    public const int TRUE = 5;
+
+    public const int FALSE = 6;
+
+    public const int SBYTE = 7;
+
+    public const int BYTE = 8;
+
+    public const int SHORT = 9;
+
+    public const int USHORT = 10;
+
+    public const int INT = 11;
+
+    public const int UINT = 12;
+
+    public const int LONG = 13;
+
+    public const int ULONG = 14;
+
+    public const int FLOAT = 15;
+
+    public const int DOUBLE = 16;
+
+    public const int CHAR = 17;
+
+    public const int WCHAR = 18;
+
+    public const int UCHAR = 19;
+
+    public const int VOID = 20;
+
+    public const int ENUM = 21;
+
+    public const int CAST = 22;
+
+    public const int INTERFACE = 23;
+
+    public const int NAMESPACE = 24;
+
+    public const int USING = 25;
+
+    public const int STATIC = 26;
+
+    public const int EXTERN = 27;
+
+    public const int AS = 28;
+
+    public const int IS = 29;
+
+    public const int EXPLICIT = 30;
+
+    public const int DELEGATE = 31;
+
+    public const int INLINE = 32;
+
+    public const int CDECL = 33;
+
+    public const int NOTHROW = 34;
+
+    public const int PUBLIC = 35;
+
+    public const int PROTECTED = 36;
+
+    public const int PRIVATE = 37;
+
+    public const int INTERNAL = 38;
+
+    public const int VIRTUAL = 39;
+
+    public const int ABSTRACT = 40;
+
+    public const int OVERRIDE = 41;
+
+    public const int SUPPRESS = 42;
+
+    public const int WINAPI = 43;
+
+    public const int OPERATOR = 44;
+
+    public const int CLASS = 45;
+
+    public const int RETURN = 46;
+
+    public const int IF = 47;
+
+    public const int ELSE = 48;
+
+    public const int SWITCH = 49;
+
+    public const int CASE = 50;
+
+    public const int DEFAULT = 51;
+
+    public const int WHILE = 52;
+
+    public const int DO = 53;
+
+    public const int FOR = 54;
+
+    public const int BREAK = 55;
+
+    public const int CONTINUE = 56;
+
+    public const int GOTO = 57;
+
+    public const int TYPEDEF = 58;
+
+    public const int TYPENAME = 59;
+
+    public const int TYPEID = 60;
+
+    public const int CONST = 61;
+
+    public const int CONSTEXPR = 62;
+
+    public const int NULLLIT = 63;
+
+    public const int THIS = 64;
+
+    public const int BASE = 65;
+
+    public const int CONSTRUCT = 66;
+
+    public const int DESTROY = 67;
+
+    public const int NEW = 68;
+
+    public const int DELETE = 69;
+
+    public const int SIZEOF = 70;
+
+    public const int TRY = 71;
+
+    public const int CATCH = 72;
+
+    public const int THROW = 73;
+
+    public const int CONCEPT = 74;
+
+    public const int WHERE = 75;
+
+    public const int AXIOM = 76;
+
+    public const int AND = 77;
+
+    public const int OR = 78;
+
+    public const int EXCLAMATION = 79;
+
+    public const int UNIT_TEST = 80;
+
+    public const int ID = 81;
+
+    public const int FLOATINGLIT = 82;
+
+    public const int INTLIT = 83;
+
+    public const int CHARLIT = 84;
+
+    public const int STRINGLIT = 85;
+
+    public const int EQUIVALENCE = 86;
+
+    public const int IMPLICATION = 87;
+
+    public const int DISJUNCTION = 88;
+
+    public const int AMPAMP = 89;
+
+    public const int BITOR = 90;
+
+    public const int BITXOR = 91;
+
+    public const int AMP = 92;
+
+    public const int EQ = 93;
+
+    public const int NEQ = 94;
+
+    public const int LEQ = 95;
+
+    public const int GEQ = 96;
+
+    public const int SHIFTLEFT = 97;
+
+    public const int SHIFTRIGHT = 98;
+
+    public const int PLUS = 99;
+
+    public const int MINUS = 100;
+
+    public const int STAR = 101;
+
+    public const int DIV = 102;
+
+    public const int REM = 103;
+
+    public const int PLUSPLUS = 104;
+
+    public const int MINUSMINUS = 105;
+
+    public const int CPL = 106;
+
+    public const int DOT = 107;
+
+    public const int ARROW = 108;
+
+    public const int LBRACKET = 109;
+
+    public const int RBRACKET = 110;
+
+    public const int LPAREN = 111;
+
+    public const int RPAREN = 112;
+
+    public const int LANGLE = 113;
+
+    public const int RANGLE = 114;
+
+    public const int LBRACE = 115;
+
+    public const int RBRACE = 116;
+
+    public const int COMMA = 117;
+
+    public const int ASSIGN = 118;
+
+    public const int COLON = 119;
+
+    public const int SEMICOLON = 120;
+
+    public const int HASH = 121;
+
+    public const int COMMENT = 122;
+
+    public const int WS = 123;
+
+    public const int DOLLAR = 124;
+
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"ABSTRACT"] = 40;
+            tokenIdMap[u"AMP"] = 92;
+            tokenIdMap[u"AMPAMP"] = 89;
+            tokenIdMap[u"AND"] = 77;
+            tokenIdMap[u"ARROW"] = 108;
+            tokenIdMap[u"AS"] = 28;
+            tokenIdMap[u"ASSERT"] = 1;
+            tokenIdMap[u"ASSIGN"] = 118;
+            tokenIdMap[u"AXIOM"] = 76;
+            tokenIdMap[u"BASE"] = 65;
+            tokenIdMap[u"BITOR"] = 90;
+            tokenIdMap[u"BITXOR"] = 91;
+            tokenIdMap[u"BOOL"] = 4;
+            tokenIdMap[u"BREAK"] = 55;
+            tokenIdMap[u"BYTE"] = 8;
+            tokenIdMap[u"CASE"] = 50;
+            tokenIdMap[u"CAST"] = 22;
+            tokenIdMap[u"CATCH"] = 72;
+            tokenIdMap[u"CDECL"] = 33;
+            tokenIdMap[u"CHAR"] = 17;
+            tokenIdMap[u"CHARLIT"] = 84;
+            tokenIdMap[u"CLASS"] = 45;
+            tokenIdMap[u"COLON"] = 119;
+            tokenIdMap[u"COMMA"] = 117;
+            tokenIdMap[u"COMMENT"] = 122;
+            tokenIdMap[u"CONCEPT"] = 74;
+            tokenIdMap[u"CONST"] = 61;
+            tokenIdMap[u"CONSTEXPR"] = 62;
+            tokenIdMap[u"CONSTRUCT"] = 66;
+            tokenIdMap[u"CONTINUE"] = 56;
+            tokenIdMap[u"CPL"] = 106;
+            tokenIdMap[u"DEFAULT"] = 51;
+            tokenIdMap[u"DELEGATE"] = 31;
+            tokenIdMap[u"DELETE"] = 69;
+            tokenIdMap[u"DESTROY"] = 67;
+            tokenIdMap[u"DISJUNCTION"] = 88;
+            tokenIdMap[u"DIV"] = 102;
+            tokenIdMap[u"DO"] = 53;
+            tokenIdMap[u"DOLLAR"] = 124;
+            tokenIdMap[u"DOT"] = 107;
+            tokenIdMap[u"DOUBLE"] = 16;
+            tokenIdMap[u"ELIF"] = 2;
+            tokenIdMap[u"ELSE"] = 48;
+            tokenIdMap[u"ENDIF"] = 3;
+            tokenIdMap[u"ENUM"] = 21;
+            tokenIdMap[u"EQ"] = 93;
+            tokenIdMap[u"EQUIVALENCE"] = 86;
+            tokenIdMap[u"EXCLAMATION"] = 79;
+            tokenIdMap[u"EXPLICIT"] = 30;
+            tokenIdMap[u"EXTERN"] = 27;
+            tokenIdMap[u"FALSE"] = 6;
+            tokenIdMap[u"FLOAT"] = 15;
+            tokenIdMap[u"FLOATINGLIT"] = 82;
+            tokenIdMap[u"FOR"] = 54;
+            tokenIdMap[u"GEQ"] = 96;
+            tokenIdMap[u"GOTO"] = 57;
+            tokenIdMap[u"HASH"] = 121;
+            tokenIdMap[u"ID"] = 81;
+            tokenIdMap[u"IF"] = 47;
+            tokenIdMap[u"IMPLICATION"] = 87;
+            tokenIdMap[u"INLINE"] = 32;
+            tokenIdMap[u"INT"] = 11;
+            tokenIdMap[u"INTERFACE"] = 23;
+            tokenIdMap[u"INTERNAL"] = 38;
+            tokenIdMap[u"INTLIT"] = 83;
+            tokenIdMap[u"IS"] = 29;
+            tokenIdMap[u"LANGLE"] = 113;
+            tokenIdMap[u"LBRACE"] = 115;
+            tokenIdMap[u"LBRACKET"] = 109;
+            tokenIdMap[u"LEQ"] = 95;
+            tokenIdMap[u"LONG"] = 13;
+            tokenIdMap[u"LPAREN"] = 111;
+            tokenIdMap[u"MINUS"] = 100;
+            tokenIdMap[u"MINUSMINUS"] = 105;
+            tokenIdMap[u"NAMESPACE"] = 24;
+            tokenIdMap[u"NEQ"] = 94;
+            tokenIdMap[u"NEW"] = 68;
+            tokenIdMap[u"NOTHROW"] = 34;
+            tokenIdMap[u"NULLLIT"] = 63;
+            tokenIdMap[u"OPERATOR"] = 44;
+            tokenIdMap[u"OR"] = 78;
+            tokenIdMap[u"OVERRIDE"] = 41;
+            tokenIdMap[u"PLUS"] = 99;
+            tokenIdMap[u"PLUSPLUS"] = 104;
+            tokenIdMap[u"PRIVATE"] = 37;
+            tokenIdMap[u"PROTECTED"] = 36;
+            tokenIdMap[u"PUBLIC"] = 35;
+            tokenIdMap[u"RANGLE"] = 114;
+            tokenIdMap[u"RBRACE"] = 116;
+            tokenIdMap[u"RBRACKET"] = 110;
+            tokenIdMap[u"REM"] = 103;
+            tokenIdMap[u"RETURN"] = 46;
+            tokenIdMap[u"RPAREN"] = 112;
+            tokenIdMap[u"SBYTE"] = 7;
+            tokenIdMap[u"SEMICOLON"] = 120;
+            tokenIdMap[u"SHIFTLEFT"] = 97;
+            tokenIdMap[u"SHIFTRIGHT"] = 98;
+            tokenIdMap[u"SHORT"] = 9;
+            tokenIdMap[u"SIZEOF"] = 70;
+            tokenIdMap[u"STAR"] = 101;
+            tokenIdMap[u"STATIC"] = 26;
+            tokenIdMap[u"STRINGLIT"] = 85;
+            tokenIdMap[u"SUPPRESS"] = 42;
+            tokenIdMap[u"SWITCH"] = 49;
+            tokenIdMap[u"THIS"] = 64;
+            tokenIdMap[u"THROW"] = 73;
+            tokenIdMap[u"TRUE"] = 5;
+            tokenIdMap[u"TRY"] = 71;
+            tokenIdMap[u"TYPEDEF"] = 58;
+            tokenIdMap[u"TYPEID"] = 60;
+            tokenIdMap[u"TYPENAME"] = 59;
+            tokenIdMap[u"UCHAR"] = 19;
+            tokenIdMap[u"UINT"] = 12;
+            tokenIdMap[u"ULONG"] = 14;
+            tokenIdMap[u"UNIT_TEST"] = 80;
+            tokenIdMap[u"USHORT"] = 10;
+            tokenIdMap[u"USING"] = 25;
+            tokenIdMap[u"VIRTUAL"] = 39;
+            tokenIdMap[u"VOID"] = 20;
+            tokenIdMap[u"WCHAR"] = 18;
+            tokenIdMap[u"WHERE"] = 75;
+            tokenIdMap[u"WHILE"] = 52;
+            tokenIdMap[u"WINAPI"] = 43;
+            tokenIdMap[u"WS"] = 123;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"ASSERT");
+            tokenInfoList.Add(u"'assert'");
+            tokenNameList.Add(u"ELIF");
+            tokenInfoList.Add(u"'elif'");
+            tokenNameList.Add(u"ENDIF");
+            tokenInfoList.Add(u"'endif'");
+            tokenNameList.Add(u"BOOL");
+            tokenInfoList.Add(u"'bool'");
+            tokenNameList.Add(u"TRUE");
+            tokenInfoList.Add(u"'true'");
+            tokenNameList.Add(u"FALSE");
+            tokenInfoList.Add(u"'false'");
+            tokenNameList.Add(u"SBYTE");
+            tokenInfoList.Add(u"'sbyte'");
+            tokenNameList.Add(u"BYTE");
+            tokenInfoList.Add(u"'byte'");
+            tokenNameList.Add(u"SHORT");
+            tokenInfoList.Add(u"'short'");
+            tokenNameList.Add(u"USHORT");
+            tokenInfoList.Add(u"'ushort'");
+            tokenNameList.Add(u"INT");
+            tokenInfoList.Add(u"'int'");
+            tokenNameList.Add(u"UINT");
+            tokenInfoList.Add(u"'uint'");
+            tokenNameList.Add(u"LONG");
+            tokenInfoList.Add(u"'long'");
+            tokenNameList.Add(u"ULONG");
+            tokenInfoList.Add(u"'ulong'");
+            tokenNameList.Add(u"FLOAT");
+            tokenInfoList.Add(u"'float'");
+            tokenNameList.Add(u"DOUBLE");
+            tokenInfoList.Add(u"'double'");
+            tokenNameList.Add(u"CHAR");
+            tokenInfoList.Add(u"'char'");
+            tokenNameList.Add(u"WCHAR");
+            tokenInfoList.Add(u"'wchar'");
+            tokenNameList.Add(u"UCHAR");
+            tokenInfoList.Add(u"'uchar'");
+            tokenNameList.Add(u"VOID");
+            tokenInfoList.Add(u"'void'");
+            tokenNameList.Add(u"ENUM");
+            tokenInfoList.Add(u"'enum'");
+            tokenNameList.Add(u"CAST");
+            tokenInfoList.Add(u"'cast'");
+            tokenNameList.Add(u"INTERFACE");
+            tokenInfoList.Add(u"'interface'");
+            tokenNameList.Add(u"NAMESPACE");
+            tokenInfoList.Add(u"'namespace'");
+            tokenNameList.Add(u"USING");
+            tokenInfoList.Add(u"'using'");
+            tokenNameList.Add(u"STATIC");
+            tokenInfoList.Add(u"'static'");
+            tokenNameList.Add(u"EXTERN");
+            tokenInfoList.Add(u"'extern'");
+            tokenNameList.Add(u"AS");
+            tokenInfoList.Add(u"'as'");
+            tokenNameList.Add(u"IS");
+            tokenInfoList.Add(u"'is'");
+            tokenNameList.Add(u"EXPLICIT");
+            tokenInfoList.Add(u"'explicit'");
+            tokenNameList.Add(u"DELEGATE");
+            tokenInfoList.Add(u"'delegate'");
+            tokenNameList.Add(u"INLINE");
+            tokenInfoList.Add(u"'inline'");
+            tokenNameList.Add(u"CDECL");
+            tokenInfoList.Add(u"'cdecl'");
+            tokenNameList.Add(u"NOTHROW");
+            tokenInfoList.Add(u"'nothrow'");
+            tokenNameList.Add(u"PUBLIC");
+            tokenInfoList.Add(u"'public'");
+            tokenNameList.Add(u"PROTECTED");
+            tokenInfoList.Add(u"'protected'");
+            tokenNameList.Add(u"PRIVATE");
+            tokenInfoList.Add(u"'private'");
+            tokenNameList.Add(u"INTERNAL");
+            tokenInfoList.Add(u"'internal'");
+            tokenNameList.Add(u"VIRTUAL");
+            tokenInfoList.Add(u"'virtual'");
+            tokenNameList.Add(u"ABSTRACT");
+            tokenInfoList.Add(u"'abstract'");
+            tokenNameList.Add(u"OVERRIDE");
+            tokenInfoList.Add(u"'override'");
+            tokenNameList.Add(u"SUPPRESS");
+            tokenInfoList.Add(u"'suppress'");
+            tokenNameList.Add(u"WINAPI");
+            tokenInfoList.Add(u"'winapi'");
+            tokenNameList.Add(u"OPERATOR");
+            tokenInfoList.Add(u"'operator'");
+            tokenNameList.Add(u"CLASS");
+            tokenInfoList.Add(u"'class'");
+            tokenNameList.Add(u"RETURN");
+            tokenInfoList.Add(u"'return'");
+            tokenNameList.Add(u"IF");
+            tokenInfoList.Add(u"'if'");
+            tokenNameList.Add(u"ELSE");
+            tokenInfoList.Add(u"'else'");
+            tokenNameList.Add(u"SWITCH");
+            tokenInfoList.Add(u"'switch'");
+            tokenNameList.Add(u"CASE");
+            tokenInfoList.Add(u"'case'");
+            tokenNameList.Add(u"DEFAULT");
+            tokenInfoList.Add(u"'default'");
+            tokenNameList.Add(u"WHILE");
+            tokenInfoList.Add(u"'while'");
+            tokenNameList.Add(u"DO");
+            tokenInfoList.Add(u"'do'");
+            tokenNameList.Add(u"FOR");
+            tokenInfoList.Add(u"'for'");
+            tokenNameList.Add(u"BREAK");
+            tokenInfoList.Add(u"'break'");
+            tokenNameList.Add(u"CONTINUE");
+            tokenInfoList.Add(u"'continue'");
+            tokenNameList.Add(u"GOTO");
+            tokenInfoList.Add(u"'goto'");
+            tokenNameList.Add(u"TYPEDEF");
+            tokenInfoList.Add(u"'typedef'");
+            tokenNameList.Add(u"TYPENAME");
+            tokenInfoList.Add(u"'typename'");
+            tokenNameList.Add(u"TYPEID");
+            tokenInfoList.Add(u"'typeid'");
+            tokenNameList.Add(u"CONST");
+            tokenInfoList.Add(u"'const'");
+            tokenNameList.Add(u"CONSTEXPR");
+            tokenInfoList.Add(u"'constexpr'");
+            tokenNameList.Add(u"NULLLIT");
+            tokenInfoList.Add(u"'null'");
+            tokenNameList.Add(u"THIS");
+            tokenInfoList.Add(u"'this'");
+            tokenNameList.Add(u"BASE");
+            tokenInfoList.Add(u"'base'");
+            tokenNameList.Add(u"CONSTRUCT");
+            tokenInfoList.Add(u"'construct'");
+            tokenNameList.Add(u"DESTROY");
+            tokenInfoList.Add(u"'destroy'");
+            tokenNameList.Add(u"NEW");
+            tokenInfoList.Add(u"'new'");
+            tokenNameList.Add(u"DELETE");
+            tokenInfoList.Add(u"'delete'");
+            tokenNameList.Add(u"SIZEOF");
+            tokenInfoList.Add(u"'sizeof'");
+            tokenNameList.Add(u"TRY");
+            tokenInfoList.Add(u"'try'");
+            tokenNameList.Add(u"CATCH");
+            tokenInfoList.Add(u"'catch'");
+            tokenNameList.Add(u"THROW");
+            tokenInfoList.Add(u"'throw'");
+            tokenNameList.Add(u"CONCEPT");
+            tokenInfoList.Add(u"'concept'");
+            tokenNameList.Add(u"WHERE");
+            tokenInfoList.Add(u"'where'");
+            tokenNameList.Add(u"AXIOM");
+            tokenInfoList.Add(u"'axiom'");
+            tokenNameList.Add(u"AND");
+            tokenInfoList.Add(u"'and'");
+            tokenNameList.Add(u"OR");
+            tokenInfoList.Add(u"'or'");
+            tokenNameList.Add(u"EXCLAMATION");
+            tokenInfoList.Add(u"'!'");
+            tokenNameList.Add(u"UNIT_TEST");
+            tokenInfoList.Add(u"'unit_test'");
+            tokenNameList.Add(u"ID");
+            tokenInfoList.Add(u"identifier");
+            tokenNameList.Add(u"FLOATINGLIT");
+            tokenInfoList.Add(u"floating literal");
+            tokenNameList.Add(u"INTLIT");
+            tokenInfoList.Add(u"integer literal");
+            tokenNameList.Add(u"CHARLIT");
+            tokenInfoList.Add(u"character literal");
+            tokenNameList.Add(u"STRINGLIT");
+            tokenInfoList.Add(u"string literal");
+            tokenNameList.Add(u"EQUIVALENCE");
+            tokenInfoList.Add(u"'<=>'");
+            tokenNameList.Add(u"IMPLICATION");
+            tokenInfoList.Add(u"'=>'");
+            tokenNameList.Add(u"DISJUNCTION");
+            tokenInfoList.Add(u"'||'");
+            tokenNameList.Add(u"AMPAMP");
+            tokenInfoList.Add(u"'&&'");
+            tokenNameList.Add(u"BITOR");
+            tokenInfoList.Add(u"'|'");
+            tokenNameList.Add(u"BITXOR");
+            tokenInfoList.Add(u"'^'");
+            tokenNameList.Add(u"AMP");
+            tokenInfoList.Add(u"'&'");
+            tokenNameList.Add(u"EQ");
+            tokenInfoList.Add(u"'=='");
+            tokenNameList.Add(u"NEQ");
+            tokenInfoList.Add(u"'!='");
+            tokenNameList.Add(u"LEQ");
+            tokenInfoList.Add(u"'<='");
+            tokenNameList.Add(u"GEQ");
+            tokenInfoList.Add(u"'>='");
+            tokenNameList.Add(u"SHIFTLEFT");
+            tokenInfoList.Add(u"'<<'");
+            tokenNameList.Add(u"SHIFTRIGHT");
+            tokenInfoList.Add(u"'>>'");
+            tokenNameList.Add(u"PLUS");
+            tokenInfoList.Add(u"'+'");
+            tokenNameList.Add(u"MINUS");
+            tokenInfoList.Add(u"'-'");
+            tokenNameList.Add(u"STAR");
+            tokenInfoList.Add(u"'*'");
+            tokenNameList.Add(u"DIV");
+            tokenInfoList.Add(u"'/'");
+            tokenNameList.Add(u"REM");
+            tokenInfoList.Add(u"'%'");
+            tokenNameList.Add(u"PLUSPLUS");
+            tokenInfoList.Add(u"'++'");
+            tokenNameList.Add(u"MINUSMINUS");
+            tokenInfoList.Add(u"'--'");
+            tokenNameList.Add(u"CPL");
+            tokenInfoList.Add(u"'~'");
+            tokenNameList.Add(u"DOT");
+            tokenInfoList.Add(u"'.'");
+            tokenNameList.Add(u"ARROW");
+            tokenInfoList.Add(u"'->'");
+            tokenNameList.Add(u"LBRACKET");
+            tokenInfoList.Add(u"'['");
+            tokenNameList.Add(u"RBRACKET");
+            tokenInfoList.Add(u"']'");
+            tokenNameList.Add(u"LPAREN");
+            tokenInfoList.Add(u"'('");
+            tokenNameList.Add(u"RPAREN");
+            tokenInfoList.Add(u"')'");
+            tokenNameList.Add(u"LANGLE");
+            tokenInfoList.Add(u"'<'");
+            tokenNameList.Add(u"RANGLE");
+            tokenInfoList.Add(u"'>'");
+            tokenNameList.Add(u"LBRACE");
+            tokenInfoList.Add(u"'{'");
+            tokenNameList.Add(u"RBRACE");
+            tokenInfoList.Add(u"'}'");
+            tokenNameList.Add(u"COMMA");
+            tokenInfoList.Add(u"','");
+            tokenNameList.Add(u"ASSIGN");
+            tokenInfoList.Add(u"'='");
+            tokenNameList.Add(u"COLON");
+            tokenInfoList.Add(u"':'");
+            tokenNameList.Add(u"SEMICOLON");
+            tokenInfoList.Add(u"';'");
+            tokenNameList.Add(u"HASH");
+            tokenInfoList.Add(u"'#'");
+            tokenNameList.Add(u"COMMENT");
+            tokenInfoList.Add(u"'comment'");
+            tokenNameList.Add(u"WS");
+            tokenInfoList.Add(u"'ws'");
+            tokenNameList.Add(u"DOLLAR");
+            tokenInfoList.Add(u"'$'");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace CmajorNothrowTokens

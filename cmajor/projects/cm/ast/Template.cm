@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class TemplateIdNode : Node
     {
-        public nothrow TemplateIdNode(const System.Lex.Span& span_) :
-            base(NodeType.templateIdNode, span_)
+        public nothrow TemplateIdNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.templateIdNode, span_, moduleId_)
         {
         }
-        public nothrow TemplateIdNode(const System.Lex.Span& span_, Node* primary_) :
-            base(NodeType.templateIdNode, span_), primary(primary_)
+        public nothrow TemplateIdNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* primary_) :
+            base(NodeType.templateIdNode, span_, moduleId_), primary(primary_)
         {
             primary->SetParent(this);
         }
@@ -33,7 +33,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            TemplateIdNode* clone = new TemplateIdNode(GetSpan(), primary->Clone(cloneContext));
+            TemplateIdNode* clone = new TemplateIdNode(GetSpan(), ModuleId(), primary->Clone(cloneContext));
             int n = templateArguments.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -81,12 +81,12 @@ namespace Cm.Ast
     }
     public class TemplateParameterNode : Node
     {
-        public nothrow TemplateParameterNode(const System.Lex.Span& span_) :
-            base(NodeType.templateParameterNode, span_), id()
+        public nothrow TemplateParameterNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.templateParameterNode, span_, moduleId_), id()
         {
         }
-        public nothrow TemplateParameterNode(const System.Lex.Span& span_, IdentifierNode* id_, Node* defaultTemplateArgument_) :
-            base(NodeType.templateParameterNode, span_), id(id_), defaultTemplateArgument(defaultTemplateArgument_)
+        public nothrow TemplateParameterNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* id_, Node* defaultTemplateArgument_) :
+            base(NodeType.templateParameterNode, span_, moduleId_), id(id_), defaultTemplateArgument(defaultTemplateArgument_)
         {
             id->SetParent(this);
             if (!defaultTemplateArgument.IsNull())
@@ -117,7 +117,7 @@ namespace Cm.Ast
             {
                 clonedDefaultTemplateArgument = defaultTemplateArgument->Clone(cloneContext);
             }
-            return new TemplateParameterNode(GetSpan(), cast<IdentifierNode*>(id->Clone(cloneContext)), clonedDefaultTemplateArgument);
+            return new TemplateParameterNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(id->Clone(cloneContext)), clonedDefaultTemplateArgument);
         }
         public override void Accept(Visitor& visitor)
         {

@@ -74,10 +74,6 @@ void ConversionTable::Check()
     for (const auto& p : conversionMap)
     {
         const ConversionTableEntry& entry = p.first;
-        entry.sourceType->SetFlag(SymbolFlags::inConversionTable);
-        entry.sourceType->BaseType()->SetFlag(SymbolFlags::inConversionTable);
-        entry.targetType->SetFlag(SymbolFlags::inConversionTable);
-        entry.targetType->BaseType()->SetFlag(SymbolFlags::inConversionTable);
         entry.CheckValid();
     }
 }

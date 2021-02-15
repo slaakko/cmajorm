@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class ParameterNode : Node
     {
-        public nothrow ParameterNode(const System.Lex.Span& span_) :
-            base(NodeType.parameterNode, span_), typeExpr(), id(), artificialId(false)
+        public nothrow ParameterNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.parameterNode, span_, moduleId_), typeExpr(), id(), artificialId(false)
         {
         }
-        public nothrow ParameterNode(const System.Lex.Span& span_, Node* typeExpr_, IdentifierNode* id_) :
-            base(NodeType.parameterNode, span_), typeExpr(typeExpr_), id(id_), artificialId(false)
+        public nothrow ParameterNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_) :
+            base(NodeType.parameterNode, span_, moduleId_), typeExpr(typeExpr_), id(id_), artificialId(false)
         {
             typeExpr->SetParent(this);
             if (!id.IsNull())
@@ -47,7 +47,7 @@ namespace Cm.Ast
             {
                 clonedId = cast<IdentifierNode*>(id->Clone(cloneContext));
             }
-            ParameterNode* clone = new ParameterNode(GetSpan(), typeExpr->Clone(cloneContext), clonedId);
+            ParameterNode* clone = new ParameterNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext), clonedId);
             if (artificialId)
             {
                 clone->artificialId = true;

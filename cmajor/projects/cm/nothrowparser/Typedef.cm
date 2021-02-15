@@ -1,0 +1,167 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/nothrowparser/Typedef.parser' using soulcm parser generator scmpg version 3.10.0
+
+public static class NothrowTypedefParser
+{
+    public static nothrow Match Typedef(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Typedef");
+            }
+        #endif
+        Span s;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<Node> type;
+        UniquePtr<IdentifierNode> id;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Span span = lexer.GetSpan();
+                            Match match = NothrowSpecifierParser.Specifiers(lexer);
+                            specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                            if (match.hit)
+                            {
+                                s = span;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match(false);
+                            if (*lexer == TYPEDEF)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch6 = &match;
+                    {
+                        Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                        type.Reset(cast<Node*>(match.value));
+                        *parentMatch6 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch7 = &match;
+                {
+                    Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                    id.Reset(cast<IdentifierNode*>(match.value));
+                    *parentMatch7 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch8 = &match;
+            {
+                Match match(false);
+                Match* parentMatch9 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Span span = lexer.GetSpan();
+                    Match match(true);
+                    Match* parentMatch10 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch10 = match;
+                        }
+                        else
+                        {
+                            match.hit = true;
+                            *parentMatch10 = match;
+                            lexer.AddError(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        s.end = span.end;
+                        TypedefNode* node = new TypedefNode(s, ctx->ModuleId(), specifiers->value, type.Release(), id.Release());
+                        node->SetLexerFlags(lexer.Flags());
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Typedef");
+                            #endif
+                            return Match(true, node);
+                        }
+                    }
+                    *parentMatch9 = match;
+                }
+                *parentMatch8 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Typedef");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Typedef");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

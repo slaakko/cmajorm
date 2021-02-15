@@ -38,7 +38,7 @@ void ParseProject(const string& projectFileName, int index, bool verbose)
         Console.Out() << ">> " << projectFileName << endl();
     }
     ContainerFileLexer lexer(ToUtf32(File.ReadAllText(projectFileName)), projectFileName, index);
-    UniquePtr<Project> project = ProjectFileParser.Parse(lexer, "debug", BackEnd.llvm);
+    UniquePtr<Project> project = ProjectFileParser.Parse(lexer, "debug", BackEnd.llvm, "gcc");
     project->ResolveDeclarations();
     long n = project->SourceFilePaths().Count();
     for (long i = 0; i < n; ++i)

@@ -84,6 +84,14 @@ public class ParsingContext
         parsingTemplateId = parsingTemplateIdStack.Top();
         parsingTemplateIdStack.Pop();
     }
+    public nothrow inline const Uuid& ModuleId() const
+    {
+        return moduleId;
+    }
+    public nothrow void SetModuleId(const Uuid& moduleId_)
+    {
+        moduleId = moduleId_;
+    }
     private Stack<bool> parsingExpressionStatementStack;
     private Stack<bool> parsingLvalueStack;
     private Stack<bool> parsingArgumentsStack;
@@ -91,4 +99,5 @@ public class ParsingContext
     private Stack<bool> parsingTypeExprStack;
     private Stack<bool> parsingConceptStack;
     private Stack<bool> parsingTemplateIdStack;
+    private Uuid moduleId;
 }

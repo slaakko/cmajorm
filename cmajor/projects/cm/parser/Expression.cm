@@ -7,7 +7,7 @@ using Cm.Ast;
 using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/Expression.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/Expression.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class ExpressionParser
 {
@@ -169,7 +169,7 @@ public static class ExpressionParser
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        expr.Reset(new EquivalenceNode(s, expr.Release(), right.Release()));
+                                                        expr.Reset(new EquivalenceNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                     }
                                                     *parentMatch10 = match;
                                                 }
@@ -334,7 +334,7 @@ public static class ExpressionParser
                                             if (match.hit)
                                             {
                                                 s.end = span.end;
-                                                expr.Reset(new ImplicationNode(s, expr.Release(), right.Release()));
+                                                expr.Reset(new ImplicationNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                             }
                                             *parentMatch10 = match;
                                         }
@@ -499,7 +499,7 @@ public static class ExpressionParser
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        expr.Reset(new DisjunctionNode(s, expr.Release(), right.Release()));
+                                                        expr.Reset(new DisjunctionNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                     }
                                                     *parentMatch10 = match;
                                                 }
@@ -667,7 +667,7 @@ public static class ExpressionParser
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        expr.Reset(new ConjunctionNode(s, expr.Release(), right.Release()));
+                                                        expr.Reset(new ConjunctionNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                     }
                                                     *parentMatch10 = match;
                                                 }
@@ -835,7 +835,7 @@ public static class ExpressionParser
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        expr.Reset(new BitOrNode(s, expr.Release(), right.Release()));
+                                                        expr.Reset(new BitOrNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                     }
                                                     *parentMatch10 = match;
                                                 }
@@ -1003,7 +1003,7 @@ public static class ExpressionParser
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        expr.Reset(new BitXorNode(s, expr.Release(), right.Release()));
+                                                        expr.Reset(new BitXorNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                     }
                                                     *parentMatch10 = match;
                                                 }
@@ -1171,7 +1171,7 @@ public static class ExpressionParser
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        expr.Reset(new BitAndNode(s, expr.Release(), right.Release()));
+                                                        expr.Reset(new BitAndNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                     }
                                                     *parentMatch10 = match;
                                                 }
@@ -1386,10 +1386,10 @@ public static class ExpressionParser
                                                         switch (op)
                                                         {
                                                             case Operator.eq: s.end = span.end;
-                                                            expr.Reset(new EqualNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new EqualNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                             case Operator.neq: s.end = span.end;
-                                                            expr.Reset(new NotEqualNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new NotEqualNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                         }
                                                     }
@@ -1841,22 +1841,22 @@ public static class ExpressionParser
                                                         switch (op)
                                                         {
                                                             case Operator.lessOrEq: s.end = span.end;
-                                                            expr.Reset(new LessOrEqualNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new LessOrEqualNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                             case Operator.greaterOrEq: s.end = span.end;
-                                                            expr.Reset(new GreaterOrEqualNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new GreaterOrEqualNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                             case Operator.less: s.end = span.end;
-                                                            expr.Reset(new LessNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new LessNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                             case Operator.greater: s.end = span.end;
-                                                            expr.Reset(new GreaterNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new GreaterNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                             case Operator.is_: s.end = span.end;
-                                                            expr.Reset(new IsNode(s, expr.Release(), isType.Release()));
+                                                            expr.Reset(new IsNode(s, ctx->ModuleId(), expr.Release(), isType.Release()));
                                                             break;
                                                             case Operator.as_: s.end = span.end;
-                                                            expr.Reset(new AsNode(s, expr.Release(), asType.Release()));
+                                                            expr.Reset(new AsNode(s, ctx->ModuleId(), expr.Release(), asType.Release()));
                                                             break;
                                                         }
                                                     }
@@ -2098,10 +2098,10 @@ public static class ExpressionParser
                                                         switch (op)
                                                         {
                                                             case Operator.shiftLeft: s.end = span.end;
-                                                            expr.Reset(new ShiftLeftNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new ShiftLeftNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                             case Operator.shiftRight: s.end = span.end;
-                                                            expr.Reset(new ShiftRightNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new ShiftRightNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                         }
                                                         ctx->EndParsingArguments();
@@ -2323,10 +2323,10 @@ public static class ExpressionParser
                                                         switch (op)
                                                         {
                                                             case Operator.plus: s.end = span.end;
-                                                            expr.Reset(new AddNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new AddNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                             case Operator.minus: s.end = span.end;
-                                                            expr.Reset(new SubNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new SubNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                         }
                                                     }
@@ -2581,13 +2581,13 @@ public static class ExpressionParser
                                                         switch (op)
                                                         {
                                                             case Operator.mul: s.end = span.end;
-                                                            expr.Reset(new MulNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new MulNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                             case Operator.div: s.end = span.end;
-                                                            expr.Reset(new DivNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new DivNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                             case Operator.rem: s.end = span.end;
-                                                            expr.Reset(new RemNode(s, expr.Release(), right.Release()));
+                                                            expr.Reset(new RemNode(s, ctx->ModuleId(), expr.Release(), right.Release()));
                                                             break;
                                                         }
                                                     }
@@ -3013,56 +3013,56 @@ public static class ExpressionParser
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Prefix");
                                         #endif
-                                        return Match(true, new PrefixIncrementNode(s, prefix.Release()));
+                                        return Match(true, new PrefixIncrementNode(s, ctx->ModuleId(), prefix.Release()));
                                     }
                                     case Operator.minusminus: 
                                     {
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Prefix");
                                         #endif
-                                        return Match(true, new PrefixDecrementNode(s, prefix.Release()));
+                                        return Match(true, new PrefixDecrementNode(s, ctx->ModuleId(), prefix.Release()));
                                     }
                                     case Operator.plus: 
                                     {
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Prefix");
                                         #endif
-                                        return Match(true, new UnaryPlusNode(s, prefix.Release()));
+                                        return Match(true, new UnaryPlusNode(s, ctx->ModuleId(), prefix.Release()));
                                     }
                                     case Operator.minus: 
                                     {
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Prefix");
                                         #endif
-                                        return Match(true, new UnaryMinusNode(s, prefix.Release()));
+                                        return Match(true, new UnaryMinusNode(s, ctx->ModuleId(), prefix.Release()));
                                     }
                                     case Operator.not_: 
                                     {
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Prefix");
                                         #endif
-                                        return Match(true, new NotNode(s, prefix.Release()));
+                                        return Match(true, new NotNode(s, ctx->ModuleId(), prefix.Release()));
                                     }
                                     case Operator.complement: 
                                     {
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Prefix");
                                         #endif
-                                        return Match(true, new ComplementNode(s, prefix.Release()));
+                                        return Match(true, new ComplementNode(s, ctx->ModuleId(), prefix.Release()));
                                     }
                                     case Operator.deref: 
                                     {
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Prefix");
                                         #endif
-                                        return Match(true, new DerefNode(s, prefix.Release()));
+                                        return Match(true, new DerefNode(s, ctx->ModuleId(), prefix.Release()));
                                     }
                                     case Operator.addrOf: 
                                     {
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Prefix");
                                         #endif
-                                        return Match(true, new AddrOfNode(s, prefix.Release()));
+                                        return Match(true, new AddrOfNode(s, ctx->ModuleId(), prefix.Release()));
                                     }
                                 }
                             }
@@ -3214,7 +3214,7 @@ public static class ExpressionParser
                                                                 if (match.hit)
                                                                 {
                                                                     s.end = span.end;
-                                                                    expr.Reset(new PostfixIncrementNode(s, expr.Release()));
+                                                                    expr.Reset(new PostfixIncrementNode(s, ctx->ModuleId(), expr.Release()));
                                                                 }
                                                                 *parentMatch12 = match;
                                                             }
@@ -3239,7 +3239,7 @@ public static class ExpressionParser
                                                                         if (match.hit)
                                                                         {
                                                                             s.end = span.end;
-                                                                            expr.Reset(new PostfixDecrementNode(s, expr.Release()));
+                                                                            expr.Reset(new PostfixDecrementNode(s, ctx->ModuleId(), expr.Release()));
                                                                         }
                                                                         *parentMatch14 = match;
                                                                     }
@@ -3276,12 +3276,12 @@ public static class ExpressionParser
                                                                         {
                                                                             long pos = lexer.GetPos();
                                                                             Span span = lexer.GetSpan();
-                                                                            Match match = IdentifierParser.Identifier(lexer);
+                                                                            Match match = IdentifierParser.Identifier(lexer, ctx);
                                                                             dotMember.Reset(cast<IdentifierNode*>(match.value));
                                                                             if (match.hit)
                                                                             {
                                                                                 s.end = span.end;
-                                                                                expr.Reset(new DotNode(s, expr.Release(), dotMember.Release()));
+                                                                                expr.Reset(new DotNode(s, ctx->ModuleId(), expr.Release(), dotMember.Release()));
                                                                             }
                                                                             *parentMatch18 = match;
                                                                         }
@@ -3322,12 +3322,12 @@ public static class ExpressionParser
                                                                     {
                                                                         long pos = lexer.GetPos();
                                                                         Span span = lexer.GetSpan();
-                                                                        Match match = IdentifierParser.Identifier(lexer);
+                                                                        Match match = IdentifierParser.Identifier(lexer, ctx);
                                                                         arrowMember.Reset(cast<IdentifierNode*>(match.value));
                                                                         if (match.hit)
                                                                         {
                                                                             s.end = span.end;
-                                                                            expr.Reset(new ArrowNode(s, expr.Release(), arrowMember.Release()));
+                                                                            expr.Reset(new ArrowNode(s, ctx->ModuleId(), expr.Release(), arrowMember.Release()));
                                                                         }
                                                                         *parentMatch22 = match;
                                                                     }
@@ -3428,7 +3428,7 @@ public static class ExpressionParser
                                                                     if (match.hit)
                                                                     {
                                                                         s.end = span.end;
-                                                                        expr.Reset(new IndexingNode(s, expr.Release(), index.Release()));
+                                                                        expr.Reset(new IndexingNode(s, ctx->ModuleId(), expr.Release(), index.Release()));
                                                                     }
                                                                     *parentMatch30 = match;
                                                                 }
@@ -3466,7 +3466,7 @@ public static class ExpressionParser
                                                                 }
                                                                 if (match.hit)
                                                                 {
-                                                                    expr.Reset(new InvokeNode(s, expr.Release()));
+                                                                    expr.Reset(new InvokeNode(s, ctx->ModuleId(), expr.Release()));
                                                                 }
                                                                 *parentMatch35 = match;
                                                             }
@@ -3728,7 +3728,7 @@ public static class ExpressionParser
                                                                     #if (DEBUG)
                                                                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Primary");
                                                                     #endif
-                                                                    return Match(true, new ParenthesizedExpressionNode(s, expr.Release()));
+                                                                    return Match(true, new ParenthesizedExpressionNode(s, ctx->ModuleId(), expr.Release()));
                                                                 }
                                                             }
                                                             *parentMatch12 = match;
@@ -3773,7 +3773,7 @@ public static class ExpressionParser
                                                             Match* parentMatch23 = &match;
                                                             {
                                                                 long pos = lexer.GetPos();
-                                                                Match match = BasicTypeParser.BasicType(lexer);
+                                                                Match match = BasicTypeParser.BasicType(lexer, ctx);
                                                                 basicType.Reset(cast<Node*>(match.value));
                                                                 if (match.hit)
                                                                 {
@@ -3831,7 +3831,7 @@ public static class ExpressionParser
                                                     Match* parentMatch27 = &match;
                                                     {
                                                         long pos = lexer.GetPos();
-                                                        Match match = IdentifierParser.Identifier(lexer);
+                                                        Match match = IdentifierParser.Identifier(lexer, ctx);
                                                         id.Reset(cast<IdentifierNode*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -3873,7 +3873,7 @@ public static class ExpressionParser
                                                             #if (DEBUG)
                                                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Primary");
                                                             #endif
-                                                            return Match(true, new ThisNode(span));
+                                                            return Match(true, new ThisNode(span, ctx->ModuleId()));
                                                         }
                                                     }
                                                     *parentMatch29 = match;
@@ -3907,7 +3907,7 @@ public static class ExpressionParser
                                                         #if (DEBUG)
                                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Primary");
                                                         #endif
-                                                        return Match(true, new BaseNode(span));
+                                                        return Match(true, new BaseNode(span, ctx->ModuleId()));
                                                     }
                                                 }
                                                 *parentMatch31 = match;
@@ -4243,7 +4243,7 @@ public static class ExpressionParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"SizeOfExpr");
                             #endif
-                            return Match(true, new SizeOfNode(s, expr.Release()));
+                            return Match(true, new SizeOfNode(s, ctx->ModuleId(), expr.Release()));
                         }
                     }
                     *parentMatch9 = match;
@@ -4404,7 +4404,7 @@ public static class ExpressionParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TypeNameExpr");
                             #endif
-                            return Match(true, new TypeNameNode(s, expr.Release()));
+                            return Match(true, new TypeNameNode(s, ctx->ModuleId(), expr.Release()));
                         }
                     }
                     *parentMatch9 = match;
@@ -4565,7 +4565,7 @@ public static class ExpressionParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TypeIdExpr");
                             #endif
-                            return Match(true, new TypeIdNode(s, expr.Release()));
+                            return Match(true, new TypeIdNode(s, ctx->ModuleId(), expr.Release()));
                         }
                     }
                     *parentMatch9 = match;
@@ -4822,7 +4822,7 @@ public static class ExpressionParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"CastExpr");
                             #endif
-                            return Match(true, new CastNode(s, typeExpr.Release(), expr.Release()));
+                            return Match(true, new CastNode(s, ctx->ModuleId(), typeExpr.Release(), expr.Release()));
                         }
                     }
                     *parentMatch18 = match;
@@ -4987,7 +4987,7 @@ public static class ExpressionParser
                                 }
                                 if (match.hit)
                                 {
-                                    expr.Reset(new ConstructNode(s, typeExpr.Release()));
+                                    expr.Reset(new ConstructNode(s, ctx->ModuleId(), typeExpr.Release()));
                                 }
                                 *parentMatch12 = match;
                             }
@@ -5190,7 +5190,7 @@ public static class ExpressionParser
                                 if (match.hit)
                                 {
                                     s.end = span.end;
-                                    expr.Reset(new NewNode(s, typeExpr.Release()));
+                                    expr.Reset(new NewNode(s, ctx->ModuleId(), typeExpr.Release()));
                                 }
                                 *parentMatch6 = match;
                             }
@@ -5585,7 +5585,7 @@ public static class ExpressionParser
                                                 {
                                                     long pos = lexer.GetPos();
                                                     Span span = lexer.GetSpan();
-                                                    Match match = IdentifierParser.Identifier(lexer);
+                                                    Match match = IdentifierParser.Identifier(lexer, ctx);
                                                     id.Reset(cast<IdentifierNode*>(match.value));
                                                     if (match.hit)
                                                     {
@@ -5643,7 +5643,7 @@ public static class ExpressionParser
                                                                 Match* parentMatch17 = &match;
                                                                 {
                                                                     System.Lex.Span span = lexer.GetSpan();
-                                                                    Match match = IdentifierParser.Identifier(lexer);
+                                                                    Match match = IdentifierParser.Identifier(lexer, ctx);
                                                                     dotMemberId.Reset(cast<IdentifierNode*>(match.value));
                                                                     if (match.hit)
                                                                     {
@@ -5657,7 +5657,7 @@ public static class ExpressionParser
                                                                 if (match.hit)
                                                                 {
                                                                     s.end = span.end;
-                                                                    expr.Reset(new DotNode(s, expr.Release(), dotMemberId.Release()));
+                                                                    expr.Reset(new DotNode(s, ctx->ModuleId(), expr.Release(), dotMemberId.Release()));
                                                                 }
                                                                 *parentMatch16 = match;
                                                             }
@@ -5702,7 +5702,7 @@ public static class ExpressionParser
                                     }
                                     if (match.hit)
                                     {
-                                        expr.Reset(new InvokeNode(s, expr.Release()));
+                                        expr.Reset(new InvokeNode(s, ctx->ModuleId(), expr.Release()));
                                     }
                                     *parentMatch19 = match;
                                 }

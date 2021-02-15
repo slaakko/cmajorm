@@ -31,7 +31,7 @@ JsonAttributeProcessor::JsonAttributeProcessor(Module* module_) : AttributeProce
 {
 }
 
-void JsonAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
+void JsonAttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbol)
 {
     switch (symbol->GetSymbolType())
     {
@@ -46,10 +46,10 @@ void JsonAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
                     if (baseClass)
                     {
                         bool baseClassHasJsonAttribute = false;
-                        Attributes* baseClassAttributes = baseClass->GetAttributes();
+                        AttributesNode* baseClassAttributes = baseClass->GetAttributes();
                         if (baseClassAttributes)
                         {
-                            Attribute* jsonAttribute = baseClassAttributes->GetAttribute(U"json");
+                            AttributeNode* jsonAttribute = baseClassAttributes->GetAttribute(U"json");
                             if (jsonAttribute)
                             {
                                 baseClassHasJsonAttribute = true;
@@ -78,7 +78,7 @@ void JsonAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
     AttributeProcessor::TypeCheck(attribute, symbol);
 }
 
-void JsonAttributeProcessor::GenerateSymbols(Attribute* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void JsonAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     if (symbol->IsClassTypeSymbol())
     {
@@ -86,7 +86,7 @@ void JsonAttributeProcessor::GenerateSymbols(Attribute* attribute, Symbol* symbo
         if (attribute->Value() == U"true")
         {
             GenerateMemberVariableJsonFieldNames(classTypeSymbol);
-            std::map<std::u32string, Attribute*> memberVariableFieldNames;
+            std::map<std::u32string, AttributeNode*> memberVariableFieldNames;
             CheckMemberVariableJsonFieldNames(classTypeSymbol, memberVariableFieldNames);
             GenerateJsonCreatorFunctionSymbol(attribute, classTypeSymbol);
             GenerateJsonConstructorSymbol(attribute, classTypeSymbol);
@@ -96,12 +96,12 @@ void JsonAttributeProcessor::GenerateSymbols(Attribute* attribute, Symbol* symbo
     }
 }
 
-void JsonAttributeProcessor::CheckMemberVariableJsonFieldNames(ClassTypeSymbol* classTypeSymbol, std::map<std::u32string, Attribute*>& memberVariableFieldNames)
+void JsonAttributeProcessor::CheckMemberVariableJsonFieldNames(ClassTypeSymbol* classTypeSymbol, std::map<std::u32string, AttributeNode*>& memberVariableFieldNames)
 {
     if (classTypeSymbol->BaseClass())
     {
-        Attributes* attributes = classTypeSymbol->BaseClass()->GetAttributes();
-        Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+        AttributesNode* attributes = classTypeSymbol->BaseClass()->GetAttributes();
+        AttributeNode* jsonAttribute = attributes->GetAttribute(U"json");
         if (jsonAttribute && jsonAttribute->Value() != U"false")
         {
             CheckMemberVariableJsonFieldNames(classTypeSymbol->BaseClass(), memberVariableFieldNames);
@@ -109,10 +109,10 @@ void JsonAttributeProcessor::CheckMemberVariableJsonFieldNames(ClassTypeSymbol* 
     }
     for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
     {
-        Attributes* attributes = memberVariableSymbol->GetAttributes();
+        AttributesNode* attributes = memberVariableSymbol->GetAttributes();
         if (attributes)
         {
-            Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+            AttributeNode* jsonAttribute = attributes->GetAttribute(U"json");
             if (jsonAttribute)
             {
                 if (jsonAttribute->Value() == U"false")
@@ -120,13 +120,13 @@ void JsonAttributeProcessor::CheckMemberVariableJsonFieldNames(ClassTypeSymbol* 
                     continue;
                 }
             }
-            Attribute* jsonFieldNameAttribute = attributes->GetAttribute(U"jsonFieldName");
+            AttributeNode* jsonFieldNameAttribute = attributes->GetAttribute(U"jsonFieldName");
             if (jsonFieldNameAttribute)
             {
                 auto it = memberVariableFieldNames.find(jsonFieldNameAttribute->Value());
                 if (it != memberVariableFieldNames.cend())
                 {
-                    Attribute* prev = it->second;
+                    AttributeNode* prev = it->second;
                     throw Exception("error in JSON field name generation: 'jsonFieldName' attribute not unique among member variable names of the current class and its base classes",
                         jsonFieldNameAttribute->GetSpan(), jsonFieldNameAttribute->ModuleId(), prev->GetSpan(), prev->ModuleId());
                 }
@@ -149,10 +149,10 @@ void JsonAttributeProcessor::GenerateMemberVariableJsonFieldNames(ClassTypeSymbo
     for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
     {
         bool hasJsonFieldAttribute = false;
-        Attributes* attributes = memberVariableSymbol->GetAttributes();
+        AttributesNode* attributes = memberVariableSymbol->GetAttributes();
         if (attributes)
         {
-            Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+            AttributeNode* jsonAttribute = attributes->GetAttribute(U"json");
             if (jsonAttribute)
             {
                 if (jsonAttribute->Value() == U"false")
@@ -160,7 +160,7 @@ void JsonAttributeProcessor::GenerateMemberVariableJsonFieldNames(ClassTypeSymbo
                     continue;
                 }
             }
-            Attribute* jsonFieldNameAttribute = attributes->GetAttribute(U"jsonFieldName");
+            AttributeNode* jsonFieldNameAttribute = attributes->GetAttribute(U"jsonFieldName");
             if (jsonFieldNameAttribute)
             {
                 hasJsonFieldAttribute = true;
@@ -168,7 +168,7 @@ void JsonAttributeProcessor::GenerateMemberVariableJsonFieldNames(ClassTypeSymbo
         }
         else
         {
-            memberVariableSymbol->SetAttributes(std::unique_ptr<Attributes>(new Attributes()));
+            memberVariableSymbol->SetAttributes(std::unique_ptr<AttributesNode>(new AttributesNode(classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId())));
             attributes = memberVariableSymbol->GetAttributes();
         }
         if (!hasJsonFieldAttribute)
@@ -178,7 +178,7 @@ void JsonAttributeProcessor::GenerateMemberVariableJsonFieldNames(ClassTypeSymbo
     }
 }
 
-void JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol)
+void JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol)
 {
     MemberFunctionSymbol* jsonCreatorFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"Create");
     jsonCreatorFunctionSymbol->SetGroupName(U"Create");
@@ -206,7 +206,7 @@ void JsonAttributeProcessor::GenerateJsonCreatorFunctionSymbol(Attribute* attrib
     jsonCreatorMap[classTypeSymbol] = jsonCreatorFunctionSymbol;
 }
 
-void JsonAttributeProcessor::GenerateJsonConstructorSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol)
+void JsonAttributeProcessor::GenerateJsonConstructorSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol)
 {
     ConstructorSymbol* jsonConstructorSymbol = new ConstructorSymbol(attribute->GetSpan(), attribute->ModuleId(), U"@constructor");
     jsonConstructorSymbol->SetModule(module);
@@ -235,7 +235,7 @@ void JsonAttributeProcessor::GenerateJsonConstructorSymbol(Attribute* attribute,
     jsonConstructorMap[classTypeSymbol] = jsonConstructorSymbol;
 }
 
-void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol)
+void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol)
 {
     MemberFunctionSymbol* toJsonJsonObjectMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ToJson");
     toJsonJsonObjectMemberFunctionSymbol->SetModule(module);
@@ -244,10 +244,10 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute
     bool jsonBase = false;
     if (baseClass)
     {
-        Attributes* attributes = baseClass->GetAttributes();
+        AttributesNode* attributes = baseClass->GetAttributes();
         if (attributes)
         {
-            Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+            AttributeNode* jsonAttribute = attributes->GetAttribute(U"json");
             if (jsonAttribute)
             {
                 if (jsonAttribute->Value() == U"true")
@@ -290,7 +290,7 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectSymbol(Attribute* attribute
     toJsonJsonObjectMemberFunctionSymbolMap[classTypeSymbol] = toJsonJsonObjectMemberFunctionSymbol;
 }
 
-void JsonAttributeProcessor::GenerateToJsonSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void JsonAttributeProcessor::GenerateToJsonSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     MemberFunctionSymbol* toJsonMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ToJson");
     toJsonMemberFunctionSymbol->SetModule(module);
@@ -299,10 +299,10 @@ void JsonAttributeProcessor::GenerateToJsonSymbol(Attribute* attribute, ClassTyp
     bool jsonBase = false;
     if (baseClass)
     {
-        Attributes* attributes = baseClass->GetAttributes();
+        AttributesNode* attributes = baseClass->GetAttributes();
         if (attributes)
         {
-            Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+            AttributeNode* jsonAttribute = attributes->GetAttribute(U"json");
             if (jsonAttribute)
             {
                 if (jsonAttribute->Value() == U"true")
@@ -338,7 +338,7 @@ void JsonAttributeProcessor::GenerateToJsonSymbol(Attribute* attribute, ClassTyp
     toJsonObjectMemberFunctionSymbolMap[classTypeSymbol] = toJsonMemberFunctionSymbol;
 }
 
-void JsonAttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol* symbol, StatementBinder* statementBinder)
+void JsonAttributeProcessor::GenerateImplementation(AttributeNode* attribute, Symbol* symbol, StatementBinder* statementBinder)
 {
     if (symbol->IsClassTypeSymbol())
     {
@@ -388,7 +388,7 @@ void JsonAttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol
     }
 }
 
-void JsonAttributeProcessor::GenerateJsonCreatorImplementation(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* jsonCreatorFunctionSymbol, StatementBinder* statementBinder)
+void JsonAttributeProcessor::GenerateJsonCreatorImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* jsonCreatorFunctionSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -441,7 +441,7 @@ void JsonAttributeProcessor::GenerateJsonCreatorImplementation(Attribute* attrib
     }
 }
 
-void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, ConstructorSymbol* jsonConstructorSymbol, StatementBinder* statementBinder)
+void JsonAttributeProcessor::GenerateJsonConstructorImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, ConstructorSymbol* jsonConstructorSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -461,10 +461,10 @@ void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* at
         ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
         if (baseClass)
         {
-            Attributes* attributes = baseClass->GetAttributes();
+            AttributesNode* attributes = baseClass->GetAttributes();
             if (attributes)
             {
-                Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+                AttributeNode* jsonAttribute = attributes->GetAttribute(U"json");
                 if (jsonAttribute)
                 {
                     if (jsonAttribute->Value() == U"true")
@@ -479,10 +479,10 @@ void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* at
         for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
         {
             std::u32string jsonFieldName = memberVariableSymbol->Name();
-            Attributes* attributes = memberVariableSymbol->GetAttributes();
+            AttributesNode* attributes = memberVariableSymbol->GetAttributes();
             if (attributes)
             {
-                Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+                AttributeNode* jsonAttribute = attributes->GetAttribute(U"json");
                 if (jsonAttribute)
                 {
                     if (jsonAttribute->Value() == U"false")
@@ -490,7 +490,7 @@ void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* at
                         continue;
                     }
                 }
-                Attribute* jsonFieldNameAttribute = attributes->GetAttribute(U"jsonFieldName");
+                AttributeNode* jsonFieldNameAttribute = attributes->GetAttribute(U"jsonFieldName");
                 if (jsonFieldNameAttribute)
                 {
                     jsonFieldName = jsonFieldNameAttribute->Value();
@@ -540,7 +540,7 @@ void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* at
     }
 }
 
-void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toJsonJsonObjectMemberFunctionSymbol, StatementBinder* statementBinder)
+void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toJsonJsonObjectMemberFunctionSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -559,10 +559,10 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* a
         ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
         if (baseClass)
         {
-            Attributes* attributes = baseClass->GetAttributes();
+            AttributesNode* attributes = baseClass->GetAttributes();
             if (attributes)
             {
-                Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+                AttributeNode* jsonAttribute = attributes->GetAttribute(U"json");
                 if (jsonAttribute)
                 {
                     if (jsonAttribute->Value() == U"true")
@@ -580,10 +580,10 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* a
         for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
         {
             std::u32string jsonFieldName = memberVariableSymbol->Name();
-            Attributes* attributes = memberVariableSymbol->GetAttributes();
+            AttributesNode* attributes = memberVariableSymbol->GetAttributes();
             if (attributes)
             {
-                Attribute* jsonAttribute = attributes->GetAttribute(U"json");
+                AttributeNode* jsonAttribute = attributes->GetAttribute(U"json");
                 if (jsonAttribute)
                 {
                     if (jsonAttribute->Value() == U"false")
@@ -591,7 +591,7 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* a
                         continue;
                     }
                 }
-                Attribute* jsonFieldNameAttribute = attributes->GetAttribute(U"jsonFieldName");
+                AttributeNode* jsonFieldNameAttribute = attributes->GetAttribute(U"jsonFieldName");
                 if (jsonFieldNameAttribute)
                 {
                     jsonFieldName = jsonFieldNameAttribute->Value();
@@ -639,7 +639,7 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* a
     }
 }
 
-void JsonAttributeProcessor::GenerateToJsonImplementation(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toJsonMemberFunctionSymbol, StatementBinder* statementBinder)
+void JsonAttributeProcessor::GenerateToJsonImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toJsonMemberFunctionSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -707,7 +707,7 @@ JsonFieldNameAttributeProcessor::JsonFieldNameAttributeProcessor() : AttributePr
 {
 }
 
-void JsonFieldNameAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
+void JsonFieldNameAttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbol)
 {
     if (symbol->GetSymbolType() == SymbolType::memberVariableSymbol)
     {

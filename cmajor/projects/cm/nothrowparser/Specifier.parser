@@ -1,0 +1,48 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowSpecifierParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    Specifiers(var Cm.Ast.Specifiers specifiers) : Cm.Ast.Specifiers
+        ::=
+        (
+            (Specifier:specifier{ specifiers = cast<Cm.Ast.Specifiers>(specifiers | specifier); })*
+        )
+        {
+            return specifiers;
+        }
+        ;
+
+    Specifier : Cm.Ast.Specifiers
+        ::= PUBLIC{ return Cm.Ast.Specifiers.public_; }
+        |   PROTECTED{ return Cm.Ast.Specifiers.protected_; }
+        |   PRIVATE{ return Cm.Ast.Specifiers.private_; }
+        |   INTERNAL{ return Cm.Ast.Specifiers.internal_; }
+        |   STATIC{ return Cm.Ast.Specifiers.static_; }
+        |   VIRTUAL{ return Cm.Ast.Specifiers.virtual_; }
+        |   OVERRIDE{ return Cm.Ast.Specifiers.override_; }
+        |   ABSTRACT{ return Cm.Ast.Specifiers.abstract_; }
+        |   INLINE{ return Cm.Ast.Specifiers.inline_; }
+        |   EXPLICIT{ return Cm.Ast.Specifiers.explicit_; }
+        |   EXTERN{ return Cm.Ast.Specifiers.external_; }
+        |   SUPPRESS{ return Cm.Ast.Specifiers.suppress_; }
+        |   DEFAULT{ return Cm.Ast.Specifiers.default_; }
+        |   CONSTEXPR{ return Cm.Ast.Specifiers.constexpr_; }
+        |   CDECL{ return Cm.Ast.Specifiers.cdecl_; }
+        |   NOTHROW{ return Cm.Ast.Specifiers.nothrow_; }
+        |   THROW{ return Cm.Ast.Specifiers.throw_; }
+        |   NEW{ return Cm.Ast.Specifiers.new_; }
+        |   UNIT_TEST{ return Cm.Ast.Specifiers.unit_test_; }
+        |   WINAPI{ return Cm.Ast.Specifiers.winapi_; }
+        ;
+}

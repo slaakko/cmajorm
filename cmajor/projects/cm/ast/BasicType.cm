@@ -9,8 +9,8 @@ namespace Cm.Ast
 {
     public class BoolNode : Node
     {
-        public nothrow BoolNode(const System.Lex.Span& span_) :
-            base(NodeType.boolNode, span_)
+        public nothrow BoolNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.boolNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -19,7 +19,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new BoolNode(GetSpan());
+            return new BoolNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -28,8 +28,8 @@ namespace Cm.Ast
     }
     public class SByteNode : Node
     {
-        public nothrow SByteNode(const System.Lex.Span& span_) :
-            base(NodeType.sbyteNode, span_)
+        public nothrow SByteNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.sbyteNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -38,7 +38,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new SByteNode(GetSpan());
+            return new SByteNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -47,8 +47,8 @@ namespace Cm.Ast
     }
     public class ByteNode : Node
     {
-        public nothrow ByteNode(const System.Lex.Span& span_) :
-            base(NodeType.byteNode, span_)
+        public nothrow ByteNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.byteNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsUnsignedTypeNode() const
@@ -61,7 +61,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ByteNode(GetSpan());
+            return new ByteNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -70,8 +70,8 @@ namespace Cm.Ast
     }
     public class ShortNode : Node
     {
-        public nothrow ShortNode(const System.Lex.Span& span_) :
-            base(NodeType.shortNode, span_)
+        public nothrow ShortNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.shortNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -80,7 +80,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ShortNode(GetSpan());
+            return new ShortNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -89,8 +89,8 @@ namespace Cm.Ast
     }
     public class UShortNode : Node
     {
-        public nothrow UShortNode(const System.Lex.Span& span_) :
-            base(NodeType.ushortNode, span_)
+        public nothrow UShortNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.ushortNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsUnsignedTypeNode() const
@@ -103,7 +103,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new UShortNode(GetSpan());
+            return new UShortNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -112,8 +112,8 @@ namespace Cm.Ast
     }
     public class IntNode : Node
     {
-        public nothrow IntNode(const System.Lex.Span& span_) :
-            base(NodeType.intNode, span_)
+        public nothrow IntNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.intNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -122,7 +122,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new IntNode(GetSpan());
+            return new IntNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -131,8 +131,8 @@ namespace Cm.Ast
     }
     public class UIntNode : Node
     {
-        public nothrow UIntNode(const System.Lex.Span& span_) :
-            base(NodeType.uintNode, span_)
+        public nothrow UIntNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.uintNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsUnsignedTypeNode() const
@@ -145,7 +145,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new UIntNode(GetSpan());
+            return new UIntNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -154,8 +154,8 @@ namespace Cm.Ast
     }
     public class LongNode : Node
     {
-        public nothrow LongNode(const System.Lex.Span& span_) :
-            base(NodeType.longNode, span_)
+        public nothrow LongNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.longNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -164,7 +164,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new LongNode(GetSpan());
+            return new LongNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -173,8 +173,8 @@ namespace Cm.Ast
     }
     public class ULongNode : Node
     {
-        public nothrow ULongNode(const System.Lex.Span& span_) :
-            base(NodeType.ulongNode, span_)
+        public nothrow ULongNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.ulongNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsUnsignedTypeNode() const
@@ -187,7 +187,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ULongNode(GetSpan());
+            return new ULongNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -196,8 +196,8 @@ namespace Cm.Ast
     }
     public class FloatNode : Node
     {
-        public nothrow FloatNode(const System.Lex.Span& span_) :
-            base(NodeType.floatNode, span_)
+        public nothrow FloatNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.floatNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -206,7 +206,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new FloatNode(GetSpan());
+            return new FloatNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -215,8 +215,8 @@ namespace Cm.Ast
     }
     public class DoubleNode : Node
     {
-        public nothrow DoubleNode(const System.Lex.Span& span_) :
-            base(NodeType.doubleNode, span_)
+        public nothrow DoubleNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.doubleNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -225,7 +225,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new DoubleNode(GetSpan());
+            return new DoubleNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -234,8 +234,8 @@ namespace Cm.Ast
     }
     public class CharNode : Node
     {
-        public nothrow CharNode(const System.Lex.Span& span_) :
-            base(NodeType.charNode, span_)
+        public nothrow CharNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.charNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -244,7 +244,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new CharNode(GetSpan());
+            return new CharNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -253,8 +253,8 @@ namespace Cm.Ast
     }
     public class WCharNode : Node
     {
-        public nothrow WCharNode(const System.Lex.Span& span_) :
-            base(NodeType.wcharNode, span_)
+        public nothrow WCharNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.wcharNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -263,7 +263,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new WCharNode(GetSpan());
+            return new WCharNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -272,8 +272,8 @@ namespace Cm.Ast
     }
     public class UCharNode : Node
     {
-        public nothrow UCharNode(const System.Lex.Span& span_) :
-            base(NodeType.ucharNode, span_)
+        public nothrow UCharNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.ucharNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -282,7 +282,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new UCharNode(GetSpan());
+            return new UCharNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -291,8 +291,8 @@ namespace Cm.Ast
     }
     public class VoidNode : Node
     {
-        public nothrow VoidNode(const System.Lex.Span& span_) :
-            base(NodeType.voidNode, span_)
+        public nothrow VoidNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.voidNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -301,7 +301,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new VoidNode(GetSpan());
+            return new VoidNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {

@@ -1,0 +1,145 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Collections;
+using Cm.Ast;
+using Cm.Symbols;
+
+int main(int argc, const char** argv)
+{
+    TimePoint start = Now();
+    try
+    {
+        bool verbose = false;
+        bool sequentially = false;
+        List<string> projectFilePaths;
+        List<string> sourceFilePaths;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--verbose")
+                {
+                    verbose = true;
+                }
+                else if (arg == "--seq")
+                {
+                    sequentially = true;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                for (char o : options)
+                {
+                    bool notFound = false;
+                    switch (o)
+                    {
+                        case 'v':
+                        {
+                            verbose = true;
+                            break;
+                        }
+                        case 's':
+                        {
+                            sequentially = true;
+                            break;
+                        }
+                        default:
+                        {
+                            notFound = true;
+                            break;
+                        }
+                    }
+                    if (notFound)
+                    {
+                        throw Exception("unknown option '-" + string(o) + "'");
+                    }
+                }
+            }
+            else
+            {
+                if (arg.EndsWith(".cmp"))
+                {
+                    projectFilePaths.Add(GetFullPath(arg));
+                }
+                else if (arg.EndsWith(".cm"))
+                {
+                    sourceFilePaths.Add(GetFullPath(arg));
+                }
+                else
+                {
+                    throw Exception("unknown file extension for argument '" + arg + "'");
+                }
+            }
+        }
+        int index = 0;
+        for (const string& sourceFilePath : sourceFilePaths)
+        {
+            if (verbose)
+            {
+                Console.Out() << "> " << sourceFilePath << endl();
+            }
+            Source source(sourceFilePath);
+            source.Read();
+            Uuid moduleId;
+            source.Parse(moduleId, index);
+            ++index;
+        }
+        index = 0;
+        for (const string& projectFilePath : projectFilePaths)
+        {
+            Uuid moduleId;
+            if (verbose)
+            {
+                Console.Out() << ">> " << projectFilePath << endl();
+            }
+            ContainerFileLexer lexer(ToUtf32(File.ReadAllText(projectFilePath)), projectFilePath, index);
+            UniquePtr<Project> project = ProjectFileParser.Parse(lexer, "debug", BackEnd.llvm, "gcc");
+            project->ResolveDeclarations();
+            Sources sources(project->SourceFilePaths());
+            if (sequentially)
+            {
+                int n = sources.Count();
+                for (int i = 0; i < n; ++i)
+                {
+                    Source* source = sources.GetSource(i);
+                    source->Read();
+                    source->Parse(moduleId, i);
+                }
+            }
+            else
+            {
+                ParseResult result = sources.Parse(null);
+                int nerrors = sources.NumberOfErrors();
+                Console.Out() << result.ok << " : " << nerrors << endl();
+                if (nerrors > 0)
+                {
+                    List<string> errors = sources.Errors();
+                    for (const string& error : errors)
+                    {
+                        Console.Out() << error << endl();
+                    }
+                }
+            }
+            ++index;
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    TimePoint end = Now();
+    Console.Out() << DurationStr(end - start) << endl();
+    return 0;
+}

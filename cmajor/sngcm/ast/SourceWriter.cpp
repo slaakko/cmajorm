@@ -351,7 +351,7 @@ void SourceWriter::Visit(TemplateIdNode& templateIdNode)
 void SourceWriter::Visit(FunctionNode& functionNode)
 {
     WriteEmptyLine();
-    Attributes* attributes = functionNode.GetAttributes();
+    AttributesNode* attributes = functionNode.GetAttributes();
     if (attributes)
     {
         attributes->Accept(*this);
@@ -410,7 +410,7 @@ void SourceWriter::Visit(FunctionNode& functionNode)
 void SourceWriter::Visit(ClassNode& classNode)
 {
     WriteEmptyLine();
-    Attributes* attributes = classNode.GetAttributes();
+    AttributesNode* attributes = classNode.GetAttributes();
     if (attributes)
     {
         attributes->Accept(*this);
@@ -516,7 +516,7 @@ void SourceWriter::Visit(MemberInitializerNode& memberInitializerNode)
 
 void SourceWriter::Visit(StaticConstructorNode& staticConstructorNode)
 {
-    Attributes* attributes = staticConstructorNode.GetAttributes();
+    AttributesNode* attributes = staticConstructorNode.GetAttributes();
     if (attributes)
     {
         attributes->Accept(*this);
@@ -564,7 +564,7 @@ void SourceWriter::Visit(StaticConstructorNode& staticConstructorNode)
 
 void SourceWriter::Visit(ConstructorNode& constructorNode)
 {
-    Attributes* attributes = constructorNode.GetAttributes();
+    AttributesNode* attributes = constructorNode.GetAttributes();
     if (attributes)
     {
         attributes->Accept(*this);
@@ -622,7 +622,7 @@ void SourceWriter::Visit(ConstructorNode& constructorNode)
 
 void SourceWriter::Visit(DestructorNode& destructorNode)
 {
-    Attributes* attributes = destructorNode.GetAttributes();
+    AttributesNode* attributes = destructorNode.GetAttributes();
     if (attributes)
     {
         attributes->Accept(*this);
@@ -656,7 +656,7 @@ void SourceWriter::Visit(DestructorNode& destructorNode)
 
 void SourceWriter::Visit(MemberFunctionNode& memberFunctionNode)
 {
-    Attributes* attributes = memberFunctionNode.GetAttributes();
+    AttributesNode* attributes = memberFunctionNode.GetAttributes();
     if (attributes)
     {
         attributes->Accept(*this);
@@ -705,7 +705,7 @@ void SourceWriter::Visit(MemberFunctionNode& memberFunctionNode)
 
 void SourceWriter::Visit(ConversionFunctionNode& conversionFunctionNode)
 {
-    Attributes* attributes = conversionFunctionNode.GetAttributes();
+    AttributesNode* attributes = conversionFunctionNode.GetAttributes();
     if (attributes)
     {
         attributes->Accept(*this);
@@ -743,7 +743,7 @@ void SourceWriter::Visit(ConversionFunctionNode& conversionFunctionNode)
 
 void SourceWriter::Visit(MemberVariableNode& memberVariableNode)
 {
-    Attributes* attributes = memberVariableNode.GetAttributes();
+    AttributesNode* attributes = memberVariableNode.GetAttributes();
     if (attributes)
     {
         attributes->Accept(*this);
@@ -763,7 +763,7 @@ void SourceWriter::Visit(MemberVariableNode& memberVariableNode)
 void SourceWriter::Visit(InterfaceNode& interfaceNode)
 {
     WriteEmptyLine();
-    Attributes* attributes = interfaceNode.GetAttributes();
+    AttributesNode* attributes = interfaceNode.GetAttributes();
     if (attributes)
     {
         attributes->Accept(*this);
@@ -2012,7 +2012,7 @@ void SourceWriter::Visit(GlobalVariableNode& globalVariableNode)
     emptyLine = true;
 }
 
-void SourceWriter::Visit(Attribute& attribute)
+void SourceWriter::Visit(AttributeNode& attribute)
 {
     formatter.Write(soulng::unicode::ToUtf8(attribute.Name()));
     if (!attribute.Value().empty())
@@ -2022,7 +2022,7 @@ void SourceWriter::Visit(Attribute& attribute)
     }
 }
 
-void SourceWriter::Visit(Attributes& attributes)
+void SourceWriter::Visit(AttributesNode& attributes)
 {
     formatter.Write("[");
     int n = static_cast<int>(attributes.GetAttributes().size());

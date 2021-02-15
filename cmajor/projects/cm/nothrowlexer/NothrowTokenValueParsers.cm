@@ -1,0 +1,353 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Lex;
+
+namespace Cm.NothrowLexer
+{
+    public nothrow bool ParseFloatingLiteralNothrow(const string& fileName, const Token& token, double& floatingLit, bool& floatingLitFloat)
+    {
+        floatingLit = 0.0;
+        floatingLitFloat = false;
+        const uchar* p = token.match.begin;
+        const uchar* e = token.match.end;
+        string s;
+        while (p != e && ((cast<uchar>(*p) >= '0' && cast<uchar>(*p) <= '9') ||
+            cast<uchar>(*p) == '.' || cast<uchar>(*p) == 'e' || cast<uchar>(*p) == 'E' || cast<uchar>(*p) == '+' || cast<uchar>(*p) == '-'))
+        {
+            s.Append(cast<char>(*p));
+            ++p;
+        }
+        if (p != e && (cast<uchar>(*p) == 'f' || cast<uchar>(*p) == 'F'))
+        {
+            floatingLitFloat = true;
+            ++p;
+        }
+        if (p != e)
+        {
+            return false;
+        }
+        if (floatingLitFloat)
+        {
+            float f;
+            if (!ParseFloat(s, f)) return false;
+            floatingLit = f;
+        }
+        else
+        {
+            if (!ParseDouble(s, floatingLit)) return false;
+        }
+        return true;
+    }
+
+    public nothrow bool ParseIntegerLiteralNothrow(const string& fileName, const Token& token, ulong& intLit, bool& intLitUnsigned)
+    {
+        intLit = 0u;
+        intLitUnsigned = false;
+        const uchar* p = token.match.begin;
+        const uchar* e = token.match.end;
+        if (p != e && cast<uchar>(*p) == '0')
+        {
+            ++p;
+            if (p != e && (cast<uchar>(*p) == 'x' || cast<uchar>(*p) == 'X'))
+            {
+                ++p;
+                while (p != e && ((cast<uchar>(*p) >= '0' && cast<uchar>(*p) <= '9') || (cast<uchar>(*p) >= 'a' && cast<uchar>(*p) <= 'f') || (cast<uchar>(*p) >= 'A' && cast<uchar>(*p) <= 'F')))
+                {
+                    switch (cast<char>(*p))
+                    {
+                        case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+                        {
+                            intLit = 16u * intLit + cast<byte>(*p) - cast<byte>('0');
+                            break;
+                        }
+                        case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+                        {
+                            intLit = 16u * intLit + 10u + cast<byte>(*p) - cast<byte>('A');
+                            break;
+                        }
+                        case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+                        {
+                            intLit = 16u * intLit + 10u + cast<byte>(*p) - cast<byte>('a');
+                            break;
+                        }
+                    }
+                    ++p;
+                }
+            }
+            else
+            {
+                while (p != e && (cast<uchar>(*p) >= '0' && cast<uchar>(*p) <= '7'))
+                {
+                    intLit = 8u * intLit + cast<byte>(*p) - cast<byte>('0');
+                    ++p;
+                }
+            }
+        }
+        else if (p != e && (cast<uchar>(*p) >= '1' && cast<uchar>(*p) <= '9'))
+        {
+            while (p != e && (cast<uchar>(*p) >= '0' && cast<uchar>(*p) <= '9'))
+            {
+                intLit = 10u * intLit + cast<byte>(*p) - cast<byte>('0');
+                ++p;
+            }
+        }
+        else
+        {
+            return false;
+        }
+        if (p != e && (cast<uchar>(*p) == 'u' || cast<uchar>(*p) == 'U'))
+        {
+            ++p;
+            intLitUnsigned = true;
+        }
+        if (p != e)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public nothrow bool ParseHexCharNothrow(const string& fileName, uchar& value, const uchar*& p, const uchar* e, const Token& token)
+    {
+        bool notHex = false;
+        if (p != e)
+        {
+            switch (cast<uchar>(*p))
+            {
+                case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+                {
+                    value = cast<uchar>(16u * cast<uint>(value) + cast<byte>(*p) - cast<byte>('0'));
+                    break;
+                }
+                case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+                {
+                    value = cast<uchar>(16u * cast<uint>(value) + 10u + cast<byte>(*p) - cast<byte>('A'));
+                    break;
+                }
+                case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+                {
+                    value = cast<uchar>(16u * cast<uint>(value) + 10u + cast<byte>(*p) - cast<byte>('a'));
+                    break;
+                }
+                default:
+                {
+                    notHex = true;
+                    break;
+                }
+            }
+            if (notHex)
+            {
+                return false;
+            }
+            ++p;
+        }
+        else
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public nothrow bool ParseEscapeNothrow(const string& fileName, const uchar*& p, const uchar* e, const Token& token, uchar& value)
+    {
+        value = '\0';
+        if (p != e && (cast<uchar>(*p) == 'x' || cast<uchar>(*p) == 'X'))
+        {
+            ++p;
+            while (p != e && ((cast<uchar>(*p) >= '0' && cast<uchar>(*p) <= '9') || (cast<uchar>(*p) >= 'A' && cast<uchar>(*p) <= 'F') ||  (cast<uchar>(*p) >= 'a' && cast<uchar>(*p) <= 'f')))
+            {
+                if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            }
+        }
+        else if (p != e && (cast<uchar>(*p) == 'd' || cast<uchar>(*p) == 'D'))
+        {
+            ++p;
+            while (p != e && (cast<uchar>(*p) >= '0' && cast<uchar>(*p) <= '9'))
+            {
+                value = cast<uchar>(10u * cast<uint>(value) + cast<byte>(*p) - cast<byte>('0'));
+                ++p;
+            }
+        }
+        else if (p != e && (cast<uchar>(*p) >= '0' && cast<uchar>(*p) <= '7'))
+        {
+            while (p != e && (cast<uchar>(*p) >= '0' && cast<uchar>(*p) <= '7'))
+            {
+                value = cast<uchar>(8u * cast<uint>(value) + cast<byte>(*p) - cast<byte>('0'));
+                ++p;
+            }
+        }
+        else if (p != e && cast<uchar>(*p) == 'u')
+        {
+            ++p;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        }
+        else if (p != e && cast<uchar>(*p) == 'U')
+        {
+            ++p;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        }
+        else if (p != e)
+        {
+            switch (cast<uchar>(*p))
+            {
+                case 'a': value = '\a'; break;
+                case 'b': value = '\b'; break;
+                case 'f': value = '\f'; break;
+                case 'n': value = '\n'; break;
+                case 'r': value = '\r'; break;
+                case 't': value = '\t'; break;
+                case 'v': value = '\v'; break;
+                default: value = *p; break;
+            }
+            ++p;
+        }
+        return true;
+    }
+
+    public const int noPrefix = 0;
+    public const int utf16Prefix = 1;
+    public const int utf32Prefix = 2;
+
+    public nothrow bool ParseCharacterLiteralNothrow(const string& fileName, const Token& token, uchar& charLit, int& charLitPrefix)
+    {
+        charLit = '\0';
+        charLitPrefix = noPrefix;
+        const uchar* p = token.match.begin;
+        const uchar* e = token.match.end;
+        if (p != e && cast<uchar>(*p) == 'w')
+        {
+            ++p;
+            charLitPrefix = utf16Prefix;
+        }
+        else if (p != e && cast<uchar>(*p) == 'u')
+        {
+            ++p;
+            charLitPrefix = utf32Prefix;
+        }
+        if (p != e && cast<uchar>(*p) == '\'')
+        {
+            ++p;
+            if (p != e && cast<uchar>(*p) == '\\')
+            {
+                ++p;
+                if (!ParseEscapeNothrow(fileName, p, e, token, charLit)) return false;
+            }
+            else
+            {
+                ustring s;
+                while (p != e && cast<uchar>(*p) != '\r' && cast<uchar>(*p) != '\n' && cast<uchar>(*p) != '\'')
+                {
+                    s.Append(*p);
+                    ++p;
+                }
+                ustring u = s;
+                if (u.Length() != 1)
+                {
+                    return false;
+                }
+                charLit = u[0];
+            }
+            if (p != e && cast<uchar>(*p) == '\'')
+            {
+                ++p;
+            }
+            if (p != e)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public nothrow bool ParseStringLiteralNothrow(const string& fileName, const Token& token, ustring& stringLit, int& stringLitPrefix)
+    {
+        stringLit.Clear();
+        stringLitPrefix = noPrefix;
+        const uchar* p = token.match.begin;
+        const uchar* e = token.match.end;
+        if (p != e && cast<uchar>(*p) == 'w')
+        {
+            stringLitPrefix = utf16Prefix;
+            ++p;
+        }
+        else if (p != e && cast<uchar>(*p) == 'u')
+        {
+            stringLitPrefix = utf32Prefix;
+            ++p;
+        }
+        if (p != e && cast<uchar>(*p) == '@')
+        {
+            ++p;
+            if (p != e && cast<uchar>(*p) == '"')
+            {
+                ++p;
+                while (p != e && cast<uchar>(*p) != '"')
+                {
+                    stringLit.Append(cast<uchar>(*p));
+                    ++p;
+                }
+                if (p != e && cast<uchar>(*p) == '"')
+                {
+                    ++p;
+                }
+                if (p != e)
+                {
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            if (p != e && cast<uchar>(*p) == '"')
+            {
+                ++p;
+                while (p != e && cast<uchar>(*p) != '\r' && cast<uchar>(*p) != '\n' && cast<uchar>(*p) != '"')
+                {
+                    if (cast<uchar>(*p) == '\\')
+                    {
+                        ++p;
+                        uchar c = '\0';
+                        if (!ParseEscapeNothrow(fileName, p, e, token, c)) return false;
+                        stringLit.Append(c);
+                    }
+                    else
+                    {
+                        stringLit.Append(cast<uchar>(*p));
+                        ++p;
+                    }
+                }
+                if (p != e && cast<uchar>(*p) == '"')
+                {
+                    ++p;
+                }
+                if (p != e)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+}

@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class CommentNode : Node
     {
-        public nothrow CommentNode(const System.Lex.Span& span_) :
-            base(NodeType.commentNode, span_)
+        public nothrow CommentNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.commentNode, span_, moduleId_)
         {
         }
-        public nothrow CommentNode(const System.Lex.Span& span_, const ustring& comment_) :
-            base(NodeType.commentNode, span_), comment(comment_)
+        public nothrow CommentNode(const System.Lex.Span& span_, const Uuid& moduleId_, const ustring& comment_) :
+            base(NodeType.commentNode, span_, moduleId_), comment(comment_)
         {
         }
         public nothrow const ustring& Comment() const
@@ -23,7 +23,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new CommentNode(GetSpan(), comment);
+            return new CommentNode(GetSpan(), ModuleId(), comment);
         }
         public override void Accept(Visitor& visitor)
         {

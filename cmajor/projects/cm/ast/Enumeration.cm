@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class EnumTypeNode : Node
     {
-        public nothrow EnumTypeNode(const System.Lex.Span& span_) :
-            base(NodeType.enumTypeNode, span_)
+        public nothrow EnumTypeNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.enumTypeNode, span_, moduleId_)
         {
         }
-        public nothrow EnumTypeNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_) :
-            base(NodeType.enumTypeNode, span_), specifiers(specifiers_), id(id_)
+        public nothrow EnumTypeNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_) :
+            base(NodeType.enumTypeNode, span_, moduleId_), specifiers(specifiers_), id(id_)
         {
             id->SetParent(this);
         }
@@ -71,7 +71,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            EnumTypeNode* clone = new EnumTypeNode(GetSpan(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)));
+            EnumTypeNode* clone = new EnumTypeNode(GetSpan(), ModuleId(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)));
             int n = constants.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -97,8 +97,9 @@ namespace Cm.Ast
                 writer.Write(underlyingType.Get());
             }
             constants.Write(writer);
-            writer.Write(beginBraceSpan);
-            writer.Write(endBraceSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(beginBraceSpan, convertExternal);
+            writer.Write(endBraceSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -124,12 +125,12 @@ namespace Cm.Ast
     }
     public class EnumConstantNode : Node
     {
-        public nothrow EnumConstantNode(const System.Lex.Span& span_) :
-            base(NodeType.enumConstantNode, span_), hasValue(false)
+        public nothrow EnumConstantNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.enumConstantNode, span_, moduleId_), hasValue(false)
         {
         }
-        public nothrow EnumConstantNode(const System.Lex.Span& span_, IdentifierNode* id_, Node* value_) :
-            base(NodeType.enumConstantNode, span_), id(id_), value(value_), hasValue(false)
+        public nothrow EnumConstantNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* id_, Node* value_) :
+            base(NodeType.enumConstantNode, span_, moduleId_), id(id_), value(value_), hasValue(false)
         {
             id->SetParent(this);
             if (!value.IsNull())
@@ -163,7 +164,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            EnumConstantNode* clone = new EnumConstantNode(GetSpan(), cast<IdentifierNode*>(id->Clone(cloneContext)), value->Clone(cloneContext));
+            EnumConstantNode* clone = new EnumConstantNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(id->Clone(cloneContext)), value->Clone(cloneContext));
             if (hasValue)
             {
                 clone->SetHasValue();
@@ -197,7 +198,7 @@ namespace Cm.Ast
         private bool hasValue;
         private ustring strValue;
     }
-    public Node* MakeNextEnumConstantValue(const System.Lex.Span& span, EnumTypeNode* enumType)
+    public Node* MakeNextEnumConstantValue(const System.Lex.Span& span, const Uuid& moduleId, EnumTypeNode* enumType)
     {
         EnumConstantNode* lastConstant = enumType->GetLastConstant();
         if ((lastConstant != null))
@@ -211,10 +212,10 @@ namespace Cm.Ast
                 {
                     if (enumType->GetUnderlyingType()->IsUnsignedTypeNode())
                     {
-                        return new AddNode(span, clonedValue, new ByteLiteralNode(span, 1u));
+                        return new AddNode(span, moduleId, clonedValue, new ByteLiteralNode(span, moduleId, 1u));
                     }
                 }
-                return new AddNode(span, clonedValue, new SByteLiteralNode(span, 1));
+                return new AddNode(span, moduleId, clonedValue, new SByteLiteralNode(span, moduleId, 1));
             }
             else
             {
@@ -227,10 +228,10 @@ namespace Cm.Ast
             {
                 if (enumType->GetUnderlyingType()->IsUnsignedTypeNode())
                 {
-                    return new ByteLiteralNode(span, 0u);
+                    return new ByteLiteralNode(span, moduleId, 0u);
                 }
             }
-            return new SByteLiteralNode(span, 0);
+            return new SByteLiteralNode(span, moduleId, 0);
         }
     }
 } // namespace Cm.Ast

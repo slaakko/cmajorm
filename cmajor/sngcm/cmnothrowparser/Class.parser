@@ -197,9 +197,9 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowClassParser
 
     Initializer(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<InitializerNode> initializer) : InitializerNode*
         ::=
-        (   THIS{ initializer.reset(new ThisInitializerNode(span, *moduleId)); } LPAREN! ArgumentList(moduleId, ctx, initializer.get()):thisArgs! RPAREN!
-        |   BASE{ initializer.reset(new BaseInitializerNode(span, *moduleId)); } LPAREN! ArgumentList(moduleId, ctx, initializer.get()):baseArgs! RPAREN!
-        |   Identifier(moduleId):id{ initializer.reset(new MemberInitializerNode(span, *moduleId, id)); } LPAREN! ArgumentList(moduleId, ctx, initializer.get()):memberArgs! RPAREN!
+        (   THIS{ initializer.reset(new ThisInitializerNode(span, *moduleId)); } LPAREN! ArgumentList(moduleId, ctx, initializer.get()):thisArgs RPAREN!
+        |   BASE{ initializer.reset(new BaseInitializerNode(span, *moduleId)); } LPAREN! ArgumentList(moduleId, ctx, initializer.get()):baseArgs RPAREN!
+        |   Identifier(moduleId):id{ initializer.reset(new MemberInitializerNode(span, *moduleId, id)); } LPAREN! ArgumentList(moduleId, ctx, initializer.get()):memberArgs RPAREN!
         )
         {
             initializer->SetLexerFlags(lexer.Flags());

@@ -27,6 +27,8 @@ class ConceptIdNode;
 class ConceptNode;
 class ConditionalCompilationExpressionNode;
 class ConditionalCompilationPartNode;
+class AttributesNode;
+class AttributeNode;
 
 class SNGCM_AST_API AstReader
 {
@@ -34,6 +36,8 @@ public:
     AstReader(const std::string& fileName_);
     BinaryReader& GetBinaryReader() { return binaryReader; }
     Node* ReadNode();
+    AttributeNode* ReadAttributeNode();
+    AttributesNode* ReadAttributesNode();
     IdentifierNode* ReadIdentifierNode();
     LabelNode* ReadLabelNode();
     StatementNode* ReadStatementNode();

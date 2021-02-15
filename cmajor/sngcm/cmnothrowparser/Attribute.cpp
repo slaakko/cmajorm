@@ -20,7 +20,7 @@ soulng::parser::Match NothrowAttributeParser::Attributes(CmajorNothrowLexer& lex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Attributes"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    std::unique_ptr<sngcm::ast::Attributes> attributes = std::unique_ptr<sngcm::ast::Attributes>();
+    std::unique_ptr<sngcm::ast::AttributesNode> attributes = std::unique_ptr<sngcm::ast::AttributesNode>();
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -31,6 +31,7 @@ soulng::parser::Match NothrowAttributeParser::Attributes(CmajorNothrowLexer& lex
             soulng::parser::Match* parentMatch2 = &match;
             {
                 int64_t pos = lexer.GetPos();
+                soulng::lexer::Span span = lexer.GetSpan();
                 soulng::parser::Match match(false);
                 if (*lexer == LBRACKET)
                 {
@@ -39,7 +40,7 @@ soulng::parser::Match NothrowAttributeParser::Attributes(CmajorNothrowLexer& lex
                 }
                 if (match.hit)
                 {
-                    attributes.reset(new sngcm::ast::Attributes);
+                    attributes.reset(new sngcm::ast::AttributesNode(span, *moduleId));
                 }
                 *parentMatch2 = match;
             }
@@ -188,7 +189,7 @@ soulng::parser::Match NothrowAttributeParser::Attributes(CmajorNothrowLexer& lex
     return match;
 }
 
-soulng::parser::Match NothrowAttributeParser::Attribute(CmajorNothrowLexer& lexer, sngcm::ast::Attributes* attributes, boost::uuids::uuid* moduleId)
+soulng::parser::Match NothrowAttributeParser::Attribute(CmajorNothrowLexer& lexer, sngcm::ast::AttributesNode* attributes, boost::uuids::uuid* moduleId)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -290,6 +291,7 @@ soulng::parser::Match NothrowAttributeParser::Attribute(CmajorNothrowLexer& lexe
                                     {
                                         int64_t pos = lexer.GetPos();
                                         soulng::lexer::Span span = lexer.GetSpan();
+                                        bool pass = true;
                                         soulng::parser::Match match(false);
                                         if (*lexer == STRINGLIT)
                                         {
@@ -299,8 +301,15 @@ soulng::parser::Match NothrowAttributeParser::Attribute(CmajorNothrowLexer& lexe
                                         if (match.hit)
                                         {
                                             s.end = span.end;
-                                            ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix);
-                                            value = lexer.strLit;
+                                            if (!ParseStringLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix)) pass = false;
+                                            else
+                                            {
+                                                value = lexer.strLit;
+                                            }
+                                        }
+                                        if (match.hit && !pass)
+                                        {
+                                            match = soulng::parser::Match(false);
                                         }
                                         *parentMatch12 = match;
                                     }

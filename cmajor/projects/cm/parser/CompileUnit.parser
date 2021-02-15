@@ -12,7 +12,7 @@ parser CompileUnitParser
 {
     uselexer CmajorLexer;
     main;
-    
+
     using IdentifierParser.Identifier;
     using IdentifierParser.QualifiedId;
     using ConceptParser.Concept;
@@ -25,47 +25,47 @@ parser CompileUnitParser
     using DelegateParser.Delegate;
     using DelegateParser.ClassDelegate;
     using GlobalVariableParser.GlobalVariable;
-    
+
     CompileUnit(ParsingContext* ctx, var UniquePtr<CompileUnitNode> compileUnit) : CompileUnitNode*
-        ::= empty{ compileUnit.Reset(new CompileUnitNode(span, lexer.FileName())); }
+        ::= empty{ compileUnit.Reset(new CompileUnitNode(span, ctx->ModuleId(), lexer.FileName())); }
             NamespaceContent(ctx, compileUnit.Get(), compileUnit->GlobalNs()):content{ return compileUnit.Release(); }
         ;
-        
+
     NamespaceContent(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns)
         ::= UsingDirectives(ctx, ns):usingDirectives
             Definitions(ctx, cu, ns):definitions
         ;
-        
+
     UsingDirectives(ParsingContext* ctx, NamespaceNode* ns)
         ::= UsingDirective(ctx, ns):usingDirective*
         ;
-        
+
     UsingDirective(ParsingContext* ctx, NamespaceNode* ns)
-        ::= UsingAliasDirective:usingAlias{ ns->AddMember(usingAlias); }
+        ::= UsingAliasDirective(ctx):usingAlias{ ns->AddMember(usingAlias); }
         |   UsingNamespaceDirective(ctx):usingNs{ ns->AddMember(usingNs); }
         ;
-        
-    UsingAliasDirective(var Span s) : Node*
-        ::= USING{ s = span; } Identifier:id ASSIGN QualifiedId:qid! SEMICOLON!
+
+    UsingAliasDirective(ParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } Identifier(ctx):id ASSIGN QualifiedId(ctx):qid! SEMICOLON!
         {
             s.end = span.end;
-            return new AliasNode(s, id, qid);
+            return new AliasNode(s, ctx->ModuleId(), id, qid);
         }
         ;
-        
+
     UsingNamespaceDirective(ParsingContext* ctx, var Span s) : Node*
-        ::= USING{ s = span; } QualifiedId:ns! SEMICOLON!
+        ::= USING{ s = span; } QualifiedId(ctx):ns! SEMICOLON!
         {
             s.end = span.end;
-            return new NamespaceImportNode(s, ns);
+            return new NamespaceImportNode(s, ctx->ModuleId(), ns);
         }
         ;
-        
+
     Definitions(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns)
         ::= (Definition(ctx, cu, ns):definition{ ns->AddMember(definition); })*
         ;
-        
-    Definition(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns) : Node* 
+
+    Definition(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns) : Node*
         ::= NamespaceDefinition(ctx, cu, ns):nsDefinition{ return nsDefinition; }
         |   TypedefDeclaration(ctx):typedefDeclaration{ return typedefDeclaration; }
         |   ConceptDefinition(ctx):conceptDefinition{ return conceptDefinition; }
@@ -78,51 +78,51 @@ parser CompileUnitParser
         |   ClassDelegateDefinition(ctx):classDelegateDefinition{ return classDelegateDefinition; }
         |   GlobalVariableDefinition(ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
         ;
-        
+
     NamespaceDefinition(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns, var UniquePtr<NamespaceNode> nsNode, var Span s) : NamespaceNode*
-        ::= NAMESPACE{ s = span; } (QualifiedId:nsName{ s.end = span.end; nsNode.Reset(new NamespaceNode(s, nsName)); } | empty{ nsNode.Reset(new NamespaceNode(s, null)); })
+        ::= NAMESPACE{ s = span; } (QualifiedId(ctx):nsName{ s.end = span.end; nsNode.Reset(new NamespaceNode(s, ctx->ModuleId(), nsName)); } | empty{ nsNode.Reset(new NamespaceNode(s, ctx->ModuleId(), null)); })
             LBRACE! NamespaceContent(ctx, cu, nsNode.Get()):content! RBRACE!
         {
             return nsNode.Release();
         }
         ;
-        
+
     TypedefDeclaration(ParsingContext* ctx) : TypedefNode*
         ::= Typedef(ctx):typedefDeclaration{ return typedefDeclaration; }
         ;
-        
+
     ConceptDefinition(ParsingContext* ctx) : ConceptNode*
         ::= Concept(ctx):conceptDefinition{ return conceptDefinition; }
         ;
-        
+
     FunctionDefinition(ParsingContext* ctx) : FunctionNode*
         ::= Function(ctx):functionDefinition{ return functionDefinition; }
         ;
-        
+
     ClassDefinition(ParsingContext* ctx) : ClassNode*
         ::= Class(ctx):classDefinition{ return classDefinition; }
         ;
-        
+
     InterfaceDefinition(ParsingContext* ctx) : InterfaceNode*
         ::= Interface(ctx):interfaceDefinition{ return interfaceDefinition; }
         ;
-        
+
     EnumTypeDefinition(ParsingContext* ctx) : EnumTypeNode*
         ::= EnumType(ctx):enumTypeDefinition{ return enumTypeDefinition; }
         ;
-        
+
     ConstantDefinition(ParsingContext* ctx) : ConstantNode*
         ::= Constant(ctx):constantDefinition{ return constantDefinition; }
         ;
-        
+
     DelegateDefinition(ParsingContext* ctx) : DelegateNode*
         ::= Delegate(ctx):delegateDefinition{ return delegateDefinition; }
         ;
-        
+
     ClassDelegateDefinition(ParsingContext* ctx) : ClassDelegateNode*
         ::= ClassDelegate(ctx):classDelegateDefinition{ return classDelegateDefinition; }
         ;
-        
+
     GlobalVariableDefinition(ParsingContext* ctx, CompileUnitNode* cu) : GlobalVariableNode*
         ::= GlobalVariable(ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
         ;

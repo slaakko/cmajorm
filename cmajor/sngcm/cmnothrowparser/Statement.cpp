@@ -438,7 +438,7 @@ soulng::parser::Match NothrowStatementParser::Statement(CmajorNothrowLexer& lexe
                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Statement"));
                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                            return soulng::parser::Match(true, new sngcm::ast::SyncNode(span, *moduleId));
+                            return soulng::parser::Match(true, new sngcm::ast::SyncStatementNode(span, *moduleId));
                         }
                     }
                     *parentMatch36 = match;

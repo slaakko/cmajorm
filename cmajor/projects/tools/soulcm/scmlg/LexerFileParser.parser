@@ -29,7 +29,7 @@ parser LexerFileParser
 
     Declaration(ParsingContext* parsingContext) : soulcm.scmlg.Declaration*
         ::= ClassMap:classMapDeclaration{ return classMapDeclaration; }
-        |   Usings:usingDeclarations{ return usingDeclarations; }
+        |   Usings(parsingContext):usingDeclarations{ return usingDeclarations; }
         |   Tokens:tokensDeclaration{ return tokensDeclaration; }
         |   Keywords:keywordsDeclaration{ return keywordsDeclaration; }
         |   Expressions:expressionsDeclaration{ return expressionsDeclaration; }
@@ -40,32 +40,32 @@ parser LexerFileParser
         ::= CLASSMAP ID!{ classMapName = lexer.GetMatch(span); } SEMICOLON!{ return new soulcm.scmlg.ClassMap(classMapName); }
         ;
 
-    Usings(var UniquePtr<soulcm.scmlg.Usings> usings) : soulcm.scmlg.Usings*
-        ::= empty{ usings.Reset(new soulcm.scmlg.Usings()); } UsingDirectives(usings.Get()):usingDirectives{ return usings.Release(); }
+    Usings(ParsingContext* ctx, var UniquePtr<soulcm.scmlg.Usings> usings) : soulcm.scmlg.Usings*
+        ::= empty{ usings.Reset(new soulcm.scmlg.Usings()); } UsingDirectives(ctx, usings.Get()):usingDirectives{ return usings.Release(); }
         ;
 
-    UsingDirectives(soulcm.scmlg.Usings* usings)
-        ::= UsingDirective(usings):usingDirective+
+    UsingDirectives(ParsingContext* ctx, soulcm.scmlg.Usings* usings)
+        ::= UsingDirective(ctx, usings):usingDirective+
         ;
 
-    UsingDirective(soulcm.scmlg.Usings* usings)
-        ::= UsingAliasDirective:usingAlias{ usings->AddMember(usingAlias); }
-        |   UsingNamespaceDirective:usingNs{ usings->AddMember(usingNs); }
+    UsingDirective(ParsingContext* ctx, soulcm.scmlg.Usings* usings)
+        ::= UsingAliasDirective(ctx):usingAlias{ usings->AddMember(usingAlias); }
+        |   UsingNamespaceDirective(ctx):usingNs{ usings->AddMember(usingNs); }
         ;
 
-    UsingAliasDirective(var Span s) : Node*
-        ::= USING{ s = span; } Identifier:id ASSIGN QualifiedId:qid! SEMICOLON!
+    UsingAliasDirective(ParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } Identifier(ctx):id ASSIGN QualifiedId(ctx):qid! SEMICOLON!
         {
             s.end = span.end;
-            return new AliasNode(s, id, qid);
+            return new AliasNode(s, ctx->ModuleId(), id, qid);
         }
         ;
 
-    UsingNamespaceDirective(var Span s) : Node*
-        ::= USING{ s = span; } QualifiedId:ns! SEMICOLON!
+    UsingNamespaceDirective(ParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } QualifiedId(ctx):ns! SEMICOLON!
         {
             s.end = span.end;
-            return new NamespaceImportNode(s, ns);
+            return new NamespaceImportNode(s, ctx->ModuleId(), ns);
         }
         ;
 

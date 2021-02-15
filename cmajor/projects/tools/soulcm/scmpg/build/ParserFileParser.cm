@@ -6,7 +6,7 @@ using System.Lex;
 using Cm.Ast;
 using ParserFileTokens;
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scmpg/build/ParserFileParser.parser' using soulcm parser generator scmpg version 3.8.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scmpg/build/ParserFileParser.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class ParserFileParser
 {
@@ -165,7 +165,7 @@ public static class ParserFileParser
             Match* parentMatch1 = &match;
             {
                 long pos = lexer.GetPos();
-                Match match = ParserFileParser.UsingDirective(lexer);
+                Match match = ParserFileParser.UsingDirective(lexer, parsingContext);
                 usingDirective.Reset(cast<Node*>(match.value));
                 if (match.hit)
                 {
@@ -216,7 +216,7 @@ public static class ParserFileParser
         }
         return match;
     }
-    public static Match UsingDirective(ParserFileLexer& lexer)
+    public static Match UsingDirective(ParserFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -237,7 +237,7 @@ public static class ParserFileParser
             Match* parentMatch1 = &match;
             {
                 long pos = lexer.GetPos();
-                Match match = ParserFileParser.UsingAliasDirective(lexer);
+                Match match = ParserFileParser.UsingAliasDirective(lexer, ctx);
                 usingAlias.Reset(cast<Node*>(match.value));
                 if (match.hit)
                 {
@@ -261,7 +261,7 @@ public static class ParserFileParser
                     Match* parentMatch3 = &match;
                     {
                         long pos = lexer.GetPos();
-                        Match match = ParserFileParser.UsingNamespaceDirective(lexer);
+                        Match match = ParserFileParser.UsingNamespaceDirective(lexer, ctx);
                         usingNs.Reset(cast<Node*>(match.value));
                         if (match.hit)
                         {
@@ -298,7 +298,7 @@ public static class ParserFileParser
         }
         return match;
     }
-    public static Match UsingAliasDirective(ParserFileLexer& lexer)
+    public static Match UsingAliasDirective(ParserFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -348,7 +348,7 @@ public static class ParserFileParser
                         Match match(false);
                         Match* parentMatch5 = &match;
                         {
-                            Match match = IdentifierParser.Identifier(lexer);
+                            Match match = IdentifierParser.Identifier(lexer, ctx);
                             id.Reset(cast<IdentifierNode*>(match.value));
                             *parentMatch5 = match;
                         }
@@ -382,7 +382,7 @@ public static class ParserFileParser
                     Match* parentMatch8 = &match;
                     {
                         System.Lex.Span span = lexer.GetSpan();
-                        Match match = IdentifierParser.QualifiedId(lexer);
+                        Match match = IdentifierParser.QualifiedId(lexer, ctx);
                         qid.Reset(cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
@@ -435,7 +435,7 @@ public static class ParserFileParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingAliasDirective");
                             #endif
-                            return Match(true, new AliasNode(s, id.Release(), qid.Release()));
+                            return Match(true, new AliasNode(s, ctx->ModuleId(), id.Release(), qid.Release()));
                         }
                     }
                     *parentMatch10 = match;
@@ -463,7 +463,7 @@ public static class ParserFileParser
         }
         return match;
     }
-    public static Match UsingNamespaceDirective(ParserFileLexer& lexer)
+    public static Match UsingNamespaceDirective(ParserFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -510,7 +510,7 @@ public static class ParserFileParser
                     Match* parentMatch4 = &match;
                     {
                         System.Lex.Span span = lexer.GetSpan();
-                        Match match = IdentifierParser.QualifiedId(lexer);
+                        Match match = IdentifierParser.QualifiedId(lexer, ctx);
                         ns.Reset(cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
@@ -563,7 +563,7 @@ public static class ParserFileParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingNamespaceDirective");
                             #endif
-                            return Match(true, new NamespaceImportNode(s, ns.Release()));
+                            return Match(true, new NamespaceImportNode(s, ctx->ModuleId(), ns.Release()));
                         }
                     }
                     *parentMatch6 = match;
@@ -806,16 +806,50 @@ public static class ParserFileParser
                     Match* parentMatch3 = &match;
                     {
                         long save = lexer.GetPos();
-                        Match match = ParserFileParser.MainStatement(lexer, grammarParser);
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match = ParserFileParser.MainStatement(lexer, grammarParser);
+                                *parentMatch5 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch6 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match = ParserFileParser.StartStatement(lexer, grammarParser);
+                                        *parentMatch6 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                            }
+                            *parentMatch4 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match = ParserFileParser.NothrowStatement(lexer, grammarParser);
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                        }
                         *parentMatch3 = match;
                         if (!match.hit)
                         {
                             Match match(false);
-                            Match* parentMatch4 = &match;
+                            Match* parentMatch8 = &match;
                             lexer.SetPos(save);
                             {
                                 Match match = ParserFileParser.UsingStatement(lexer, grammarParser);
-                                *parentMatch4 = match;
+                                *parentMatch8 = match;
                             }
                             *parentMatch3 = match;
                         }
@@ -824,11 +858,11 @@ public static class ParserFileParser
                     if (!match.hit)
                     {
                         Match match(false);
-                        Match* parentMatch5 = &match;
+                        Match* parentMatch9 = &match;
                         lexer.SetPos(save);
                         {
                             Match match = ParserFileParser.LexerStatement(lexer, grammarParser);
-                            *parentMatch5 = match;
+                            *parentMatch9 = match;
                         }
                         *parentMatch2 = match;
                     }
@@ -837,11 +871,11 @@ public static class ParserFileParser
                 if (!match.hit)
                 {
                     Match match(false);
-                    Match* parentMatch6 = &match;
+                    Match* parentMatch10 = &match;
                     lexer.SetPos(save);
                     {
                         Match match = ParserFileParser.RuleInfoStatement(lexer, grammarParser);
-                        *parentMatch6 = match;
+                        *parentMatch10 = match;
                     }
                     *parentMatch1 = match;
                 }
@@ -850,11 +884,11 @@ public static class ParserFileParser
             if (!match.hit)
             {
                 Match match(false);
-                Match* parentMatch7 = &match;
+                Match* parentMatch11 = &match;
                 lexer.SetPos(save);
                 {
                     Match match = ParserFileParser.RuleStatement(lexer, grammarParser, parsingContext);
-                    *parentMatch7 = match;
+                    *parentMatch11 = match;
                 }
                 *parentMatch0 = match;
             }
@@ -948,6 +982,164 @@ public static class ParserFileParser
                 else
                 {
                     System.Lex.WriteFailureToLog(lexer, u"MainStatement");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match StartStatement(ParserFileLexer& lexer, soulcm.scmpg.GrammarParser* grammarParser)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"StartStatement");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            if (*lexer == START)
+            {
+                ++lexer;
+                match.hit = true;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(true);
+                    Match* parentMatch3 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch3 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        grammarParser->SetStart();
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"StartStatement");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"StartStatement");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match NothrowStatement(ParserFileLexer& lexer, soulcm.scmpg.GrammarParser* grammarParser)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"NothrowStatement");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            if (*lexer == NOTHROW)
+            {
+                ++lexer;
+                match.hit = true;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(true);
+                    Match* parentMatch3 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch3 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        grammarParser->SetNothrow();
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"NothrowStatement");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"NothrowStatement");
                 }
             }
         #endif
@@ -2159,7 +2351,7 @@ public static class ParserFileParser
                     Match* parentMatch5 = &match;
                     {
                         long pos = lexer.GetPos();
-                        Match match = IdentifierParser.Identifier(lexer);
+                        Match match = IdentifierParser.Identifier(lexer, parsingContext);
                         varName.Reset(cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
@@ -2199,7 +2391,7 @@ public static class ParserFileParser
                             Match* parentMatch9 = &match;
                             {
                                 long pos = lexer.GetPos();
-                                Match match = IdentifierParser.Identifier(lexer);
+                                Match match = IdentifierParser.Identifier(lexer, parsingContext);
                                 paramName.Reset(cast<IdentifierNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -3404,7 +3596,7 @@ public static class ParserFileParser
                         {
                             ruleName = nt->value;
                             nonterminalPos = pos;
-                            invoke.Reset(new InvokeNode(Span()));
+                            invoke.Reset(new InvokeNode(Span(), parsingContext->ModuleId()));
                         }
                         *parentMatch3 = match;
                     }

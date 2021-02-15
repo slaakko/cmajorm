@@ -29,16 +29,16 @@ parser ClassParser
     using ConstantParser.Constant;
     using DelegateParser.Delegate;
     using DelegateParser.ClassDelegate;
-    
+
     Class(ParsingContext* ctx, var UniquePtr<ClassNode> cls, var Span s, var Span specifierSpan, var Span classSpan, var Span beginBraceSpan, var Span endBraceSpan) : ClassNode*
         ::= empty{ s = span; }
-            Attributes:attrs?
+            Attributes(ctx):attrs?
             Specifiers:specifiers{ specifierSpan = span; }
             CLASS{ classSpan = span; }
-            Identifier:id
+            Identifier(ctx):id
         {
             s.end = span.end;
-            cls.Reset(new ClassNode(s, specifiers, id, attrs));
+            cls.Reset(new ClassNode(s, ctx->ModuleId(), specifiers, id, attrs));
             cls->SetSpecifierSpan(specifierSpan);
             cls->SetClassSpan(classSpan);
         }
@@ -55,23 +55,23 @@ parser ClassParser
             return cls.Release();
         }
         ;
-        
+
     InheritanceAndInterfaces(ParsingContext* ctx, ClassNode* classNode)
         ::= COLON
         (   empty{ ctx->BeginParsingTypeExpr(); }
             BaseClassOrInterface(ctx):baseOrIntf{ classNode->AddBaseClassOrInterface(baseOrIntf); ctx->EndParsingTypeExpr(); } / { ctx->EndParsingTypeExpr(); }
         ) % COMMA
         ;
-        
+
     BaseClassOrInterface(ParsingContext* ctx) : Node*
         ::= TemplateId(ctx):templateId{ return templateId; }
-        |   QualifiedId:qid{ return qid; }
+        |   QualifiedId(ctx):qid{ return qid; }
         ;
-        
-    ClassContent(ParsingContext* ctx, ClassNode* classNode) 
+
+    ClassContent(ParsingContext* ctx, ClassNode* classNode)
         ::= (ClassMember(ctx, classNode):classMember{ classNode->AddMember(classMember); })*
         ;
-        
+
     ClassMember(ParsingContext* ctx, ClassNode* classNode) : Node*
         ::= StaticConstructor(ctx, classNode):staticConstructor{ return staticConstructor; }
         |   Constructor(ctx, classNode):constructor{ return constructor; }
@@ -86,16 +86,16 @@ parser ClassParser
         |   Delegate(ctx):dlg{ return dlg; }
         |   ClassDelegate(ctx):classDelegate{ return classDelegate; }
         ;
-        
+
     StaticConstructor(ParsingContext* ctx, ClassNode* classNode, var UniquePtr<StaticConstructorNode> staticConstructor, var Span s, var Span specifierSpan,
         var ustring className) : StaticConstructorNode*
-        ::= 
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier:id{ className = lexer.GetMatch(span); } LPAREN RPAREN
+        ::=
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier(ctx):id{ className = lexer.GetMatch(span); } LPAREN RPAREN
             {
                 s.end = span.end;
                 if (className != classNode->Id()->Str()) pass = false; else if (!StaticConstructorSpecifiers(specifiers)) pass = false; else
                 {
-                    staticConstructor.Reset(new StaticConstructorNode(s, specifiers, attrs));
+                    staticConstructor.Reset(new StaticConstructorNode(s, ctx->ModuleId(), specifiers, attrs));
                     staticConstructor->SetClassId(id);
                     staticConstructor->SetSpecifierSpan(specifierSpan);
                 }
@@ -108,16 +108,16 @@ parser ClassParser
             return staticConstructor.Release();
         }
         ;
-        
+
     Constructor(ParsingContext* ctx, ClassNode* classNode, var UniquePtr<ConstructorNode> ctor, var Span s, var Span specifierSpan) : Node*
         ::=
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier:id
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } Identifier(ctx):id
             {
                 ustring className = lexer.GetMatch(span);
                 s.end = span.end;
                 if (className != classNode->Id()->Str()) pass = false; else
                 {
-                    ctor.Reset(new ConstructorNode(s, specifiers, attrs));
+                    ctor.Reset(new ConstructorNode(s, ctx->ModuleId(), specifiers, attrs));
                     ctor->SetClassId(id);
                     ctor->SetSpecifierSpan(specifierSpan);
                 }
@@ -131,15 +131,15 @@ parser ClassParser
             return ctor.Release();
         }
         ;
-        
+
     Destructor(ParsingContext* ctx, ClassNode* classNode, var UniquePtr<DestructorNode> dtor, var Span s, var Span specifierSpan, var ustring className) : Node*
-        ::= 
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } CPL Identifier:id{ className = lexer.GetMatch(span); } LPAREN! RPAREN!
+        ::=
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } CPL Identifier(ctx):id{ className = lexer.GetMatch(span); } LPAREN! RPAREN!
             {
                 s.end = span.end;
                 if (className != classNode->Id()->Str()) pass = false; else
                 {
-                    dtor.Reset(new DestructorNode(s, specifiers, attrs));
+                    dtor.Reset(new DestructorNode(s, ctx->ModuleId(), specifiers, attrs));
                     dtor->SetClassId(id);
                     dtor->SetSpecifierSpan(specifierSpan);
                 }
@@ -151,25 +151,25 @@ parser ClassParser
             return  dtor.Release();
         }
         ;
-        
+
     Initializer(ParsingContext* ctx, var UniquePtr<InitializerNode> initializer) : InitializerNode*
         ::=
-        (   THIS{ initializer.Reset(new ThisInitializerNode(span)); } LPAREN! ArgumentList(ctx, initializer.Get()):thisArgs! RPAREN!
-        |   BASE{ initializer.Reset(new BaseInitializerNode(span)); } LPAREN! ArgumentList(ctx, initializer.Get()):baseArgs! RPAREN!
-        |   Identifier:id{ initializer.Reset(new MemberInitializerNode(span, id)); } LPAREN! ArgumentList(ctx, initializer.Get()):memberArgs! RPAREN!
+        (   THIS{ initializer.Reset(new ThisInitializerNode(span, ctx->ModuleId())); } LPAREN! ArgumentList(ctx, initializer.Get()):thisArgs! RPAREN!
+        |   BASE{ initializer.Reset(new BaseInitializerNode(span, ctx->ModuleId())); } LPAREN! ArgumentList(ctx, initializer.Get()):baseArgs! RPAREN!
+        |   Identifier(ctx):id{ initializer.Reset(new MemberInitializerNode(span, ctx->ModuleId(), id)); } LPAREN! ArgumentList(ctx, initializer.Get()):memberArgs! RPAREN!
         )
         {
             return initializer.Release();
         }
         ;
-        
+
     MemberFunction(ParsingContext* ctx, var UniquePtr<MemberFunctionNode> memFun, var Span s, var Span specifierSpan, var Span groupIdSpan) : Node*
         ::=
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):returnType FunctionGroupId(ctx):groupId
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):returnType FunctionGroupId(ctx):groupId
             {
                 s.end = span.end;
                 groupIdSpan = span;
-                memFun.Reset(new MemberFunctionNode(s, specifiers, returnType, groupId, attrs)); 
+                memFun.Reset(new MemberFunctionNode(s, ctx->ModuleId(), specifiers, returnType, groupId, attrs));
                 memFun->SetSpecifierSpan(specifierSpan);
                 memFun->SetGroupIdSpan(groupIdSpan);
             }
@@ -181,13 +181,13 @@ parser ClassParser
             return memFun.Release();
         }
         ;
-        
+
     ConversionFunction(ParsingContext* ctx, var UniquePtr<ConversionFunctionNode> conversionFun, var Span s, var Span specifierSpan) : Node*
         ::=
-        (   empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } OPERATOR TypeExpr(ctx):type LPAREN! RPAREN!
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } OPERATOR TypeExpr(ctx):type LPAREN! RPAREN!
             {
                 s.end = span.end;
-                conversionFun.Reset(new ConversionFunctionNode(s, specifiers, type, attrs));
+                conversionFun.Reset(new ConversionFunctionNode(s, ctx->ModuleId(), specifiers, type, attrs));
                 conversionFun->SetSpecifierSpan(specifierSpan);
             }
             (CONST{ conversionFun->SetConst(); })?
@@ -200,10 +200,10 @@ parser ClassParser
         ;
 
     MemberVariable(ParsingContext* ctx, var Span s, var Span specifierSpan) : Node*
-        ::= empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):type Identifier:id SEMICOLON
+        ::= empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):type Identifier(ctx):id SEMICOLON
         {
             s.end = span.end;
-            MemberVariableNode* value = new MemberVariableNode(s, specifiers, type, id, attrs); 
+            MemberVariableNode* value = new MemberVariableNode(s, ctx->ModuleId(), specifiers, type, id, attrs);
             value->SetSpecifierSpan(specifierSpan);
             return value;
         }

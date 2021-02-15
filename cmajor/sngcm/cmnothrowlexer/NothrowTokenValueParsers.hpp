@@ -16,10 +16,9 @@ const int noPrefix = 0;
 const int utf16Prefix = 1;
 const int utf32Prefix = 2;
 
-SNGCM_NOTHROW_LEXER_API void ParseFloatingLiteral(const std::string& fileName, const Token& token, double& floatingLit, bool& floatingLitFloat);
-SNGCM_NOTHROW_LEXER_API void ParseIntegerLiteral(const std::string& fileName, const Token& token, uint64_t& intLit, bool& intLitUnsigned);
-SNGCM_NOTHROW_LEXER_API void ParseCharacterLiteral(const std::string& fileName, const Token& token, char32_t& charLit, int& charLitPrefix);
-SNGCM_NOTHROW_LEXER_API void ParseStringLiteral(const std::string& fileName, const Token& token, std::u32string& stringLit, int& stringLitPrefix);
-SNGCM_NOTHROW_LEXER_API std::string MakeFilePath(const Lexeme& lexeme);
+SNGCM_NOTHROW_LEXER_API bool ParseFloatingLiteralNothrow(const std::string& fileName, const Token& token, double& floatingLit, bool& floatingLitFloat);
+SNGCM_NOTHROW_LEXER_API bool ParseIntegerLiteralNothrow(const std::string& fileName, const Token& token, uint64_t& intLit, bool& intLitUnsigned);
+SNGCM_NOTHROW_LEXER_API bool ParseCharacterLiteralNothrow(const std::string& fileName, const Token& token, char32_t& charLit, int& charLitPrefix);
+SNGCM_NOTHROW_LEXER_API bool ParseStringLiteralNothrow(const std::string& fileName, const Token& token, std::u32string& stringLit, int& stringLitPrefix);
 
 #endif // TOKEN_VALUE_PARSERS_HPP

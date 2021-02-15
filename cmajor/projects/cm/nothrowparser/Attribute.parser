@@ -1,0 +1,44 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowAttributeParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    Attributes(NothrowParsingContext* ctx, var UniquePtr<Cm.Ast.AttributesNode> attributes) : Cm.Ast.AttributesNode*
+        ::= LBRACKET{ attributes.Reset(new Cm.Ast.AttributesNode(span, ctx->ModuleId())); }
+            (Attribute(ctx, attributes.Get()):attribute % COMMA)?
+            RBRACKET!
+        {
+            return attributes.Release();
+        }
+        ;
+
+    Attribute(NothrowParsingContext* ctx, Cm.Ast.AttributesNode* attributes, var Span s, var ustring name, var ustring value)
+        ::=
+        (   empty{ value = u"true"; }
+            ID{ s = span; name = lexer.GetMatch(span); }
+            (   ASSIGN STRINGLIT
+                {
+                    s.end = span.end;
+                    if (!Cm.NothrowLexer.ParseStringLiteralNothrow(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix)) pass = false;
+                    else
+                    {
+                        value = lexer.strLit;
+                    }
+                }
+            )?
+        )
+        {
+            attributes->AddAttribute(s, ctx->ModuleId(), name, value);
+        }
+        ;
+}

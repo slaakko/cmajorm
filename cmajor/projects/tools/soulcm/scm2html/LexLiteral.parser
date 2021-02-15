@@ -1,0 +1,94 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Ast;
+using LexerFileTokens;
+
+parser LexLiteralParser
+{
+    uselexer LexerFileLexer;
+
+    using LexExpressionParser.Expression;
+
+    Literal(ParsingContext* ctx) : LiteralNode*
+        ::= SimpleLiteral(ctx):simpleLiteral{ return simpleLiteral; }
+        |   ComplexLiteral(ctx):complexLiteral{ return complexLiteral; }
+        ;
+
+    SimpleLiteral(ParsingContext* ctx) : LiteralNode*
+        ::= TRUE
+        {
+            LiteralNode* value = new BooleanLiteralNode(span, ctx->ModuleId(), true);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   FALSE
+        {
+            LiteralNode* value = new BooleanLiteralNode(span, ctx->ModuleId(), false);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   FLOATINGLIT
+        {
+            soulcm.scm2html.ParseFloatingLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.floatingLit, lexer.floatingLitFloat);
+            LiteralNode* value = CreateFloatingLiteralNode(span, ctx->ModuleId(), lexer.floatingLit, lexer.floatingLitFloat);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   INTLIT
+        {
+            soulcm.scm2html.ParseIntegerLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.intLit, lexer.intLitUnsigned);
+            LiteralNode* value = CreateIntegerLiteralNode(span, ctx->ModuleId(), lexer.intLit, lexer.intLitUnsigned);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   CHARLIT
+        {
+            soulcm.scm2html.ParseCharacterLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.chrLit, lexer.chrLitPrefix);
+            LiteralNode* value = CreateCharacterLiteralNode(span, ctx->ModuleId(), lexer.chrLit, lexer.chrLitPrefix);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   STRINGLIT
+        {
+            soulcm.scm2html.ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix);
+            LiteralNode* value = CreateStringLiteralNode(span, ctx->ModuleId(), lexer.strLit, lexer.strLitPrefix);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   NULLLIT
+        {
+            LiteralNode* value = new NullLiteralNode(span, ctx->ModuleId());
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        ;
+
+    ComplexLiteral(ParsingContext* ctx) : LiteralNode*
+        ::= ArrayLiteral(ctx):arrayLiteral{ return arrayLiteral; }
+        |   StructuredLiteral(ctx):structuredLiteral{ return structuredLiteral; }
+        ;
+
+    ArrayLiteral(ParsingContext* ctx, var UniquePtr<ArrayLiteralNode> arrayLiteral) : ArrayLiteralNode*
+        ::= LBRACKET{ arrayLiteral.Reset(new ArrayLiteralNode(span, ctx->ModuleId())); } (Expression(ctx):expr{ arrayLiteral->AddValue(expr); } % COMMA)? RBRACKET!
+        {
+            arrayLiteral->SetSpanEnd(span.end);
+            return arrayLiteral.Release();
+        }
+        ;
+
+    StructuredLiteral(ParsingContext* ctx, var UniquePtr<StructuredLiteralNode> structuredLiteral) : StructuredLiteralNode*
+        ::= LBRACE{ structuredLiteral.Reset(new StructuredLiteralNode(span, ctx->ModuleId())); } (Expression(ctx):expr{ structuredLiteral->AddMember(expr); } % COMMA)? RBRACE!
+        {
+            structuredLiteral->SetSpanEnd(span.end);
+            return structuredLiteral.Release();
+        }
+        ;
+
+    ruleinfo
+    {
+        (Literal, "literal"), (SimpleLiteral, "simple literal"), (ComplexLiteral, "complex literal"), (ArrayLiteral, "array literal"), (StructuredLiteral, "structured literal")
+    }
+}

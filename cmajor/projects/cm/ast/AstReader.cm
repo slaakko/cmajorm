@@ -8,40 +8,47 @@ using System.IO;
 
 namespace Cm.Ast
 {
-    public inline int MakeFileIndex(short moduleId, short fileId)
-    {
-        return (cast<int>(moduleId) << 16) | fileId;
-    }
-    public inline short GetModuleId(int fileIndex)
-    {
-        return cast<short>((fileIndex >> 16) & 65535);
-    }
-    public inline short GetFileId(int fileIndex)
-    {
-        return cast<short>(fileIndex & 65535);
-    }
-
     public class AstReader
     {
-        public AstReader(const string& fileName_) :
-            binaryReader(File.OpenBinary(fileName_)), moduleId(-1)
+        public AstReader(const string& fileName_) : binaryReader(File.OpenBinary(fileName_))
         {
         }
-        public BinaryReader& GetBinaryReader()
+        public nothrow inline BinaryReader& GetBinaryReader()
         {
             return binaryReader;
-        }
-        public void SetModuleId(short moduleId_)
-        {
-            moduleId = moduleId_;
         }
         public Node* ReadNode()
         {
             NodeType nodeType = cast<NodeType>(binaryReader.ReadByte());
             System.Lex.Span span = ReadSpan();
-            Node* node = NodeFactory.Instance().CreateNode(nodeType, span);
+            Uuid moduleId = binaryReader.ReadUuid();
+            Node* node = NodeFactory.Instance().CreateNode(nodeType, span, moduleId);
             node->Read(*this);
             return node;
+        }
+        public AttributeNode* ReadAttributeNode()
+        {
+             Node* node = ReadNode();
+             if (node->GetNodeType() == NodeType.attributeNode)
+             {
+                 return cast<AttributeNode*>(node);
+             }
+             else
+             {
+                 throw Exception("attribute node expected");
+             }
+        }
+        public AttributesNode* ReadAttributesNode()
+        {
+            Node* node = ReadNode();
+            if (node->GetNodeType() == NodeType.attributesNode)
+            {
+                return cast<AttributesNode*>(node);
+            }
+            else
+            {
+                throw Exception("attributes node expected");
+            }
         }
         public IdentifierNode* ReadIdentifierNode()
         {
@@ -189,11 +196,6 @@ namespace Cm.Ast
             else
             {
                 uint fileIndex = binaryReader.ReadULEB128UInt();
-                if (moduleId != -1)
-                {
-                    short fileId = GetFileId(cast<int>(fileIndex));
-                    fileIndex = cast<uint>(MakeFileIndex(moduleId, fileId));
-                }
                 uint line = binaryReader.ReadULEB128UInt();
                 uint start = binaryReader.ReadULEB128UInt();
                 uint end = binaryReader.ReadULEB128UInt();
@@ -201,6 +203,5 @@ namespace Cm.Ast
             }
         }
         private BinaryReader binaryReader;
-        private short moduleId;
     }
 } // namespace Cm.Ast

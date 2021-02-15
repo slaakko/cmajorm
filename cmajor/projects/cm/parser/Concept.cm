@@ -7,7 +7,7 @@ using Cm.Ast;
 using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/Concept.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/Concept.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class ConceptParser
 {
@@ -133,7 +133,7 @@ public static class ConceptParser
                                                                 Match* parentMatch18 = &match;
                                                                 {
                                                                     System.Lex.Span span = lexer.GetSpan();
-                                                                    Match match = IdentifierParser.Identifier(lexer);
+                                                                    Match match = IdentifierParser.Identifier(lexer, ctx);
                                                                     conceptName.Reset(cast<IdentifierNode*>(match.value));
                                                                     if (match.hit)
                                                                     {
@@ -147,7 +147,7 @@ public static class ConceptParser
                                                                 if (match.hit)
                                                                 {
                                                                     s.end = span.end;
-                                                                    conceptNode.Reset(new ConceptNode(s, specifiers->value, conceptName.Release()));
+                                                                    conceptNode.Reset(new ConceptNode(s, ctx->ModuleId(), specifiers->value, conceptName.Release()));
                                                                 }
                                                                 *parentMatch17 = match;
                                                             }
@@ -202,7 +202,7 @@ public static class ConceptParser
                                                             Match* parentMatch24 = &match;
                                                             {
                                                                 long pos = lexer.GetPos();
-                                                                Match match = IdentifierParser.Identifier(lexer);
+                                                                Match match = IdentifierParser.Identifier(lexer, ctx);
                                                                 typeParam.Reset(cast<IdentifierNode*>(match.value));
                                                                 if (match.hit)
                                                                 {
@@ -244,7 +244,7 @@ public static class ConceptParser
                                                                                     Match* parentMatch29 = &match;
                                                                                     {
                                                                                         long pos = lexer.GetPos();
-                                                                                        Match match = IdentifierParser.Identifier(lexer);
+                                                                                        Match match = IdentifierParser.Identifier(lexer, ctx);
                                                                                         typeParam.Reset(cast<IdentifierNode*>(match.value));
                                                                                         if (match.hit)
                                                                                         {
@@ -336,7 +336,7 @@ public static class ConceptParser
                                                                 Match* parentMatch38 = &match;
                                                                 {
                                                                     long pos = lexer.GetPos();
-                                                                    Match match = ConceptParser.Refinement(lexer);
+                                                                    Match match = ConceptParser.Refinement(lexer, ctx);
                                                                     refinement.Reset(cast<ConceptIdNode*>(match.value));
                                                                     if (match.hit)
                                                                     {
@@ -562,7 +562,7 @@ public static class ConceptParser
         }
         return match;
     }
-    public static Match Refinement(CmajorLexer& lexer)
+    public static Match Refinement(CmajorLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -613,11 +613,11 @@ public static class ConceptParser
                                     {
                                         long pos = lexer.GetPos();
                                         Span span = lexer.GetSpan();
-                                        Match match = IdentifierParser.QualifiedId(lexer);
+                                        Match match = IdentifierParser.QualifiedId(lexer, ctx);
                                         refinedConcept.Reset(cast<IdentifierNode*>(match.value));
                                         if (match.hit)
                                         {
-                                            conceptId.Reset(new ConceptIdNode(span, refinedConcept.Release()));
+                                            conceptId.Reset(new ConceptIdNode(span, ctx->ModuleId(), refinedConcept.Release()));
                                         }
                                         *parentMatch7 = match;
                                     }
@@ -672,7 +672,7 @@ public static class ConceptParser
                                     Match* parentMatch13 = &match;
                                     {
                                         long pos = lexer.GetPos();
-                                        Match match = IdentifierParser.Identifier(lexer);
+                                        Match match = IdentifierParser.Identifier(lexer, ctx);
                                         typeParam.Reset(cast<IdentifierNode*>(match.value));
                                         if (match.hit)
                                         {
@@ -714,7 +714,7 @@ public static class ConceptParser
                                                             Match* parentMatch18 = &match;
                                                             {
                                                                 long pos = lexer.GetPos();
-                                                                Match match = IdentifierParser.Identifier(lexer);
+                                                                Match match = IdentifierParser.Identifier(lexer, ctx);
                                                                 typeParam.Reset(cast<IdentifierNode*>(match.value));
                                                                 if (match.hit)
                                                                 {
@@ -1083,7 +1083,7 @@ public static class ConceptParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TypeNameConstraint");
                             #endif
-                            return Match(true, new TypeNameConstraintNode(s, type.Release()));
+                            return Match(true, new TypeNameConstraintNode(s, ctx->ModuleId(), type.Release()));
                         }
                     }
                     *parentMatch6 = match;
@@ -1323,13 +1323,13 @@ public static class ConceptParser
                                     long pos = lexer.GetPos();
                                     Span span = lexer.GetSpan();
                                     bool pass = true;
-                                    Match match = IdentifierParser.Identifier(lexer);
+                                    Match match = IdentifierParser.Identifier(lexer, ctx);
                                     id.Reset(cast<IdentifierNode*>(match.value));
                                     if (match.hit)
                                     {
                                         ustring className = lexer.GetMatch(span);
                                         pass = className == firstTypeParameter->Str();
-                                        if (pass) ctorConstraint.Reset(new ConstructorConstraintNode(span, id.Release()));
+                                        if (pass) ctorConstraint.Reset(new ConstructorConstraintNode(span, ctx->ModuleId(), id.Release()));
                                     }
                                     if (match.hit && !pass)
                                     {
@@ -1489,7 +1489,7 @@ public static class ConceptParser
                                         long pos = lexer.GetPos();
                                         Span span = lexer.GetSpan();
                                         bool pass = true;
-                                        Match match = IdentifierParser.Identifier(lexer);
+                                        Match match = IdentifierParser.Identifier(lexer, ctx);
                                         id.Reset(cast<IdentifierNode*>(match.value));
                                         if (match.hit)
                                         {
@@ -1615,7 +1615,7 @@ public static class ConceptParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"DestructorConstraint");
                     #endif
-                    return Match(true, new DestructorConstraintNode(s, id.Release()));
+                    return Match(true, new DestructorConstraintNode(s, ctx->ModuleId(), id.Release()));
                 }
             }
             *parentMatch0 = match;
@@ -1678,7 +1678,7 @@ public static class ConceptParser
                             Match match(false);
                             Match* parentMatch5 = &match;
                             {
-                                Match match = IdentifierParser.Identifier(lexer);
+                                Match match = IdentifierParser.Identifier(lexer, ctx);
                                 typeParam.Reset(cast<IdentifierNode*>(match.value));
                                 *parentMatch5 = match;
                             }
@@ -1730,7 +1730,7 @@ public static class ConceptParser
                             }
                             if (match.hit)
                             {
-                                memberFunctionConstraint.Reset(new MemberFunctionConstraintNode(span, returnType.Release(), typeParam.Release(), functionGroupId->value));
+                                memberFunctionConstraint.Reset(new MemberFunctionConstraintNode(span, ctx->ModuleId(), returnType.Release(), typeParam.Release(), functionGroupId->value));
                             }
                             *parentMatch8 = match;
                         }
@@ -1883,7 +1883,7 @@ public static class ConceptParser
                             }
                             if (match.hit)
                             {
-                                functionConstraint.Reset(new FunctionConstraintNode(span, returnType.Release(), functionGroupId->value));
+                                functionConstraint.Reset(new FunctionConstraintNode(span, ctx->ModuleId(), returnType.Release(), functionGroupId->value));
                             }
                             *parentMatch4 = match;
                         }
@@ -2133,7 +2133,7 @@ public static class ConceptParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"WhereConstraint");
                             #endif
-                            return Match(true, new WhereConstraintNode(s, constraint.Release()));
+                            return Match(true, new WhereConstraintNode(s, ctx->ModuleId(), constraint.Release()));
                         }
                     }
                     *parentMatch3 = match;
@@ -2291,7 +2291,7 @@ public static class ConceptParser
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        constraint.Reset(new DisjunctiveConstraintNode(s, constraint.Release(), right.Release()));
+                                                        constraint.Reset(new DisjunctiveConstraintNode(s, ctx->ModuleId(), constraint.Release(), right.Release()));
                                                     }
                                                     *parentMatch9 = match;
                                                 }
@@ -2431,7 +2431,7 @@ public static class ConceptParser
                                                     if (match.hit)
                                                     {
                                                         s.end = span.end;
-                                                        constraint.Reset(new ConjunctiveConstraintNode(s, constraint.Release(), right.Release()));
+                                                        constraint.Reset(new ConjunctiveConstraintNode(s, ctx->ModuleId(), constraint.Release(), right.Release()));
                                                     }
                                                     *parentMatch9 = match;
                                                 }
@@ -2581,7 +2581,7 @@ public static class ConceptParser
                                 #if (DEBUG)
                                     if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"PrimaryConstraintExpr");
                                 #endif
-                                return Match(true, new ParenthesizedConstraintNode(s, constraint.Release()));
+                                return Match(true, new ParenthesizedConstraintNode(s, ctx->ModuleId(), constraint.Release()));
                             }
                         }
                         *parentMatch6 = match;
@@ -2779,7 +2779,7 @@ public static class ConceptParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"PredicateConstraint");
                     #endif
-                    return Match(true, new PredicateConstraintNode(span, invokeExpr.Release()));
+                    return Match(true, new PredicateConstraintNode(span, ctx->ModuleId(), invokeExpr.Release()));
                 }
             }
             *parentMatch0 = match;
@@ -2874,7 +2874,7 @@ public static class ConceptParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"IsConstraint");
                             #endif
-                            return Match(true, new IsConstraintNode(s, type.Release(), conceptOrTypeName.Release()));
+                            return Match(true, new IsConstraintNode(s, ctx->ModuleId(), type.Release(), conceptOrTypeName.Release()));
                         }
                     }
                     *parentMatch5 = match;
@@ -2978,11 +2978,11 @@ public static class ConceptParser
                     {
                         long pos = lexer.GetPos();
                         Span span = lexer.GetSpan();
-                        Match match = IdentifierParser.QualifiedId(lexer);
+                        Match match = IdentifierParser.QualifiedId(lexer, ctx);
                         id.Reset(cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
-                            constraint.Reset(new MultiParamConstraintNode(span, id.Release()));
+                            constraint.Reset(new MultiParamConstraintNode(span, ctx->ModuleId(), id.Release()));
                         }
                         *parentMatch3 = match;
                     }
@@ -3231,7 +3231,7 @@ public static class ConceptParser
                                             long save = lexer.GetPos();
                                             Match* parentMatch10 = &match;
                                             {
-                                                Match match = IdentifierParser.Identifier(lexer);
+                                                Match match = IdentifierParser.Identifier(lexer, ctx);
                                                 id.Reset(cast<IdentifierNode*>(match.value));
                                                 if (match.hit)
                                                 {
@@ -3260,7 +3260,7 @@ public static class ConceptParser
                                             Match match(true);
                                             if (match.hit)
                                             {
-                                                axiomNode.Reset(new AxiomNode(axiomSpan, id.Release()));
+                                                axiomNode.Reset(new AxiomNode(axiomSpan, ctx->ModuleId(), id.Release()));
                                             }
                                             *parentMatch12 = match;
                                         }
@@ -3557,7 +3557,7 @@ public static class ConceptParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"AxiomStatement");
                     #endif
-                    return Match(true, new AxiomStatementNode(s, expr.Release(), lexer.GetMatch(s)));
+                    return Match(true, new AxiomStatementNode(s, ctx->ModuleId(), expr.Release(), lexer.GetMatch(s)));
                 }
             }
             *parentMatch0 = match;

@@ -17,12 +17,12 @@ namespace Cm.Ast
     }
     public class NamespaceNode : Node
     {
-        public nothrow NamespaceNode(const System.Lex.Span& span_) :
-            base(NodeType.namespaceNode, span_), id(), flags()
+        public nothrow NamespaceNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.namespaceNode, span_, moduleId_), id(), flags()
         {
         }
-        public nothrow NamespaceNode(const System.Lex.Span& span_, IdentifierNode* id_) :
-            base(NodeType.namespaceNode, span_), id(id_), flags()
+        public nothrow NamespaceNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* id_) :
+            base(NodeType.namespaceNode, span_, moduleId_), id(id_), flags()
         {
             if (id.IsNull())
             {
@@ -33,7 +33,7 @@ namespace Cm.Ast
                 {
                     sha1.Process(x);
                 }
-                id.Reset(new IdentifierNode(span_, u"unnamed_ns_" + ToUtf32(sha1.GetDigest())));
+                id.Reset(new IdentifierNode(span_, moduleId_, u"unnamed_ns_" + ToUtf32(sha1.GetDigest())));
             }
             id->SetParent(this);
         }
@@ -100,7 +100,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            NamespaceNode* clone = new NamespaceNode(GetSpan(), cast<IdentifierNode*>(id->Clone(cloneContext)));
+            NamespaceNode* clone = new NamespaceNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(id->Clone(cloneContext)));
             int n = members.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -124,12 +124,12 @@ namespace Cm.Ast
     }
     public class AliasNode : Node
     {
-        public nothrow AliasNode(const System.Lex.Span& span_) :
-            base(NodeType.aliasNode, span_), id(), qid()
+        public nothrow AliasNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.aliasNode, span_, moduleId_), id(), qid()
         {
         }
-        public nothrow AliasNode(const System.Lex.Span& span_, IdentifierNode* id_, IdentifierNode* qid_) :
-            base(NodeType.aliasNode, span_), id(id_), qid(qid_)
+        public nothrow AliasNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* id_, IdentifierNode* qid_) :
+            base(NodeType.aliasNode, span_, moduleId_), id(id_), qid(qid_)
         {
             id->SetParent(this);
             qid->SetParent(this);
@@ -144,7 +144,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new AliasNode(GetSpan(), cast<IdentifierNode*>(id->Clone(cloneContext)), cast<IdentifierNode*>(qid->Clone(cloneContext)));
+            return new AliasNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(id->Clone(cloneContext)), cast<IdentifierNode*>(qid->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -169,12 +169,12 @@ namespace Cm.Ast
     }
     public class NamespaceImportNode : Node
     {
-        public nothrow NamespaceImportNode(const System.Lex.Span& span_) :
-            base(NodeType.namespaceImportNode, span_), ns()
+        public nothrow NamespaceImportNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.namespaceImportNode, span_, moduleId_), ns()
         {
         }
-        public nothrow NamespaceImportNode(const System.Lex.Span& span_, IdentifierNode* ns_) :
-            base(NodeType.namespaceImportNode, span_), ns(ns_)
+        public nothrow NamespaceImportNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* ns_) :
+            base(NodeType.namespaceImportNode, span_, moduleId_), ns(ns_)
         {
             ns->SetParent(this);
         }
@@ -184,7 +184,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new NamespaceImportNode(GetSpan(), cast<IdentifierNode*>(ns->Clone(cloneContext)));
+            return new NamespaceImportNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(ns->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {

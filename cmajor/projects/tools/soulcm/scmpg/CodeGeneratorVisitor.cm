@@ -12,9 +12,10 @@ namespace soulcm.scmpg
 {
     public class CodeGeneratorVisitor : Visitor
     {
-        public CodeGeneratorVisitor(bool verbose_, bool debug_, bool noParserDebugSupport_) :
+        public CodeGeneratorVisitor(bool verbose_, bool debug_, bool noParserDebugSupport_, const Uuid& moduleId_) :
             verbose(verbose_), debug(debug_), noParserDebugSupport(noParserDebugSupport_), domain(null), currentParser(null), currentRule(null), lexerTypeName(u"System.Lex.Lexer"),
-            parentMatchNumber(0), setParentMatchNumber(-1), sn(0), currentBlock(null), currentClass(null), currentCompileUnit(null), tokenSwitch(null), stage(Stage.generateSource)
+            parentMatchNumber(0), setParentMatchNumber(-1), sn(0), currentBlock(null), currentClass(null), currentCompileUnit(null), tokenSwitch(null), stage(Stage.generateSource),
+            moduleId(moduleId_)
         {
         }
         public enum Stage
@@ -23,21 +24,21 @@ namespace soulcm.scmpg
         }
         public override void Visit(EmptyParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true));
+            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true));
             currentBlock->AddStatement(matchTrueStmt);
         }
         public override void Visit(AnyParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
             currentBlock->AddStatement(matchFalseStmt);
-            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"))));
-            thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true)));
-            Cm.Ast.Node* endToken = new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")),
-                new Cm.Ast.IdentifierNode(System.Lex.Span(), u"END_TOKEN"));
-            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.NotEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), endToken), thenS, null);
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"))));
+            thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true)));
+            Cm.Ast.Node* endToken = new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Lex")),
+                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"END_TOKEN"));
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.NotEqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), endToken), thenS, null);
             currentBlock->AddStatement(ifStmt);
         }
         public override void Visit(TokenParser& parser)
@@ -45,14 +46,14 @@ namespace soulcm.scmpg
             if (stage == Stage.beginGenerateTokenSwitch)
             {
                 blockStack.Push(currentBlock);
-                currentBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                currentBlock->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"))));
+                currentBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                currentBlock->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"))));
             }
             else if (stage == Stage.endGenerateTokenSwitch)
             {
-                Cm.Ast.CaseStatementNode* caseStmt = new Cm.Ast.CaseStatementNode(System.Lex.Span());
-                caseStmt->AddCaseExpr(new Cm.Ast.IdentifierNode(System.Lex.Span(), parser.TokenName()));
-                currentBlock->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span()));
+                Cm.Ast.CaseStatementNode* caseStmt = new Cm.Ast.CaseStatementNode(System.Lex.Span(), moduleId);
+                caseStmt->AddCaseExpr(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, parser.TokenName()));
+                currentBlock->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span(), moduleId));
                 caseStmt->AddStatement(currentBlock);
                 currentBlock = blockStack.Top();
                 blockStack.Pop();
@@ -60,116 +61,116 @@ namespace soulcm.scmpg
             }
             else
             {
-                Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-                matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+                Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
                 currentBlock->AddStatement(matchFalseStmt);
-                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"))));
-                thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true)));
-                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.EqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.IdentifierNode(System.Lex.Span(), parser.TokenName())), thenS, null);
+                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"))));
+                thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true)));
+                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.EqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, parser.TokenName())), thenS, null);
                 currentBlock->AddStatement(ifStmt);
             }
         }
         public override void Visit(CharParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
             currentBlock->AddStatement(matchFalseStmt);
-            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"))));
-            thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true)));
-            Cm.Ast.IntLiteralNode* parserChar = new Cm.Ast.IntLiteralNode(System.Lex.Span(), cast<int>(parser.Chr()));
-            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.EqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), parserChar), thenS, null);
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"))));
+            thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true)));
+            Cm.Ast.IntLiteralNode* parserChar = new Cm.Ast.IntLiteralNode(System.Lex.Span(), moduleId, cast<int>(parser.Chr()));
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.EqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), parserChar), thenS, null);
             currentBlock->AddStatement(ifStmt);
         }
         public override void Visit(StringParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true));
+            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true));
             currentBlock->AddStatement(matchTrueStmt);
-            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"))));
-            Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            elseS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false)));
-            elseS->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span()));
-            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.EqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"i")), thenS, elseS);
-            Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"))));
+            Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            elseS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false)));
+            elseS->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span(), moduleId));
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.EqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"i")), thenS, elseS);
+            Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             actionS->AddStatement(ifStmt);
-            Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(), new Cm.Ast.IntNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"i"), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(parser.ArrayName())), actionS);
+            Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IntNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"i"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, ToUtf32(parser.ArrayName())), actionS);
             currentBlock->AddStatement(rangeFor);
         }
         public override void Visit(CharSetParser& parser)
         {
             if (parser.Set().Inverse())
             {
-                Cm.Ast.InvokeNode* lexerPos = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Pos")));
-                Cm.Ast.InvokeNode* lexerEnd = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"End")));
-                Cm.Ast.NotEqualNode* posNotEnd = new Cm.Ast.NotEqualNode(System.Lex.Span(), lexerPos, lexerEnd);
-                Cm.Ast.ConstructionStatementNode* matchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+                Cm.Ast.InvokeNode* lexerPos = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Pos")));
+                Cm.Ast.InvokeNode* lexerEnd = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"End")));
+                Cm.Ast.NotEqualNode* posNotEnd = new Cm.Ast.NotEqualNode(System.Lex.Span(), moduleId, lexerPos, lexerEnd);
+                Cm.Ast.ConstructionStatementNode* matchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
                 matchStmt->AddArgument(posNotEnd);
                 currentBlock->AddStatement(matchStmt);
-                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false)));
-                thenS->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span()));
-                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.ConjunctionNode(System.Lex.Span(), new Cm.Ast.GreaterOrEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"first"))), new Cm.Ast.LessOrEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"last")))), thenS, null);
-                Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false)));
+                thenS->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span(), moduleId));
+                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ConjunctionNode(System.Lex.Span(), moduleId, new Cm.Ast.GreaterOrEqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"first"))), new Cm.Ast.LessOrEqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"last")))), thenS, null);
+                Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                 actionS->AddStatement(ifStmt);
-                Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(),
-                    new Cm.Ast.ConstNode(System.Lex.Span(),
-                    new Cm.Ast.LValueRefNode(System.Lex.Span(),
-                    new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(parser.ArrayName())), actionS);
+                Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(), moduleId,
+                    new Cm.Ast.ConstNode(System.Lex.Span(), moduleId,
+                    new Cm.Ast.LValueRefNode(System.Lex.Span(), moduleId,
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Range"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, ToUtf32(parser.ArrayName())), actionS);
                 currentBlock->AddStatement(rangeFor);
-                Cm.Ast.CompoundStatementNode* then2S = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                then2S->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"))));
-                Cm.Ast.IfStatementNode* if2Stmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), then2S, null);
+                Cm.Ast.CompoundStatementNode* then2S = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                then2S->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"))));
+                Cm.Ast.IfStatementNode* if2Stmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), then2S, null);
                 currentBlock->AddStatement(if2Stmt);
             }
             else
             {
-                Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-                matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+                Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
                 currentBlock->AddStatement(matchFalseStmt);
-                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true)));
-                thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"))));
-                thenS->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span()));
-                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.ConjunctionNode(System.Lex.Span(), new Cm.Ast.GreaterOrEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"first"))), new Cm.Ast.LessOrEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"last")))), thenS, null);
-                Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true)));
+                thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"))));
+                thenS->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span(), moduleId));
+                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ConjunctionNode(System.Lex.Span(), moduleId, new Cm.Ast.GreaterOrEqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"first"))), new Cm.Ast.LessOrEqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"last")))), thenS, null);
+                Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                 actionS->AddStatement(ifStmt);
-                Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(), new Cm.Ast.ConstNode(System.Lex.Span(),
-                    new Cm.Ast.LValueRefNode(System.Lex.Span(),
-                    new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(parser.ArrayName())), actionS);
+                Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ConstNode(System.Lex.Span(), moduleId,
+                    new Cm.Ast.LValueRefNode(System.Lex.Span(), moduleId,
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Range"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, ToUtf32(parser.ArrayName())), actionS);
                 currentBlock->AddStatement(rangeFor);
             }
         }
         public override void Visit(OptionalParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true));
+            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true));
             currentBlock->AddStatement(matchTrueStmt);
-            Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.LongNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-            saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetPos"))));
+            Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.LongNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+            saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetPos"))));
             saveStmt->SetAssignment();
             currentBlock->AddStatement(saveStmt);
             int prevSetParentMatchNumber = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt->SetAssignment();
             currentBlock->AddStatement(parentMatchStmt);
-            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
             currentBlock = childBlock;
             parser.Child()->Accept(*this);
-            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             thenS->AddStatement(assignS);
-            Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.InvokeNode* invoke = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"SetPos")));
-            invoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-            Cm.Ast.ExpressionStatementNode* setSaveS = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invoke);
+            Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.InvokeNode* invoke = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"SetPos")));
+            invoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+            Cm.Ast.ExpressionStatementNode* setSaveS = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invoke);
             elseS->AddStatement(setSaveS);
-            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS, elseS);
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS, elseS);
             childBlock->AddStatement(ifStmt);
             currentBlock = prevBlock;
             currentBlock->AddStatement(childBlock);
@@ -177,152 +178,213 @@ namespace soulcm.scmpg
         }
         public override void Visit(KleeneParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true));
+            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true));
             currentBlock->AddStatement(matchTrueStmt);
             int prevSetParentMatchNumber = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt->SetAssignment();
             currentBlock->AddStatement(parentMatchStmt);
-            Cm.Ast.CompoundStatementNode* saveBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.LongNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-            saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetPos"))));
+            Cm.Ast.CompoundStatementNode* saveBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.LongNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+            saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetPos"))));
             saveStmt->SetAssignment();
             saveBlock->AddStatement(saveStmt);
-            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
             currentBlock = childBlock;
             parser.Child()->Accept(*this);
-            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             thenS->AddStatement(assignS);
-            Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.InvokeNode* invoke = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"SetPos")));
-            invoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-            Cm.Ast.ExpressionStatementNode* setSaveS = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invoke);
+            Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.InvokeNode* invoke = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"SetPos")));
+            invoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+            Cm.Ast.ExpressionStatementNode* setSaveS = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invoke);
             elseS->AddStatement(setSaveS);
-            elseS->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span()));
-            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS, elseS);
+            elseS->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span(), moduleId));
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS, elseS);
             childBlock->AddStatement(ifStmt);
             currentBlock = prevBlock;
             saveBlock->AddStatement(childBlock);
-            Cm.Ast.CompoundStatementNode* whileBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.WhileStatementNode* whileTrue = new Cm.Ast.WhileStatementNode(System.Lex.Span(), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true), saveBlock);
+            Cm.Ast.CompoundStatementNode* whileBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.WhileStatementNode* whileTrue = new Cm.Ast.WhileStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true), saveBlock);
             whileBlock->AddStatement(whileTrue);
             currentBlock->AddStatement(whileBlock);
             setParentMatchNumber = prevSetParentMatchNumber;
         }
         public override void Visit(PositiveParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
             currentBlock->AddStatement(matchFalseStmt);
             int prevSetParentMatchNumber0 = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt->SetAssignment();
             currentBlock->AddStatement(parentMatchStmt);
-            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
             currentBlock = childBlock;
             parser.Child()->Accept(*this);
-            Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             childBlock->AddStatement(assignS);
             currentBlock = prevBlock;
             currentBlock->AddStatement(childBlock);
-            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true));
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true));
             thenS->AddStatement(matchTrueStmt);
             int prevSetParentMatchNumber1 = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt2->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt2->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt2->SetAssignment();
             thenS->AddStatement(parentMatchStmt2);
-            Cm.Ast.CompoundStatementNode* saveBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.LongNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-            saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetPos"))));
+            Cm.Ast.CompoundStatementNode* saveBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.LongNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+            saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetPos"))));
             saveStmt->SetAssignment();
             saveBlock->AddStatement(saveStmt);
-            Cm.Ast.CompoundStatementNode* childBlock2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* childBlock2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             Cm.Ast.CompoundStatementNode* prevBlock2 = currentBlock;
             currentBlock = childBlock2;
             parser.Child()->Accept(*this);
-            Cm.Ast.CompoundStatementNode* thenS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.AssignmentStatementNode* assignS2 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.CompoundStatementNode* thenS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.AssignmentStatementNode* assignS2 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             thenS2->AddStatement(assignS2);
-            Cm.Ast.CompoundStatementNode* elseS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.InvokeNode* invoke2 = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"SetPos")));
-            invoke2->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-            Cm.Ast.ExpressionStatementNode* setSaveS2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invoke2);
+            Cm.Ast.CompoundStatementNode* elseS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.InvokeNode* invoke2 = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"SetPos")));
+            invoke2->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+            Cm.Ast.ExpressionStatementNode* setSaveS2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invoke2);
             elseS2->AddStatement(setSaveS2);
-            elseS2->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span()));
-            Cm.Ast.IfStatementNode* ifStmt2 = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS2, elseS2);
+            elseS2->AddStatement(new Cm.Ast.BreakStatementNode(System.Lex.Span(), moduleId));
+            Cm.Ast.IfStatementNode* ifStmt2 = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS2, elseS2);
             childBlock2->AddStatement(ifStmt2);
             currentBlock = prevBlock2;
             saveBlock->AddStatement(childBlock2);
-            Cm.Ast.WhileStatementNode* whileTrue = new Cm.Ast.WhileStatementNode(System.Lex.Span(), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true), saveBlock);
+            Cm.Ast.WhileStatementNode* whileTrue = new Cm.Ast.WhileStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true), saveBlock);
             thenS->AddStatement(whileTrue);
-            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS, null);
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS, null);
             currentBlock->AddStatement(ifStmt);
             setParentMatchNumber = prevSetParentMatchNumber1;
             setParentMatchNumber = prevSetParentMatchNumber0;
         }
         public override void Visit(ExpectationParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true));
+            Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true));
             currentBlock->AddStatement(matchTrueStmt);
             int prevSetParentMatchNumber0 = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt->SetAssignment();
             currentBlock->AddStatement(parentMatchStmt);
-            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Span")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"span"));
-            spanStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetSpan"))));
+            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Span")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+            spanStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetSpan"))));
             spanStmt->SetAssignment();
             childBlock->AddStatement(spanStmt);
             Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
             currentBlock = childBlock;
             parser.Child()->Accept(*this);
-            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             thenS->AddStatement(assignS);
-            Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.InvokeNode* throwExpr = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"ThrowExpectationFailure")));
-            throwExpr->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"span"));
-            Cm.Ast.ExpressionStatementNode* throwStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), throwExpr);
+            Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             if (parser.Child()->IsNonterminal())
             {
-                NonterminalParser* nonterminalParser = cast<NonterminalParser*>(parser.Child());
-                RuleParser* rule = nonterminalParser->Rule();
-                ustring ruleInfo = rule->Info();
-                if (ruleInfo.IsEmpty())
+                if (parser.IsNothrow())
                 {
-                    ruleInfo = rule->Name();
+                    elseS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true)));
+                    Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                    elseS->AddStatement(assignS);
+                    Cm.Ast.InvokeNode* addErrorExpr = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"AddError")));
+                    addErrorExpr->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                    Cm.Ast.ExpressionStatementNode* addErrorStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, addErrorExpr);
+                    NonterminalParser* nonterminalParser = cast<NonterminalParser*>(parser.Child());
+                    RuleParser* rule = nonterminalParser->Rule();
+                    ustring ruleInfo = rule->Info();
+                    if (ruleInfo.IsEmpty())
+                    {
+                        ruleInfo = rule->Name();
+                    }
+                    addErrorExpr->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, ruleInfo));
+                    elseS->AddStatement(addErrorStmt);
                 }
-                throwExpr->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), ruleInfo));
+                else
+                {
+                    Cm.Ast.InvokeNode* throwExpr = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowExpectationFailure")));
+                    throwExpr->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                    Cm.Ast.ExpressionStatementNode* throwStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, throwExpr);
+                    NonterminalParser* nonterminalParser = cast<NonterminalParser*>(parser.Child());
+                    RuleParser* rule = nonterminalParser->Rule();
+                    ustring ruleInfo = rule->Info();
+                    if (ruleInfo.IsEmpty())
+                    {
+                        ruleInfo = rule->Name();
+                    }
+                    throwExpr->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, ruleInfo));
+                    elseS->AddStatement(throwStmt);
+                }
             }
             else if (parser.Child()->IsToken())
             {
-                ustring tokenName = cast<TokenParser*>(parser.Child())->TokenName();
-                Cm.Ast.InvokeNode* getTokenInfoInvoke = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetTokenName"));
-                getTokenInfoInvoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), tokenName));
-                throwExpr->AddArgument(getTokenInfoInvoke);
+                if (parser.IsNothrow())
+                {
+                    elseS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true)));
+                    Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                    elseS->AddStatement(assignS);
+                    Cm.Ast.InvokeNode* addErrorExpr = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"AddError")));
+                    addErrorExpr->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                    Cm.Ast.ExpressionStatementNode* addErrorStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, addErrorExpr);
+                    ustring tokenName = cast<TokenParser*>(parser.Child())->TokenName();
+                    Cm.Ast.InvokeNode* getTokenInfoInvoke = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetTokenName"));
+                    getTokenInfoInvoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, tokenName));
+                    addErrorExpr->AddArgument(getTokenInfoInvoke);
+                    elseS->AddStatement(addErrorStmt);
+                }
+                else
+                {
+                    Cm.Ast.InvokeNode* throwExpr = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowExpectationFailure")));
+                    throwExpr->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                    Cm.Ast.ExpressionStatementNode* throwStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, throwExpr);
+                    ustring tokenName = cast<TokenParser*>(parser.Child())->TokenName();
+                    Cm.Ast.InvokeNode* getTokenInfoInvoke = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetTokenName"));
+                    getTokenInfoInvoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, tokenName));
+                    throwExpr->AddArgument(getTokenInfoInvoke);
+                    elseS->AddStatement(throwStmt);
+                }
             }
             else
             {
-                ustring parserName = parser.Child()->Name();
-                throwExpr->AddArgument(new Cm.Ast.StringLiteralNode(System.Lex.Span(), ToUtf8(parserName)));
+                if (parser.IsNothrow())
+                {
+                    elseS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true)));
+                    Cm.Ast.AssignmentStatementNode* assignS = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                    elseS->AddStatement(assignS);
+                    Cm.Ast.InvokeNode* addErrorExpr = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"AddError")));
+                    addErrorExpr->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                    Cm.Ast.ExpressionStatementNode* addErrorStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, addErrorExpr);
+                    ustring parserName = parser.Child()->Name();
+                    addErrorExpr->AddArgument(new Cm.Ast.StringLiteralNode(System.Lex.Span(), moduleId, ToUtf8(parserName)));
+                    elseS->AddStatement(addErrorStmt);
+                }
+                else
+                {
+                    Cm.Ast.InvokeNode* throwExpr = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowExpectationFailure")));
+                    throwExpr->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                    Cm.Ast.ExpressionStatementNode* throwStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, throwExpr);
+                    ustring parserName = parser.Child()->Name();
+                    throwExpr->AddArgument(new Cm.Ast.StringLiteralNode(System.Lex.Span(), moduleId, ToUtf8(parserName)));
+                    elseS->AddStatement(throwStmt);
+                }
             }
-            elseS->AddStatement(throwStmt);
-            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS, elseS);
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS, elseS);
             childBlock->AddStatement(ifStmt);
             currentBlock = prevBlock;
             currentBlock->AddStatement(childBlock);
@@ -330,20 +392,20 @@ namespace soulcm.scmpg
         }
         public override void Visit(GroupingParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
             currentBlock->AddStatement(matchFalseStmt);
             int prevSetParentMatchNumber = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt->SetAssignment();
             currentBlock->AddStatement(parentMatchStmt);
-            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
             currentBlock = childBlock;
             parser.Child()->Accept(*this);
-            Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             childBlock->AddStatement(setParentMatchStmt);
             currentBlock = prevBlock;
             currentBlock->AddStatement(childBlock);
@@ -351,45 +413,45 @@ namespace soulcm.scmpg
         }
         public override void Visit(SequenceParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
             currentBlock->AddStatement(matchFalseStmt);
             int prevSetParentMatchNumber0 = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt->SetAssignment();
             currentBlock->AddStatement(parentMatchStmt);
-            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
             currentBlock = childBlock;
             parser.Left()->Accept(*this);
-            Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             childBlock->AddStatement(setParentMatchStmt);
             currentBlock = prevBlock;
             currentBlock->AddStatement(childBlock);
-            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.ConstructionStatementNode* matchFalseStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchFalseStmt2->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.ConstructionStatementNode* matchFalseStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchFalseStmt2->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
             thenS->AddStatement(matchFalseStmt2);
             int prevSetParentMatchNumber1 = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt2->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt2->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt2->SetAssignment();
             thenS->AddStatement(parentMatchStmt2);
-            Cm.Ast.CompoundStatementNode* childBlock2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* childBlock2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             Cm.Ast.CompoundStatementNode* prevBlock2 = currentBlock;
             currentBlock = childBlock2;
             parser.Right()->Accept(*this);
-            Cm.Ast.AssignmentStatementNode* setParentMatchStmt2 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.AssignmentStatementNode* setParentMatchStmt2 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             childBlock2->AddStatement(setParentMatchStmt2);
             currentBlock = prevBlock2;
             thenS->AddStatement(childBlock2);
             setParentMatchNumber = prevSetParentMatchNumber1;
-            Cm.Ast.AssignmentStatementNode* setParentMatchStmt3 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.AssignmentStatementNode* setParentMatchStmt3 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             thenS->AddStatement(setParentMatchStmt3);
-            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS, null);
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS, null);
             currentBlock->AddStatement(ifStmt);
             setParentMatchNumber = prevSetParentMatchNumber0;
         }
@@ -406,15 +468,15 @@ namespace soulcm.scmpg
                 {
                     Stage prevStage = stage;
                     stage = Stage.generateTokenSwitch;
-                    Cm.Ast.ConstructionStatementNode* posStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.LongNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"pos"));
-                    posStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetPos"))));
+                    Cm.Ast.ConstructionStatementNode* posStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.LongNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"pos"));
+                    posStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetPos"))));
                     posStmt->SetAssignment();
                     currentBlock->AddStatement(posStmt);
-                    Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Span"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"span"));
-                    spanStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetSpan"))));
+                    Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Span"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                    spanStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetSpan"))));
                     spanStmt->SetAssignment();
                     currentBlock->AddStatement(spanStmt);
-                    Cm.Ast.SwitchStatementNode* switchStmt = new Cm.Ast.SwitchStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")));
+                    Cm.Ast.SwitchStatementNode* switchStmt = new Cm.Ast.SwitchStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")));
                     Cm.Ast.SwitchStatementNode* prevTokenSwitch = tokenSwitch;
                     tokenSwitch = switchStmt;
                     parser.Left()->Accept(*this);
@@ -425,51 +487,51 @@ namespace soulcm.scmpg
                 }
                 else
                 {
-                    Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-                    matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+                    Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                    matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
                     currentBlock->AddStatement(matchFalseStmt);
                     int prevSetParentMatchNumber0 = setParentMatchNumber;
                     setParentMatchNumber = parentMatchNumber;
-                    Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-                    parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+                    Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+                    parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
                     parentMatchStmt->SetAssignment();
                     currentBlock->AddStatement(parentMatchStmt);
-                    Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                    Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                     Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
                     currentBlock = childBlock;
-                    Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.LongNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-                    saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetPos"))));
+                    Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.LongNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+                    saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetPos"))));
                     saveStmt->SetAssignment();
                     currentBlock->AddStatement(saveStmt);
                     parser.Left()->Accept(*this);
-                    Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+                    Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
                     currentBlock->AddStatement(setParentMatchStmt);
-                    Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                    Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                     int prevSetParentMatchNumber1 = setParentMatchNumber;
-                    Cm.Ast.ConstructionStatementNode* matchFalseStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-                    matchFalseStmt2->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+                    Cm.Ast.ConstructionStatementNode* matchFalseStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                    matchFalseStmt2->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
                     thenS->AddStatement(matchFalseStmt2);
                     setParentMatchNumber = parentMatchNumber;
-                    Cm.Ast.ConstructionStatementNode* parentMatchStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-                    parentMatchStmt2->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+                    Cm.Ast.ConstructionStatementNode* parentMatchStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+                    parentMatchStmt2->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
                     parentMatchStmt2->SetAssignment();
                     thenS->AddStatement(parentMatchStmt2);
-                    Cm.Ast.InvokeNode* invokeSetPos = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"SetPos")));
-                    invokeSetPos->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-                    Cm.Ast.ExpressionStatementNode* setPosStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeSetPos);
+                    Cm.Ast.InvokeNode* invokeSetPos = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"SetPos")));
+                    invokeSetPos->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+                    Cm.Ast.ExpressionStatementNode* setPosStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeSetPos);
                     thenS->AddStatement(setPosStmt);
-                    Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.NotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit"))), thenS, null);
+                    Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.NotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit"))), thenS, null);
                     currentBlock->AddStatement(ifStmt);
-                    Cm.Ast.CompoundStatementNode* childBlock2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                    Cm.Ast.CompoundStatementNode* childBlock2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                     Cm.Ast.CompoundStatementNode* prevBlock2 = currentBlock;
                     currentBlock = childBlock2;
                     parser.Right()->Accept(*this);
-                    Cm.Ast.AssignmentStatementNode* setParentMatchStmt2 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+                    Cm.Ast.AssignmentStatementNode* setParentMatchStmt2 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
                     currentBlock->AddStatement(setParentMatchStmt2);
                     currentBlock = prevBlock2;
                     thenS->AddStatement(childBlock2);
                     setParentMatchNumber = prevSetParentMatchNumber1;
-                    Cm.Ast.AssignmentStatementNode* setParentMatchStmt3 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+                    Cm.Ast.AssignmentStatementNode* setParentMatchStmt3 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
                     thenS->AddStatement(setParentMatchStmt3);
                     currentBlock = prevBlock;
                     currentBlock->AddStatement(childBlock);
@@ -479,69 +541,69 @@ namespace soulcm.scmpg
         }
         public override void Visit(DifferenceParser& parser)
         {
-            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
             currentBlock->AddStatement(matchFalseStmt);
             int prevSetParentMatchNumber0 = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt->SetAssignment();
             currentBlock->AddStatement(parentMatchStmt);
-            Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.LongNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-            saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetPos"))));
+            Cm.Ast.ConstructionStatementNode* saveStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.LongNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+            saveStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetPos"))));
             saveStmt->SetAssignment();
             currentBlock->AddStatement(saveStmt);
-            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
             currentBlock = childBlock;
             parser.Left()->Accept(*this);
-            Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             currentBlock->AddStatement(setParentMatchStmt);
             currentBlock = prevBlock;
             currentBlock->AddStatement(childBlock);
-            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.ConstructionStatementNode* matchFalseStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-            matchFalseStmt2->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.ConstructionStatementNode* matchFalseStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+            matchFalseStmt2->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
             thenS->AddStatement(matchFalseStmt2);
             int prevSetParentMatchNumber1 = setParentMatchNumber;
             setParentMatchNumber = parentMatchNumber;
-            Cm.Ast.ConstructionStatementNode* parentMatchStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-            parentMatchStmt2->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+            Cm.Ast.ConstructionStatementNode* parentMatchStmt2 = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+            parentMatchStmt2->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
             parentMatchStmt2->SetAssignment();
             thenS->AddStatement(parentMatchStmt2);
-            Cm.Ast.CompoundStatementNode* childBlock2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* childBlock2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             Cm.Ast.CompoundStatementNode* prevBlock2 = currentBlock;
             currentBlock = childBlock2;
-            Cm.Ast.ConstructionStatementNode* tmpStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.LongNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"tmp"));
-            tmpStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetPos"))));
+            Cm.Ast.ConstructionStatementNode* tmpStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.LongNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"tmp"));
+            tmpStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetPos"))));
             tmpStmt->SetAssignment();
             currentBlock->AddStatement(tmpStmt);
-            Cm.Ast.InvokeNode* invokeSetPos = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"SetPos")));
-            invokeSetPos->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-            Cm.Ast.ExpressionStatementNode* setPosStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeSetPos);
+            Cm.Ast.InvokeNode* invokeSetPos = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"SetPos")));
+            invokeSetPos->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+            Cm.Ast.ExpressionStatementNode* setPosStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeSetPos);
             currentBlock->AddStatement(setPosStmt);
-            Cm.Ast.AssignmentStatementNode* setSave = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"tmp"));
+            Cm.Ast.AssignmentStatementNode* setSave = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"tmp"));
             currentBlock->AddStatement(setSave);
             parser.Right()->Accept(*this);
-            Cm.Ast.AssignmentStatementNode* setParentMatchStmt2 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.AssignmentStatementNode* setParentMatchStmt2 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             currentBlock->AddStatement(setParentMatchStmt2);
             currentBlock = prevBlock2;
             thenS->AddStatement(childBlock2);
             setParentMatchNumber = prevSetParentMatchNumber1;
-            Cm.Ast.CompoundStatementNode* thenS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            Cm.Ast.InvokeNode* invokeSetPosSave = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"SetPos")));
-            invokeSetPosSave->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"save"));
-            Cm.Ast.ExpressionStatementNode* setPosSaveStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeSetPosSave);
+            Cm.Ast.CompoundStatementNode* thenS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            Cm.Ast.InvokeNode* invokeSetPosSave = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"SetPos")));
+            invokeSetPosSave->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"save"));
+            Cm.Ast.ExpressionStatementNode* setPosSaveStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeSetPosSave);
             thenS2->AddStatement(setPosSaveStmt);
-            Cm.Ast.IfStatementNode* ifStmt2 = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.NotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit"))), thenS2, null);
+            Cm.Ast.IfStatementNode* ifStmt2 = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.NotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit"))), thenS2, null);
             thenS->AddStatement(ifStmt2);
-            Cm.Ast.InvokeNode* invokeMatch = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"));
-            invokeMatch->AddArgument(new Cm.Ast.NotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit"))));
-            invokeMatch->AddArgument(new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value")));
-            Cm.Ast.AssignmentStatementNode* setParentMatchStmt3 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), invokeMatch);
+            Cm.Ast.InvokeNode* invokeMatch = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"));
+            invokeMatch->AddArgument(new Cm.Ast.NotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit"))));
+            invokeMatch->AddArgument(new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value")));
+            Cm.Ast.AssignmentStatementNode* setParentMatchStmt3 = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), invokeMatch);
             thenS->AddStatement(setParentMatchStmt3);
-            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS, null);
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS, null);
             currentBlock->AddStatement(ifStmt);
             setParentMatchNumber = prevSetParentMatchNumber0;
         }
@@ -581,7 +643,7 @@ namespace soulcm.scmpg
                 }
                 NonterminalCountingVisitor countingVisitor(nonterminalInfos);
                 parser.SuccessCode()->Accept(countingVisitor);
-                CodeEmittingVisitor emittingVisitor(ptrType, nonterminalName, nonterminalInfos, returnType, noParserDebugSupport, currentRule->Name());
+                CodeEmittingVisitor emittingVisitor(ptrType, nonterminalName, nonterminalInfos, returnType, noParserDebugSupport, currentRule->Name(), moduleId);
                 parser.SuccessCode()->Accept(emittingVisitor);
                 Cm.Ast.CompoundStatementNode* code = emittingVisitor.GetCode();
                 int n = code->Statements().Count();
@@ -595,20 +657,20 @@ namespace soulcm.scmpg
             }
             else
             {
-                Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-                matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+                Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
                 currentBlock->AddStatement(matchFalseStmt);
                 int prevSetParentMatchNumber = setParentMatchNumber;
                 setParentMatchNumber = parentMatchNumber;
-                Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
-                parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+                Cm.Ast.ConstructionStatementNode* parentMatchStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(parentMatchNumber++))));
+                parentMatchStmt->AddArgument(new Cm.Ast.AddrOfNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match")));
                 parentMatchStmt->SetAssignment();
                 currentBlock->AddStatement(parentMatchStmt);
-                Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                Cm.Ast.CompoundStatementNode* childBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                 Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
                 currentBlock = childBlock;
-                Cm.Ast.ConstructionStatementNode* posStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.LongNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"pos"));
-                posStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetPos"))));
+                Cm.Ast.ConstructionStatementNode* posStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.LongNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"pos"));
+                posStmt->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetPos"))));
                 posStmt->SetAssignment();
                 currentBlock->AddStatement(posStmt);
                 CodeEvaluationVisitor codeEvaluationVisitor;
@@ -621,16 +683,16 @@ namespace soulcm.scmpg
                 bool hasSpan = codeEvaluationVisitor.HasSpan();
                 if (hasSpan)
                 {
-                    Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Span"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"span"));
-                    Cm.Ast.InvokeNode* invokeLexerGetSpan = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetSpan")));
+                    Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Span"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                    Cm.Ast.InvokeNode* invokeLexerGetSpan = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetSpan")));
                     spanStmt->AddArgument(invokeLexerGetSpan);
                     spanStmt->SetAssignment();
                     currentBlock->AddStatement(spanStmt);
                 }
                 if (hasPass)
                 {
-                    Cm.Ast.ConstructionStatementNode* passStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.BoolNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"pass"));
-                    passStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true));
+                    Cm.Ast.ConstructionStatementNode* passStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.BoolNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"pass"));
+                    passStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, true));
                     passStmt->SetAssignment();
                     currentBlock->AddStatement(passStmt);
                 }
@@ -650,29 +712,29 @@ namespace soulcm.scmpg
                 }
                 NonterminalCountingVisitor countingVisitor(nonterminalInfos);
                 parser.SuccessCode()->Accept(countingVisitor);
-                CodeEmittingVisitor emittingVisitor(ptrType, nonterminalName, nonterminalInfos, returnType, noParserDebugSupport, currentRule->Name());
+                CodeEmittingVisitor emittingVisitor(ptrType, nonterminalName, nonterminalInfos, returnType, noParserDebugSupport, currentRule->Name(), moduleId);
                 parser.SuccessCode()->Accept(emittingVisitor);
                 Cm.Ast.CompoundStatementNode* thenS = emittingVisitor.GetCode();
                 Cm.Ast.CompoundStatementNode* elseS = null;
                 if ((parser.FailCode() != null))
                 {
-                    elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                    CodeEmittingVisitor emittingVisitor(ptrType, nonterminalName, nonterminalInfos, returnType, noParserDebugSupport, currentRule->Name());
+                    elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                    CodeEmittingVisitor emittingVisitor(ptrType, nonterminalName, nonterminalInfos, returnType, noParserDebugSupport, currentRule->Name(), moduleId);
                     parser.FailCode()->Accept(emittingVisitor);
                     elseS = emittingVisitor.GetCode();
                 }
-                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS, elseS);
+                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS, elseS);
                 currentBlock->AddStatement(ifStmt);
                 if (hasPass)
                 {
-                    Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                    Cm.Ast.InvokeNode* matchFalse = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"));
-                    matchFalse->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
-                    thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), matchFalse));
-                    Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.ConjunctionNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), new Cm.Ast.NotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"pass"))), thenS, elseS);
+                    Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                    Cm.Ast.InvokeNode* matchFalse = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"));
+                    matchFalse->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
+                    thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), matchFalse));
+                    Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ConjunctionNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), new Cm.Ast.NotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"pass"))), thenS, elseS);
                     currentBlock->AddStatement(ifStmt);
                 }
-                Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+                Cm.Ast.AssignmentStatementNode* setParentMatchStmt = new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"parentMatch" + ToUtf32(ToString(setParentMatchNumber)))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
                 currentBlock->AddStatement(setParentMatchStmt);
                 setParentMatchNumber = prevSetParentMatchNumber;
                 currentBlock = prevBlock;
@@ -682,10 +744,10 @@ namespace soulcm.scmpg
         public override void Visit(NonterminalParser& parser)
         {
             RuleParser* rule = parser.Rule();
-            Cm.Ast.ConstructionStatementNode* ruleCallStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.ConstructionStatementNode* ruleCallStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             ruleCallStmt->SetAssignment();
-            Cm.Ast.InvokeNode* invokeRule = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), rule->Parent()->Name()), new Cm.Ast.IdentifierNode(System.Lex.Span(), rule->Name())));
-            invokeRule->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"));
+            Cm.Ast.InvokeNode* invokeRule = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, rule->Parent()->Name()), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, rule->Name())));
+            invokeRule->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"));
             int n = parser.Args().Count();
             for (int i = 0; i < n; ++i)
             {
@@ -706,15 +768,15 @@ namespace soulcm.scmpg
                 }
                 else
                 {
-                    Cm.Ast.TemplateIdNode* value = new Cm.Ast.TemplateIdNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Value"));
+                    Cm.Ast.TemplateIdNode* value = new Cm.Ast.TemplateIdNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Value"));
                     Cm.Ast.CloneContext cloneContext;
                     value->AddTemplateArgument(calledRule->ReturnType()->Clone(cloneContext));
-                    targetType = new Cm.Ast.PointerNode(System.Lex.Span(), value);
+                    targetType = new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, value);
                 }
-                Cm.Ast.InvokeNode* invokeReset = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), parser.Name()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Reset")));
-                Cm.Ast.CastNode* castedValue = new Cm.Ast.CastNode(System.Lex.Span(), targetType, new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value")));
+                Cm.Ast.InvokeNode* invokeReset = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, parser.Name()), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Reset")));
+                Cm.Ast.CastNode* castedValue = new Cm.Ast.CastNode(System.Lex.Span(), moduleId, targetType, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value")));
                 invokeReset->AddArgument(castedValue);
-                Cm.Ast.ExpressionStatementNode* resetStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeReset);
+                Cm.Ast.ExpressionStatementNode* resetStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeReset);
                 currentBlock->AddStatement(resetStmt);
             }
         }
@@ -727,42 +789,47 @@ namespace soulcm.scmpg
             parentMatchNumber = 0;
             setParentMatchNumber = -1;
             currentRule = &parser;
-            UniquePtr<Cm.Ast.MemberFunctionNode> memberFunction(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_ | Specifiers.static_, new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), parser.Name(), null));
-            memberFunction->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), new Cm.Ast.LValueRefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), lexerTypeName)), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")));
+            Specifiers specifiers = Specifiers.public_ | Specifiers.static_;
+            if (parser.IsNothrow())
+            {
+                specifiers = specifiers | Specifiers.nothrow_;
+            }
+            UniquePtr<Cm.Ast.MemberFunctionNode> memberFunction(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), moduleId, specifiers, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), parser.Name(), null));
+            memberFunction->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), moduleId, new Cm.Ast.LValueRefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, lexerTypeName)), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")));
             for (const UniquePtr<Parameter>& param : parser.Parameters())
             {
                 Cm.Ast.CloneContext cloneContext;
-                memberFunction->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), param->type->Clone(cloneContext), new Cm.Ast.IdentifierNode(System.Lex.Span(), param->id->Str())));
+                memberFunction->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), moduleId, param->type->Clone(cloneContext), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, param->id->Str())));
             }
-            Cm.Ast.CompoundStatementNode* body = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            Cm.Ast.CompoundStatementNode* body = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
             memberFunction->SetBody(body);
             Cm.Ast.CompoundStatementNode* prevBlock = currentBlock;
             currentBlock = body;
             if (!noParserDebugSupport)
             {
-                Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), u"DEBUG"));
-                Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Span"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"debugSpan"));
+                Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), moduleId, u"DEBUG"));
+                Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Span"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"debugSpan"));
                 spanStmt->SetEmpty();
                 ccstmt->AddIfStatement(spanStmt);
-                Cm.Ast.ConstructionStatementNode* writeToLog = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.BoolNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"writeToLog"));
+                Cm.Ast.ConstructionStatementNode* writeToLog = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.BoolNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"writeToLog"));
                 writeToLog->SetAssignment();
-                writeToLog->AddArgument(new Cm.Ast.NotEqualNode(System.Lex.Span(), new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Log"))), new Cm.Ast.NullLiteralNode(System.Lex.Span())));
+                writeToLog->AddArgument(new Cm.Ast.NotEqualNode(System.Lex.Span(), moduleId, new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Log"))), new Cm.Ast.NullLiteralNode(System.Lex.Span(), moduleId)));
                 ccstmt->AddIfStatement(writeToLog);
-                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"debugSpan"), new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetSpan")))));
-                Cm.Ast.InvokeNode* invokeWriteBeginRule = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"WriteBeginRuleToLog")));
-                invokeWriteBeginRule->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"));
-                invokeWriteBeginRule->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), parser.Name()));
-                Cm.Ast.ExpressionStatementNode* writeBeginRuleToLog = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeWriteBeginRule);
+                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"debugSpan"), new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetSpan")))));
+                Cm.Ast.InvokeNode* invokeWriteBeginRule = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"WriteBeginRuleToLog")));
+                invokeWriteBeginRule->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"));
+                invokeWriteBeginRule->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, parser.Name()));
+                Cm.Ast.ExpressionStatementNode* writeBeginRuleToLog = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeWriteBeginRule);
                 thenS->AddStatement(writeBeginRuleToLog);
-                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"writeToLog"), thenS, null);
+                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"writeToLog"), thenS, null);
                 ccstmt->AddIfStatement(ifStmt);
                 currentBlock->AddStatement(ccstmt);
             }
             for (const UniquePtr<Variable>& variable : parser.Variables())
             {
                 Cm.Ast.CloneContext cloneContext;
-                Cm.Ast.ConstructionStatementNode* constructLocal = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), variable->type->Clone(cloneContext), new Cm.Ast.IdentifierNode(System.Lex.Span(), variable->id->Str()));
+                Cm.Ast.ConstructionStatementNode* constructLocal = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, variable->type->Clone(cloneContext), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, variable->id->Str()));
                 constructLocal->SetEmpty();
                 currentBlock->AddStatement(constructLocal);
             }
@@ -784,22 +851,22 @@ namespace soulcm.scmpg
                 {
                     if (IsPtrType(calledRule->ReturnType()))
                     {
-                        Cm.Ast.TemplateIdNode* uniquePtr = new Cm.Ast.TemplateIdNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"UniquePtr"));
+                        Cm.Ast.TemplateIdNode* uniquePtr = new Cm.Ast.TemplateIdNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"UniquePtr"));
                         Cm.Ast.CloneContext cloneContext;
                         uniquePtr->AddTemplateArgument(RemovePointer(calledRule->ReturnType()->Clone(cloneContext)));
-                        Cm.Ast.ConstructionStatementNode* constructLocal = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), uniquePtr, new Cm.Ast.IdentifierNode(System.Lex.Span(), nonterminal->Name()));
+                        Cm.Ast.ConstructionStatementNode* constructLocal = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, uniquePtr, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, nonterminal->Name()));
                         constructLocal->SetEmpty();
                         currentBlock->AddStatement(constructLocal);
                         nonterminalInfos.Add(NonterminalInfo(nonterminal->Name(), true));
                     }
                     else
                     {
-                        Cm.Ast.TemplateIdNode* value = new Cm.Ast.TemplateIdNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Value"));
+                        Cm.Ast.TemplateIdNode* value = new Cm.Ast.TemplateIdNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Value"));
                         Cm.Ast.CloneContext cloneContext;
                         value->AddTemplateArgument(calledRule->ReturnType()->Clone(cloneContext));
-                        Cm.Ast.TemplateIdNode* uniquePtr = new Cm.Ast.TemplateIdNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"UniquePtr"));
+                        Cm.Ast.TemplateIdNode* uniquePtr = new Cm.Ast.TemplateIdNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"UniquePtr"));
                         uniquePtr->AddTemplateArgument(value);
-                        Cm.Ast.ConstructionStatementNode* constructLocal = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), uniquePtr, new Cm.Ast.IdentifierNode(System.Lex.Span(), nonterminal->Name()));
+                        Cm.Ast.ConstructionStatementNode* constructLocal = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, uniquePtr, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, nonterminal->Name()));
                         constructLocal->SetEmpty();
                         currentBlock->AddStatement(constructLocal);
                         nonterminalInfos.Add(NonterminalInfo(nonterminal->Name(), false));
@@ -808,39 +875,39 @@ namespace soulcm.scmpg
             }
             if (parser.Definition()->IsTokenSwitch())
             {
-                Cm.Ast.ConstructionStatementNode* constructMatch = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-                constructMatch->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+                Cm.Ast.ConstructionStatementNode* constructMatch = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                constructMatch->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, false));
                 currentBlock->AddStatement(constructMatch);
             }
             parser.Definition()->Accept(*this);
             if (!noParserDebugSupport)
             {
-                Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), u"DEBUG"));
-                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                Cm.Ast.CompoundStatementNode* thenS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                Cm.Ast.InvokeNode* invokeWriteSuccess = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"WriteSuccessToLog")));
-                invokeWriteSuccess->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"));
-                invokeWriteSuccess->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"debugSpan"));
-                invokeWriteSuccess->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), parser.Name()));
-                Cm.Ast.ExpressionStatementNode* writeSuccessStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeWriteSuccess);
+                Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), moduleId, u"DEBUG"));
+                Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                Cm.Ast.CompoundStatementNode* thenS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                Cm.Ast.InvokeNode* invokeWriteSuccess = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"WriteSuccessToLog")));
+                invokeWriteSuccess->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"));
+                invokeWriteSuccess->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"debugSpan"));
+                invokeWriteSuccess->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, parser.Name()));
+                Cm.Ast.ExpressionStatementNode* writeSuccessStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeWriteSuccess);
                 thenS2->AddStatement(writeSuccessStmt);
-                Cm.Ast.CompoundStatementNode* elseS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                Cm.Ast.InvokeNode* invokeWriteFailure = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"WriteFailureToLog")));
-                invokeWriteFailure->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"));
-                invokeWriteFailure->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), parser.Name()));
-                Cm.Ast.ExpressionStatementNode* writeFailureStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeWriteFailure);
+                Cm.Ast.CompoundStatementNode* elseS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                Cm.Ast.InvokeNode* invokeWriteFailure = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"WriteFailureToLog")));
+                invokeWriteFailure->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"));
+                invokeWriteFailure->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, parser.Name()));
+                Cm.Ast.ExpressionStatementNode* writeFailureStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeWriteFailure);
                 elseS2->AddStatement(writeFailureStmt);
-                Cm.Ast.IfStatementNode* ifStmt2 = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS2, elseS2);
+                Cm.Ast.IfStatementNode* ifStmt2 = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS2, elseS2);
                 thenS->AddStatement(ifStmt2);
-                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"writeToLog"), thenS, null);
+                Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"writeToLog"), thenS, null);
                 ccstmt->AddIfStatement(ifStmt);
                 currentBlock->AddStatement(ccstmt);
             }
-            Cm.Ast.CompoundStatementNode* thenSetMatchValue = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-            thenSetMatchValue->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value")), new Cm.Ast.NullLiteralNode(System.Lex.Span())));
-            Cm.Ast.IfStatementNode* ifNotMatchHit = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.NotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit"))), thenSetMatchValue, null);
+            Cm.Ast.CompoundStatementNode* thenSetMatchValue = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+            thenSetMatchValue->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value")), new Cm.Ast.NullLiteralNode(System.Lex.Span(), moduleId)));
+            Cm.Ast.IfStatementNode* ifNotMatchHit = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.NotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit"))), thenSetMatchValue, null);
             currentBlock->AddStatement(ifNotMatchHit);
-            Cm.Ast.ReturnStatementNode* returnMatch = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            Cm.Ast.ReturnStatementNode* returnMatch = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
             currentBlock->AddStatement(returnMatch);
             for (const NonterminalInfo& info : nonterminalInfos)
             {
@@ -869,7 +936,7 @@ namespace soulcm.scmpg
                 lexerTypeName = parser.Lexer();
             }
             Cm.Ast.ClassNode* prevClass = currentClass;
-            UniquePtr<Cm.Ast.ClassNode> classNode(new Cm.Ast.ClassNode(System.Lex.Span(), Specifiers.public_ | Specifiers.static_, new Cm.Ast.IdentifierNode(System.Lex.Span(), parser.Name()), null));
+            UniquePtr<Cm.Ast.ClassNode> classNode(new Cm.Ast.ClassNode(System.Lex.Span(), moduleId, Specifiers.public_ | Specifiers.static_, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, parser.Name()), null));
             currentClass = classNode.Get();
             if (parser.Main())
             {
@@ -881,7 +948,7 @@ namespace soulcm.scmpg
                     {
                         if (IsPtrType(startRule->ReturnType()))
                         {
-                            Cm.Ast.TemplateIdNode* tid = new Cm.Ast.TemplateIdNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"UniquePtr"));
+                            Cm.Ast.TemplateIdNode* tid = new Cm.Ast.TemplateIdNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"UniquePtr"));
                             Cm.Ast.CloneContext cloneContext;
                             tid->AddTemplateArgument(RemovePointer(startRule->ReturnType())->Clone(cloneContext));
                             returnTypeNode.Reset(tid);
@@ -894,21 +961,26 @@ namespace soulcm.scmpg
                     }
                     else
                     {
-                        returnTypeNode.Reset(new Cm.Ast.VoidNode(System.Lex.Span()));
+                        returnTypeNode.Reset(new Cm.Ast.VoidNode(System.Lex.Span(), moduleId));
                     }
-                    UniquePtr<Cm.Ast.MemberFunctionNode> parseFunction(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_ | Specifiers.static_, returnTypeNode.Release(), u"Parse", null));
-                    parseFunction->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), new Cm.Ast.LValueRefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), lexerTypeName)), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")));
+                    Specifiers specifiers = Specifiers.public_ | Specifiers.static_;
+                    if (parser.IsNothrow())
+                    {
+                        specifiers = specifiers | Specifiers.nothrow_;
+                    }
+                    UniquePtr<Cm.Ast.MemberFunctionNode> parseFunction(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), moduleId, specifiers, returnTypeNode.Release(), u"Parse", null));
+                    parseFunction->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), moduleId, new Cm.Ast.LValueRefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, lexerTypeName)), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")));
                     for (const UniquePtr<Parameter>& param : startRule->Parameters())
                     {
                         Cm.Ast.CloneContext cloneContext;
-                        parseFunction->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), param->type->Clone(cloneContext), new Cm.Ast.IdentifierNode(System.Lex.Span(), param->id->Str())));
+                        parseFunction->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), moduleId, param->type->Clone(cloneContext), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, param->id->Str())));
                     }
-                    Cm.Ast.CompoundStatementNode* body = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                    Cm.Ast.CompoundStatementNode* body = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                     parseFunction->SetBody(body);
                     RuleParser* rule = startRule.Get();
                     if (rule->ReturnType() != null)
                     {
-                        Cm.Ast.TemplateIdNode* tid = new Cm.Ast.TemplateIdNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"UniquePtr"));
+                        Cm.Ast.TemplateIdNode* tid = new Cm.Ast.TemplateIdNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"UniquePtr"));
                         Cm.Ast.CloneContext cloneContext;
                         if (IsPtrType(startRule->ReturnType()))
                         {
@@ -916,43 +988,43 @@ namespace soulcm.scmpg
                         }
                         else
                         {
-                            Cm.Ast.TemplateIdNode* vid = new Cm.Ast.TemplateIdNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Value"));
+                            Cm.Ast.TemplateIdNode* vid = new Cm.Ast.TemplateIdNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Value"));
                             Cm.Ast.CloneContext cloneContext;
                             vid->AddTemplateArgument(startRule->ReturnType()->Clone(cloneContext));
                             tid->AddTemplateArgument(vid);
                         }
-                        Cm.Ast.ConstructionStatementNode* valueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), tid, new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value"));
+                        Cm.Ast.ConstructionStatementNode* valueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, tid, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"));
                         valueStmt->SetEmpty();
                         parseFunction->Body()->AddStatement(valueStmt);
                     }
                     if (!noParserDebugSupport)
                     {
-                        Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), u"DEBUG"));
-                        Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                        Cm.Ast.InvokeNode* invokeWrite = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.ArrowNode(System.Lex.Span(), new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Log"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"WriteBeginRule")));
-                        invokeWrite->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), u"parse"));
-                        Cm.Ast.ExpressionStatementNode* exprStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeWrite);
+                        Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), moduleId, u"DEBUG"));
+                        Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                        Cm.Ast.InvokeNode* invokeWrite = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.ArrowNode(System.Lex.Span(), moduleId, new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Log"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"WriteBeginRule")));
+                        invokeWrite->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, u"parse"));
+                        Cm.Ast.ExpressionStatementNode* exprStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeWrite);
                         thenS->AddStatement(exprStmt);
-                        Cm.Ast.InvokeNode* invokeIncIndent = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.ArrowNode(System.Lex.Span(), new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Log"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"IncIndent")));
-                        Cm.Ast.ExpressionStatementNode* exprStmt2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeIncIndent);
+                        Cm.Ast.InvokeNode* invokeIncIndent = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.ArrowNode(System.Lex.Span(), moduleId, new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Log"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"IncIndent")));
+                        Cm.Ast.ExpressionStatementNode* exprStmt2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeIncIndent);
                         thenS->AddStatement(exprStmt2);
-                        Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.NotEqualNode(System.Lex.Span(), new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Log"))), new Cm.Ast.NullLiteralNode(System.Lex.Span())), thenS, null);
+                        Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.NotEqualNode(System.Lex.Span(), moduleId, new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Log"))), new Cm.Ast.NullLiteralNode(System.Lex.Span(), moduleId)), thenS, null);
                         ccstmt->AddIfStatement(ifStmt);
                         parseFunction->Body()->AddStatement(ccstmt);
                     }
-                    Cm.Ast.PrefixIncrementNode* incLexer = new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"));
-                    Cm.Ast.ExpressionStatementNode* exprStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), incLexer);
+                    Cm.Ast.PrefixIncrementNode* incLexer = new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"));
+                    Cm.Ast.ExpressionStatementNode* exprStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, incLexer);
                     parseFunction->Body()->AddStatement(exprStmt);
-                    Cm.Ast.ConstructionStatementNode* constructSpan = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Span")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"span"));
-                    constructSpan->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetSpan"))));
+                    Cm.Ast.ConstructionStatementNode* constructSpan = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Span")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                    constructSpan->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetSpan"))));
                     constructSpan->SetAssignment();
                     parseFunction->Body()->AddStatement(constructSpan);
-                    Cm.Ast.ConstructionStatementNode* constructionStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
-                    Cm.Ast.InvokeNode* invokeRule = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), rule->Name()));
-                    invokeRule->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"));
+                    Cm.Ast.ConstructionStatementNode* constructionStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"));
+                    Cm.Ast.InvokeNode* invokeRule = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, rule->Name()));
+                    invokeRule->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"));
                     for (const UniquePtr<Parameter>& param : startRule->Parameters())
                     {
-                        invokeRule->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), param->id->Str()));
+                        invokeRule->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, param->id->Str()));
                     }
                     constructionStmt->AddArgument(invokeRule);
                     constructionStmt->SetAssignment();
@@ -968,89 +1040,148 @@ namespace soulcm.scmpg
                         }
                         else
                         {
-                            Cm.Ast.TemplateIdNode* vid = new Cm.Ast.TemplateIdNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Value"));
+                            Cm.Ast.TemplateIdNode* vid = new Cm.Ast.TemplateIdNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Value"));
                             vid->AddTemplateArgument(calledRule->ReturnType()->Clone(cloneContext));
-                            targetType = new Cm.Ast.PointerNode(System.Lex.Span(), vid);
+                            targetType = new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, vid);
                         }
-                        Cm.Ast.CastNode* castNode = new Cm.Ast.CastNode(System.Lex.Span(), targetType, new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value")));
-                        Cm.Ast.InvokeNode* invokeReset = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Reset")));
+                        Cm.Ast.CastNode* castNode = new Cm.Ast.CastNode(System.Lex.Span(), moduleId, targetType, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value")));
+                        Cm.Ast.InvokeNode* invokeReset = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Reset")));
                         invokeReset->AddArgument(castNode);
-                        Cm.Ast.ExpressionStatementNode* exprStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeReset);
+                        Cm.Ast.ExpressionStatementNode* exprStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeReset);
                         parseFunction->Body()->AddStatement(exprStmt);
                         if (!noParserDebugSupport)
                         {
-                            Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), u"DEBUG"));
-                            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                            Cm.Ast.InvokeNode* invokeDecIndent = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.ArrowNode(System.Lex.Span(), new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Log"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"DecIndent")));
-                            Cm.Ast.ExpressionStatementNode* exprStmt2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeDecIndent);
+                            Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), moduleId, u"DEBUG"));
+                            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                            Cm.Ast.InvokeNode* invokeDecIndent = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.ArrowNode(System.Lex.Span(), moduleId, new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Log"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"DecIndent")));
+                            Cm.Ast.ExpressionStatementNode* exprStmt2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeDecIndent);
                             thenS->AddStatement(exprStmt2);
-                            Cm.Ast.InvokeNode* invokeWrite = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.ArrowNode(System.Lex.Span(), new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Log"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"WriteEndRule")));
-                            invokeWrite->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), u"parse"));
-                            Cm.Ast.ExpressionStatementNode* exprStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeWrite);
+                            Cm.Ast.InvokeNode* invokeWrite = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.ArrowNode(System.Lex.Span(), moduleId, new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Log"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"WriteEndRule")));
+                            invokeWrite->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, u"parse"));
+                            Cm.Ast.ExpressionStatementNode* exprStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeWrite);
                             thenS->AddStatement(exprStmt);
-                            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.NotEqualNode(System.Lex.Span(), new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Log"))), new Cm.Ast.NullLiteralNode(System.Lex.Span())), thenS, null);
+                            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.NotEqualNode(System.Lex.Span(), moduleId, new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Log"))), new Cm.Ast.NullLiteralNode(System.Lex.Span(), moduleId)), thenS, null);
                             ccstmt->AddIfStatement(ifStmt);
                             parseFunction->Body()->AddStatement(ccstmt);
                         }
                     }
-                    Cm.Ast.CompoundStatementNode* thenS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                    Cm.Ast.CompoundStatementNode* thenS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                     if (startRule->ReturnType() != null)
                     {
                         if (IsPtrType(startRule->ReturnType()))
                         {
-                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value"));
+                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"));
                             thenS2->AddStatement(returnStmt);
                         }
                         else
                         {
-                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), new Cm.Ast.ArrowNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value")));
+                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ArrowNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value")));
                             thenS2->AddStatement(returnStmt);
                         }
                     }
                     else
                     {
-                        Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), null);
+                        Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, null);
                         thenS2->AddStatement(returnStmt);
                     }
-                    Cm.Ast.CompoundStatementNode* elseS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                    Cm.Ast.InvokeNode* invokeThrow = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"ThrowExpectationFailure")));
-                    invokeThrow->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetSpan"))));
-                    Cm.Ast.InvokeNode* invokeGetTokenInfo = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"GetEndTokenInfo"));
-                    invokeThrow->AddArgument(invokeGetTokenInfo);
-                    Cm.Ast.ExpressionStatementNode* exprStmt2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeThrow);
-                    elseS2->AddStatement(exprStmt2);
-                    Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
-                    Cm.Ast.IfStatementNode* ifStmt2 = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.EqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"END_TOKEN"))), thenS2, elseS2);
+                    Cm.Ast.CompoundStatementNode* elseS2 = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                    if (parser.IsNothrow())
+                    {
+                        Cm.Ast.InvokeNode* invokeAddError = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"AddError")));
+                        invokeAddError->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetSpan"))));
+                        Cm.Ast.InvokeNode* invokeGetTokenInfo = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetEndTokenInfo"));
+                        invokeAddError->AddArgument(invokeGetTokenInfo);
+                        Cm.Ast.ExpressionStatementNode* exprStmt2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeAddError);
+                        elseS2->AddStatement(exprStmt2);
+                        if (startRule->ReturnType() != null)
+                        {
+                            if (IsPtrType(startRule->ReturnType()))
+                            {
+                                Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"));
+                                elseS2->AddStatement(returnStmt);
+                            }
+                            else
+                            {
+                                Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ArrowNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value")));
+                                elseS2->AddStatement(returnStmt);
+                            }
+                        }
+                        else
+                        {
+                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, null);
+                            elseS2->AddStatement(returnStmt);
+                        }
+                    }
+                    else
+                    {
+                        Cm.Ast.InvokeNode* invokeThrow = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowExpectationFailure")));
+                        invokeThrow->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetSpan"))));
+                        Cm.Ast.InvokeNode* invokeGetTokenInfo = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetEndTokenInfo"));
+                        invokeThrow->AddArgument(invokeGetTokenInfo);
+                        Cm.Ast.ExpressionStatementNode* exprStmt2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeThrow);
+                        elseS2->AddStatement(exprStmt2);
+                    }
+                    Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
+                    Cm.Ast.IfStatementNode* ifStmt2 = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.EqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"END_TOKEN"))), thenS2, elseS2);
                     thenS->AddStatement(ifStmt2);
-                    Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                    Cm.Ast.CompoundStatementNode* elseS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                     ustring ruleInfo = rule->Info();
                     if (ruleInfo.IsEmpty())
                     {
                         ruleInfo = rule->Name();
                     }
-                    Cm.Ast.InvokeNode* invokeThrow2 = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"ThrowExpectationFailure")));
-                    invokeThrow2->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"span"));
-                    invokeThrow2->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), ruleInfo));
-                    Cm.Ast.ExpressionStatementNode* exprStmt3 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeThrow2);
-                    elseS->AddStatement(exprStmt3);
-                    Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), thenS, elseS);
+                    if (parser.IsNothrow())
+                    {
+                        Cm.Ast.InvokeNode* invokeAddError2 = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"AddError")));
+                        invokeAddError2->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                        invokeAddError2->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, ruleInfo));
+                        Cm.Ast.ExpressionStatementNode* exprStmt3 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeAddError2);
+                        elseS->AddStatement(exprStmt3);
+                        if (startRule->ReturnType() != null)
+                        {
+                            if (IsPtrType(startRule->ReturnType()))
+                            {
+                                Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"));
+                                elseS->AddStatement(returnStmt);
+                            }
+                            else
+                            {
+                                Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ArrowNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value")));
+                                elseS->AddStatement(returnStmt);
+                            }
+                        }
+                        else
+                        {
+                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, null);
+                            elseS->AddStatement(returnStmt);
+                        }
+                    }
+                    else
+                    {
+                        Cm.Ast.InvokeNode* invokeThrow2 = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowExpectationFailure")));
+                        invokeThrow2->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                        invokeThrow2->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, ruleInfo));
+                        Cm.Ast.ExpressionStatementNode* exprStmt3 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeThrow2);
+                        elseS->AddStatement(exprStmt3);
+                    }
+                    Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS, elseS);
                     parseFunction->Body()->AddStatement(ifStmt);
                     if (startRule->ReturnType() != null)
                     {
                         if (IsPtrType(startRule->ReturnType()))
                         {
-                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value"));
+                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"));
                             parseFunction->Body()->AddStatement(returnStmt);
                         }
                         else
                         {
-                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), new Cm.Ast.ArrowNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value")));
+                            Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ArrowNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"value")));
                             parseFunction->Body()->AddStatement(returnStmt);
                         }
                     }
                     else
                     {
-                        Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), null);
+                        Cm.Ast.ReturnStatementNode* returnStmt = new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, null);
                         parseFunction->Body()->AddStatement(returnStmt);
                     }
                     classNode->AddMember(parseFunction.Release());
@@ -1072,20 +1203,20 @@ namespace soulcm.scmpg
             sn = 0;
             string cmajorFilePath = Path.ChangeExtension(parserFile.FileName(), ".cm");
             Cm.Ast.CompileUnitNode* prevCu = currentCompileUnit;
-            UniquePtr<Cm.Ast.CompileUnitNode> cu(new Cm.Ast.CompileUnitNode(System.Lex.Span(), cmajorFilePath));
-            cu->GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System")));
-            cu->GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System.Collections")));
-            cu->GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System.Lex")));
-            cu->GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System.Parsing")));
+            UniquePtr<Cm.Ast.CompileUnitNode> cu(new Cm.Ast.CompileUnitNode(System.Lex.Span(), moduleId, cmajorFilePath));
+            cu->GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System")));
+            cu->GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System.Collections")));
+            cu->GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System.Lex")));
+            cu->GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System.Parsing")));
             Cm.Ast.CloneContext cloneContext;
             for (const UniquePtr<Cm.Ast.Node>& usingDirective : parserFile.UsingDirectives())
             {
                 cu->GlobalNs()->AddMember(usingDirective->Clone(cloneContext));
             }
-            cu->GlobalNs()->AddMember(new Cm.Ast.CommentNode(System.Lex.Span(), u"this file has been automatically generated from \'" + ToUtf32(parserFile.FileName()) + u"\' using soulcm parser generator scmpg version " + ToUtf32(ParserGeneratorVersionStr())));
+            cu->GlobalNs()->AddMember(new Cm.Ast.CommentNode(System.Lex.Span(), moduleId, u"this file has been automatically generated from \'" + ToUtf32(parserFile.FileName()) + u"\' using soulcm parser generator scmpg version " + ToUtf32(ParserGeneratorVersionStr())));
             currentCompileUnit = cu.Get();
-            UniquePtr<Cm.Ast.NamespaceNode> unnamedNamespace(new Cm.Ast.NamespaceNode(System.Lex.Span(), null));
-            ArrayGeneratorVisitor arrayGeneratorVisitor(unnamedNamespace.Get(), sn);
+            UniquePtr<Cm.Ast.NamespaceNode> unnamedNamespace(new Cm.Ast.NamespaceNode(System.Lex.Span(), moduleId, null));
+            ArrayGeneratorVisitor arrayGeneratorVisitor(unnamedNamespace.Get(), sn, moduleId);
             parserFile.Accept(arrayGeneratorVisitor);
             if (unnamedNamespace->Members().Count() > 0)
             {
@@ -1130,6 +1261,7 @@ namespace soulcm.scmpg
         private int setParentMatchNumber;
         private int sn;
         private Cm.Ast.SwitchStatementNode* tokenSwitch;
+        private Uuid moduleId;
     }
     public string ParserGeneratorVersionStr()
     {

@@ -6,7 +6,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Typedef.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Typedef.parser' using soulng parser generator spg version 3.10.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;

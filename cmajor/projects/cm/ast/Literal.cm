@@ -9,8 +9,8 @@ namespace Cm.Ast
 {
     public abstract class LiteralNode : Node
     {
-        public nothrow LiteralNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_)
+        public nothrow LiteralNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_)
         {
         }
         public nothrow const ustring& Text() const
@@ -35,12 +35,12 @@ namespace Cm.Ast
     }
     public class BooleanLiteralNode : LiteralNode
     {
-        public nothrow BooleanLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.booleanLiteralNode, span_), value(false)
+        public nothrow BooleanLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.booleanLiteralNode, span_, moduleId_), value(false)
         {
         }
-        public nothrow BooleanLiteralNode(const System.Lex.Span& span_, bool value_) :
-            base(NodeType.booleanLiteralNode, span_), value(value_)
+        public nothrow BooleanLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, bool value_) :
+            base(NodeType.booleanLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow bool Value() const
@@ -49,7 +49,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new BooleanLiteralNode(GetSpan(), value);
+            return new BooleanLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -74,12 +74,12 @@ namespace Cm.Ast
     }
     public class SByteLiteralNode : LiteralNode
     {
-        public nothrow SByteLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.sbyteLiteralNode, span_), value(0)
+        public nothrow SByteLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.sbyteLiteralNode, span_, moduleId_), value(0)
         {
         }
-        public nothrow SByteLiteralNode(const System.Lex.Span& span_, sbyte value_) :
-            base(NodeType.sbyteLiteralNode, span_), value(value_)
+        public nothrow SByteLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, sbyte value_) :
+            base(NodeType.sbyteLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow sbyte Value() const
@@ -88,7 +88,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new SByteLiteralNode(GetSpan(), value);
+            return new SByteLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -112,12 +112,12 @@ namespace Cm.Ast
     }
     public class ByteLiteralNode : LiteralNode
     {
-        public nothrow ByteLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.byteLiteralNode, span_), value(0u)
+        public nothrow ByteLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.byteLiteralNode, span_, moduleId_), value(0u)
         {
         }
-        public nothrow ByteLiteralNode(const System.Lex.Span& span_, byte value_) :
-            base(NodeType.byteLiteralNode, span_), value(value_)
+        public nothrow ByteLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, byte value_) :
+            base(NodeType.byteLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow byte Value() const
@@ -126,7 +126,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ByteLiteralNode(GetSpan(), value);
+            return new ByteLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -150,12 +150,12 @@ namespace Cm.Ast
     }
     public class ShortLiteralNode : LiteralNode
     {
-        public nothrow ShortLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.shortLiteralNode, span_), value(0)
+        public nothrow ShortLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.shortLiteralNode, span_, moduleId_), value(0)
         {
         }
-        public nothrow ShortLiteralNode(const System.Lex.Span& span_, short value_) :
-            base(NodeType.shortLiteralNode, span_), value(value_)
+        public nothrow ShortLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, short value_) :
+            base(NodeType.shortLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow short Value() const
@@ -164,7 +164,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ShortLiteralNode(GetSpan(), value);
+            return new ShortLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -188,12 +188,12 @@ namespace Cm.Ast
     }
     public class UShortLiteralNode : LiteralNode
     {
-        public nothrow UShortLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.ushortLiteralNode, span_), value(0u)
+        public nothrow UShortLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.ushortLiteralNode, span_, moduleId_), value(0u)
         {
         }
-        public nothrow UShortLiteralNode(const System.Lex.Span& span_, ushort value_) :
-            base(NodeType.ushortLiteralNode, span_), value(value_)
+        public nothrow UShortLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, ushort value_) :
+            base(NodeType.ushortLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow ushort Value() const
@@ -202,7 +202,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new UShortLiteralNode(GetSpan(), value);
+            return new UShortLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -226,12 +226,12 @@ namespace Cm.Ast
     }
     public class IntLiteralNode : LiteralNode
     {
-        public nothrow IntLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.intLiteralNode, span_), value(0)
+        public nothrow IntLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.intLiteralNode, span_, moduleId_), value(0)
         {
         }
-        public nothrow IntLiteralNode(const System.Lex.Span& span_, int value_) :
-            base(NodeType.intLiteralNode, span_), value(value_)
+        public nothrow IntLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, int value_) :
+            base(NodeType.intLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow int Value() const
@@ -240,7 +240,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new IntLiteralNode(GetSpan(), value);
+            return new IntLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -264,12 +264,12 @@ namespace Cm.Ast
     }
     public class UIntLiteralNode : LiteralNode
     {
-        public nothrow UIntLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.uintLiteralNode, span_), value(0u)
+        public nothrow UIntLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.uintLiteralNode, span_, moduleId_), value(0u)
         {
         }
-        public nothrow UIntLiteralNode(const System.Lex.Span& span_, uint value_) :
-            base(NodeType.uintLiteralNode, span_), value(value_)
+        public nothrow UIntLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, uint value_) :
+            base(NodeType.uintLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow uint Value() const
@@ -278,7 +278,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new UIntLiteralNode(GetSpan(), value);
+            return new UIntLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -302,12 +302,12 @@ namespace Cm.Ast
     }
     public class LongLiteralNode : LiteralNode
     {
-        public nothrow LongLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.longLiteralNode, span_), value(0)
+        public nothrow LongLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.longLiteralNode, span_, moduleId_), value(0)
         {
         }
-        public nothrow LongLiteralNode(const System.Lex.Span& span_, long value_) :
-            base(NodeType.longLiteralNode, span_), value(value_)
+        public nothrow LongLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, long value_) :
+            base(NodeType.longLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow long Value() const
@@ -316,7 +316,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new LongLiteralNode(GetSpan(), value);
+            return new LongLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -340,12 +340,12 @@ namespace Cm.Ast
     }
     public class ULongLiteralNode : LiteralNode
     {
-        public nothrow ULongLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.ulongLiteralNode, span_), value(0u)
+        public nothrow ULongLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.ulongLiteralNode, span_, moduleId_), value(0u)
         {
         }
-        public nothrow ULongLiteralNode(const System.Lex.Span& span_, ulong value_) :
-            base(NodeType.ulongLiteralNode, span_), value(value_)
+        public nothrow ULongLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, ulong value_) :
+            base(NodeType.ulongLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow ulong Value() const
@@ -354,7 +354,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ULongLiteralNode(GetSpan(), value);
+            return new ULongLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -378,12 +378,12 @@ namespace Cm.Ast
     }
     public class FloatLiteralNode : LiteralNode
     {
-        public nothrow FloatLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.floatLiteralNode, span_), value(0)
+        public nothrow FloatLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.floatLiteralNode, span_, moduleId_), value(0)
         {
         }
-        public nothrow FloatLiteralNode(const System.Lex.Span& span_, float value_) :
-            base(NodeType.floatLiteralNode, span_), value(value_)
+        public nothrow FloatLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, float value_) :
+            base(NodeType.floatLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow float Value() const
@@ -392,7 +392,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new FloatLiteralNode(GetSpan(), value);
+            return new FloatLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -416,12 +416,12 @@ namespace Cm.Ast
     }
     public class DoubleLiteralNode : LiteralNode
     {
-        public nothrow DoubleLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.doubleLiteralNode, span_), value(0)
+        public nothrow DoubleLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.doubleLiteralNode, span_, moduleId_), value(0)
         {
         }
-        public nothrow DoubleLiteralNode(const System.Lex.Span& span_, double value_) :
-            base(NodeType.doubleLiteralNode, span_), value(value_)
+        public nothrow DoubleLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, double value_) :
+            base(NodeType.doubleLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow double Value() const
@@ -430,7 +430,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new DoubleLiteralNode(GetSpan(), value);
+            return new DoubleLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -454,12 +454,12 @@ namespace Cm.Ast
     }
     public class CharLiteralNode : LiteralNode
     {
-        public nothrow CharLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.charLiteralNode, span_), value('\0')
+        public nothrow CharLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.charLiteralNode, span_, moduleId_), value('\0')
         {
         }
-        public nothrow CharLiteralNode(const System.Lex.Span& span_, char value_) :
-            base(NodeType.charLiteralNode, span_), value(value_)
+        public nothrow CharLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, char value_) :
+            base(NodeType.charLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow char Value() const
@@ -468,7 +468,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new CharLiteralNode(GetSpan(), value);
+            return new CharLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -492,12 +492,12 @@ namespace Cm.Ast
     }
     public class WCharLiteralNode : LiteralNode
     {
-        public nothrow WCharLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.wcharLiteralNode, span_), value('\0')
+        public nothrow WCharLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.wcharLiteralNode, span_, moduleId_), value('\0')
         {
         }
-        public nothrow WCharLiteralNode(const System.Lex.Span& span_, wchar value_) :
-            base(NodeType.wcharLiteralNode, span_), value(value_)
+        public nothrow WCharLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, wchar value_) :
+            base(NodeType.wcharLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow wchar Value() const
@@ -506,7 +506,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new WCharLiteralNode(GetSpan(), value);
+            return new WCharLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -530,12 +530,12 @@ namespace Cm.Ast
     }
     public class UCharLiteralNode : LiteralNode
     {
-        public nothrow UCharLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.ucharLiteralNode, span_), value('\0')
+        public nothrow UCharLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.ucharLiteralNode, span_, moduleId_), value('\0')
         {
         }
-        public nothrow UCharLiteralNode(const System.Lex.Span& span_, uchar value_) :
-            base(NodeType.ucharLiteralNode, span_), value(value_)
+        public nothrow UCharLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, uchar value_) :
+            base(NodeType.ucharLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow uchar Value() const
@@ -544,7 +544,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new UCharLiteralNode(GetSpan(), value);
+            return new UCharLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -568,12 +568,12 @@ namespace Cm.Ast
     }
     public class StringLiteralNode : LiteralNode
     {
-        public nothrow StringLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.stringLiteralNode, span_), value()
+        public nothrow StringLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.stringLiteralNode, span_, moduleId_), value()
         {
         }
-        public nothrow StringLiteralNode(const System.Lex.Span& span_, const string& value_) :
-            base(NodeType.stringLiteralNode, span_), value(value_)
+        public nothrow StringLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, const string& value_) :
+            base(NodeType.stringLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow const string& Value() const
@@ -582,7 +582,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new StringLiteralNode(GetSpan(), value);
+            return new StringLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -606,12 +606,12 @@ namespace Cm.Ast
     }
     public class WStringLiteralNode : LiteralNode
     {
-        public nothrow WStringLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.wstringLiteralNode, span_), value()
+        public nothrow WStringLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.wstringLiteralNode, span_, moduleId_), value()
         {
         }
-        public nothrow WStringLiteralNode(const System.Lex.Span& span_, const wstring& value_) :
-            base(NodeType.wstringLiteralNode, span_), value(value_)
+        public nothrow WStringLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, const wstring& value_) :
+            base(NodeType.wstringLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow const wstring& Value() const
@@ -620,7 +620,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new WStringLiteralNode(GetSpan(), value);
+            return new WStringLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -644,12 +644,12 @@ namespace Cm.Ast
     }
     public class UStringLiteralNode : LiteralNode
     {
-        public nothrow UStringLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.ustringLiteralNode, span_), value()
+        public nothrow UStringLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.ustringLiteralNode, span_, moduleId_), value()
         {
         }
-        public nothrow UStringLiteralNode(const System.Lex.Span& span_, const ustring& value_) :
-            base(NodeType.ustringLiteralNode, span_), value(value_)
+        public nothrow UStringLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, const ustring& value_) :
+            base(NodeType.ustringLiteralNode, span_, moduleId_), value(value_)
         {
         }
         public nothrow const ustring& Value() const
@@ -658,7 +658,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new UStringLiteralNode(GetSpan(), value);
+            return new UStringLiteralNode(GetSpan(), ModuleId(), value);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -682,8 +682,8 @@ namespace Cm.Ast
     }
     public class NullLiteralNode : LiteralNode
     {
-        public nothrow NullLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.nullLiteralNode, span_)
+        public nothrow NullLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.nullLiteralNode, span_, moduleId_)
         {
         }
         public override nothrow string ToString() const
@@ -692,7 +692,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new NullLiteralNode(GetSpan());
+            return new NullLiteralNode(GetSpan(), ModuleId());
         }
         public override void Accept(Visitor& visitor)
         {
@@ -701,8 +701,8 @@ namespace Cm.Ast
     }
     public class ArrayLiteralNode : LiteralNode
     {
-        public nothrow ArrayLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.arrayLiteralNode, span_)
+        public nothrow ArrayLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.arrayLiteralNode, span_, moduleId_)
         {
         }
         public nothrow const NodeList<Node>& Values() const
@@ -724,7 +724,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ArrayLiteralNode* clone = new ArrayLiteralNode(GetSpan());
+            ArrayLiteralNode* clone = new ArrayLiteralNode(GetSpan(), ModuleId());
             int n = values.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -750,8 +750,8 @@ namespace Cm.Ast
     }
     public class StructuredLiteralNode : LiteralNode
     {
-        public nothrow StructuredLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.structuredLiteralNode, span_)
+        public nothrow StructuredLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.structuredLiteralNode, span_, moduleId_)
         {
         }
         public nothrow const NodeList<Node>& Members() const
@@ -773,7 +773,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            StructuredLiteralNode* clone = new StructuredLiteralNode(GetSpan());
+            StructuredLiteralNode* clone = new StructuredLiteralNode(GetSpan(), ModuleId());
             int n = members.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -799,12 +799,12 @@ namespace Cm.Ast
     }
     public class UuidLiteralNode : LiteralNode
     {
-        public nothrow UuidLiteralNode(const System.Lex.Span& span_) :
-            base(NodeType.uuidLiteralNode, span_), uuid()
+        public nothrow UuidLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.uuidLiteralNode, span_, moduleId_), uuid()
         {
         }
-        public nothrow UuidLiteralNode(const System.Lex.Span& span_, const Uuid& uuid_) :
-            base(NodeType.uuidLiteralNode, span_), uuid(uuid_)
+        public nothrow UuidLiteralNode(const System.Lex.Span& span_, const Uuid& moduleId_, const Uuid& uuid_) :
+            base(NodeType.uuidLiteralNode, span_, moduleId_), uuid(uuid_)
         {
         }
         public nothrow const Uuid& GetUuid() const
@@ -817,7 +817,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new UuidLiteralNode(GetSpan(), uuid);
+            return new UuidLiteralNode(GetSpan(), ModuleId(), uuid);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -835,72 +835,72 @@ namespace Cm.Ast
         }
         private Uuid uuid;
     }
-    public nothrow LiteralNode* CreateIntegerLiteralNode(const System.Lex.Span& span, ulong value, bool unsignedSuffix)
+    public nothrow LiteralNode* CreateIntegerLiteralNode(const System.Lex.Span& span, const Uuid& moduleId, ulong value, bool unsignedSuffix)
     {
         if (unsignedSuffix)
         {
-            if (value <= MaxValue<byte>()) return new ByteLiteralNode(span, cast<byte>(value));
-            if (value <= MaxValue<ushort>()) return new UShortLiteralNode(span, cast<ushort>(value));
-            if (value <= MaxValue<uint>()) return new UIntLiteralNode(span, cast<uint>(value));
-            return new ULongLiteralNode(span, value);
+            if (value <= MaxValue<byte>()) return new ByteLiteralNode(span, moduleId, cast<byte>(value));
+            if (value <= MaxValue<ushort>()) return new UShortLiteralNode(span, moduleId, cast<ushort>(value));
+            if (value <= MaxValue<uint>()) return new UIntLiteralNode(span, moduleId, cast<uint>(value));
+            return new ULongLiteralNode(span, moduleId, value);
         }
         else
         {
-            if (value <= MaxValue<sbyte>()) return new SByteLiteralNode(span, cast<sbyte>(value));
-            if (value <= MaxValue<byte>()) return new ByteLiteralNode(span, cast<byte>(value));
-            if (value <= MaxValue<short>()) return new ShortLiteralNode(span, cast<short>(value));
-            if (value <= MaxValue<ushort>()) return new UShortLiteralNode(span, cast<ushort>(value));
-            if (value <= MaxValue<int>()) return new IntLiteralNode(span, cast<int>(value));
-            if (value <= MaxValue<uint>()) return new UIntLiteralNode(span, cast<uint>(value));
-            if (value <= MaxValue<long>()) return new LongLiteralNode(span, cast<long>(value));
-            return new ULongLiteralNode(span, value);
+            if (value <= MaxValue<sbyte>()) return new SByteLiteralNode(span, moduleId, cast<sbyte>(value));
+            if (value <= MaxValue<byte>()) return new ByteLiteralNode(span, moduleId, cast<byte>(value));
+            if (value <= MaxValue<short>()) return new ShortLiteralNode(span, moduleId, cast<short>(value));
+            if (value <= MaxValue<ushort>()) return new UShortLiteralNode(span, moduleId, cast<ushort>(value));
+            if (value <= MaxValue<int>()) return new IntLiteralNode(span, moduleId, cast<int>(value));
+            if (value <= MaxValue<uint>()) return new UIntLiteralNode(span, moduleId, cast<uint>(value));
+            if (value <= MaxValue<long>()) return new LongLiteralNode(span, moduleId, cast<long>(value));
+            return new ULongLiteralNode(span, moduleId, value);
         }
     }
-    public nothrow LiteralNode* CreateFloatingLiteralNode(const System.Lex.Span& span, double value, bool float_)
+    public nothrow LiteralNode* CreateFloatingLiteralNode(const System.Lex.Span& span, const Uuid& moduleId, double value, bool float_)
     {
         if (float_)
         {
-            return new FloatLiteralNode(span, cast<float>(value));
+            return new FloatLiteralNode(span, moduleId, cast<float>(value));
         }
         else
         {
-            return new DoubleLiteralNode(span, value);
+            return new DoubleLiteralNode(span, moduleId, value);
         }
     }
-    public nothrow LiteralNode* CreateCharacterLiteralNode(const System.Lex.Span& span, uchar value, int chrLitPrefix)
+    public nothrow LiteralNode* CreateCharacterLiteralNode(const System.Lex.Span& span, const Uuid& moduleId, uchar value, int chrLitPrefix)
     {
         switch (chrLitPrefix)
         {
             case 0:
             {
-                return new CharLiteralNode(span, cast<char>(value));
+                return new CharLiteralNode(span, moduleId, cast<char>(value));
             }
             case 1:
             {
-                return new WCharLiteralNode(span, cast<wchar>(value));
+                return new WCharLiteralNode(span, moduleId, cast<wchar>(value));
             }
             case 2:
             {
-                return new UCharLiteralNode(span, value);
+                return new UCharLiteralNode(span, moduleId, value);
             }
         }
         return null;
     }
-    public nothrow LiteralNode* CreateStringLiteralNode(const System.Lex.Span& span, const ustring& value, int strLitPrefix)
+    public nothrow LiteralNode* CreateStringLiteralNode(const System.Lex.Span& span, const Uuid& moduleId, const ustring& value, int strLitPrefix)
     {
         switch (strLitPrefix)
         {
             case 0:
             {
-                return new StringLiteralNode(span, ToUtf8(value));
+                return new StringLiteralNode(span, moduleId, ToUtf8(value));
             }
             case 1:
             {
-                return new WStringLiteralNode(span, ToUtf16(value));
+                return new WStringLiteralNode(span, moduleId, ToUtf16(value));
             }
             case 2:
             {
-                return new UStringLiteralNode(span, value);
+                return new UStringLiteralNode(span, moduleId, value);
             }
         }
         return null;

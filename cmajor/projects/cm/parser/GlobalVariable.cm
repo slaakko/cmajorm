@@ -8,7 +8,7 @@ using Cm.Lexer;
 using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/GlobalVariable.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/GlobalVariable.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class GlobalVariableParser
 {
@@ -73,7 +73,7 @@ public static class GlobalVariableParser
                     Match match(false);
                     Match* parentMatch6 = &match;
                     {
-                        Match match = IdentifierParser.Identifier(lexer);
+                        Match match = IdentifierParser.Identifier(lexer, ctx);
                         id.Reset(cast<IdentifierNode*>(match.value));
                         *parentMatch6 = match;
                     }
@@ -151,7 +151,7 @@ public static class GlobalVariableParser
                     if (match.hit)
                     {
                         s.end = span.end;
-                        GlobalVariableNode* value = new GlobalVariableNode(s, specifiers->value, type.Release(), id.Release(), cu);
+                        GlobalVariableNode* value = new GlobalVariableNode(s, ctx->ModuleId(), specifiers->value, type.Release(), id.Release(), cu);
                         value->SetInitializer(initializer.Release());
                         {
                             #if (DEBUG)

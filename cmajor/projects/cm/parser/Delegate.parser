@@ -17,15 +17,15 @@ parser DelegateParser
     using TypeExprParser.TypeExpr;
     using ParameterParser.ParameterList;
     using IdentifierParser.Identifier;
-    
+
     Delegate(ParsingContext* ctx, var Span s, var UniquePtr<DelegateNode> dlg) : DelegateNode*
-        ::= Specifiers:specifiers{ s = span; } DELEGATE TypeExpr(ctx):type! Identifier:id!{ dlg.Reset(new DelegateNode(s, specifiers, type, id)); }
+        ::= Specifiers:specifiers{ s = span; } DELEGATE TypeExpr(ctx):type! Identifier(ctx):id!{ dlg.Reset(new DelegateNode(s, ctx->ModuleId(), specifiers, type, id)); }
             ParameterList(ctx, dlg.Get()):parameterList! SEMICOLON!{ dlg->SetSpanEnd(span.end); return dlg.Release(); }
         ;
-        
+
     ClassDelegate(ParsingContext* ctx, var Span s, var UniquePtr<ClassDelegateNode> clsDlg) : ClassDelegateNode*
-        ::= Specifiers:specifiers{ s = span; } CLASS DELEGATE TypeExpr(ctx):type! Identifier:id!{ clsDlg.Reset(new ClassDelegateNode(s, specifiers, type, id)); }
+        ::= Specifiers:specifiers{ s = span; } CLASS DELEGATE TypeExpr(ctx):type! Identifier(ctx):id!{ clsDlg.Reset(new ClassDelegateNode(s, ctx->ModuleId(), specifiers, type, id)); }
             ParameterList(ctx, clsDlg.Get()):parameterList! SEMICOLON!{ clsDlg->SetSpanEnd(span.end); return clsDlg.Release(); }
         ;
-        
+
 }

@@ -35,11 +35,11 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
     Concept(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<ConceptNode> conceptNode, var std::unique_ptr<WhereConstraintNode> constraint,
         var Span s, var Span beginBraceSpan, var Span endBraceSpan) : ConceptNode*
         ::= empty{ ctx->BeginParsingConcept(); }
-        (   (Specifiers:specifiers{ s = span; } CONCEPT Identifier(moduleId):conceptName!){ conceptNode.reset(new ConceptNode(span, *moduleId, specifiers, conceptName)); }
+        (   (Specifiers:specifiers{ s = span; } CONCEPT Identifier(moduleId):conceptName){ conceptNode.reset(new ConceptNode(span, *moduleId, specifiers, conceptName)); }
             LANGLE! (Identifier(moduleId):typeParam{ conceptNode->AddTypeParameter(typeParam); } % COMMA) RANGLE!
             ((Refinement(moduleId):refinement{ conceptNode->SetRefinement(refinement); })?
             (WhereConstraint(moduleId, ctx):c{ s.end = span.end; constraint.reset(c); constraint->SetHeaderConstraint(); conceptNode->AddConstraint(constraint.release()); })?){ conceptNode->SetSpan(s); }
-            LBRACE!{ beginBraceSpan = span; } ConceptBody(moduleId, ctx, conceptNode.get()):body! RBRACE!{ endBraceSpan = span; }
+            LBRACE!{ beginBraceSpan = span; } ConceptBody(moduleId, ctx, conceptNode.get()):body RBRACE!{ endBraceSpan = span; }
         )
         {
             ctx->EndParsingConcept();
@@ -71,7 +71,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
         ;
 
     TypeNameConstraint(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : ConstraintNode*
-        ::= TYPENAME{ s = span; } TypeExpr(moduleId, ctx):type! SEMICOLON!
+        ::= TYPENAME{ s = span; } TypeExpr(moduleId, ctx):type SEMICOLON!
         { 
             s.end = span.end; 
             TypeNameConstraintNode* node = new TypeNameConstraintNode(s, *moduleId, type); 
@@ -102,8 +102,8 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
         ;
 
     MemberFunctionConstraint(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<ConstraintNode> memberFunctionConstraint) : ConstraintNode*
-        ::= (TypeExpr(moduleId, ctx):returnType Identifier(moduleId):typeParam DOT FunctionGroupId(moduleId, ctx):functionGroupId!){ memberFunctionConstraint.reset(new MemberFunctionConstraintNode(span, *moduleId, returnType, typeParam, functionGroupId)); }
-            ParameterList(moduleId, ctx, memberFunctionConstraint.get()):paramList! SEMICOLON!
+        ::= (TypeExpr(moduleId, ctx):returnType Identifier(moduleId):typeParam DOT FunctionGroupId(moduleId, ctx):functionGroupId){ memberFunctionConstraint.reset(new MemberFunctionConstraintNode(span, *moduleId, returnType, typeParam, functionGroupId)); }
+            ParameterList(moduleId, ctx, memberFunctionConstraint.get()):paramList SEMICOLON!
         { 
             memberFunctionConstraint->SetSpanEnd(span.end); 
             memberFunctionConstraint->SetLexerFlags(lexer.Flags()); 
@@ -112,8 +112,8 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
         ;
 
     FunctionConstraint(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<ConstraintNode> functionConstraint) : ConstraintNode*
-        ::= (TypeExpr(moduleId, ctx):returnType FunctionGroupId(moduleId, ctx):functionGroupId!){ functionConstraint.reset(new FunctionConstraintNode(span, *moduleId, returnType, functionGroupId)); }
-            ParameterList(moduleId, ctx, functionConstraint.get()):paramList! SEMICOLON!
+        ::= (TypeExpr(moduleId, ctx):returnType FunctionGroupId(moduleId, ctx):functionGroupId){ functionConstraint.reset(new FunctionConstraintNode(span, *moduleId, returnType, functionGroupId)); }
+            ParameterList(moduleId, ctx, functionConstraint.get()):paramList SEMICOLON!
         { 
             functionConstraint->SetSpanEnd(span.end); 
             functionConstraint->SetLexerFlags(lexer.Flags());
@@ -132,7 +132,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
         ;
 
     WhereConstraint(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : WhereConstraintNode*
-        ::= WHERE{ s = span; } ConstraintExpr(moduleId, ctx):constraint!
+        ::= WHERE{ s = span; } ConstraintExpr(moduleId, ctx):constraint
         { 
             s.end = span.end; 
             WhereConstraintNode* node = new WhereConstraintNode(s, *moduleId, constraint); 
@@ -194,7 +194,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
         ;
 
     IsConstraint(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : ConstraintNode*
-        ::= TypeExpr(moduleId, ctx):type{ s = span; } IS ConceptOrTypeName(moduleId, ctx):conceptOrTypeName!
+        ::= TypeExpr(moduleId, ctx):type{ s = span; } IS ConceptOrTypeName(moduleId, ctx):conceptOrTypeName
         { 
             s.end = span.end; 
             IsConstraintNode* node = new IsConstraintNode(s, *moduleId, type, conceptOrTypeName); 
@@ -221,7 +221,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
         ::=
         (   AXIOM{ axiomSpan = span; } Identifier(moduleId):id? empty{ axiomNode.reset(new AxiomNode(axiomSpan, *moduleId, id)); }
             ParameterList(moduleId, ctx, axiomNode.get()):paramList?
-            LBRACE!{ beginBraceSpan = span; } AxiomBody(moduleId, ctx, axiomNode.get()):axiomBody! RBRACE!{ endBraceSpan = span; }
+            LBRACE!{ beginBraceSpan = span; } AxiomBody(moduleId, ctx, axiomNode.get()):axiomBody RBRACE!{ endBraceSpan = span; }
         )
         {
             axiomNode->SetBeginBraceSpan(beginBraceSpan);

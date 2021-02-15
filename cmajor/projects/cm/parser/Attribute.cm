@@ -8,11 +8,11 @@ using Cm.Lexer;
 using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/Attribute.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/Attribute.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class AttributeParser
 {
-    public static Match Attributes(CmajorLexer& lexer)
+    public static Match Attributes(CmajorLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -34,6 +34,7 @@ public static class AttributeParser
                 Match* parentMatch2 = &match;
                 {
                     long pos = lexer.GetPos();
+                    Span span = lexer.GetSpan();
                     Match match(false);
                     if (*lexer == LBRACKET)
                     {
@@ -42,7 +43,7 @@ public static class AttributeParser
                     }
                     if (match.hit)
                     {
-                        attributes.Reset(new Cm.Ast.AttributesNode());
+                        attributes.Reset(new Cm.Ast.AttributesNode(span, ctx->ModuleId()));
                     }
                     *parentMatch2 = match;
                 }
@@ -63,7 +64,7 @@ public static class AttributeParser
                             Match match(false);
                             Match* parentMatch6 = &match;
                             {
-                                Match match = AttributeParser.Attribute(lexer, attributes.Get());
+                                Match match = AttributeParser.Attribute(lexer, ctx, attributes.Get());
                                 *parentMatch6 = match;
                             }
                             if (match.hit)
@@ -94,7 +95,7 @@ public static class AttributeParser
                                                     Match match(false);
                                                     Match* parentMatch10 = &match;
                                                     {
-                                                        Match match = AttributeParser.Attribute(lexer, attributes.Get());
+                                                        Match match = AttributeParser.Attribute(lexer, ctx, attributes.Get());
                                                         *parentMatch10 = match;
                                                     }
                                                     *parentMatch9 = match;
@@ -194,7 +195,7 @@ public static class AttributeParser
         }
         return match;
     }
-    public static Match Attribute(CmajorLexer& lexer, Cm.Ast.AttributesNode* attributes)
+    public static Match Attribute(CmajorLexer& lexer, ParsingContext* ctx, Cm.Ast.AttributesNode* attributes)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -333,7 +334,7 @@ public static class AttributeParser
             }
             if (match.hit)
             {
-                attributes->AddAttribute(s, name, value);
+                attributes->AddAttribute(s, ctx->ModuleId(), name, value);
             }
             *parentMatch0 = match;
         }

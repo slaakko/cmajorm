@@ -186,8 +186,8 @@ public:
     void Visit(BaseNode& baseNode) override;
     void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) override;
     void Visit(GlobalVariableNode& globalVariableNode) override;
-    void Visit(Attribute& attribute) override;
-    void Visit(Attributes& attributes) override;
+    void Visit(AttributeNode& attribute) override;
+    void Visit(AttributesNode& attributes) override;
     void Visit(CommentNode& comment) override;
     void WriteWarning(const std::string& message);
     void WriteEmptyLine();

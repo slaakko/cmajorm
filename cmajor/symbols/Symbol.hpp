@@ -85,7 +85,7 @@ enum class SymbolFlags : uint8_t
     nothrow_ = 1 << 4,
     project = 1 << 5,
     bound = 1 << 6,
-    inConversionTable = 1 << 7
+    installed = 1 << 7
 };
 
 inline SymbolFlags operator&(SymbolFlags left, SymbolFlags right)
@@ -154,7 +154,6 @@ public:
     virtual ContainerScope* GetArrowScope();
     virtual const ContainerScope* GetArrowScope() const;
     virtual std::u32string FullName() const;
-    virtual std::u32string FullNameNoThrow() const;
     virtual std::u32string FullNameWithSpecifiers() const;
     virtual std::u32string SimpleName() const { return Name(); }
     virtual std::u32string DocName() const { return Name(); }
@@ -180,6 +179,7 @@ public:
     const std::u32string& Name() const { return name; }
     void SetName(const std::u32string& name_) { name = name_; }
     SymbolFlags GetSymbolFlags() const { return flags; }
+    SymbolFlags GetStableSymbolFlags() const { return flags & ~(SymbolFlags::project | SymbolFlags::bound | SymbolFlags::installed); }
     bool IsStatic() const { return GetFlag(SymbolFlags::static_); }
     void SetStatic() { SetFlag(SymbolFlags::static_); }
     bool IsExternal() const { return GetFlag(SymbolFlags::external); }
@@ -232,8 +232,8 @@ public:
     const CompileUnitNode* GetCompileUnit() const { return compileUnit; }
     void SetCompileUnit(CompileUnitNode* compileUnit_) { compileUnit = compileUnit_; }
     const std::u32string& MangledName() const { return mangledName; }
-    void SetAttributes(std::unique_ptr<Attributes>&& attributes_);
-    Attributes* GetAttributes() const { return attributes.get(); }
+    void SetAttributes(std::unique_ptr<AttributesNode>&& attributes_);
+    AttributesNode* GetAttributes() const { return attributes.get(); }
     std::unique_ptr<sngxml::dom::Element> ToDomElement(TypeMap& typeMap);
     virtual std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap);
     virtual sngxml::dom::Element* ToCCElement(int ccPrefixLength, const std::u32string& replacement, const std::u32string& functionGroup) const;
@@ -250,9 +250,9 @@ public:
     void SetSymbolIndex(int symbolIndex_) { symbolIndex = symbolIndex_; }
     virtual std::unique_ptr<Symbol> RemoveMember(int symbolIndex);
     virtual std::unique_ptr<Symbol> RemoveFromParent();
-    void SetInstalled() { installed = true; }
-    void ResetInstalled() { installed = false; }
-    bool IsInstalled() const { return installed; }
+    void SetInstalled() { SetFlag(SymbolFlags::installed); }
+    void ResetInstalled() { ResetFlag(SymbolFlags::installed); }
+    bool IsInstalled() const { return GetFlag(SymbolFlags::installed); }
 private:
     SymbolType symbolType;
     Span span;
@@ -263,9 +263,8 @@ private:
     Symbol* parent;
     Module* module;
     CompileUnitNode* compileUnit;
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     int symbolIndex;
-    bool installed;
 };
 
 class SymbolCreator

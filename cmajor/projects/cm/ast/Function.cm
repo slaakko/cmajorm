@@ -10,24 +10,24 @@ namespace Cm.Ast
     public class FunctionNode : Node
     {
         public suppress nothrow FunctionNode(const FunctionNode& );
-        public nothrow FunctionNode(const System.Lex.Span& span_) :
-            base(NodeType.functionNode, span_), specifiers(Specifiers.none), returnTypeExpr(), groupId(), parameters(), body(), bodySource(), programMain(false)
+        public nothrow FunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.functionNode, span_, moduleId_), specifiers(Specifiers.none), returnTypeExpr(), groupId(), parameters(), body(), bodySource(), programMain(false)
         {
         }
-        public nothrow FunctionNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_), specifiers(Specifiers.none), returnTypeExpr(), groupId(), parameters(), body(), bodySource(), programMain(false)
+        public nothrow FunctionNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_), specifiers(Specifiers.none), returnTypeExpr(), groupId(), parameters(), body(), bodySource(), programMain(false)
         {
         }
-        public nothrow FunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, AttributesNode* attributes_) :
-            base(NodeType.functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
+        public nothrow FunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, AttributesNode* attributes_) :
+            base(NodeType.functionNode, span_, moduleId_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
         {
             if (!returnTypeExpr.IsNull())
             {
                 returnTypeExpr->SetParent(this);
             }
         }
-        public nothrow FunctionNode(NodeType nodeType_, const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, AttributesNode* attributes_) :
-            base(nodeType_, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
+        public nothrow FunctionNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, AttributesNode* attributes_) :
+            base(nodeType_, span_, moduleId_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
         {
             if (!returnTypeExpr.IsNull())
             {
@@ -196,7 +196,7 @@ namespace Cm.Ast
             {
                 clonedReturnTypeExpr = returnTypeExpr->Clone(cloneContext);
             }
-            FunctionNode* clone = new FunctionNode(GetSpan(), specifiers, clonedReturnTypeExpr, groupId, clonedAttributes);
+            FunctionNode* clone = new FunctionNode(GetSpan(), ModuleId(), specifiers, clonedReturnTypeExpr, groupId, clonedAttributes);
             if (!cloneContext.InstantiateFunctionNode())
             {
                 int nt = templateParameters.Count();
@@ -271,8 +271,9 @@ namespace Cm.Ast
             {
                 writer.Write(bodySource.Get());
             }
-            writer.Write(groupIdSpan);
-            writer.Write(specifierSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(groupIdSpan, convertExternal);
+            writer.Write(specifierSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {

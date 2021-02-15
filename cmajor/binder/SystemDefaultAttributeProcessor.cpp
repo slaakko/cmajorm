@@ -15,7 +15,7 @@ SystemDefaultAttributeProcessor::SystemDefaultAttributeProcessor() : AttributePr
 {
 }
 
-void SystemDefaultAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
+void SystemDefaultAttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbol)
 {
     if (symbol->IsFunctionSymbol())
     {

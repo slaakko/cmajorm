@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class LabelNode : Node
     {
-        public nothrow LabelNode(const System.Lex.Span& span_) :
-            base(NodeType.labelNode, span_)
+        public nothrow LabelNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.labelNode, span_, moduleId_)
         {
         }
-        public nothrow LabelNode(const System.Lex.Span& span_, const ustring& label_) :
-            base(NodeType.labelNode, span_), label(label_)
+        public nothrow LabelNode(const System.Lex.Span& span_, const Uuid& moduleId_, const ustring& label_) :
+            base(NodeType.labelNode, span_, moduleId_), label(label_)
         {
         }
         public nothrow const ustring& Label() const
@@ -23,7 +23,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new LabelNode(GetSpan(), label);
+            return new LabelNode(GetSpan(), ModuleId(), label);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -41,10 +41,11 @@ namespace Cm.Ast
         }
         private ustring label;
     }
+
     public abstract class StatementNode : Node
     {
-        public nothrow StatementNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_)
+        public nothrow StatementNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_)
         {
         }
         public override nothrow bool IsStatementNode() const
@@ -80,14 +81,31 @@ namespace Cm.Ast
             base->Read(reader);
         }
     }
-    public class LabeledStatementNode : StatementNode
+
+    public class SyncStatementNode : StatementNode
     {
-        public nothrow LabeledStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.labeledStatementNode, span_)
+        public nothrow SyncStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.syncStatementNode, span_, moduleId_)
         {
         }
-        public nothrow LabeledStatementNode(const System.Lex.Span& span_, StatementNode* stmt_) :
-            base(NodeType.labeledStatementNode, span_), stmt(stmt_)
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new SyncStatementNode(GetSpan(), ModuleId());
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class LabeledStatementNode : StatementNode
+    {
+        public nothrow LabeledStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.labeledStatementNode, span_, moduleId_)
+        {
+        }
+        public nothrow LabeledStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, StatementNode* stmt_) :
+            base(NodeType.labeledStatementNode, span_, moduleId_), stmt(stmt_)
         {
             stmt->SetParent(this);
         }
@@ -110,7 +128,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            LabeledStatementNode* clone = new LabeledStatementNode(GetSpan(), cast<StatementNode*>(stmt->Clone(cloneContext)));
+            LabeledStatementNode* clone = new LabeledStatementNode(GetSpan(), ModuleId(), cast<StatementNode*>(stmt->Clone(cloneContext)));
             clone->SetLabelNode(cast<LabelNode*>(labelNode->Clone(cloneContext)));
             return clone;
         }
@@ -137,8 +155,8 @@ namespace Cm.Ast
     }
     public class CompoundStatementNode : StatementNode
     {
-        public nothrow CompoundStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.compoundStatementNode, span_), statements(), beginBraceSpan(), endBraceSpan()
+        public nothrow CompoundStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.compoundStatementNode, span_, moduleId_), statements(), beginBraceSpan(), endBraceSpan()
         {
         }
         public nothrow NodeList<StatementNode>& Statements()
@@ -168,7 +186,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            CompoundStatementNode* clone = new CompoundStatementNode(GetSpan());
+            CompoundStatementNode* clone = new CompoundStatementNode(GetSpan(), ModuleId());
             int n = statements.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -187,8 +205,9 @@ namespace Cm.Ast
         {
             base->Write(writer);
             statements.Write(writer);
-            writer.Write(beginBraceSpan);
-            writer.Write(endBraceSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(beginBraceSpan, convertExternal);
+            writer.Write(endBraceSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -204,12 +223,12 @@ namespace Cm.Ast
     }
     public class ReturnStatementNode : StatementNode
     {
-        public nothrow ReturnStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.returnStatementNode, span_), expression()
+        public nothrow ReturnStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.returnStatementNode, span_, moduleId_), expression()
         {
         }
-        public nothrow ReturnStatementNode(const System.Lex.Span& span_, Node* expression_) :
-            base(NodeType.returnStatementNode, span_), expression(expression_)
+        public nothrow ReturnStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* expression_) :
+            base(NodeType.returnStatementNode, span_, moduleId_), expression(expression_)
         {
             if (!expression.IsNull())
             {
@@ -243,7 +262,7 @@ namespace Cm.Ast
             {
                 clonedExpression = expression->Clone(cloneContext);
             }
-            ReturnStatementNode* clone = new ReturnStatementNode(GetSpan(), clonedExpression);
+            ReturnStatementNode* clone = new ReturnStatementNode(GetSpan(), ModuleId(), clonedExpression);
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -274,12 +293,12 @@ namespace Cm.Ast
     }
     public class IfStatementNode : StatementNode
     {
-        public nothrow IfStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.ifStatementNode, span_), condition(), thenS(), elseS()
+        public nothrow IfStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.ifStatementNode, span_, moduleId_), condition(), thenS(), elseS()
         {
         }
-        public nothrow IfStatementNode(const System.Lex.Span& span_, Node* condition_, StatementNode* thenS_, StatementNode* elseS_) :
-            base(NodeType.ifStatementNode, span_), condition(condition_), thenS(thenS_), elseS(elseS_)
+        public nothrow IfStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* condition_, StatementNode* thenS_, StatementNode* elseS_) :
+            base(NodeType.ifStatementNode, span_, moduleId_), condition(condition_), thenS(thenS_), elseS(elseS_)
         {
             condition->SetParent(this);
             thenS->SetParent(this);
@@ -343,7 +362,7 @@ namespace Cm.Ast
             {
                 clonedElseS = cast<StatementNode*>(elseS->Clone(cloneContext));
             }
-            IfStatementNode* clone = new IfStatementNode(GetSpan(), condition->Clone(cloneContext), cast<StatementNode*>(thenS->Clone(cloneContext)), clonedElseS);
+            IfStatementNode* clone = new IfStatementNode(GetSpan(), ModuleId(), condition->Clone(cloneContext), cast<StatementNode*>(thenS->Clone(cloneContext)), clonedElseS);
             clone->SetLeftParenSpan(leftParenSpan);
             clone->SetRightParenSpan(rightParenSpan);
             clone->SetElseSpan(elseSpan);
@@ -364,9 +383,10 @@ namespace Cm.Ast
             {
                 writer.Write(elseS.Get());
             }
-            writer.Write(leftParenSpan);
-            writer.Write(rightParenSpan);
-            writer.Write(elseSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(leftParenSpan, convertExternal);
+            writer.Write(rightParenSpan, convertExternal);
+            writer.Write(elseSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -394,12 +414,12 @@ namespace Cm.Ast
     }
     public class WhileStatementNode : StatementNode
     {
-        public nothrow WhileStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.whileStatementNode, span_), condition(), statement()
+        public nothrow WhileStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.whileStatementNode, span_, moduleId_), condition(), statement()
         {
         }
-        public nothrow WhileStatementNode(const System.Lex.Span& span_, Node* condition_, StatementNode* statement_) :
-            base(NodeType.whileStatementNode, span_), condition(condition_), statement(statement_)
+        public nothrow WhileStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* condition_, StatementNode* statement_) :
+            base(NodeType.whileStatementNode, span_, moduleId_), condition(condition_), statement(statement_)
         {
             condition->SetParent(this);
             statement->SetParent(this);
@@ -446,7 +466,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            WhileStatementNode* clone = new WhileStatementNode(GetSpan(), condition->Clone(cloneContext), cast<StatementNode*>(statement->Clone(cloneContext)));
+            WhileStatementNode* clone = new WhileStatementNode(GetSpan(), ModuleId(), condition->Clone(cloneContext), cast<StatementNode*>(statement->Clone(cloneContext)));
             clone->SetLeftParenSpan(leftParenSpan);
             clone->SetRightParenSpan(rightParenSpan);
             return clone;
@@ -460,8 +480,9 @@ namespace Cm.Ast
             base->Write(writer);
             writer.Write(condition.Get());
             writer.Write(statement.Get());
-            writer.Write(leftParenSpan);
-            writer.Write(rightParenSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(leftParenSpan, convertExternal);
+            writer.Write(rightParenSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -480,12 +501,12 @@ namespace Cm.Ast
     }
     public class DoStatementNode : StatementNode
     {
-        public nothrow DoStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.doStatementNode, span_), statement(), condition()
+        public nothrow DoStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.doStatementNode, span_, moduleId_), statement(), condition()
         {
         }
-        public nothrow DoStatementNode(const System.Lex.Span& span_, StatementNode* statement_, Node* condition_) :
-            base(NodeType.doStatementNode, span_), statement(statement_), condition(condition_)
+        public nothrow DoStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, StatementNode* statement_, Node* condition_) :
+            base(NodeType.doStatementNode, span_, moduleId_), statement(statement_), condition(condition_)
         {
             statement->SetParent(this);
             condition->SetParent(this);
@@ -540,7 +561,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            DoStatementNode* clone = new DoStatementNode(GetSpan(), cast<StatementNode*>(statement->Clone(cloneContext)), condition->Clone(cloneContext));
+            DoStatementNode* clone = new DoStatementNode(GetSpan(), ModuleId(), cast<StatementNode*>(statement->Clone(cloneContext)), condition->Clone(cloneContext));
             clone->SetWhileSpan(whileSpan);
             clone->SetLeftParenSpan(leftParenSpan);
             clone->SetRightParenSpan(rightParenSpan);
@@ -555,9 +576,10 @@ namespace Cm.Ast
             base->Write(writer);
             writer.Write(statement.Get());
             writer.Write(condition.Get());
-            writer.Write(whileSpan);
-            writer.Write(leftParenSpan);
-            writer.Write(rightParenSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(whileSpan, convertExternal);
+            writer.Write(leftParenSpan, convertExternal);
+            writer.Write(rightParenSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -578,12 +600,12 @@ namespace Cm.Ast
     }
     public class ForStatementNode : StatementNode
     {
-        public nothrow ForStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.forStatementNode, span_), initS(), condition(), loopS(), actionS()
+        public nothrow ForStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.forStatementNode, span_, moduleId_), initS(), condition(), loopS(), actionS()
         {
         }
-        public nothrow ForStatementNode(const System.Lex.Span& span_, StatementNode* initS_, Node* condition_, StatementNode* loopS_, StatementNode* actionS_) :
-            base(NodeType.forStatementNode, span_), initS(initS_), condition(condition_), loopS(loopS_), actionS(actionS_)
+        public nothrow ForStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, StatementNode* initS_, Node* condition_, StatementNode* loopS_, StatementNode* actionS_) :
+            base(NodeType.forStatementNode, span_, moduleId_), initS(initS_), condition(condition_), loopS(loopS_), actionS(actionS_)
         {
             initS->SetParent(this);
             if (!condition.IsNull())
@@ -656,7 +678,7 @@ namespace Cm.Ast
             {
                 clonedCondition = condition->Clone(cloneContext);
             }
-            ForStatementNode* clone = new ForStatementNode(GetSpan(), cast<StatementNode*>(initS->Clone(cloneContext)), clonedCondition, cast<StatementNode*>(loopS->Clone(cloneContext)), cast<StatementNode*>(actionS->Clone(cloneContext)));
+            ForStatementNode* clone = new ForStatementNode(GetSpan(), ModuleId(), cast<StatementNode*>(initS->Clone(cloneContext)), clonedCondition, cast<StatementNode*>(loopS->Clone(cloneContext)), cast<StatementNode*>(actionS->Clone(cloneContext)));
             clone->SetLeftParenSpan(leftParenSpan);
             clone->SetRightParenSpan(rightParenSpan);
             return clone;
@@ -677,8 +699,9 @@ namespace Cm.Ast
             }
             writer.Write(loopS.Get());
             writer.Write(actionS.Get());
-            writer.Write(leftParenSpan);
-            writer.Write(rightParenSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(leftParenSpan, convertExternal);
+            writer.Write(rightParenSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -707,8 +730,8 @@ namespace Cm.Ast
     }
     public class BreakStatementNode : StatementNode
     {
-        public nothrow BreakStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.breakStatementNode, span_)
+        public nothrow BreakStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.breakStatementNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsCaseTerminatingNode() const
@@ -721,7 +744,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            BreakStatementNode* clone = new BreakStatementNode(GetSpan());
+            BreakStatementNode* clone = new BreakStatementNode(GetSpan(), ModuleId());
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -731,8 +754,8 @@ namespace Cm.Ast
     }
     public class ContinueStatementNode : StatementNode
     {
-        public nothrow ContinueStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.continueStatementNode, span_)
+        public nothrow ContinueStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.continueStatementNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsCaseTerminatingNode() const
@@ -745,7 +768,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ContinueStatementNode* clone = new ContinueStatementNode(GetSpan());
+            ContinueStatementNode* clone = new ContinueStatementNode(GetSpan(), ModuleId());
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -755,12 +778,12 @@ namespace Cm.Ast
     }
     public class GotoStatementNode : StatementNode
     {
-        public nothrow GotoStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.gotoStatementNode, span_)
+        public nothrow GotoStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.gotoStatementNode, span_, moduleId_)
         {
         }
-        public nothrow GotoStatementNode(const System.Lex.Span& span_, const ustring& target_) :
-            base(NodeType.gotoStatementNode, span_), target(target_)
+        public nothrow GotoStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, const ustring& target_) :
+            base(NodeType.gotoStatementNode, span_, moduleId_), target(target_)
         {
         }
         public nothrow const ustring& Target() const
@@ -769,7 +792,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            GotoStatementNode* clone = new GotoStatementNode(GetSpan(), target);
+            GotoStatementNode* clone = new GotoStatementNode(GetSpan(), ModuleId(), target);
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -790,12 +813,12 @@ namespace Cm.Ast
     }
     public class ConstructionStatementNode : StatementNode
     {
-        public nothrow ConstructionStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.constructionStatementNode, span_), typeExpr(), id(), arguments(), assignment(false), empty(false)
+        public nothrow ConstructionStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.constructionStatementNode, span_, moduleId_), typeExpr(), id(), arguments(), assignment(false), empty(false)
         {
         }
-        public nothrow ConstructionStatementNode(const System.Lex.Span& span_, Node* typeExpr_, IdentifierNode* id_) :
-            base(NodeType.constructionStatementNode, span_), typeExpr(typeExpr_), id(id_), arguments(), assignment(false), empty(false)
+        public nothrow ConstructionStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_) :
+            base(NodeType.constructionStatementNode, span_, moduleId_), typeExpr(typeExpr_), id(id_), arguments(), assignment(false), empty(false)
         {
             typeExpr->SetParent(this);
             id->SetParent(this);
@@ -838,7 +861,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ConstructionStatementNode* clone = new ConstructionStatementNode(GetSpan(), typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)));
+            ConstructionStatementNode* clone = new ConstructionStatementNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)));
             int n = arguments.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -886,12 +909,12 @@ namespace Cm.Ast
     }
     public class DeleteStatementNode : StatementNode
     {
-        public nothrow DeleteStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.deleteStatementNode, span_), expression()
+        public nothrow DeleteStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.deleteStatementNode, span_, moduleId_), expression()
         {
         }
-        public nothrow DeleteStatementNode(const System.Lex.Span& span_, Node* expression_) :
-            base(NodeType.deleteStatementNode, span_), expression(expression_)
+        public nothrow DeleteStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* expression_) :
+            base(NodeType.deleteStatementNode, span_, moduleId_), expression(expression_)
         {
             expression->SetParent(this);
         }
@@ -905,7 +928,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            DeleteStatementNode* clone = new DeleteStatementNode(GetSpan(), expression->Clone(cloneContext));
+            DeleteStatementNode* clone = new DeleteStatementNode(GetSpan(), ModuleId(), expression->Clone(cloneContext));
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -927,12 +950,12 @@ namespace Cm.Ast
     }
     public class DestroyStatementNode : StatementNode
     {
-        public nothrow DestroyStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.destroyStatementNode, span_), expression()
+        public nothrow DestroyStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.destroyStatementNode, span_, moduleId_), expression()
         {
         }
-        public nothrow DestroyStatementNode(const System.Lex.Span& span_, Node* expression_) :
-            base(NodeType.destroyStatementNode, span_), expression(expression_)
+        public nothrow DestroyStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* expression_) :
+            base(NodeType.destroyStatementNode, span_, moduleId_), expression(expression_)
         {
             expression->SetParent(this);
         }
@@ -946,7 +969,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            DestroyStatementNode* clone = new DestroyStatementNode(GetSpan(), expression->Clone(cloneContext));
+            DestroyStatementNode* clone = new DestroyStatementNode(GetSpan(), ModuleId(), expression->Clone(cloneContext));
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -968,12 +991,12 @@ namespace Cm.Ast
     }
     public class AssignmentStatementNode : StatementNode
     {
-        public nothrow AssignmentStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.assignmentStatementNode, span_), targetExpr(), sourceExpr()
+        public nothrow AssignmentStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.assignmentStatementNode, span_, moduleId_), targetExpr(), sourceExpr()
         {
         }
-        public nothrow AssignmentStatementNode(const System.Lex.Span& span_, Node* targetExpr_, Node* sourceExpr_) :
-            base(NodeType.assignmentStatementNode, span_), targetExpr(targetExpr_), sourceExpr(sourceExpr_)
+        public nothrow AssignmentStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* targetExpr_, Node* sourceExpr_) :
+            base(NodeType.assignmentStatementNode, span_, moduleId_), targetExpr(targetExpr_), sourceExpr(sourceExpr_)
         {
             targetExpr->SetParent(this);
             sourceExpr->SetParent(this);
@@ -996,7 +1019,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            AssignmentStatementNode* clone = new AssignmentStatementNode(GetSpan(), targetExpr->Clone(cloneContext), sourceExpr->Clone(cloneContext));
+            AssignmentStatementNode* clone = new AssignmentStatementNode(GetSpan(), ModuleId(), targetExpr->Clone(cloneContext), sourceExpr->Clone(cloneContext));
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -1022,12 +1045,12 @@ namespace Cm.Ast
     }
     public class ExpressionStatementNode : StatementNode
     {
-        public nothrow ExpressionStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.expressionStatementNode, span_), expression()
+        public nothrow ExpressionStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.expressionStatementNode, span_, moduleId_), expression()
         {
         }
-        public nothrow ExpressionStatementNode(const System.Lex.Span& span_, Node* expression_) :
-            base(NodeType.expressionStatementNode, span_), expression(expression_)
+        public nothrow ExpressionStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* expression_) :
+            base(NodeType.expressionStatementNode, span_, moduleId_), expression(expression_)
         {
             expression->SetParent(this);
         }
@@ -1041,7 +1064,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ExpressionStatementNode* clone = new ExpressionStatementNode(GetSpan(), expression->Clone(cloneContext));
+            ExpressionStatementNode* clone = new ExpressionStatementNode(GetSpan(), ModuleId(), expression->Clone(cloneContext));
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -1063,13 +1086,13 @@ namespace Cm.Ast
     }
     public class EmptyStatementNode : StatementNode
     {
-        public nothrow EmptyStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.emptyStatementNode, span_)
+        public nothrow EmptyStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.emptyStatementNode, span_, moduleId_)
         {
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            EmptyStatementNode* clone = new EmptyStatementNode(GetSpan());
+            EmptyStatementNode* clone = new EmptyStatementNode(GetSpan(), ModuleId());
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -1079,12 +1102,12 @@ namespace Cm.Ast
     }
     public class RangeForStatementNode : StatementNode
     {
-        public nothrow RangeForStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.rangeForStatementNode, span_), typeExpr(), id(), container(), action()
+        public nothrow RangeForStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.rangeForStatementNode, span_, moduleId_), typeExpr(), id(), container(), action()
         {
         }
-        public nothrow RangeForStatementNode(const System.Lex.Span& span_, Node* typeExpr_, IdentifierNode* id_, Node* container_, StatementNode* action_) :
-            base(NodeType.rangeForStatementNode, span_), typeExpr(typeExpr_), id(id_), container(container_), action(action_)
+        public nothrow RangeForStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_, Node* container_, StatementNode* action_) :
+            base(NodeType.rangeForStatementNode, span_, moduleId_), typeExpr(typeExpr_), id(id_), container(container_), action(action_)
         {
             typeExpr->SetParent(this);
             id->SetParent(this);
@@ -1157,7 +1180,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            RangeForStatementNode* clone = new RangeForStatementNode(GetSpan(), typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), container->Clone(cloneContext), cast<StatementNode*>(action->Clone(cloneContext)));
+            RangeForStatementNode* clone = new RangeForStatementNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), container->Clone(cloneContext), cast<StatementNode*>(action->Clone(cloneContext)));
             clone->SetLeftParenSpan(leftParenSpan);
             clone->SetRightParenSpan(rightParenSpan);
             clone->SetColonSpan(colonSpan);
@@ -1174,9 +1197,10 @@ namespace Cm.Ast
             writer.Write(id.Get());
             writer.Write(container.Get());
             writer.Write(action.Get());
-            writer.Write(leftParenSpan);
-            writer.Write(rightParenSpan);
-            writer.Write(colonSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(leftParenSpan, convertExternal);
+            writer.Write(rightParenSpan, convertExternal);
+            writer.Write(colonSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -1203,12 +1227,12 @@ namespace Cm.Ast
     }
     public class SwitchStatementNode : StatementNode
     {
-        public nothrow SwitchStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.switchStatementNode, span_), condition(), cases(), defaultS()
+        public nothrow SwitchStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.switchStatementNode, span_, moduleId_), condition(), cases(), defaultS()
         {
         }
-        public nothrow SwitchStatementNode(const System.Lex.Span& span_, Node* condition_) :
-            base(NodeType.switchStatementNode, span_), condition(condition_), cases(), defaultS()
+        public nothrow SwitchStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* condition_) :
+            base(NodeType.switchStatementNode, span_, moduleId_), condition(condition_), cases(), defaultS()
         {
             condition->SetParent(this);
         }
@@ -1280,7 +1304,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            SwitchStatementNode* clone = new SwitchStatementNode(GetSpan(), condition->Clone(cloneContext));
+            SwitchStatementNode* clone = new SwitchStatementNode(GetSpan(), ModuleId(), condition->Clone(cloneContext));
             int n = cases.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -1311,10 +1335,11 @@ namespace Cm.Ast
             {
                 writer.Write(defaultS.Get());
             }
-            writer.Write(leftParenSpan);
-            writer.Write(rightParenSpan);
-            writer.Write(beginBraceSpan);
-            writer.Write(endBraceSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(leftParenSpan, convertExternal);
+            writer.Write(rightParenSpan, convertExternal);
+            writer.Write(beginBraceSpan, convertExternal);
+            writer.Write(endBraceSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -1344,8 +1369,8 @@ namespace Cm.Ast
     }
     public class CaseStatementNode : StatementNode
     {
-        public nothrow CaseStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.caseStatementNode, span_), caseExprs(), statements()
+        public nothrow CaseStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.caseStatementNode, span_, moduleId_), caseExprs(), statements()
         {
         }
         public nothrow const NodeList<Node>& CaseExprs() const
@@ -1376,7 +1401,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            CaseStatementNode* clone = new CaseStatementNode(GetSpan());
+            CaseStatementNode* clone = new CaseStatementNode(GetSpan(), ModuleId());
             int ne = caseExprs.Count();
             for (int i = 0; i < ne; ++i)
             {
@@ -1401,9 +1426,10 @@ namespace Cm.Ast
             statements.Write(writer);
             uint n = cast<uint>(caseSpans.Count());
             writer.GetBinaryWriter().WriteULEB128UInt(n);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
             for (uint i = 0u; i < n; ++i)
             {
-                writer.Write(caseSpans[i]);
+                writer.Write(caseSpans[i], convertExternal);
             }
         }
         public override void Read(AstReader& reader)
@@ -1425,8 +1451,8 @@ namespace Cm.Ast
     }
     public class DefaultStatementNode : StatementNode
     {
-        public nothrow DefaultStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.defaultStatementNode, span_), statements()
+        public nothrow DefaultStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.defaultStatementNode, span_, moduleId_), statements()
         {
         }
         public nothrow const NodeList<StatementNode>& Statements() const
@@ -1440,7 +1466,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            DefaultStatementNode* clone = new DefaultStatementNode(GetSpan());
+            DefaultStatementNode* clone = new DefaultStatementNode(GetSpan(), ModuleId());
             int n = statements.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -1467,12 +1493,12 @@ namespace Cm.Ast
     }
     public class GotoCaseStatementNode : StatementNode
     {
-        public nothrow GotoCaseStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.gotoCaseStatementNode, span_), caseExpr()
+        public nothrow GotoCaseStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.gotoCaseStatementNode, span_, moduleId_), caseExpr()
         {
         }
-        public nothrow GotoCaseStatementNode(const System.Lex.Span& span_, Node* caseExpr_) :
-            base(NodeType.gotoCaseStatementNode, span_), caseExpr(caseExpr_)
+        public nothrow GotoCaseStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* caseExpr_) :
+            base(NodeType.gotoCaseStatementNode, span_, moduleId_), caseExpr(caseExpr_)
         {
             caseExpr->SetParent(this);
         }
@@ -1494,7 +1520,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            GotoCaseStatementNode* clone = new GotoCaseStatementNode(GetSpan(), caseExpr->Clone(cloneContext));
+            GotoCaseStatementNode* clone = new GotoCaseStatementNode(GetSpan(), ModuleId(), caseExpr->Clone(cloneContext));
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -1515,8 +1541,8 @@ namespace Cm.Ast
     }
     public class GotoDefaultStatementNode : StatementNode
     {
-        public nothrow GotoDefaultStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.gotoDefaultStatementNode, span_)
+        public nothrow GotoDefaultStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.gotoDefaultStatementNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsCaseTerminatingNode() const
@@ -1525,7 +1551,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            GotoDefaultStatementNode* clone = new GotoDefaultStatementNode(GetSpan());
+            GotoDefaultStatementNode* clone = new GotoDefaultStatementNode(GetSpan(), ModuleId());
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -1535,12 +1561,12 @@ namespace Cm.Ast
     }
     public class ThrowStatementNode : StatementNode
     {
-        public nothrow ThrowStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.throwStatementNode, span_), expression()
+        public nothrow ThrowStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.throwStatementNode, span_, moduleId_), expression()
         {
         }
-        public nothrow ThrowStatementNode(const System.Lex.Span& span_, Node* expression_) :
-            base(NodeType.throwStatementNode, span_), expression(expression_)
+        public nothrow ThrowStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* expression_) :
+            base(NodeType.throwStatementNode, span_, moduleId_), expression(expression_)
         {
             if (!expression.IsNull())
             {
@@ -1574,7 +1600,7 @@ namespace Cm.Ast
             {
                 clonedExpression = expression->Clone(cloneContext);
             }
-            ThrowStatementNode* clone = new ThrowStatementNode(GetSpan(), clonedExpression);
+            ThrowStatementNode* clone = new ThrowStatementNode(GetSpan(), ModuleId(), clonedExpression);
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -1605,12 +1631,12 @@ namespace Cm.Ast
     }
     public class TryStatementNode : StatementNode
     {
-        public nothrow TryStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.tryStatementNode, span_), tryBlock(), catches()
+        public nothrow TryStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.tryStatementNode, span_, moduleId_), tryBlock(), catches()
         {
         }
-        public nothrow TryStatementNode(const System.Lex.Span& span_, CompoundStatementNode* tryBlock_) :
-            base(NodeType.tryStatementNode, span_), tryBlock(tryBlock_), catches()
+        public nothrow TryStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, CompoundStatementNode* tryBlock_) :
+            base(NodeType.tryStatementNode, span_, moduleId_), tryBlock(tryBlock_), catches()
         {
             tryBlock->SetParent(this);
         }
@@ -1633,7 +1659,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            TryStatementNode* clone = new TryStatementNode(GetSpan(), cast<CompoundStatementNode*>(tryBlock->Clone(cloneContext)));
+            TryStatementNode* clone = new TryStatementNode(GetSpan(), ModuleId(), cast<CompoundStatementNode*>(tryBlock->Clone(cloneContext)));
             int n = catches.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -1664,12 +1690,12 @@ namespace Cm.Ast
     }
     public class CatchNode : Node
     {
-        public nothrow CatchNode(const System.Lex.Span& span_) :
-            base(NodeType.catchNode, span_), typeExpr(), id(), catchBlock()
+        public nothrow CatchNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.catchNode, span_, moduleId_), typeExpr(), id(), catchBlock()
         {
         }
-        public nothrow CatchNode(const System.Lex.Span& span_, Node* typeExpr_, IdentifierNode* id_, CompoundStatementNode* catchBlock_) :
-            base(NodeType.catchNode, span_), typeExpr(typeExpr_), id(id_), catchBlock(catchBlock_)
+        public nothrow CatchNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* typeExpr_, IdentifierNode* id_, CompoundStatementNode* catchBlock_) :
+            base(NodeType.catchNode, span_, moduleId_), typeExpr(typeExpr_), id(id_), catchBlock(catchBlock_)
         {
             typeExpr->SetParent(this);
             if (!id.IsNull())
@@ -1725,7 +1751,7 @@ namespace Cm.Ast
             {
                 clonedId = cast<IdentifierNode*>(id->Clone(cloneContext));
             }
-            CatchNode* clone = new CatchNode(GetSpan(), typeExpr->Clone(cloneContext), clonedId, cast<CompoundStatementNode*>(catchBlock->Clone(cloneContext)));
+            CatchNode* clone = new CatchNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext), clonedId, cast<CompoundStatementNode*>(catchBlock->Clone(cloneContext)));
             clone->SetLeftParenSpan(leftParenSpan);
             clone->SetRightParenSpan(rightParenSpan);
             return clone;
@@ -1745,8 +1771,9 @@ namespace Cm.Ast
                 writer.Write(id.Get());
             }
             writer.Write(catchBlock.Get());
-            writer.Write(leftParenSpan);
-            writer.Write(rightParenSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(leftParenSpan, convertExternal);
+            writer.Write(rightParenSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -1772,12 +1799,12 @@ namespace Cm.Ast
     }
     public class AssertStatementNode : StatementNode
     {
-        public nothrow AssertStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.assertStatementNode, span_), assertExpr()
+        public nothrow AssertStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.assertStatementNode, span_, moduleId_), assertExpr()
         {
         }
-        public nothrow AssertStatementNode(const System.Lex.Span& span_, Node* assertExpr_) :
-            base(NodeType.assertStatementNode, span_), assertExpr(assertExpr_)
+        public nothrow AssertStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* assertExpr_) :
+            base(NodeType.assertStatementNode, span_, moduleId_), assertExpr(assertExpr_)
         {
             assertExpr->SetParent(this);
         }
@@ -1791,7 +1818,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            AssertStatementNode* clone = new AssertStatementNode(GetSpan(), assertExpr->Clone(cloneContext));
+            AssertStatementNode* clone = new AssertStatementNode(GetSpan(), ModuleId(), assertExpr->Clone(cloneContext));
             return clone;
         }
         public override void Accept(Visitor& visitor)
@@ -1813,8 +1840,8 @@ namespace Cm.Ast
     }
     public abstract class ConditionalCompilationExpressionNode : Node
     {
-        public nothrow ConditionalCompilationExpressionNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_)
+        public nothrow ConditionalCompilationExpressionNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_)
         {
         }
         public override nothrow bool IsConditionalCompilationExpressionNode() const
@@ -1824,12 +1851,13 @@ namespace Cm.Ast
     }
     public abstract class ConditionalCompilationBinaryExpressionNode : ConditionalCompilationExpressionNode
     {
-        public nothrow ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_)
+        public nothrow ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_)
         {
         }
-        public nothrow ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const System.Lex.Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
-            base(nodeType_, span_), left(left_), right(right_)
+        public nothrow ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_,
+            ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
+            base(nodeType_, span_, moduleId_), left(left_), right(right_)
         {
             left->SetParent(this);
             right->SetParent(this);
@@ -1861,17 +1889,17 @@ namespace Cm.Ast
     }
     public class ConditionalCompilationDisjunctionNode : ConditionalCompilationBinaryExpressionNode
     {
-        public nothrow ConditionalCompilationDisjunctionNode(const System.Lex.Span& span_) :
-            base(NodeType.conditionalCompilationDisjunctionNode, span_)
+        public nothrow ConditionalCompilationDisjunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conditionalCompilationDisjunctionNode, span_, moduleId_)
         {
         }
-        public nothrow ConditionalCompilationDisjunctionNode(const System.Lex.Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
-            base(NodeType.conditionalCompilationDisjunctionNode, span_, left_, right_)
+        public nothrow ConditionalCompilationDisjunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
+            base(NodeType.conditionalCompilationDisjunctionNode, span_, moduleId_, left_, right_)
         {
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ConditionalCompilationDisjunctionNode(GetSpan(), cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
+            return new ConditionalCompilationDisjunctionNode(GetSpan(), ModuleId(), cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -1880,17 +1908,17 @@ namespace Cm.Ast
     }
     public class ConditionalCompilationConjunctionNode : ConditionalCompilationBinaryExpressionNode
     {
-        public nothrow ConditionalCompilationConjunctionNode(const System.Lex.Span& span_) :
-            base(NodeType.conditionalCompilationConjunctionNode, span_)
+        public nothrow ConditionalCompilationConjunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conditionalCompilationConjunctionNode, span_, moduleId_)
         {
         }
-        public nothrow ConditionalCompilationConjunctionNode(const System.Lex.Span& span_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
-            base(NodeType.conditionalCompilationConjunctionNode, span_, left_, right_)
+        public nothrow ConditionalCompilationConjunctionNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConditionalCompilationExpressionNode* left_, ConditionalCompilationExpressionNode* right_) :
+            base(NodeType.conditionalCompilationConjunctionNode, span_, moduleId_, left_, right_)
         {
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ConditionalCompilationConjunctionNode(GetSpan(), cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
+            return new ConditionalCompilationConjunctionNode(GetSpan(), ModuleId(), cast<ConditionalCompilationExpressionNode*>(Left()->Clone(cloneContext)), cast<ConditionalCompilationExpressionNode*>(Right()->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -1899,12 +1927,12 @@ namespace Cm.Ast
     }
     public class ConditionalCompilationNotNode : ConditionalCompilationExpressionNode
     {
-        public nothrow ConditionalCompilationNotNode(const System.Lex.Span& span_) :
-            base(NodeType.conditionalCompilationNotNode, span_)
+        public nothrow ConditionalCompilationNotNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conditionalCompilationNotNode, span_, moduleId_)
         {
         }
-        public nothrow ConditionalCompilationNotNode(const System.Lex.Span& span_, ConditionalCompilationExpressionNode* expr_) :
-            base(NodeType.conditionalCompilationNotNode, span_), expr(expr_)
+        public nothrow ConditionalCompilationNotNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConditionalCompilationExpressionNode* expr_) :
+            base(NodeType.conditionalCompilationNotNode, span_, moduleId_), expr(expr_)
         {
             expr->SetParent(this);
         }
@@ -1914,7 +1942,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ConditionalCompilationNotNode(GetSpan(), cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext)));
+            return new ConditionalCompilationNotNode(GetSpan(), ModuleId(), cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -1935,12 +1963,12 @@ namespace Cm.Ast
     }
     public class ConditionalCompilationPrimaryNode : ConditionalCompilationExpressionNode
     {
-        public nothrow ConditionalCompilationPrimaryNode(const System.Lex.Span& span_) :
-            base(NodeType.conditionalCompilationPrimaryNode, span_)
+        public nothrow ConditionalCompilationPrimaryNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conditionalCompilationPrimaryNode, span_, moduleId_)
         {
         }
-        public nothrow ConditionalCompilationPrimaryNode(const System.Lex.Span& span_, const ustring& symbol_) :
-            base(NodeType.conditionalCompilationPrimaryNode, span_), symbol(symbol_)
+        public nothrow ConditionalCompilationPrimaryNode(const System.Lex.Span& span_, const Uuid& moduleId_, const ustring& symbol_) :
+            base(NodeType.conditionalCompilationPrimaryNode, span_, moduleId_), symbol(symbol_)
         {
         }
         public nothrow const ustring& Symbol() const
@@ -1949,7 +1977,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ConditionalCompilationPrimaryNode(GetSpan(), symbol);
+            return new ConditionalCompilationPrimaryNode(GetSpan(), ModuleId(), symbol);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -1969,12 +1997,12 @@ namespace Cm.Ast
     }
     public class ParenthesizedConditionalCompilationExpressionNode : ConditionalCompilationExpressionNode
     {
-        public nothrow ParenthesizedConditionalCompilationExpressionNode(const System.Lex.Span& span_) :
-            base(NodeType.parenthesizedCondCompExpressionNode, span_)
+        public nothrow ParenthesizedConditionalCompilationExpressionNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.parenthesizedCondCompExpressionNode, span_, moduleId_)
         {
         }
-        public nothrow ParenthesizedConditionalCompilationExpressionNode(const System.Lex.Span& span_, ConditionalCompilationExpressionNode* expr_) :
-            base(NodeType.parenthesizedCondCompExpressionNode, span_), expr(expr_)
+        public nothrow ParenthesizedConditionalCompilationExpressionNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConditionalCompilationExpressionNode* expr_) :
+            base(NodeType.parenthesizedCondCompExpressionNode, span_, moduleId_), expr(expr_)
         {
         }
         public nothrow ConditionalCompilationExpressionNode* Expr() const
@@ -1983,7 +2011,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ParenthesizedConditionalCompilationExpressionNode(GetSpan(), cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext)));
+            return new ParenthesizedConditionalCompilationExpressionNode(GetSpan(), ModuleId(), cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -2004,12 +2032,12 @@ namespace Cm.Ast
     }
     public class ConditionalCompilationPartNode : Node
     {
-        public nothrow ConditionalCompilationPartNode(const System.Lex.Span& span_) :
-            base(NodeType.conditionalCompilationPartNode, span_)
+        public nothrow ConditionalCompilationPartNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conditionalCompilationPartNode, span_, moduleId_)
         {
         }
-        public nothrow ConditionalCompilationPartNode(const System.Lex.Span& span_, ConditionalCompilationExpressionNode* expr_) :
-            base(NodeType.conditionalCompilationPartNode, span_), expr(expr_)
+        public nothrow ConditionalCompilationPartNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConditionalCompilationExpressionNode* expr_) :
+            base(NodeType.conditionalCompilationPartNode, span_, moduleId_), expr(expr_)
         {
             if (!expr.IsNull())
             {
@@ -2060,7 +2088,7 @@ namespace Cm.Ast
             {
                 clonedIfExpr = cast<ConditionalCompilationExpressionNode*>(expr->Clone(cloneContext));
             }
-            ConditionalCompilationPartNode* clone = new ConditionalCompilationPartNode(GetSpan(), clonedIfExpr);
+            ConditionalCompilationPartNode* clone = new ConditionalCompilationPartNode(GetSpan(), ModuleId(), clonedIfExpr);
             int n = statements.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -2085,9 +2113,10 @@ namespace Cm.Ast
                 writer.Write(expr.Get());
             }
             statements.Write(writer);
-            writer.Write(keywordSpan);
-            writer.Write(leftParenSpan);
-            writer.Write(rightParenSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(keywordSpan, convertExternal);
+            writer.Write(leftParenSpan, convertExternal);
+            writer.Write(rightParenSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -2112,12 +2141,12 @@ namespace Cm.Ast
     }
     public class ConditionalCompilationStatementNode : StatementNode
     {
-        public nothrow ConditionalCompilationStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.conditionalCompilationStatementNode, span_), ifPart(null)
+        public nothrow ConditionalCompilationStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conditionalCompilationStatementNode, span_, moduleId_), ifPart(null)
         {
         }
-        public nothrow ConditionalCompilationStatementNode(const System.Lex.Span& span_, ConditionalCompilationExpressionNode* ifExpr_) :
-            base(NodeType.conditionalCompilationStatementNode, span_), ifPart(new ConditionalCompilationPartNode(span_, ifExpr_))
+        public nothrow ConditionalCompilationStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConditionalCompilationExpressionNode* ifExpr_) :
+            base(NodeType.conditionalCompilationStatementNode, span_, moduleId_), ifPart(new ConditionalCompilationPartNode(span_, moduleId_, ifExpr_))
         {
         }
         public nothrow ConditionalCompilationPartNode* IfPart()
@@ -2144,9 +2173,9 @@ namespace Cm.Ast
         {
             ifPart->AddStatement(statement);
         }
-        public nothrow void AddElifExpr(const System.Lex.Span& span, ConditionalCompilationExpressionNode* expr)
+        public nothrow void AddElifExpr(const System.Lex.Span& span, const Uuid& moduleId, ConditionalCompilationExpressionNode* expr)
         {
-            elifParts.Add(new ConditionalCompilationPartNode(span, expr));
+            elifParts.Add(new ConditionalCompilationPartNode(span, moduleId, expr));
         }
         public nothrow void AddElifStatement(StatementNode* statement)
         {
@@ -2164,11 +2193,11 @@ namespace Cm.Ast
         {
             elifParts[elifParts.Count() - 1]->SetKeywordSpan(span);
         }
-        public nothrow void AddElseStatement(const System.Lex.Span& span, StatementNode* statement)
+        public nothrow void AddElseStatement(const System.Lex.Span& span, const Uuid& moduleId, StatementNode* statement)
         {
             if (!!elsePart.IsNull())
             {
-                elsePart.Reset(new ConditionalCompilationPartNode(span));
+                elsePart.Reset(new ConditionalCompilationPartNode(span, moduleId));
             }
             elsePart->AddStatement(statement);
         }
@@ -2186,7 +2215,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ConditionalCompilationStatementNode* clone = new ConditionalCompilationStatementNode(GetSpan());
+            ConditionalCompilationStatementNode* clone = new ConditionalCompilationStatementNode(GetSpan(), ModuleId());
             ConditionalCompilationPartNode* clonedIfPart = cast<ConditionalCompilationPartNode*>(ifPart->Clone(cloneContext));
             clone->ifPart.Reset(clonedIfPart);
             int n = elifParts.Count();
@@ -2219,7 +2248,8 @@ namespace Cm.Ast
             {
                 writer.Write(elsePart.Get());
             }
-            writer.Write(endifSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(endifSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {

@@ -25,7 +25,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowTypedefParser
     using NothrowIdentifierParser.Identifier;
 
     Typedef(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : TypedefNode*
-        ::= Specifiers:specifiers{ s = span; } TYPEDEF TypeExpr(moduleId, ctx):type! Identifier(moduleId):id! SEMICOLON!
+        ::= Specifiers:specifiers{ s = span; } TYPEDEF TypeExpr(moduleId, ctx):type Identifier(moduleId):id SEMICOLON!
         { 
             s.end = span.end; 
             TypedefNode* node = new TypedefNode(s, *moduleId, specifiers, type, id); 

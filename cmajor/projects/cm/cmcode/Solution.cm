@@ -21,7 +21,7 @@ namespace cmcode
     {
         UniquePtr<ustring> content(new ustring(ToUtf32(File.ReadAllText(projectFilePath))));
         ContainerFileLexer lexer(content->Chars(), content->Chars() + content->Length(), projectFilePath, 0);
-        UniquePtr<Cm.Ast.Project> project = ProjectFileParser.Parse(lexer, "debug", Cm.Ast.BackEnd.llvm);
+        UniquePtr<Cm.Ast.Project> project = ProjectFileParser.Parse(lexer, "debug", Cm.Ast.BackEnd.llvm, "gcc");
         project->ResolveDeclarations();
         contents.Add(Rvalue(content));
         return project;

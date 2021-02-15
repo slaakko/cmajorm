@@ -31,7 +31,7 @@ soulng::parser::Match NothrowFunctionParser::Function(CmajorNothrowLexer& lexer,
     std::unique_ptr<FunctionNode> fun = std::unique_ptr<FunctionNode>();
     Span s = Span();
     Span specifierSpan = Span();
-    std::unique_ptr<sngcm::ast::Attributes> attrs;
+    std::unique_ptr<sngcm::ast::AttributesNode> attrs;
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<sngcm::ast::Node> returnType;
     std::unique_ptr<soulng::parser::Value<std::u32string>> functionGroupId;
@@ -85,7 +85,7 @@ soulng::parser::Match NothrowFunctionParser::Function(CmajorNothrowLexer& lexer,
                                         soulng::parser::Match* parentMatch10 = &match;
                                         {
                                             soulng::parser::Match match = NothrowAttributeParser::Attributes(lexer, moduleId);
-                                            attrs.reset(static_cast<sngcm::ast::Attributes*>(match.value));
+                                            attrs.reset(static_cast<sngcm::ast::AttributesNode*>(match.value));
                                             if (match.hit)
                                             {
                                                 *parentMatch10 = match;

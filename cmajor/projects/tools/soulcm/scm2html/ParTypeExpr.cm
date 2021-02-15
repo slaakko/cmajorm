@@ -5,7 +5,7 @@ using System.Parsing;
 using Cm.Ast;
 using ParserFileTokens;
 
-// this file has been automatically generated from 'D:/work/soulng-project/tools/cpp2cm/projects/soulcm/scm2html/parser/ParTypeExpr.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scm2html/ParTypeExpr.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class ParTypeExprParser
 {
@@ -116,7 +116,7 @@ public static class ParTypeExprParser
                                 #if (DEBUG)
                                     if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"PrefixTypeExpr");
                                 #endif
-                                return Match(true, new ConstNode(s, constTypeExpr.Release()));
+                                return Match(true, new ConstNode(s, ctx->ModuleId(), constTypeExpr.Release()));
                             }
                         }
                         *parentMatch4 = match;
@@ -288,7 +288,7 @@ public static class ParTypeExprParser
                                                                     if (match.hit)
                                                                     {
                                                                         s.end = span.end;
-                                                                        typeExpr.Reset(new DotNode(s, typeExpr.Release(), new IdentifierNode(span, lexer.GetToken(pos))));
+                                                                        typeExpr.Reset(new DotNode(s, ctx->ModuleId(), typeExpr.Release(), new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos))));
                                                                     }
                                                                     *parentMatch13 = match;
                                                                 }
@@ -317,7 +317,7 @@ public static class ParTypeExprParser
                                                                     if (match.hit)
                                                                     {
                                                                         s.end = span.end;
-                                                                        typeExpr.Reset(new PointerNode(s, typeExpr.Release()));
+                                                                        typeExpr.Reset(new PointerNode(s, ctx->ModuleId(), typeExpr.Release()));
                                                                     }
                                                                     *parentMatch16 = match;
                                                                 }
@@ -347,7 +347,7 @@ public static class ParTypeExprParser
                                                                 if (match.hit)
                                                                 {
                                                                     s.end = span.end;
-                                                                    typeExpr.Reset(new RValueRefNode(s, typeExpr.Release()));
+                                                                    typeExpr.Reset(new RValueRefNode(s, ctx->ModuleId(), typeExpr.Release()));
                                                                 }
                                                                 *parentMatch18 = match;
                                                             }
@@ -377,7 +377,7 @@ public static class ParTypeExprParser
                                                             if (match.hit)
                                                             {
                                                                 s.end = span.end;
-                                                                typeExpr.Reset(new LValueRefNode(s, typeExpr.Release()));
+                                                                typeExpr.Reset(new LValueRefNode(s, ctx->ModuleId(), typeExpr.Release()));
                                                             }
                                                             *parentMatch20 = match;
                                                         }
@@ -465,7 +465,7 @@ public static class ParTypeExprParser
                                                                 if (match.hit)
                                                                 {
                                                                     s.end = span.end;
-                                                                    typeExpr.Reset(new ArrayNode(s, typeExpr.Release(), size.Release()));
+                                                                    typeExpr.Reset(new ArrayNode(s, ctx->ModuleId(), typeExpr.Release(), size.Release()));
                                                                 }
                                                                 *parentMatch27 = match;
                                                             }
@@ -553,7 +553,7 @@ public static class ParTypeExprParser
                 Match* parentMatch2 = &match;
                 {
                     long pos = lexer.GetPos();
-                    Match match = ParBasicTypeParser.BasicType(lexer);
+                    Match match = ParBasicTypeParser.BasicType(lexer, ctx);
                     basicType.Reset(cast<Node*>(match.value));
                     if (match.hit)
                     {
@@ -619,7 +619,7 @@ public static class ParTypeExprParser
                                 #if (DEBUG)
                                     if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"PrimaryTypeExpr");
                                 #endif
-                                return Match(true, new IdentifierNode(span, lexer.GetToken(pos)));
+                                return Match(true, new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos)));
                             }
                         }
                         *parentMatch6 = match;

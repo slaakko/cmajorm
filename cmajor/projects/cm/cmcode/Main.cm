@@ -249,7 +249,7 @@ namespace cmcode
             optionsMenuItem->ClickEvent().AddHandler(OptionsClick);
             editMenuItem->AddMenuItem(optionsMenuItemPtr.Release());
             menuBar->AddMenuItem(editMenuItem.Release());
-            
+
             UniquePtr<MenuItem> viewMenuItem(new MenuItem("&View"));
             UniquePtr<MenuItem> debugWindowsMenuItem(new MenuItem("&Debug Windows"));
             UniquePtr<MenuItem> callStackMenuItemPtr(new MenuItem("&Call Stack"));
@@ -1261,7 +1261,7 @@ namespace cmcode
                         Directory.CreateDirectories(projectDir);
                     }
                     UniquePtr<Cm.Ast.Solution> solution(new Cm.Ast.Solution(ToUtf32(dialog.GetSolutionName()), solutionFilePath));
-                    UniquePtr<Cm.Ast.Project> project(new Cm.Ast.Project(ToUtf32(dialog.GetProjectName()), projectFilePath, "debug", Cm.Ast.BackEnd.llvm));
+                    UniquePtr<Cm.Ast.Project> project(new Cm.Ast.Project(ToUtf32(dialog.GetProjectName()), projectFilePath, "debug", Cm.Ast.BackEnd.llvm, "gcc"));
                     project->SetTarget(dialog.GetProjectType());
                     solution->SetActiveProject(project.Get());
                     solution->AddProject(Rvalue(project));
@@ -1292,7 +1292,7 @@ namespace cmcode
                     string projectFilePath = Path.Combine(dialog.GetLocation(), Path.Combine(dialog.GetProjectName(), dialog.GetProjectName() + ".cmp"));
                     string projectDir = Path.GetDirectoryName(projectFilePath);
                     Directory.CreateDirectories(projectDir);
-                    UniquePtr<Cm.Ast.Project> project(new Cm.Ast.Project(ToUtf32(dialog.GetProjectName()), projectFilePath, "debug", Cm.Ast.BackEnd.llvm));
+                    UniquePtr<Cm.Ast.Project> project(new Cm.Ast.Project(ToUtf32(dialog.GetProjectName()), projectFilePath, "debug", Cm.Ast.BackEnd.llvm, "gcc"));
                     project->SetTarget(dialog.GetProjectType());
                     solution->AddProject(Rvalue(project));
                     solution->SortByProjectName();
@@ -3873,7 +3873,7 @@ namespace cmcode
             {
                 const EditorSettings& editorSettings = MainConfiguration.Instance().GetEditorSettings();
                 if (!editorSettings.useCodeCompletion) return;
-                if (codeCompletionServerStarting) return;
+                if (codeCompletionServerStarting || parseSourceRequestInProgress) return;
                 if (!solutionExplorerData.IsNull())
                 {
                     TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
@@ -3900,6 +3900,7 @@ namespace cmcode
                                         UniquePtr<ParseSourceRequest> request(new ParseSourceRequest(project->FilePath(), GetBackend(), GetConfig(), sourceFilePath));
                                         request->sourceCode = textView->GetCursorText();
                                         GetCodeCompletionService().PutRequest(request.Release());
+                                        parseSourceRequestInProgress = true;
                                     }
                                 }
                             }
@@ -4135,6 +4136,7 @@ namespace cmcode
         {
             try
             {
+                parseSourceRequestInProgress = false;
                 GetOutputLogView()->Clear();
                 GetOutputTabPage()->Select();
                 string logMessage = "source parsed:";
@@ -5202,6 +5204,7 @@ namespace cmcode
         private bool loadEditModuleRequestSent;
         private string ccFunctionGroup;
         private bool ccOverloadListFetched;
+        private bool parseSourceRequestInProgress;
     }
 }
 

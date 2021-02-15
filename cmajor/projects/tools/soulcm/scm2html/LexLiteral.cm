@@ -5,6 +5,8 @@ using System.Parsing;
 using Cm.Ast;
 using LexerFileTokens;
 
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scm2html/LexLiteral.parser' using soulcm parser generator scmpg version 3.10.0
+
 public static class LexLiteralParser
 {
     public static Match Literal(LexerFileLexer& lexer, ParsingContext* ctx)
@@ -28,7 +30,7 @@ public static class LexLiteralParser
             Match* parentMatch1 = &match;
             {
                 long pos = lexer.GetPos();
-                Match match = LexLiteralParser.SimpleLiteral(lexer);
+                Match match = LexLiteralParser.SimpleLiteral(lexer, ctx);
                 simpleLiteral.Reset(cast<LiteralNode*>(match.value));
                 if (match.hit)
                 {
@@ -89,7 +91,7 @@ public static class LexLiteralParser
         }
         return match;
     }
-    public static Match SimpleLiteral(LexerFileLexer& lexer)
+    public static Match SimpleLiteral(LexerFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -108,7 +110,7 @@ public static class LexLiteralParser
             case TRUE: 
             {
                 ++lexer;
-                LiteralNode* value = new BooleanLiteralNode(span, true);
+                LiteralNode* value = new BooleanLiteralNode(span, ctx->ModuleId(), true);
                 value->SetText(lexer.GetMatch(span));
                 {
                     #if (DEBUG)
@@ -121,7 +123,7 @@ public static class LexLiteralParser
             case FALSE: 
             {
                 ++lexer;
-                LiteralNode* value = new BooleanLiteralNode(span, false);
+                LiteralNode* value = new BooleanLiteralNode(span, ctx->ModuleId(), false);
                 value->SetText(lexer.GetMatch(span));
                 {
                     #if (DEBUG)
@@ -135,7 +137,7 @@ public static class LexLiteralParser
             {
                 ++lexer;
                 soulcm.scm2html.ParseFloatingLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.floatingLit, lexer.floatingLitFloat);
-                LiteralNode* value = CreateFloatingLiteralNode(span, lexer.floatingLit, lexer.floatingLitFloat);
+                LiteralNode* value = CreateFloatingLiteralNode(span, ctx->ModuleId(), lexer.floatingLit, lexer.floatingLitFloat);
                 value->SetText(lexer.GetMatch(span));
                 {
                     #if (DEBUG)
@@ -149,7 +151,7 @@ public static class LexLiteralParser
             {
                 ++lexer;
                 soulcm.scm2html.ParseIntegerLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.intLit, lexer.intLitUnsigned);
-                LiteralNode* value = CreateIntegerLiteralNode(span, lexer.intLit, lexer.intLitUnsigned);
+                LiteralNode* value = CreateIntegerLiteralNode(span, ctx->ModuleId(), lexer.intLit, lexer.intLitUnsigned);
                 value->SetText(lexer.GetMatch(span));
                 {
                     #if (DEBUG)
@@ -163,7 +165,7 @@ public static class LexLiteralParser
             {
                 ++lexer;
                 soulcm.scm2html.ParseCharacterLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.chrLit, lexer.chrLitPrefix);
-                LiteralNode* value = CreateCharacterLiteralNode(span, lexer.chrLit, lexer.chrLitPrefix);
+                LiteralNode* value = CreateCharacterLiteralNode(span, ctx->ModuleId(), lexer.chrLit, lexer.chrLitPrefix);
                 value->SetText(lexer.GetMatch(span));
                 {
                     #if (DEBUG)
@@ -177,7 +179,7 @@ public static class LexLiteralParser
             {
                 ++lexer;
                 soulcm.scm2html.ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix);
-                LiteralNode* value = CreateStringLiteralNode(span, lexer.strLit, lexer.strLitPrefix);
+                LiteralNode* value = CreateStringLiteralNode(span, ctx->ModuleId(), lexer.strLit, lexer.strLitPrefix);
                 value->SetText(lexer.GetMatch(span));
                 {
                     #if (DEBUG)
@@ -190,7 +192,7 @@ public static class LexLiteralParser
             case NULLLIT: 
             {
                 ++lexer;
-                LiteralNode* value = new NullLiteralNode(span);
+                LiteralNode* value = new NullLiteralNode(span, ctx->ModuleId());
                 value->SetText(lexer.GetMatch(span));
                 {
                     #if (DEBUG)
@@ -334,7 +336,7 @@ public static class LexLiteralParser
                     }
                     if (match.hit)
                     {
-                        arrayLiteral.Reset(new ArrayLiteralNode(span));
+                        arrayLiteral.Reset(new ArrayLiteralNode(span, ctx->ModuleId()));
                     }
                     *parentMatch2 = match;
                 }
@@ -542,7 +544,7 @@ public static class LexLiteralParser
                     }
                     if (match.hit)
                     {
-                        structuredLiteral.Reset(new StructuredLiteralNode(span));
+                        structuredLiteral.Reset(new StructuredLiteralNode(span, ctx->ModuleId()));
                     }
                     *parentMatch2 = match;
                 }

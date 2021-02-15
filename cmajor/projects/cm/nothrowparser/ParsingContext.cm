@@ -1,0 +1,104 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace Cm.NothrowParser
+{
+    public class NothrowParsingContext
+    {
+        public nothrow NothrowParsingContext() :
+            parsingExpressionStatement(false), parsingLvalue(false), parsingArguments(false), parsingIsOrAs(false), parsingTypeExpr(false), parsingConcept(false), parsingTemplateId(false)
+        {
+        }
+        public nothrow void BeginParsingTemplateId()
+        {
+            parsingTemplateIdStack.Push(parsingTemplateId);
+            parsingTemplateId = true;
+        }
+        public nothrow void EndParsingTemplateId()
+        {
+            parsingTemplateId = parsingTemplateIdStack.Pop();
+        }
+        public nothrow void PushParsingIsOrAs(bool parsingIsOrAs_)
+        {
+            parsingIsOrAsStack.Push(parsingIsOrAs);
+            parsingIsOrAs = parsingIsOrAs_;
+        }
+        public nothrow void PopParsingIsOrAs()
+        {
+            parsingIsOrAs = parsingIsOrAsStack.Pop();
+        }
+        public nothrow void BeginParsingTypeExpr()
+        {
+            parsingTypeExprStack.Push(parsingTypeExpr);
+            parsingTypeExpr = true;
+        }
+        public nothrow void EndParsingTypeExpr()
+        {
+            parsingTypeExpr = parsingTypeExprStack.Pop();
+        }
+        public nothrow void PushParsingLvalue(bool parsingLvalue_)
+        {
+            parsingLvalueStack.Push(parsingLvalue);
+            parsingLvalue = parsingLvalue_;
+        }
+        public nothrow void PopParsingLvalue()
+        {
+            parsingLvalue = parsingLvalueStack.Pop();
+        }
+        public nothrow void PushParsingExpressionStatement(bool parsingExpressionStatement_)
+        {
+            parsingExpressionStatementStack.Push(parsingExpressionStatement);
+            parsingExpressionStatement = parsingExpressionStatement_;
+        }
+        public nothrow void PopParsingExpressionStatement()
+        {
+            parsingExpressionStatement = parsingExpressionStatementStack.Pop();
+        }
+        public nothrow void BeginParsingArguments()
+        {
+            parsingArgumentsStack.Push(parsingArguments);
+            parsingArguments = true;
+        }
+        public nothrow void EndParsingArguments()
+        {
+            parsingArguments = parsingArgumentsStack.Pop();
+        }
+        public nothrow void BeginParsingConcept()
+        {
+            parsingConceptStack.Push(parsingConcept);
+            parsingConcept = true;
+        }
+        public nothrow void EndParsingConcept()
+        {
+            parsingConcept = parsingConceptStack.Pop();
+        }
+        public nothrow inline const Uuid& ModuleId() const
+        {
+            return moduleId;
+        }
+        public nothrow void SetModuleId(const Uuid& moduleId_)
+        {
+            moduleId = moduleId_;
+        }
+        public bool parsingExpressionStatement;
+        public bool parsingLvalue;
+        public bool parsingArguments;
+        public bool parsingIsOrAs;
+        public bool parsingTypeExpr;
+        public bool parsingConcept;
+        public bool parsingTemplateId;
+        private Stack<bool> parsingExpressionStatementStack;
+        private Stack<bool> parsingLvalueStack;
+        private Stack<bool> parsingArgumentsStack;
+        private Stack<bool> parsingIsOrAsStack;
+        private Stack<bool> parsingTypeExprStack;
+        private Stack<bool> parsingConceptStack;
+        private Stack<bool> parsingTemplateIdStack;
+        private Uuid moduleId;
+    }
+}

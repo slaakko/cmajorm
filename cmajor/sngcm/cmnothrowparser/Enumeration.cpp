@@ -91,23 +91,8 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                             {
                                 int64_t pos = lexer.GetPos();
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match(true);
-                                soulng::parser::Match* parentMatch10 = &match;
-                                {
-                                    soulng::lexer::Span span = lexer.GetSpan();
-                                    soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
-                                    enumTypeId.reset(static_cast<IdentifierNode*>(match.value));
-                                    if (match.hit)
-                                    {
-                                        *parentMatch10 = match;
-                                    }
-                                    else
-                                    {
-                                        match.hit = true;
-                                        *parentMatch10 = match;
-                                        lexer.AddError(span, U"identifier");
-                                    }
-                                }
+                                soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+                                enumTypeId.reset(static_cast<IdentifierNode*>(match.value));
                                 if (match.hit)
                                 {
                                     s.end = span.end;
@@ -124,17 +109,17 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                 if (match.hit)
                 {
                     soulng::parser::Match match(false);
-                    soulng::parser::Match* parentMatch11 = &match;
+                    soulng::parser::Match* parentMatch10 = &match;
                     {
                         soulng::parser::Match match(true);
                         int64_t save = lexer.GetPos();
-                        soulng::parser::Match* parentMatch12 = &match;
+                        soulng::parser::Match* parentMatch11 = &match;
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch13 = &match;
+                            soulng::parser::Match* parentMatch12 = &match;
                             {
                                 soulng::parser::Match match(false);
-                                soulng::parser::Match* parentMatch14 = &match;
+                                soulng::parser::Match* parentMatch13 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
                                     soulng::parser::Match match = NothrowEnumerationParser::UnderlyingType(lexer, moduleId, ctx);
@@ -143,20 +128,20 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                                     {
                                         enumTypeNode->SetUnderlyingType(underlyingType.release());
                                     }
-                                    *parentMatch14 = match;
+                                    *parentMatch13 = match;
                                 }
-                                *parentMatch13 = match;
+                                *parentMatch12 = match;
                             }
                             if (match.hit)
                             {
-                                *parentMatch12 = match;
+                                *parentMatch11 = match;
                             }
                             else
                             {
                                 lexer.SetPos(save);
                             }
                         }
-                        *parentMatch11 = match;
+                        *parentMatch10 = match;
                     }
                     *parentMatch3 = match;
                 }
@@ -165,15 +150,15 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
             if (match.hit)
             {
                 soulng::parser::Match match(false);
-                soulng::parser::Match* parentMatch15 = &match;
+                soulng::parser::Match* parentMatch14 = &match;
                 {
                     soulng::parser::Match match(false);
-                    soulng::parser::Match* parentMatch16 = &match;
+                    soulng::parser::Match* parentMatch15 = &match;
                     {
                         int64_t pos = lexer.GetPos();
                         soulng::lexer::Span span = lexer.GetSpan();
                         soulng::parser::Match match(true);
-                        soulng::parser::Match* parentMatch17 = &match;
+                        soulng::parser::Match* parentMatch16 = &match;
                         {
                             soulng::lexer::Span span = lexer.GetSpan();
                             soulng::parser::Match match(false);
@@ -184,12 +169,12 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                             }
                             if (match.hit)
                             {
-                                *parentMatch17 = match;
+                                *parentMatch16 = match;
                             }
                             else
                             {
                                 match.hit = true;
-                                *parentMatch17 = match;
+                                *parentMatch16 = match;
                                 lexer.AddError(span, ToUtf32(GetTokenInfo(LBRACE)));
                             }
                         }
@@ -197,9 +182,9 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                         {
                             beginBraceSpan = span;
                         }
-                        *parentMatch16 = match;
+                        *parentMatch15 = match;
                     }
-                    *parentMatch15 = match;
+                    *parentMatch14 = match;
                 }
                 *parentMatch2 = match;
             }
@@ -208,10 +193,10 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
         if (match.hit)
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch18 = &match;
+            soulng::parser::Match* parentMatch17 = &match;
             {
                 soulng::parser::Match match = NothrowEnumerationParser::EnumConstants(lexer, moduleId, ctx, enumTypeNode.get());
-                *parentMatch18 = match;
+                *parentMatch17 = match;
             }
             *parentMatch1 = match;
         }
@@ -220,15 +205,15 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch19 = &match;
+        soulng::parser::Match* parentMatch18 = &match;
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch20 = &match;
+            soulng::parser::Match* parentMatch19 = &match;
             {
                 int64_t pos = lexer.GetPos();
                 soulng::lexer::Span span = lexer.GetSpan();
                 soulng::parser::Match match(true);
-                soulng::parser::Match* parentMatch21 = &match;
+                soulng::parser::Match* parentMatch20 = &match;
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
                     soulng::parser::Match match(false);
@@ -239,12 +224,12 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                     }
                     if (match.hit)
                     {
-                        *parentMatch21 = match;
+                        *parentMatch20 = match;
                     }
                     else
                     {
                         match.hit = true;
-                        *parentMatch21 = match;
+                        *parentMatch20 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACE)));
                     }
                 }
@@ -261,9 +246,9 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                         return soulng::parser::Match(true, enumTypeNode.release());
                     }
                 }
-                *parentMatch20 = match;
+                *parentMatch19 = match;
             }
-            *parentMatch19 = match;
+            *parentMatch18 = match;
         }
         *parentMatch0 = match;
     }
@@ -363,23 +348,8 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstants(CmajorNothrowLexer
         soulng::parser::Match* parentMatch1 = &match;
         {
             int64_t pos = lexer.GetPos();
-            soulng::parser::Match match(true);
-            soulng::parser::Match* parentMatch2 = &match;
-            {
-                soulng::lexer::Span span = lexer.GetSpan();
-                soulng::parser::Match match = NothrowEnumerationParser::EnumConstant(lexer, moduleId, ctx, enumType);
-                enumConstant.reset(static_cast<EnumConstantNode*>(match.value));
-                if (match.hit)
-                {
-                    *parentMatch2 = match;
-                }
-                else
-                {
-                    match.hit = true;
-                    *parentMatch2 = match;
-                    lexer.AddError(span, U"enumeration constant");
-                }
-            }
+            soulng::parser::Match match = NothrowEnumerationParser::EnumConstant(lexer, moduleId, ctx, enumType);
+            enumConstant.reset(static_cast<EnumConstantNode*>(match.value));
             if (match.hit)
             {
                 enumType->AddConstant(enumConstant.release());
@@ -391,17 +361,17 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstants(CmajorNothrowLexer
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch3 = &match;
+        soulng::parser::Match* parentMatch2 = &match;
         {
             soulng::parser::Match match(true);
-            soulng::parser::Match* parentMatch4 = &match;
+            soulng::parser::Match* parentMatch3 = &match;
             {
                 while (true)
                 {
                     int64_t save = lexer.GetPos();
                     {
                         soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch5 = &match;
+                        soulng::parser::Match* parentMatch4 = &match;
                         {
                             soulng::parser::Match match(false);
                             if (*lexer == COMMA)
@@ -409,47 +379,32 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstants(CmajorNothrowLexer
                                 ++lexer;
                                 match.hit = true;
                             }
-                            *parentMatch5 = match;
+                            *parentMatch4 = match;
                         }
                         if (match.hit)
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch6 = &match;
+                            soulng::parser::Match* parentMatch5 = &match;
                             {
                                 soulng::parser::Match match(false);
-                                soulng::parser::Match* parentMatch7 = &match;
+                                soulng::parser::Match* parentMatch6 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
-                                    soulng::parser::Match match(true);
-                                    soulng::parser::Match* parentMatch8 = &match;
-                                    {
-                                        soulng::lexer::Span span = lexer.GetSpan();
-                                        soulng::parser::Match match = NothrowEnumerationParser::EnumConstant(lexer, moduleId, ctx, enumType);
-                                        enumConstant.reset(static_cast<EnumConstantNode*>(match.value));
-                                        if (match.hit)
-                                        {
-                                            *parentMatch8 = match;
-                                        }
-                                        else
-                                        {
-                                            match.hit = true;
-                                            *parentMatch8 = match;
-                                            lexer.AddError(span, U"enumeration constant");
-                                        }
-                                    }
+                                    soulng::parser::Match match = NothrowEnumerationParser::EnumConstant(lexer, moduleId, ctx, enumType);
+                                    enumConstant.reset(static_cast<EnumConstantNode*>(match.value));
                                     if (match.hit)
                                     {
                                         enumType->AddConstant(enumConstant.release());
                                     }
-                                    *parentMatch7 = match;
+                                    *parentMatch6 = match;
                                 }
-                                *parentMatch6 = match;
+                                *parentMatch5 = match;
                             }
-                            *parentMatch5 = match;
+                            *parentMatch4 = match;
                         }
                         if (match.hit)
                         {
-                            *parentMatch4 = match;
+                            *parentMatch3 = match;
                         }
                         else
                         {
@@ -459,7 +414,7 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstants(CmajorNothrowLexer
                     }
                 }
             }
-            *parentMatch3 = match;
+            *parentMatch2 = match;
         }
         *parentMatch0 = match;
     }
@@ -500,23 +455,8 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstant(CmajorNothrowLexer&
         {
             int64_t pos = lexer.GetPos();
             soulng::lexer::Span span = lexer.GetSpan();
-            soulng::parser::Match match(true);
-            soulng::parser::Match* parentMatch2 = &match;
-            {
-                soulng::lexer::Span span = lexer.GetSpan();
-                soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
-                constantId.reset(static_cast<IdentifierNode*>(match.value));
-                if (match.hit)
-                {
-                    *parentMatch2 = match;
-                }
-                else
-                {
-                    match.hit = true;
-                    *parentMatch2 = match;
-                    lexer.AddError(span, U"identifier");
-                }
-            }
+            soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+            constantId.reset(static_cast<IdentifierNode*>(match.value));
             if (match.hit)
             {
                 s = span;
@@ -528,17 +468,17 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstant(CmajorNothrowLexer&
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch3 = &match;
+        soulng::parser::Match* parentMatch2 = &match;
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch4 = &match;
+            soulng::parser::Match* parentMatch3 = &match;
             {
                 soulng::parser::Match match(false);
-                soulng::parser::Match* parentMatch5 = &match;
+                soulng::parser::Match* parentMatch4 = &match;
                 {
                     int64_t save = lexer.GetPos();
                     soulng::parser::Match match(false);
-                    soulng::parser::Match* parentMatch6 = &match;
+                    soulng::parser::Match* parentMatch5 = &match;
                     {
                         soulng::parser::Match match(false);
                         if (*lexer == ASSIGN)
@@ -546,15 +486,15 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstant(CmajorNothrowLexer&
                             ++lexer;
                             match.hit = true;
                         }
-                        *parentMatch6 = match;
+                        *parentMatch5 = match;
                     }
                     if (match.hit)
                     {
                         soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch7 = &match;
+                        soulng::parser::Match* parentMatch6 = &match;
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch8 = &match;
+                            soulng::parser::Match* parentMatch7 = &match;
                             {
                                 int64_t pos = lexer.GetPos();
                                 soulng::parser::Match match = NothrowExpressionParser::Expression(lexer, moduleId, ctx);
@@ -576,21 +516,21 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstant(CmajorNothrowLexer&
                                         return soulng::parser::Match(true, value);
                                     }
                                 }
-                                *parentMatch8 = match;
+                                *parentMatch7 = match;
                             }
-                            *parentMatch7 = match;
+                            *parentMatch6 = match;
                         }
-                        *parentMatch6 = match;
+                        *parentMatch5 = match;
                     }
-                    *parentMatch5 = match;
+                    *parentMatch4 = match;
                     if (!match.hit)
                     {
                         soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch9 = &match;
+                        soulng::parser::Match* parentMatch8 = &match;
                         lexer.SetPos(save);
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch10 = &match;
+                            soulng::parser::Match* parentMatch9 = &match;
                             {
                                 int64_t pos = lexer.GetPos();
                                 soulng::parser::Match match(true);
@@ -605,16 +545,16 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstant(CmajorNothrowLexer&
                                         return soulng::parser::Match(true, node);
                                     }
                                 }
-                                *parentMatch10 = match;
+                                *parentMatch9 = match;
                             }
-                            *parentMatch9 = match;
+                            *parentMatch8 = match;
                         }
-                        *parentMatch5 = match;
+                        *parentMatch4 = match;
                     }
                 }
-                *parentMatch4 = match;
+                *parentMatch3 = match;
             }
-            *parentMatch3 = match;
+            *parentMatch2 = match;
         }
         *parentMatch0 = match;
     }

@@ -1,0 +1,358 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/nothrowparser/Specifier.parser' using soulcm parser generator scmpg version 3.10.0
+
+public static class NothrowSpecifierParser
+{
+    public static nothrow Match Specifiers(CmajorNothrowLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Specifiers");
+            }
+        #endif
+        Cm.Ast.Specifiers specifiers;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifier;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(true);
+                Match* parentMatch2 = &match;
+                {
+                    while (true)
+                    {
+                        long save = lexer.GetPos();
+                        {
+                            Match match(false);
+                            Match* parentMatch3 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch4 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowSpecifierParser.Specifier(lexer);
+                                    specifier.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        specifiers = cast<Cm.Ast.Specifiers>(specifiers | specifier->value);
+                                    }
+                                    *parentMatch4 = match;
+                                }
+                                *parentMatch3 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch2 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                                break;
+                            }
+                        }
+                    }
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifiers");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(specifiers));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifiers");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Specifiers");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match Specifier(CmajorNothrowLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Specifier");
+            }
+        #endif
+        Match match(false);
+        long pos = lexer.GetPos();
+        Span span = lexer.GetSpan();
+        switch (*lexer)
+        {
+            case PUBLIC: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.public_));
+                }
+                break;
+            }
+            case PROTECTED: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.protected_));
+                }
+                break;
+            }
+            case PRIVATE: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.private_));
+                }
+                break;
+            }
+            case INTERNAL: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.internal_));
+                }
+                break;
+            }
+            case STATIC: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.static_));
+                }
+                break;
+            }
+            case VIRTUAL: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.virtual_));
+                }
+                break;
+            }
+            case OVERRIDE: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.override_));
+                }
+                break;
+            }
+            case ABSTRACT: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.abstract_));
+                }
+                break;
+            }
+            case INLINE: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.inline_));
+                }
+                break;
+            }
+            case EXPLICIT: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.explicit_));
+                }
+                break;
+            }
+            case EXTERN: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.external_));
+                }
+                break;
+            }
+            case SUPPRESS: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.suppress_));
+                }
+                break;
+            }
+            case DEFAULT: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.default_));
+                }
+                break;
+            }
+            case CONSTEXPR: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.constexpr_));
+                }
+                break;
+            }
+            case CDECL: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.cdecl_));
+                }
+                break;
+            }
+            case NOTHROW: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.nothrow_));
+                }
+                break;
+            }
+            case THROW: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.throw_));
+                }
+                break;
+            }
+            case NEW: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.new_));
+                }
+                break;
+            }
+            case UNIT_TEST: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.unit_test_));
+                }
+                break;
+            }
+            case WINAPI: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Specifiers>(Cm.Ast.Specifiers.winapi_));
+                }
+                break;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Specifier");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Specifier");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

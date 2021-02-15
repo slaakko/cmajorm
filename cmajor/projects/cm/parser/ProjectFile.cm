@@ -7,11 +7,11 @@ using Cm.Ast;
 using Cm.Parser;
 using ContainerFileTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/ProjectFile.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/ProjectFile.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class ProjectFileParser
 {
-    public static UniquePtr<Project> Parse(ContainerFileLexer& lexer, string config, BackEnd backend)
+    public static UniquePtr<Project> Parse(ContainerFileLexer& lexer, string config, BackEnd backend, string toolChain)
     {
         UniquePtr<Project> value;
         #if (DEBUG)
@@ -23,7 +23,7 @@ public static class ProjectFileParser
         #endif
         ++lexer;
         System.Lex.Span span = lexer.GetSpan();
-        Match match = ProjectFile(lexer, config, backend);
+        Match match = ProjectFile(lexer, config, backend, toolChain);
         value.Reset(cast<Project*>(match.value));
         #if (DEBUG)
             if (lexer.Log() != null)
@@ -49,7 +49,7 @@ public static class ProjectFileParser
         }
         return value;
     }
-    public static Match ProjectFile(ContainerFileLexer& lexer, string config, BackEnd backend)
+    public static Match ProjectFile(ContainerFileLexer& lexer, string config, BackEnd backend, string toolChain)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -143,7 +143,7 @@ public static class ProjectFileParser
                                 }
                                 if (match.hit)
                                 {
-                                    project.Reset(new Project(name->value, lexer.FileName(), config, backend));
+                                    project.Reset(new Project(name->value, lexer.FileName(), config, backend, toolChain));
                                 }
                                 *parentMatch8 = match;
                             }

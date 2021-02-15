@@ -5,7 +5,7 @@ using System.Parsing;
 using Cm.Ast;
 using ParserFileTokens;
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scmpg/build/Template.parser' using soulcm parser generator scmpg version 3.8.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scmpg/build/Template.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class TemplateParser
 {
@@ -63,11 +63,11 @@ public static class TemplateParser
                                 {
                                     long pos = lexer.GetPos();
                                     Span span = lexer.GetSpan();
-                                    Match match = IdentifierParser.QualifiedId(lexer);
+                                    Match match = IdentifierParser.QualifiedId(lexer, ctx);
                                     primary.Reset(cast<IdentifierNode*>(match.value));
                                     if (match.hit)
                                     {
-                                        templateId.Reset(new TemplateIdNode(span, primary.Release()));
+                                        templateId.Reset(new TemplateIdNode(span, ctx->ModuleId(), primary.Release()));
                                     }
                                     *parentMatch7 = match;
                                 }
@@ -307,7 +307,7 @@ public static class TemplateParser
                 Match match(false);
                 Match* parentMatch2 = &match;
                 {
-                    Match match = IdentifierParser.Identifier(lexer);
+                    Match match = IdentifierParser.Identifier(lexer, ctx);
                     id.Reset(cast<IdentifierNode*>(match.value));
                     *parentMatch2 = match;
                 }
@@ -368,7 +368,7 @@ public static class TemplateParser
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TemplateParameter");
                     #endif
-                    return Match(true, new TemplateParameterNode(span, id.Release(), type.Release()));
+                    return Match(true, new TemplateParameterNode(span, ctx->ModuleId(), id.Release(), type.Release()));
                 }
             }
             *parentMatch0 = match;

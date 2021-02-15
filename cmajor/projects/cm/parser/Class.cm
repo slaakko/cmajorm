@@ -7,7 +7,7 @@ using Cm.Ast;
 using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/Class.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/Class.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class ClassParser
 {
@@ -85,7 +85,7 @@ public static class ClassParser
                                                     long save = lexer.GetPos();
                                                     Match* parentMatch12 = &match;
                                                     {
-                                                        Match match = AttributeParser.Attributes(lexer);
+                                                        Match match = AttributeParser.Attributes(lexer, ctx);
                                                         attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -164,12 +164,12 @@ public static class ClassParser
                                         {
                                             long pos = lexer.GetPos();
                                             Span span = lexer.GetSpan();
-                                            Match match = IdentifierParser.Identifier(lexer);
+                                            Match match = IdentifierParser.Identifier(lexer, ctx);
                                             id.Reset(cast<IdentifierNode*>(match.value));
                                             if (match.hit)
                                             {
                                                 s.end = span.end;
-                                                cls.Reset(new ClassNode(s, specifiers->value, id.Release(), attrs.Release()));
+                                                cls.Reset(new ClassNode(s, ctx->ModuleId(), specifiers->value, id.Release(), attrs.Release()));
                                                 cls->SetSpecifierSpan(specifierSpan);
                                                 cls->SetClassSpan(classSpan);
                                             }
@@ -630,7 +630,7 @@ public static class ClassParser
                     Match* parentMatch3 = &match;
                     {
                         long pos = lexer.GetPos();
-                        Match match = IdentifierParser.QualifiedId(lexer);
+                        Match match = IdentifierParser.QualifiedId(lexer, ctx);
                         qid.Reset(cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
@@ -1231,7 +1231,7 @@ public static class ClassParser
                                                     long save = lexer.GetPos();
                                                     Match* parentMatch12 = &match;
                                                     {
-                                                        Match match = AttributeParser.Attributes(lexer);
+                                                        Match match = AttributeParser.Attributes(lexer, ctx);
                                                         attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -1282,7 +1282,7 @@ public static class ClassParser
                                             {
                                                 long pos = lexer.GetPos();
                                                 Span span = lexer.GetSpan();
-                                                Match match = IdentifierParser.Identifier(lexer);
+                                                Match match = IdentifierParser.Identifier(lexer, ctx);
                                                 id.Reset(cast<IdentifierNode*>(match.value));
                                                 if (match.hit)
                                                 {
@@ -1337,7 +1337,7 @@ public static class ClassParser
                                             else if (!StaticConstructorSpecifiers(specifiers->value)) pass = false;
                                             else
                                             {
-                                                staticConstructor.Reset(new StaticConstructorNode(s, specifiers->value, attrs.Release()));
+                                                staticConstructor.Reset(new StaticConstructorNode(s, ctx->ModuleId(), specifiers->value, attrs.Release()));
                                                 staticConstructor->SetClassId(id.Release());
                                                 staticConstructor->SetSpecifierSpan(specifierSpan);
                                             }
@@ -1677,7 +1677,7 @@ public static class ClassParser
                                                 long save = lexer.GetPos();
                                                 Match* parentMatch11 = &match;
                                                 {
-                                                    Match match = AttributeParser.Attributes(lexer);
+                                                    Match match = AttributeParser.Attributes(lexer, ctx);
                                                     attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                     if (match.hit)
                                                     {
@@ -1729,7 +1729,7 @@ public static class ClassParser
                                             long pos = lexer.GetPos();
                                             Span span = lexer.GetSpan();
                                             bool pass = true;
-                                            Match match = IdentifierParser.Identifier(lexer);
+                                            Match match = IdentifierParser.Identifier(lexer, ctx);
                                             id.Reset(cast<IdentifierNode*>(match.value));
                                             if (match.hit)
                                             {
@@ -1738,7 +1738,7 @@ public static class ClassParser
                                                 if (className != classNode->Id()->Str()) pass = false;
                                                 else
                                                 {
-                                                    ctor.Reset(new ConstructorNode(s, specifiers->value, attrs.Release()));
+                                                    ctor.Reset(new ConstructorNode(s, ctx->ModuleId(), specifiers->value, attrs.Release()));
                                                     ctor->SetClassId(id.Release());
                                                     ctor->SetSpecifierSpan(specifierSpan);
                                                 }
@@ -2093,7 +2093,7 @@ public static class ClassParser
                                                     long save = lexer.GetPos();
                                                     Match* parentMatch12 = &match;
                                                     {
-                                                        Match match = AttributeParser.Attributes(lexer);
+                                                        Match match = AttributeParser.Attributes(lexer, ctx);
                                                         attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -2161,7 +2161,7 @@ public static class ClassParser
                                         {
                                             long pos = lexer.GetPos();
                                             Span span = lexer.GetSpan();
-                                            Match match = IdentifierParser.Identifier(lexer);
+                                            Match match = IdentifierParser.Identifier(lexer, ctx);
                                             id.Reset(cast<IdentifierNode*>(match.value));
                                             if (match.hit)
                                             {
@@ -2241,7 +2241,7 @@ public static class ClassParser
                                         if (className != classNode->Id()->Str()) pass = false;
                                         else
                                         {
-                                            dtor.Reset(new DestructorNode(s, specifiers->value, attrs.Release()));
+                                            dtor.Reset(new DestructorNode(s, ctx->ModuleId(), specifiers->value, attrs.Release()));
                                             dtor->SetClassId(id.Release());
                                             dtor->SetSpecifierSpan(specifierSpan);
                                         }
@@ -2429,7 +2429,7 @@ public static class ClassParser
                                         }
                                         if (match.hit)
                                         {
-                                            initializer.Reset(new ThisInitializerNode(span));
+                                            initializer.Reset(new ThisInitializerNode(span, ctx->ModuleId()));
                                         }
                                         *parentMatch7 = match;
                                     }
@@ -2547,7 +2547,7 @@ public static class ClassParser
                                                 }
                                                 if (match.hit)
                                                 {
-                                                    initializer.Reset(new BaseInitializerNode(span));
+                                                    initializer.Reset(new BaseInitializerNode(span, ctx->ModuleId()));
                                                 }
                                                 *parentMatch18 = match;
                                             }
@@ -2662,11 +2662,11 @@ public static class ClassParser
                                         {
                                             long pos = lexer.GetPos();
                                             Span span = lexer.GetSpan();
-                                            Match match = IdentifierParser.Identifier(lexer);
+                                            Match match = IdentifierParser.Identifier(lexer, ctx);
                                             id.Reset(cast<IdentifierNode*>(match.value));
                                             if (match.hit)
                                             {
-                                                initializer.Reset(new MemberInitializerNode(span, id.Release()));
+                                                initializer.Reset(new MemberInitializerNode(span, ctx->ModuleId(), id.Release()));
                                             }
                                             *parentMatch29 = match;
                                         }
@@ -2867,7 +2867,7 @@ public static class ClassParser
                                                     long save = lexer.GetPos();
                                                     Match* parentMatch12 = &match;
                                                     {
-                                                        Match match = AttributeParser.Attributes(lexer);
+                                                        Match match = AttributeParser.Attributes(lexer, ctx);
                                                         attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                         if (match.hit)
                                                         {
@@ -2937,7 +2937,7 @@ public static class ClassParser
                                             {
                                                 s.end = span.end;
                                                 groupIdSpan = span;
-                                                memFun.Reset(new MemberFunctionNode(s, specifiers->value, returnType.Release(), groupId->value, attrs.Release()));
+                                                memFun.Reset(new MemberFunctionNode(s, ctx->ModuleId(), specifiers->value, returnType.Release(), groupId->value, attrs.Release()));
                                                 memFun->SetSpecifierSpan(specifierSpan);
                                                 memFun->SetGroupIdSpan(groupIdSpan);
                                             }
@@ -3203,7 +3203,7 @@ public static class ClassParser
                                                         long save = lexer.GetPos();
                                                         Match* parentMatch13 = &match;
                                                         {
-                                                            Match match = AttributeParser.Attributes(lexer);
+                                                            Match match = AttributeParser.Attributes(lexer, ctx);
                                                             attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                             if (match.hit)
                                                             {
@@ -3336,7 +3336,7 @@ public static class ClassParser
                                         if (match.hit)
                                         {
                                             s.end = span.end;
-                                            conversionFun.Reset(new ConversionFunctionNode(s, specifiers->value, type.Release(), attrs.Release()));
+                                            conversionFun.Reset(new ConversionFunctionNode(s, ctx->ModuleId(), specifiers->value, type.Release(), attrs.Release()));
                                             conversionFun->SetSpecifierSpan(specifierSpan);
                                         }
                                         *parentMatch21 = match;
@@ -3568,7 +3568,7 @@ public static class ClassParser
                                 long save = lexer.GetPos();
                                 Match* parentMatch7 = &match;
                                 {
-                                    Match match = AttributeParser.Attributes(lexer);
+                                    Match match = AttributeParser.Attributes(lexer, ctx);
                                     attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -3627,7 +3627,7 @@ public static class ClassParser
                 Match match(false);
                 Match* parentMatch11 = &match;
                 {
-                    Match match = IdentifierParser.Identifier(lexer);
+                    Match match = IdentifierParser.Identifier(lexer, ctx);
                     id.Reset(cast<IdentifierNode*>(match.value));
                     *parentMatch11 = match;
                 }
@@ -3654,7 +3654,7 @@ public static class ClassParser
                     if (match.hit)
                     {
                         s.end = span.end;
-                        MemberVariableNode* value = new MemberVariableNode(s, specifiers->value, type.Release(), id.Release(), attrs.Release());
+                        MemberVariableNode* value = new MemberVariableNode(s, ctx->ModuleId(), specifiers->value, type.Release(), id.Release(), attrs.Release());
                         value->SetSpecifierSpan(specifierSpan);
                         {
                             #if (DEBUG)

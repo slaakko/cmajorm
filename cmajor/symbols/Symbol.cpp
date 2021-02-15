@@ -112,6 +112,30 @@ std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess)
         }
         s.append("nothrow");
     }
+    if ((symbolFlags & SymbolFlags::project) != SymbolFlags::none)
+    {
+        if (!s.empty())
+        {
+            s.append(1, ' ');
+        }
+        s.append("project");
+    }
+    if ((symbolFlags & SymbolFlags::bound) != SymbolFlags::none)
+    {
+        if (!s.empty())
+        {
+            s.append(1, ' ');
+        }
+        s.append("bound");
+    }
+    if ((symbolFlags & SymbolFlags::installed) != SymbolFlags::none)
+    {
+        if (!s.empty())
+        {
+            s.append(1, ' ');
+        }
+        s.append("installed");
+    }
     return s;
 }
 
@@ -162,8 +186,7 @@ SymbolLocation MakeSymbolLocation(const Span& span, Module* module)
 }
 
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
-    symbolType(symbolType_), span(span_), sourceModuleId(sourceModuleId_), name(name_), flags(SymbolFlags::project), parent(nullptr), module(nullptr), compileUnit(nullptr), 
-    symbolIndex(-1), installed(false)
+    symbolType(symbolType_), span(span_), sourceModuleId(sourceModuleId_), name(name_), flags(SymbolFlags::project), parent(nullptr), module(nullptr), compileUnit(nullptr), symbolIndex(-1)
 {
 }
 
@@ -173,14 +196,14 @@ Symbol::~Symbol()
 
 void Symbol::Write(SymbolWriter& writer)
 {
-    SymbolFlags f = flags & ~(SymbolFlags::project);
+    SymbolFlags f = flags & ~(SymbolFlags::project | SymbolFlags::installed);
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(f));
     writer.GetBinaryWriter().Write(mangledName);
     bool hasAttributes = attributes != nullptr;
     writer.GetBinaryWriter().Write(hasAttributes);
     if (hasAttributes)
     {
-        attributes->Write(writer.GetAstWriter());
+        writer.GetAstWriter().Write(attributes.get());
     }
 }
 
@@ -195,8 +218,7 @@ void Symbol::Read(SymbolReader& reader)
     bool hasAttributes = reader.GetBinaryReader().ReadBool();
     if (hasAttributes)
     {
-        attributes.reset(new Attributes());
-        attributes->Read(reader.GetAstReader());
+        attributes.reset(reader.GetAstReader().ReadAttributesNode());
     }
 }
 
@@ -245,24 +267,9 @@ std::u32string Symbol::FullName() const
     return fullName;
 }
 
-std::u32string Symbol::FullNameNoThrow() const
-{
-    std::u32string fullName;
-    if (parent)
-    {
-        fullName.append(parent->FullNameNoThrow());
-    }
-    if (!fullName.empty())
-    {
-        fullName.append(1, '.');
-    }
-    fullName.append(Name());
-    return fullName;
-}
-
 std::u32string Symbol::FullNameWithSpecifiers() const
 {
-    std::u32string fullNameWithSpecifiers = ToUtf32(SymbolFlagStr(flags));
+    std::u32string fullNameWithSpecifiers = ToUtf32(SymbolFlagStr(GetStableSymbolFlags()));
     if (!fullNameWithSpecifiers.empty())
     {
         fullNameWithSpecifiers.append(1, U' ');
@@ -316,7 +323,8 @@ void Symbol::CopyFrom(const Symbol* that)
     compileUnit = that->compileUnit;
     if (that->attributes)
     {
-        attributes.reset(static_cast<Attributes*>(that->attributes->Clone()));
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(that->attributes->Clone(cloneContext)));
     }
 }
 
@@ -1024,7 +1032,7 @@ ContainerScope* Symbol::ClassInterfaceEnumDelegateOrNsScope()
     }
 }
 
-void Symbol::SetAttributes(std::unique_ptr<Attributes>&& attributes_)
+void Symbol::SetAttributes(std::unique_ptr<AttributesNode>&& attributes_)
 {
     attributes = std::move(attributes_);
 }

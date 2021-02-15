@@ -26,28 +26,28 @@ parser ParserFileParser
         ;
 
     Declaration(soulcm.scm2html.ParserFile* parserFile, ParsingContext* parsingContext)
-        ::= UsingDirective:usingDirective{ parserFile->AddUsingDirective(usingDirective); }
+        ::= UsingDirective(parsingContext):usingDirective{ parserFile->AddUsingDirective(usingDirective); }
         |   ParserDeclaration(parsingContext):parserDeclaration{ parserFile->AddParser(parserDeclaration); }
         ;
 
-    UsingDirective : Node*
-        ::= UsingAliasDirective:usingAlias{ return usingAlias; }
-        |   UsingNamespaceDirective:usingNs{ return usingNs; }
+    UsingDirective(ParsingContext* parsingContext) : Node*
+        ::= UsingAliasDirective(parsingContext):usingAlias{ return usingAlias; }
+        |   UsingNamespaceDirective(parsingContext):usingNs{ return usingNs; }
         ;
 
-    UsingAliasDirective(var Span s) : Node*
-        ::= USING{ s = span; } Identifier:id ASSIGN QualifiedId:qid! SEMICOLON!
+    UsingAliasDirective(ParsingContext* parsingContext, var Span s) : Node*
+        ::= USING{ s = span; } Identifier(parsingContext):id ASSIGN QualifiedId(parsingContext):qid! SEMICOLON!
         {
             s.end = span.end;
-            return new AliasNode(s, id, qid);
+            return new AliasNode(s, parsingContext->ModuleId(), id, qid);
         }
         ;
 
-    UsingNamespaceDirective(var Span s) : Node*
-        ::= USING{ s = span; } QualifiedId:ns! SEMICOLON!
+    UsingNamespaceDirective(ParsingContext* parsingContext, var Span s) : Node*
+        ::= USING{ s = span; } QualifiedId(parsingContext):ns! SEMICOLON!
         {
             s.end = span.end;
-            return new NamespaceImportNode(s, ns);
+            return new NamespaceImportNode(s, parsingContext->ModuleId(), ns);
         }
         ;
 
@@ -108,8 +108,8 @@ parser ParserFileParser
         ;
 
     ParamOrVariable(ParsingContext* parsingContext) : soulcm.scm2html.Parameter*
-        ::= VAR TypeExpr(parsingContext):varType Identifier:varName{ return new soulcm.scm2html.Variable(varType, varName); }
-        |   TypeExpr(parsingContext):paramType Identifier:paramName{ return new soulcm.scm2html.Parameter(paramType, paramName); }
+        ::= VAR TypeExpr(parsingContext):varType Identifier(parsingContext):varName{ return new soulcm.scm2html.Variable(varType, varName); }
+        |   TypeExpr(parsingContext):paramType Identifier(parsingContext):paramName{ return new soulcm.scm2html.Parameter(paramType, paramName); }
         ;
 
     ReturnType(ParsingContext* parsingContext) : Node*
@@ -154,7 +154,7 @@ parser ParserFileParser
             (   STAR{ value.Reset(new soulcm.scm2html.KleeneParser(value.Release())); }
             |   PLUS{ value.Reset(new soulcm.scm2html.PositiveParser(value.Release())); }
             |   QUEST{ value.Reset(new soulcm.scm2html.OptionalParser(value.Release())); }
-            )?    
+            )?
         )
         {
             return value.Release();
@@ -171,7 +171,7 @@ parser ParserFileParser
             (
                 EXCLAMATION{ value.Reset(new soulcm.scm2html.ExpectationParser(value.Release())); }
             )?
-            (   
+            (
                 (
                     (CompoundStatement(parsingContext):successCode
                     (DIV CompoundStatement(parsingContext):failureCode)?){ value.Reset(new soulcm.scm2html.ActionParser(value.Release())); }
@@ -184,7 +184,7 @@ parser ParserFileParser
         ;
 
     RuleCall(ParsingContext* parsingContext, var ustring ruleName, var UniquePtr<InvokeNode> invoke, var long nonterminalPos) : soulcm.scm2html.Parser*
-        ::= Nonterminal:nt{ ruleName = nt; nonterminalPos = pos; invoke.Reset(new InvokeNode(Span())); } 
+        ::= Nonterminal:nt{ ruleName = nt; nonterminalPos = pos; invoke.Reset(new InvokeNode(Span(), parsingContext->ModuleId())); }
             (LPAREN{ pass = NoWhiteSpaceBetweenTokens(lexer.GetToken(nonterminalPos), lexer.GetToken(pos)); }
             ExpressionList(parsingContext, invoke.Get()):args RPAREN)? COLON ID!
         {

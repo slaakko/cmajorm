@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2020 Seppo Laakko
+// Copyright (c) 2021 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -9,7 +9,7 @@ using LexerFileTokens;
 parser TypeExprParser
 {
     uselexer LexerFileLexer;
-    
+
     using BasicTypeParser.BasicType;
     using ExpressionParser.Expression;
     using TemplateParser.TemplateId;
@@ -19,18 +19,18 @@ parser TypeExprParser
         ;
 
     PrefixTypeExpr(ParsingContext* ctx, var Span s) : Node*
-        ::= CONST{ s = span; } PostfixTypeExpr(ctx):constTypeExpr{ s.end = span.end; return new ConstNode(s, constTypeExpr); }
+        ::= CONST{ s = span; } PostfixTypeExpr(ctx):constTypeExpr{ s.end = span.end; return new ConstNode(s, ctx->ModuleId(), constTypeExpr); }
         |   PostfixTypeExpr(ctx):postfixTypeExpr{ return postfixTypeExpr; }
         ;
 
     PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<Node> typeExpr, var Span s) : Node*
         ::=
         (   PrimaryTypeExpr(ctx):primaryTypeExpr{ s = span; typeExpr.Reset(primaryTypeExpr); }
-            (   DOT ID!{ s.end = span.end; typeExpr.Reset(new DotNode(s, typeExpr.Release(), new IdentifierNode(span, lexer.GetToken(pos)))); }
-            |   STAR{ s.end = span.end; typeExpr.Reset(new PointerNode(s, typeExpr.Release())); }
-            |   AMPAMP{ s.end = span.end; typeExpr.Reset(new RValueRefNode(s, typeExpr.Release())); }
-            |   AMP{ s.end = span.end; typeExpr.Reset(new LValueRefNode(s, typeExpr.Release())); }
-            |   LBRACKET Expression(ctx):size? RBRACKET!{ s.end = span.end; typeExpr.Reset(new ArrayNode(s, typeExpr.Release(), size)); }
+            (   DOT ID!{ s.end = span.end; typeExpr.Reset(new DotNode(s, ctx->ModuleId(), typeExpr.Release(), new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos)))); }
+            |   STAR{ s.end = span.end; typeExpr.Reset(new PointerNode(s, ctx->ModuleId(), typeExpr.Release())); }
+            |   AMPAMP{ s.end = span.end; typeExpr.Reset(new RValueRefNode(s, ctx->ModuleId(), typeExpr.Release())); }
+            |   AMP{ s.end = span.end; typeExpr.Reset(new LValueRefNode(s, ctx->ModuleId(), typeExpr.Release())); }
+            |   LBRACKET Expression(ctx):size? RBRACKET!{ s.end = span.end; typeExpr.Reset(new ArrayNode(s, ctx->ModuleId(), typeExpr.Release(), size)); }
             )*
         )
         {
@@ -39,9 +39,9 @@ parser TypeExprParser
         ;
 
     PrimaryTypeExpr(ParsingContext* ctx) : Node*
-        ::= BasicType:basicType{ return basicType; }
+        ::= BasicType(ctx):basicType{ return basicType; }
         |   TemplateId(ctx):templateId{ return templateId; }
-        |   ID{ return new IdentifierNode(span, lexer.GetToken(pos)); }
+        |   ID{ return new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos)); }
         ;
 
     ruleinfo

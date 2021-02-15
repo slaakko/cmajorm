@@ -9,8 +9,8 @@ namespace Cm.Ast
 {
     public abstract class ConstraintNode : Node
     {
-        public nothrow ConstraintNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_)
+        public nothrow ConstraintNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_)
         {
         }
         public override nothrow bool NodeIsConstraintNode() const
@@ -24,12 +24,12 @@ namespace Cm.Ast
     }
     public class ParenthesizedConstraintNode : ConstraintNode
     {
-        public nothrow ParenthesizedConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.parenthesizedConstraintNode, span_)
+        public nothrow ParenthesizedConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.parenthesizedConstraintNode, span_, moduleId_)
         {
         }
-        public nothrow ParenthesizedConstraintNode(const System.Lex.Span& span_, ConstraintNode* constraint_) :
-            base(NodeType.parenthesizedConstraintNode, span_), constraint(constraint_)
+        public nothrow ParenthesizedConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConstraintNode* constraint_) :
+            base(NodeType.parenthesizedConstraintNode, span_, moduleId_), constraint(constraint_)
         {
         }
         public nothrow const ConstraintNode* Constraint() const
@@ -42,7 +42,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ParenthesizedConstraintNode(GetSpan(), cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+            return new ParenthesizedConstraintNode(GetSpan(), ModuleId(), cast<ConstraintNode*>(constraint->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -66,12 +66,12 @@ namespace Cm.Ast
     }
     public abstract class BinaryConstraintNode : ConstraintNode
     {
-        public nothrow BinaryConstraintNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_), left(), right()
+        public nothrow BinaryConstraintNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_), left(), right()
         {
         }
-        public nothrow BinaryConstraintNode(NodeType nodeType_, const System.Lex.Span& span_, ConstraintNode* left_, ConstraintNode* right_) :
-            base(nodeType_, span_), left(left_), right(right_)
+        public nothrow BinaryConstraintNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_, ConstraintNode* left_, ConstraintNode* right_) :
+            base(nodeType_, span_, moduleId_), left(left_), right(right_)
         {
             left->SetParent(this);
             right->SetParent(this);
@@ -111,17 +111,17 @@ namespace Cm.Ast
     }
     public class DisjunctiveConstraintNode : BinaryConstraintNode
     {
-        public nothrow DisjunctiveConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.disjunctiveConstraintNode, span_)
+        public nothrow DisjunctiveConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.disjunctiveConstraintNode, span_, moduleId_)
         {
         }
-        public nothrow DisjunctiveConstraintNode(const System.Lex.Span& span_, ConstraintNode* left_, ConstraintNode* right_) :
-            base(NodeType.disjunctiveConstraintNode, span_, left_, right_)
+        public nothrow DisjunctiveConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConstraintNode* left_, ConstraintNode* right_) :
+            base(NodeType.disjunctiveConstraintNode, span_, moduleId_, left_, right_)
         {
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new DisjunctiveConstraintNode(GetSpan(), cast<ConstraintNode*>(Left()->Clone(cloneContext)), cast<ConstraintNode*>(Right()->Clone(cloneContext)));
+            return new DisjunctiveConstraintNode(GetSpan(), ModuleId(), cast<ConstraintNode*>(Left()->Clone(cloneContext)), cast<ConstraintNode*>(Right()->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -134,17 +134,17 @@ namespace Cm.Ast
     }
     public class ConjunctiveConstraintNode : BinaryConstraintNode
     {
-        public nothrow ConjunctiveConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.conjunctiveConstraintNode, span_)
+        public nothrow ConjunctiveConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conjunctiveConstraintNode, span_, moduleId_)
         {
         }
-        public nothrow ConjunctiveConstraintNode(const System.Lex.Span& span_, ConstraintNode* left_, ConstraintNode* right_) :
-            base(NodeType.conjunctiveConstraintNode, span_, left_, right_)
+        public nothrow ConjunctiveConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConstraintNode* left_, ConstraintNode* right_) :
+            base(NodeType.conjunctiveConstraintNode, span_, moduleId_, left_, right_)
         {
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ConjunctiveConstraintNode(GetSpan(), cast<ConstraintNode*>(Left()->Clone(cloneContext)), cast<ConstraintNode*>(Right()->Clone(cloneContext)));
+            return new ConjunctiveConstraintNode(GetSpan(), ModuleId(), cast<ConstraintNode*>(Left()->Clone(cloneContext)), cast<ConstraintNode*>(Right()->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -157,12 +157,12 @@ namespace Cm.Ast
     }
     public class WhereConstraintNode : ConstraintNode
     {
-        public nothrow WhereConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.whereConstraintNode, span_), constraint(), headerConstraint(false), semicolon(false)
+        public nothrow WhereConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.whereConstraintNode, span_, moduleId_), constraint(), headerConstraint(false), semicolon(false)
         {
         }
-        public nothrow WhereConstraintNode(const System.Lex.Span& span_, ConstraintNode* constraint_) :
-            base(NodeType.whereConstraintNode, span_), constraint(constraint_), headerConstraint(false), semicolon(false)
+        public nothrow WhereConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, ConstraintNode* constraint_) :
+            base(NodeType.whereConstraintNode, span_, moduleId_), constraint(constraint_), headerConstraint(false), semicolon(false)
         {
             constraint->SetParent(this);
         }
@@ -192,7 +192,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            WhereConstraintNode* clone = new WhereConstraintNode(GetSpan(), cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+            WhereConstraintNode* clone = new WhereConstraintNode(GetSpan(), ModuleId(), cast<ConstraintNode*>(constraint->Clone(cloneContext)));
             if (headerConstraint)
             {
                 clone->SetHeaderConstraint();
@@ -232,12 +232,12 @@ namespace Cm.Ast
     }
     public class PredicateConstraintNode : ConstraintNode
     {
-        public nothrow PredicateConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.predicateConstraintNode, span_), invokeExpr()
+        public nothrow PredicateConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.predicateConstraintNode, span_, moduleId_), invokeExpr()
         {
         }
-        public nothrow PredicateConstraintNode(const System.Lex.Span& span_, Node* invokeExpr_) :
-            base(NodeType.predicateConstraintNode, span_), invokeExpr(invokeExpr_)
+        public nothrow PredicateConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* invokeExpr_) :
+            base(NodeType.predicateConstraintNode, span_, moduleId_), invokeExpr(invokeExpr_)
         {
             invokeExpr->SetParent(this);
         }
@@ -251,7 +251,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new PredicateConstraintNode(GetSpan(), invokeExpr->Clone(cloneContext));
+            return new PredicateConstraintNode(GetSpan(), ModuleId(), invokeExpr->Clone(cloneContext));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -276,12 +276,12 @@ namespace Cm.Ast
     }
     public class IsConstraintNode : ConstraintNode
     {
-        public nothrow IsConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.isConstraintNode, span_), typeExpr(), conceptOrTypeName()
+        public nothrow IsConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.isConstraintNode, span_, moduleId_), typeExpr(), conceptOrTypeName()
         {
         }
-        public nothrow IsConstraintNode(const System.Lex.Span& span_, Node* typeExpr_, Node* conceptOrTypeName_) :
-            base(NodeType.isConstraintNode, span_), typeExpr(typeExpr_), conceptOrTypeName(conceptOrTypeName_)
+        public nothrow IsConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* typeExpr_, Node* conceptOrTypeName_) :
+            base(NodeType.isConstraintNode, span_, moduleId_), typeExpr(typeExpr_), conceptOrTypeName(conceptOrTypeName_)
         {
             typeExpr->SetParent(this);
             conceptOrTypeName->SetParent(this);
@@ -304,7 +304,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new IsConstraintNode(GetSpan(), typeExpr->Clone(cloneContext), conceptOrTypeName->Clone(cloneContext));
+            return new IsConstraintNode(GetSpan(), ModuleId(), typeExpr->Clone(cloneContext), conceptOrTypeName->Clone(cloneContext));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -333,12 +333,12 @@ namespace Cm.Ast
     }
     public class MultiParamConstraintNode : ConstraintNode
     {
-        public nothrow MultiParamConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.multiParamConstraintNode, span_), conceptId(), typeExprs()
+        public nothrow MultiParamConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.multiParamConstraintNode, span_, moduleId_), conceptId(), typeExprs()
         {
         }
-        public nothrow MultiParamConstraintNode(const System.Lex.Span& span_, IdentifierNode* conceptId_) :
-            base(NodeType.multiParamConstraintNode, span_), conceptId(conceptId_), typeExprs()
+        public nothrow MultiParamConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* conceptId_) :
+            base(NodeType.multiParamConstraintNode, span_, moduleId_), conceptId(conceptId_), typeExprs()
         {
             conceptId->SetParent(this);
         }
@@ -361,7 +361,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            MultiParamConstraintNode* clone = new MultiParamConstraintNode(GetSpan(), cast<IdentifierNode*>(conceptId->Clone(cloneContext)));
+            MultiParamConstraintNode* clone = new MultiParamConstraintNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(conceptId->Clone(cloneContext)));
             int n = typeExprs.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -408,12 +408,12 @@ namespace Cm.Ast
     }
     public class TypeNameConstraintNode : ConstraintNode
     {
-        public nothrow TypeNameConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.typeNameConstraintNode, span_), typeId()
+        public nothrow TypeNameConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.typeNameConstraintNode, span_, moduleId_), typeId()
         {
         }
-        public nothrow TypeNameConstraintNode(const System.Lex.Span& span_, Node* typeId_) :
-            base(NodeType.typeNameConstraintNode, span_), typeId(typeId_)
+        public nothrow TypeNameConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* typeId_) :
+            base(NodeType.typeNameConstraintNode, span_, moduleId_), typeId(typeId_)
         {
             typeId->SetParent(this);
         }
@@ -427,7 +427,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new TypeNameConstraintNode(GetSpan(), typeId->Clone(cloneContext));
+            return new TypeNameConstraintNode(GetSpan(), ModuleId(), typeId->Clone(cloneContext));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -451,19 +451,19 @@ namespace Cm.Ast
     }
     public abstract class SignatureConstraintNode : ConstraintNode
     {
-        public nothrow SignatureConstraintNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_)
+        public nothrow SignatureConstraintNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_)
         {
         }
     }
     public class ConstructorConstraintNode : SignatureConstraintNode
     {
-        public nothrow ConstructorConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.constructorConstraintNode, span_), typeParamId(), parameters()
+        public nothrow ConstructorConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.constructorConstraintNode, span_, moduleId_), typeParamId(), parameters()
         {
         }
-        public nothrow ConstructorConstraintNode(const System.Lex.Span& span_, IdentifierNode* typeParamId_) :
-            base(NodeType.constructorConstraintNode, span_), typeParamId(typeParamId_), parameters()
+        public nothrow ConstructorConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* typeParamId_) :
+            base(NodeType.constructorConstraintNode, span_, moduleId_), typeParamId(typeParamId_), parameters()
         {
             typeParamId->SetParent(this);
         }
@@ -481,7 +481,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ConstructorConstraintNode* clone = new ConstructorConstraintNode(GetSpan(), cast<IdentifierNode*>(typeParamId->Clone(cloneContext)));
+            ConstructorConstraintNode* clone = new ConstructorConstraintNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(typeParamId->Clone(cloneContext)));
             int n = parameters.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -534,12 +534,12 @@ namespace Cm.Ast
     }
     public class DestructorConstraintNode : SignatureConstraintNode
     {
-        public nothrow DestructorConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.destructorConstraintNode, span_), typeParamId()
+        public nothrow DestructorConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.destructorConstraintNode, span_, moduleId_), typeParamId()
         {
         }
-        public nothrow DestructorConstraintNode(const System.Lex.Span& span_, IdentifierNode* typeParamId_) :
-            base(NodeType.destructorConstraintNode, span_), typeParamId(typeParamId_)
+        public nothrow DestructorConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* typeParamId_) :
+            base(NodeType.destructorConstraintNode, span_, moduleId_), typeParamId(typeParamId_)
         {
             typeParamId->SetParent(this);
         }
@@ -549,7 +549,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new DestructorConstraintNode(GetSpan(), cast<IdentifierNode*>(typeParamId->Clone(cloneContext)));
+            return new DestructorConstraintNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(typeParamId->Clone(cloneContext)));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -576,12 +576,12 @@ namespace Cm.Ast
     }
     public class MemberFunctionConstraintNode : SignatureConstraintNode
     {
-        public nothrow MemberFunctionConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.memberFunctionConstraintNode, span_), returnTypeExpr(), typeParamId(), groupId(), parameters()
+        public nothrow MemberFunctionConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.memberFunctionConstraintNode, span_, moduleId_), returnTypeExpr(), typeParamId(), groupId(), parameters()
         {
         }
-        public nothrow MemberFunctionConstraintNode(const System.Lex.Span& span_, Node* returnTypeExpr_, IdentifierNode* typeParamId_, const ustring& groupId_) :
-            base(NodeType.memberFunctionConstraintNode, span_), returnTypeExpr(returnTypeExpr_), typeParamId(typeParamId_), groupId(groupId_), parameters()
+        public nothrow MemberFunctionConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* returnTypeExpr_, IdentifierNode* typeParamId_, const ustring& groupId_) :
+            base(NodeType.memberFunctionConstraintNode, span_, moduleId_), returnTypeExpr(returnTypeExpr_), typeParamId(typeParamId_), groupId(groupId_), parameters()
         {
             returnTypeExpr->SetParent(this);
             typeParamId->SetParent(this);
@@ -612,7 +612,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            MemberFunctionConstraintNode* clone = new MemberFunctionConstraintNode(GetSpan(), returnTypeExpr->Clone(cloneContext), cast<IdentifierNode*>(typeParamId->Clone(cloneContext)), groupId);
+            MemberFunctionConstraintNode* clone = new MemberFunctionConstraintNode(GetSpan(), ModuleId(), returnTypeExpr->Clone(cloneContext), cast<IdentifierNode*>(typeParamId->Clone(cloneContext)), groupId);
             int n = parameters.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -678,12 +678,12 @@ namespace Cm.Ast
     }
     public class FunctionConstraintNode : SignatureConstraintNode
     {
-        public nothrow FunctionConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.functionConstraintNode, span_), returnTypeExpr(), groupId(), parameters()
+        public nothrow FunctionConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.functionConstraintNode, span_, moduleId_), returnTypeExpr(), groupId(), parameters()
         {
         }
-        public nothrow FunctionConstraintNode(const System.Lex.Span& span_, Node* returnTypeExpr_, const ustring& groupId_) :
-            base(NodeType.functionConstraintNode, span_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), parameters()
+        public nothrow FunctionConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* returnTypeExpr_, const ustring& groupId_) :
+            base(NodeType.functionConstraintNode, span_, moduleId_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), parameters()
         {
             returnTypeExpr->SetParent(this);
         }
@@ -705,7 +705,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            FunctionConstraintNode* clone = new FunctionConstraintNode(GetSpan(), returnTypeExpr->Clone(cloneContext), groupId);
+            FunctionConstraintNode* clone = new FunctionConstraintNode(GetSpan(), ModuleId(), returnTypeExpr->Clone(cloneContext), groupId);
             int n = parameters.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -766,12 +766,12 @@ namespace Cm.Ast
     }
     public class AxiomStatementNode : Node
     {
-        public nothrow AxiomStatementNode(const System.Lex.Span& span_) :
-            base(NodeType.axiomStatementNode, span_), expression(), text()
+        public nothrow AxiomStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.axiomStatementNode, span_, moduleId_), expression(), text()
         {
         }
-        public nothrow AxiomStatementNode(const System.Lex.Span& span_, Node* expression_, const ustring& text_) :
-            base(NodeType.axiomStatementNode, span_), expression(expression_), text(text_)
+        public nothrow AxiomStatementNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* expression_, const ustring& text_) :
+            base(NodeType.axiomStatementNode, span_, moduleId_), expression(expression_), text(text_)
         {
             expression->SetParent(this);
         }
@@ -789,7 +789,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new AxiomStatementNode(GetSpan(), expression->Clone(cloneContext), text);
+            return new AxiomStatementNode(GetSpan(), ModuleId(), expression->Clone(cloneContext), text);
         }
         public override void Accept(Visitor& visitor)
         {
@@ -817,12 +817,12 @@ namespace Cm.Ast
     }
     public class AxiomNode : Node
     {
-        public nothrow AxiomNode(const System.Lex.Span& span_) :
-            base(NodeType.axiomNode, span_), id(), parameters(), statements()
+        public nothrow AxiomNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.axiomNode, span_, moduleId_), id(), parameters(), statements()
         {
         }
-        public nothrow AxiomNode(const System.Lex.Span& span_, IdentifierNode* id_) :
-            base(NodeType.axiomNode, span_), id(id_), parameters(), statements()
+        public nothrow AxiomNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* id_) :
+            base(NodeType.axiomNode, span_, moduleId_), id(id_), parameters(), statements()
         {
             id->SetParent(this);
         }
@@ -865,7 +865,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            AxiomNode* clone = new AxiomNode(GetSpan(), cast<IdentifierNode*>(id->Clone(cloneContext)));
+            AxiomNode* clone = new AxiomNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(id->Clone(cloneContext)));
             int np = parameters.Count();
             for (int i = 0; i < np; ++i)
             {
@@ -890,8 +890,9 @@ namespace Cm.Ast
             writer.Write(id.Get());
             parameters.Write(writer);
             statements.Write(writer);
-            writer.Write(beginBraceSpan);
-            writer.Write(endBraceSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(beginBraceSpan, convertExternal);
+            writer.Write(endBraceSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -918,12 +919,12 @@ namespace Cm.Ast
     }
     public class ConceptIdNode : Node
     {
-        public nothrow ConceptIdNode(const System.Lex.Span& span_) :
-            base(NodeType.conceptIdNode, span_), id(), typeParameters()
+        public nothrow ConceptIdNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conceptIdNode, span_, moduleId_), id(), typeParameters()
         {
         }
-        public nothrow ConceptIdNode(const System.Lex.Span& span_, IdentifierNode* id_) :
-            base(NodeType.conceptIdNode, span_), id(id_), typeParameters()
+        public nothrow ConceptIdNode(const System.Lex.Span& span_, const Uuid& moduleId_, IdentifierNode* id_) :
+            base(NodeType.conceptIdNode, span_, moduleId_), id(id_), typeParameters()
         {
             id->SetParent(this);
         }
@@ -950,7 +951,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ConceptIdNode* clone = new ConceptIdNode(GetSpan(), cast<IdentifierNode*>(id->Clone(cloneContext)));
+            ConceptIdNode* clone = new ConceptIdNode(GetSpan(), ModuleId(), cast<IdentifierNode*>(id->Clone(cloneContext)));
             int n = typeParameters.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -997,21 +998,21 @@ namespace Cm.Ast
     }
     public class ConceptNode : Node
     {
-        public nothrow ConceptNode(const System.Lex.Span& span_) :
-            base(NodeType.conceptNode, span_), specifiers(Specifiers.none), id(), typeParameters(), refinement(), constraints(), axioms()
+        public nothrow ConceptNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.conceptNode, span_, moduleId_), specifiers(Specifiers.none), id(), typeParameters(), refinement(), constraints(), axioms()
         {
         }
-        public nothrow ConceptNode(NodeType nodeType_, const System.Lex.Span& span_) :
-            base(nodeType_, span_), specifiers(Specifiers.none), id(), typeParameters(), refinement(), constraints(), axioms()
+        public nothrow ConceptNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(nodeType_, span_, moduleId_), specifiers(Specifiers.none), id(), typeParameters(), refinement(), constraints(), axioms()
         {
         }
-        public nothrow ConceptNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_) :
-            base(NodeType.conceptNode, span_), specifiers(specifiers_), id(id_), typeParameters(), refinement(), constraints(), axioms()
+        public nothrow ConceptNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_) :
+            base(NodeType.conceptNode, span_, moduleId_), specifiers(specifiers_), id(id_), typeParameters(), refinement(), constraints(), axioms()
         {
             id->SetParent(this);
         }
-        public nothrow ConceptNode(NodeType nodeType_, const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_) :
-            base(nodeType_, span_), specifiers(specifiers_), id(id_), typeParameters(), refinement(), constraints(), axioms()
+        public nothrow ConceptNode(NodeType nodeType_, const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_) :
+            base(nodeType_, span_, moduleId_), specifiers(specifiers_), id(id_), typeParameters(), refinement(), constraints(), axioms()
         {
             id->SetParent(this);
         }
@@ -1093,7 +1094,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            ConceptNode* clone = new ConceptNode(GetSpan(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)));
+            ConceptNode* clone = new ConceptNode(GetSpan(), ModuleId(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)));
             int nt = typeParameters.Count();
             for (int i = 0; i < nt; ++i)
             {
@@ -1135,8 +1136,9 @@ namespace Cm.Ast
             }
             constraints.Write(writer);
             axioms.Write(writer);
-            writer.Write(beginBraceSpan);
-            writer.Write(endBraceSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(beginBraceSpan, convertExternal);
+            writer.Write(endBraceSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {
@@ -1170,19 +1172,19 @@ namespace Cm.Ast
     }
     public abstract class IntrinsicConstraintNode : ConstraintNode
     {
-        public nothrow IntrinsicConstraintNode(NodeType nodeType_) :
-            base(nodeType_, System.Lex.Span())
+        public nothrow IntrinsicConstraintNode(NodeType nodeType_, const Uuid& moduleId_) :
+            base(nodeType_, System.Lex.Span(), moduleId_)
         {
         }
     }
     public class SameConstraintNode : IntrinsicConstraintNode
     {
-        public nothrow SameConstraintNode() :
-            base(NodeType.sameConstraintNode)
+        public nothrow SameConstraintNode(const Uuid& moduleId_) :
+            base(NodeType.sameConstraintNode, moduleId_)
         {
         }
-        public nothrow SameConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.sameConstraintNode)
+        public nothrow SameConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.sameConstraintNode, moduleId_)
         {
         }
         public override void Accept(Visitor& visitor)
@@ -1196,12 +1198,12 @@ namespace Cm.Ast
     }
     public class DerivedConstraintNode : IntrinsicConstraintNode
     {
-        public nothrow DerivedConstraintNode() :
-            base(NodeType.derivedConstraintNode)
+        public nothrow DerivedConstraintNode(const Uuid& moduleId_) :
+            base(NodeType.derivedConstraintNode, moduleId_)
         {
         }
-        public nothrow DerivedConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.derivedConstraintNode)
+        public nothrow DerivedConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.derivedConstraintNode, moduleId_)
         {
         }
         public override void Accept(Visitor& visitor)
@@ -1215,12 +1217,12 @@ namespace Cm.Ast
     }
     public class ConvertibleConstraintNode : IntrinsicConstraintNode
     {
-        public nothrow ConvertibleConstraintNode() :
-            base(NodeType.convertibleConstraintNode)
+        public nothrow ConvertibleConstraintNode(const Uuid& moduleId_) :
+            base(NodeType.convertibleConstraintNode, moduleId_)
         {
         }
-        public nothrow ConvertibleConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.convertibleConstraintNode)
+        public nothrow ConvertibleConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.convertibleConstraintNode, moduleId_)
         {
         }
         public override void Accept(Visitor& visitor)
@@ -1234,12 +1236,12 @@ namespace Cm.Ast
     }
     public class ExplicitlyConvertibleConstraintNode : IntrinsicConstraintNode
     {
-        public nothrow ExplicitlyConvertibleConstraintNode() :
-            base(NodeType.explicitlyConvertibleConstraintNode)
+        public nothrow ExplicitlyConvertibleConstraintNode(const Uuid& moduleId_) :
+            base(NodeType.explicitlyConvertibleConstraintNode, moduleId_)
         {
         }
-        public nothrow ExplicitlyConvertibleConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.explicitlyConvertibleConstraintNode)
+        public nothrow ExplicitlyConvertibleConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.explicitlyConvertibleConstraintNode, moduleId_)
         {
         }
         public override void Accept(Visitor& visitor)
@@ -1253,12 +1255,12 @@ namespace Cm.Ast
     }
     public class CommonConstraintNode : IntrinsicConstraintNode
     {
-        public nothrow CommonConstraintNode() :
-            base(NodeType.commonConstraintNode)
+        public nothrow CommonConstraintNode(const Uuid& moduleId_) :
+            base(NodeType.commonConstraintNode, moduleId_)
         {
         }
-        public nothrow CommonConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.commonConstraintNode)
+        public nothrow CommonConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.commonConstraintNode, moduleId_)
         {
         }
         public override void Accept(Visitor& visitor)
@@ -1272,12 +1274,12 @@ namespace Cm.Ast
     }
     public class NonreferenceTypeConstraintNode : IntrinsicConstraintNode
     {
-        public nothrow NonreferenceTypeConstraintNode() :
-            base(NodeType.nonreferenceTypeConstraintNode)
+        public nothrow NonreferenceTypeConstraintNode(const Uuid& moduleId_) :
+            base(NodeType.nonreferenceTypeConstraintNode, moduleId_)
         {
         }
-        public nothrow NonreferenceTypeConstraintNode(const System.Lex.Span& span_) :
-            base(NodeType.nonreferenceTypeConstraintNode)
+        public nothrow NonreferenceTypeConstraintNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.nonreferenceTypeConstraintNode, moduleId_)
         {
         }
         public override void Accept(Visitor& visitor)
@@ -1291,15 +1293,15 @@ namespace Cm.Ast
     }
     public class SameConceptNode : ConceptNode
     {
-        public nothrow SameConceptNode() :
-            base(NodeType.sameConceptNode, System.Lex.Span(), Specifiers.public_, new IdentifierNode(System.Lex.Span(), u"Same"))
+        public nothrow SameConceptNode(const Uuid& moduleId_) :
+            base(NodeType.sameConceptNode, System.Lex.Span(), moduleId_, Specifiers.public_, new IdentifierNode(System.Lex.Span(), moduleId_, u"Same"))
         {
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"T"));
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"U"));
-            AddConstraint(new SameConstraintNode());
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"T"));
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"U"));
+            AddConstraint(new SameConstraintNode(moduleId_));
         }
-        public nothrow SameConceptNode(const System.Lex.Span& span_) :
-            base(NodeType.sameConceptNode, span_)
+        public nothrow SameConceptNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.sameConceptNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsIntrinsicConceptNode() const
@@ -1309,15 +1311,15 @@ namespace Cm.Ast
     }
     public class DerivedConceptNode : ConceptNode
     {
-        public nothrow DerivedConceptNode() :
-            base(NodeType.derivedConceptNode, System.Lex.Span(), Specifiers.public_, new IdentifierNode(System.Lex.Span(), u"Derived"))
+        public nothrow DerivedConceptNode(const Uuid& moduleId_) :
+            base(NodeType.derivedConceptNode, System.Lex.Span(), moduleId_, Specifiers.public_, new IdentifierNode(System.Lex.Span(), moduleId_, u"Derived"))
         {
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"T"));
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"U"));
-            AddConstraint(new DerivedConstraintNode());
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"T"));
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"U"));
+            AddConstraint(new DerivedConstraintNode(moduleId_));
         }
-        public nothrow DerivedConceptNode(const System.Lex.Span& span_) :
-            base(NodeType.derivedConceptNode, span_)
+        public nothrow DerivedConceptNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.derivedConceptNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsIntrinsicConceptNode() const
@@ -1327,15 +1329,16 @@ namespace Cm.Ast
     }
     public class ConvertibleConceptNode : ConceptNode
     {
-        public nothrow ConvertibleConceptNode() :
-            base(NodeType.convertibleConceptNode, System.Lex.Span(), Specifiers.public_, new IdentifierNode(System.Lex.Span(), u"Convertible"))
+        public nothrow ConvertibleConceptNode(const Uuid& moduleId_) :
+            base(NodeType.convertibleConceptNode, System.Lex.Span(), moduleId_, Specifiers.public_,
+            new IdentifierNode(System.Lex.Span(), moduleId_, u"Convertible"))
         {
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"T"));
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"U"));
-            AddConstraint(new ConvertibleConstraintNode());
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"T"));
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"U"));
+            AddConstraint(new ConvertibleConstraintNode(moduleId_));
         }
-        public nothrow ConvertibleConceptNode(const System.Lex.Span& span_) :
-            base(NodeType.convertibleConceptNode, span_)
+        public nothrow ConvertibleConceptNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.convertibleConceptNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsIntrinsicConceptNode() const
@@ -1345,15 +1348,16 @@ namespace Cm.Ast
     }
     public class ExplicitlyConvertibleConceptNode : ConceptNode
     {
-        public nothrow ExplicitlyConvertibleConceptNode() :
-            base(NodeType.explicitlyConvertibleConceptNode, System.Lex.Span(), Specifiers.public_, new IdentifierNode(System.Lex.Span(), u"ExplicitlyConvertible"))
+        public nothrow ExplicitlyConvertibleConceptNode(const Uuid& moduleId_) :
+            base(NodeType.explicitlyConvertibleConceptNode, System.Lex.Span(), moduleId_, Specifiers.public_,
+            new IdentifierNode(System.Lex.Span(), moduleId_, u"ExplicitlyConvertible"))
         {
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"T"));
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"U"));
-            AddConstraint(new ExplicitlyConvertibleConstraintNode());
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"T"));
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"U"));
+            AddConstraint(new ExplicitlyConvertibleConstraintNode(moduleId_));
         }
-        public nothrow ExplicitlyConvertibleConceptNode(const System.Lex.Span& span_) :
-            base(NodeType.explicitlyConvertibleConceptNode, span_)
+        public nothrow ExplicitlyConvertibleConceptNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.explicitlyConvertibleConceptNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsIntrinsicConceptNode() const
@@ -1363,15 +1367,16 @@ namespace Cm.Ast
     }
     public class CommonConceptNode : ConceptNode
     {
-        public nothrow CommonConceptNode() :
-            base(NodeType.commonConceptNode, System.Lex.Span(), Specifiers.public_, new IdentifierNode(System.Lex.Span(), u"Common"))
+        public nothrow CommonConceptNode(const Uuid& moduleId_) :
+            base(NodeType.commonConceptNode, System.Lex.Span(), moduleId_, Specifiers.public_,
+            new IdentifierNode(System.Lex.Span(), moduleId_, u"Common"))
         {
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"T"));
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"U"));
-            AddConstraint(new CommonConstraintNode());
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"T"));
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"U"));
+            AddConstraint(new CommonConstraintNode(moduleId_));
         }
-        public nothrow CommonConceptNode(const System.Lex.Span& span_) :
-            base(NodeType.commonConceptNode, span_)
+        public nothrow CommonConceptNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.commonConceptNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsCommonConceptNode() const
@@ -1385,14 +1390,15 @@ namespace Cm.Ast
     }
     public class NonreferenceTypeConceptNode : ConceptNode
     {
-        public nothrow NonreferenceTypeConceptNode() :
-            base(NodeType.nonreferenceTypeConceptNode, System.Lex.Span(), Specifiers.public_, new IdentifierNode(System.Lex.Span(), u"NonreferenceType"))
+        public nothrow NonreferenceTypeConceptNode(const Uuid& moduleId_) :
+            base(NodeType.nonreferenceTypeConceptNode, System.Lex.Span(), moduleId_, Specifiers.public_,
+            new IdentifierNode(System.Lex.Span(), moduleId_, u"NonreferenceType"))
         {
-            AddTypeParameter(new IdentifierNode(System.Lex.Span(), u"T"));
-            AddConstraint(new NonreferenceTypeConstraintNode());
+            AddTypeParameter(new IdentifierNode(System.Lex.Span(), moduleId_, u"T"));
+            AddConstraint(new NonreferenceTypeConstraintNode(moduleId_));
         }
-        public nothrow NonreferenceTypeConceptNode(const System.Lex.Span& span_) :
-            base(NodeType.nonreferenceTypeConceptNode, span_)
+        public nothrow NonreferenceTypeConceptNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.nonreferenceTypeConceptNode, span_, moduleId_)
         {
         }
         public override nothrow bool IsIntrinsicConceptNode() const

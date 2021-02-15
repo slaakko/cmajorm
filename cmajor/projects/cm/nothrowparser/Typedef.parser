@@ -1,0 +1,29 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowTypedefParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowSpecifierParser.Specifiers;
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowIdentifierParser.Identifier;
+
+    Typedef(NothrowParsingContext* ctx, var Span s) : TypedefNode*
+        ::= Specifiers:specifiers{ s = span; } TYPEDEF TypeExpr(ctx):type Identifier(ctx):id SEMICOLON!
+        {
+            s.end = span.end;
+            TypedefNode* node = new TypedefNode(s, ctx->ModuleId(), specifiers, type, id);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+}

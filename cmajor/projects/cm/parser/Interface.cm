@@ -7,7 +7,7 @@ using Cm.Ast;
 using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/Interface.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/Interface.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class InterfaceParser
 {
@@ -81,7 +81,7 @@ public static class InterfaceParser
                                                 long save = lexer.GetPos();
                                                 Match* parentMatch11 = &match;
                                                 {
-                                                    Match match = AttributeParser.Attributes(lexer);
+                                                    Match match = AttributeParser.Attributes(lexer, ctx);
                                                     attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                     if (match.hit)
                                                     {
@@ -153,7 +153,7 @@ public static class InterfaceParser
                                         Match* parentMatch17 = &match;
                                         {
                                             System.Lex.Span span = lexer.GetSpan();
-                                            Match match = IdentifierParser.Identifier(lexer);
+                                            Match match = IdentifierParser.Identifier(lexer, ctx);
                                             id.Reset(cast<IdentifierNode*>(match.value));
                                             if (match.hit)
                                             {
@@ -167,7 +167,7 @@ public static class InterfaceParser
                                         if (match.hit)
                                         {
                                             s.end = span.end;
-                                            intf.Reset(new InterfaceNode(s, specifiers->value, id.Release(), attrs.Release()));
+                                            intf.Reset(new InterfaceNode(s, ctx->ModuleId(), specifiers->value, id.Release(), attrs.Release()));
                                             intf->SetSpecifierSpan(specifierSpan);
                                         }
                                         *parentMatch16 = match;
@@ -425,7 +425,7 @@ public static class InterfaceParser
                                 long save = lexer.GetPos();
                                 Match* parentMatch7 = &match;
                                 {
-                                    Match match = AttributeParser.Attributes(lexer);
+                                    Match match = AttributeParser.Attributes(lexer, ctx);
                                     attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -483,7 +483,7 @@ public static class InterfaceParser
                             if (match.hit)
                             {
                                 s.end = span.end;
-                                memFun.Reset(new MemberFunctionNode(s, Specifiers(), returnType.Release(), groupId->value, attrs.Release()));
+                                memFun.Reset(new MemberFunctionNode(s, ctx->ModuleId(), Specifiers(), returnType.Release(), groupId->value, attrs.Release()));
                             }
                             *parentMatch10 = match;
                         }

@@ -86,7 +86,7 @@ void Source::Parse(const boost::uuids::uuid& moduleId, int index)
     boost::uuids::uuid mid = moduleId;
     NothrowParsingContext parsingContext;
     std::unique_ptr<CompileUnitNode> parsedCompileUnit = NothrowCompileUnitParser::Parse(lexer, &mid, &parsingContext);
-    std::vector<std::exception> parsingErrors = lexer.Errors();
+    std::vector<std::unique_ptr<std::exception>> parsingErrors = lexer.Errors();
     if (!parsingErrors.empty())
     {
         CmajorNothrowLexer lexer(Start(), End(), FilePath(), index);
@@ -100,9 +100,9 @@ void Source::Parse(const boost::uuids::uuid& moduleId, int index)
     {
         synchronized = lexer.GetFlag(LexerFlags::synchronizedAtLeastOnce);
     }
-    for (const std::exception& ex : parsingErrors)
+    for (const std::unique_ptr<std::exception>& ex : parsingErrors)
     {
-        errors.push_back(ex.what());
+        errors.push_back(ex->what());
     }
     compileUnit = std::move(parsedCompileUnit);
 }
@@ -556,7 +556,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         result.synchronized = src->Synchronized();
         if (src->CursorContainer())
         {
-            result.cursorContainer = ToUtf8(src->CursorContainer()->FullNameNoThrow());
+            result.cursorContainer = ToUtf8(src->CursorContainer()->FullName());
         }
     }
     catch (const Exception& ex)

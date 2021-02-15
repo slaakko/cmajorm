@@ -7,7 +7,7 @@ using Cm.Ast;
 using Cm.Parser;
 using CmajorTokens;
 
-// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/Function.parser' using soulcm parser generator scmpg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/parser/Function.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class FunctionParser
 {
@@ -78,7 +78,7 @@ public static class FunctionParser
                                             long save = lexer.GetPos();
                                             Match* parentMatch10 = &match;
                                             {
-                                                Match match = AttributeParser.Attributes(lexer);
+                                                Match match = AttributeParser.Attributes(lexer, ctx);
                                                 attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                 if (match.hit)
                                                 {
@@ -147,7 +147,7 @@ public static class FunctionParser
                                     if (match.hit)
                                     {
                                         s.end = span.end;
-                                        fun.Reset(new FunctionNode(s, specifiers->value, returnType.Release(), functionGroupId->value, attrs.Release()));
+                                        fun.Reset(new FunctionNode(s, ctx->ModuleId(), specifiers->value, returnType.Release(), functionGroupId->value, attrs.Release()));
                                         fun->SetSpecifierSpan(specifierSpan);
                                         fun->SetGroupIdSpan(span);
                                     }

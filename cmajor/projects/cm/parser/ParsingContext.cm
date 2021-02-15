@@ -68,7 +68,7 @@ namespace Cm.Parser
         {
             parsingArguments = parsingArgumentsStack.Pop();
         }
-        public nothrow void BeginParsingConcept() 
+        public nothrow void BeginParsingConcept()
         {
             parsingConceptStack.Push(parsingConcept);
             parsingConcept = true;
@@ -76,6 +76,14 @@ namespace Cm.Parser
         public nothrow void EndParsingConcept()
         {
             parsingConcept = parsingConceptStack.Pop();
+        }
+        public nothrow inline const Uuid& ModuleId() const
+        {
+            return moduleId;
+        }
+        public nothrow void SetModuleId(const Uuid& moduleId_)
+        {
+            moduleId = moduleId_;
         }
         public bool parsingExpressionStatement;
         public bool parsingLvalue;
@@ -91,5 +99,6 @@ namespace Cm.Parser
         private Stack<bool> parsingTypeExprStack;
         private Stack<bool> parsingConceptStack;
         private Stack<bool> parsingTemplateIdStack;
+        private Uuid moduleId;
     }
 }

@@ -15,14 +15,14 @@ parser api(SNGCM_PARSER_API) AttributeParser
 {
     uselexer CmajorLexer;
 
-    Attributes(boost::uuids::uuid* moduleId, var std::unique_ptr<sngcm::ast::Attributes> attributes) : sngcm::ast::Attributes*
-        ::= LBRACKET{ attributes.reset(new sngcm::ast::Attributes()); } (Attribute(attributes.get(), moduleId):attribute % COMMA)? RBRACKET!
+    Attributes(boost::uuids::uuid* moduleId, var std::unique_ptr<sngcm::ast::AttributesNode> attributes) : sngcm::ast::AttributesNode*
+        ::= LBRACKET{ attributes.reset(new sngcm::ast::AttributesNode(span, *moduleId)); } (Attribute(attributes.get(), moduleId):attribute % COMMA)? RBRACKET!
         {
             return attributes.release();
         }
         ;
 
-    Attribute(sngcm::ast::Attributes* attributes, boost::uuids::uuid* moduleId, var Span s, var std::u32string name, var std::u32string value)
+    Attribute(sngcm::ast::AttributesNode* attributes, boost::uuids::uuid* moduleId, var Span s, var std::u32string name, var std::u32string value)
         ::= 
         (
             empty{ value = U"true"; }

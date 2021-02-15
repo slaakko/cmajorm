@@ -400,10 +400,11 @@ void ConversionVisitor::Visit(FunctionNode& functionNode)
 {
     functionNode.ReturnTypeExpr()->Accept(*this);
     std::unique_ptr<Node> returnTypeExpr(node.release());
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     if (functionNode.GetAttributes())
     {
-        attributes.reset(functionNode.GetAttributes()->Clone());
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(functionNode.GetAttributes()->Clone(cloneContext)));
     }
     std::unique_ptr<FunctionNode> clone(new FunctionNode(Span(), boost::uuids::nil_uuid(), functionNode.GetSpecifiers(), returnTypeExpr.release(), functionNode.GroupId(), attributes.release()));
     int n = functionNode.TemplateParameters().Count();
@@ -437,10 +438,11 @@ void ConversionVisitor::Visit(ClassNode& classNode)
     bool prevDerivesFromXmlContentHandler = derivesFromXmlContentHandler;
     classNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     if (classNode.GetAttributes())
     {
-        attributes.reset(classNode.GetAttributes()->Clone());
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(classNode.GetAttributes()->Clone(cloneContext)));
     }
     std::unique_ptr<ClassNode> clone(new ClassNode(Span(), boost::uuids::nil_uuid(), classNode.GetSpecifiers(), id.release(), attributes.release()));
     int nt = classNode.TemplateParameters().Count();
@@ -513,10 +515,11 @@ void ConversionVisitor::Visit(MemberInitializerNode& memberInitializerNode)
 
 void ConversionVisitor::Visit(StaticConstructorNode& staticConstructorNode)
 {
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     if (staticConstructorNode.GetAttributes())
     {
-        attributes.reset(staticConstructorNode.GetAttributes()->Clone());
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(staticConstructorNode.GetAttributes()->Clone(cloneContext)));
     }
     std::unique_ptr<StaticConstructorNode> clone(new StaticConstructorNode(Span(), boost::uuids::nil_uuid(), staticConstructorNode.GetSpecifiers(), attributes.release()));
     int ni = staticConstructorNode.Initializers().Count();
@@ -542,10 +545,11 @@ void ConversionVisitor::Visit(StaticConstructorNode& staticConstructorNode)
 
 void ConversionVisitor::Visit(ConstructorNode& constructorNode)
 {
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     if (constructorNode.GetAttributes())
     {
-        attributes.reset(constructorNode.GetAttributes()->Clone());
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(constructorNode.GetAttributes()->Clone(cloneContext)));
     }
     std::unique_ptr<ConstructorNode> clone(new ConstructorNode(Span(), boost::uuids::nil_uuid(), constructorNode.GetSpecifiers(), attributes.release()));
     int ni = constructorNode.Initializers().Count();
@@ -577,10 +581,11 @@ void ConversionVisitor::Visit(ConstructorNode& constructorNode)
 
 void ConversionVisitor::Visit(DestructorNode& destructorNode)
 {
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     if (destructorNode.GetAttributes())
     {
-        attributes.reset(destructorNode.GetAttributes()->Clone());
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(destructorNode.GetAttributes()->Clone(cloneContext)));
     }
     std::unique_ptr<DestructorNode> clone(new DestructorNode(Span(), boost::uuids::nil_uuid(), destructorNode.GetSpecifiers(), attributes.release()));
     if (destructorNode.WhereConstraint())
@@ -600,10 +605,11 @@ void ConversionVisitor::Visit(DestructorNode& destructorNode)
 
 void ConversionVisitor::Visit(MemberFunctionNode& memberFunctionNode)
 {
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     if (memberFunctionNode.GetAttributes())
     {
-        attributes.reset(memberFunctionNode.GetAttributes()->Clone());
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(memberFunctionNode.GetAttributes()->Clone(cloneContext)));
     }
     memberFunctionNode.ReturnTypeExpr()->Accept(*this);
     std::unique_ptr<Node> returnTypeExpr(node.release());
@@ -638,10 +644,11 @@ void ConversionVisitor::Visit(MemberFunctionNode& memberFunctionNode)
 
 void ConversionVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
 {
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     if (conversionFunctionNode.GetAttributes())
     {
-        attributes.reset(conversionFunctionNode.GetAttributes()->Clone());
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(conversionFunctionNode.GetAttributes()->Clone(cloneContext)));
     }
     conversionFunctionNode.ReturnTypeExpr()->Accept(*this);
     std::unique_ptr<Node> returnTypeExpr(node.release());
@@ -671,10 +678,11 @@ void ConversionVisitor::Visit(ConversionFunctionNode& conversionFunctionNode)
 
 void ConversionVisitor::Visit(MemberVariableNode& memberVariableNode)
 {
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     if (memberVariableNode.GetAttributes())
     {
-        attributes.reset(memberVariableNode.GetAttributes()->Clone());
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(memberVariableNode.GetAttributes()->Clone(cloneContext)));
     }
     memberVariableNode.TypeExpr()->Accept(*this);
     std::unique_ptr<Node> typeExpr(node.release());
@@ -686,10 +694,11 @@ void ConversionVisitor::Visit(MemberVariableNode& memberVariableNode)
 
 void ConversionVisitor::Visit(InterfaceNode& interfaceNode)
 {
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     if (interfaceNode.GetAttributes())
     {
-        attributes.reset(interfaceNode.GetAttributes()->Clone());
+        CloneContext cloneContext;
+        attributes.reset(static_cast<AttributesNode*>(interfaceNode.GetAttributes()->Clone(cloneContext)));
     }
     interfaceNode.Id()->Accept(*this);
     std::unique_ptr<IdentifierNode> id(static_cast<IdentifierNode*>(node.release()));

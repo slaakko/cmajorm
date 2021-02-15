@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class GlobalVariableNode : Node
     {
-        public nothrow GlobalVariableNode(const System.Lex.Span& span_) :
-            base(NodeType.globalVariableNode, span_), specifiers(Specifiers.none), cu(null)
+        public nothrow GlobalVariableNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.globalVariableNode, span_, moduleId_), specifiers(Specifiers.none), cu(null)
         {
         }
-        public nothrow GlobalVariableNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, CompileUnitNode* cu_) :
-            base(NodeType.globalVariableNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), cu(cu_)
+        public nothrow GlobalVariableNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, CompileUnitNode* cu_) :
+            base(NodeType.globalVariableNode, span_, moduleId_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), cu(cu_)
         {
             typeExpr->SetParent(this);
             id->SetParent(this);
@@ -57,7 +57,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            GlobalVariableNode* clone = new GlobalVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), cu);
+            GlobalVariableNode* clone = new GlobalVariableNode(GetSpan(), ModuleId(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), cu);
             if (!initializer.IsNull())
             {
                 clone->SetInitializer(initializer->Clone(cloneContext));

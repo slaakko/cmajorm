@@ -188,8 +188,8 @@ class ThisNode;
 class BaseNode;
 class ParenthesizedExpressionNode;
 class GlobalVariableNode;
-class Attribute;
-class Attributes;
+class AttributeNode;
+class AttributesNode;
 class CommentNode;
 
 class SyncNode;
@@ -379,8 +379,8 @@ public:
     virtual void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) {}
     virtual void Visit(GlobalVariableNode& globalVariableNode) {}
 
-    virtual void Visit(Attribute& attribute) {}
-    virtual void Visit(Attributes& attributes) {}
+    virtual void Visit(AttributeNode& attribute) {}
+    virtual void Visit(AttributesNode& attributes) {}
 
     virtual void Visit(CommentNode& commentNode) {}
 

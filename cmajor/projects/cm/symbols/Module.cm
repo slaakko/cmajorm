@@ -1,0 +1,29 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace Cm.Symbols
+{
+    public enum ModuleFlags : byte
+    {
+        none = 0u,
+        system = 1u << 0u, core = 1u << 1u, root = 1u << 2u, immutable = 1u << 3u, compiling = 1u << 4u, fileIndexFilePathMapBuilt = 1u << 5u, readFromModuleFile = 1u << 6u
+    }
+    
+    public class Module
+    {
+        public nothrow inline const Uuid& Id() const
+        {
+            return id;
+        }
+        public nothrow inline bool GetFlag(ModuleFlags flag) const
+        {
+            return (flags & flag) != ModuleFlags.none;
+        }
+        private Uuid id;
+        private ModuleFlags flags;
+    }
+}

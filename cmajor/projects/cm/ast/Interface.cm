@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class InterfaceNode : Node
     {
-        public nothrow InterfaceNode(const System.Lex.Span& span_) :
-            base(NodeType.interfaceNode, span_), specifiers(), id(), members()
+        public nothrow InterfaceNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.interfaceNode, span_, moduleId_), specifiers(), id(), members()
         {
         }
-        public nothrow InterfaceNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_, AttributesNode* attributes_) :
-            base(NodeType.interfaceNode, span_), specifiers(specifiers_), id(id_), members(), attributes(attributes_)
+        public nothrow InterfaceNode(const System.Lex.Span& span_, const Uuid& moduleId_, Specifiers specifiers_, IdentifierNode* id_, AttributesNode* attributes_) :
+            base(NodeType.interfaceNode, span_, moduleId_), specifiers(specifiers_), id(id_), members(), attributes(attributes_)
         {
             id->SetParent(this);
         }
@@ -70,7 +70,7 @@ namespace Cm.Ast
             {
                 clonedAttributes = cast<AttributesNode*>(attributes->Clone(cloneContext));
             }
-            InterfaceNode* clone = new InterfaceNode(GetSpan(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+            InterfaceNode* clone = new InterfaceNode(GetSpan(), ModuleId(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
             int n = members.Count();
             for (int i = 0; i < n; ++i)
             {
@@ -96,9 +96,10 @@ namespace Cm.Ast
             }
             writer.Write(id.Get());
             members.Write(writer);
-            writer.Write(specifierSpan);
-            writer.Write(beginBraceSpan);
-            writer.Write(endBraceSpan);
+            bool convertExternal = ModuleId() == writer.SpanConversionModuleId();
+            writer.Write(specifierSpan, convertExternal);
+            writer.Write(beginBraceSpan, convertExternal);
+            writer.Write(endBraceSpan, convertExternal);
         }
         public override void Read(AstReader& reader)
         {

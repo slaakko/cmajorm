@@ -1,0 +1,58 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowInterfaceParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowAttributeParser.Attributes;
+    using NothrowSpecifierParser.Specifiers;
+    using NothrowIdentifierParser.Identifier;
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowParameterParser.ParameterList;
+
+    Interface(NothrowParsingContext* ctx, var UniquePtr<InterfaceNode> intf, var Span s, var Span specifierSpan, var Span beginBraceSpan, var Span endBraceSpan) : InterfaceNode*
+        ::=
+        (   empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } INTERFACE Identifier(ctx):id
+            {
+                s.end = span.end;
+                intf.Reset(new InterfaceNode(s, ctx->ModuleId(), specifiers, id, attrs));
+                intf->SetSpecifierSpan(specifierSpan);
+            }
+            LBRACE!{ beginBraceSpan = span; } InterfaceContent(ctx, intf.Get()):content RBRACE!{ endBraceSpan = span; intf->SetBeginBraceSpan(beginBraceSpan); intf->SetEndBraceSpan(endBraceSpan); }
+        )
+        {
+            intf->SetLexerFlags(lexer.Flags());
+            return intf.Release();
+        }
+        ;
+
+    InterfaceContent(NothrowParsingContext* ctx, InterfaceNode* intf)
+        ::= (InterfaceMemFun(ctx):intfMemFun{ intf->AddMember(intfMemFun); })*
+        ;
+
+    InterfaceMemFun(NothrowParsingContext* ctx, var UniquePtr<MemberFunctionNode> memFun, var Span s) : Node*
+        ::= empty{ s = span; } Attributes(ctx):attrs? TypeExpr(ctx):returnType InterfaceFunctionGroupId:groupId
+        {
+            s.end = span.end;
+            memFun.Reset(new MemberFunctionNode(s, ctx->ModuleId(), Specifiers(), returnType, groupId, attrs));
+        }
+        ParameterList(ctx, memFun.Get()):paramList SEMICOLON!
+        {
+            memFun->SetLexerFlags(lexer.Flags());
+            return memFun.Release();
+        }
+        ;
+
+    InterfaceFunctionGroupId : ustring
+        ::= ID{ return lexer.GetMatch(span); }
+        ;
+}

@@ -1,0 +1,3777 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/nothrowparser/Class.parser' using soulcm parser generator scmpg version 3.10.0
+
+public static class NothrowClassParser
+{
+    public static nothrow Match Class(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Class");
+            }
+        #endif
+        UniquePtr<ClassNode> cls;
+        Span s;
+        Span specifierSpan;
+        Span classSpan;
+        Span beginBraceSpan;
+        Span endBraceSpan;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<IdentifierNode> id;
+        UniquePtr<WhereConstraintNode> constraint;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match(true);
+                                                    if (match.hit)
+                                                    {
+                                                        s = span;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch11 = &match;
+                                                {
+                                                    Match match(true);
+                                                    long save = lexer.GetPos();
+                                                    Match* parentMatch12 = &match;
+                                                    {
+                                                        Match match = NothrowAttributeParser.Attributes(lexer, ctx);
+                                                        attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            *parentMatch12 = match;
+                                                        }
+                                                        else
+                                                        {
+                                                            lexer.SetPos(save);
+                                                        }
+                                                    }
+                                                    *parentMatch11 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch14 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                                    specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                                    if (match.hit)
+                                                    {
+                                                        specifierSpan = span;
+                                                    }
+                                                    *parentMatch14 = match;
+                                                }
+                                                *parentMatch13 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch15 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch16 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Span span = lexer.GetSpan();
+                                                Match match(false);
+                                                if (*lexer == CLASS)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    classSpan = span;
+                                                }
+                                                *parentMatch16 = match;
+                                            }
+                                            *parentMatch15 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch17 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch18 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Span span = lexer.GetSpan();
+                                            Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                                            id.Reset(cast<IdentifierNode*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                s.end = span.end;
+                                                cls.Reset(new ClassNode(s, ctx->ModuleId(), specifiers->value, id.Release(), attrs.Release()));
+                                                cls->SetSpecifierSpan(specifierSpan);
+                                                cls->SetClassSpan(classSpan);
+                                            }
+                                            *parentMatch18 = match;
+                                        }
+                                        *parentMatch17 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch19 = &match;
+                                {
+                                    Match match(true);
+                                    long save = lexer.GetPos();
+                                    Match* parentMatch20 = &match;
+                                    {
+                                        Match match = NothrowTemplateParser.TemplateParameterList(lexer, ctx, cls.Get());
+                                        if (match.hit)
+                                        {
+                                            *parentMatch20 = match;
+                                        }
+                                        else
+                                        {
+                                            lexer.SetPos(save);
+                                        }
+                                    }
+                                    *parentMatch19 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch21 = &match;
+                            {
+                                Match match(true);
+                                long save = lexer.GetPos();
+                                Match* parentMatch22 = &match;
+                                {
+                                    Match match = NothrowClassParser.InheritanceAndInterfaces(lexer, ctx, cls.Get());
+                                    if (match.hit)
+                                    {
+                                        *parentMatch22 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                    }
+                                }
+                                *parentMatch21 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch23 = &match;
+                        {
+                            Match match(true);
+                            long save = lexer.GetPos();
+                            Match* parentMatch24 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch25 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch26 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = NothrowConceptParser.WhereConstraint(lexer, ctx);
+                                        constraint.Reset(cast<WhereConstraintNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            cls->SetConstraint(constraint.Release());
+                                        }
+                                        *parentMatch26 = match;
+                                    }
+                                    *parentMatch25 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    *parentMatch24 = match;
+                                }
+                                else
+                                {
+                                    lexer.SetPos(save);
+                                }
+                            }
+                            *parentMatch23 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch27 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch28 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Span span = lexer.GetSpan();
+                            Match match(true);
+                            Match* parentMatch29 = &match;
+                            {
+                                System.Lex.Span span = lexer.GetSpan();
+                                Match match(false);
+                                if (*lexer == LBRACE)
+                                {
+                                    ++lexer;
+                                    match.hit = true;
+                                }
+                                if (match.hit)
+                                {
+                                    *parentMatch29 = match;
+                                }
+                                else
+                                {
+                                    match.hit = true;
+                                    *parentMatch29 = match;
+                                    lexer.AddError(span, GetTokenName(LBRACE));
+                                }
+                            }
+                            if (match.hit)
+                            {
+                                beginBraceSpan = span;
+                            }
+                            *parentMatch28 = match;
+                        }
+                        *parentMatch27 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch30 = &match;
+                {
+                    Match match = NothrowClassParser.ClassContent(lexer, ctx, cls.Get());
+                    *parentMatch30 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch31 = &match;
+            {
+                Match match(false);
+                Match* parentMatch32 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Span span = lexer.GetSpan();
+                    Match match(true);
+                    Match* parentMatch33 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == RBRACE)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch33 = match;
+                        }
+                        else
+                        {
+                            match.hit = true;
+                            *parentMatch33 = match;
+                            lexer.AddError(span, GetTokenName(RBRACE));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        endBraceSpan = span;
+                        cls->SetBeginBraceSpan(beginBraceSpan);
+                        cls->SetEndBraceSpan(endBraceSpan);
+                        cls->SetLexerFlags(lexer.Flags());
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Class");
+                            #endif
+                            return Match(true, cls.Release());
+                        }
+                    }
+                    *parentMatch32 = match;
+                }
+                *parentMatch31 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Class");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Class");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match InheritanceAndInterfaces(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx, ClassNode* classNode)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"InheritanceAndInterfaces");
+            }
+        #endif
+        UniquePtr<Node> baseOrIntf;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            if (*lexer == COLON)
+            {
+                ++lexer;
+                match.hit = true;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match(true);
+                                if (match.hit)
+                                {
+                                    ctx->BeginParsingTypeExpr();
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowClassParser.BaseClassOrInterface(lexer, ctx);
+                                    baseOrIntf.Reset(cast<Node*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        classNode->AddBaseClassOrInterface(baseOrIntf.Release());
+                                        ctx->EndParsingTypeExpr();
+                                    }
+                                    else
+                                    {
+                                        ctx->EndParsingTypeExpr();
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch8 = &match;
+                    {
+                        Match match(true);
+                        Match* parentMatch9 = &match;
+                        {
+                            while (true)
+                            {
+                                long save = lexer.GetPos();
+                                {
+                                    Match match(false);
+                                    Match* parentMatch10 = &match;
+                                    {
+                                        Match match(false);
+                                        if (*lexer == COMMA)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        *parentMatch10 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch11 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch12 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch13 = &match;
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch14 = &match;
+                                                    {
+                                                        long pos = lexer.GetPos();
+                                                        Match match(true);
+                                                        if (match.hit)
+                                                        {
+                                                            ctx->BeginParsingTypeExpr();
+                                                        }
+                                                        *parentMatch14 = match;
+                                                    }
+                                                    *parentMatch13 = match;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch15 = &match;
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch16 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match = NothrowClassParser.BaseClassOrInterface(lexer, ctx);
+                                                            baseOrIntf.Reset(cast<Node*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                classNode->AddBaseClassOrInterface(baseOrIntf.Release());
+                                                                ctx->EndParsingTypeExpr();
+                                                            }
+                                                            *parentMatch16 = match;
+                                                        }
+                                                        *parentMatch15 = match;
+                                                    }
+                                                    *parentMatch13 = match;
+                                                }
+                                                *parentMatch12 = match;
+                                            }
+                                            *parentMatch11 = match;
+                                        }
+                                        *parentMatch10 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch9 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        *parentMatch8 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"InheritanceAndInterfaces");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"InheritanceAndInterfaces");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match BaseClassOrInterface(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"BaseClassOrInterface");
+            }
+        #endif
+        UniquePtr<Node> templateId;
+        UniquePtr<IdentifierNode> qid;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long pos = lexer.GetPos();
+                Match match = NothrowTemplateParser.TemplateId(lexer, ctx);
+                templateId.Reset(cast<Node*>(match.value));
+                if (match.hit)
+                {
+                    {
+                        #if (DEBUG)
+                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BaseClassOrInterface");
+                        #endif
+                        return Match(true, templateId.Release());
+                    }
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = NothrowIdentifierParser.QualifiedId(lexer, ctx);
+                        qid.Reset(cast<IdentifierNode*>(match.value));
+                        if (match.hit)
+                        {
+                            {
+                                #if (DEBUG)
+                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BaseClassOrInterface");
+                                #endif
+                                return Match(true, qid.Release());
+                            }
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"BaseClassOrInterface");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"BaseClassOrInterface");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match ClassContent(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx, ClassNode* classNode)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ClassContent");
+            }
+        #endif
+        UniquePtr<Node> clsMem;
+        UniquePtr<Node> classMember;
+        Match match(true);
+        Match* parentMatch0 = &match;
+        {
+            while (true)
+            {
+                long save = lexer.GetPos();
+                {
+                    Match match(false);
+                    Match* parentMatch1 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch2 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = NothrowClassParser.ClassMember(lexer, ctx, classNode);
+                            classMember.Reset(cast<Node*>(match.value));
+                            if (match.hit)
+                            {
+                                clsMem.Reset(classMember.Release());
+                                bool isSyncNode = (clsMem.Get() is SyncNode*);
+                                if (!isSyncNode)
+                                {
+                                    lexer.ResetFlag(LexerFlags.synchronized);
+                                }
+                                classNode->AddMember(clsMem.Release());
+                            }
+                            *parentMatch2 = match;
+                        }
+                        *parentMatch1 = match;
+                    }
+                    if (match.hit)
+                    {
+                        *parentMatch0 = match;
+                    }
+                    else
+                    {
+                        lexer.SetPos(save);
+                        break;
+                    }
+                }
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassContent");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ClassContent");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match ClassMember(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx, ClassNode* classNode)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ClassMember");
+            }
+        #endif
+        UniquePtr<StaticConstructorNode> staticConstructor;
+        UniquePtr<Node> constructor;
+        UniquePtr<Node> destructor;
+        UniquePtr<Node> memberFunction;
+        UniquePtr<Node> conversionFunction;
+        UniquePtr<Node> memberVariable;
+        UniquePtr<TypedefNode> typeDefinition;
+        UniquePtr<ClassNode> cls;
+        UniquePtr<EnumTypeNode> enumType;
+        UniquePtr<ConstantNode> constant;
+        UniquePtr<DelegateNode> dlg;
+        UniquePtr<ClassDelegateNode> classDelegate;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long save = lexer.GetPos();
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long save = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    long save = lexer.GetPos();
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        long save = lexer.GetPos();
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            long save = lexer.GetPos();
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                long save = lexer.GetPos();
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    long save = lexer.GetPos();
+                                                    Match match(false);
+                                                    Match* parentMatch11 = &match;
+                                                    {
+                                                        long save = lexer.GetPos();
+                                                        Match match(false);
+                                                        Match* parentMatch12 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match = NothrowClassParser.StaticConstructor(lexer, ctx, classNode);
+                                                            staticConstructor.Reset(cast<StaticConstructorNode*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                {
+                                                                    #if (DEBUG)
+                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                                                    #endif
+                                                                    return Match(true, staticConstructor.Release());
+                                                                }
+                                                            }
+                                                            *parentMatch12 = match;
+                                                        }
+                                                        *parentMatch11 = match;
+                                                        if (!match.hit)
+                                                        {
+                                                            Match match(false);
+                                                            Match* parentMatch13 = &match;
+                                                            lexer.SetPos(save);
+                                                            {
+                                                                Match match(false);
+                                                                Match* parentMatch14 = &match;
+                                                                {
+                                                                    long pos = lexer.GetPos();
+                                                                    Match match = NothrowClassParser.Constructor(lexer, ctx, classNode);
+                                                                    constructor.Reset(cast<Node*>(match.value));
+                                                                    if (match.hit)
+                                                                    {
+                                                                        {
+                                                                            #if (DEBUG)
+                                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                                                            #endif
+                                                                            return Match(true, constructor.Release());
+                                                                        }
+                                                                    }
+                                                                    *parentMatch14 = match;
+                                                                }
+                                                                *parentMatch13 = match;
+                                                            }
+                                                            *parentMatch11 = match;
+                                                        }
+                                                    }
+                                                    *parentMatch10 = match;
+                                                    if (!match.hit)
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch15 = &match;
+                                                        lexer.SetPos(save);
+                                                        {
+                                                            Match match(false);
+                                                            Match* parentMatch16 = &match;
+                                                            {
+                                                                long pos = lexer.GetPos();
+                                                                Match match = NothrowClassParser.Destructor(lexer, ctx, classNode);
+                                                                destructor.Reset(cast<Node*>(match.value));
+                                                                if (match.hit)
+                                                                {
+                                                                    {
+                                                                        #if (DEBUG)
+                                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                                                        #endif
+                                                                        return Match(true, destructor.Release());
+                                                                    }
+                                                                }
+                                                                *parentMatch16 = match;
+                                                            }
+                                                            *parentMatch15 = match;
+                                                        }
+                                                        *parentMatch10 = match;
+                                                    }
+                                                }
+                                                *parentMatch9 = match;
+                                                if (!match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch17 = &match;
+                                                    lexer.SetPos(save);
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch18 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match = NothrowClassParser.MemberFunction(lexer, ctx);
+                                                            memberFunction.Reset(cast<Node*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                {
+                                                                    #if (DEBUG)
+                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                                                    #endif
+                                                                    return Match(true, memberFunction.Release());
+                                                                }
+                                                            }
+                                                            *parentMatch18 = match;
+                                                        }
+                                                        *parentMatch17 = match;
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                            }
+                                            *parentMatch8 = match;
+                                            if (!match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch19 = &match;
+                                                lexer.SetPos(save);
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch20 = &match;
+                                                    {
+                                                        long pos = lexer.GetPos();
+                                                        Match match = NothrowClassParser.ConversionFunction(lexer, ctx);
+                                                        conversionFunction.Reset(cast<Node*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            {
+                                                                #if (DEBUG)
+                                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                                                #endif
+                                                                return Match(true, conversionFunction.Release());
+                                                            }
+                                                        }
+                                                        *parentMatch20 = match;
+                                                    }
+                                                    *parentMatch19 = match;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                        }
+                                        *parentMatch7 = match;
+                                        if (!match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch21 = &match;
+                                            lexer.SetPos(save);
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch22 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Match match = NothrowClassParser.MemberVariable(lexer, ctx);
+                                                    memberVariable.Reset(cast<Node*>(match.value));
+                                                    if (match.hit)
+                                                    {
+                                                        {
+                                                            #if (DEBUG)
+                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                                            #endif
+                                                            return Match(true, memberVariable.Release());
+                                                        }
+                                                    }
+                                                    *parentMatch22 = match;
+                                                }
+                                                *parentMatch21 = match;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                    }
+                                    *parentMatch6 = match;
+                                    if (!match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch23 = &match;
+                                        lexer.SetPos(save);
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch24 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match = NothrowTypedefParser.Typedef(lexer, ctx);
+                                                typeDefinition.Reset(cast<TypedefNode*>(match.value));
+                                                if (match.hit)
+                                                {
+                                                    {
+                                                        #if (DEBUG)
+                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                                        #endif
+                                                        return Match(true, typeDefinition.Release());
+                                                    }
+                                                }
+                                                *parentMatch24 = match;
+                                            }
+                                            *parentMatch23 = match;
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                }
+                                *parentMatch5 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch25 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch26 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match = NothrowClassParser.Class(lexer, ctx);
+                                            cls.Reset(cast<ClassNode*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                {
+                                                    #if (DEBUG)
+                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                                    #endif
+                                                    return Match(true, cls.Release());
+                                                }
+                                            }
+                                            *parentMatch26 = match;
+                                        }
+                                        *parentMatch25 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                            }
+                            *parentMatch4 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch27 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match(false);
+                                    Match* parentMatch28 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = NothrowEnumerationParser.EnumType(lexer, ctx);
+                                        enumType.Reset(cast<EnumTypeNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            {
+                                                #if (DEBUG)
+                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                                #endif
+                                                return Match(true, enumType.Release());
+                                            }
+                                        }
+                                        *parentMatch28 = match;
+                                    }
+                                    *parentMatch27 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                        }
+                        *parentMatch3 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch29 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(false);
+                                Match* parentMatch30 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowConstantParser.Constant(lexer, ctx);
+                                    constant.Reset(cast<ConstantNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        {
+                                            #if (DEBUG)
+                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                            #endif
+                                            return Match(true, constant.Release());
+                                        }
+                                    }
+                                    *parentMatch30 = match;
+                                }
+                                *parentMatch29 = match;
+                            }
+                            *parentMatch3 = match;
+                        }
+                    }
+                    *parentMatch2 = match;
+                    if (!match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch31 = &match;
+                        lexer.SetPos(save);
+                        {
+                            Match match(false);
+                            Match* parentMatch32 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match = NothrowDelegateParser.Delegate(lexer, ctx);
+                                dlg.Reset(cast<DelegateNode*>(match.value));
+                                if (match.hit)
+                                {
+                                    {
+                                        #if (DEBUG)
+                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                        #endif
+                                        return Match(true, dlg.Release());
+                                    }
+                                }
+                                *parentMatch32 = match;
+                            }
+                            *parentMatch31 = match;
+                        }
+                        *parentMatch2 = match;
+                    }
+                }
+                *parentMatch1 = match;
+                if (!match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch33 = &match;
+                    lexer.SetPos(save);
+                    {
+                        Match match(false);
+                        Match* parentMatch34 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = NothrowDelegateParser.ClassDelegate(lexer, ctx);
+                            classDelegate.Reset(cast<ClassDelegateNode*>(match.value));
+                            if (match.hit)
+                            {
+                                {
+                                    #if (DEBUG)
+                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                    #endif
+                                    return Match(true, classDelegate.Release());
+                                }
+                            }
+                            *parentMatch34 = match;
+                        }
+                        *parentMatch33 = match;
+                    }
+                    *parentMatch1 = match;
+                }
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch35 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(false);
+                    Match* parentMatch36 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Span span = lexer.GetSpan();
+                        Match match = NothrowClassParser.SyncMember(lexer);
+                        if (match.hit)
+                        {
+                            {
+                                #if (DEBUG)
+                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                                #endif
+                                return Match(true, new SyncNode(span, ctx->ModuleId()));
+                            }
+                        }
+                        *parentMatch36 = match;
+                    }
+                    *parentMatch35 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassMember");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ClassMember");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match SyncMember(CmajorNothrowLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"SyncMember");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            bool pass = true;
+            Match match(true);
+            if (match.hit)
+            {
+                if (lexer.Synchronize())
+                {
+                    ++lexer;
+                }
+                else
+                {
+                    pass = false;
+                }
+            }
+            if (match.hit && !pass)
+            {
+                match = Match(false);
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"SyncMember");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"SyncMember");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match StaticConstructor(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx, ClassNode* classNode)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"StaticConstructor");
+            }
+        #endif
+        UniquePtr<StaticConstructorNode> staticConstructor;
+        Span s;
+        Span specifierSpan;
+        ustring className;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<IdentifierNode> id;
+        UniquePtr<InitializerNode> initializer;
+        UniquePtr<WhereConstraintNode> constraint;
+        UniquePtr<CompoundStatementNode> body;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match(true);
+                                                    if (match.hit)
+                                                    {
+                                                        s = span;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch11 = &match;
+                                                {
+                                                    Match match(true);
+                                                    long save = lexer.GetPos();
+                                                    Match* parentMatch12 = &match;
+                                                    {
+                                                        Match match = NothrowAttributeParser.Attributes(lexer, ctx);
+                                                        attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            *parentMatch12 = match;
+                                                        }
+                                                        else
+                                                        {
+                                                            lexer.SetPos(save);
+                                                        }
+                                                    }
+                                                    *parentMatch11 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch14 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                                    specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                                    if (match.hit)
+                                                    {
+                                                        specifierSpan = span;
+                                                    }
+                                                    *parentMatch14 = match;
+                                                }
+                                                *parentMatch13 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch15 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch16 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Span span = lexer.GetSpan();
+                                                Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                                                id.Reset(cast<IdentifierNode*>(match.value));
+                                                if (match.hit)
+                                                {
+                                                    className = lexer.GetMatch(span);
+                                                }
+                                                *parentMatch16 = match;
+                                            }
+                                            *parentMatch15 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch17 = &match;
+                                    {
+                                        Match match(false);
+                                        if (*lexer == LPAREN)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        *parentMatch17 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch18 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch19 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Span span = lexer.GetSpan();
+                                        bool pass = true;
+                                        Match match(false);
+                                        if (*lexer == RPAREN)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            s.end = span.end;
+                                            if (className != classNode->Id()->Str()) pass = false;
+                                            else if (!StaticConstructorSpecifiers(specifiers->value)) pass = false;
+                                            else
+                                            {
+                                                staticConstructor.Reset(new StaticConstructorNode(s, ctx->ModuleId(), specifiers->value, attrs.Release()));
+                                                staticConstructor->SetClassId(id.Release());
+                                                staticConstructor->SetSpecifierSpan(specifierSpan);
+                                            }
+                                        }
+                                        if (match.hit && !pass)
+                                        {
+                                            match = Match(false);
+                                        }
+                                        *parentMatch19 = match;
+                                    }
+                                    *parentMatch18 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch20 = &match;
+                            {
+                                Match match(true);
+                                long save = lexer.GetPos();
+                                Match* parentMatch21 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch22 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch23 = &match;
+                                        {
+                                            Match match(false);
+                                            if (*lexer == COLON)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            *parentMatch23 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch24 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch25 = &match;
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch26 = &match;
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch27 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match = NothrowClassParser.Initializer(lexer, ctx);
+                                                            initializer.Reset(cast<InitializerNode*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                staticConstructor->AddInitializer(initializer.Release());
+                                                            }
+                                                            *parentMatch27 = match;
+                                                        }
+                                                        *parentMatch26 = match;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch28 = &match;
+                                                        {
+                                                            Match match(true);
+                                                            Match* parentMatch29 = &match;
+                                                            {
+                                                                while (true)
+                                                                {
+                                                                    long save = lexer.GetPos();
+                                                                    {
+                                                                        Match match(false);
+                                                                        Match* parentMatch30 = &match;
+                                                                        {
+                                                                            Match match(false);
+                                                                            if (*lexer == COMMA)
+                                                                            {
+                                                                                ++lexer;
+                                                                                match.hit = true;
+                                                                            }
+                                                                            *parentMatch30 = match;
+                                                                        }
+                                                                        if (match.hit)
+                                                                        {
+                                                                            Match match(false);
+                                                                            Match* parentMatch31 = &match;
+                                                                            {
+                                                                                Match match(false);
+                                                                                Match* parentMatch32 = &match;
+                                                                                {
+                                                                                    long pos = lexer.GetPos();
+                                                                                    Match match = NothrowClassParser.Initializer(lexer, ctx);
+                                                                                    initializer.Reset(cast<InitializerNode*>(match.value));
+                                                                                    if (match.hit)
+                                                                                    {
+                                                                                        staticConstructor->AddInitializer(initializer.Release());
+                                                                                    }
+                                                                                    *parentMatch32 = match;
+                                                                                }
+                                                                                *parentMatch31 = match;
+                                                                            }
+                                                                            *parentMatch30 = match;
+                                                                        }
+                                                                        if (match.hit)
+                                                                        {
+                                                                            *parentMatch29 = match;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            lexer.SetPos(save);
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            *parentMatch28 = match;
+                                                        }
+                                                        *parentMatch26 = match;
+                                                    }
+                                                    *parentMatch25 = match;
+                                                }
+                                                *parentMatch24 = match;
+                                            }
+                                            *parentMatch23 = match;
+                                        }
+                                        *parentMatch22 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch21 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                    }
+                                }
+                                *parentMatch20 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch33 = &match;
+                        {
+                            Match match(true);
+                            long save = lexer.GetPos();
+                            Match* parentMatch34 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch35 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch36 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = NothrowConceptParser.WhereConstraint(lexer, ctx);
+                                        constraint.Reset(cast<WhereConstraintNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            staticConstructor->SetConstraint(constraint.Release());
+                                        }
+                                        *parentMatch36 = match;
+                                    }
+                                    *parentMatch35 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    *parentMatch34 = match;
+                                }
+                                else
+                                {
+                                    lexer.SetPos(save);
+                                }
+                            }
+                            *parentMatch33 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch37 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch38 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch39 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch40 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowStatementParser.CompoundStatement(lexer, ctx);
+                                    body.Reset(cast<CompoundStatementNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        staticConstructor->SetBody(body.Release());
+                                    }
+                                    *parentMatch40 = match;
+                                }
+                                *parentMatch39 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch41 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        if (*lexer == SEMICOLON)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        *parentMatch41 = match;
+                                    }
+                                    *parentMatch39 = match;
+                                }
+                            }
+                            *parentMatch38 = match;
+                        }
+                        *parentMatch37 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                staticConstructor->SetLexerFlags(lexer.Flags());
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"StaticConstructor");
+                    #endif
+                    return Match(true, staticConstructor.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"StaticConstructor");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"StaticConstructor");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match Constructor(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx, ClassNode* classNode)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Constructor");
+            }
+        #endif
+        UniquePtr<ConstructorNode> ctor;
+        Span s;
+        Span specifierSpan;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<IdentifierNode> id;
+        UniquePtr<InitializerNode> initializer;
+        UniquePtr<WhereConstraintNode> constraint;
+        UniquePtr<CompoundStatementNode> body;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Span span = lexer.GetSpan();
+                                                Match match(true);
+                                                if (match.hit)
+                                                {
+                                                    s = span;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch10 = &match;
+                                            {
+                                                Match match(true);
+                                                long save = lexer.GetPos();
+                                                Match* parentMatch11 = &match;
+                                                {
+                                                    Match match = NothrowAttributeParser.Attributes(lexer, ctx);
+                                                    attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
+                                                    if (match.hit)
+                                                    {
+                                                        *parentMatch11 = match;
+                                                    }
+                                                    else
+                                                    {
+                                                        lexer.SetPos(save);
+                                                    }
+                                                }
+                                                *parentMatch10 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch12 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Span span = lexer.GetSpan();
+                                                Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                                specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                                if (match.hit)
+                                                {
+                                                    specifierSpan = span;
+                                                }
+                                                *parentMatch13 = match;
+                                            }
+                                            *parentMatch12 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch14 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch15 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Span span = lexer.GetSpan();
+                                            bool pass = true;
+                                            Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                                            id.Reset(cast<IdentifierNode*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                ustring className = lexer.GetMatch(span);
+                                                s.end = span.end;
+                                                if (className != classNode->Id()->Str()) pass = false;
+                                                else
+                                                {
+                                                    ctor.Reset(new ConstructorNode(s, ctx->ModuleId(), specifiers->value, attrs.Release()));
+                                                    ctor->SetClassId(id.Release());
+                                                    ctor->SetSpecifierSpan(specifierSpan);
+                                                }
+                                            }
+                                            if (match.hit && !pass)
+                                            {
+                                                match = Match(false);
+                                            }
+                                            *parentMatch15 = match;
+                                        }
+                                        *parentMatch14 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch16 = &match;
+                                {
+                                    Match match = NothrowParameterParser.ParameterList(lexer, ctx, ctor.Get());
+                                    *parentMatch16 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch17 = &match;
+                            {
+                                Match match(true);
+                                long save = lexer.GetPos();
+                                Match* parentMatch18 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch19 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch20 = &match;
+                                        {
+                                            Match match(false);
+                                            if (*lexer == COLON)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            *parentMatch20 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch21 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch22 = &match;
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch23 = &match;
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch24 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match = NothrowClassParser.Initializer(lexer, ctx);
+                                                            initializer.Reset(cast<InitializerNode*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                ctor->AddInitializer(initializer.Release());
+                                                            }
+                                                            *parentMatch24 = match;
+                                                        }
+                                                        *parentMatch23 = match;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch25 = &match;
+                                                        {
+                                                            Match match(true);
+                                                            Match* parentMatch26 = &match;
+                                                            {
+                                                                while (true)
+                                                                {
+                                                                    long save = lexer.GetPos();
+                                                                    {
+                                                                        Match match(false);
+                                                                        Match* parentMatch27 = &match;
+                                                                        {
+                                                                            Match match(false);
+                                                                            if (*lexer == COMMA)
+                                                                            {
+                                                                                ++lexer;
+                                                                                match.hit = true;
+                                                                            }
+                                                                            *parentMatch27 = match;
+                                                                        }
+                                                                        if (match.hit)
+                                                                        {
+                                                                            Match match(false);
+                                                                            Match* parentMatch28 = &match;
+                                                                            {
+                                                                                Match match(false);
+                                                                                Match* parentMatch29 = &match;
+                                                                                {
+                                                                                    long pos = lexer.GetPos();
+                                                                                    Match match = NothrowClassParser.Initializer(lexer, ctx);
+                                                                                    initializer.Reset(cast<InitializerNode*>(match.value));
+                                                                                    if (match.hit)
+                                                                                    {
+                                                                                        ctor->AddInitializer(initializer.Release());
+                                                                                    }
+                                                                                    *parentMatch29 = match;
+                                                                                }
+                                                                                *parentMatch28 = match;
+                                                                            }
+                                                                            *parentMatch27 = match;
+                                                                        }
+                                                                        if (match.hit)
+                                                                        {
+                                                                            *parentMatch26 = match;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            lexer.SetPos(save);
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            *parentMatch25 = match;
+                                                        }
+                                                        *parentMatch23 = match;
+                                                    }
+                                                    *parentMatch22 = match;
+                                                }
+                                                *parentMatch21 = match;
+                                            }
+                                            *parentMatch20 = match;
+                                        }
+                                        *parentMatch19 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch18 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                    }
+                                }
+                                *parentMatch17 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch30 = &match;
+                        {
+                            Match match(true);
+                            long save = lexer.GetPos();
+                            Match* parentMatch31 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch32 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch33 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = NothrowConceptParser.WhereConstraint(lexer, ctx);
+                                        constraint.Reset(cast<WhereConstraintNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            ctor->SetConstraint(constraint.Release());
+                                        }
+                                        *parentMatch33 = match;
+                                    }
+                                    *parentMatch32 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    *parentMatch31 = match;
+                                }
+                                else
+                                {
+                                    lexer.SetPos(save);
+                                }
+                            }
+                            *parentMatch30 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch34 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch35 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch36 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch37 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowStatementParser.CompoundStatement(lexer, ctx);
+                                    body.Reset(cast<CompoundStatementNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        ctor->SetBody(body.Release());
+                                    }
+                                    *parentMatch37 = match;
+                                }
+                                *parentMatch36 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch38 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        if (*lexer == SEMICOLON)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        *parentMatch38 = match;
+                                    }
+                                    *parentMatch36 = match;
+                                }
+                            }
+                            *parentMatch35 = match;
+                        }
+                        *parentMatch34 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                ctor->SetLexerFlags(lexer.Flags());
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Constructor");
+                    #endif
+                    return Match(true, ctor.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Constructor");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Constructor");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match Destructor(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx, ClassNode* classNode)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Destructor");
+            }
+        #endif
+        UniquePtr<DestructorNode> dtor;
+        Span s;
+        Span specifierSpan;
+        ustring className;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<IdentifierNode> id;
+        UniquePtr<WhereConstraintNode> constraint;
+        UniquePtr<CompoundStatementNode> body;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match(true);
+                                                    if (match.hit)
+                                                    {
+                                                        s = span;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch11 = &match;
+                                                {
+                                                    Match match(true);
+                                                    long save = lexer.GetPos();
+                                                    Match* parentMatch12 = &match;
+                                                    {
+                                                        Match match = NothrowAttributeParser.Attributes(lexer, ctx);
+                                                        attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            *parentMatch12 = match;
+                                                        }
+                                                        else
+                                                        {
+                                                            lexer.SetPos(save);
+                                                        }
+                                                    }
+                                                    *parentMatch11 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch14 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                                    specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                                    if (match.hit)
+                                                    {
+                                                        specifierSpan = span;
+                                                    }
+                                                    *parentMatch14 = match;
+                                                }
+                                                *parentMatch13 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch15 = &match;
+                                        {
+                                            Match match(false);
+                                            if (*lexer == CPL)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            *parentMatch15 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch16 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch17 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Span span = lexer.GetSpan();
+                                            Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                                            id.Reset(cast<IdentifierNode*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                className = lexer.GetMatch(span);
+                                            }
+                                            *parentMatch17 = match;
+                                        }
+                                        *parentMatch16 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch18 = &match;
+                                {
+                                    Match match(true);
+                                    Match* parentMatch19 = &match;
+                                    {
+                                        System.Lex.Span span = lexer.GetSpan();
+                                        Match match(false);
+                                        if (*lexer == LPAREN)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            *parentMatch19 = match;
+                                        }
+                                        else
+                                        {
+                                            match.hit = true;
+                                            *parentMatch19 = match;
+                                            lexer.AddError(span, GetTokenName(LPAREN));
+                                        }
+                                    }
+                                    *parentMatch18 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch20 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch21 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Span span = lexer.GetSpan();
+                                    bool pass = true;
+                                    Match match(true);
+                                    Match* parentMatch22 = &match;
+                                    {
+                                        System.Lex.Span span = lexer.GetSpan();
+                                        Match match(false);
+                                        if (*lexer == RPAREN)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            *parentMatch22 = match;
+                                        }
+                                        else
+                                        {
+                                            match.hit = true;
+                                            *parentMatch22 = match;
+                                            lexer.AddError(span, GetTokenName(RPAREN));
+                                        }
+                                    }
+                                    if (match.hit)
+                                    {
+                                        s.end = span.end;
+                                        if (className != classNode->Id()->Str()) pass = false;
+                                        else
+                                        {
+                                            dtor.Reset(new DestructorNode(s, ctx->ModuleId(), specifiers->value, attrs.Release()));
+                                            dtor->SetClassId(id.Release());
+                                            dtor->SetSpecifierSpan(specifierSpan);
+                                        }
+                                    }
+                                    if (match.hit && !pass)
+                                    {
+                                        match = Match(false);
+                                    }
+                                    *parentMatch21 = match;
+                                }
+                                *parentMatch20 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch23 = &match;
+                        {
+                            Match match(true);
+                            long save = lexer.GetPos();
+                            Match* parentMatch24 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch25 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch26 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = NothrowConceptParser.WhereConstraint(lexer, ctx);
+                                        constraint.Reset(cast<WhereConstraintNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            dtor->SetConstraint(constraint.Release());
+                                        }
+                                        *parentMatch26 = match;
+                                    }
+                                    *parentMatch25 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    *parentMatch24 = match;
+                                }
+                                else
+                                {
+                                    lexer.SetPos(save);
+                                }
+                            }
+                            *parentMatch23 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch27 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch28 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch29 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch30 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowStatementParser.CompoundStatement(lexer, ctx);
+                                    body.Reset(cast<CompoundStatementNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        dtor->SetBody(body.Release());
+                                    }
+                                    *parentMatch30 = match;
+                                }
+                                *parentMatch29 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch31 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        if (*lexer == SEMICOLON)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        *parentMatch31 = match;
+                                    }
+                                    *parentMatch29 = match;
+                                }
+                            }
+                            *parentMatch28 = match;
+                        }
+                        *parentMatch27 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                dtor->SetLexerFlags(lexer.Flags());
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Destructor");
+                    #endif
+                    return Match(true, dtor.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Destructor");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Destructor");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match Initializer(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Initializer");
+            }
+        #endif
+        UniquePtr<InitializerNode> initializer;
+        UniquePtr<IdentifierNode> id;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long save = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Span span = lexer.GetSpan();
+                                        Match match(false);
+                                        if (*lexer == THIS)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            initializer.Reset(new ThisInitializerNode(span, ctx->ModuleId()));
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch8 = &match;
+                                    {
+                                        Match match(true);
+                                        Match* parentMatch9 = &match;
+                                        {
+                                            System.Lex.Span span = lexer.GetSpan();
+                                            Match match(false);
+                                            if (*lexer == LPAREN)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                *parentMatch9 = match;
+                                            }
+                                            else
+                                            {
+                                                match.hit = true;
+                                                *parentMatch9 = match;
+                                                lexer.AddError(span, GetTokenName(LPAREN));
+                                            }
+                                        }
+                                        *parentMatch8 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch10 = &match;
+                                {
+                                    Match match = NothrowExpressionParser.ArgumentList(lexer, ctx, initializer.Get());
+                                    *parentMatch10 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch11 = &match;
+                            {
+                                Match match(true);
+                                Match* parentMatch12 = &match;
+                                {
+                                    System.Lex.Span span = lexer.GetSpan();
+                                    Match match(false);
+                                    if (*lexer == RPAREN)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch12 = match;
+                                    }
+                                    else
+                                    {
+                                        match.hit = true;
+                                        *parentMatch12 = match;
+                                        lexer.AddError(span, GetTokenName(RPAREN));
+                                    }
+                                }
+                                *parentMatch11 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch13 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(false);
+                                Match* parentMatch14 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch15 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch16 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch17 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Span span = lexer.GetSpan();
+                                                Match match(false);
+                                                if (*lexer == BASE)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    initializer.Reset(new BaseInitializerNode(span, ctx->ModuleId()));
+                                                }
+                                                *parentMatch17 = match;
+                                            }
+                                            *parentMatch16 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch18 = &match;
+                                            {
+                                                Match match(true);
+                                                Match* parentMatch19 = &match;
+                                                {
+                                                    System.Lex.Span span = lexer.GetSpan();
+                                                    Match match(false);
+                                                    if (*lexer == LPAREN)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        *parentMatch19 = match;
+                                                    }
+                                                    else
+                                                    {
+                                                        match.hit = true;
+                                                        *parentMatch19 = match;
+                                                        lexer.AddError(span, GetTokenName(LPAREN));
+                                                    }
+                                                }
+                                                *parentMatch18 = match;
+                                            }
+                                            *parentMatch16 = match;
+                                        }
+                                        *parentMatch15 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch20 = &match;
+                                        {
+                                            Match match = NothrowExpressionParser.ArgumentList(lexer, ctx, initializer.Get());
+                                            *parentMatch20 = match;
+                                        }
+                                        *parentMatch15 = match;
+                                    }
+                                    *parentMatch14 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch21 = &match;
+                                    {
+                                        Match match(true);
+                                        Match* parentMatch22 = &match;
+                                        {
+                                            System.Lex.Span span = lexer.GetSpan();
+                                            Match match(false);
+                                            if (*lexer == RPAREN)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                *parentMatch22 = match;
+                                            }
+                                            else
+                                            {
+                                                match.hit = true;
+                                                *parentMatch22 = match;
+                                                lexer.AddError(span, GetTokenName(RPAREN));
+                                            }
+                                        }
+                                        *parentMatch21 = match;
+                                    }
+                                    *parentMatch14 = match;
+                                }
+                                *parentMatch13 = match;
+                            }
+                            *parentMatch3 = match;
+                        }
+                    }
+                    *parentMatch2 = match;
+                    if (!match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch23 = &match;
+                        lexer.SetPos(save);
+                        {
+                            Match match(false);
+                            Match* parentMatch24 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch25 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch26 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch27 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Span span = lexer.GetSpan();
+                                            Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                                            id.Reset(cast<IdentifierNode*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                initializer.Reset(new MemberInitializerNode(span, ctx->ModuleId(), id.Release()));
+                                            }
+                                            *parentMatch27 = match;
+                                        }
+                                        *parentMatch26 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch28 = &match;
+                                        {
+                                            Match match(true);
+                                            Match* parentMatch29 = &match;
+                                            {
+                                                System.Lex.Span span = lexer.GetSpan();
+                                                Match match(false);
+                                                if (*lexer == LPAREN)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    *parentMatch29 = match;
+                                                }
+                                                else
+                                                {
+                                                    match.hit = true;
+                                                    *parentMatch29 = match;
+                                                    lexer.AddError(span, GetTokenName(LPAREN));
+                                                }
+                                            }
+                                            *parentMatch28 = match;
+                                        }
+                                        *parentMatch26 = match;
+                                    }
+                                    *parentMatch25 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch30 = &match;
+                                    {
+                                        Match match = NothrowExpressionParser.ArgumentList(lexer, ctx, initializer.Get());
+                                        *parentMatch30 = match;
+                                    }
+                                    *parentMatch25 = match;
+                                }
+                                *parentMatch24 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch31 = &match;
+                                {
+                                    Match match(true);
+                                    Match* parentMatch32 = &match;
+                                    {
+                                        System.Lex.Span span = lexer.GetSpan();
+                                        Match match(false);
+                                        if (*lexer == RPAREN)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            *parentMatch32 = match;
+                                        }
+                                        else
+                                        {
+                                            match.hit = true;
+                                            *parentMatch32 = match;
+                                            lexer.AddError(span, GetTokenName(RPAREN));
+                                        }
+                                    }
+                                    *parentMatch31 = match;
+                                }
+                                *parentMatch24 = match;
+                            }
+                            *parentMatch23 = match;
+                        }
+                        *parentMatch2 = match;
+                    }
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                initializer->SetLexerFlags(lexer.Flags());
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Initializer");
+                    #endif
+                    return Match(true, initializer.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Initializer");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Initializer");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match MemberFunction(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"MemberFunction");
+            }
+        #endif
+        UniquePtr<MemberFunctionNode> memFun;
+        Span s;
+        Span specifierSpan;
+        Span groupIdSpan;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<Node> returnType;
+        UniquePtr<Value<ustring>> groupId;
+        UniquePtr<WhereConstraintNode> constraint;
+        UniquePtr<CompoundStatementNode> body;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match(true);
+                                                    if (match.hit)
+                                                    {
+                                                        s = span;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch11 = &match;
+                                                {
+                                                    Match match(true);
+                                                    long save = lexer.GetPos();
+                                                    Match* parentMatch12 = &match;
+                                                    {
+                                                        Match match = NothrowAttributeParser.Attributes(lexer, ctx);
+                                                        attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            *parentMatch12 = match;
+                                                        }
+                                                        else
+                                                        {
+                                                            lexer.SetPos(save);
+                                                        }
+                                                    }
+                                                    *parentMatch11 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch14 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                                    specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                                    if (match.hit)
+                                                    {
+                                                        specifierSpan = span;
+                                                    }
+                                                    *parentMatch14 = match;
+                                                }
+                                                *parentMatch13 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch15 = &match;
+                                        {
+                                            Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                                            returnType.Reset(cast<Node*>(match.value));
+                                            *parentMatch15 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch16 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch17 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Span span = lexer.GetSpan();
+                                            Match match = NothrowFunctionParser.FunctionGroupId(lexer, ctx);
+                                            groupId.Reset(cast<Value<ustring>*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                s.end = span.end;
+                                                groupIdSpan = span;
+                                                memFun.Reset(new MemberFunctionNode(s, ctx->ModuleId(), specifiers->value, returnType.Release(), groupId->value, attrs.Release()));
+                                                memFun->SetSpecifierSpan(specifierSpan);
+                                                memFun->SetGroupIdSpan(groupIdSpan);
+                                            }
+                                            *parentMatch17 = match;
+                                        }
+                                        *parentMatch16 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch18 = &match;
+                                {
+                                    Match match = NothrowParameterParser.ParameterList(lexer, ctx, memFun.Get());
+                                    *parentMatch18 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch19 = &match;
+                            {
+                                Match match(true);
+                                long save = lexer.GetPos();
+                                Match* parentMatch20 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch21 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch22 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match(false);
+                                            if (*lexer == CONST)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                memFun->SetConst();
+                                            }
+                                            *parentMatch22 = match;
+                                        }
+                                        *parentMatch21 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch20 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                    }
+                                }
+                                *parentMatch19 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch23 = &match;
+                        {
+                            Match match(true);
+                            long save = lexer.GetPos();
+                            Match* parentMatch24 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch25 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch26 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = NothrowConceptParser.WhereConstraint(lexer, ctx);
+                                        constraint.Reset(cast<WhereConstraintNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            memFun->SetConstraint(constraint.Release());
+                                        }
+                                        *parentMatch26 = match;
+                                    }
+                                    *parentMatch25 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    *parentMatch24 = match;
+                                }
+                                else
+                                {
+                                    lexer.SetPos(save);
+                                }
+                            }
+                            *parentMatch23 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch27 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch28 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch29 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch30 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowStatementParser.CompoundStatement(lexer, ctx);
+                                    body.Reset(cast<CompoundStatementNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        memFun->SetBody(body.Release());
+                                    }
+                                    *parentMatch30 = match;
+                                }
+                                *parentMatch29 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch31 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        if (*lexer == SEMICOLON)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        *parentMatch31 = match;
+                                    }
+                                    *parentMatch29 = match;
+                                }
+                            }
+                            *parentMatch28 = match;
+                        }
+                        *parentMatch27 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                memFun->SetLexerFlags(lexer.Flags());
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"MemberFunction");
+                    #endif
+                    return Match(true, memFun.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"MemberFunction");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"MemberFunction");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match ConversionFunction(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ConversionFunction");
+            }
+        #endif
+        UniquePtr<ConversionFunctionNode> conversionFun;
+        Span s;
+        Span specifierSpan;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<Node> type;
+        UniquePtr<WhereConstraintNode> constraint;
+        UniquePtr<CompoundStatementNode> body;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch11 = &match;
+                                                    {
+                                                        long pos = lexer.GetPos();
+                                                        Span span = lexer.GetSpan();
+                                                        Match match(true);
+                                                        if (match.hit)
+                                                        {
+                                                            s = span;
+                                                        }
+                                                        *parentMatch11 = match;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch12 = &match;
+                                                    {
+                                                        Match match(true);
+                                                        long save = lexer.GetPos();
+                                                        Match* parentMatch13 = &match;
+                                                        {
+                                                            Match match = NothrowAttributeParser.Attributes(lexer, ctx);
+                                                            attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                *parentMatch13 = match;
+                                                            }
+                                                            else
+                                                            {
+                                                                lexer.SetPos(save);
+                                                            }
+                                                        }
+                                                        *parentMatch12 = match;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch14 = &match;
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch15 = &match;
+                                                    {
+                                                        long pos = lexer.GetPos();
+                                                        Span span = lexer.GetSpan();
+                                                        Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                                        specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            specifierSpan = span;
+                                                        }
+                                                        *parentMatch15 = match;
+                                                    }
+                                                    *parentMatch14 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch16 = &match;
+                                            {
+                                                Match match(false);
+                                                if (*lexer == OPERATOR)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                *parentMatch16 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch17 = &match;
+                                        {
+                                            Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                                            type.Reset(cast<Node*>(match.value));
+                                            *parentMatch17 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch18 = &match;
+                                    {
+                                        Match match(true);
+                                        Match* parentMatch19 = &match;
+                                        {
+                                            System.Lex.Span span = lexer.GetSpan();
+                                            Match match(false);
+                                            if (*lexer == LPAREN)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                *parentMatch19 = match;
+                                            }
+                                            else
+                                            {
+                                                match.hit = true;
+                                                *parentMatch19 = match;
+                                                lexer.AddError(span, GetTokenName(LPAREN));
+                                            }
+                                        }
+                                        *parentMatch18 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch20 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch21 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Span span = lexer.GetSpan();
+                                        Match match(true);
+                                        Match* parentMatch22 = &match;
+                                        {
+                                            System.Lex.Span span = lexer.GetSpan();
+                                            Match match(false);
+                                            if (*lexer == RPAREN)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                *parentMatch22 = match;
+                                            }
+                                            else
+                                            {
+                                                match.hit = true;
+                                                *parentMatch22 = match;
+                                                lexer.AddError(span, GetTokenName(RPAREN));
+                                            }
+                                        }
+                                        if (match.hit)
+                                        {
+                                            s.end = span.end;
+                                            conversionFun.Reset(new ConversionFunctionNode(s, ctx->ModuleId(), specifiers->value, type.Release(), attrs.Release()));
+                                            conversionFun->SetSpecifierSpan(specifierSpan);
+                                        }
+                                        *parentMatch21 = match;
+                                    }
+                                    *parentMatch20 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch23 = &match;
+                            {
+                                Match match(true);
+                                long save = lexer.GetPos();
+                                Match* parentMatch24 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch25 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch26 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match(false);
+                                            if (*lexer == CONST)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                conversionFun->SetConst();
+                                            }
+                                            *parentMatch26 = match;
+                                        }
+                                        *parentMatch25 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch24 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                    }
+                                }
+                                *parentMatch23 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch27 = &match;
+                        {
+                            Match match(true);
+                            long save = lexer.GetPos();
+                            Match* parentMatch28 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch29 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch30 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = NothrowConceptParser.WhereConstraint(lexer, ctx);
+                                        constraint.Reset(cast<WhereConstraintNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            conversionFun->SetConstraint(constraint.Release());
+                                        }
+                                        *parentMatch30 = match;
+                                    }
+                                    *parentMatch29 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    *parentMatch28 = match;
+                                }
+                                else
+                                {
+                                    lexer.SetPos(save);
+                                }
+                            }
+                            *parentMatch27 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch31 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch32 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch33 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch34 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowStatementParser.CompoundStatement(lexer, ctx);
+                                    body.Reset(cast<CompoundStatementNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        conversionFun->SetBody(body.Release());
+                                    }
+                                    *parentMatch34 = match;
+                                }
+                                *parentMatch33 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch35 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        if (*lexer == SEMICOLON)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        *parentMatch35 = match;
+                                    }
+                                    *parentMatch33 = match;
+                                }
+                            }
+                            *parentMatch32 = match;
+                        }
+                        *parentMatch31 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                conversionFun->SetLexerFlags(lexer.Flags());
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ConversionFunction");
+                    #endif
+                    return Match(true, conversionFun.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ConversionFunction");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ConversionFunction");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match MemberVariable(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"MemberVariable");
+            }
+        #endif
+        Span s;
+        Span specifierSpan;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<Node> type;
+        UniquePtr<IdentifierNode> id;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Span span = lexer.GetSpan();
+                                Match match(true);
+                                if (match.hit)
+                                {
+                                    s = span;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(true);
+                                long save = lexer.GetPos();
+                                Match* parentMatch7 = &match;
+                                {
+                                    Match match = NothrowAttributeParser.Attributes(lexer, ctx);
+                                    attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        *parentMatch7 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                    }
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch8 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch9 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Span span = lexer.GetSpan();
+                                Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                if (match.hit)
+                                {
+                                    specifierSpan = span;
+                                }
+                                *parentMatch9 = match;
+                            }
+                            *parentMatch8 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch10 = &match;
+                    {
+                        Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                        type.Reset(cast<Node*>(match.value));
+                        *parentMatch10 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch11 = &match;
+                {
+                    Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                    id.Reset(cast<IdentifierNode*>(match.value));
+                    *parentMatch11 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch12 = &match;
+            {
+                Match match(false);
+                Match* parentMatch13 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Span span = lexer.GetSpan();
+                    Match match(false);
+                    if (*lexer == SEMICOLON)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        s.end = span.end;
+                        MemberVariableNode* value = new MemberVariableNode(s, ctx->ModuleId(), specifiers->value, type.Release(), id.Release(), attrs.Release());
+                        value->SetSpecifierSpan(specifierSpan);
+                        value->SetLexerFlags(lexer.Flags());
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"MemberVariable");
+                            #endif
+                            return Match(true, value);
+                        }
+                    }
+                    *parentMatch13 = match;
+                }
+                *parentMatch12 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"MemberVariable");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"MemberVariable");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

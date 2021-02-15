@@ -29,6 +29,32 @@ Node* AstReader::ReadNode()
     return node;
 }
 
+AttributeNode* AstReader::ReadAttributeNode()
+{
+    Node* node = ReadNode();
+    if (node->GetNodeType() == NodeType::attributeNode)
+    {
+        return static_cast<AttributeNode*>(node);
+    }
+    else
+    {
+        throw std::runtime_error("attribute node expected");
+    }
+}
+
+AttributesNode* AstReader::ReadAttributesNode()
+{
+    Node* node = ReadNode();
+    if (node->GetNodeType() == NodeType::attributesNode)
+    {
+        return static_cast<AttributesNode*>(node);
+    }
+    else
+    {
+        throw std::runtime_error("attributes node expected");
+    }
+}
+
 IdentifierNode* AstReader::ReadIdentifierNode()
 {
     Node* node = ReadNode();

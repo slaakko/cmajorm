@@ -13,18 +13,18 @@ parser ProjectFileParser
     uselexer ContainerFileLexer;
     main;
 
-    ProjectFile(string config, BackEnd backend, var UniquePtr<Project> project) : Project*
+    ProjectFile(string config, BackEnd backend, string toolChain, var UniquePtr<Project> project) : Project*
         ::=
-        (   PROJECT QualifiedId:name! SEMICOLON!{ project.Reset(new Project(name, lexer.FileName(), config, backend)); }
+        (   PROJECT QualifiedId:name! SEMICOLON!{ project.Reset(new Project(name, lexer.FileName(), config, backend, toolChain)); }
             (Declaration:declaration{ project->AddDeclaration(declaration); })*
         )
         {
             return project.Release();
         }
         ;
-        
+
     QualifiedId(var Span s) : ustring
-        ::= 
+        ::=
         (
             ID{ s = span; } (DOT ID{ s.end = span.end; })*
         )
@@ -32,7 +32,7 @@ parser ProjectFileParser
             return lexer.GetMatch(s);
         }
         ;
-        
+
     Declaration : ProjectDeclaration*
         ::= ReferenceDeclaration:referenceDeclaration{ return referenceDeclaration; }
         |   SourceFileDeclaration:sourceFileDeclaration{ return sourceFileDeclaration; }
@@ -40,11 +40,11 @@ parser ProjectFileParser
         |   TextFileDeclaration:textFileDeclaration{ return textFileDeclaration; }
         |   TargetDeclaration:targetDeclaration{ return targetDeclaration; }
         ;
-        
+
     ReferenceDeclaration(var string filePath) : ProjectDeclaration*
         ::= REFERENCE FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new Cm.Ast.ReferenceDeclaration(filePath); }
         ;
-        
+
     SourceFileDeclaration(var string filePath) : ProjectDeclaration*
         ::= SOURCE FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new Cm.Ast.SourceFileDeclaration(filePath); }
         ;
@@ -52,15 +52,15 @@ parser ProjectFileParser
     ResourceFileDeclaration(var string filePath) : ProjectDeclaration*
         ::= RESOURCE FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new Cm.Ast.ResourceFileDeclaration(filePath); }
         ;
-        
+
     TextFileDeclaration(var string filePath) : ProjectDeclaration*
         ::= TEXT FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new Cm.Ast.TextFileDeclaration(filePath); }
         ;
-        
+
     TargetDeclaration : ProjectDeclaration*
         ::= TARGET ASSIGN! Target:target! SEMICOLON!{ return new Cm.Ast.TargetDeclaration(target); }
         ;
-        
+
     Target : Cm.Ast.Target
         ::= PROGRAM{ return Cm.Ast.Target.program; }
         |   WINGUIAPP{ return Cm.Ast.Target.winguiapp; }

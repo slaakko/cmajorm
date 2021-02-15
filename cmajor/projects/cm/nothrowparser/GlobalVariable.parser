@@ -1,0 +1,31 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowGlobalVariableParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowSpecifierParser.Specifiers;
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowIdentifierParser.Identifier;
+    using NothrowExpressionParser.Expression;
+
+    GlobalVariable(NothrowParsingContext* ctx, CompileUnitNode* cu, var Span s) : GlobalVariableNode*
+        ::= Specifiers:specifiers{ s = span; } TypeExpr(ctx):type Identifier(ctx):id (ASSIGN Expression(ctx):initializer)? SEMICOLON
+        {
+            s.end = span.end;
+            GlobalVariableNode* value = new GlobalVariableNode(s, ctx->ModuleId(), specifiers, type, id, cu);
+            value->SetInitializer(initializer);
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+}

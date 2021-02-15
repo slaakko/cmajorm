@@ -1,0 +1,593 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/nothrowparser/Enumeration.parser' using soulcm parser generator scmpg version 3.10.0
+
+public static class NothrowEnumerationParser
+{
+    public static nothrow Match EnumType(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"EnumType");
+            }
+        #endif
+        UniquePtr<EnumTypeNode> enumType;
+        Span s;
+        Span beginBraceSpan;
+        Span endBraceSpan;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<IdentifierNode> enumTypeId;
+        UniquePtr<Node> underlyingType;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Span span = lexer.GetSpan();
+                                    Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                    specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s = span;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    Match match(false);
+                                    if (*lexer == ENUM)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch8 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch9 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Span span = lexer.GetSpan();
+                                    Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                                    enumTypeId.Reset(cast<IdentifierNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s.end = span.end;
+                                        enumType.Reset(new EnumTypeNode(s, ctx->ModuleId(), specifiers->value, enumTypeId.Release()));
+                                    }
+                                    *parentMatch9 = match;
+                                }
+                                *parentMatch8 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch10 = &match;
+                        {
+                            Match match(true);
+                            long save = lexer.GetPos();
+                            Match* parentMatch11 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch12 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch13 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = NothrowEnumerationParser.UnderlyingType(lexer, ctx);
+                                        underlyingType.Reset(cast<Node*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            enumType->SetUnderlyingType(underlyingType.Release());
+                                        }
+                                        *parentMatch13 = match;
+                                    }
+                                    *parentMatch12 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    *parentMatch11 = match;
+                                }
+                                else
+                                {
+                                    lexer.SetPos(save);
+                                }
+                            }
+                            *parentMatch10 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch14 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch15 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Span span = lexer.GetSpan();
+                            Match match(true);
+                            Match* parentMatch16 = &match;
+                            {
+                                System.Lex.Span span = lexer.GetSpan();
+                                Match match(false);
+                                if (*lexer == LBRACE)
+                                {
+                                    ++lexer;
+                                    match.hit = true;
+                                }
+                                if (match.hit)
+                                {
+                                    *parentMatch16 = match;
+                                }
+                                else
+                                {
+                                    match.hit = true;
+                                    *parentMatch16 = match;
+                                    lexer.AddError(span, GetTokenName(LBRACE));
+                                }
+                            }
+                            if (match.hit)
+                            {
+                                beginBraceSpan = span;
+                            }
+                            *parentMatch15 = match;
+                        }
+                        *parentMatch14 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch17 = &match;
+                {
+                    Match match = NothrowEnumerationParser.EnumConstants(lexer, ctx, enumType.Get());
+                    *parentMatch17 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch18 = &match;
+            {
+                Match match(false);
+                Match* parentMatch19 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Span span = lexer.GetSpan();
+                    Match match(true);
+                    Match* parentMatch20 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == RBRACE)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch20 = match;
+                        }
+                        else
+                        {
+                            match.hit = true;
+                            *parentMatch20 = match;
+                            lexer.AddError(span, GetTokenName(RBRACE));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        endBraceSpan = span;
+                        enumType->SetBeginBraceSpan(beginBraceSpan);
+                        enumType->SetEndBraceSpan(endBraceSpan);
+                        enumType->SetLexerFlags(lexer.Flags());
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"EnumType");
+                            #endif
+                            return Match(true, enumType.Release());
+                        }
+                    }
+                    *parentMatch19 = match;
+                }
+                *parentMatch18 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"EnumType");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"EnumType");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match UnderlyingType(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"UnderlyingType");
+            }
+        #endif
+        UniquePtr<Node> type;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            if (*lexer == COLON)
+            {
+                ++lexer;
+                match.hit = true;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                    type.Reset(cast<Node*>(match.value));
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UnderlyingType");
+                            #endif
+                            return Match(true, type.Release());
+                        }
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UnderlyingType");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"UnderlyingType");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match EnumConstants(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx, EnumTypeNode* enumType)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"EnumConstants");
+            }
+        #endif
+        UniquePtr<EnumConstantNode> enumConstant;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long pos = lexer.GetPos();
+                Match match = NothrowEnumerationParser.EnumConstant(lexer, ctx, enumType);
+                enumConstant.Reset(cast<EnumConstantNode*>(match.value));
+                if (match.hit)
+                {
+                    enumType->AddConstant(enumConstant.Release());
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch2 = &match;
+            {
+                Match match(true);
+                Match* parentMatch3 = &match;
+                {
+                    while (true)
+                    {
+                        long save = lexer.GetPos();
+                        {
+                            Match match(false);
+                            Match* parentMatch4 = &match;
+                            {
+                                Match match(false);
+                                if (*lexer == COMMA)
+                                {
+                                    ++lexer;
+                                    match.hit = true;
+                                }
+                                *parentMatch4 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch5 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch6 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = NothrowEnumerationParser.EnumConstant(lexer, ctx, enumType);
+                                        enumConstant.Reset(cast<EnumConstantNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            enumType->AddConstant(enumConstant.Release());
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch3 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                                break;
+                            }
+                        }
+                    }
+                }
+                *parentMatch2 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"EnumConstants");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"EnumConstants");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match EnumConstant(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx, EnumTypeNode* enumType)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"EnumConstant");
+            }
+        #endif
+        Span s;
+        UniquePtr<Node> expr;
+        UniquePtr<IdentifierNode> constantId;
+        UniquePtr<Node> constantValue;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long pos = lexer.GetPos();
+                Span span = lexer.GetSpan();
+                Match match = NothrowIdentifierParser.Identifier(lexer, ctx);
+                constantId.Reset(cast<IdentifierNode*>(match.value));
+                if (match.hit)
+                {
+                    s = span;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch2 = &match;
+            {
+                Match match(false);
+                Match* parentMatch3 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match(false);
+                            if (*lexer == ASSIGN)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = NothrowExpressionParser.Expression(lexer, ctx);
+                                    constantValue.Reset(cast<Node*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        expr.Reset(constantValue.Release());
+                                        expr->SetFullSpan();
+                                        Span v = expr->GetSpan();
+                                        s.end = expr->GetSpan().end;
+                                        EnumConstantNode* value = new EnumConstantNode(s, ctx->ModuleId(), constantId.Release(), expr.Release());
+                                        value->SetHasValue();
+                                        value->SetStrValue(lexer.GetMatch(v));
+                                        value->SetLexerFlags(lexer.Flags());
+                                        {
+                                            #if (DEBUG)
+                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"EnumConstant");
+                                            #endif
+                                            return Match(true, value);
+                                        }
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch4 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch8 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(false);
+                                Match* parentMatch9 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match(true);
+                                    if (match.hit)
+                                    {
+                                        EnumConstantNode* node = new EnumConstantNode(s, ctx->ModuleId(), constantId.Release(), MakeNextEnumConstantValue(s, ctx->ModuleId(), enumType));
+                                        node->SetLexerFlags(lexer.Flags());
+                                        {
+                                            #if (DEBUG)
+                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"EnumConstant");
+                                            #endif
+                                            return Match(true, node);
+                                        }
+                                    }
+                                    *parentMatch9 = match;
+                                }
+                                *parentMatch8 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                    }
+                    *parentMatch3 = match;
+                }
+                *parentMatch2 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"EnumConstant");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"EnumConstant");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

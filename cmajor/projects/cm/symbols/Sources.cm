@@ -1,0 +1,246 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Collections;
+using System.Threading;
+using System.Lex;
+using Cm.NothrowParser;
+using Cm.Ast;
+
+namespace Cm.Symbols
+{
+    public class Source
+    {
+        public nothrow Source(const string& filePath_) : filePath(filePath_)
+        {
+        }
+        public void Read()
+        {
+            content = ToUtf32(File.ReadAllText(filePath));
+        }
+        public void Parse(const Uuid& moduleId, int index)
+        {
+            errors.Clear();
+            CmajorNothrowLexer lexer(Start(), End(), FilePath(), index);
+            NothrowParsingContext parsingContext;
+            parsingContext.SetModuleId(moduleId);
+            UniquePtr<CompileUnitNode> parsedCompileUnit = NothrowCompileUnitParser.Parse(lexer, &parsingContext);
+            List<UniquePtr<Exception>> parsingErrors = lexer.Errors();
+            if (!parsingErrors.IsEmpty())
+            {
+                CmajorNothrowLexer lexer(Start(), End(), FilePath(), index);
+                lexer.SetFlag(LexerFlags.synchronize);
+                NothrowParsingContext parsingContext;
+                parsingContext.SetModuleId(moduleId);
+                parsedCompileUnit = NothrowCompileUnitParser.Parse(lexer, &parsingContext);
+                parsingErrors = lexer.Errors();
+                synchronized = lexer.GetFlag(LexerFlags.synchronizedAtLeastOnce);
+            }
+            else
+            {
+                synchronized = lexer.GetFlag(LexerFlags.synchronizedAtLeastOnce);
+            }
+            for (const UniquePtr<Exception>& ex : parsingErrors)
+            {
+                errors.Add(ex->Message());
+            }
+            compileUnit = Rvalue(parsedCompileUnit);
+        }
+        public nothrow inline const uchar* Start() const
+        {
+            return content.Chars();
+        }
+        public nothrow inline const uchar* End() const
+        {
+            return content.Chars() + content.Length();
+        }
+        public nothrow inline const string& FilePath() const
+        {
+            return filePath;
+        }
+        public nothrow inline bool Synchronized() const
+        {
+            return synchronized;
+        }
+        public nothrow inline const List<string>& Errors() const
+        {
+            return errors;
+        }
+        private string filePath;
+        private ustring content;
+        private List<string> errors;
+        private bool synchronized;
+        private UniquePtr<CompileUnitNode> compileUnit;
+    }
+
+    public class ParseResult
+    {
+        public bool ok;
+        public string error;
+        public int numberOfErrors;
+        public bool synchronized;
+        public string cursorContainer;
+        public List<string> errors;
+        public TimePoint start;
+        public TimePoint end;
+    }
+
+    public class ParserData
+    {
+        public nothrow ParserData(bool& stop_, LinkedList<int>& indexQueue_, List<ExceptionPtr>& exceptions_, Sources& sources_, const Uuid& moduleId_) :
+            stop(stop_), indexQueue(indexQueue_), exceptions(exceptions_), sources(sources_), moduleId(moduleId_), mtx()
+        {
+        }
+        public bool& stop;
+        public LinkedList<int>& indexQueue;
+        public List<ExceptionPtr>& exceptions;
+        public Sources& sources;
+        public Uuid moduleId;
+        public Mutex mtx;
+    }
+
+    public void DoParse(void* param)
+    {
+        ParserData* parserData = cast<ParserData*>(param);
+        int index = -1;
+        try
+        {
+            while (!parserData->stop)
+            {
+                {
+                    LockGuard<Mutex> lock(parserData->mtx);
+                    if (parserData->indexQueue.IsEmpty())
+                    {
+                        return;
+                    }
+                    index = parserData->indexQueue.Front();
+                    parserData->indexQueue.RemoveFirst();
+                }
+                Source* source = parserData->sources.GetSource(index);
+                source->Read();
+                source->Parse(parserData->moduleId, index);
+            }
+        }
+        catch (const Exception& ex)
+        {
+            if (index != -1)
+            {
+                parserData->exceptions[index] = CaptureCurrentException();
+                parserData->stop = true;
+            }
+        }
+    }
+
+    public class Sources
+    {
+        public nothrow Sources(const List<string>& filePaths)
+        {
+            for (const string& filePath : filePaths)
+            {
+                UniquePtr<Source> source(new Source(filePath));
+                sources.Add(Rvalue(source));
+            }
+            MakeSourceIndexMap();
+        }
+        public nothrow inline int Count() const
+        {
+            return cast<int>(sources.Count());
+        }
+        public nothrow inline Source* GetSource(int index) const
+        {
+            return sources[index].Get();
+        }
+        public ParseResult Parse(Module* module)
+        {
+            ParseResult result;
+            result.ok = true;
+            result.start = Now();
+            try
+            {
+                bool stop = false;
+                LinkedList<int> indexQueue;
+                List<ExceptionPtr> exceptions;
+                int n = Count();
+                exceptions.Resize(n);
+                for (int i = 0; i < n; ++i)
+                {
+                    indexQueue.Add(i);
+                }
+                Uuid moduleId;
+                if (module != null)
+                {
+                    moduleId = module->Id();
+                }
+                ParserData parserData(stop, indexQueue, exceptions, *this, moduleId);
+                List<Thread> threads;
+                int numThreads = HardwareConcurrency();
+                if (numThreads <= 0)
+                {
+                    numThreads = 1;
+                }
+                for (int i = 0; i < numThreads; ++i)
+                {
+                    threads.Add(Thread.StartFunction(DoParse, &parserData));
+                    if (parserData.stop) break;
+                }
+                int numStartedThreads = cast<int>(threads.Count());
+                for (int i = 0; i < numStartedThreads; ++i)
+                {
+                    threads[i].Join();
+                }
+                for (int i = 0; i < n; ++i)
+                {
+                    ExceptionPtr ex = exceptions[i];
+                    if (ex.Exception() != null)
+                    {
+                        ThrowCapturedException(ex);
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                result.ok = false;
+                result.error = StringStr(ex.Message());
+            }
+            return result;
+        }
+        public nothrow int NumberOfErrors() const
+        {
+            int numberOfErrors = 0;
+            for (int i = 0; i < Count(); ++i)
+            {
+                Source* source = GetSource(i);
+                numberOfErrors = numberOfErrors + cast<int>(source->Errors().Count());
+            }
+            return numberOfErrors;
+        }
+        public nothrow List<string> Errors() const
+        {
+            List<string> errors;
+            for (int i = 0; i < Count(); ++i)
+            {
+                Source* source = GetSource(i);
+                for (const string& s : source->Errors())
+                {
+                    errors.Add(source->FilePath() + " : " + s);
+                }
+            }
+            return errors;
+        }
+        private nothrow void MakeSourceIndexMap()
+        {
+            sourceIndexMap.Clear();
+            for (int i = 0; i < Count(); ++i)
+            {
+                Source* source = sources[i].Get();
+                sourceIndexMap[source->FilePath()] = i;
+            }
+        }
+        private List<UniquePtr<Source>> sources;
+        private Map<string, int> sourceIndexMap;
+    }
+}

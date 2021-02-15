@@ -26,7 +26,7 @@ XmlAttributeProcessor::XmlAttributeProcessor() : AttributeProcessor(U"xml")
 {
 }
 
-void XmlAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
+void XmlAttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbol)
 {
     switch (symbol->GetSymbolType())
     {
@@ -46,7 +46,7 @@ void XmlAttributeProcessor::TypeCheck(Attribute* attribute, Symbol* symbol)
     AttributeProcessor::TypeCheck(attribute, symbol);
 }
 
-void XmlAttributeProcessor::GenerateSymbols(Attribute* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     if (symbol->IsClassTypeSymbol())
     {
@@ -59,7 +59,7 @@ void XmlAttributeProcessor::GenerateSymbols(Attribute* attribute, Symbol* symbol
     }
 }
 
-void XmlAttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol* symbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateImplementation(AttributeNode* attribute, Symbol* symbol, StatementBinder* statementBinder)
 {
     if (symbol->IsClassTypeSymbol())
     {
@@ -87,7 +87,7 @@ void XmlAttributeProcessor::GenerateImplementation(Attribute* attribute, Symbol*
     }
 }
 
-void XmlAttributeProcessor::GenerateToXmlSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateToXmlSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     MemberFunctionSymbol* toXmlMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ToXml");
     toXmlMemberFunctionSymbol->SetModule(&boundCompileUnit.GetModule());
@@ -125,7 +125,7 @@ void XmlAttributeProcessor::GenerateToXmlSymbol(Attribute* attribute, ClassTypeS
     toXmlMemberFunctionSymbolMap[classTypeSymbol] = toXmlMemberFunctionSymbol;
 }
 
-void XmlAttributeProcessor::GenerateSystemDomElementConstructorSymbol(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateSystemDomElementConstructorSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     ConstructorSymbol* constructorSymbol = new ConstructorSymbol(attribute->GetSpan(), attribute->ModuleId(), U"@constructor");
     constructorSymbol->SetModule(&boundCompileUnit.GetModule());
@@ -145,7 +145,7 @@ void XmlAttributeProcessor::GenerateSystemDomElementConstructorSymbol(Attribute*
     constructorSymbolMap[classTypeSymbol] = constructorSymbol;
 }
 
-void XmlAttributeProcessor::GenerateToXmlMemberFunctionImplementation(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toXmlMemberFunctionSymbol, 
+void XmlAttributeProcessor::GenerateToXmlMemberFunctionImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toXmlMemberFunctionSymbol,
     StatementBinder* statementBinder)
 {
     try
@@ -176,10 +176,10 @@ void XmlAttributeProcessor::GenerateToXmlMemberFunctionImplementation(Attribute*
         if (classTypeSymbol->BaseClass())
         {
             ClassTypeSymbol* baseClassSymbol = classTypeSymbol->BaseClass();
-            Attributes* attributes = baseClassSymbol->GetAttributes();
+            AttributesNode* attributes = baseClassSymbol->GetAttributes();
             if (attributes)
             {
-                Attribute* xmlAttribute = attributes->GetAttribute(U"xml");
+                AttributeNode* xmlAttribute = attributes->GetAttribute(U"xml");
                 if (xmlAttribute)
                 {
                     if (xmlAttribute->Value() == U"true")
@@ -208,10 +208,10 @@ void XmlAttributeProcessor::GenerateToXmlMemberFunctionImplementation(Attribute*
 
         for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
         {
-            Attributes* attributes = memberVariableSymbol->GetAttributes();
+            AttributesNode* attributes = memberVariableSymbol->GetAttributes();
             if (attributes)
             {
-                Attribute* xmlAttribute = attributes->GetAttribute(U"xml");
+                AttributeNode* xmlAttribute = attributes->GetAttribute(U"xml");
                 if (xmlAttribute)
                 {
                     if (xmlAttribute->Value() == U"false")
@@ -280,7 +280,7 @@ void XmlAttributeProcessor::GenerateToXmlMemberFunctionImplementation(Attribute*
     }
 }
 
-void XmlAttributeProcessor::GenerateSystemDomElementConstructorImplementation(Attribute* attribute, ClassTypeSymbol* classTypeSymbol, ConstructorSymbol* constructorSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateSystemDomElementConstructorImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, ConstructorSymbol* constructorSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -296,10 +296,10 @@ void XmlAttributeProcessor::GenerateSystemDomElementConstructorImplementation(At
         ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
         if (baseClass)
         {
-            Attributes* attributes = baseClass->GetAttributes();
+            AttributesNode* attributes = baseClass->GetAttributes();
             if (attributes)
             {
-                Attribute* xmlAttribute = attributes->GetAttribute(U"xml");
+                AttributeNode* xmlAttribute = attributes->GetAttribute(U"xml");
                 if (xmlAttribute)
                 {
                     if (xmlAttribute->Value() == U"true")
@@ -319,10 +319,10 @@ void XmlAttributeProcessor::GenerateSystemDomElementConstructorImplementation(At
 
         for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
         {
-            Attributes* attributes = memberVariableSymbol->GetAttributes();
+            AttributesNode* attributes = memberVariableSymbol->GetAttributes();
             if (attributes)
             {
-                Attribute* xmlAttribute = attributes->GetAttribute(U"xml");
+                AttributeNode* xmlAttribute = attributes->GetAttribute(U"xml");
                 if (xmlAttribute)
                 {
                     if (xmlAttribute->Value() == U"false")

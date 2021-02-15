@@ -11,7 +11,7 @@ using CmajorTokens;
 parser FunctionParser
 {
     uselexer CmajorLexer;
-    
+
     using AttributeParser.Attributes;
     using SpecifierParser.Specifiers;
     using TypeExprParser.TypeExpr;
@@ -20,13 +20,13 @@ parser FunctionParser
     using ParameterParser.ParameterList;
     using IdentifierParser.Identifier;
     using StatementParser.CompoundStatement;
-    
+
     Function(ParsingContext* ctx, var UniquePtr<FunctionNode> fun, var Span s, var Span specifierSpan) : FunctionNode*
-        ::= empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):returnType
+        ::= empty{ s = span; } Attributes(ctx):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):returnType
             FunctionGroupId(ctx):functionGroupId
         {
-            s.end = span.end; 
-            fun.Reset(new FunctionNode(s, specifiers, returnType, functionGroupId, attrs));
+            s.end = span.end;
+            fun.Reset(new FunctionNode(s, ctx->ModuleId(), specifiers, returnType, functionGroupId, attrs));
             fun->SetSpecifierSpan(specifierSpan);
             fun->SetGroupIdSpan(span);
         }
@@ -38,12 +38,12 @@ parser FunctionParser
             return fun.Release();
         }
         ;
-        
+
     FunctionGroupId(ParsingContext* ctx) : ustring
         ::= ID{ return lexer.GetMatch(span); }
         |   OperatorFunctionGroupId(ctx):operatorFunctionGroupId{ return operatorFunctionGroupId; }
         ;
-        
+
     OperatorFunctionGroupId(ParsingContext* ctx) : ustring
         ::= empty{ lexer.parsingOperatorFunctionGroupId = true; }
         (   OPERATOR

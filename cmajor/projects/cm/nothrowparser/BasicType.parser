@@ -1,0 +1,33 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowBasicTypeParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    BasicType(NothrowParsingContext* ctx) : Node*
+        ::= BOOL{ BoolNode* node = new BoolNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   SBYTE{ SByteNode* node = new SByteNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   BYTE{ ByteNode* node = new ByteNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   SHORT{ ShortNode* node = new ShortNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   USHORT{ UShortNode* node = new UShortNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   INT{ IntNode* node = new IntNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   UINT{ UIntNode* node =new UIntNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   LONG{ LongNode* node = new LongNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   ULONG{ ULongNode* node = new ULongNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   FLOAT{ FloatNode* node = new FloatNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   DOUBLE{ DoubleNode* node = new DoubleNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   CHAR{ CharNode* node = new CharNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   WCHAR{ WCharNode* node = new WCharNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   UCHAR{ UCharNode* node = new UCharNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        |   VOID{ VoidNode* node = new VoidNode(span, ctx->ModuleId()); node->SetLexerFlags(lexer.Flags()); return node; }
+        ;
+}

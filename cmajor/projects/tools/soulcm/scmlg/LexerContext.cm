@@ -16,7 +16,10 @@ namespace soulcm.scmlg
     public class LexerContext
     {
         public LexerContext(IdentifierClassKind identifierClassKind) :
-            nextNfaStateId(0), nextDfaStateId(0), lexerStatementIndex(-1), classIndex(0), any(), epsilon(eps), idStart(new Class(classIndex++)), idCont(new Class(classIndex++)), classMap(null), tokens(null), keywords(null), expressions(null), lexer(null), parser(null), currentExpression(null)
+            nextNfaStateId(0), nextDfaStateId(0), lexerStatementIndex(-1), classIndex(0), any(), epsilon(eps),
+            idStart(new Class(classIndex++)), idCont(new Class(classIndex++)),
+            classMap(null), tokens(null), keywords(null), expressions(null), lexer(null), parser(null), currentExpression(null),
+            moduleId(Uuid.Random())
         {
             if (identifierClassKind == IdentifierClassKind.unicode)
             {
@@ -444,63 +447,63 @@ namespace soulcm.scmlg
                 classMapName = ToUtf8(classMap->Name());
             }
             string classMapSourceFileName = GetFullPath(Path.Combine(root, classMapName + ".cm"));
-            Cm.Ast.CompileUnitNode classMapUnit(System.Lex.Span(), classMapSourceFileName);
-            classMapUnit.GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System")));
-            classMapUnit.GlobalNs()->AddMember(new Cm.Ast.CommentNode(System.Lex.Span(), u"this file has been automatically generated from \'" + ToUtf32(FileName()) + u"\' using soulcm lexer generator scmlg version " + ToUtf32(LexerGeneratorVersionStr())));
-            UniquePtr<Cm.Ast.GlobalVariableNode> classMapDataVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), Cm.Ast.Specifiers.private_, new Cm.Ast.ArrayNode(System.Lex.Span(), new Cm.Ast.ByteNode(System.Lex.Span()), null), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapData"), &classMapUnit));
-            UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span()));
+            Cm.Ast.CompileUnitNode classMapUnit(System.Lex.Span(), moduleId, classMapSourceFileName);
+            classMapUnit.GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System")));
+            classMapUnit.GlobalNs()->AddMember(new Cm.Ast.CommentNode(System.Lex.Span(), moduleId, u"this file has been automatically generated from \'" + ToUtf32(FileName()) + u"\' using soulcm lexer generator scmlg version " + ToUtf32(LexerGeneratorVersionStr())));
+            UniquePtr<Cm.Ast.GlobalVariableNode> classMapDataVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), moduleId, Cm.Ast.Specifiers.private_, new Cm.Ast.ArrayNode(System.Lex.Span(), moduleId, new Cm.Ast.ByteNode(System.Lex.Span(), moduleId), null), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"classMapData"), &classMapUnit));
+            UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span(), moduleId));
             SharedPtr<ByteStream> stream = System.Lex.MakeClassMapData(classMapVec, !noClassMapCompression);
             int x = stream->ReadByte();
             while (x != -1)
             {
-                arrayLiteral->AddValue(new Cm.Ast.ByteLiteralNode(System.Lex.Span(), cast<byte>(x)));
+                arrayLiteral->AddValue(new Cm.Ast.ByteLiteralNode(System.Lex.Span(), moduleId, cast<byte>(x)));
                 x = stream->ReadByte();
             }
             classMapDataVariable->SetInitializer(arrayLiteral.Release());
             classMapUnit.GlobalNs()->AddMember(classMapDataVariable.Release());
-            UniquePtr<Cm.Ast.GlobalVariableNode> classMapVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), Cm.Ast.Specifiers.private_, new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IntNode(System.Lex.Span())), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMap"), &classMapUnit));
-            classMapVariable->SetInitializer(new Cm.Ast.NullLiteralNode());
+            UniquePtr<Cm.Ast.GlobalVariableNode> classMapVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), moduleId, Cm.Ast.Specifiers.private_, new Cm.Ast.PointerNode(System.Lex.Span(), moduleId, new Cm.Ast.IntNode(System.Lex.Span(), moduleId)), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"classMap"), &classMapUnit));
+            classMapVariable->SetInitializer(new Cm.Ast.NullLiteralNode(System.Lex.Span(), moduleId));
             classMapUnit.GlobalNs()->AddMember(classMapVariable.Release());
-            UniquePtr<Cm.Ast.GlobalVariableNode> classMapCompressedVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), Cm.Ast.Specifiers.private_, new Cm.Ast.BoolNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapDataCompressed"), &classMapUnit));
-            classMapCompressedVariable->SetInitializer(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), !noClassMapCompression));
+            UniquePtr<Cm.Ast.GlobalVariableNode> classMapCompressedVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), moduleId, Cm.Ast.Specifiers.private_, new Cm.Ast.BoolNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"classMapDataCompressed"), &classMapUnit));
+            classMapCompressedVariable->SetInitializer(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), moduleId, !noClassMapCompression));
             classMapUnit.GlobalNs()->AddMember(classMapCompressedVariable.Release());
-            UniquePtr<Cm.Ast.ClassNode> cls(new Cm.Ast.ClassNode(System.Lex.Span(), Cm.Ast.Specifiers.public_ | Cm.Ast.Specifiers.static_, new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(classMapName)), null));
-            UniquePtr<Cm.Ast.MemberFunctionNode> initMemFun(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), Cm.Ast.Specifiers.public_ | Cm.Ast.Specifiers.static_, new Cm.Ast.VoidNode(System.Lex.Span()), u"Init", null));
-            UniquePtr<Cm.Ast.CompoundStatementNode> initMemFunBody(new Cm.Ast.CompoundStatementNode(System.Lex.Span()));
-            UniquePtr<Cm.Ast.CompoundStatementNode> initMemFunThenS(new Cm.Ast.CompoundStatementNode(System.Lex.Span()));
-            UniquePtr<Cm.Ast.InvokeNode> initMemFunInvoke(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(),
-                new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")),
-                new Cm.Ast.IdentifierNode(System.Lex.Span(), u"CreateClassMap"))));
-            initMemFunInvoke->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(),
-                new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapData"),
-                    new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Begin"))));
-            initMemFunInvoke->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(),
-                new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapData"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Length"))));
-            initMemFunInvoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapDataCompressed"));
-            UniquePtr<Cm.Ast.AssignmentStatementNode> initMemFunAssigmentStmt(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMap"),
+            UniquePtr<Cm.Ast.ClassNode> cls(new Cm.Ast.ClassNode(System.Lex.Span(), moduleId, Cm.Ast.Specifiers.public_ | Cm.Ast.Specifiers.static_, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, ToUtf32(classMapName)), null));
+            UniquePtr<Cm.Ast.MemberFunctionNode> initMemFun(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), moduleId, Cm.Ast.Specifiers.public_ | Cm.Ast.Specifiers.static_, new Cm.Ast.VoidNode(System.Lex.Span(), moduleId), u"Init", null));
+            UniquePtr<Cm.Ast.CompoundStatementNode> initMemFunBody(new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId));
+            UniquePtr<Cm.Ast.CompoundStatementNode> initMemFunThenS(new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId));
+            UniquePtr<Cm.Ast.InvokeNode> initMemFunInvoke(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId,
+                new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Lex")),
+                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"CreateClassMap"))));
+            initMemFunInvoke->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId,
+                new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"classMapData"),
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Begin"))));
+            initMemFunInvoke->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId,
+                new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"classMapData"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Length"))));
+            initMemFunInvoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"classMapDataCompressed"));
+            UniquePtr<Cm.Ast.AssignmentStatementNode> initMemFunAssigmentStmt(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"classMap"),
                 initMemFunInvoke.Release()));
             initMemFunThenS->AddStatement(initMemFunAssigmentStmt.Release());
-            UniquePtr<Cm.Ast.IfStatementNode> initMemFunIfStmt(new Cm.Ast.IfStatementNode(System.Lex.Span(),
-                new Cm.Ast.EqualNode(System.Lex.Span(),
-                    new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMap"), new Cm.Ast.NullLiteralNode(System.Lex.Span())),
+            UniquePtr<Cm.Ast.IfStatementNode> initMemFunIfStmt(new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId,
+                new Cm.Ast.EqualNode(System.Lex.Span(), moduleId,
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"classMap"), new Cm.Ast.NullLiteralNode(System.Lex.Span(), moduleId)),
                 initMemFunThenS.Release(), null));
             initMemFunBody->AddStatement(initMemFunIfStmt.Release());
             initMemFun->SetBody(initMemFunBody.Release());
             cls->AddMember(initMemFun.Release());
-            UniquePtr<Cm.Ast.MemberFunctionNode> getClassMemFun(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), Cm.Ast.Specifiers.public_ | Cm.Ast.Specifiers.static_, new Cm.Ast.IntNode(System.Lex.Span()), u"GetClass", null));
-            getClassMemFun->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), new Cm.Ast.UCharNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"c")));
-            UniquePtr<Cm.Ast.CompoundStatementNode> body(new Cm.Ast.CompoundStatementNode(System.Lex.Span()));
-            UniquePtr<Cm.Ast.ConstructionStatementNode> constructStmt(new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IntNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"i")));
+            UniquePtr<Cm.Ast.MemberFunctionNode> getClassMemFun(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), moduleId, Cm.Ast.Specifiers.public_ | Cm.Ast.Specifiers.static_, new Cm.Ast.IntNode(System.Lex.Span(), moduleId), u"GetClass", null));
+            getClassMemFun->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), moduleId, new Cm.Ast.UCharNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"c")));
+            UniquePtr<Cm.Ast.CompoundStatementNode> body(new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId));
+            UniquePtr<Cm.Ast.ConstructionStatementNode> constructStmt(new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IntNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"i")));
             constructStmt->SetAssignment();
-            constructStmt->AddArgument(new Cm.Ast.CastNode(System.Lex.Span(), new Cm.Ast.IntNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"c")));
+            constructStmt->AddArgument(new Cm.Ast.CastNode(System.Lex.Span(), moduleId, new Cm.Ast.IntNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"c")));
             body->AddStatement(constructStmt.Release());
-            UniquePtr<Cm.Ast.CompoundStatementNode> thenS(new Cm.Ast.CompoundStatementNode(System.Lex.Span()));
-            UniquePtr<Cm.Ast.ReturnStatementNode> returnClassMapI(new Cm.Ast.ReturnStatementNode(System.Lex.Span(), new Cm.Ast.IndexingNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMap"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"i"))));
+            UniquePtr<Cm.Ast.CompoundStatementNode> thenS(new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId));
+            UniquePtr<Cm.Ast.ReturnStatementNode> returnClassMapI(new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IndexingNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"classMap"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"i"))));
             thenS->AddStatement(returnClassMapI.Release());
-            UniquePtr<Cm.Ast.CompoundStatementNode> elseS(new Cm.Ast.CompoundStatementNode(System.Lex.Span()));
-            UniquePtr<Cm.Ast.ReturnStatementNode> returnMinusOne(new Cm.Ast.ReturnStatementNode(System.Lex.Span(), new Cm.Ast.IntLiteralNode(System.Lex.Span(), -1)));
+            UniquePtr<Cm.Ast.CompoundStatementNode> elseS(new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId));
+            UniquePtr<Cm.Ast.ReturnStatementNode> returnMinusOne(new Cm.Ast.ReturnStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IntLiteralNode(System.Lex.Span(), moduleId, -1)));
             elseS->AddStatement(returnMinusOne.Release());
-            UniquePtr<Cm.Ast.IfStatementNode> ifStmt(new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.LessNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"i"), new Cm.Ast.IntLiteralNode(System.Lex.Span(), 1114112)), thenS.Release(), elseS.Release()));
+            UniquePtr<Cm.Ast.IfStatementNode> ifStmt(new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.LessNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"i"), new Cm.Ast.IntLiteralNode(System.Lex.Span(), moduleId, 1114112)), thenS.Release(), elseS.Release()));
             body->AddStatement(ifStmt.Release());
             getClassMemFun->SetBody(body.Release());
             cls->AddMember(getClassMemFun.Release());
@@ -513,6 +516,10 @@ namespace soulcm.scmlg
             {
                 Console.Out() << "==> " << classMapSourceFileName << endl();
             }
+        }
+        public nothrow inline const Uuid& ModuleId() const
+        {
+            return moduleId;
         }
         private int nextNfaStateId;
         private int nextDfaStateId;
@@ -540,6 +547,7 @@ namespace soulcm.scmlg
         private Parser* parser;
         private Expression* currentExpression;
         private ustring api;
+        private Uuid moduleId;
     }
     public class ClassLess
     {

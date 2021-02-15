@@ -302,26 +302,11 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                             {
                                                                 int64_t pos = lexer.GetPos();
                                                                 soulng::lexer::Span span = lexer.GetSpan();
-                                                                soulng::parser::Match match(true);
-                                                                soulng::parser::Match* parentMatch14 = &match;
+                                                                soulng::parser::Match match(false);
+                                                                if (*lexer == ID)
                                                                 {
-                                                                    soulng::lexer::Span span = lexer.GetSpan();
-                                                                    soulng::parser::Match match(false);
-                                                                    if (*lexer == ID)
-                                                                    {
-                                                                        ++lexer;
-                                                                        match.hit = true;
-                                                                    }
-                                                                    if (match.hit)
-                                                                    {
-                                                                        *parentMatch14 = match;
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        match.hit = true;
-                                                                        *parentMatch14 = match;
-                                                                        lexer.AddError(span, ToUtf32(GetTokenInfo(ID)));
-                                                                    }
+                                                                    ++lexer;
+                                                                    match.hit = true;
                                                                 }
                                                                 if (match.hit)
                                                                 {
@@ -338,11 +323,11 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                     if (!match.hit)
                                                     {
                                                         soulng::parser::Match match(false);
-                                                        soulng::parser::Match* parentMatch15 = &match;
+                                                        soulng::parser::Match* parentMatch14 = &match;
                                                         lexer.SetPos(save);
                                                         {
                                                             soulng::parser::Match match(false);
-                                                            soulng::parser::Match* parentMatch16 = &match;
+                                                            soulng::parser::Match* parentMatch15 = &match;
                                                             {
                                                                 int64_t pos = lexer.GetPos();
                                                                 soulng::lexer::Span span = lexer.GetSpan();
@@ -357,9 +342,9 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                                     s.end = span.end;
                                                                     typeExpr.reset(new PointerNode(s, *moduleId, typeExpr.release()));
                                                                 }
-                                                                *parentMatch16 = match;
+                                                                *parentMatch15 = match;
                                                             }
-                                                            *parentMatch15 = match;
+                                                            *parentMatch14 = match;
                                                         }
                                                         *parentMatch10 = match;
                                                     }
@@ -368,11 +353,11 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                 if (!match.hit)
                                                 {
                                                     soulng::parser::Match match(false);
-                                                    soulng::parser::Match* parentMatch17 = &match;
+                                                    soulng::parser::Match* parentMatch16 = &match;
                                                     lexer.SetPos(save);
                                                     {
                                                         soulng::parser::Match match(false);
-                                                        soulng::parser::Match* parentMatch18 = &match;
+                                                        soulng::parser::Match* parentMatch17 = &match;
                                                         {
                                                             int64_t pos = lexer.GetPos();
                                                             soulng::lexer::Span span = lexer.GetSpan();
@@ -387,9 +372,9 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                                 s.end = span.end;
                                                                 typeExpr.reset(new RValueRefNode(s, *moduleId, typeExpr.release()));
                                                             }
-                                                            *parentMatch18 = match;
+                                                            *parentMatch17 = match;
                                                         }
-                                                        *parentMatch17 = match;
+                                                        *parentMatch16 = match;
                                                     }
                                                     *parentMatch9 = match;
                                                 }
@@ -398,11 +383,11 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                             if (!match.hit)
                                             {
                                                 soulng::parser::Match match(false);
-                                                soulng::parser::Match* parentMatch19 = &match;
+                                                soulng::parser::Match* parentMatch18 = &match;
                                                 lexer.SetPos(save);
                                                 {
                                                     soulng::parser::Match match(false);
-                                                    soulng::parser::Match* parentMatch20 = &match;
+                                                    soulng::parser::Match* parentMatch19 = &match;
                                                     {
                                                         int64_t pos = lexer.GetPos();
                                                         soulng::lexer::Span span = lexer.GetSpan();
@@ -417,9 +402,9 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                             s.end = span.end;
                                                             typeExpr.reset(new LValueRefNode(s, *moduleId, typeExpr.release()));
                                                         }
-                                                        *parentMatch20 = match;
+                                                        *parentMatch19 = match;
                                                     }
-                                                    *parentMatch19 = match;
+                                                    *parentMatch18 = match;
                                                 }
                                                 *parentMatch8 = match;
                                             }
@@ -428,14 +413,14 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                         if (!match.hit)
                                         {
                                             soulng::parser::Match match(false);
-                                            soulng::parser::Match* parentMatch21 = &match;
+                                            soulng::parser::Match* parentMatch20 = &match;
                                             lexer.SetPos(save);
                                             {
                                                 soulng::parser::Match match(false);
-                                                soulng::parser::Match* parentMatch22 = &match;
+                                                soulng::parser::Match* parentMatch21 = &match;
                                                 {
                                                     soulng::parser::Match match(false);
-                                                    soulng::parser::Match* parentMatch23 = &match;
+                                                    soulng::parser::Match* parentMatch22 = &match;
                                                     {
                                                         soulng::parser::Match match(false);
                                                         if (*lexer == LBRACKET)
@@ -443,46 +428,46 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                             ++lexer;
                                                             match.hit = true;
                                                         }
-                                                        *parentMatch23 = match;
+                                                        *parentMatch22 = match;
                                                     }
                                                     if (match.hit)
                                                     {
                                                         soulng::parser::Match match(false);
-                                                        soulng::parser::Match* parentMatch24 = &match;
+                                                        soulng::parser::Match* parentMatch23 = &match;
                                                         {
                                                             soulng::parser::Match match(true);
                                                             int64_t save = lexer.GetPos();
-                                                            soulng::parser::Match* parentMatch25 = &match;
+                                                            soulng::parser::Match* parentMatch24 = &match;
                                                             {
                                                                 soulng::parser::Match match = NothrowExpressionParser::Expression(lexer, moduleId, ctx);
                                                                 size.reset(static_cast<Node*>(match.value));
                                                                 if (match.hit)
                                                                 {
-                                                                    *parentMatch25 = match;
+                                                                    *parentMatch24 = match;
                                                                 }
                                                                 else
                                                                 {
                                                                     lexer.SetPos(save);
                                                                 }
                                                             }
-                                                            *parentMatch24 = match;
+                                                            *parentMatch23 = match;
                                                         }
-                                                        *parentMatch23 = match;
+                                                        *parentMatch22 = match;
                                                     }
-                                                    *parentMatch22 = match;
+                                                    *parentMatch21 = match;
                                                 }
                                                 if (match.hit)
                                                 {
                                                     soulng::parser::Match match(false);
-                                                    soulng::parser::Match* parentMatch26 = &match;
+                                                    soulng::parser::Match* parentMatch25 = &match;
                                                     {
                                                         soulng::parser::Match match(false);
-                                                        soulng::parser::Match* parentMatch27 = &match;
+                                                        soulng::parser::Match* parentMatch26 = &match;
                                                         {
                                                             int64_t pos = lexer.GetPos();
                                                             soulng::lexer::Span span = lexer.GetSpan();
                                                             soulng::parser::Match match(true);
-                                                            soulng::parser::Match* parentMatch28 = &match;
+                                                            soulng::parser::Match* parentMatch27 = &match;
                                                             {
                                                                 soulng::lexer::Span span = lexer.GetSpan();
                                                                 soulng::parser::Match match(false);
@@ -493,12 +478,12 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                                 }
                                                                 if (match.hit)
                                                                 {
-                                                                    *parentMatch28 = match;
+                                                                    *parentMatch27 = match;
                                                                 }
                                                                 else
                                                                 {
                                                                     match.hit = true;
-                                                                    *parentMatch28 = match;
+                                                                    *parentMatch27 = match;
                                                                     lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACKET)));
                                                                 }
                                                             }
@@ -507,13 +492,13 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                                 s.end = span.end;
                                                                 typeExpr.reset(new ArrayNode(s, *moduleId, typeExpr.release(), size.release()));
                                                             }
-                                                            *parentMatch27 = match;
+                                                            *parentMatch26 = match;
                                                         }
-                                                        *parentMatch26 = match;
+                                                        *parentMatch25 = match;
                                                     }
-                                                    *parentMatch22 = match;
+                                                    *parentMatch21 = match;
                                                 }
-                                                *parentMatch21 = match;
+                                                *parentMatch20 = match;
                                             }
                                             *parentMatch7 = match;
                                         }

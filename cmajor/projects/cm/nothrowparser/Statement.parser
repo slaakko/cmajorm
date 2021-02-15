@@ -1,0 +1,483 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+parser NothrowStatementParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+
+    using NothrowExpressionParser.Expression;
+    using NothrowExpressionParser.ArgumentList;
+    using NothrowTypeExprParser.TypeExpr;
+    using NothrowIdentifierParser.Identifier;
+
+    Statement(NothrowParsingContext* ctx) : StatementNode*
+        ::= LabeledStatement(ctx):labeledStatement{ return labeledStatement; }
+        |   ControlStatement(ctx):controlStatement{ return controlStatement; }
+        |   ExpressionStatement(ctx):expressionStatement{ return expressionStatement; }
+        |   AssignmentStatement(ctx):assignmentStatement{ return assignmentStatement; }
+        |   ConstructionStatement(ctx):constructionStatement{ return constructionStatement; }
+        |   DeleteStatement(ctx):deleteStatement{ return deleteStatement; }
+        |   DestroyStatement(ctx):destroyStatement{ return destroyStatement; }
+        |   EmptyStatement(ctx):emptyStatement{ return emptyStatement; }
+        |   ThrowStatement(ctx):throwStatement{ return throwStatement; }
+        |   TryStatement(ctx):tryStatement{ return tryStatement; }
+        |   AssertStatement(ctx):assertStatement{ return assertStatement; }
+        |   ConditionalCompilationStatement(ctx):condCompStatement{ return condCompStatement; }
+        |   SyncStmt:sync{ return new SyncStatementNode(span, ctx->ModuleId()); }
+        ;
+
+    SyncStmt
+        ::= empty
+        {
+            if (lexer.Synchronize())
+            {
+                ++lexer;
+            }
+            else
+            {
+                pass = false;
+            }
+        }
+        ;
+
+    Label(NothrowParsingContext* ctx, var Span s, var ustring label) : LabelNode*
+        ::= (ID{ s = span; label = lexer.GetMatch(span); } COLON{ s.end = span.end; }){ return new LabelNode(s, ctx->ModuleId(), label); }
+        ;
+
+    LabeledStatement(NothrowParsingContext* ctx, var UniquePtr<LabeledStatementNode> stmt) : StatementNode*
+        ::= Label(ctx):lbl Statement(ctx):s{ stmt.Reset(new LabeledStatementNode(span, ctx->ModuleId(), s)); stmt->SetLabelNode(lbl); return stmt.Release(); }
+        ;
+
+    ControlStatement(NothrowParsingContext* ctx) : StatementNode*
+        ::= CompoundStatement(ctx):compoundStatement{ return compoundStatement; }
+        |   ReturnStatement(ctx):returnStatement{ return returnStatement; }
+        |   IfStatement(ctx):ifStatement{ return ifStatement; }
+        |   WhileStatement(ctx):whileStatement{ return whileStatement; }
+        |   DoStatement(ctx):doStatement{ return doStatement; }
+        |   RangeForStatement(ctx):rangeForStatement{ return rangeForStatement; }
+        |   ForStatement(ctx):forStatement{ return forStatement; }
+        |   BreakStatement(ctx):breakStatement{ return breakStatement; }
+        |   ContinueStatement(ctx):continueStatement{ return continueStatement; }
+        |   GotoStatement(ctx):gotoStatement{ return gotoStatement; }
+        |   SwitchStatement(ctx):switchStatement{ return switchStatement; }
+        |   GotoCaseStatement(ctx):gotoCaseStatement{ return gotoCaseStatement; }
+        |   GotoDefaultStatement(ctx):gotoDefaultStatement{ return gotoDefaultStatement; }
+        ;
+
+    CompoundStatement(NothrowParsingContext* ctx, var UniquePtr<CompoundStatementNode> compoundStatement, var UniquePtr<StatementNode> stmt) : CompoundStatementNode*
+        ::= LBRACE{ compoundStatement.Reset(new CompoundStatementNode(span, ctx->ModuleId())); compoundStatement->SetBeginBraceSpan(span); }
+            (Statement(ctx):statement
+            {
+                stmt.Reset(statement);
+                bool isSyncNode = (stmt.Get() is SyncStatementNode*);
+                if (!isSyncNode)
+                {
+                    lexer.ResetFlag(LexerFlags.synchronized);
+                }
+                compoundStatement->AddStatement(stmt.Release());
+            }
+            )* RBRACE!
+        {
+            compoundStatement->SetEndBraceSpan(span);
+            compoundStatement->SetSpanEnd(span.end);
+            return compoundStatement.Release();
+        }
+        ;
+
+    ReturnStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= RETURN{ s = span; } Expression(ctx):expr? SEMICOLON!
+        {
+            s.end = span.end;
+            ReturnStatementNode* node = new ReturnStatementNode(s, ctx->ModuleId(), expr);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    IfStatement(NothrowParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span elseSpan) : IfStatementNode*
+        ::=
+        (   IF{ s = span; } LPAREN{ leftParenSpan = span; } Expression(ctx):cond RPAREN{ rightParenSpan = span; }
+            Statement(ctx):thenS{ s.end = span.end; }
+            (ELSE{ elseSpan = span; } Statement(ctx):elseS{ s.end = span.end; })?
+        )
+        {
+            IfStatementNode* value = new IfStatementNode(s, ctx->ModuleId(), cond, thenS, elseS);
+            value->SetLeftParenSpan(leftParenSpan);
+            value->SetRightParenSpan(rightParenSpan);
+            value->SetElseSpan(elseSpan);
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+
+    WhileStatement(NothrowParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : WhileStatementNode*
+        ::=
+        (   WHILE{ s = span; } LPAREN!{ leftParenSpan = span; } Expression(ctx):cond RPAREN!{ rightParenSpan = span; }
+            Statement(ctx):stmt{ s.end = span.end; }
+        )
+        {
+            WhileStatementNode* value = new WhileStatementNode(s, ctx->ModuleId(), cond, stmt);
+            value->SetLeftParenSpan(leftParenSpan);
+            value->SetRightParenSpan(rightParenSpan);
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+
+    DoStatement(NothrowParsingContext* ctx, var Span s, var Span whileSpan, var Span leftParenSpan, var Span rightParenSpan) : DoStatementNode*
+        ::=
+        (   DO{ s = span; } Statement(ctx):stmt WHILE!{ whileSpan = span; }
+            LPAREN!{ leftParenSpan = span; } Expression(ctx):cond RPAREN!{ rightParenSpan = span; } SEMICOLON!{ s.end = span.end; }
+        )
+        {
+            DoStatementNode* value = new DoStatementNode(s, ctx->ModuleId(), stmt, cond);
+            value->SetWhileSpan(whileSpan);
+            value->SetLeftParenSpan(leftParenSpan);
+            value->SetRightParenSpan(rightParenSpan);
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+
+    ForStatement(NothrowParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : ForStatementNode*
+        ::=
+        (   FOR{ s = span; } LPAREN{ leftParenSpan = span; } ForInitStatement(ctx):init Expression(ctx):cond? SEMICOLON!
+            ForLoopStatementExpr(ctx):loop RPAREN!{ rightParenSpan = span; }
+            Statement(ctx):stmt{ s.end = span.end; }
+        )
+        {
+            ForStatementNode* value = new ForStatementNode(s, ctx->ModuleId(), init, cond, loop, stmt);
+            value->SetLeftParenSpan(leftParenSpan);
+            value->SetRightParenSpan(rightParenSpan);
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+
+    ForInitStatement(NothrowParsingContext* ctx) : StatementNode*
+        ::= AssignmentStatement(ctx):assignmentStatement{ return assignmentStatement; }
+        |   ConstructionStatement(ctx):constructionStatement{ return constructionStatement; }
+        |   EmptyStatement(ctx):emptyStatement{ return emptyStatement; }
+        ;
+
+    ForLoopStatementExpr(NothrowParsingContext* ctx) : StatementNode*
+        ::= AssignmentStatementExpr(ctx):assignmentStatementExpr{ return assignmentStatementExpr; }
+        |   Expression(ctx):expr{ return new ExpressionStatementNode(span, ctx->ModuleId(), expr); }
+        |   empty{ return new EmptyStatementNode(span, ctx->ModuleId()); }
+        ;
+
+    RangeForStatement(NothrowParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span colonSpan) : RangeForStatementNode*
+        ::=
+        (   FOR{ s = span; } LPAREN{ leftParenSpan = span; } TypeExpr(ctx):type Identifier(ctx):id COLON{ colonSpan = span; } Expression(ctx):container
+            RPAREN!{ rightParenSpan = span; } Statement(ctx):action{ s.end = span.end; }
+        )
+        {
+            RangeForStatementNode* value = new RangeForStatementNode(s, ctx->ModuleId(), type, id, container, action);
+            value->SetLeftParenSpan(leftParenSpan);
+            value->SetRightParenSpan(rightParenSpan);
+            value->SetColonSpan(colonSpan);
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+
+    BreakStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= BREAK{ s = span; } SEMICOLON!
+        {
+            s.end = span.end;
+            BreakStatementNode* node = new BreakStatementNode(s, ctx->ModuleId());
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    ContinueStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= CONTINUE{ s = span; } SEMICOLON!
+        {
+            s.end = span.end;
+            ContinueStatementNode* node = new ContinueStatementNode(s, ctx->ModuleId());
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    GotoStatement(NothrowParsingContext* ctx, var ustring label, var Span s) : StatementNode*
+        ::= GOTO{ s = span; } ID{ label = lexer.GetMatch(span); } SEMICOLON!
+        {
+            s.end = span.end;
+            GotoStatementNode* node = new GotoStatementNode(s, ctx->ModuleId(), label);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    SwitchStatement(NothrowParsingContext* ctx, var UniquePtr<SwitchStatementNode> switchStatement, var Span s, var Span leftParenSpan, var Span rightParenSpan,
+        var Span beginBraceSpan, var Span endBraceSpan) : SwitchStatementNode*
+        ::= SWITCH{ s = span; } LPAREN!{ leftParenSpan = span; } Expression(ctx):cond RPAREN!
+        {
+            rightParenSpan = span;
+            switchStatement.Reset(new SwitchStatementNode(s, ctx->ModuleId(), cond));
+            switchStatement->SetLeftParenSpan(leftParenSpan);
+            switchStatement->SetRightParenSpan(rightParenSpan);
+        }
+            LBRACE!{ beginBraceSpan = span; }
+        (   CaseStatement(ctx):caseStatement{ switchStatement->AddCase(caseStatement); }
+        |   DefaultStatement(ctx):defaultStatement{ switchStatement->SetDefault(defaultStatement); }
+        )*
+            RBRACE!
+        {
+            endBraceSpan = span;
+            switchStatement->SetBeginBraceSpan(beginBraceSpan);
+            switchStatement->SetEndBraceSpan(endBraceSpan);
+            switchStatement->SetLexerFlags(lexer.Flags());
+            return switchStatement.Release();
+        }
+        ;
+
+    CaseStatement(NothrowParsingContext* ctx, var UniquePtr<CaseStatementNode> caseS, var Span s, var Span caseSpan) : CaseStatementNode*
+        ::= empty{ caseS.Reset(new CaseStatementNode(span, ctx->ModuleId())); s = span; }
+        (   ((CASE{ caseSpan = span; } Expression(ctx):caseExpr{ caseS->AddCaseSpan(caseSpan); caseS->AddCaseExpr(caseExpr); } COLON!)+){ s.end = span.end; caseS->SetSpan(s); }
+            (Statement(ctx):stmt{ caseS->AddStatement(stmt); })*
+        )
+        {
+            caseS->SetLexerFlags(lexer.Flags());
+            return caseS.Release();
+        }
+        ;
+
+    DefaultStatement(NothrowParsingContext* ctx, var UniquePtr<DefaultStatementNode> defaultS, var Span s) : DefaultStatementNode*
+        ::=
+        (   DEFAULT{ s = span; } COLON!{ s.end = span.end; defaultS.Reset(new DefaultStatementNode(s, ctx->ModuleId())); }
+            (Statement(ctx):stmt{ defaultS->AddStatement(stmt); })*
+        )
+        {
+            defaultS->SetLexerFlags(lexer.Flags());
+            return defaultS.Release();
+        }
+        ;
+
+    GotoCaseStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= GOTO{ s = span; } CASE Expression(ctx):caseExpr SEMICOLON!
+        {
+            s.end = span.end;
+            GotoCaseStatementNode* node = new GotoCaseStatementNode(s, ctx->ModuleId(), caseExpr);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    GotoDefaultStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= GOTO{ s = span; } DEFAULT SEMICOLON!
+        {
+            s.end = span.end;
+            GotoDefaultStatementNode* node = new GotoDefaultStatementNode(s, ctx->ModuleId());
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    AssignmentStatementExpr(NothrowParsingContext* ctx, var Span s ) : StatementNode*
+        ::= empty{ ctx->PushParsingLvalue(true); s = span; } Expression(ctx):target{ ctx->PopParsingLvalue(); } / { ctx->PopParsingLvalue(); } ASSIGN Expression(ctx):source
+        {
+            s.end = span.end;
+            AssignmentStatementNode* node = new AssignmentStatementNode(s, ctx->ModuleId(), target, source);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    AssignmentStatement(NothrowParsingContext* ctx, var UniquePtr<StatementNode> statement) : StatementNode*
+        ::= AssignmentStatementExpr(ctx):stmt SEMICOLON
+        {
+            statement.Reset(stmt);
+            statement->SetSpanEnd(span.end);
+            statement->SetLexerFlags(lexer.Flags());
+            return statement.Release();
+        }
+        ;
+
+    ConstructionStatement(NothrowParsingContext* ctx, var UniquePtr<ConstructionStatementNode> constructionStatement, var Span s) : ConstructionStatementNode*
+        ::= TypeExpr(ctx):type{ s = span; } Identifier(ctx):id{ s.end = span.end; constructionStatement.Reset(new ConstructionStatementNode(s, ctx->ModuleId(), type, id)); }
+        (   ASSIGN Expression(ctx):value{ constructionStatement->AddArgument(value); constructionStatement->SetAssignment(); }
+        |   LPAREN ArgumentList(ctx, constructionStatement.Get()):argumentList RPAREN!
+        |   empty{ constructionStatement->SetEmpty(); }
+        )
+        SEMICOLON!
+        {
+            constructionStatement->SetSpanEnd(span.end);
+            constructionStatement->SetLexerFlags(lexer.Flags());
+            return constructionStatement.Release();
+        }
+        ;
+
+    DeleteStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= DELETE{ s = span; } Expression(ctx):ptr SEMICOLON!
+        {
+            s.end = span.end;
+            DeleteStatementNode* node = new DeleteStatementNode(s, ctx->ModuleId(), ptr);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    DestroyStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= DESTROY{ s = span; } Expression(ctx):ptr SEMICOLON!
+        {
+            s.end = span.end;
+            DestroyStatementNode* node = new DestroyStatementNode(s, ctx->ModuleId(), ptr);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    ExpressionStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= empty{ ctx->PushParsingExpressionStatement(true); }
+            (Expression(ctx):expr{ s = span; } SEMICOLON{ s.end = span.end; })
+        {
+            ctx->PopParsingExpressionStatement();
+            ExpressionStatementNode* node = new ExpressionStatementNode(s, ctx->ModuleId(), expr);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        /
+        {
+            ctx->PopParsingExpressionStatement();
+        }
+        ;
+
+    EmptyStatement(NothrowParsingContext* ctx) : StatementNode*
+        ::= SEMICOLON
+        {
+            EmptyStatementNode* node = new EmptyStatementNode(span, ctx->ModuleId());
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    ThrowStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= THROW{ s = span; } Expression(ctx):exception? SEMICOLON!
+        {
+            s.end = span.end;
+            ThrowStatementNode* node = new ThrowStatementNode(s, ctx->ModuleId(), exception);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    TryStatement(NothrowParsingContext* ctx, var UniquePtr<TryStatementNode> tryStatement, var Span s) : TryStatementNode*
+        ::=
+        (   TRY{ s = span; } CompoundStatement(ctx):tryBlock{ s.end = span.end; tryStatement.Reset(new TryStatementNode(s, ctx->ModuleId(), tryBlock)); }
+            (Catch(ctx):ctch{ tryStatement->AddCatch(ctch); })+
+        )
+        {
+            tryStatement->SetLexerFlags(lexer.Flags());
+            return tryStatement.Release();
+        }
+        ;
+
+    Catch(NothrowParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : CatchNode*
+        ::= CATCH{ s = span; } LPAREN!{ leftParenSpan = span; } TypeExpr(ctx):catchType Identifier(ctx):catchId? RPAREN!{ rightParenSpan = span; }
+            CompoundStatement(ctx):catchBlock
+        {
+            s.end = span.end;
+            CatchNode* value = new CatchNode(s, ctx->ModuleId(), catchType, catchId, catchBlock);
+            value->SetLeftParenSpan(leftParenSpan);
+            value->SetRightParenSpan(rightParenSpan);
+            value->SetLexerFlags(lexer.Flags());
+            return value;
+        }
+        ;
+
+    AssertStatement(NothrowParsingContext* ctx, var Span s) : StatementNode*
+        ::= HASH{ s = span; } ASSERT Expression(ctx):expr SEMICOLON!
+        {
+            s.end = span.end;
+            AssertStatementNode* node = new AssertStatementNode(s, ctx->ModuleId(), expr);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+
+    ConditionalCompilationStatement(NothrowParsingContext* ctx, var UniquePtr<ConditionalCompilationStatementNode> condCompStatement,
+        var Span s, var Span keywordSpan, var Span leftParenSpan, var Span rightParenSpan) : ConditionalCompilationStatementNode*
+        ::= HASH{ s = span; keywordSpan = span; }
+            IF{ keywordSpan.end = span.end; }  LPAREN!{ leftParenSpan = span; }
+            ConditionalCompilationExpression(ctx):ifExpr{ s.end = span.end; condCompStatement.Reset(new ConditionalCompilationStatementNode(s, ctx->ModuleId(), ifExpr)); condCompStatement->IfPart()->SetKeywordSpan(keywordSpan); }
+            RPAREN!{ rightParenSpan = span; condCompStatement->IfPart()->SetLeftParenSpan(leftParenSpan); condCompStatement->IfPart()->SetRightParenSpan(rightParenSpan); }
+            (Statement(ctx):ifS{ condCompStatement->AddIfStatement(ifS); })*
+            (   HASH{ keywordSpan = span; } ELIF{ keywordSpan.end = span.end; }
+                LPAREN!{ leftParenSpan = span; } ConditionalCompilationExpression(ctx):elifExpr{ condCompStatement->AddElifExpr(span, ctx->ModuleId(), elifExpr); } RPAREN!
+                {
+                    rightParenSpan = span;
+                    condCompStatement->SetElifLeftParenSpan(leftParenSpan);
+                    condCompStatement->SetElifRightParenSpan(rightParenSpan);
+                    condCompStatement->SetElifKeywordSpan(keywordSpan);
+                }
+                (Statement(ctx):elifS{ condCompStatement->AddElifStatement(elifS); })*
+            )*
+            (   HASH{ keywordSpan = span; } ELSE (Statement(ctx):elseS{ condCompStatement->AddElseStatement(span, ctx->ModuleId(), elseS); })* empty{ condCompStatement->ElsePart()->SetKeywordSpan(keywordSpan); }
+            )?
+            HASH{ keywordSpan = span; } ENDIF!
+            {
+                keywordSpan.end = span.end;
+                condCompStatement->SetEndIfSpan(keywordSpan);
+                condCompStatement->SetLexerFlags(lexer.Flags());
+                return condCompStatement.Release();
+            }
+        ;
+
+    ConditionalCompilationExpression(NothrowParsingContext* ctx) : ConditionalCompilationExpressionNode*
+        ::= ConditionalCompilationDisjunction(ctx):disjunction{ return disjunction; }
+        ;
+
+    ConditionalCompilationDisjunction(NothrowParsingContext* ctx, var Span s, var UniquePtr<ConditionalCompilationExpressionNode> condCompExpr) : ConditionalCompilationExpressionNode*
+        ::=
+        (   ConditionalCompilationConjunction(ctx):left{ s = span; condCompExpr.Reset(left); }
+            (DISJUNCTION ConditionalCompilationConjunction(ctx):right{ s.end = span.end; condCompExpr.Reset(new ConditionalCompilationDisjunctionNode(s, ctx->ModuleId(), condCompExpr.Release(), right)); })*
+        )
+        {
+            condCompExpr->SetLexerFlags(lexer.Flags());
+            return condCompExpr.Release();
+        }
+        ;
+
+    ConditionalCompilationConjunction(NothrowParsingContext* ctx, var Span s, var UniquePtr<ConditionalCompilationExpressionNode> condCompExpr) : ConditionalCompilationExpressionNode*
+        ::=
+        (   ConditionalCompilationPrefix(ctx):left{ s = span; condCompExpr.Reset(left); }
+            (AMPAMP ConditionalCompilationPrefix(ctx):right{ s.end = span.end; condCompExpr.Reset(new ConditionalCompilationConjunctionNode(s, ctx->ModuleId(), condCompExpr.Release(), right)); })*
+        )
+        {
+            condCompExpr->SetLexerFlags(lexer.Flags());
+            return condCompExpr.Release();
+        }
+        ;
+
+    ConditionalCompilationPrefix(NothrowParsingContext* ctx, var Span s, var UniquePtr<ConditionalCompilationExpressionNode> condCompExpr) : ConditionalCompilationExpressionNode*
+        ::=
+        (   EXCLAMATION{ s = span; } ConditionalCompilationPrefix(ctx):prefix{ s.end = span.end; condCompExpr.Reset(new ConditionalCompilationNotNode(s, ctx->ModuleId(), prefix)); }
+        |   ConditionalCompilationPrimary(ctx):primary{ condCompExpr.Reset(primary); }
+        )
+        {
+            condCompExpr->SetLexerFlags(lexer.Flags());
+            return condCompExpr.Release();
+        }
+        ;
+
+    ConditionalCompilationPrimary(NothrowParsingContext* ctx, var ustring symbol) : ConditionalCompilationExpressionNode*
+        ::= ID{ symbol = lexer.GetMatch(span); return new ConditionalCompilationPrimaryNode(span, ctx->ModuleId(), symbol); }
+        |   LPAREN ConditionalCompilationExpression(ctx):expr RPAREN!
+        {
+            ParenthesizedConditionalCompilationExpressionNode* node = new ParenthesizedConditionalCompilationExpressionNode(span, ctx->ModuleId(), expr);
+            node->SetLexerFlags(lexer.Flags());
+            return node;
+        }
+        ;
+}

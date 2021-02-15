@@ -10,20 +10,20 @@ namespace soulcm.scmpg
 {
     public class ArrayGeneratorVisitor : Visitor
     {
-        public ArrayGeneratorVisitor(Cm.Ast.NamespaceNode* ns_, int& sn_) :
-            ns(ns_), sn(sn_)
+        public ArrayGeneratorVisitor(Cm.Ast.NamespaceNode* ns_, int& sn_, const Uuid& moduleId_) :
+            ns(ns_), sn(sn_), moduleId(moduleId_)
         {
         }
         public override void Visit(StringParser& parser)
         {
-            UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span()));
+            UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span(), moduleId));
             string s = "s" + ToString(sn++);
             parser.SetArrayName(s);
             for (uchar c : parser.Str())
             {
-                arrayLiteral->AddValue(new Cm.Ast.IntLiteralNode(System.Lex.Span(), cast<int>(c)));
+                arrayLiteral->AddValue(new Cm.Ast.IntLiteralNode(System.Lex.Span(), moduleId, cast<int>(c)));
             }
-            UniquePtr<Cm.Ast.ConstantNode> arrayConstant(new Cm.Ast.ConstantNode(System.Lex.Span(), Specifiers.public_, new Cm.Ast.ArrayNode(System.Lex.Span(), new Cm.Ast.IntNode(System.Lex.Span()), new Cm.Ast.LongLiteralNode(System.Lex.Span(), parser.Str().Length())), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(s)), arrayLiteral.Release()));
+            UniquePtr<Cm.Ast.ConstantNode> arrayConstant(new Cm.Ast.ConstantNode(System.Lex.Span(), moduleId, Specifiers.public_, new Cm.Ast.ArrayNode(System.Lex.Span(), moduleId, new Cm.Ast.IntNode(System.Lex.Span(), moduleId), new Cm.Ast.LongLiteralNode(System.Lex.Span(), moduleId, parser.Str().Length())), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, ToUtf32(s)), arrayLiteral.Release()));
             int index = 0;
             for (int i = 0; i < ns->Members().Count(); ++i)
             {
@@ -33,18 +33,18 @@ namespace soulcm.scmpg
         }
         public override void Visit(CharSetParser& parser)
         {
-            UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span()));
+            UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span(), moduleId));
             string s = "s" + ToString(sn++);
             parser.SetArrayName(s);
             bool first = true;
             for (const System.Parsing.Range& range : parser.Set().Ranges())
             {
-                Cm.Ast.StructuredLiteralNode* value = new Cm.Ast.StructuredLiteralNode(System.Lex.Span());
-                value->AddMember(new Cm.Ast.IntLiteralNode(System.Lex.Span(), range.first));
-                value->AddMember(new Cm.Ast.IntLiteralNode(System.Lex.Span(), range.last));
+                Cm.Ast.StructuredLiteralNode* value = new Cm.Ast.StructuredLiteralNode(System.Lex.Span(), moduleId);
+                value->AddMember(new Cm.Ast.IntLiteralNode(System.Lex.Span(), moduleId, range.first));
+                value->AddMember(new Cm.Ast.IntLiteralNode(System.Lex.Span(), moduleId, range.last));
                 arrayLiteral->AddValue(value);
             }
-            UniquePtr<Cm.Ast.ConstantNode> arrayConstant(new Cm.Ast.ConstantNode(System.Lex.Span(), Specifiers.public_, new Cm.Ast.ArrayNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range"), new Cm.Ast.LongLiteralNode(System.Lex.Span(), parser.Set().Ranges().Count())), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(s)), arrayLiteral.Release()));
+            UniquePtr<Cm.Ast.ConstantNode> arrayConstant(new Cm.Ast.ConstantNode(System.Lex.Span(), moduleId, Specifiers.public_, new Cm.Ast.ArrayNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Range"), new Cm.Ast.LongLiteralNode(System.Lex.Span(), moduleId, parser.Set().Ranges().Count())), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, ToUtf32(s)), arrayLiteral.Release()));
             int index = 0;
             for (int i = 0; i < ns->Members().Count(); ++i)
             {
@@ -115,5 +115,6 @@ namespace soulcm.scmpg
         }
         private Cm.Ast.NamespaceNode* ns;
         private int& sn;
+        private Uuid moduleId;
     }
 } // namespace soulcm.scmpg

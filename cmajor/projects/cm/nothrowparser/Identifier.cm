@@ -1,0 +1,218 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/nothrowparser/Identifier.parser' using soulcm parser generator scmpg version 3.10.0
+
+public static class NothrowIdentifierParser
+{
+    public static nothrow Match Identifier(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Identifier");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Span span = lexer.GetSpan();
+            Match match(false);
+            if (*lexer == ID)
+            {
+                ++lexer;
+                match.hit = true;
+            }
+            if (match.hit)
+            {
+                IdentifierNode* node = new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos));
+                node->SetLexerFlags(lexer.Flags());
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Identifier");
+                    #endif
+                    return Match(true, node);
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Identifier");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Identifier");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match QualifiedId(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"QualifiedId");
+            }
+        #endif
+        ustring value;
+        Span s;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == ID)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            s = span;
+                            Token token = lexer.GetToken(pos);
+                            value.Append(token.match.ToString());
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(true);
+                        Match* parentMatch5 = &match;
+                        {
+                            while (true)
+                            {
+                                long save = lexer.GetPos();
+                                {
+                                    Match match(false);
+                                    Match* parentMatch6 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch7 = &match;
+                                        {
+                                            Match match(false);
+                                            if (*lexer == DOT)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch8 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch9 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match(false);
+                                                    if (*lexer == ID)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        s.end = span.end;
+                                                        Token token = lexer.GetToken(pos);
+                                                        value.Append('.').Append(token.match.ToString());
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch5 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                IdentifierNode* node = new IdentifierNode(s, ctx->ModuleId(), value);
+                node->SetLexerFlags(lexer.Flags());
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"QualifiedId");
+                    #endif
+                    return Match(true, node);
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"QualifiedId");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"QualifiedId");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

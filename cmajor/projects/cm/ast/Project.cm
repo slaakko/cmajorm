@@ -8,9 +8,24 @@ namespace Cm.Ast
     private ModuleVersionTagVerifier* moduleVersionTagVerifier = null;
     private string outDir;
 
-    public enum BackEnd
+    public enum BackEnd : sbyte
     {
-        llvm, cmsx
+        llvm = 0, cmsx = 1, cppcm = 2
+    }
+
+    public enum Config : sbyte
+    {
+        debug = 0, release = 1, profile = 2, trace = 3
+    }
+
+    public nothrow string GetPlatform()
+    {
+    #if (WINDOWS)
+        return "windows";
+    #else
+        return "linux";
+    #endif
+        return string();
     }
 
     public abstract class ModuleVersionTagVerifier
@@ -39,7 +54,7 @@ namespace Cm.Ast
         return cmajorRootDir;
     }
 
-    public string CmajorSystemLibDir(const string& config, BackEnd backend)
+    public string CmajorSystemLibDir(const string& config, BackEnd backend, const string& toolChain)
     {
         if (backend == BackEnd.llvm)
         {
@@ -51,20 +66,52 @@ namespace Cm.Ast
             string cmajorRootDir = CmajorRootDir();
             return GetFullPath(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cmsx"), "system"), "lib"));
         }
+        else if (backend == BackEnd.cppcm)
+        {
+            string cmajorRootDir = CmajorRootDir();
+            return GetFullPath(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "system"), "lib"), "cpp"), toolChain), config));
+        }
         else
         {
             return string();
         }
     }
 
-    public string CmajorSystemModuleFilePath(const string& config, BackEnd backend)
+    public string CmajorSystemModuleFilePath(const string& config, BackEnd backend, const string& toolChain)
     {
-        return GetFullPath(Path.Combine(CmajorSystemLibDir(config, backend), "System.cmm"));
+        return GetFullPath(Path.Combine(CmajorSystemLibDir(config, backend, toolChain), "System.cmm"));
     }
 
-    public string CmajorSystemWindowsModuleFilePath(const string& config)
+    public string CmajorSystemWindowsModuleFilePath(const string& config, const string& toolChain)
     {
-        return GetFullPath(Path.Combine(CmajorSystemLibDir(config, BackEnd.llvm), "System.Windows.cmm"));
+        return GetFullPath(Path.Combine(CmajorSystemLibDir(config, BackEnd.llvm, toolChain), "System.Windows.cmm"));
+    }
+
+    public string MakeCmajorRootRelativeFilePath(const string& filePath)
+    {
+        string cmajorRootDir = GetFullPath(CmajorRootDir());
+        string fullPath = GetFullPath(filePath);
+        if (fullPath.StartsWith(cmajorRootDir))
+        {
+            return "$CMAJOR_ROOT$" + fullPath.Substring(cmajorRootDir.Length());
+        }
+        else
+        {
+            return fullPath;
+        }
+    }
+
+    public string ExpandCmajorRootRelativeFilePath(const string& filePath)
+    {
+        if (filePath.StartsWith("$CMAJOR_ROOT$"))
+        {
+            string cmajorRootDir = GetFullPath(CmajorRootDir());
+            return cmajorRootDir + filePath.Substring(string("$CMAJOR_ROOT$").Length());
+        }
+        else
+        {
+            return GetFullPath(filePath);
+        }
     }
 
     public nothrow void SetOutDir(const string& outDir_)
@@ -176,9 +223,11 @@ namespace Cm.Ast
 
     public class Project
     {
-        public nothrow Project(const ustring& name_, const string& filePath_, const string& config_, BackEnd backend_) :
-            name(name_), filePath(Path.MakeCanonical(filePath_)), config(config_), backend(backend_), sourceBasePath(Path.GetDirectoryName(filePath))
+        public nothrow Project(const ustring& name_, const string& filePath_, const string& config_, BackEnd backend_, const string& toolChain_) :
+            name(name_), filePath(Path.MakeCanonical(filePath_)), config(config_), backend(backend_), toolChain(toolChain_),
+            sourceBasePath(Path.GetDirectoryName(filePath))
         {
+            string platform = GetPlatform();
             if (!outDir.IsEmpty())
             {
                 outDirBasePath = Path.Combine(outDir, ToUtf8(name));
@@ -187,7 +236,7 @@ namespace Cm.Ast
             {
                 outDirBasePath = sourceBasePath;
             }
-            systemLibDir = CmajorSystemLibDir(config, backend);
+            systemLibDir = CmajorSystemLibDir(config, backend, toolChain);
             moduleFilePath = Path.GetDirectoryName(filePath);
             if (!outDir.IsEmpty())
             {
@@ -202,6 +251,10 @@ namespace Cm.Ast
             else if (backend == BackEnd.llvm)
             {
                 libraryFilePath = GetFullPath(Path.ChangeExtension(moduleFilePath, ".lib"));
+            }
+            else if (backend == BackEnd.cppcm)
+            {
+                libraryFilePath = GetFullPath(Path.ChangeExtension(moduleFilePath, ".a"));
             }
         #else
             libraryFilePath = GetFullPath(Path.ChangeExtension(moduleFilePath, ".a"));
@@ -218,6 +271,10 @@ namespace Cm.Ast
                 executableFilePath = GetFullPath(Path.ChangeExtension(executableFilePath, string()));
             }
             else if (backend == BackEnd.llvm)
+            {
+                executableFilePath = GetFullPath(Path.ChangeExtension(executableFilePath, ".exe"));
+            }
+            else if (backend == BackEnd.cppcm)
             {
                 executableFilePath = GetFullPath(Path.ChangeExtension(executableFilePath, ".exe"));
             }
@@ -602,6 +659,7 @@ namespace Cm.Ast
         private string config;
         private BackEnd backend;
         private Target target;
+        private string toolChain;
         private string sourceBasePath;
         private string outDirBasePath;
         private string systemLibDir;

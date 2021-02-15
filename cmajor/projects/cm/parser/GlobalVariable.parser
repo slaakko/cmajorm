@@ -17,12 +17,12 @@ parser GlobalVariableParser
     using TypeExprParser.TypeExpr;
     using IdentifierParser.Identifier;
     using ExpressionParser.Expression;
-    
+
     GlobalVariable(ParsingContext* ctx, CompileUnitNode* cu, var Span s) : GlobalVariableNode*
-        ::= Specifiers:specifiers{ s = span; } TypeExpr(ctx):type Identifier:id (ASSIGN Expression(ctx):initializer)? SEMICOLON
+        ::= Specifiers:specifiers{ s = span; } TypeExpr(ctx):type Identifier(ctx):id (ASSIGN Expression(ctx):initializer)? SEMICOLON
         {
             s.end = span.end;
-            GlobalVariableNode* value = new GlobalVariableNode(s, specifiers, type, id, cu); 
+            GlobalVariableNode* value = new GlobalVariableNode(s, ctx->ModuleId(), specifiers, type, id, cu);
             value->SetInitializer(initializer);
             return value;
         }

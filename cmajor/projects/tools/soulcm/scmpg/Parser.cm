@@ -53,6 +53,14 @@ namespace soulcm.scmpg
         {
             return false;
         }
+        public virtual nothrow bool IsNothrow() const
+        {
+            if (parent != null)
+            {
+                return parent->IsNothrow();
+            }
+            return false;
+        }
         public virtual Parser* Clone() const
         {
             throw Exception("this class does not support clone operation");
@@ -545,6 +553,7 @@ namespace soulcm.scmpg
         public void SetDefinition(Parser* definition_)
         {
             definition.Reset(definition_);
+            definition->SetParent(this);
         }
         public void AddParamOrVariable(Parameter* paramOrVariable)
         {
@@ -598,6 +607,26 @@ namespace soulcm.scmpg
         public bool Main() const
         {
             return main;
+        }
+        public nothrow bool Start() const
+        {
+            return start;
+        }
+        public nothrow void SetStart()
+        {
+            start = true;
+        }
+        public nothrow bool Nothrow() const
+        {
+            return isNothrow;
+        }
+        public override nothrow bool IsNothrow() const
+        {
+            return isNothrow;
+        }
+        public nothrow void SetNothrow()
+        {
+            isNothrow = true;
         }
         public const List<ustring>& Usings() const
         {
@@ -655,6 +684,8 @@ namespace soulcm.scmpg
         }
         private ustring api;
         private bool main;
+        private bool start;
+        private bool isNothrow;
         private List<ustring> usings;
         private ustring lexer;
         private List<UniquePtr<RuleParser>> rules;

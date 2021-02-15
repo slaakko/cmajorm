@@ -9,7 +9,7 @@
 
 using namespace soulng::unicode;
 
-void ParseFloatingLiteral(const std::string& fileName, const Token& token, double& floatingLit, bool& floatingLitFloat)
+bool ParseFloatingLiteralNothrow(const std::string& fileName, const Token& token, double& floatingLit, bool& floatingLitFloat)
 {
     floatingLit = 0.0;
     floatingLitFloat = false;
@@ -28,18 +28,19 @@ void ParseFloatingLiteral(const std::string& fileName, const Token& token, doubl
     }
     if (p != e)
     {
-        throw std::runtime_error("invalid floating literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+        return false;
     }
     std::stringstream s;
     s.str(str);
     s >> floatingLit;
     if (s.fail() || s.bad())
     {
-        throw std::runtime_error("invalid floating literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+        return false;
     }
+    return true;
 }
 
-void ParseIntegerLiteral(const std::string& fileName, const Token& token, uint64_t& intLit, bool& intLitUnsigned)
+bool ParseIntegerLiteralNothrow(const std::string& fileName, const Token& token, uint64_t& intLit, bool& intLitUnsigned)
 {
     intLit = 0;
     intLitUnsigned = false;
@@ -93,7 +94,7 @@ void ParseIntegerLiteral(const std::string& fileName, const Token& token, uint64
     }
     else
     {
-        throw std::runtime_error("invalid integer literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+        return false;
     }
     if (p != e && (*p == 'u' || *p == 'U'))
     {
@@ -102,11 +103,12 @@ void ParseIntegerLiteral(const std::string& fileName, const Token& token, uint64
     }
     if (p != e)
     {
-        throw std::runtime_error("invalid integer literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+        return false;
     }
+    return true;
 }
 
-void ParseHexChar(const std::string& fileName, char32_t& value, const char32_t*& p, const char32_t* e, const Token& token)
+bool ParseHexCharNothrow(const std::string& fileName, char32_t& value, const char32_t*& p, const char32_t* e, const Token& token)
 {
     if (p != e)
     {
@@ -136,25 +138,26 @@ void ParseHexChar(const std::string& fileName, char32_t& value, const char32_t*&
         }
         if (notHex)
         {
-            throw std::runtime_error("hex character expected at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+            return false;
         }
         ++p;
     }
     else
     {
-        throw std::runtime_error("hex character expected at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+        return false;
     }
+    return true;
 }
 
-char32_t ParseEscape(const std::string& fileName, const char32_t*& p, const char32_t* e, const Token& token)
+bool ParseEscapeNothrow(const std::string& fileName, const char32_t*& p, const char32_t* e, const Token& token, char32_t& value)
 {
-    char32_t value = '\0';
+    value = '\0';
     if (p != e && (*p == 'x' || *p == 'X'))
     {
         ++p;
         while (p != e && ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'f') || (*p >= 'A' && *p <= 'F')))
         {
-            ParseHexChar(fileName, value, p, e, token);
+            if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
         }
     }
     else if (p != e && (*p == 'd' || *p == 'D'))
@@ -177,22 +180,22 @@ char32_t ParseEscape(const std::string& fileName, const char32_t*& p, const char
     else if (p != e && *p == 'u')
     {
         ++p;
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
     }
     else if (p != e && *p == 'U')
     {
         ++p;
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
-        ParseHexChar(fileName, value, p, e, token);
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
+        if (!ParseHexCharNothrow(fileName, value, p, e, token)) return false;
     }
     else if (p != e)
     {
@@ -209,10 +212,10 @@ char32_t ParseEscape(const std::string& fileName, const char32_t*& p, const char
         }
         ++p;
     }
-    return value;
+    return true;
 }
 
-void ParseCharacterLiteral(const std::string& fileName, const Token& token, char32_t& charLit, int& charLitPrefix)
+bool ParseCharacterLiteralNothrow(const std::string& fileName, const Token& token, char32_t& charLit, int& charLitPrefix)
 {
     charLit = '\0';
     charLitPrefix = noPrefix;
@@ -234,7 +237,7 @@ void ParseCharacterLiteral(const std::string& fileName, const Token& token, char
         if (p != e && *p == '\\')
         {
             ++p;
-            charLit = ParseEscape(fileName, p, e, token);
+            if (!ParseEscapeNothrow(fileName, p, e, token, charLit)) return false;
         }
         else 
         {
@@ -247,7 +250,7 @@ void ParseCharacterLiteral(const std::string& fileName, const Token& token, char
             std::u32string u = s;
             if (u.size() != 1)
             {
-                throw std::runtime_error("invalid character literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+                return false;
             }
             charLit = u.front();
         }
@@ -257,16 +260,17 @@ void ParseCharacterLiteral(const std::string& fileName, const Token& token, char
         }
         if (p != e)
         {
-            throw std::runtime_error("invalid character literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+            return false;
         }
     }
     else
     {
-        throw std::runtime_error("invalid character literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+        return false;
     }
+    return true;
 }
 
-void ParseStringLiteral(const std::string& fileName, const Token& token, std::u32string& stringLit, int& stringLitPrefix)
+bool ParseStringLiteralNothrow(const std::string& fileName, const Token& token, std::u32string& stringLit, int& stringLitPrefix)
 {
     stringLit.clear();
     stringLitPrefix = noPrefix;
@@ -299,7 +303,7 @@ void ParseStringLiteral(const std::string& fileName, const Token& token, std::u3
             }
             if (p != e)
             {
-                throw std::runtime_error("invalid string literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+                return false;
             }
         }
     }
@@ -313,7 +317,9 @@ void ParseStringLiteral(const std::string& fileName, const Token& token, std::u3
                 if (*p == '\\')
                 {
                     ++p;
-                    stringLit.append(1, ParseEscape(fileName, p, e, token));
+                    char32_t c = '\0';
+                    if (!ParseEscapeNothrow(fileName, p, e, token, c)) return false;
+                    stringLit.append(1, c);
                 }
                 else
                 {
@@ -327,37 +333,13 @@ void ParseStringLiteral(const std::string& fileName, const Token& token, std::u3
             }
             if (p != e)
             {
-                throw std::runtime_error("invalid string literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+                return false;
             }
         }
         else
         {
-            throw std::runtime_error("invalid string literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
+            return false;
         }
     }
-}
-
-std::string MakeFilePath(const Lexeme& lexeme)
-{
-    std::u32string s;
-    const char32_t* p = lexeme.begin;
-    const char32_t* e = lexeme.end;
-    if (p != e && *p == '<')
-    {
-        ++p;
-    }
-    while (p != e && *p != '>')
-    {
-        s.append(1, *p);
-        ++p;
-    }
-    if (p != e && *p == '>')
-    {
-        ++p;
-    }
-    if (p != e)
-    {
-        throw std::runtime_error("invalid file path '" + ToUtf8(std::u32string(lexeme.begin, lexeme.end)));
-    }
-    return ToUtf8(s);
+    return true;
 }

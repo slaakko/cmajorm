@@ -5,7 +5,7 @@ using System.Parsing;
 using Cm.Ast;
 using LexerFileTokens;
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scmlg/build/LexerFileParser.parser' using soulcm parser generator scmpg version 3.8.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/tools/soulcm/scmlg/build/LexerFileParser.parser' using soulcm parser generator scmpg version 3.10.0
 
 public static class LexerFileParser
 {
@@ -225,7 +225,7 @@ public static class LexerFileParser
                                     Match* parentMatch7 = &match;
                                     {
                                         long pos = lexer.GetPos();
-                                        Match match = LexerFileParser.Usings(lexer);
+                                        Match match = LexerFileParser.Usings(lexer, parsingContext);
                                         usingDeclarations.Reset(cast<soulcm.scmlg.Usings*>(match.value));
                                         if (match.hit)
                                         {
@@ -507,7 +507,7 @@ public static class LexerFileParser
         }
         return match;
     }
-    public static Match Usings(LexerFileLexer& lexer)
+    public static Match Usings(LexerFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -544,7 +544,7 @@ public static class LexerFileParser
                 Match* parentMatch3 = &match;
                 {
                     long pos = lexer.GetPos();
-                    Match match = LexerFileParser.UsingDirectives(lexer, usings.Get());
+                    Match match = LexerFileParser.UsingDirectives(lexer, ctx, usings.Get());
                     if (match.hit)
                     {
                         {
@@ -579,7 +579,7 @@ public static class LexerFileParser
         }
         return match;
     }
-    public static Match UsingDirectives(LexerFileLexer& lexer, soulcm.scmlg.Usings* usings)
+    public static Match UsingDirectives(LexerFileLexer& lexer, ParsingContext* ctx, soulcm.scmlg.Usings* usings)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -593,7 +593,7 @@ public static class LexerFileParser
         Match match(false);
         Match* parentMatch0 = &match;
         {
-            Match match = LexerFileParser.UsingDirective(lexer, usings);
+            Match match = LexerFileParser.UsingDirective(lexer, ctx, usings);
             *parentMatch0 = match;
         }
         if (match.hit)
@@ -604,7 +604,7 @@ public static class LexerFileParser
             {
                 long save = lexer.GetPos();
                 {
-                    Match match = LexerFileParser.UsingDirective(lexer, usings);
+                    Match match = LexerFileParser.UsingDirective(lexer, ctx, usings);
                     if (match.hit)
                     {
                         *parentMatch1 = match;
@@ -636,7 +636,7 @@ public static class LexerFileParser
         }
         return match;
     }
-    public static Match UsingDirective(LexerFileLexer& lexer, soulcm.scmlg.Usings* usings)
+    public static Match UsingDirective(LexerFileLexer& lexer, ParsingContext* ctx, soulcm.scmlg.Usings* usings)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -657,7 +657,7 @@ public static class LexerFileParser
             Match* parentMatch1 = &match;
             {
                 long pos = lexer.GetPos();
-                Match match = LexerFileParser.UsingAliasDirective(lexer);
+                Match match = LexerFileParser.UsingAliasDirective(lexer, ctx);
                 usingAlias.Reset(cast<Node*>(match.value));
                 if (match.hit)
                 {
@@ -676,7 +676,7 @@ public static class LexerFileParser
                     Match* parentMatch3 = &match;
                     {
                         long pos = lexer.GetPos();
-                        Match match = LexerFileParser.UsingNamespaceDirective(lexer);
+                        Match match = LexerFileParser.UsingNamespaceDirective(lexer, ctx);
                         usingNs.Reset(cast<Node*>(match.value));
                         if (match.hit)
                         {
@@ -708,7 +708,7 @@ public static class LexerFileParser
         }
         return match;
     }
-    public static Match UsingAliasDirective(LexerFileLexer& lexer)
+    public static Match UsingAliasDirective(LexerFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -758,7 +758,7 @@ public static class LexerFileParser
                         Match match(false);
                         Match* parentMatch5 = &match;
                         {
-                            Match match = IdentifierParser.Identifier(lexer);
+                            Match match = IdentifierParser.Identifier(lexer, ctx);
                             id.Reset(cast<IdentifierNode*>(match.value));
                             *parentMatch5 = match;
                         }
@@ -792,7 +792,7 @@ public static class LexerFileParser
                     Match* parentMatch8 = &match;
                     {
                         System.Lex.Span span = lexer.GetSpan();
-                        Match match = IdentifierParser.QualifiedId(lexer);
+                        Match match = IdentifierParser.QualifiedId(lexer, ctx);
                         qid.Reset(cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
@@ -845,7 +845,7 @@ public static class LexerFileParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingAliasDirective");
                             #endif
-                            return Match(true, new AliasNode(s, id.Release(), qid.Release()));
+                            return Match(true, new AliasNode(s, ctx->ModuleId(), id.Release(), qid.Release()));
                         }
                     }
                     *parentMatch10 = match;
@@ -873,7 +873,7 @@ public static class LexerFileParser
         }
         return match;
     }
-    public static Match UsingNamespaceDirective(LexerFileLexer& lexer)
+    public static Match UsingNamespaceDirective(LexerFileLexer& lexer, ParsingContext* ctx)
     {
         #if (DEBUG)
             Span debugSpan;
@@ -920,7 +920,7 @@ public static class LexerFileParser
                     Match* parentMatch4 = &match;
                     {
                         System.Lex.Span span = lexer.GetSpan();
-                        Match match = IdentifierParser.QualifiedId(lexer);
+                        Match match = IdentifierParser.QualifiedId(lexer, ctx);
                         ns.Reset(cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
@@ -973,7 +973,7 @@ public static class LexerFileParser
                             #if (DEBUG)
                                 if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingNamespaceDirective");
                             #endif
-                            return Match(true, new NamespaceImportNode(s, ns.Release()));
+                            return Match(true, new NamespaceImportNode(s, ctx->ModuleId(), ns.Release()));
                         }
                     }
                     *parentMatch6 = match;

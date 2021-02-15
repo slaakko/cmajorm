@@ -1,0 +1,35 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Ast;
+using LexerFileTokens;
+
+parser LexBasicTypeParser
+{
+    uselexer LexerFileLexer;
+
+    BasicType(ParsingContext* ctx) : Node*
+        ::= BOOL{ return new BoolNode(span, ctx->ModuleId()); }
+        |   SBYTE{ return new SByteNode(span, ctx->ModuleId()); }
+        |   BYTE{ return new ByteNode(span, ctx->ModuleId()); }
+        |   SHORT{ return new ShortNode(span, ctx->ModuleId()); }
+        |   USHORT{ return new UShortNode(span, ctx->ModuleId()); }
+        |   INT{ return new IntNode(span, ctx->ModuleId()); }
+        |   UINT{ return new UIntNode(span, ctx->ModuleId()); }
+        |   LONG{ return new LongNode(span, ctx->ModuleId()); }
+        |   ULONG{ return new ULongNode(span, ctx->ModuleId()); }
+        |   FLOAT{ return new FloatNode(span, ctx->ModuleId()); }
+        |   DOUBLE{ return new DoubleNode(span, ctx->ModuleId()); }
+        |   CHAR{ return new CharNode(span, ctx->ModuleId()); }
+        |   WCHAR{ return new WCharNode(span, ctx->ModuleId()); }
+        |   UCHAR{ return new UCharNode(span, ctx->ModuleId()); }
+        |   VOID{ return new VoidNode(span, ctx->ModuleId()); }
+        ;
+
+    ruleinfo
+    {
+        (BasicType, "basic type")
+    }
+}

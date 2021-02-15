@@ -1,0 +1,51 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Ast;
+using LexerFileTokens;
+
+parser LexTypeExprParser
+{
+    uselexer LexerFileLexer;
+
+    using LexBasicTypeParser.BasicType;
+    using LexExpressionParser.Expression;
+    using LexTemplateParser.TemplateId;
+
+    TypeExpr(ParsingContext* ctx) : Node*
+        ::= PrefixTypeExpr(ctx):prefixTypeExpr{ return prefixTypeExpr; }
+        ;
+
+    PrefixTypeExpr(ParsingContext* ctx, var Span s) : Node*
+        ::= CONST{ s = span; } PostfixTypeExpr(ctx):constTypeExpr{ s.end = span.end; return new ConstNode(s, ctx->ModuleId(), constTypeExpr); }
+        |   PostfixTypeExpr(ctx):postfixTypeExpr{ return postfixTypeExpr; }
+        ;
+
+    PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<Node> typeExpr, var Span s) : Node*
+        ::=
+        (   PrimaryTypeExpr(ctx):primaryTypeExpr{ s = span; typeExpr.Reset(primaryTypeExpr); }
+            (   DOT ID!{ s.end = span.end; typeExpr.Reset(new DotNode(s, ctx->ModuleId(), typeExpr.Release(), new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos)))); }
+            |   STAR{ s.end = span.end; typeExpr.Reset(new PointerNode(s, ctx->ModuleId(), typeExpr.Release())); }
+            |   AMPAMP{ s.end = span.end; typeExpr.Reset(new RValueRefNode(s, ctx->ModuleId(), typeExpr.Release())); }
+            |   AMP{ s.end = span.end; typeExpr.Reset(new LValueRefNode(s, ctx->ModuleId(), typeExpr.Release())); }
+            |   LBRACKET Expression(ctx):size? RBRACKET!{ s.end = span.end; typeExpr.Reset(new ArrayNode(s, ctx->ModuleId(), typeExpr.Release(), size)); }
+            )*
+        )
+        {
+            return typeExpr.Release();
+        }
+        ;
+
+    PrimaryTypeExpr(ParsingContext* ctx) : Node*
+        ::= BasicType(ctx):basicType{ return basicType; }
+        |   TemplateId(ctx):templateId{ return templateId; }
+        |   ID{ return new IdentifierNode(span, ctx->ModuleId(), lexer.GetToken(pos)); }
+        ;
+
+    ruleinfo
+    {
+        (TypeExpr, "type expression"), (PrefixTypeExpr, "prefix type expression"), (PostfixTypeExpr, "postfix type expression"), (PrimaryTypeExpr, "primary type expression")
+    }
+}

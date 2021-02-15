@@ -1,0 +1,45 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Ast;
+using LexerFileTokens;
+
+parser LexTemplateParser
+{
+    uselexer LexerFileLexer;
+
+    using LexIdentifierParser.Identifier;
+    using LexIdentifierParser.QualifiedId;
+    using LexTypeExprParser.TypeExpr;
+
+    TemplateId(ParsingContext* ctx, var UniquePtr<TemplateIdNode> templateId, var Span e) : Node*
+        ::= empty{ ctx->BeginParsingTemplateId(); }
+            (QualifiedId(ctx):primary{ templateId.Reset(new TemplateIdNode(span, ctx->ModuleId(), primary)); }
+            LANGLE{ ++lexer.leftAngleCount; }
+            ((TypeExpr(ctx):templateArg{ templateId->AddTemplateArgument(templateArg); } % COMMA) RANGLE{ e = span; }){ --lexer.leftAngleCount; } / { --lexer.leftAngleCount; })
+        {
+            templateId->SetSpanEnd(e.end);
+            ctx->EndParsingTemplateId();
+            return templateId.Release();
+        }
+        /
+        {
+            ctx->EndParsingTemplateId();
+        }
+        ;
+
+    TemplateParameter(ParsingContext* ctx) : TemplateParameterNode*
+        ::= (Identifier(ctx):id (ASSIGN TypeExpr(ctx):type)?){ return new TemplateParameterNode(span, ctx->ModuleId(), id, type); }
+        ;
+
+    TemplateParameterList(ParsingContext* ctx, Node* owner)
+        ::= LANGLE (TemplateParameter(ctx):tp{ owner->AddTemplateParameter(tp); } % COMMA) RANGLE!
+        ;
+
+    ruleinfo
+    {
+        (TemplateId, "template identifier"), (TemplateParameter, "template parameter"), (TemplateParameterList, "template parameter list")
+    }
+}

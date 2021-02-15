@@ -10,12 +10,13 @@ namespace Cm.Ast
 {
     public class CompileUnitNode : Node
     {
-        public nothrow CompileUnitNode(const System.Lex.Span& span_) :
-            base(NodeType.compileUnitNode, span_), globalNs(), isSynthesizedUnit(false)
+        public nothrow CompileUnitNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.compileUnitNode, span_, moduleId_), globalNs(), isSynthesizedUnit(false)
         {
         }
-        public nothrow CompileUnitNode(const System.Lex.Span& span_, const string& filePath_) :
-            base(NodeType.compileUnitNode, span_), filePath(filePath_), globalNs(new NamespaceNode(span_, new IdentifierNode(span_, u""))), isSynthesizedUnit(false)
+        public nothrow CompileUnitNode(const System.Lex.Span& span_, const Uuid& moduleId_, const string& filePath_) :
+            base(NodeType.compileUnitNode, span_, moduleId_), filePath(filePath_),
+            globalNs(new NamespaceNode(span_, moduleId_, new IdentifierNode(span_, moduleId_, u""))), isSynthesizedUnit(false)
         {
         }
         public nothrow const string& FilePath() const
@@ -70,7 +71,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            CompileUnitNode* clone = new CompileUnitNode(GetSpan(), filePath);
+            CompileUnitNode* clone = new CompileUnitNode(GetSpan(), ModuleId(), filePath);
             clone->globalNs.Reset(cast<NamespaceNode*>(globalNs->Clone(cloneContext)));
             return clone;
         }
@@ -158,7 +159,7 @@ namespace Cm.Ast
             {
                 CloneContext cloneContext;
                 IdentifierNode* unnamedNsId = cast<IdentifierNode*>(unnamedNs->Id()->Clone(cloneContext));
-                NamespaceImportNode* import = new NamespaceImportNode(compileUnitNode.GetSpan(), unnamedNsId);
+                NamespaceImportNode* import = new NamespaceImportNode(compileUnitNode.GetSpan(), compileUnitNode.ModuleId(), unnamedNsId);
                 compileUnitNode.GlobalNs()->Members().Insert(index, import);
                 ++index;
             }

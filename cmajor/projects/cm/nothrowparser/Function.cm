@@ -1,0 +1,1472 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.NothrowParser;
+using CmajorNothrowTokens;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/cm/nothrowparser/Function.parser' using soulcm parser generator scmpg version 3.10.0
+
+public static class NothrowFunctionParser
+{
+    public static nothrow Match Function(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Function");
+            }
+        #endif
+        UniquePtr<FunctionNode> fun;
+        Span s;
+        Span specifierSpan;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
+        UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
+        UniquePtr<Node> returnType;
+        UniquePtr<Value<ustring>> functionGroupId;
+        UniquePtr<WhereConstraintNode> constraint;
+        UniquePtr<CompoundStatementNode> body;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Span span = lexer.GetSpan();
+                                            Match match(true);
+                                            if (match.hit)
+                                            {
+                                                s = span;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch9 = &match;
+                                        {
+                                            Match match(true);
+                                            long save = lexer.GetPos();
+                                            Match* parentMatch10 = &match;
+                                            {
+                                                Match match = NothrowAttributeParser.Attributes(lexer, ctx);
+                                                attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
+                                                if (match.hit)
+                                                {
+                                                    *parentMatch10 = match;
+                                                }
+                                                else
+                                                {
+                                                    lexer.SetPos(save);
+                                                }
+                                            }
+                                            *parentMatch9 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch11 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch12 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Span span = lexer.GetSpan();
+                                            Match match = NothrowSpecifierParser.Specifiers(lexer);
+                                            specifiers.Reset(cast<Value<Cm.Ast.Specifiers>*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                specifierSpan = span;
+                                            }
+                                            *parentMatch12 = match;
+                                        }
+                                        *parentMatch11 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch13 = &match;
+                                {
+                                    Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                                    returnType.Reset(cast<Node*>(match.value));
+                                    *parentMatch13 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch14 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch15 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Span span = lexer.GetSpan();
+                                    Match match = NothrowFunctionParser.FunctionGroupId(lexer, ctx);
+                                    functionGroupId.Reset(cast<Value<ustring>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s.end = span.end;
+                                        fun.Reset(new FunctionNode(s, ctx->ModuleId(), specifiers->value, returnType.Release(), functionGroupId->value, attrs.Release()));
+                                        fun->SetSpecifierSpan(specifierSpan);
+                                        fun->SetGroupIdSpan(span);
+                                    }
+                                    *parentMatch15 = match;
+                                }
+                                *parentMatch14 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch16 = &match;
+                        {
+                            Match match(true);
+                            long save = lexer.GetPos();
+                            Match* parentMatch17 = &match;
+                            {
+                                Match match = NothrowTemplateParser.TemplateParameterList(lexer, ctx, fun.Get());
+                                if (match.hit)
+                                {
+                                    *parentMatch17 = match;
+                                }
+                                else
+                                {
+                                    lexer.SetPos(save);
+                                }
+                            }
+                            *parentMatch16 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch18 = &match;
+                    {
+                        Match match = NothrowParameterParser.ParameterList(lexer, ctx, fun.Get());
+                        *parentMatch18 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch19 = &match;
+                {
+                    Match match(true);
+                    long save = lexer.GetPos();
+                    Match* parentMatch20 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch21 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch22 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match = NothrowConceptParser.WhereConstraint(lexer, ctx);
+                                constraint.Reset(cast<WhereConstraintNode*>(match.value));
+                                if (match.hit)
+                                {
+                                    fun->SetConstraint(constraint.Release());
+                                }
+                                *parentMatch22 = match;
+                            }
+                            *parentMatch21 = match;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch20 = match;
+                        }
+                        else
+                        {
+                            lexer.SetPos(save);
+                        }
+                    }
+                    *parentMatch19 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch23 = &match;
+            {
+                Match match(false);
+                Match* parentMatch24 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch25 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch26 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            Match match(false);
+                            Match* parentMatch27 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match = NothrowStatementParser.CompoundStatement(lexer, ctx);
+                                body.Reset(cast<CompoundStatementNode*>(match.value));
+                                if (match.hit)
+                                {
+                                    fun->SetBody(body.Release());
+                                }
+                                *parentMatch27 = match;
+                            }
+                            *parentMatch26 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch28 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match(false);
+                                    if (*lexer == SEMICOLON)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    *parentMatch28 = match;
+                                }
+                                *parentMatch26 = match;
+                            }
+                        }
+                        *parentMatch25 = match;
+                    }
+                    if (match.hit)
+                    {
+                        fun->SetLexerFlags(lexer.Flags());
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Function");
+                            #endif
+                            return Match(true, fun.Release());
+                        }
+                    }
+                    *parentMatch24 = match;
+                }
+                *parentMatch23 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Function");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Function");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match FunctionGroupId(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"FunctionGroupId");
+            }
+        #endif
+        UniquePtr<Value<ustring>> operatorFunctionGroupId;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long pos = lexer.GetPos();
+                Span span = lexer.GetSpan();
+                Match match(false);
+                if (*lexer == ID)
+                {
+                    ++lexer;
+                    match.hit = true;
+                }
+                if (match.hit)
+                {
+                    {
+                        #if (DEBUG)
+                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"FunctionGroupId");
+                        #endif
+                        return Match(true, new Value<ustring>(lexer.GetMatch(span)));
+                    }
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = NothrowFunctionParser.OperatorFunctionGroupId(lexer, ctx);
+                        operatorFunctionGroupId.Reset(cast<Value<ustring>*>(match.value));
+                        if (match.hit)
+                        {
+                            {
+                                #if (DEBUG)
+                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"FunctionGroupId");
+                                #endif
+                                return Match(true, new Value<ustring>(operatorFunctionGroupId->value));
+                            }
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"FunctionGroupId");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"FunctionGroupId");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static nothrow Match OperatorFunctionGroupId(CmajorNothrowLexer& lexer, NothrowParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"OperatorFunctionGroupId");
+            }
+        #endif
+        UniquePtr<Node> typeExpr;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long pos = lexer.GetPos();
+                Match match(true);
+                if (match.hit)
+                {
+                    lexer.parsingOperatorFunctionGroupId = true;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch2 = &match;
+            {
+                Match match(false);
+                Match* parentMatch3 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match(false);
+                            if (*lexer == OPERATOR)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch8 = &match;
+                                    {
+                                        long save = lexer.GetPos();
+                                        Match match(false);
+                                        Match* parentMatch9 = &match;
+                                        {
+                                            long save = lexer.GetPos();
+                                            Match match(false);
+                                            Match* parentMatch10 = &match;
+                                            {
+                                                long save = lexer.GetPos();
+                                                Match match(false);
+                                                Match* parentMatch11 = &match;
+                                                {
+                                                    long save = lexer.GetPos();
+                                                    Match match(false);
+                                                    Match* parentMatch12 = &match;
+                                                    {
+                                                        long save = lexer.GetPos();
+                                                        Match match(false);
+                                                        Match* parentMatch13 = &match;
+                                                        {
+                                                            long save = lexer.GetPos();
+                                                            Match match(false);
+                                                            Match* parentMatch14 = &match;
+                                                            {
+                                                                long save = lexer.GetPos();
+                                                                Match match(false);
+                                                                Match* parentMatch15 = &match;
+                                                                {
+                                                                    long save = lexer.GetPos();
+                                                                    Match match(false);
+                                                                    Match* parentMatch16 = &match;
+                                                                    {
+                                                                        long save = lexer.GetPos();
+                                                                        Match match(false);
+                                                                        Match* parentMatch17 = &match;
+                                                                        {
+                                                                            long save = lexer.GetPos();
+                                                                            Match match(false);
+                                                                            Match* parentMatch18 = &match;
+                                                                            {
+                                                                                long save = lexer.GetPos();
+                                                                                Match match(false);
+                                                                                Match* parentMatch19 = &match;
+                                                                                {
+                                                                                    long save = lexer.GetPos();
+                                                                                    Match match(false);
+                                                                                    Match* parentMatch20 = &match;
+                                                                                    {
+                                                                                        long save = lexer.GetPos();
+                                                                                        Match match(false);
+                                                                                        Match* parentMatch21 = &match;
+                                                                                        {
+                                                                                            long save = lexer.GetPos();
+                                                                                            Match match(false);
+                                                                                            Match* parentMatch22 = &match;
+                                                                                            {
+                                                                                                long save = lexer.GetPos();
+                                                                                                Match match(false);
+                                                                                                Match* parentMatch23 = &match;
+                                                                                                {
+                                                                                                    long save = lexer.GetPos();
+                                                                                                    Match match(false);
+                                                                                                    Match* parentMatch24 = &match;
+                                                                                                    {
+                                                                                                        long save = lexer.GetPos();
+                                                                                                        Match match(false);
+                                                                                                        Match* parentMatch25 = &match;
+                                                                                                        {
+                                                                                                            long save = lexer.GetPos();
+                                                                                                            Match match(false);
+                                                                                                            Match* parentMatch26 = &match;
+                                                                                                            {
+                                                                                                                long save = lexer.GetPos();
+                                                                                                                Match match(false);
+                                                                                                                Match* parentMatch27 = &match;
+                                                                                                                {
+                                                                                                                    long pos = lexer.GetPos();
+                                                                                                                    Match match(false);
+                                                                                                                    Match* parentMatch28 = &match;
+                                                                                                                    {
+                                                                                                                        Match match(false);
+                                                                                                                        Match* parentMatch29 = &match;
+                                                                                                                        long save = lexer.GetPos();
+                                                                                                                        {
+                                                                                                                            Match match(false);
+                                                                                                                            Match* parentMatch30 = &match;
+                                                                                                                            {
+                                                                                                                                Match match(false);
+                                                                                                                                Match* parentMatch31 = &match;
+                                                                                                                                {
+                                                                                                                                    Match match(false);
+                                                                                                                                    if (*lexer == LANGLE)
+                                                                                                                                    {
+                                                                                                                                        ++lexer;
+                                                                                                                                        match.hit = true;
+                                                                                                                                    }
+                                                                                                                                    *parentMatch31 = match;
+                                                                                                                                }
+                                                                                                                                if (match.hit)
+                                                                                                                                {
+                                                                                                                                    Match match(false);
+                                                                                                                                    Match* parentMatch32 = &match;
+                                                                                                                                    {
+                                                                                                                                        Match match(false);
+                                                                                                                                        if (*lexer == LANGLE)
+                                                                                                                                        {
+                                                                                                                                            ++lexer;
+                                                                                                                                            match.hit = true;
+                                                                                                                                        }
+                                                                                                                                        *parentMatch32 = match;
+                                                                                                                                    }
+                                                                                                                                    *parentMatch31 = match;
+                                                                                                                                }
+                                                                                                                                *parentMatch30 = match;
+                                                                                                                            }
+                                                                                                                            *parentMatch29 = match;
+                                                                                                                        }
+                                                                                                                        if (match.hit)
+                                                                                                                        {
+                                                                                                                            Match match(false);
+                                                                                                                            Match* parentMatch33 = &match;
+                                                                                                                            {
+                                                                                                                                long tmp = lexer.GetPos();
+                                                                                                                                lexer.SetPos(save);
+                                                                                                                                save = tmp;
+                                                                                                                                Match match(false);
+                                                                                                                                Match* parentMatch34 = &match;
+                                                                                                                                {
+                                                                                                                                    Match match(false);
+                                                                                                                                    Match* parentMatch35 = &match;
+                                                                                                                                    {
+                                                                                                                                        Match match(false);
+                                                                                                                                        Match* parentMatch36 = &match;
+                                                                                                                                        {
+                                                                                                                                            Match match(false);
+                                                                                                                                            Match* parentMatch37 = &match;
+                                                                                                                                            {
+                                                                                                                                                Match match(false);
+                                                                                                                                                if (*lexer == LANGLE)
+                                                                                                                                                {
+                                                                                                                                                    ++lexer;
+                                                                                                                                                    match.hit = true;
+                                                                                                                                                }
+                                                                                                                                                *parentMatch37 = match;
+                                                                                                                                            }
+                                                                                                                                            if (match.hit)
+                                                                                                                                            {
+                                                                                                                                                Match match(false);
+                                                                                                                                                Match* parentMatch38 = &match;
+                                                                                                                                                {
+                                                                                                                                                    Match match(false);
+                                                                                                                                                    if (*lexer == LANGLE)
+                                                                                                                                                    {
+                                                                                                                                                        ++lexer;
+                                                                                                                                                        match.hit = true;
+                                                                                                                                                    }
+                                                                                                                                                    *parentMatch38 = match;
+                                                                                                                                                }
+                                                                                                                                                *parentMatch37 = match;
+                                                                                                                                            }
+                                                                                                                                            *parentMatch36 = match;
+                                                                                                                                        }
+                                                                                                                                        if (match.hit)
+                                                                                                                                        {
+                                                                                                                                            Match match(false);
+                                                                                                                                            Match* parentMatch39 = &match;
+                                                                                                                                            {
+                                                                                                                                                Match match(false);
+                                                                                                                                                Match* parentMatch40 = &match;
+                                                                                                                                                {
+                                                                                                                                                    Match match(false);
+                                                                                                                                                    Match* parentMatch41 = &match;
+                                                                                                                                                    {
+                                                                                                                                                        Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                                                                                                                                                        typeExpr.Reset(cast<Node*>(match.value));
+                                                                                                                                                        *parentMatch41 = match;
+                                                                                                                                                    }
+                                                                                                                                                    if (match.hit)
+                                                                                                                                                    {
+                                                                                                                                                        Match match(false);
+                                                                                                                                                        Match* parentMatch42 = &match;
+                                                                                                                                                        {
+                                                                                                                                                            Match match(true);
+                                                                                                                                                            Match* parentMatch43 = &match;
+                                                                                                                                                            {
+                                                                                                                                                                while (true)
+                                                                                                                                                                {
+                                                                                                                                                                    long save = lexer.GetPos();
+                                                                                                                                                                    {
+                                                                                                                                                                        Match match(false);
+                                                                                                                                                                        Match* parentMatch44 = &match;
+                                                                                                                                                                        {
+                                                                                                                                                                            Match match(false);
+                                                                                                                                                                            if (*lexer == COMMA)
+                                                                                                                                                                            {
+                                                                                                                                                                                ++lexer;
+                                                                                                                                                                                match.hit = true;
+                                                                                                                                                                            }
+                                                                                                                                                                            *parentMatch44 = match;
+                                                                                                                                                                        }
+                                                                                                                                                                        if (match.hit)
+                                                                                                                                                                        {
+                                                                                                                                                                            Match match(false);
+                                                                                                                                                                            Match* parentMatch45 = &match;
+                                                                                                                                                                            {
+                                                                                                                                                                                Match match = NothrowTypeExprParser.TypeExpr(lexer, ctx);
+                                                                                                                                                                                typeExpr.Reset(cast<Node*>(match.value));
+                                                                                                                                                                                *parentMatch45 = match;
+                                                                                                                                                                            }
+                                                                                                                                                                            *parentMatch44 = match;
+                                                                                                                                                                        }
+                                                                                                                                                                        if (match.hit)
+                                                                                                                                                                        {
+                                                                                                                                                                            *parentMatch43 = match;
+                                                                                                                                                                        }
+                                                                                                                                                                        else
+                                                                                                                                                                        {
+                                                                                                                                                                            lexer.SetPos(save);
+                                                                                                                                                                            break;
+                                                                                                                                                                        }
+                                                                                                                                                                    }
+                                                                                                                                                                }
+                                                                                                                                                            }
+                                                                                                                                                            *parentMatch42 = match;
+                                                                                                                                                        }
+                                                                                                                                                        *parentMatch41 = match;
+                                                                                                                                                    }
+                                                                                                                                                    *parentMatch40 = match;
+                                                                                                                                                }
+                                                                                                                                                *parentMatch39 = match;
+                                                                                                                                            }
+                                                                                                                                            *parentMatch36 = match;
+                                                                                                                                        }
+                                                                                                                                        *parentMatch35 = match;
+                                                                                                                                    }
+                                                                                                                                    if (match.hit)
+                                                                                                                                    {
+                                                                                                                                        Match match(false);
+                                                                                                                                        Match* parentMatch46 = &match;
+                                                                                                                                        {
+                                                                                                                                            Match match(false);
+                                                                                                                                            if (*lexer == RANGLE)
+                                                                                                                                            {
+                                                                                                                                                ++lexer;
+                                                                                                                                                match.hit = true;
+                                                                                                                                            }
+                                                                                                                                            *parentMatch46 = match;
+                                                                                                                                        }
+                                                                                                                                        *parentMatch35 = match;
+                                                                                                                                    }
+                                                                                                                                    *parentMatch34 = match;
+                                                                                                                                }
+                                                                                                                                *parentMatch33 = match;
+                                                                                                                            }
+                                                                                                                            if (!match.hit)
+                                                                                                                            {
+                                                                                                                                lexer.SetPos(save);
+                                                                                                                            }
+                                                                                                                            *parentMatch29 = Match(!match.hit, match.value);
+                                                                                                                        }
+                                                                                                                        *parentMatch28 = match;
+                                                                                                                    }
+                                                                                                                    if (match.hit)
+                                                                                                                    {
+                                                                                                                        lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                                        {
+                                                                                                                            #if (DEBUG)
+                                                                                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                                            #endif
+                                                                                                                            return Match(true, new Value<ustring>(u"operator<<"));
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                    *parentMatch27 = match;
+                                                                                                                }
+                                                                                                                *parentMatch26 = match;
+                                                                                                                if (!match.hit)
+                                                                                                                {
+                                                                                                                    Match match(false);
+                                                                                                                    Match* parentMatch47 = &match;
+                                                                                                                    lexer.SetPos(save);
+                                                                                                                    {
+                                                                                                                        Match match(false);
+                                                                                                                        Match* parentMatch48 = &match;
+                                                                                                                        {
+                                                                                                                            long pos = lexer.GetPos();
+                                                                                                                            Match match(false);
+                                                                                                                            if (*lexer == SHIFTRIGHT)
+                                                                                                                            {
+                                                                                                                                ++lexer;
+                                                                                                                                match.hit = true;
+                                                                                                                            }
+                                                                                                                            if (match.hit)
+                                                                                                                            {
+                                                                                                                                lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                                                {
+                                                                                                                                    #if (DEBUG)
+                                                                                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                                                    #endif
+                                                                                                                                    return Match(true, new Value<ustring>(u"operator>>"));
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                                            *parentMatch48 = match;
+                                                                                                                        }
+                                                                                                                        *parentMatch47 = match;
+                                                                                                                    }
+                                                                                                                    *parentMatch26 = match;
+                                                                                                                }
+                                                                                                            }
+                                                                                                            *parentMatch25 = match;
+                                                                                                            if (!match.hit)
+                                                                                                            {
+                                                                                                                Match match(false);
+                                                                                                                Match* parentMatch49 = &match;
+                                                                                                                lexer.SetPos(save);
+                                                                                                                {
+                                                                                                                    Match match(false);
+                                                                                                                    Match* parentMatch50 = &match;
+                                                                                                                    {
+                                                                                                                        long pos = lexer.GetPos();
+                                                                                                                        Match match(false);
+                                                                                                                        if (*lexer == EQ)
+                                                                                                                        {
+                                                                                                                            ++lexer;
+                                                                                                                            match.hit = true;
+                                                                                                                        }
+                                                                                                                        if (match.hit)
+                                                                                                                        {
+                                                                                                                            lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                                            {
+                                                                                                                                #if (DEBUG)
+                                                                                                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                                                #endif
+                                                                                                                                return Match(true, new Value<ustring>(u"operator=="));
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                        *parentMatch50 = match;
+                                                                                                                    }
+                                                                                                                    *parentMatch49 = match;
+                                                                                                                }
+                                                                                                                *parentMatch25 = match;
+                                                                                                            }
+                                                                                                        }
+                                                                                                        *parentMatch24 = match;
+                                                                                                        if (!match.hit)
+                                                                                                        {
+                                                                                                            Match match(false);
+                                                                                                            Match* parentMatch51 = &match;
+                                                                                                            lexer.SetPos(save);
+                                                                                                            {
+                                                                                                                Match match(false);
+                                                                                                                Match* parentMatch52 = &match;
+                                                                                                                {
+                                                                                                                    long pos = lexer.GetPos();
+                                                                                                                    Match match(false);
+                                                                                                                    if (*lexer == ASSIGN)
+                                                                                                                    {
+                                                                                                                        ++lexer;
+                                                                                                                        match.hit = true;
+                                                                                                                    }
+                                                                                                                    if (match.hit)
+                                                                                                                    {
+                                                                                                                        lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                                        {
+                                                                                                                            #if (DEBUG)
+                                                                                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                                            #endif
+                                                                                                                            return Match(true, new Value<ustring>(u"operator="));
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                    *parentMatch52 = match;
+                                                                                                                }
+                                                                                                                *parentMatch51 = match;
+                                                                                                            }
+                                                                                                            *parentMatch24 = match;
+                                                                                                        }
+                                                                                                    }
+                                                                                                    *parentMatch23 = match;
+                                                                                                    if (!match.hit)
+                                                                                                    {
+                                                                                                        Match match(false);
+                                                                                                        Match* parentMatch53 = &match;
+                                                                                                        lexer.SetPos(save);
+                                                                                                        {
+                                                                                                            Match match(false);
+                                                                                                            Match* parentMatch54 = &match;
+                                                                                                            {
+                                                                                                                long pos = lexer.GetPos();
+                                                                                                                Match match(false);
+                                                                                                                if (*lexer == LANGLE)
+                                                                                                                {
+                                                                                                                    ++lexer;
+                                                                                                                    match.hit = true;
+                                                                                                                }
+                                                                                                                if (match.hit)
+                                                                                                                {
+                                                                                                                    lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                                    {
+                                                                                                                        #if (DEBUG)
+                                                                                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                                        #endif
+                                                                                                                        return Match(true, new Value<ustring>(u"operator<"));
+                                                                                                                    }
+                                                                                                                }
+                                                                                                                *parentMatch54 = match;
+                                                                                                            }
+                                                                                                            *parentMatch53 = match;
+                                                                                                        }
+                                                                                                        *parentMatch23 = match;
+                                                                                                    }
+                                                                                                }
+                                                                                                *parentMatch22 = match;
+                                                                                                if (!match.hit)
+                                                                                                {
+                                                                                                    Match match(false);
+                                                                                                    Match* parentMatch55 = &match;
+                                                                                                    lexer.SetPos(save);
+                                                                                                    {
+                                                                                                        Match match(false);
+                                                                                                        Match* parentMatch56 = &match;
+                                                                                                        {
+                                                                                                            long pos = lexer.GetPos();
+                                                                                                            Match match(false);
+                                                                                                            if (*lexer == ARROW)
+                                                                                                            {
+                                                                                                                ++lexer;
+                                                                                                                match.hit = true;
+                                                                                                            }
+                                                                                                            if (match.hit)
+                                                                                                            {
+                                                                                                                lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                                {
+                                                                                                                    #if (DEBUG)
+                                                                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                                    #endif
+                                                                                                                    return Match(true, new Value<ustring>(u"operator->"));
+                                                                                                                }
+                                                                                                            }
+                                                                                                            *parentMatch56 = match;
+                                                                                                        }
+                                                                                                        *parentMatch55 = match;
+                                                                                                    }
+                                                                                                    *parentMatch22 = match;
+                                                                                                }
+                                                                                            }
+                                                                                            *parentMatch21 = match;
+                                                                                            if (!match.hit)
+                                                                                            {
+                                                                                                Match match(false);
+                                                                                                Match* parentMatch57 = &match;
+                                                                                                lexer.SetPos(save);
+                                                                                                {
+                                                                                                    Match match(false);
+                                                                                                    Match* parentMatch58 = &match;
+                                                                                                    {
+                                                                                                        long pos = lexer.GetPos();
+                                                                                                        Match match(false);
+                                                                                                        if (*lexer == PLUSPLUS)
+                                                                                                        {
+                                                                                                            ++lexer;
+                                                                                                            match.hit = true;
+                                                                                                        }
+                                                                                                        if (match.hit)
+                                                                                                        {
+                                                                                                            lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                            {
+                                                                                                                #if (DEBUG)
+                                                                                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                                #endif
+                                                                                                                return Match(true, new Value<ustring>(u"operator++"));
+                                                                                                            }
+                                                                                                        }
+                                                                                                        *parentMatch58 = match;
+                                                                                                    }
+                                                                                                    *parentMatch57 = match;
+                                                                                                }
+                                                                                                *parentMatch21 = match;
+                                                                                            }
+                                                                                        }
+                                                                                        *parentMatch20 = match;
+                                                                                        if (!match.hit)
+                                                                                        {
+                                                                                            Match match(false);
+                                                                                            Match* parentMatch59 = &match;
+                                                                                            lexer.SetPos(save);
+                                                                                            {
+                                                                                                Match match(false);
+                                                                                                Match* parentMatch60 = &match;
+                                                                                                {
+                                                                                                    long pos = lexer.GetPos();
+                                                                                                    Match match(false);
+                                                                                                    if (*lexer == MINUSMINUS)
+                                                                                                    {
+                                                                                                        ++lexer;
+                                                                                                        match.hit = true;
+                                                                                                    }
+                                                                                                    if (match.hit)
+                                                                                                    {
+                                                                                                        lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                        {
+                                                                                                            #if (DEBUG)
+                                                                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                            #endif
+                                                                                                            return Match(true, new Value<ustring>(u"operator--"));
+                                                                                                        }
+                                                                                                    }
+                                                                                                    *parentMatch60 = match;
+                                                                                                }
+                                                                                                *parentMatch59 = match;
+                                                                                            }
+                                                                                            *parentMatch20 = match;
+                                                                                        }
+                                                                                    }
+                                                                                    *parentMatch19 = match;
+                                                                                    if (!match.hit)
+                                                                                    {
+                                                                                        Match match(false);
+                                                                                        Match* parentMatch61 = &match;
+                                                                                        lexer.SetPos(save);
+                                                                                        {
+                                                                                            Match match(false);
+                                                                                            Match* parentMatch62 = &match;
+                                                                                            {
+                                                                                                long pos = lexer.GetPos();
+                                                                                                Match match(false);
+                                                                                                if (*lexer == PLUS)
+                                                                                                {
+                                                                                                    ++lexer;
+                                                                                                    match.hit = true;
+                                                                                                }
+                                                                                                if (match.hit)
+                                                                                                {
+                                                                                                    lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                    {
+                                                                                                        #if (DEBUG)
+                                                                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                        #endif
+                                                                                                        return Match(true, new Value<ustring>(u"operator+"));
+                                                                                                    }
+                                                                                                }
+                                                                                                *parentMatch62 = match;
+                                                                                            }
+                                                                                            *parentMatch61 = match;
+                                                                                        }
+                                                                                        *parentMatch19 = match;
+                                                                                    }
+                                                                                }
+                                                                                *parentMatch18 = match;
+                                                                                if (!match.hit)
+                                                                                {
+                                                                                    Match match(false);
+                                                                                    Match* parentMatch63 = &match;
+                                                                                    lexer.SetPos(save);
+                                                                                    {
+                                                                                        Match match(false);
+                                                                                        Match* parentMatch64 = &match;
+                                                                                        {
+                                                                                            long pos = lexer.GetPos();
+                                                                                            Match match(false);
+                                                                                            if (*lexer == MINUS)
+                                                                                            {
+                                                                                                ++lexer;
+                                                                                                match.hit = true;
+                                                                                            }
+                                                                                            if (match.hit)
+                                                                                            {
+                                                                                                lexer.parsingOperatorFunctionGroupId = false;
+                                                                                                {
+                                                                                                    #if (DEBUG)
+                                                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                    #endif
+                                                                                                    return Match(true, new Value<ustring>(u"operator-"));
+                                                                                                }
+                                                                                            }
+                                                                                            *parentMatch64 = match;
+                                                                                        }
+                                                                                        *parentMatch63 = match;
+                                                                                    }
+                                                                                    *parentMatch18 = match;
+                                                                                }
+                                                                            }
+                                                                            *parentMatch17 = match;
+                                                                            if (!match.hit)
+                                                                            {
+                                                                                Match match(false);
+                                                                                Match* parentMatch65 = &match;
+                                                                                lexer.SetPos(save);
+                                                                                {
+                                                                                    Match match(false);
+                                                                                    Match* parentMatch66 = &match;
+                                                                                    {
+                                                                                        long pos = lexer.GetPos();
+                                                                                        Match match(false);
+                                                                                        if (*lexer == STAR)
+                                                                                        {
+                                                                                            ++lexer;
+                                                                                            match.hit = true;
+                                                                                        }
+                                                                                        if (match.hit)
+                                                                                        {
+                                                                                            lexer.parsingOperatorFunctionGroupId = false;
+                                                                                            {
+                                                                                                #if (DEBUG)
+                                                                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                                #endif
+                                                                                                return Match(true, new Value<ustring>(u"operator*"));
+                                                                                            }
+                                                                                        }
+                                                                                        *parentMatch66 = match;
+                                                                                    }
+                                                                                    *parentMatch65 = match;
+                                                                                }
+                                                                                *parentMatch17 = match;
+                                                                            }
+                                                                        }
+                                                                        *parentMatch16 = match;
+                                                                        if (!match.hit)
+                                                                        {
+                                                                            Match match(false);
+                                                                            Match* parentMatch67 = &match;
+                                                                            lexer.SetPos(save);
+                                                                            {
+                                                                                Match match(false);
+                                                                                Match* parentMatch68 = &match;
+                                                                                {
+                                                                                    long pos = lexer.GetPos();
+                                                                                    Match match(false);
+                                                                                    if (*lexer == DIV)
+                                                                                    {
+                                                                                        ++lexer;
+                                                                                        match.hit = true;
+                                                                                    }
+                                                                                    if (match.hit)
+                                                                                    {
+                                                                                        lexer.parsingOperatorFunctionGroupId = false;
+                                                                                        {
+                                                                                            #if (DEBUG)
+                                                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                            #endif
+                                                                                            return Match(true, new Value<ustring>(u"operator/"));
+                                                                                        }
+                                                                                    }
+                                                                                    *parentMatch68 = match;
+                                                                                }
+                                                                                *parentMatch67 = match;
+                                                                            }
+                                                                            *parentMatch16 = match;
+                                                                        }
+                                                                    }
+                                                                    *parentMatch15 = match;
+                                                                    if (!match.hit)
+                                                                    {
+                                                                        Match match(false);
+                                                                        Match* parentMatch69 = &match;
+                                                                        lexer.SetPos(save);
+                                                                        {
+                                                                            Match match(false);
+                                                                            Match* parentMatch70 = &match;
+                                                                            {
+                                                                                long pos = lexer.GetPos();
+                                                                                Match match(false);
+                                                                                if (*lexer == REM)
+                                                                                {
+                                                                                    ++lexer;
+                                                                                    match.hit = true;
+                                                                                }
+                                                                                if (match.hit)
+                                                                                {
+                                                                                    lexer.parsingOperatorFunctionGroupId = false;
+                                                                                    {
+                                                                                        #if (DEBUG)
+                                                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                        #endif
+                                                                                        return Match(true, new Value<ustring>(u"operator%"));
+                                                                                    }
+                                                                                }
+                                                                                *parentMatch70 = match;
+                                                                            }
+                                                                            *parentMatch69 = match;
+                                                                        }
+                                                                        *parentMatch15 = match;
+                                                                    }
+                                                                }
+                                                                *parentMatch14 = match;
+                                                                if (!match.hit)
+                                                                {
+                                                                    Match match(false);
+                                                                    Match* parentMatch71 = &match;
+                                                                    lexer.SetPos(save);
+                                                                    {
+                                                                        Match match(false);
+                                                                        Match* parentMatch72 = &match;
+                                                                        {
+                                                                            long pos = lexer.GetPos();
+                                                                            Match match(false);
+                                                                            if (*lexer == AMP)
+                                                                            {
+                                                                                ++lexer;
+                                                                                match.hit = true;
+                                                                            }
+                                                                            if (match.hit)
+                                                                            {
+                                                                                lexer.parsingOperatorFunctionGroupId = false;
+                                                                                {
+                                                                                    #if (DEBUG)
+                                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                    #endif
+                                                                                    return Match(true, new Value<ustring>(u"operator&"));
+                                                                                }
+                                                                            }
+                                                                            *parentMatch72 = match;
+                                                                        }
+                                                                        *parentMatch71 = match;
+                                                                    }
+                                                                    *parentMatch14 = match;
+                                                                }
+                                                            }
+                                                            *parentMatch13 = match;
+                                                            if (!match.hit)
+                                                            {
+                                                                Match match(false);
+                                                                Match* parentMatch73 = &match;
+                                                                lexer.SetPos(save);
+                                                                {
+                                                                    Match match(false);
+                                                                    Match* parentMatch74 = &match;
+                                                                    {
+                                                                        long pos = lexer.GetPos();
+                                                                        Match match(false);
+                                                                        if (*lexer == BITOR)
+                                                                        {
+                                                                            ++lexer;
+                                                                            match.hit = true;
+                                                                        }
+                                                                        if (match.hit)
+                                                                        {
+                                                                            lexer.parsingOperatorFunctionGroupId = false;
+                                                                            {
+                                                                                #if (DEBUG)
+                                                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                                #endif
+                                                                                return Match(true, new Value<ustring>(u"operator|"));
+                                                                            }
+                                                                        }
+                                                                        *parentMatch74 = match;
+                                                                    }
+                                                                    *parentMatch73 = match;
+                                                                }
+                                                                *parentMatch13 = match;
+                                                            }
+                                                        }
+                                                        *parentMatch12 = match;
+                                                        if (!match.hit)
+                                                        {
+                                                            Match match(false);
+                                                            Match* parentMatch75 = &match;
+                                                            lexer.SetPos(save);
+                                                            {
+                                                                Match match(false);
+                                                                Match* parentMatch76 = &match;
+                                                                {
+                                                                    long pos = lexer.GetPos();
+                                                                    Match match(false);
+                                                                    if (*lexer == BITXOR)
+                                                                    {
+                                                                        ++lexer;
+                                                                        match.hit = true;
+                                                                    }
+                                                                    if (match.hit)
+                                                                    {
+                                                                        lexer.parsingOperatorFunctionGroupId = false;
+                                                                        {
+                                                                            #if (DEBUG)
+                                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                            #endif
+                                                                            return Match(true, new Value<ustring>(u"operator^"));
+                                                                        }
+                                                                    }
+                                                                    *parentMatch76 = match;
+                                                                }
+                                                                *parentMatch75 = match;
+                                                            }
+                                                            *parentMatch12 = match;
+                                                        }
+                                                    }
+                                                    *parentMatch11 = match;
+                                                    if (!match.hit)
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch77 = &match;
+                                                        lexer.SetPos(save);
+                                                        {
+                                                            Match match(false);
+                                                            Match* parentMatch78 = &match;
+                                                            {
+                                                                long pos = lexer.GetPos();
+                                                                Match match(false);
+                                                                if (*lexer == EXCLAMATION)
+                                                                {
+                                                                    ++lexer;
+                                                                    match.hit = true;
+                                                                }
+                                                                if (match.hit)
+                                                                {
+                                                                    lexer.parsingOperatorFunctionGroupId = false;
+                                                                    {
+                                                                        #if (DEBUG)
+                                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                        #endif
+                                                                        return Match(true, new Value<ustring>(u"operator!"));
+                                                                    }
+                                                                }
+                                                                *parentMatch78 = match;
+                                                            }
+                                                            *parentMatch77 = match;
+                                                        }
+                                                        *parentMatch11 = match;
+                                                    }
+                                                }
+                                                *parentMatch10 = match;
+                                                if (!match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch79 = &match;
+                                                    lexer.SetPos(save);
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch80 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match(false);
+                                                            if (*lexer == CPL)
+                                                            {
+                                                                ++lexer;
+                                                                match.hit = true;
+                                                            }
+                                                            if (match.hit)
+                                                            {
+                                                                lexer.parsingOperatorFunctionGroupId = false;
+                                                                {
+                                                                    #if (DEBUG)
+                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                    #endif
+                                                                    return Match(true, new Value<ustring>(u"operator~"));
+                                                                }
+                                                            }
+                                                            *parentMatch80 = match;
+                                                        }
+                                                        *parentMatch79 = match;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                            }
+                                            *parentMatch9 = match;
+                                            if (!match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch81 = &match;
+                                                lexer.SetPos(save);
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch82 = &match;
+                                                    {
+                                                        Match match(false);
+                                                        if (*lexer == LBRACKET)
+                                                        {
+                                                            ++lexer;
+                                                            match.hit = true;
+                                                        }
+                                                        *parentMatch82 = match;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch83 = &match;
+                                                        {
+                                                            Match match(false);
+                                                            Match* parentMatch84 = &match;
+                                                            {
+                                                                long pos = lexer.GetPos();
+                                                                Match match(false);
+                                                                if (*lexer == RBRACKET)
+                                                                {
+                                                                    ++lexer;
+                                                                    match.hit = true;
+                                                                }
+                                                                if (match.hit)
+                                                                {
+                                                                    lexer.parsingOperatorFunctionGroupId = false;
+                                                                    {
+                                                                        #if (DEBUG)
+                                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                        #endif
+                                                                        return Match(true, new Value<ustring>(u"operator[]"));
+                                                                    }
+                                                                }
+                                                                *parentMatch84 = match;
+                                                            }
+                                                            *parentMatch83 = match;
+                                                        }
+                                                        *parentMatch82 = match;
+                                                    }
+                                                    *parentMatch81 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                        }
+                                        *parentMatch8 = match;
+                                        if (!match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch85 = &match;
+                                            lexer.SetPos(save);
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch86 = &match;
+                                                {
+                                                    Match match(false);
+                                                    if (*lexer == LPAREN)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    *parentMatch86 = match;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch87 = &match;
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch88 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match(false);
+                                                            if (*lexer == RPAREN)
+                                                            {
+                                                                ++lexer;
+                                                                match.hit = true;
+                                                            }
+                                                            if (match.hit)
+                                                            {
+                                                                lexer.parsingOperatorFunctionGroupId = false;
+                                                                {
+                                                                    #if (DEBUG)
+                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                                                                    #endif
+                                                                    return Match(true, new Value<ustring>(u"operator()"));
+                                                                }
+                                                            }
+                                                            *parentMatch88 = match;
+                                                        }
+                                                        *parentMatch87 = match;
+                                                    }
+                                                    *parentMatch86 = match;
+                                                }
+                                                *parentMatch85 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch4 = match;
+                    }
+                    if (match.hit)
+                    {
+                        lexer.parsingOperatorFunctionGroupId = false;
+                    }
+                    else
+                    {
+                        lexer.parsingOperatorFunctionGroupId = false;
+                    }
+                    *parentMatch3 = match;
+                }
+                *parentMatch2 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"OperatorFunctionGroupId");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"OperatorFunctionGroupId");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

@@ -20,8 +20,8 @@ class SNGCM_AST_API FunctionNode : public Node
 public:
     FunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_);
     FunctionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_);
-    FunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
-    FunctionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
+    FunctionNode(const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, AttributesNode* attributes_);
+    FunctionNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, AttributesNode* attributes_);
     FunctionNode(const FunctionNode&) = delete;
     FunctionNode& operator=(const FunctionNode&) = delete;
     Node* Clone(CloneContext& cloneContext) const override;
@@ -51,7 +51,7 @@ public:
     void SetBodySource(CompoundStatementNode* bodySource_);
     bool IsProgramMain() const { return programMain; }
     void SetProgramMain() { programMain = true; }
-    Attributes* GetAttributes() const { return attributes.get(); }
+    AttributesNode* GetAttributes() const { return attributes.get(); }
     void SetSpecifierSpan(const Span& specifierSpan_) { specifierSpan = specifierSpan_; }
     const Span& SpecifierSpan() const { return specifierSpan; }
     void SetGroupIdSpan(const Span& groupIdSpan_) { groupIdSpan = groupIdSpan_; }
@@ -67,7 +67,7 @@ private:
     std::unique_ptr<WhereConstraintNode> whereConstraint;
     std::unique_ptr<CompoundStatementNode> body;
     std::unique_ptr<CompoundStatementNode> bodySource;
-    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<AttributesNode> attributes;
     bool programMain;
 };
 

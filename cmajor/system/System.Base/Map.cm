@@ -9,7 +9,7 @@ using System.IO;
 
 namespace System.Collections
 {
-    public class Map<Key, Value, KeyCompare = Less<Key>> 
+    public class Map<Key, Value, KeyCompare = Less<Key>>
         where Key is Semiregular and Value is Semiregular and KeyCompare is Relation and KeyCompare.Domain is Key
     {
         public typedef Key KeyType;
@@ -69,6 +69,18 @@ namespace System.Collections
         {
             return tree.CFind(key);
         }
+        public inline nothrow Iterator LowerBound(const KeyType& key)
+        {
+            return tree.LowerBound(key);
+        }
+        public inline nothrow ConstIterator LowerBound(const KeyType& key) const
+        {
+            return tree.CLowerBound(key);
+        }
+        public inline nothrow ConstIterator CLowerBound(const KeyType& key) const
+        {
+            return tree.CLowerBound(key);
+        }
         public inline MappedType& operator[](const KeyType& key)
         {
             ValueType valueType(key, MappedType());
@@ -76,7 +88,7 @@ namespace System.Collections
             Iterator i = ib.first;
             return i->second;
         }
-        public inline Pair<Iterator, bool> Insert(const ValueType& value) 
+        public inline Pair<Iterator, bool> Insert(const ValueType& value)
             where ValueType is Copyable
         {
             return tree.Insert(value);
@@ -92,13 +104,13 @@ namespace System.Collections
         private TreeType tree;
     }
 
-    public inline nothrow bool operator==<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& left, const Map<Key, Value, KeyCompare>& right) 
+    public inline nothrow bool operator==<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& left, const Map<Key, Value, KeyCompare>& right)
         where Key is Regular and Value is Regular and KeyCompare is Relation and KeyCompare.Domain is Key
     {
         return left.Count() == right.Count() && Equal(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), EqualTo<Pair<Key, Value>>());
     }
 
-    public inline nothrow bool operator<<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& left, const Map<Key, Value, KeyCompare>& right) 
+    public inline nothrow bool operator<<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& left, const Map<Key, Value, KeyCompare>& right)
         where Key is TotallyOrdered and Value is TotallyOrdered and KeyCompare is Relation and KeyCompare.Domain is Key
     {
         return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), Less<Pair<Key, Value>>());
@@ -123,5 +135,5 @@ namespace System.Collections
         }
         writer << "}";
         return writer;
-    }        
+    }
 }

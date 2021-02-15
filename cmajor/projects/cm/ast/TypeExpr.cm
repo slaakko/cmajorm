@@ -9,12 +9,12 @@ namespace Cm.Ast
 {
     public class ConstNode : Node
     {
-        public nothrow ConstNode(const System.Lex.Span& span_) :
-            base(NodeType.constNode, span_)
+        public nothrow ConstNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.constNode, span_, moduleId_)
         {
         }
-        public nothrow ConstNode(const System.Lex.Span& span_, Node* subject_) :
-            base(NodeType.constNode, span_), subject(subject_)
+        public nothrow ConstNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* subject_) :
+            base(NodeType.constNode, span_, moduleId_), subject(subject_)
         {
             subject->SetParent(this);
         }
@@ -28,7 +28,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new ConstNode(GetSpan(), subject->Clone(cloneContext));
+            return new ConstNode(GetSpan(), ModuleId(), subject->Clone(cloneContext));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -53,12 +53,12 @@ namespace Cm.Ast
     }
     public class LValueRefNode : Node
     {
-        public nothrow LValueRefNode(const System.Lex.Span& span_) :
-            base(NodeType.lvalueRefNode, span_)
+        public nothrow LValueRefNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.lvalueRefNode, span_, moduleId_)
         {
         }
-        public nothrow LValueRefNode(const System.Lex.Span& span_, Node* subject_) :
-            base(NodeType.lvalueRefNode, span_), subject(subject_)
+        public nothrow LValueRefNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* subject_) :
+            base(NodeType.lvalueRefNode, span_, moduleId_), subject(subject_)
         {
             subject->SetParent(this);
         }
@@ -72,7 +72,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new LValueRefNode(GetSpan(), subject->Clone(cloneContext));
+            return new LValueRefNode(GetSpan(), ModuleId(), subject->Clone(cloneContext));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -97,12 +97,12 @@ namespace Cm.Ast
     }
     public class RValueRefNode : Node
     {
-        public nothrow RValueRefNode(const System.Lex.Span& span_) :
-            base(NodeType.rvalueRefNode, span_)
+        public nothrow RValueRefNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.rvalueRefNode, span_, moduleId_)
         {
         }
-        public nothrow RValueRefNode(const System.Lex.Span& span_, Node* subject_) :
-            base(NodeType.rvalueRefNode, span_), subject(subject_)
+        public nothrow RValueRefNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* subject_) :
+            base(NodeType.rvalueRefNode, span_, moduleId_), subject(subject_)
         {
             subject->SetParent(this);
         }
@@ -116,7 +116,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new RValueRefNode(GetSpan(), subject->Clone(cloneContext));
+            return new RValueRefNode(GetSpan(), ModuleId(), subject->Clone(cloneContext));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -141,12 +141,12 @@ namespace Cm.Ast
     }
     public class PointerNode : Node
     {
-        public nothrow PointerNode(const System.Lex.Span& span_) :
-            base(NodeType.pointerNode, span_)
+        public nothrow PointerNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.pointerNode, span_, moduleId_)
         {
         }
-        public nothrow PointerNode(const System.Lex.Span& span_, Node* subject_) :
-            base(NodeType.pointerNode, span_), subject(subject_)
+        public nothrow PointerNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* subject_) :
+            base(NodeType.pointerNode, span_, moduleId_), subject(subject_)
         {
             subject->SetParent(this);
         }
@@ -160,7 +160,7 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            return new PointerNode(GetSpan(), subject->Clone(cloneContext));
+            return new PointerNode(GetSpan(), ModuleId(), subject->Clone(cloneContext));
         }
         public override void Accept(Visitor& visitor)
         {
@@ -185,12 +185,12 @@ namespace Cm.Ast
     }
     public class ArrayNode : Node
     {
-        public nothrow ArrayNode(const System.Lex.Span& span_) :
-            base(NodeType.arrayNode, span_), subject(), size()
+        public nothrow ArrayNode(const System.Lex.Span& span_, const Uuid& moduleId_) :
+            base(NodeType.arrayNode, span_, moduleId_), subject(), size()
         {
         }
-        public nothrow ArrayNode(const System.Lex.Span& span_, Node* subject_, Node* size_) :
-            base(NodeType.arrayNode, span_), subject(subject_), size(size_)
+        public nothrow ArrayNode(const System.Lex.Span& span_, const Uuid& moduleId_, Node* subject_, Node* size_) :
+            base(NodeType.arrayNode, span_, moduleId_), subject(subject_), size(size_)
         {
             subject->SetParent(this);
             if (!size.IsNull())
@@ -221,7 +221,7 @@ namespace Cm.Ast
             {
                 clonedSize = size->Clone(cloneContext);
             }
-            return new ArrayNode(GetSpan(), subject->Clone(cloneContext), clonedSize);
+            return new ArrayNode(GetSpan(), ModuleId(), subject->Clone(cloneContext), clonedSize);
         }
         public override void Accept(Visitor& visitor)
         {
