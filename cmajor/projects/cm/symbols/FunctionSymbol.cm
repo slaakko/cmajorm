@@ -1,0 +1,183 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Span = System.Lex.Span;
+using System.Collections;
+
+namespace Cm.Symbols
+{
+    public enum FunctionSymbolFlags : uint
+    {
+        none = 0u,
+        inline_ = 1u << 0u,
+        constExpr = 1u << 1u,
+        cdecl_ = 1u << 2u,
+        suppress_ = 1u << 3u,
+        default_ = 1u << 4u,
+        explicit_ = 1u << 5u,
+        virtual_ = 1u << 6u,
+        override_ = 1u << 7u,
+        abstract_ = 1u << 8u,
+        new_ = 1u << 9u,
+        const_ = 1u << 10u,
+        conversion_ = 1u << 11u,
+        linkOnceOdrLinkage_ = 1u << 12u,
+        templateSpecialization_ = 1u << 13u,
+        hasTry_ = 1u << 14u,
+        hasSource_ = 1u << 15u,
+        includeConstraint_ = 1u << 16u,
+        copy_ = 1u << 17u,
+        varArg_ = 1u << 18u,
+        winapi_ = 1u << 19u,
+        dontReuse_ = 1u << 20u,
+        hasArtificialBody_ = 1u << 21u,
+        hasCleanup_ = 1u << 22u,
+        systemDefault = 1u << 23u,
+        immutable = 1u << 24u
+    }
+
+    public class FunctionGroupSymbol : Symbol
+    {
+        public nothrow FunctionGroupSymbol(const Span& span, const Uuid& sourceModuleId, const ustring& name) :
+            base(SymbolType.functionGroupSymbol, span, sourceModuleId, name)
+        {
+        }
+        public nothrow override bool IsExportSymbol() const
+        {
+            return false;
+        }
+        public void AddFunction(FunctionSymbol* functionSymbol)
+        {
+            if (functionSymbol->IsProgramMain()) return;
+            #assert(functionSymbol->GroupName() == Name());
+            if (functionSymbol->GetFlag(varArg_))
+            {
+                varArgFunctions.Add(functionSymbol);
+            }
+            else
+            {
+                int arity = functionSymbol->Arity();
+                List<FunctionSymbol*>& functionList = arityFunctionListMap[arity];
+                functionList.Add(functionSymbol);
+                functionSymbol->SetFunctionGroup(this);
+            }
+        }
+        public void RemoveFunction(FunctionSymbol* functionSymbol)
+        {
+            if (functionSymbol->GetFlag(varArg_))
+            {
+                varArgFunctions.Remove(functionSymbol);
+            }
+            else
+            {
+                int arity = functionSymbol->Arity();
+                List<FunctionSymbol*>& functionList = arityFunctionListMap[arity];
+                functionList.Remove(functionSymbol);
+            }
+        }
+        public nothrow bool IsEmpty() const
+        {
+            for (const Pair<int, List<FunctionSymbol*>>& p : arityFunctionListMap)
+            {
+                if (!p.second.IsEmpty()) return false;
+            }
+            return true;
+        }
+        private HashMap<int, List<FunctionSymbol*>> arityFunctionListMap;
+        private List<FunctionSymbol*> varArgFunctions;
+    }
+
+    public class FunctionSymbol : ContainerSymbol
+    {
+         public nothrow FunctionSymbol(const Span& span, const Uuid& sourceModuleId, const ustring& name) :
+             base(SymbolType.functionSymbol, span, sourceModuleId, name), index(-1)
+         {
+         }
+         public nothrow FunctionSymbol(SymbolType symbolType, const Span& span, const Uuid& sourceModuleId, const ustring& name) :
+             base(symbolType, span, sourceModuleId, name), index(-1)
+         {
+         }
+         public override void Write(SymbolWriter& writer)
+         {
+             base->Write(writer);
+             #assert(functionId != Uuid());
+             writer.GetBinaryWriter().Write(functionId);
+             writer.GetBinaryWriter().Write(index);
+             writer.GetBinaryWriter().Write(groupName);
+             writer.GetBinaryWriter().Write(cast<uint>(flags));
+             // todo
+         }
+         public override void Read(SymbolReader& reader)
+         {
+             base->Read(reader);
+             functionId = reader.GetBinaryReader().ReadUuid();
+             index = reader.GetBinaryReader().ReadInt();
+             groupName = reader.GetBinaryReader().ReadUString();
+             flags = cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUInt());
+             // todo
+         }
+         public nothrow inline const Uuid& FunctionId() const
+         {
+             #assert(functionId != Uuid());
+             return functionId;
+         }
+         public nothrow void SetFunctionId(const Uuid& functionId_)
+         {
+             functionId = functionId_;
+         }
+         public nothrow inline int GetIndex() const
+         {
+             return index;
+         }
+         public nothrow void SetIndex(int index_)
+         {
+             index = index_;
+         }
+         public nothrow inline const ustring& GroupName() const
+         {
+             return groupName;
+         }
+         public nothrow void SetGroupName(const ustring& groupName_)
+         {
+             groupName = groupName_;
+         }
+         public nothrow inline FunctionGroupSymbol* FunctionGroup() const
+         {
+             return functionGroup;
+         }
+         public nothrow void SetFunctionGroup(FunctionGroupSymbol* functionGroup_)
+         {
+             functionGroup = functionGroup_;
+         }
+         public nothrow inline int Arity() const
+         {
+             return cast<int>(parameters.Count());
+         }
+         public nothrow inline FunctionSymbolFlags GetFunctionSymbolFlags() const
+         {
+             return flags;
+         }
+         public nothrow inline bool GetFlag(FunctionSymbolFlags flag) const
+         {
+             return (flags & flag) != FunctionSymbolFlags.none;
+         }
+         public nothrow inline void SetFlag(FunctionSymbolFlags flag)
+         {
+             flags = cast<FunctionSymbolFlags>(flags | flag);
+         }
+         public nothrow inline void ResetFlag(FunctionSymbolFlags flag)
+         {
+             flags = cast<FunctionSymbolFlags>(flags & ~flag);
+         }
+         private Uuid functionId;
+         private int index;
+         private ustring groupName;
+         private FunctionSymbolFlags flags;
+         private FunctionGroupSymbol* functionGroup;
+         private List<ParameterSymbol*> parameters;
+    }
+}
+

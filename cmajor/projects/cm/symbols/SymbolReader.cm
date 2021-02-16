@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using Span = System.Lex.Span;
 using Cm.Ast;
 
 namespace Cm.Symbols
@@ -30,7 +31,28 @@ namespace Cm.Symbols
         {
             setProjectBit = true;
         }
+        public Symbol* ReadSymbol(Symbol* parent)
+        {
+            SymbolType symbolType = cast<SymbolType>(GetBinaryReader().ReadByte());
+            Span span = astReader.ReadSpan();
+            Uuid sourceModuleId = GetBinaryReader().ReadUuid();
+            ustring name = GetBinaryReader().ReadUString();
+            Symbol* symbol = SymbolFactory.Instance().CreateSymbol(symbolType, span, sourceModuleId, name);
+            symbol->SetModule(module);
+            symbol->SetParent(parent);
+            symbol->Read(*this);
+            return symbol;
+        }
+        public nothrow inline Module* GetModule() const
+        {
+            return module;
+        }
+        public nothrow void SetModule(Module* module_)
+        {
+            module = module_;
+        }
         private AstReader astReader;
         private bool setProjectBit;
+        private Module* module;
     }
 }

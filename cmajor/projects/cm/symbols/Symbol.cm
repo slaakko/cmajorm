@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Collections;
 using Span = System.Lex.Span;
 using Cm.Ast;
 
@@ -182,6 +183,14 @@ namespace Cm.Symbols
                 attributes.Reset(reader.GetAstReader().ReadAttributesNode());
             }
         }
+        public virtual nothrow bool IsExportSymbol() const
+        {
+            return GetFlag(SymbolFlags.project_);
+        }
+        virtual nothrow bool IsParentSymbol() const
+        {
+            return false;
+        }
         public nothrow inline SymbolType GetSymbolType() const
         {
             return symbolType;
@@ -230,9 +239,17 @@ namespace Cm.Symbols
         {
             return parent;
         }
+        public nothrow void SetParent(Symbol* parent_)
+        {
+            parent = parent_;
+        }
         public nothrow inline Module* GetModule() const
         {
             return module;
+        }
+        public nothrow void SetModule(Module* module_)
+        {
+            module = module_;
         }
         public nothrow inline CompileUnitNode* GetCompileUnit() const
         {
@@ -241,6 +258,10 @@ namespace Cm.Symbols
         public nothrow inline int SymbolIndex() const
         {
             return symbolIndex;
+        }
+        public nothrow void SetSymbolIndex(int symbolIndex_)
+        {
+            symbolIndex = symbolIndex_;
         }
         private SymbolType symbolType;
         private Span span;
@@ -253,5 +274,53 @@ namespace Cm.Symbols
         private CompileUnitNode* compileUnit;
         private UniquePtr<AttributesNode> attributes;
         private int symbolIndex;
+    }
+
+    public abstract class SymbolCreator
+    {
+        public default virtual ~SymbolCreator();
+        public abstract Symbol* CreateSymbol(const Span& span, const Uuid& sourceModuleId, const ustring& name);
+    }
+
+    public class ConcreteSymbolCreator<SymbolT> : SymbolCreator
+    {
+        public override Symbol* CreateSymbol(const Span& span, const Uuid& sourceModuleId, const ustring& name)
+        {
+            return new SymbolT(span, sourceModuleId, name);
+        }
+    }
+
+    public class SymbolFactory
+    {
+         static SymbolFactory() : instance(new SymbolFactory())
+         {
+         }
+         public static SymbolFactory& Instance()
+         {
+             return *instance;
+         }
+         public Symbol* CreateSymbol(SymbolType symbolType, const Span& span, const Uuid& sourceModuleId, const ustring& name)
+         {
+             SymbolCreator* creator = creators[cast<byte>(symbolType)].Get();
+             if (creator != null)
+             {
+                 return creator->CreateSymbol(span, sourceModuleId, name);
+             }
+             else
+             {
+                 throw Exception("creator for symbol type '" + SymbolTypeStr(symbolType) + "' not set");
+             }
+         }
+         public void Register(SymbolType symbolType, SymbolCreator* creator)
+         {
+             creators[cast<byte>(symbolType)].Reset(creator);
+         }
+         private SymbolFactory()
+         {
+             creators.Resize(cast<byte>(SymbolType.maxSymbol));
+
+         }
+         private static UniquePtr<SymbolFactory> instance;
+         private List<UniquePtr<SymbolCreator>> creators;
     }
 }

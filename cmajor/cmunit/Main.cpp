@@ -37,6 +37,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Time.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/uuid/random_generator.hpp>
 #include <iostream>
 #include <chrono>
 
@@ -369,7 +370,7 @@ std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> SplitIntoT
 }
 
 void TestSourceFile(bool& first, sngcm::ast::Project* project, const std::string& sourceFilePath, const std::string& onlyTest, sngxml::dom::Element* projectElement, 
-    std::unique_ptr<Module>& rootModule)
+    std::unique_ptr<Module>& rootModule, const boost::uuids::uuid& moduleId_)
 {
     std::unique_ptr<sngxml::dom::Element> sourceFileElement(new sngxml::dom::Element(U"sourceFile"));
     sourceFileElement->SetAttribute(U"name", ToUtf32(Path::GetFileNameWithoutExtension(sourceFilePath)));
@@ -379,7 +380,7 @@ void TestSourceFile(bool& first, sngcm::ast::Project* project, const std::string
     ParsingContext parsingContext;
     std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
     CmajorLexer lexer(s, sourceFilePath, fileIndex);
-    boost::uuids::uuid moduleId = rootModule->Id();
+    boost::uuids::uuid moduleId = moduleId_;
     std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(lexer, &moduleId, &parsingContext);
     std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> testUnits = SplitIntoTestUnits(compileUnit.get());
     if (!testUnits.empty())
@@ -423,7 +424,8 @@ bool SourceFileNameEquals(const std::string& fileName, const std::string& source
     return true;
 }
 
-void TestProject(sngcm::ast::Project* project, const std::string& onlySourceFile, const std::string& onlyTest, sngxml::dom::Element* parentElement, std::unique_ptr<Module>& rootModule)
+void TestProject(sngcm::ast::Project* project, const std::string& onlySourceFile, const std::string& onlyTest, sngxml::dom::Element* parentElement, std::unique_ptr<Module>& rootModule, 
+    const boost::uuids::uuid& moduleId)
 {
     if (project->GetTarget() != Target::unitTest)
     {
@@ -442,13 +444,13 @@ void TestProject(sngcm::ast::Project* project, const std::string& onlySourceFile
                 continue;
             }
         }
-        TestSourceFile(first, project, sourceFilePath, onlyTest, projectElement.get(), rootModule);
+        TestSourceFile(first, project, sourceFilePath, onlyTest, projectElement.get(), rootModule, moduleId);
     }
     parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(projectElement.release()));
 }
 
 bool TestProject(const std::string& projectFileName, const std::string& onlySourceFile, const std::string& onlyTest, sngxml::dom::Element* parentElement, 
-    std::unique_ptr<Module>& rootModule)
+    std::unique_ptr<Module>& rootModule, const boost::uuids::uuid& moduleId)
 {
     std::string config = GetConfig();
     MappedInputFile projectFile(projectFileName);
@@ -460,7 +462,7 @@ bool TestProject(const std::string& projectFileName, const std::string& onlySour
     {
         return false;
     }
-    TestProject(project.get(), onlySourceFile, onlyTest, parentElement, rootModule);
+    TestProject(project.get(), onlySourceFile, onlyTest, parentElement, rootModule, moduleId);
     return true;
 }
 
@@ -478,7 +480,8 @@ bool TestSolution(const std::string& solutionFileName, const std::string& onlySo
     bool containsUnitTestProject = false;
     for (const std::string& projectFilePath : solution->ProjectFilePaths())
     {
-        bool unitTestProject = TestProject(projectFilePath, onlySourceFile, onlyTest, solutionElement.get(), rootModule);
+        boost::uuids::uuid moduleId = boost::uuids::random_generator()();
+        bool unitTestProject = TestProject(projectFilePath, onlySourceFile, onlyTest, solutionElement.get(), rootModule, moduleId);
         if (unitTestProject)
         {
             containsUnitTestProject = true;
@@ -1025,7 +1028,8 @@ int main(int argc, const char** argv)
                         std::unique_ptr<sngxml::dom::Element> componentElement(new sngxml::dom::Element(U"component"));
                         componentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(Path::GetFileName(projectFileName)))));
                         componentsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(componentElement.release()));
-                        bool projectIsUnitTestProject = TestProject(projectFileName, onlySourceFile, onlyTest, cmunitElement.get(), rootModule);
+                        boost::uuids::uuid moduleId = boost::uuids::random_generator()();
+                        bool projectIsUnitTestProject = TestProject(projectFileName, onlySourceFile, onlyTest, cmunitElement.get(), rootModule, moduleId);
                         if (projectIsUnitTestProject)
                         {
                             unitTestProjectsFound = true;

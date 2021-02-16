@@ -224,10 +224,18 @@ void FunctionGroupSymbol::AddFunction(FunctionSymbol* function)
 
 void FunctionGroupSymbol::RemoveFunction(FunctionSymbol* function)
 {
-    int arity = function->Arity();
-    std::vector<FunctionSymbol*>& functionList = arityFunctionListMap[arity];
-    auto end = std::remove(functionList.begin(), functionList.end(), function);
-    functionList.erase(end, functionList.end());
+    if (function->IsVarArg())
+    {
+        auto end = std::remove(varArgFunctions.begin(), varArgFunctions.end(), function);
+        varArgFunctions.erase(end, varArgFunctions.end());
+    }
+    else
+    {
+        int arity = function->Arity();
+        std::vector<FunctionSymbol*>& functionList = arityFunctionListMap[arity];
+        auto end = std::remove(functionList.begin(), functionList.end(), function);
+        functionList.erase(end, functionList.end());
+    }
 }
 
 bool FunctionGroupSymbol::IsEmpty() const

@@ -1,0 +1,47 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace Cm.Symbols
+{
+    public abstract class Scope
+    {
+        public default virtual ~Scope();
+    }
+
+    public class ContainerScope : Scope
+    {
+        public void Install(Symbol* symbol)
+        {
+            Map<ustring, Symbol*>.ConstIterator it = symbolMap.CFind(symbol->Name());
+            if (!(symbol is NamespaceSymbol*) && !(symbol is DeclarationBlock*) && it != symbolMap.CEnd())
+            {
+                Symbol* prev = it->second;
+                if (prev != symbol)
+                {
+                    throw SymbolException("symbol '" + ToUtf8(symbol->Name()) + "' already defined", symbol->GetSpan(), symbol->SourceModuleId(),
+                        prev->GetSpan(), prev->SourceModuleId());
+                }
+            }
+            else
+            {
+                symbolMap[symbol->Name()] = symbol;
+            }
+            symbol->SetFlag(SymbolFlags.installed_);
+        }
+        public void Uninstall(Symbol* symbol)
+        {
+            symbolMap.Remove(symbol->Name());
+            symbol->ResetFlag(SymbolFlags.installed_);
+        }
+        private Map<ustring, Symbol*> symbolMap;
+    }
+
+    public class FileScope : Scope
+    {
+    }
+}
+
