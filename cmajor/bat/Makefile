@@ -21,7 +21,7 @@ sys:
 
 cm:
 	cmc -u -v ../projects/cm/Cm.cms
-	cmc -u -v -c=release ../projects/cm/Cm.cms
+	cmc -u -v -c=release -st ../projects/cm/Cm.cms
 	
 tools:
 	cmc -u -v ../projects/tools/soulcm/scmpg/scmpg.cmp

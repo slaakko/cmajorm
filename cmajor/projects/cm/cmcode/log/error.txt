@@ -1,12 +1,16 @@
-System.Windows.API.WindowsAPIException: Ikkunakahva ei kelpaa.
+System.Net.Sockets.SocketException: Etäpalvelin sulki aiemmin luodun yhteyden.
 
 CALL STACK:
-System.Windows.API.WindowsAPIException.WindowsAPIException(ulong) C:/work/cmajorm/cmajor/system/System.Windows/Api.cm:39
-System.Windows.MessageBox.Show(const String<char>&, const String<char>&, Control*, System.Windows.MessageBoxType) C:/work/cmajorm/cmajor/system/System.Windows/MessageBox.cm:72
-cmcode.MainWindow.CloseSolution() C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:1423
-cmcode.MainWindow.OnWindowClosing(bool&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:677
-System.Windows.Window.ProcessMessage(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Window.cm:149
-cmcode.MainWindow.ProcessMessage(Message&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:4027
+System.Net.Sockets.TcpSocket.Send(byte*, int) C:/work/cmajorm/cmajor/system/System.Net.Sockets/TcpSocket.cm:187
+System.Net.Sockets.Write(TcpSocket&, const String<char>&) C:/work/cmajorm/cmajor/system/System.Net.Sockets/TcpSocket.cm:218
+Cm.Service.Build.BuildService.ProcessBuildRequest(const BuildRequest&) C:/work/cmajorm/cmajor/projects/cm/service/BuildService.cm:412
+cmcode.MainWindow.StartBuild(const BuildRequest&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:2012
+cmcode.MainWindow.BuildSolutionClick() C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:2060
+System.Windows.ToolButton.OnClick() C:/work/cmajorm/cmajor/system/System.Windows/ToolBar.cm:782
+System.Windows.ToolButton.DoClick() C:/work/cmajorm/cmajor/system/System.Windows/ToolBar.cm:777
+System.Windows.ToolBar.OnMouseUp(MouseEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/ToolBar.cm:354
+System.Windows.Control.DoMouseUp(MouseEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:1680
+System.Windows.Control.ProcessMessage(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:871
 System.Windows.Control.ProcessMessageInternal(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:789
 System.Windows.Application.ProcessMessage(void*, uint, uint, long, long&, void*&) C:/work/cmajorm/cmajor/system/System.Windows/Application.cm:133
 System.Windows.Application.Run(Window&) C:/work/cmajorm/cmajor/system/System.Windows/Application.cm:95
