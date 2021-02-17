@@ -36,7 +36,8 @@ namespace Cm.Symbols
         hasArtificialBody_ = 1u << 21u,
         hasCleanup_ = 1u << 22u,
         systemDefault = 1u << 23u,
-        immutable = 1u << 24u
+        immutable = 1u << 24u,
+        programMain = 1u << 25u
     }
 
     public class FunctionGroupSymbol : Symbol
@@ -51,9 +52,9 @@ namespace Cm.Symbols
         }
         public void AddFunction(FunctionSymbol* functionSymbol)
         {
-            if (functionSymbol->IsProgramMain()) return;
+            if (functionSymbol->GetFlag(FunctionSymbolFlags.programMain)) return;
             #assert(functionSymbol->GroupName() == Name());
-            if (functionSymbol->GetFlag(varArg_))
+            if (functionSymbol->GetFlag(FunctionSymbolFlags.varArg_))
             {
                 varArgFunctions.Add(functionSymbol);
             }
@@ -67,7 +68,7 @@ namespace Cm.Symbols
         }
         public void RemoveFunction(FunctionSymbol* functionSymbol)
         {
-            if (functionSymbol->GetFlag(varArg_))
+            if (functionSymbol->GetFlag(FunctionSymbolFlags.varArg_))
             {
                 varArgFunctions.Remove(functionSymbol);
             }

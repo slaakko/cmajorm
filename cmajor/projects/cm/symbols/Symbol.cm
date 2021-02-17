@@ -183,6 +183,31 @@ namespace Cm.Symbols
                 attributes.Reset(reader.GetAstReader().ReadAttributesNode());
             }
         }
+        public nothrow virtual ContainerScope* GetContainerScope() const
+        {
+            if (parent != null)
+            {
+                return parent->GetContainerScope();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public virtual ustring FullName() const
+        {
+            ustring fullName;
+            if (parent != null)
+            {
+                fullName.Append(parent->FullName());
+            }
+            if (!fullName.IsEmpty())
+            {
+                fullName.Append('.');
+            }
+            fullName.Append(Name());
+            return fullName;
+        }
         public virtual nothrow bool IsExportSymbol() const
         {
             return GetFlag(SymbolFlags.project_);

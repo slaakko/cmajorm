@@ -1,0 +1,36 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace Cm.Symbols
+{
+    public class SymbolTable
+    {
+        public nothrow SymbolTable(Module* module_) : module(module_)
+        {
+        }
+        public nothrow inline Module* GetModule() const
+        {
+            return module;
+        }
+        public nothrow NamespaceSymbol* GetMappedNs(NamespaceSymbol* fromNs) const
+        {
+            HashMap<NamespaceSymbol*, NamespaceSymbol*>.ConstIterator it = nsMap.CFind(fromNs);
+            if (it != nsMap.CEnd())
+            {
+                return it->second;
+            }
+            return null;
+        }
+        public nothrow void MapNs(NamespaceSymbol* fromNs, NamespaceSymbol* toNs)
+        {
+            nsMap[fromNs] = toNs;
+        }
+        private Module* module;
+        private HashMap<NamespaceSymbol*, NamespaceSymbol*> nsMap;
+    }
+}

@@ -4,16 +4,90 @@
 // =================================
 
 using System;
+using System.Collections;
 
 namespace Cm.Symbols
 {
+    public enum ScopeLookup : byte
+    {
+        none = 0u,
+        this_ = 1u << 0u,
+        base_ = 1u << 1u,
+        parent_ = 1u << 2u,
+        this_and_base = this_ | base_,
+        this_and_parent = this_ | parent_,
+        this_and_base_and_parent = this_ | base_ | parent_
+    }
+
     public abstract class Scope
     {
         public default virtual ~Scope();
+        public abstract Symbol* Lookup(const ustring& name) const;
+        public abstract Symbol* Lookup(const ustring& name, ScopeLookup lookup) const;
+        //public abstract List<CCSymbolEntry> LookupBeginWith(const ustring& prefix) const;
+        //public abstract List<CCSymbolEntry> LookupBeginWith(const ustring& prefix, ScopeLookup lookup) const;
     }
 
     public class ContainerScope : Scope
     {
+        public nothrow ContainerScope() : container(null), parentScope(null), symbolMap()
+        {
+        }
+        public nothrow ContainerScope* BaseScope() const
+        {
+            if (container != null)
+            {
+                if (container is ClassTypeSymbol*)
+                {
+                    ClassTypeSymbol* cls = cast<ClassTypeSymbol*>(container);
+                    ClassTypeSymbol* baseClass = cls->BaseClass();
+                    if (baseClass != null)
+                    {
+                        return baseClass->GetContainerScope();
+                    }
+                }
+            }
+            return null;
+        }
+        public nothrow ContainerScope* ParentScope() const
+        {
+            if (parentScope != null)
+            {
+                return parentScope;
+            }
+            if (container != null)
+            {
+                Symbol* parent = null;
+                if (container is ClassTemplateSpecializationSymbol*)
+                {
+                    ClassTemplateSpecializationSymbol* specialization = cast<ClassTemplateSpecializationSymbol*>(container);
+                    ClassTypeSymbol* classTemplate = specialization->GetClassTemplate();
+                    parent = classTemplate->Parent();
+                }
+                else
+                {
+                    parent = container->Parent();
+                }
+                if (parent != null)
+                {
+                    if (!parent->GetModule()->GetFlag(ModuleFlags.root) && (parent is NamespaceSymbol*))
+                    {
+                        NamespaceSymbol* ns = cast<NamespaceSymbol*>(parent);
+                        Module* rootModule = GetRootModule();
+                        if (rootModule != null)
+                        {
+                            NamespaceSymbol* mappedNs = rootModule->GetSymbolTable().GetMappedNs(ns);
+                            if (mappedNs != null)
+                            {
+                                return mappedNs->GetContainerScope();
+                            }
+                        }
+                    }
+                    return parent->GetContainerScope();
+                }
+            }
+            return null;
+        }
         public void Install(Symbol* symbol)
         {
             Map<ustring, Symbol*>.ConstIterator it = symbolMap.CFind(symbol->Name());
@@ -37,11 +111,213 @@ namespace Cm.Symbols
             symbolMap.Remove(symbol->Name());
             symbol->ResetFlag(SymbolFlags.installed_);
         }
+
+        public override Symbol* Lookup(const ustring& name) const
+        {
+            return Lookup(name, ScopeLookup.this_);
+        }
+        public override Symbol* Lookup(const ustring& name, ScopeLookup lookup) const
+        {
+            int numQualifiedNameComponents = CountQualifiedNameComponents(name);
+            if (numQualifiedNameComponents > 1)
+            {
+                List<ustring> components = ParseQualifiedName(name);
+                return LookupQualified(components, lookup);
+            }
+            else
+            {
+                Map<ustring, Symbol*>.ConstIterator it = symbolMap.CFind(name);
+                if (it != symbolMap.CEnd())
+                {
+                    Symbol* s = it->second;
+                    return s;
+                }
+                if ((lookup & ScopeLookup.base_) != ScopeLookup.none)
+                {
+                    ContainerScope* baseScope = BaseScope();
+                    if (baseScope != null)
+                    {
+                        Symbol* s = baseScope->Lookup(name);
+                        if (s != null)
+                        {
+                            return s;
+                        }
+                    }
+                }
+                if ((lookup & ScopeLookup.parent_) != ScopeLookup.none)
+                {
+                    ContainerScope* parentScope = ParentScope();
+                    if (parentScope != null)
+                    {
+                        Symbol* s = parentScope->Lookup(name);
+                        if (s != null)
+                        {
+                            return s;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        private Symbol* LookupQualified(const List<ustring>& components, ScopeLookup lookup) const
+        {
+            ContainerScope* scope = this;
+            Symbol* s = null;
+            bool allComponentsMatched = false;
+            int n = cast<int>(components.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                const ustring& component = components[i];
+                if (scope != null)
+                {
+                    s = scope->Lookup(component, ScopeLookup.this_);
+                    if (s != null)
+                    {
+                        scope = s->GetContainerScope();
+                    }
+                    else
+                    {
+                        allComponentsMatched = false;
+                    }
+                }
+            }
+            if (s == null || !allComponentsMatched)
+            {
+                if ((lookup & ScopeLookup.parent_) != ScopeLookup.none)
+                {
+                    ContainerScope* parentScope = ParentScope();
+                    if (parentScope != null)
+                    {
+                        return parentScope->LookupQualified(components, lookup);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            return s;
+        }
+/*
+        public override List<CCSymbolEntry> LookupBeginWith(const ustring& prefix) const
+        {
+        }
+        public override List<CCSymbolEntry> LookupBeginWith(const ustring& prefix, ScopeLookup lookup) const
+        {
+        }
+*/
+        private ContainerSymbol* container;
+        private ContainerScope* parentScope;
         private Map<ustring, Symbol*> symbolMap;
     }
 
-    public class FileScope : Scope
+    internal nothrow int CountQualifiedNameComponents(const ustring& name)
     {
+        int numComponents = 0;
+        int componentSize = 0;
+        int state = 0;
+        int angleBracketCount = 0;
+        for (uchar c : name)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (c == '.')
+                    {
+                        ++numComponents;
+                        componentSize = 0;
+                    }
+                    else if (c == '<')
+                    {
+                        ++componentSize;
+                        angleBracketCount = 1;
+                        state = 1;
+                    }
+                    else
+                    {
+                        ++componentSize;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    ++componentSize;
+                    if (c == '<')
+                    {
+                        ++angleBracketCount;
+                    }
+                    else if (c == '>')
+                    {
+                        --angleBracketCount;
+                        if (angleBracketCount == 0)
+                        {
+                            state = 0;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        if (componentSize > 0)
+        {
+            ++numComponents;
+        }
+        return numComponents;
+    }
+    internal nothrow List<ustring> ParseQualifiedName(const ustring& qualifiedName)
+    {
+        List<ustring> components;
+        int state = 0;
+        ustring component;
+        int angleBracketCount = 0;
+        for (uchar c : qualifiedName)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (c == '.')
+                    {
+                        components.Add(component);
+                        component.Clear();
+                    }
+                    else if (c == '<')
+                    {
+                        component.Append(c);
+                        angleBracketCount = 1;
+                        state = 1;
+                    }
+                    else
+                    {
+                        component.Append(c);
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    component.Append(c);
+                    if (c == '<')
+                    {
+                        ++angleBracketCount;
+                    }
+                    else if (c == '>')
+                    {
+                        --angleBracketCount;
+                        if (angleBracketCount == 0)
+                        {
+                            state = 0;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        if (!component.IsEmpty())
+        {
+            components.Add(component);
+        }
+        return components;
     }
 }
 

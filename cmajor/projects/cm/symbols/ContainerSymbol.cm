@@ -88,7 +88,7 @@ namespace Cm.Symbols
             }
             else if (ownedMember is ClassTypeSymbol*)
             {
-                
+
             }
             else if (ownedMember is ConceptSymbol*)
             {
@@ -100,6 +100,10 @@ namespace Cm.Symbols
             {
                 containerScope.Install(ownedMember);
             }
+        }
+        public nothrow inline const ContainerScope* GetContainerScope() const
+        {
+            return &containerScope;
         }
         private FunctionGroupSymbol* MakeFunctionGroupSymbol(const ustring& groupName, const Span& span, const Uuid& sourceModuleId)
         {

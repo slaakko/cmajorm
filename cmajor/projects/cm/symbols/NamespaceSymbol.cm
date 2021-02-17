@@ -11,7 +11,7 @@ namespace Cm.Symbols
     public class NamespaceSymbol : ContainerSymbol
     {
         public nothrow NamespaceSymbol(const Span& span, const Uuid& sourceModuleId, const ustring& name) :
-            base(span, sourceModuleId, name)
+            base(SymbolType.namespaceSymbol, span, sourceModuleId, name)
         {
         }
         public nothrow override bool IsParentSymbol() const

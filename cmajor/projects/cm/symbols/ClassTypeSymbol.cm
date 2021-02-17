@@ -4,6 +4,8 @@
 // =================================
 
 using System;
+using Span = System.Lex.Span;
+using System.Collections;
 
 namespace Cm.Symbols
 {
@@ -31,7 +33,7 @@ namespace Cm.Symbols
          }
          private HashMap<int, ClassTypeSymbol*> arityClassMap;
     }
-    
+
     public class ClassTypeSymbol : TypeSymbol
     {
         public nothrow ClassTypeSymbol(const Span& span, const Uuid& sourceModuleId, const ustring& name) :
@@ -88,7 +90,16 @@ namespace Cm.Symbols
                 minArity = n;
             }
         }
+        public nothrow inline ClassTypeSymbol* BaseClass() const
+        {
+            return baseClass;
+        }
+        public nothrow void SetBaseClass(ClassTypeSymbol* baseClass_)
+        {
+            baseClass = baseClass_;
+        }    
         private int minArity;
+        private ClassTypeSymbol* baseClass;
         private List<TemplateParameterSymbol*> templateParameters;
     }
 }
