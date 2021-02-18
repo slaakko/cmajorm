@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using System.Collections;
 using Span = System.Lex.Span;
 using Cm.Ast;
 
@@ -31,6 +32,32 @@ namespace Cm.Symbols
         {
             setProjectBit = true;
         }
+        public nothrow void SetTypeAndConceptRequestTarget(List<TypeOrConceptRequest>* typeAndConceptRequestTarget)
+        {
+            typeAndConceptRequests = typeAndConceptRequestTarget;
+        }
+        public void AddTypeOrConceptRequest(const TypeOrConceptRequest& request)
+        {
+            #assert(typeAndConceptRequests != null);
+            typeAndConceptRequests->Add(request);
+        }
+        public nothrow void SetFunctionRequestTarget(List<FunctionRequest>* functionRequestTarget)
+        {
+            functionRequests = functionRequestTarget;
+        }
+        public void AddFunctionRequest(const FunctionRequest& request)
+        {
+            #assert(functionRequests != null);
+            functionRequests->Add(request);
+        }
+        public nothrow void SetConversionsTarget(List<FunctionSymbol*>* conversionsTarget)
+        {
+            conversions = conversionsTarget;
+        }
+        public void AddConversion(FunctionSymbol* conversion)
+        {
+            conversions->Add(conversion);
+        }
         public Symbol* ReadSymbol(Symbol* parent)
         {
             SymbolType symbolType = cast<SymbolType>(GetBinaryReader().ReadByte());
@@ -43,6 +70,26 @@ namespace Cm.Symbols
             symbol->Read(*this);
             return symbol;
         }
+        public ParameterSymbol* ReadParameterSymbol(Symbol* parent)
+        {
+            Symbol* symbol = ReadSymbol(parent);
+            if (symbol is ParameterSymbol*)
+            {
+                return cast<ParameterSymbol*>(symbol);
+            }
+            else
+            {
+                throw Exception("internal error: parameter symbol expected");
+            }
+        }
+        public nothrow inline SymbolTable* GetSymbolTable() const
+        {
+            return symbolTable;
+        }
+        public nothrow void SetSymbolTable(SymbolTable* symbolTable_)
+        {
+            symbolTable = symbolTable_;
+        }
         public nothrow inline Module* GetModule() const
         {
             return module;
@@ -53,6 +100,10 @@ namespace Cm.Symbols
         }
         private AstReader astReader;
         private bool setProjectBit;
+        private SymbolTable* symbolTable;
         private Module* module;
+        private List<TypeOrConceptRequest>* typeAndConceptRequests;
+        private List<FunctionRequest>* functionRequests;
+        private List<FunctionSymbol*>* conversions;
     }
 }

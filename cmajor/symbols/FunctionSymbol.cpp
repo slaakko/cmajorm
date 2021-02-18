@@ -650,7 +650,7 @@ void FunctionSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)
     else if (index < 0)
     {
         int templateArgumentIndex = -(index + 1);
-        if (templateArgumentIndex < 0 || templateArgumentIndex > templateArgumentTypes.size())
+        if (templateArgumentIndex < 0 || templateArgumentIndex >= templateArgumentTypes.size())
         {
             throw Exception("invalid emplace template argument index '" + std::to_string(index) + "'", GetSpan(), SourceModuleId());
         }

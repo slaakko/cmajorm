@@ -21,11 +21,23 @@ namespace Cm.Symbols
          }
          public void AddClass(ClassTypeSymbol* classTypeSymbol)
          {
-             // todo
+             for (int arity = classTypeSymbol->MinArity(); arity <= classTypeSymbol->MaxArity(); ++arity)
+             {
+                 if (arityClassMap.CFind(arity) != arityClassMap.CEnd())
+                 {
+                     throw SymbolException("already has class with arity " + ToString(arity) + " in class group '" + ToUtf8(Name()) + "'",
+                         GetSpan(), SourceModuleId(), classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId());
+                 }
+                 arityClassMap[arity] = classTypeSymbol;
+                 classTypeSymbol->SetClassGroup(this);
+             }
          }
          public void RemoveClass(ClassTypeSymbol* classTypeSymbol)
          {
-             // todo
+             for (int arity = classTypeSymbol->MinArity(); arity <= classTypeSymbol->MaxArity(); ++arity)
+             {
+                 arityClassMap.Remove(arity);
+             }
          }
          public nothrow bool IsEmpty() const
          {
@@ -97,9 +109,18 @@ namespace Cm.Symbols
         public nothrow void SetBaseClass(ClassTypeSymbol* baseClass_)
         {
             baseClass = baseClass_;
-        }    
+        }
+        public nothrow inline ClassGroupTypeSymbol* ClassGroup() const
+        {
+            return classGroup;
+        }
+        public nothrow void SetClassGroup(ClassGroupTypeSymbol* classGroup_)
+        {
+            classGroup = classGroup_;
+        }
         private int minArity;
         private ClassTypeSymbol* baseClass;
         private List<TemplateParameterSymbol*> templateParameters;
+        private ClassGroupTypeSymbol* classGroup;
     }
 }

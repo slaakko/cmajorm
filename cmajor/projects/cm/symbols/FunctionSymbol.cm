@@ -6,6 +6,10 @@
 using System;
 using Span = System.Lex.Span;
 using System.Collections;
+using Node = Cm.Ast.Node;
+using NodeList = Cm.Ast.NodeList;
+using FunctionNode = Cm.Ast.FunctionNode;
+using ConstraintNode = Cm.Ast.ConstraintNode;
 
 namespace Cm.Symbols
 {
@@ -109,7 +113,52 @@ namespace Cm.Symbols
              writer.GetBinaryWriter().Write(index);
              writer.GetBinaryWriter().Write(groupName);
              writer.GetBinaryWriter().Write(cast<uint>(flags));
-             // todo
+             Uuid functionTemplateId;
+             if (functionTemplate != null)
+             {
+                 functionTemplateId = functionTemplate->FunctionId();
+             }
+             writer.GetBinaryWriter().Write(functionTemplateId);
+             if (!templateParameters.IsEmpty() ||
+                 (GetGlobalFlag(GlobalFlags.release) && GetFlag(FunctionSymbolFlags.inline_)) ||
+                 GetFlag(FunctionSymbolFlags.constExpr))
+             {
+                 usingNodes.Write(writer.GetAstWriter());
+                 Node* node = GetRootModule()->GetSymbolTable().GetNode(this);
+                 writer.GetAstWriter().Write(node);
+             }
+             Uuid returnTypeId;
+             if (returnType != null)
+             {
+                 returnTypeId = returnType->TypeId();
+             }
+             writer.GetBinaryWriter().Write(returnTypeId);
+             writer.GetBinaryWriter().Write(vmtIndex);
+             writer.GetBinaryWriter().Write(imtIndex);
+             bool hasReturnParam = !returnParam.IsNull();
+             writer.GetBinaryWriter().Write(hasReturnParam);
+             if (hasReturnParam)
+             {
+                 writer.Write(returnParam.Get());
+             }
+             bool hasConstraint = !constraint.IsNull();
+             writer.GetBinaryWriter().Write(hasConstraint);
+             if (hasConstraint)
+             {
+                 writer.GetAstWriter().Write(constraint.Get());
+             }
+             uint n = cast<uint>(templateArgumentTypes.Count());
+             writer.GetBinaryWriter().WriteULEB128UInt(n);
+             for (uint i = 0u; i < n; ++i)
+             {
+                 TypeSymbol* templateArgumentType = templateArgumentTypes[i];
+                 writer.GetBinaryWriter().Write(templateArgumentType->TypeId());
+             }
+             if (GetFlag(FunctionSymbolFlags.conversion_))
+             {
+                 writer.GetBinaryWriter().Write(conversionSourceType->TypeId());
+                 writer.GetBinaryWriter().Write(conversionTargetType->TypeId());
+             }
          }
          public override void Read(SymbolReader& reader)
          {
@@ -118,7 +167,97 @@ namespace Cm.Symbols
              index = reader.GetBinaryReader().ReadInt();
              groupName = reader.GetBinaryReader().ReadUString();
              flags = cast<FunctionSymbolFlags>(reader.GetBinaryReader().ReadUInt());
-             // todo
+             Uuid functionTemplateId = reader.GetBinaryReader().ReadUuid();
+             if (functionTemplateId != Uuid())
+             {
+                 reader.GetSymbolTable()->EmplaceFunctionRequest(reader, this, functionTemplateId, 0);
+             }
+             if (!templateParameters.IsEmpty() ||
+                 (GetGlobalFlag(GlobalFlags.release) && GetFlag(FunctionSymbolFlags.inline_)) ||
+                 GetFlag(FunctionSymbolFlags.constExpr))
+             {
+                 usingNodes.Read(reader.GetAstReader());
+                 Node* node = reader.GetAstReader().ReadNode();
+                 #assert(node is FunctionNode*);
+                 functionNode.Reset(cast<FunctionNode*>(node));
+             }
+             Uuid returnTypeId = reader.GetBinaryReader().ReadUuid();
+             if (returnTypeId != Uuid())
+             {
+                 reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, returnTypeId, 0);
+             }
+             vmtIndex = reader.GetBinaryReader().ReadInt();
+             imtIndex = reader.GetBinaryReader().ReadInt();
+             bool hasReturnParam = reader.GetBinaryReader().ReadBool();
+             if (hasReturnParam)
+             {
+                 returnParam.Reset(reader.ReadParameterSymbol(this));
+             }
+             bool hasConstraint = reader.GetBinaryReader().ReadBool();
+             if (hasConstraint)
+             {
+                 constraint.Reset(reader.GetAstReader().ReadConstraintNode());
+             }
+             uint n = reader.GetBinaryReader().ReadULEB128UInt();
+             templateArgumentTypes.Resize(n);
+             for (uint i = 0u; i < n; ++i)
+             {
+                 Uuid templateArgumentId = reader.GetBinaryReader().ReadUuid();
+                 reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, templateArgumentId, -1 - cast<int>(i));
+             }
+             if (GetFlag(FunctionSymbolFlags.conversion_))
+             {
+                 Uuid conversionSourceTypeId = reader.GetBinaryReader().ReadUuid();
+                 reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, conversionSourceTypeId, 10000);
+                 Uuid conversionTargetTypeId = reader.GetBinaryReader().ReadUuid();
+                 reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, conversionTargetTypeId, 10001);
+                 reader.AddConversion(this);
+             }
+         }
+         public override void EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+         {
+             #assert(index == 0);
+             functionTemplate = functionSymbol;
+         }
+         public override void EmplaceType(TypeSymbol* typeSymbol, int index)
+         {
+             if (index == 0)
+             {
+                 returnType = typeSymbol;
+             }
+             else if (index == 10000)
+             {
+                 conversionSourceType = typeSymbol;
+             }
+             else if (index == 10001)
+             {
+                 conversionTargetType = typeSymbol;
+             }
+             else if (index < 0)
+             {
+                 int templateArgumentIndex = -(index + 1);
+                 if (templateArgumentIndex < 0 || templateArgumentIndex >= templateArgumentTypes.Count())
+                 {
+                     throw SymbolException("invalid emplace template argument index '" + ToString(templateArgumentIndex) + "'", GetSpan(), SourceModuleId());
+                 }
+                 templateArgumentTypes[templateArgumentIndex] = typeSymbol;
+             }
+             else
+             {
+                 throw SymbolException("invalid emplace type index '" + ToString(index) + "'", GetSpan(), SourceModuleId());
+             }
+         }
+         public override void AddMember(Symbol* member)
+         {
+             base->AddMember(member);
+             if (member is ParameterSymbol*)
+             {
+                 parameters.Add(cast<ParameterSymbol*>(member));
+             }
+             else if (member is TemplateParameterSymbol*)
+             {
+                 templateParameters.Add(cast<TemplateParameterSymbol*>(member));
+             }
          }
          public nothrow inline const Uuid& FunctionId() const
          {
@@ -153,9 +292,49 @@ namespace Cm.Symbols
          {
              functionGroup = functionGroup_;
          }
+         public nothrow inline FunctionSymbol* FunctionTemplate() const
+         {
+             return functionTemplate;
+         }
+         public nothrow void SetFunctionTemplate(FunctionSymbol* functionTemplate_)
+         {
+             functionTemplate = functionTemplate_;
+         }
+         public nothrow inline const List<TypeSymbol*>& TemplateArgumentTypes() const
+         {
+             return templateArgumentTypes;
+         }
+         public nothrow void SetTemplateArgumentTypes(const List<TypeSymbol*>& templateArgumentTypes_)
+         {
+             templateArgumentTypes = templateArgumentTypes_;
+         }
+         public nothrow inline FunctionSymbol* Master() const
+         {
+             return master;
+         }
+         public nothrow void SetMaster(FunctionSymbol* master_)
+         {
+             master = master_;
+         }
          public nothrow inline int Arity() const
          {
              return cast<int>(parameters.Count());
+         }
+         public nothrow inline TypeSymbol* ConversionSourceType() const
+         {
+             return conversionSourceType;
+         }
+         public nothrow void SetConversionSourceType(TypeSymbol* conversionSourceType_)
+         {
+             conversionSourceType = conversionSourceType_;
+         }
+         public nothrow inline TypeSymbol* ConversionTargetType() const
+         {
+             return conversionTargetType;
+         }
+         public nothrow void SetConversionTargetType(TypeSymbol* conversionTargetType_)
+         {
+             conversionTargetType = conversionTargetType_;
          }
          public nothrow inline FunctionSymbolFlags GetFunctionSymbolFlags() const
          {
@@ -179,6 +358,19 @@ namespace Cm.Symbols
          private FunctionSymbolFlags flags;
          private FunctionGroupSymbol* functionGroup;
          private List<ParameterSymbol*> parameters;
+         private List<TemplateParameterSymbol*> templateParameters;
+         private FunctionSymbol* functionTemplate;
+         private List<TypeSymbol*> templateArgumentTypes;
+         private FunctionSymbol* master;
+         private NodeList<Node> usingNodes;
+         private UniquePtr<FunctionNode> functionNode;
+         private TypeSymbol* returnType;
+         private int vmtIndex;
+         private int imtIndex;
+         private UniquePtr<ParameterSymbol> returnParam;
+         private UniquePtr<ConstraintNode> constraint;
+         private TypeSymbol* conversionSourceType;
+         private TypeSymbol* conversionTargetType;
     }
 }
 

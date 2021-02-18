@@ -212,9 +212,21 @@ namespace Cm.Symbols
         {
             return GetFlag(SymbolFlags.project_);
         }
-        virtual nothrow bool IsParentSymbol() const
+        public virtual nothrow bool IsParentSymbol() const
         {
             return false;
+        }
+        public virtual void EmplaceType(TypeSymbol* type, int index)
+        {
+            #assert(false);
+        }
+        public virtual void EmplaceConcept(ConceptSymbol* conceptSymbol, int index)
+        {
+            #assert(false);
+        }
+        public virtual void EmplaceFunction(FunctionSymbol* functionSymbol, int index)
+        {
+            #assert(false);
         }
         public nothrow inline SymbolType GetSymbolType() const
         {

@@ -24,6 +24,14 @@ namespace Cm.Symbols
             base->Read(reader);
             // todo
         }
+        public nothrow inline const Uuid& TypeId() const
+        {
+            return typeId;
+        }
+        public nothrow void SetTypeId(const Uuid& typeId_)
+        {
+            typeId = typeId_;
+        }
         private Uuid typeId;
     }
 }
