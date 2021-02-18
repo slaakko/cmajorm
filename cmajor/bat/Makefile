@@ -15,13 +15,13 @@ cppbert:
 	
 sys:
 	cmc -u -v ../system/platform/windows/System.cms
-	cmc -u -v -st -c=release ../system/platform/windows/System.cms
+	cmc -u -v -bt=1 -c=release ../system/platform/windows/System.cms
 	cppcmc -u -v -st ../system/platform/windows/System.cms
 	cppcmc -u -v -st -c=release ../system/platform/windows/System.cms
 
 cm:
 	cmc -u -v ../projects/cm/Cm.cms
-	cmc -u -v -c=release -st ../projects/cm/Cm.cms
+	cmc -u -v -c=release ../projects/cm/Cm.cms
 	
 tools:
 	cmc -u -v ../projects/tools/soulcm/scmpg/scmpg.cmp
