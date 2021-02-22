@@ -207,6 +207,11 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsngutild.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngutil.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsngutil.lib ..\lib
 
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmwingd.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmwingd.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmwing.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmwing.lib ..\lib
+
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcmd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcmd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmcm.dll ..\bin
