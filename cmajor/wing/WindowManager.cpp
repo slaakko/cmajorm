@@ -27,7 +27,7 @@ bool WindowManager::IsSystemClassName(const std::string& windowClassName) const
     return it != systemClassNames.cend();
 }
 
-uint16_t WindowManager::Register(const std::string& windowClassName, uint32_t windowClassStyle, int64_t windowClassBackgroundColor)
+uint16_t WindowManager::Register(const std::string& windowClassName, uint32_t windowClassStyle, int windowClassBackgroundColor)
 {
     auto it = registeredWindowClasses.find(windowClassName);
     if (it != registeredWindowClasses.cend())
@@ -43,14 +43,14 @@ uint16_t WindowManager::Register(const std::string& windowClassName, uint32_t wi
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
     wc.hInstance = instance;
-    wc.hIcon = LoadIcon(instance, IDI_APPLICATION);
+    wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
     wc.hCursor = nullptr;
     int64_t c = windowClassBackgroundColor + 1;
     HBRUSH bgc = *reinterpret_cast<HBRUSH*>(&c);
     wc.hbrBackground = bgc;
     wc.lpszMenuName = nullptr;
     wc.lpszClassName = (LPWSTR)className.c_str();
-    wc.hIconSm = LoadIcon(instance, IDI_APPLICATION);
+    wc.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
     uint16_t windowClass = RegisterClassExW(&wc);
     if (windowClass == 0)
     {

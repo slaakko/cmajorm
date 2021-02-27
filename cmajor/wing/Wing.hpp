@@ -35,6 +35,8 @@ struct WING_API Message
     uint32_t LParamHiDWord() const { return static_cast<uint32_t>((lParam >> 32) & 0xFFFFFFFF); }
     uint16_t WParamLoWord() const { return static_cast<uint16_t>(wParam & 0xFFFF); }
     uint16_t WParamHiWord() const { return static_cast<uint16_t>((wParam >> 16) & 0xFFFF); }
+    int LParamX() const { return static_cast<uint16_t>(LParamLoDWord()); }
+    int LParamY() const { return static_cast<uint16_t>(LParamLoDWord() >> 16); }
     HWND handle;
     UINT message;
     WPARAM wParam;
@@ -43,6 +45,18 @@ struct WING_API Message
 };
 
 WING_API void SetMessageProcessorFunction(MessageProcessorFunction messageProcessorFun);
+
+struct WING_API Padding
+{
+    Padding() : left(0), top(0), right(0), bottom(0) {}
+    Padding(int left_, int top_, int right_, int bottom_) : left(left_), top(top_), right(right_), bottom(bottom_) {}
+    int Vertical() const { return top + bottom; }
+    int Horizontal() const { return left + right; }
+    int left;
+    int top;
+    int right;
+    int bottom;
+};
 
 enum class KeyState : int
 {
@@ -69,18 +83,19 @@ using KeyPreviewFunction = void (*)(WPARAM keyCode, KeyState keyState, bool& han
 WING_API void SetKeyPreviewFunction(KeyPreviewFunction keyPreviewFun);
 
 WING_API HINSTANCE Instance();
-WING_API void SetInstance(HINSTANCE instance_);
 WING_API WNDPROC GetWndProc();
 
 WING_API int Run();
 
-WING_API void WingInit();
+WING_API void WingInit(HINSTANCE instance_);
 WING_API void WingDone();
 
 using Color = Gdiplus::Color;
 
 WING_API Color GetSystemColor(int index);
 
+WING_API void ShowMessageBox(HWND handle, const std::string& caption, const std::string& message);
+WING_API void ShowInfoMessageBox(HWND handle, const std::string& message);
 WING_API void ShowErrorMessageBox(HWND handle, const std::string& message);
 
 } } // cmajor::wing

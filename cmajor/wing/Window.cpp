@@ -6,6 +6,7 @@
 #include <cmajor/wing/Window.hpp>
 #include <cmajor/wing/Application.hpp>
 #include <cmajor/wing/Button.hpp>
+#include <cmajor/wing/Menu.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {
@@ -29,7 +30,7 @@ FontStyle DefaultWindowFontStyle()
 
 WindowCreateParams::WindowCreateParams()
 {
-    controlCreateParams.WindowClassName("System.Windows.Window").WindowStyle(OverlappedWindowStyle()).WindowClassBackgroundColor(DefaultWindowClassWindowBackgroundColor()).
+    controlCreateParams.WindowClassName("wing.Window").WindowStyle(OverlappedWindowStyle()).WindowClassBackgroundColor(DefaultWindowClassWindowBackgroundColor()).
         BackgroundColor(DefaultWindowBackgroundColor()).Location(DefaultLocation()).SetSize(DefaultSize());
     FontFamilyName(DefaultWindowFontFamilyName()).FontSize(DefaultWindowFontSize()).SetFontStyle(DefaultWindowFontStyle());
 }
@@ -125,6 +126,7 @@ Window::Window(WindowCreateParams& createParams) :
     mainWindow(false),
     defaultButton(nullptr),
     cancelButton(nullptr),
+    menuBar(nullptr),
     dialogResult(DialogResult::none)
 {
     if (!fontFamilyName.empty())
@@ -154,6 +156,10 @@ void Window::SetDefaultButton(Button* defaultButton_)
             defaultButton->SetDefault();
         }
     }
+}
+
+void Window::MouseUpNotification(MouseEventArgs& args)
+{
 }
 
 bool Window::ProcessMessage(Message& msg) 
@@ -203,6 +209,69 @@ void Window::OnPaint(PaintEventArgs& args)
     catch (const std::exception& ex)
     {
         ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void Window::OnControlAdded(ControlEventArgs& args)
+{
+    ContainerControl::OnControlAdded(args);
+    Control* control = args.control;
+    if (control->IsMenuBar())
+    { 
+        menuBar = static_cast<MenuBar*>(control);
+    }
+    else if (control->IsButton())
+    {
+        Button* button = static_cast<Button*>(control);
+        if (button->IsDefault())
+        {
+            SetDefaultButton(button);
+        }
+    }
+}
+
+void Window::OnControlRemoved(ControlEventArgs& args)
+{
+    ContainerControl::OnControlRemoved(args);
+    Control* control = args.control;
+    if (control == menuBar)
+    {
+        menuBar = nullptr;
+    }
+    else if (control == defaultButton)
+    {
+        defaultButton = nullptr;
+    }
+    else if (control == cancelButton)
+    {
+        cancelButton = nullptr;
+    }
+}
+
+void Window::OnMouseDown(MouseEventArgs& args)
+{
+    ContainerControl::OnMouseDown(args);
+    if (menuBar)
+    {
+        menuBar->MouseDownInternal(args);
+    }
+}
+
+void Window::OnMouseUp(MouseEventArgs& args)
+{
+    ContainerControl::OnMouseUp(args);
+    if (menuBar)
+    {
+        menuBar->MouseUpInternal(args);
+    }
+}
+
+void Window::OnMouseMove(MouseEventArgs& args)
+{
+    ContainerControl::OnMouseMove(args);
+    if (menuBar)
+    {
+        menuBar->MouseMoveInternal(args);
     }
 }
 

@@ -18,6 +18,7 @@ class WING_API ContainerControl : public Control
 public:
     ContainerControl(ControlCreateParams& createParams);
     bool IsContainerControl() const override { return true; }
+    void PaintAll(PaintEventArgs& args, bool skipMenuBar) override;
     ContainerControl* GetContainerControl() const override;
     void AddChild(Control* child);
     std::unique_ptr<Control> RemoveChild(Control* child);

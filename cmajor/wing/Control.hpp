@@ -6,6 +6,7 @@
 #ifndef CMAJOR_WING_CONTROL_INCLUDED
 #define CMAJOR_WING_CONTROL_INCLUDED
 #include <cmajor/wing/Component.hpp>
+#include <cmajor/wing/Cursor.hpp>
 #include <cmajor/wing/Event.hpp>
 #include <cmajor/wing/Graphics.hpp>
 #include <cmajor/wing/Wing.hpp>
@@ -67,6 +68,13 @@ WING_API inline Size DefaultSize()
     return Size(CW_USEDEFAULT, CW_USEDEFAULT);
 }
 
+WING_API inline Size DefaultMouseHoverSize()
+{
+    return Size(8, 8);
+}
+
+const int mouseHoverTimerId = 2;
+
 struct WING_API PaintEventArgs
 {
     PaintEventArgs(Graphics& graphics_, Rect& clipRect_) : graphics(graphics_), clipRect(clipRect_) {}
@@ -111,6 +119,50 @@ enum class Dock : int
     none = 0, top = 1, bottom = 2, left = 3, right = 4, fill = 5
 };
 
+enum class MouseButtons : int
+{
+    none = 0, lbutton = 1, rbutton = 2, shift = 4, control = 8, mbutton = 16, xbutton1 = 32, xbutton2 = 64
+};
+
+inline MouseButtons operator|(MouseButtons left, MouseButtons right)
+{
+    return MouseButtons(int(left) | int(right));
+}
+
+inline MouseButtons operator&(MouseButtons left, MouseButtons right)
+{
+    return MouseButtons(int(left) & int(right));
+}
+
+inline MouseButtons operator~(MouseButtons buttons)
+{
+    return MouseButtons(~int(buttons));
+}
+
+struct MouseEventArgs
+{
+    MouseEventArgs(const Point& location_, MouseButtons buttons_, int clicks_) : location(location_), buttons(buttons_), clicks(clicks_) {}
+    Point location;
+    MouseButtons buttons;
+    int clicks;
+};
+
+using MouseEnterEvent = Event;
+using MouseLeaveEvent = Event;
+using MouseDownEvent = EventWithArgs<MouseEventArgs>;
+using MouseUpEvent = EventWithArgs<MouseEventArgs>;
+using MouseMoveEvent = EventWithArgs<MouseEventArgs>;
+using MouseHoverEvent = EventWithArgs<MouseEventArgs>;
+using MouseDoubleClickEvent = EventWithArgs<MouseEventArgs>;
+
+struct TimerEventArgs
+{
+    TimerEventArgs(int timerId_) : timerId(timerId_) {}
+    int timerId;
+};
+
+using TimerEvent = EventWithArgs<TimerEventArgs>;
+
 struct WING_API ControlCreateParams
 {
     ControlCreateParams();
@@ -148,7 +200,10 @@ enum class ControlFlags : int
     caretShown = 1 << 3,
     disabled = 1 << 4,
     tabStop = 1 << 5,
-    doubleBuffered = 1 << 6
+    doubleBuffered = 1 << 6,
+    mouseInClient = 1 << 7,
+    lbuttonPressed = 1 << 8,
+    mouseHoverTimerStarted = 1 << 9
 };
 
 WING_API inline ControlFlags operator&(ControlFlags left, ControlFlags right)
@@ -173,7 +228,10 @@ public:
     ~Control();
     bool IsControl() const override { return true; }
     virtual bool IsContainerControl() const { return false; }
+    virtual bool IsButton() const { return false; }
     virtual bool IsWindow() const { return false; }
+    virtual bool IsMenuBar() const { return false; }
+    virtual bool IsMenuBox() const { return false; }
     virtual ContainerControl* GetContainerControl() const;
     Window* GetWindow() const;
     void AddChildVisual(Control* child);
@@ -191,6 +249,7 @@ public:
     void DockWindow(Rect& parentRect);
     void MoveWindow(int dx, int dy);
     void MoveWindow(const Point& loc, const Size& sz, bool repaint);
+    virtual void PaintAll(PaintEventArgs& args, bool skipMenuBar);
     PaintEvent& Paint() { return paint; }
     ClickEvent& Click() { return click; }
     CreatedEvent& Created() { return created; }
@@ -201,16 +260,30 @@ public:
     EnabledChangedEvent& EnabledChanged() { return enabledChanged; }
     LocationChangedEvent& LocationChanged() { return locationChanged; }
     SizeChangedEvent& SizeChanged() { return sizeChanged; }
+    MouseEnterEvent& MouseEnter() { return mouseEnter; }
+    MouseLeaveEvent& MouseLeave() { return mouseLeave; }
+    MouseDownEvent& MouseDown() { return mouseDown; }
+    MouseUpEvent& MouseUp() { return mouseUp; }
+    MouseMoveEvent& MouseMove() { return mouseMove; }
+    MouseHoverEvent& MouseHover() { return mouseHover; }
+    MouseDoubleClickEvent& MouseDoubleClick() { return mouseDoubleClick; }
     const Color& BackgroundColor() const { return backgroundColor; }
     const Point& Location() const { return location; }
     void SetLocation(const Point& newLocation);
+    void SetLocationInternal(const Point& newLocation);
     const Size& GetSize() const { return size; }
     void SetSize(const Size& newSize);
     void SetSizeInternal(const Size& newSize);
     Anchors GetAnchors() const { return anchors; }
     Dock GetDock() const { return dock; }
+    Point GetCursorPos();
+    Point ScreenToClient(const Point& pt);
+    Point ClientToScreen(const Point& pt);
     HWND Handle() const { return handle; }
+    void BringToFront();
+    Control* TopControl() const;
     const Font& GetFont() const;
+    bool HasFont() const { return !font.IsNull(); }
     void SetFont(Font& font_);
     void SetFont(Font&& font_);
     const FontHandle& GetFontHandle(Graphics& graphics);
@@ -244,10 +317,25 @@ public:
     bool TabStop() const { return GetFlag(ControlFlags::tabStop); }
     void SetTabStop() { SetFlag(ControlFlags::tabStop);  }
     void ResetTabStop() { ResetFlag(ControlFlags::tabStop); }
+    bool MouseInClient() { return GetFlag(ControlFlags::mouseInClient); }
+    void SetMouseInClient() { SetFlag(ControlFlags::mouseInClient); }
+    void ResetMouseInClient() { ResetFlag(ControlFlags::mouseInClient); }
+    bool LButtonPressed() const { return GetFlag(ControlFlags::lbuttonPressed); }
+    void SetLButtonPressed() { SetFlag(ControlFlags::lbuttonPressed); }
+    void ResetLButtonPressed() { ResetFlag(ControlFlags::lbuttonPressed); }
+    bool MouseHoverTimerStarted() const { return GetFlag(ControlFlags::mouseHoverTimerStarted); }
+    void SetMouseHoverTimerStarted() { SetFlag(ControlFlags::mouseHoverTimerStarted); }
+    void ResetMouseHoverTimerStarted() { ResetFlag(ControlFlags::mouseHoverTimerStarted); }
+    void SetTimer(int timerId, int durationMs);
+    void KillTimer(int timerId);
+    int MouseHoverMs() const { return mouseHoverMs; }
+    void SetMouseHoverMs(int mouseHoverMs_) { mouseHoverMs = mouseHoverMs_; }
     bool ProcessMessageInternal(Message& msg) { return ProcessMessage(msg); }
 protected:
     virtual bool IsDecoratorControl() const { return false; }
     virtual void TranslateChildGraphics(Graphics& graphics);
+    virtual void TranslateMousePos(Point& location);
+    virtual void TranslateContentLocation(Point& location);
     virtual bool ProcessMessage(Message& msg);
     virtual void OnPaint(PaintEventArgs& args);
     virtual void OnClick();
@@ -257,17 +345,33 @@ protected:
     virtual void OnChildGotFocus(ControlEventArgs& args);
     virtual void OnLostFocus();
     virtual void OnChildLostFocus(ControlEventArgs& args);
+    virtual void OnTimer(TimerEventArgs& args);
     virtual void OnVisibleChanged();
     virtual void OnEnabledChanged();
     virtual void OnLocationChanged();
     virtual void OnSizeChanged();
+    virtual void OnMouseEnter();
+    virtual void OnMouseLeave();
+    virtual void OnMouseDown(MouseEventArgs& args);
+    virtual void OnMouseUp(MouseEventArgs& args);
+    virtual void OnMouseMove(MouseEventArgs& args);
+    virtual void OnMouseHover(MouseEventArgs& args);
+    virtual void OnMouseDoubleClick(MouseEventArgs& args);
     virtual void SetCaretLocation();
+    virtual void SetCursor();
 private:
     void DoPaint();
+    void DoMouseMove(MouseEventArgs& args);
+    void DoMouseLeave();
     void DoSetFocus();
     void DoGotFocus();
     void DoKillFocus();
     void DoLostFocus();
+    void DoTimer(int timerId);
+    void DoMouseDown(MouseEventArgs& args);
+    void DoMouseUp(MouseEventArgs& args);
+    void DoMouseDoubleClick(MouseEventArgs& args);
+    void DoMouseHover();
     void DoCreateAndShowCaret();
     void DoDestroyCaret();
     void CreateCaret();
@@ -295,12 +399,24 @@ private:
     ChildGotFocusEvent childGotFocus;
     LostFocusEvent lostFocus;
     ChildLostFocusEvent childLostFocus;
+    TimerEvent timer;
     VisibleChangedEvent visibleChanged;
     EnabledChangedEvent enabledChanged;
     LocationChangedEvent locationChanged;
     SizeChangedEvent sizeChanged;
     PaintEvent paint;
+    MouseEnterEvent mouseEnter;
+    MouseLeaveEvent mouseLeave;
+    MouseDownEvent mouseDown;
+    MouseUpEvent mouseUp;
+    MouseMoveEvent mouseMove;
+    MouseHoverEvent mouseHover;
+    MouseDoubleClickEvent mouseDoubleClick;
     std::vector<Control*> createList;
+    Cursor arrowCursor;
+    int mouseHoverMs;
+    Point mouseHoverLocation;
+    Size mouseHoverRectSize;
 };
 
 WING_API HWND LParamHandle(Message& msg);

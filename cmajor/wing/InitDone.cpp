@@ -10,9 +10,9 @@
 
 namespace cmajor { namespace wing {
 
-void Init()
+void Init(HINSTANCE instance)
 {
-    WingInit();
+    WingInit(instance);
     ApplicationInit();
     LoadMetrics();
 }

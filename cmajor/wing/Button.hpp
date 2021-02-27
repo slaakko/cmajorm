@@ -20,6 +20,7 @@ class WING_API Button : public ButtonBase
 {
 public:
     Button(ControlCreateParams& createParams);
+    bool IsButton() const override { return true; }
     bool IsDefault() const { return isDefault; }
     void SetDefault();
     void ResetDefault();

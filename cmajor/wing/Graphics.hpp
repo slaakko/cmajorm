@@ -20,8 +20,13 @@ using FontFamily = Gdiplus::FontFamily;
 using FontStyle = Gdiplus::FontStyle;
 using Unit = Gdiplus::Unit;
 using Graphics = Gdiplus::Graphics;
+using GraphicsState = Gdiplus::GraphicsState;
+using StringFormat = Gdiplus::StringFormat;
+using StringAlignment = Gdiplus::StringAlignment;
+using HotKeyPrefix = Gdiplus::HotkeyPrefix;
 using Bitmap = Gdiplus::Bitmap;
 using Matrix = Gdiplus::Matrix;
+using Region = Gdiplus::Region;
 using Brush = Gdiplus::Brush;
 using SolidBrush = Gdiplus::SolidBrush;
 using Pen = Gdiplus::Pen;
@@ -90,6 +95,7 @@ WING_API inline bool operator!=(const Size& s, const Size& t)
     return !(s == t);
 }
 
+WING_API Point GetMessagePos();
 WING_API Rect ToRect(const RECT& winRect);
 WING_API RECT ToWinRect(const Rect& rect);
 WING_API Size LParamSize(Message& msg);
@@ -97,6 +103,9 @@ WING_API Point LParamLocation(Message& msg);
 WING_API HWND LParamHandle(Message& msg);
 
 WING_API void DrawString(Graphics& graphics, const std::string& text, const Font& font, const PointF& origin, const Brush& brush);
+WING_API void DrawString(Graphics& graphics, const std::string& text, const Font& font, const PointF& origin, const StringFormat& stringFormat, const Brush& brush);
+WING_API void DrawString(Graphics& graphics, const std::string& text, const Font& font, const RectF& rect, const StringFormat& stringFormat, const Brush& brush);
+WING_API RectF MeasureString(Graphics& graphics, const std::string& text, const Font& font, const PointF& origin, const StringFormat& stringFormat);
 
 } } // cmajor::wing
 

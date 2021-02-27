@@ -15,6 +15,7 @@ enum class DialogResult : int
 };
 
 class Button;
+class MenuBar;
 
 struct CancelArgs
 {
@@ -77,9 +78,17 @@ public:
     void SetCancelButton(Button* cancelButton_) { cancelButton = cancelButton_; }
     DialogResult GetDialogResult() const { return dialogResult; }
     void SetDialogResult(DialogResult dialogResult_) { dialogResult = dialogResult_; }
+    void MouseUpNotificationInternal(MouseEventArgs& args) { MouseUpNotification(args); }
+    MenuBar* GetMenuBar() const { return menuBar; }
 protected:
+    virtual void MouseUpNotification(MouseEventArgs& args);
     bool ProcessMessage(Message& msg) override;
     void OnPaint(PaintEventArgs& args) override;
+    void OnControlAdded(ControlEventArgs& args) override;
+    void OnControlRemoved(ControlEventArgs& args) override;
+    void OnMouseDown(MouseEventArgs& args) override;
+    void OnMouseUp(MouseEventArgs& args) override;
+    void OnMouseMove(MouseEventArgs& args) override;
     virtual void OnWindowClosing(CancelArgs& args);
     virtual void OnWindowClosed(bool& processed);
 private:
@@ -89,6 +98,7 @@ private:
     bool mainWindow;
     Button* defaultButton;
     Button* cancelButton;
+    MenuBar* menuBar;
     DialogResult dialogResult;
     WindowClosingEvent windowClosing;
     WindowClosedEvent windowClosed;

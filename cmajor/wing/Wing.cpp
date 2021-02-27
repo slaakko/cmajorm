@@ -18,11 +18,6 @@ HINSTANCE Instance()
     return instance;
 }
 
-void SetInstance(HINSTANCE instance_)
-{
-    instance = instance_;
-}
-
 std::string WindowsErrorMessage(uint64_t errorCode)
 {
     char16_t buf[4096];
@@ -113,8 +108,9 @@ int Run()
 ULONG_PTR gdiplusToken;
 Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 
-void WingInit()
+void WingInit(HINSTANCE instance_)
 {
+    instance = instance_;
     Gdiplus::Status status = Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
     if (status != Gdiplus::Status::Ok)
     {
@@ -136,10 +132,21 @@ Color GetSystemColor(int index)
     return Color(r, g, b);
 }
 
+void ShowMessageBox(HWND handle, const std::string& caption, const std::string& message)
+{
+    std::u16string msg = ToUtf16(message);
+    std::u16string cap = ToUtf16(caption);
+    MessageBoxW(handle, LPCWSTR(msg.c_str()), LPCWSTR(cap.c_str()), MB_OK);
+}
+
+void ShowInfoMessageBox(HWND handle, const std::string& message)
+{
+    ShowMessageBox(handle, "info", message);
+}
+
 void ShowErrorMessageBox(HWND handle, const std::string& message)
 {
-    std::u16string errorMessage = ToUtf16(message);
-    MessageBoxW(handle, LPCWSTR(errorMessage.c_str()), LPCWSTR(u"error"), MB_OK);
+    ShowMessageBox(handle, "error", message);
 }
 
 } } // cmajor::wing

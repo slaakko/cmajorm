@@ -5,6 +5,7 @@
 
 #include <cmajor/wing/Control.hpp>
 #include <cmajor/wing/ContainerControl.hpp>
+#include <cmajor/wing/Menu.hpp>
 #include <cmajor/wing/Window.hpp>
 #include <cmajor/wing/Application.hpp>
 #include <cmajor/wing/Container.hpp>
@@ -94,7 +95,7 @@ ControlCreateParams& ControlCreateParams::SetDock(Dock dock_)
     return *this;
 }
 
-Control::Control(ControlCreateParams& createParams) : 
+Control::Control(ControlCreateParams& createParams) :
     Component(),
     windowClassName(createParams.windowClassName),
     windowClassStyle(createParams.windowClassStyle),
@@ -110,7 +111,11 @@ Control::Control(ControlCreateParams& createParams) :
     font(),
     fontHandle(nullptr),
     flags(ControlFlags::none),
-    caretShowCount(0)
+    caretShowCount(0),
+    arrowCursor(LoadStandardCursor(StandardCursorId::arrow)),
+    mouseHoverMs(0),
+    mouseHoverLocation(),
+    mouseHoverRectSize(DefaultMouseHoverSize())
 {
     if ((windowStyle & WS_DISABLED) != 0)
     {
@@ -415,6 +420,7 @@ void Control::DockWindow(Rect& parentRect)
     {
         SetLocation(newLocation);
         SetSize(newSize);
+        MoveWindow(location, size, true);
     }
 }
 
@@ -458,6 +464,11 @@ void Control::MoveWindow(const Point& loc, const Size& sz, bool repaint)
     }
 }
 
+void Control::PaintAll(PaintEventArgs& args, bool skipMenuBar)
+{
+    OnPaint(args);
+}
+
 void Control::SetLocation(const Point& newLocation)
 {
     if (location != newLocation)
@@ -471,15 +482,24 @@ void Control::SetLocation(const Point& newLocation)
     }
 }
 
+void Control::SetLocationInternal(const Point& newLocation)
+{
+    if (location != newLocation)
+    {
+        location = newLocation;
+        OnLocationChanged();
+    }
+}
+
 void Control::SetSize(const Size& newSize)
 {
     if (size != newSize)
     {
+        SetSizeInternal(newSize);
         if (handle)
         {
             MoveWindow(location, size, true);
         }
-        SetSizeInternal(newSize);
     }
 }
 
@@ -525,7 +545,7 @@ const FontHandle& Control::GetFontHandle(Graphics& graphics)
     {
         return fontHandle;
     }
-    if (!font.IsNull())
+    if (HasFont())
     {
         fontHandle = ToFontHandle(graphics, font);
         return fontHandle;
@@ -575,12 +595,47 @@ void Control::Invalidate(const Rect& rect, bool eraseBackground)
     InvalidateRect(handle, &winRect, eraseBackground);
 }
 
+void Control::SetTimer(int timerId, int durationMs)
+{
+    int retval = ::SetTimer(handle, timerId, durationMs, nullptr);
+    if (!retval)
+    {
+        throw WindowsException(GetLastError());
+    }
+}
+
+void Control::KillTimer(int timerId)
+{
+    if (!::KillTimer(handle, timerId))
+    {
+        throw WindowsException(GetLastError());
+    }
+}
+
 void Control::TranslateChildGraphics(Graphics& graphics)
 {
     Control* parentControl = ParentControl();
     if (parentControl)
     {
         parentControl->TranslateChildGraphics(graphics);
+    }
+}
+
+void Control::TranslateMousePos(Point& location)
+{
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->TranslateMousePos(location);
+    }
+}
+
+void Control::TranslateContentLocation(Point& location)
+{
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->TranslateContentLocation(location);
     }
 }
 
@@ -592,6 +647,54 @@ bool Control::ProcessMessage(Message& msg)
         case WM_PAINT:
         {
             DoPaint();
+            msg.result = 0;
+            return true;
+        }
+        case WM_MOUSEMOVE:
+        {
+            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(msg.wParam), 0);
+            DoMouseMove(args);
+            msg.result = 0;
+            return true;
+        }
+        case WM_MOUSELEAVE:
+        {
+            DoMouseLeave();
+            msg.result = 0;
+            return true;
+        }
+        case WM_LBUTTONDOWN:
+        {
+            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::lbutton), 1);
+            DoMouseDown(args);
+            msg.result = 0;
+            return true;
+        }
+        case WM_LBUTTONUP:
+        {
+            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::lbutton), 1);
+            DoMouseUp(args);
+            msg.result = 0;
+            return true;
+        }
+        case WM_LBUTTONDBLCLK:
+        {
+            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::lbutton), 2);
+            DoMouseDoubleClick(args);
+            msg.result = 0;
+            return true;
+        }
+        case WM_RBUTTONDOWN:
+        {
+            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::rbutton), 1);
+            DoMouseDown(args);
+            msg.result = 0;
+            return true;
+        }
+        case WM_RBUTTONUP:
+        {
+            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::rbutton), 1);
+            DoMouseUp(args);
             msg.result = 0;
             return true;
         }
@@ -607,11 +710,28 @@ bool Control::ProcessMessage(Message& msg)
             msg.result = 0;
             return true;
         }
+        case WM_TIMER:
+        {
+            DoTimer(msg.wParam);
+            msg.result = 0;
+            return true;
+        }
         case WM_SHOWWINDOW:
         {
             if (msg.wParam == 1)
             {
                 OnShown();
+            }
+            msg.result = 0;
+            return true;
+        }
+        case WM_MOVE:
+        {
+            Point newLocation = LParamLocation(msg);
+            Point oldLocation = Location();
+            if (newLocation != oldLocation)
+            {
+                SetLocationInternal(newLocation);
             }
             msg.result = 0;
             return true;
@@ -722,6 +842,53 @@ void Control::DoPaint()
     }
 }
 
+void Control::DoMouseMove(MouseEventArgs& args)
+{
+    try
+    {
+        if (!MouseInClient())
+        {
+            SetMouseInClient();
+            SetCursor();
+            OnMouseEnter();
+            TRACKMOUSEEVENT trackMouseEvent;
+            trackMouseEvent.cbSize = sizeof(TRACKMOUSEEVENT);
+            trackMouseEvent.hwndTrack = handle;
+            trackMouseEvent.dwFlags = TME_LEAVE;
+            trackMouseEvent.dwHoverTime = HOVER_DEFAULT;
+            TrackMouseEvent(&trackMouseEvent);
+        }
+        else
+        {
+            if (!IsDecoratorControl())
+            {
+                TranslateMousePos(args.location);
+            }
+            OnMouseMove(args);
+        }
+        if (mouseHoverMs != 0u && !MouseHoverTimerStarted())
+        {
+            Point pt = args.location;
+            int dx = std::abs(mouseHoverLocation.X - pt.X);
+            int dy = std::abs(mouseHoverLocation.Y - pt.Y);
+            SetMouseHoverTimerStarted();
+            mouseHoverLocation = pt;
+            SetTimer(mouseHoverTimerId, mouseHoverMs);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(handle, ex.what());
+    }
+}
+
+void Control::DoMouseLeave()
+{
+    ResetMouseInClient();
+    ResetLButtonPressed();
+    OnMouseLeave();
+}
+
 void Control::DoSetFocus()
 {
     if (IsWindow())
@@ -764,6 +931,131 @@ void Control::DoLostFocus()
     {
         ControlEventArgs args(this);
         parentControl->OnChildLostFocus(args);
+    }
+}
+
+void Control::DoTimer(int timerId)
+{
+    TimerEventArgs timerEventArgs(timerId);
+    OnTimer(timerEventArgs);
+}
+
+void Control::DoMouseDown(MouseEventArgs& args)
+{
+    if (!IsDecoratorControl())
+    {
+        TranslateMousePos(args.location);
+    }
+    OnMouseDown(args);
+    if ((args.buttons & MouseButtons::lbutton) != MouseButtons::none)
+    {
+        SetLButtonPressed();
+    }
+}
+
+void Control::DoMouseUp(MouseEventArgs& args)
+{
+    if (!IsDecoratorControl())
+    {
+        TranslateMousePos(args.location);
+    }
+    OnMouseUp(args);
+    if ((args.buttons & MouseButtons::lbutton) != MouseButtons::none)
+    {
+        if (LButtonPressed())
+        {
+            ResetLButtonPressed();
+            OnClick();
+        }
+    }
+    Window* mainWindow = Application::MainWindow();
+    if (mainWindow)
+    {
+        mainWindow->MouseUpNotificationInternal(args);
+    }
+}
+
+void Control::DoMouseDoubleClick(MouseEventArgs& args)
+{
+    if (!IsDecoratorControl())
+    {
+        TranslateMousePos(args.location);
+    }
+    OnMouseDoubleClick(args);
+}
+
+void Control::DoMouseHover()
+{
+    ResetMouseHoverTimerStarted();
+    KillTimer(mouseHoverTimerId);
+    Point pt = GetCursorPos();
+    pt = ScreenToClient(pt);
+    if (!IsDecoratorControl())
+    {
+        TranslateMousePos(pt);
+    }
+    int dx = std::abs(mouseHoverLocation.X - pt.X);
+    int dy = std::abs(mouseHoverLocation.Y - pt.Y);
+    if (dx <= mouseHoverRectSize.Width && dy <= mouseHoverRectSize.Height)
+    {
+        MouseEventArgs args(pt, MouseButtons::none, 0);
+        args.location = pt;
+        OnMouseHover(args);
+    }
+}
+
+Point Control::GetCursorPos()
+{
+    POINT pt;
+    bool succeeded = ::GetCursorPos(&pt);
+    if (!succeeded)
+    {
+        throw WindowsException(GetLastError());
+    }
+    return Point(pt.x, pt.y);
+}
+
+Point Control::ScreenToClient(const Point& pt)
+{
+    POINT p;
+    p.x = pt.X;
+    p.y = pt.Y;
+    bool succeeded = ::ScreenToClient(handle, &p);
+    if (!succeeded)
+    {
+        throw WindowsException(GetLastError());
+    }
+    return Point(p.x, p.y);
+}
+
+Point Control::ClientToScreen(const Point& pt)
+{
+    POINT p;
+    p.x = pt.X;
+    p.y = pt.Y;
+    bool succeeded = ::ClientToScreen(handle, &p);
+    if (!succeeded)
+    {
+        throw WindowsException(GetLastError());
+    }
+    return Point(p.x, p.y);
+}
+
+void Control::BringToFront()
+{
+    BringWindowToTop(handle);
+}
+
+Control* Control::TopControl() const
+{
+    HWND topHandle = GetTopWindow(handle);
+    if (topHandle)
+    {
+        return Application::GetWindowManager().GetWindow(topHandle);
+    }
+    else
+    {
+        return nullptr;
     }
 }
 
@@ -839,6 +1131,11 @@ void Control::OnChildLostFocus(ControlEventArgs& args)
     childLostFocus.Fire(args);
 }
 
+void Control::OnTimer(TimerEventArgs& args)
+{
+    timer.Fire(args);
+}
+
 void Control::OnVisibleChanged()
 {
     visibleChanged.Fire();
@@ -859,9 +1156,61 @@ void Control::OnSizeChanged()
     sizeChanged.Fire();
 }
 
+void Control::OnMouseEnter()
+{
+    mouseEnter.Fire();
+}
+
+void Control::OnMouseLeave()
+{
+    mouseLeave.Fire();
+}
+
+void Control::OnMouseDown(MouseEventArgs& args)
+{
+    mouseDown.Fire(args);
+    if (!IsMenuItem() && !IsMenuControl())
+    {
+        Window* window = GetWindow();
+        if (window)
+        {
+            MenuBar* menuBar = window->GetMenuBar();
+            if (menuBar)
+            {
+                menuBar->CloseMenu();
+            }
+        }
+    }
+}
+
+void Control::OnMouseUp(MouseEventArgs& args)
+{
+    mouseUp.Fire(args);
+}
+
+void Control::OnMouseMove(MouseEventArgs& args)
+{
+    mouseMove.Fire(args);
+}
+
+void Control::OnMouseHover(MouseEventArgs& args)
+{
+    mouseHover.Fire(args);
+}
+
+void Control::OnMouseDoubleClick(MouseEventArgs& args)
+{
+    mouseDoubleClick.Fire(args);
+}
+
 void Control::SetCaretLocation()
 {
     SetCaretPos(0, 0);
+}
+
+void Control::SetCursor()
+{
+    cmajor::wing::SetCursor(arrowCursor);
 }
 
 HWND LParamHandle(Message& msg)

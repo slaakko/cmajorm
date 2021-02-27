@@ -8,6 +8,8 @@
 
 namespace cmajor { namespace wing {
 
+Keys Application::keyboardModifiers;
+ResourceManager Application::resourceManager;
 WindowManager Application::windowManager;
 Window* Application::mainWindow = nullptr;
 Window* Application::activeWindow = nullptr;

@@ -122,11 +122,19 @@ FontHandle& FontHandle::operator=(FontHandle&& that) noexcept
     return *this;
 }
 
-WING_API FontHandle ToFontHandle(Graphics& graphics, const Font& font)
+FontHandle ToFontHandle(Graphics& graphics, const Font& font)
 {
     LOGFONTW logFont;
     CheckGraphicsStatus(font.NativeFont()->GetLogFontW(&graphics, &logFont));
     return FontHandle(CreateFontIndirectW(&logFont));
+}
+
+Point GetMessagePos()
+{
+    DWORD pos = ::GetMessagePos();
+    int x = pos & 0xFFFF;
+    int y = (pos >> 16) & 0xFFFF;
+    return Point(x, y);
 }
 
 Rect ToRect(const RECT& winRect)
@@ -164,6 +172,26 @@ void DrawString(Graphics& graphics, const std::string& text, const Font& font, c
 {
     std::u16string txt = ToUtf16(text);
     CheckGraphicsStatus(graphics.DrawString((const WCHAR*)txt.c_str(), txt.length(), font.NativeFont(), origin, &brush));
+}
+
+void DrawString(Graphics& graphics, const std::string& text, const Font& font, const PointF& origin, const StringFormat& stringFormat, const Brush& brush)
+{
+    std::u16string txt = ToUtf16(text);
+    CheckGraphicsStatus(graphics.DrawString((const WCHAR*)txt.c_str(), txt.length(), font.NativeFont(), origin, &stringFormat, &brush));
+}
+
+void DrawString(Graphics& graphics, const std::string& text, const Font& font, const RectF& rect, const StringFormat& stringFormat, const Brush& brush)
+{
+    std::u16string txt = ToUtf16(text);
+    CheckGraphicsStatus(graphics.DrawString((const WCHAR*)txt.c_str(), txt.length(), font.NativeFont(), rect, &stringFormat, &brush));
+}
+
+RectF MeasureString(Graphics& graphics, const std::string& text, const Font& font, const PointF& origin, const StringFormat& stringFormat)
+{
+    std::u16string txt = ToUtf16(text);
+    RectF boundingBox;
+    CheckGraphicsStatus(graphics.MeasureString((const WCHAR*)txt.c_str(), txt.length(), font.NativeFont(), origin, &stringFormat, &boundingBox));
+    return boundingBox;
 }
 
 } } // cmajor::wing

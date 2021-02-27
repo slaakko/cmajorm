@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/wing/ContainerControl.hpp>
+#include <cmajor/wing/Menu.hpp>
 
 namespace cmajor { namespace wing {
 
@@ -14,6 +15,58 @@ ContainerControl::ContainerControl(ControlCreateParams& createParams) : Control(
 ContainerControl* ContainerControl::GetContainerControl() const
 {
     return const_cast<ContainerControl*>(this);
+}
+
+void ContainerControl::PaintAll(PaintEventArgs& args, bool skipMenuBar)
+{
+    Control::PaintAll(args, skipMenuBar);
+    Control* topControl = TopControl();
+    Component* child = children.FirstChild();
+    while (child)
+    {
+        if (child->IsControl())
+        {
+            Control* childControl = static_cast<Control*>(child);
+            if (childControl != topControl)
+            {
+                bool skip = false;
+                if (skipMenuBar)
+                {
+                    if (childControl->IsMenuBar())
+                    {
+                        skip = true;
+                    }
+                    else if (childControl->IsMenuBox())
+                    {
+                        MenuBox* menuBox = static_cast<MenuBox*>(childControl); 
+                        if (!menuBox->PaintThisMenuBox())
+                        {
+                            skip = true;
+                        }
+                    }
+                }
+                if (!skip)
+                {
+                    GraphicsState state = args.graphics.Save();
+                    Point loc = childControl->Location();
+                    CheckGraphicsStatus(args.graphics.SetClip(Rect(loc, childControl->GetSize())));
+                    CheckGraphicsStatus(args.graphics.TranslateTransform(loc.X, loc.Y));
+                    childControl->PaintAll(args, skipMenuBar);
+                    CheckGraphicsStatus(args.graphics.Restore(state));
+                }
+            }
+        }
+        child = child->NextSibling();
+    }
+    if (topControl)
+    {
+        GraphicsState state = args.graphics.Save();
+        Point loc = topControl->Location();
+        CheckGraphicsStatus(args.graphics.SetClip(Rect(loc, topControl->GetSize())));
+        CheckGraphicsStatus(args.graphics.TranslateTransform(loc.X, loc.Y));
+        topControl->PaintAll(args, skipMenuBar);
+        CheckGraphicsStatus(args.graphics.Restore(state));
+    }
 }
 
 void ContainerControl::AddChild(Control* child)
