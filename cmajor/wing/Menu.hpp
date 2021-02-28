@@ -12,6 +12,7 @@
 namespace cmajor { namespace wing {
 
 class MenuItem;
+class MenuItemBase;
 class MenuBox;
 
 WING_API Color DefaultMenuTextColor();
@@ -159,7 +160,6 @@ public:
     bool PaintThisMenuBox() const { return paintThisMenuBox; }
     MenuItem* RootItem() const { return rootItem; }
 protected:
-    virtual Point GetBoxLocation() const { return Point(); }
     void OnPaint(PaintEventArgs& args) override;
     void OnMouseEnter() override;
     void OnMouseLeave() override;
@@ -171,6 +171,32 @@ private:
     MenuItem* rootItem;
     bool paintThisMenuBox;
     bool paintMenu;
+};
+
+class WING_API ContextMenu : public MenuBox
+{
+public:
+    ContextMenu();
+    void AddMenuItem(MenuItemBase* menuItem);
+    void CalculateSize();
+    bool HasMenuItems() const;
+    void SetMenuInvalidated() override;
+    bool IsOpen() const override;
+    MenuItem* OpenedMenuItem() const override;
+    MenuItem* SelectedMenuItem() const override { return selectedMenuItem; }
+    void SetSelectedMenuItem(MenuItem* selectedMenuItem_) override;
+    MenuItem* LatestOpenedMenuItem() const override { return latestOpenedMenuItem; }
+    void SetLatestOpenedMenuItem(MenuItem* menuItem) override;
+    MenuItem* LatestMouseDownMenuItem() const override { return latestMouseDownMenuItem; }
+    void SetLatestMouseDownMenuItem(MenuItem* menuItem) override;
+protected:
+    void OnPaint(PaintEventArgs& args) override;
+    void OnVisibleChanged() override;
+private:
+    std::unique_ptr<MenuItem> rootItemPtr;
+    MenuItem* latestOpenedMenuItem;
+    MenuItem* selectedMenuItem;
+    MenuItem* latestMouseDownMenuItem;
 };
 
 class WING_API MenuItemBase : public Component

@@ -75,7 +75,7 @@ MenuBar::MenuBar() : MenuControl(ControlCreateParams().WindowClassName("wing.Men
     BackgroundColor(DefaultMenuBackgroundColor()).SetDock(Dock::top).SetSize(Size(0, 20))), flags(MenuFlags::none), children(this), latestOpenedMenuItem(nullptr), selectedMenuItem(nullptr), 
     latestMouseDownMenuItem(nullptr), menuBox(nullptr)
 {
-    // SetDoubleBuffered();
+    SetDoubleBuffered();
     SetMenuChanged();
 }
 
@@ -516,6 +516,7 @@ void MenuBar::LocateMenuItems(Graphics& graphics, const Size& size)
             itemRect.GetSize(&sz);
             menuItem->SetSize(sz);
             menuItem->CalculateRects(graphics, GetFont(), GetStringFormat(), Point(itemRect.X, itemRect.Y + itemRect.Height));
+            itemRect.X = itemRect.X + w;
         }
         child = child->NextSibling();
     }
@@ -665,6 +666,78 @@ void MenuBox::OnMouseMove(MouseEventArgs& args)
     {
         bool handled = false;
         rootItem->DispatchMouseMove(args, handled);
+    }
+}
+
+ContextMenu::ContextMenu() : MenuBox(nullptr, new MenuItem("root")), rootItemPtr(RootItem()), latestOpenedMenuItem(nullptr), selectedMenuItem(nullptr), latestMouseDownMenuItem(nullptr)
+{
+}
+
+void ContextMenu::AddMenuItem(MenuItemBase* menuItem)
+{
+    rootItemPtr->AddMenuItem(menuItem);
+}
+
+void ContextMenu::CalculateSize()
+{
+    rootItemPtr->SetState(MenuItemState::open);
+    Graphics graphics(Handle());
+    rootItemPtr->CalculateRects(graphics, GetFont(), GetStringFormat(), Point(0, 0));
+    Rect menuRect;
+    rootItemPtr->GetOpenRect(menuRect);
+    Size sz;
+    menuRect.GetSize(&sz);
+    SetSize(sz);
+}
+
+bool ContextMenu::HasMenuItems() const
+{
+    return !rootItemPtr->Children().IsEmpty();
+}
+
+void ContextMenu::SetMenuInvalidated()
+{
+    Invalidate();
+}
+
+bool ContextMenu::IsOpen() const
+{
+    return rootItemPtr->State() == MenuItemState::open;
+}
+
+MenuItem* ContextMenu::OpenedMenuItem() const
+{
+    return rootItemPtr.get();
+}
+
+void ContextMenu::SetSelectedMenuItem(MenuItem* selectedMenuItem_)
+{
+    selectedMenuItem = selectedMenuItem_;
+}
+
+void ContextMenu::SetLatestOpenedMenuItem(MenuItem* menuItem) 
+{
+    latestOpenedMenuItem = menuItem;
+}
+
+void ContextMenu::SetLatestMouseDownMenuItem(MenuItem* menuItem)
+{
+    latestMouseDownMenuItem = menuItem;
+}
+
+void ContextMenu::OnPaint(PaintEventArgs& args)
+{
+    SetPaintThisMenuBox();
+    MenuBox::OnPaint(args);
+}
+
+void ContextMenu::OnVisibleChanged()
+{
+    MenuBox::OnVisibleChanged();
+    if (!IsVisible())
+    {
+        rootItemPtr->SetState(MenuItemState::closed);
+        ResetPaintThisMenuBox();
     }
 }
 
@@ -1489,7 +1562,7 @@ void MenuItem::DrawOpen(Graphics& graphics, bool drawSubitems, const Point& orig
             CheckGraphicsStatus(graphics.DrawLine(&menuControl->BlackPen(), loc, Point(loc.X + r.Width, loc.Y)));
             CheckGraphicsStatus(graphics.DrawLine(&menuControl->BlackPen(), loc, Point(loc.X, loc.Y + r.Height)));
             CheckGraphicsStatus(graphics.DrawLine(&menuControl->BlackPen(), Point(loc.X + r.Width, loc.Y), Point(loc.X + r.Width, loc.Y + r.Height)));
-            if (!children.IsEmpty())
+            if (children.IsEmpty())
             {
                 CheckGraphicsStatus(graphics.DrawLine(&menuControl->BlackPen(), Point(loc.X, loc.Y + r.Height), Point(loc.X + r.Width, loc.Y + r.Height)));
             }

@@ -299,8 +299,9 @@ public:
     bool Hidden() const { return GetFlag(ControlFlags::hidden); }
     void SetHidden() { SetFlag(ControlFlags::hidden); }
     void ResetHidden() { ResetFlag(ControlFlags::hidden); }
+    bool IsVisible() const { return !Hidden(); }
     bool IsDoubleBuffered() const { return GetFlag(ControlFlags::doubleBuffered); }
-    void SetDoubleBufferered() { SetFlag(ControlFlags::doubleBuffered); }
+    void SetDoubleBuffered() { SetFlag(ControlFlags::doubleBuffered); }
     void ResetDoubleBuffered() { ResetFlag(ControlFlags::doubleBuffered); }
     bool Focused() const { return GetFlag(ControlFlags::focused); }
     void SetFocused() { SetFlag(ControlFlags::focused); }
