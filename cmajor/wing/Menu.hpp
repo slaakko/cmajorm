@@ -54,6 +54,7 @@ public:
     virtual void SetLatestOpenedMenuItem(MenuItem* menuItem) {}
     virtual MenuItem* LatestMouseDownMenuItem() const { return nullptr; }
     virtual void SetLatestMouseDownMenuItem(MenuItem* menuItem) {}
+    virtual MenuItem* GetMenuItemByAccessKey(char16_t accessKey) const { return nullptr; }
 private:
     Color textColor;
     Color disabledTextColor;
@@ -130,12 +131,16 @@ public:
     void MouseEnterInternal();
     void MouseLeaveInternal();
     void DrawMenuItems(PaintEventArgs& args, bool drawSubitems, const Point& origin);
+    bool HandleAccessKey(char16_t accessKey, Keys keyCode, bool& menuWantsKeys);
+    void DoKeyDown(KeyEventArgs& args);
+    MenuItem* GetMenuItemByAccessKey(char16_t accessKey) const override;
 protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnMouseDown(MouseEventArgs& args) override;
     void OnMouseUp(MouseEventArgs& args) override;
     void OnMouseMove(MouseEventArgs& args) override;
     void OnMouseLeave() override;
+    void OnKeyDown(KeyEventArgs& args) override;
 private:
     void AddMenuBox();
     void LocateMenuItems(Graphics& graphics, const Size& size);
@@ -307,6 +312,8 @@ public:
     void CollectShortcuts(std::unordered_map<int, MenuItem*>& shortcuts);
     void Draw(Graphics& graphics, bool drawSubitems, const Point& origin) override;
     void GetOpenRect(Rect& openRect);
+    bool HandleKey(Keys keyCode, bool& menuWantsKeys, MenuItem* parentMenuItem);
+    void Execute(MenuItem* parentMenuItem, bool& menuWantsKeys);
 protected:
     virtual void OnClick();
     virtual void OnMouseDown(MouseEventArgs& args);

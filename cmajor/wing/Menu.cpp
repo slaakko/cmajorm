@@ -469,6 +469,25 @@ void MenuBar::OnMouseLeave()
     }
 }
 
+void MenuBar::OnKeyDown(KeyEventArgs& args)
+{
+    MenuControl::OnKeyDown(args);
+    if (!args.handled)
+    {
+        auto it = shortcuts.find(int(args.keyData));
+        if (it != shortcuts.cend())
+        {
+            MenuItem* menuItem = it->second;
+            if (menuItem->IsEnabled())
+            {
+                CloseMenu();
+                menuItem->DoClick();
+                args.handled = true;
+            }
+        }
+    }
+}
+
 void MenuBar::DrawMenuItems(PaintEventArgs& args, bool drawSubitems, const Point& origin)
 {
     Component* child = children.FirstChild();
@@ -481,6 +500,99 @@ void MenuBar::DrawMenuItems(PaintEventArgs& args, bool drawSubitems, const Point
         }
         child = child->NextSibling();
     }
+}
+
+bool MenuBar::HandleAccessKey(char16_t accessKey, Keys keyCode, bool& menuWantsKeys)
+{
+    ResetMenuInvalidated();
+    if (accessKey == char16_t() && keyCode == Keys::none)
+    {
+        if (!selectedMenuItem)
+        {
+            MenuItem* firstMenuItem = GetFirstMenuItem();
+            if (firstMenuItem)
+            {
+                SetOpen();
+                SetSelectedMenuItem(firstMenuItem);
+                menuWantsKeys = true;
+                InvalidateMenu();
+                return true;
+            }
+        }
+        else
+        {
+            SetClosed();
+            MenuItem* openedMenuItem = OpenedMenuItem();
+            if (openedMenuItem)
+            {
+                openedMenuItem->SetState(MenuItemState::closed);
+            }
+            selectedMenuItem->ResetSelected();
+            SetSelectedMenuItem(nullptr);
+            menuWantsKeys = false;
+            InvalidateMenu();
+            return true;
+        }
+    }
+    else if (accessKey != char16_t() && keyCode == Keys::none)
+    {
+        MenuItem* menuItem = GetMenuItemByAccessKey(accessKey);
+        if (menuItem)
+        {
+            MenuItem* firstChild = menuItem->GetFirstMenuItem();
+            if (firstChild)
+            {
+                if (selectedMenuItem)
+                {
+                    MenuItem* openedMenuItem = OpenedMenuItem();
+                    if (openedMenuItem)
+                    {
+                        openedMenuItem->SetState(MenuItemState::closed);
+                    }
+                }
+                SetOpen();
+                menuItem->SetState(MenuItemState::open);
+                SetSelectedMenuItem(firstChild);
+                menuWantsKeys = true;
+                InvalidateMenu();
+                return true;
+            }
+        }
+    }
+    else if (accessKey == char16_t() && keyCode != Keys::none)
+    {
+        if (selectedMenuItem)
+        {
+            MenuItem* parentMenuItem = selectedMenuItem->ParentMenuItem();
+            bool handled = selectedMenuItem->HandleKey(keyCode, menuWantsKeys, parentMenuItem);
+            if (MenuInvalidated())
+            {
+                InvalidateMenu();
+            }
+            return handled;
+        }
+    }
+    menuWantsKeys = false;
+    return false;
+}
+
+void MenuBar::DoKeyDown(KeyEventArgs& args)
+{
+    OnKeyDown(args);
+}
+
+MenuItem* MenuBar::GetMenuItemByAccessKey(char16_t accessKey) const
+{
+    MenuItem* menuItem = GetFirstMenuItem();
+    while (menuItem)
+    {
+        if (menuItem->AccessKey() == accessKey)
+        {
+            return menuItem;
+        }
+        menuItem = menuItem->GetNextMenuItem();
+    }
+    return nullptr;
 }
 
 void MenuBar::AddMenuBox()
@@ -1385,6 +1497,339 @@ void MenuItem::GetOpenRect(Rect& openRect)
             }
         }
         child = child->NextSibling();
+    }
+}
+
+bool MenuItem::HandleKey(Keys keyCode, bool& menuWantsKeys, MenuItem* parentMenuItem)
+{
+    MenuControl* menuControl = GetMenuControl();
+    if (keyCode >= Keys::a && keyCode <= Keys::z || keyCode >= Keys::d0 && keyCode <= Keys::d9)
+    {
+        char16_t accessKey = static_cast<char16_t>(keyCode);
+        MenuItem* childItem = nullptr;
+        if (parentMenuItem)
+        {
+            childItem = parentMenuItem->GetChildItemByAccessKey(accessKey);
+        }
+        else
+        {
+            if (menuControl)
+            {
+                childItem = menuControl->GetMenuItemByAccessKey(accessKey);
+            }
+        }
+        if (childItem && childItem->IsEnabled())
+        {
+            childItem->Execute(parentMenuItem, menuWantsKeys);
+            return true;
+        }
+        else
+        {
+            menuWantsKeys = true;
+            return false;
+        }
+    }
+    else
+    {
+        switch (keyCode)
+        {
+            case Keys::enter:
+            {
+                if (IsEnabled())
+                {
+                    Execute(parentMenuItem, menuWantsKeys);
+                    return true;
+                }
+                else
+                {
+                    menuWantsKeys = true;
+                    return false;
+                }
+            }
+            case Keys::escape:
+            {
+                MenuItem* openedMenuItem = menuControl->OpenedMenuItem();
+                if (openedMenuItem)
+                {
+                    openedMenuItem->SetState(MenuItemState::closed);
+                }
+                menuWantsKeys = false;
+                menuControl->SetSelectedMenuItem(nullptr);
+                menuControl->SetClosed();
+                menuControl->SetMenuInvalidated();
+                return true;
+            }
+            case Keys::home:
+            {
+                if (Level() == 0)
+                {
+                    MenuItem* firstMenuItem = menuControl->GetFirstMenuItem();
+                    if (firstMenuItem)
+                    {
+                        menuControl->SetSelectedMenuItem(firstMenuItem);
+                        menuWantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                        return true;
+                    }
+                }
+                else
+                {
+                    MenuItem* parentMenuItem = ParentMenuItem();
+                    if (parentMenuItem)
+                    {
+                        MenuItem* firstMenuItem = parentMenuItem->GetFirstMenuItem();
+                        if (firstMenuItem)
+                        {
+                            menuControl->SetSelectedMenuItem(firstMenuItem);
+                            menuWantsKeys = true;
+                            menuControl->SetMenuInvalidated();
+                            return true;
+                        }
+                    }
+                }
+                break;
+            }
+            case Keys::end:
+            {
+                if (Level() == 0)
+                {
+                    MenuItem* lastMenuItem = menuControl->GetLastMenuItem();
+                    if (lastMenuItem)
+                    {
+                        menuControl->SetSelectedMenuItem(lastMenuItem);
+                        menuWantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                        return true;
+                    }
+                }
+                else
+                {
+                    MenuItem* parentMenuItem = ParentMenuItem();
+                    if (parentMenuItem)
+                    {
+                        MenuItem* lastMenuItem = parentMenuItem->GetLastMenuItem();
+                        if (lastMenuItem)
+                        {
+                            menuControl->SetSelectedMenuItem(lastMenuItem);
+                            menuWantsKeys = true;
+                            menuControl->SetMenuInvalidated();
+                            return true;
+                        }
+                    }
+                }
+                break;
+            }
+            case Keys::down:
+            {
+                if (Level() == 0)
+                {
+                    SetState(MenuItemState::open);
+                    MenuItem* firstChild = GetFirstMenuItem();
+                    if (firstChild)
+                    {
+                        menuControl->SetSelectedMenuItem(firstChild);
+                        menuWantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                        return true;
+                    }
+                }
+                else
+                {
+                    MenuItem* nextMenuItem = GetNextMenuItem();
+                    if (nextMenuItem)
+                    {
+                        menuControl->SetSelectedMenuItem(nextMenuItem);
+                        menuWantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                        return true;
+                    }
+                }
+                break;
+            }
+            case Keys::up:
+            {
+                if (Level() == 0)
+                {
+                    SetState(MenuItemState::open);
+                    MenuItem* lastChild = GetLastMenuItem();
+                    if (lastChild)
+                    {
+                        menuControl->SetSelectedMenuItem(lastChild);
+                        menuWantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                        return true;
+                    }
+                }
+                else
+                {
+                    MenuItem* prevMenuItem = GetPrevMenuItem();
+                    if (prevMenuItem)
+                    {
+                        menuControl->SetSelectedMenuItem(prevMenuItem);
+                        menuWantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                        return true;
+                    }
+                }
+                break;
+            }
+            case Keys::right:
+            {
+                if (Level() == 0)
+                {
+                    MenuItem* nextMenuItem = GetNextMenuItem();
+                    if (nextMenuItem)
+                    {
+                        menuControl->SetSelectedMenuItem(nextMenuItem);
+                        menuWantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                        return true;
+                    }
+                }
+                else
+                {
+                    MenuItem* firstChild = GetFirstMenuItem();
+                    if (firstChild)
+                    {
+                        SetState(MenuItemState::open);
+                        menuControl->SetSelectedMenuItem(firstChild);
+                        menuWantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                        return true;
+                    }
+                    else
+                    {
+                        while (parentMenuItem)
+                        {
+                            if (parentMenuItem->Level() == 0)
+                            {
+                                MenuItem* nextMenuItem = parentMenuItem->GetNextMenuItem();
+                                if (nextMenuItem)
+                                {
+                                    parentMenuItem->SetState(MenuItemState::closed);
+                                    nextMenuItem->SetState(MenuItemState::open);
+                                    MenuItem* firstChild = nextMenuItem->GetFirstMenuItem();
+                                    if (firstChild)
+                                    {
+                                        menuControl->SetSelectedMenuItem(firstChild);
+                                        menuWantsKeys = true;
+                                        menuControl->SetMenuInvalidated();
+                                        return true;
+                                    }
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                MenuItem* grandParentMenuItem = parentMenuItem->ParentMenuItem();
+                                MenuItem* nextMenuItem = grandParentMenuItem->GetNextMenuItem();
+                                if (nextMenuItem)
+                                {
+                                    parentMenuItem->SetState(MenuItemState::closed);
+                                    grandParentMenuItem->SetState(MenuItemState::closed);
+                                    nextMenuItem->SetState(MenuItemState::open);
+                                    MenuItem* firstChild = nextMenuItem->GetFirstMenuItem();
+                                    if (firstChild)
+                                    {
+                                        menuControl->SetSelectedMenuItem(firstChild);
+                                        menuWantsKeys = true;
+                                        menuControl->SetMenuInvalidated();
+                                        return true;
+                                    }
+                                }
+                                else
+                                {
+                                    parentMenuItem = grandParentMenuItem;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case Keys::left:
+            {
+                if (Level() == 0)
+                {
+                    MenuItem* prevMenuItem = GetPrevMenuItem();
+                    if (prevMenuItem)
+                    {
+                        menuControl->SetSelectedMenuItem(prevMenuItem);
+                        menuWantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (parentMenuItem)
+                    {
+                        MenuItem* prevMenuItem = parentMenuItem->GetPrevMenuItem();
+                        if (prevMenuItem)
+                        {
+                            parentMenuItem->SetState(MenuItemState::closed);
+                            prevMenuItem->SetState(MenuItemState::open);
+                            MenuItem* firstChild = prevMenuItem->GetFirstMenuItem();
+                            if (firstChild)
+                            {
+                                menuControl->SetSelectedMenuItem(firstChild);
+                                menuWantsKeys = true;
+                                menuControl->SetMenuInvalidated();
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            MenuItem* grandParentMenuItem = parentMenuItem->ParentMenuItem();
+                            if (grandParentMenuItem)
+                            {
+                                grandParentMenuItem->SetState(MenuItemState::open);
+                                MenuItem* firstMenuItem = grandParentMenuItem->GetFirstMenuItem();
+                                if (firstMenuItem)
+                                {
+                                    firstMenuItem->SetState(MenuItemState::closed);
+                                    menuControl->SetSelectedMenuItem(firstMenuItem);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
+    menuWantsKeys = true;
+    return false;
+}
+
+void MenuItem::Execute(MenuItem* parentMenuItem, bool& menuWantsKeys)
+{
+    if (children.IsEmpty())
+    {
+        if (IsEnabled())
+        {
+            Close();
+            menuWantsKeys = false;
+            DoClick();
+        }
+    }
+    else
+    {
+        if (IsEnabled())
+        {
+            SetState(MenuItemState::open);
+            MenuItem* firstChild = GetFirstMenuItem();
+            if (firstChild)
+            {
+                MenuControl* menuControl = GetMenuControl();
+                menuControl->SetSelectedMenuItem(firstChild);
+                menuWantsKeys = true;
+                menuControl->SetMenuInvalidated();
+            }
+        }
     }
 }
 

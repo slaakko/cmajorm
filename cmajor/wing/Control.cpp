@@ -779,7 +779,47 @@ bool Control::ProcessMessage(Message& msg)
             }
             break;
         }
-
+        case WM_SYSCOMMAND:
+        {
+            if (DoSysCommand(msg.wParam, msg.lParam))
+            {
+                msg.result = 0;
+                return true;
+            }
+            break;
+        }
+        case WM_KEYDOWN:
+        {
+            int virtualKeyCode = static_cast<int>(msg.wParam);
+            if (DoKeyDown(virtualKeyCode))
+            {
+                msg.result = 0;
+                return true;
+            }
+            break;
+        }
+        case WM_KEYUP:
+        {
+            int virtualKeyCode = static_cast<int>(msg.wParam);
+            if (DoKeyUp(virtualKeyCode))
+            {
+                msg.result = 0;
+                return true;
+            }
+            break;
+        }
+        case WM_CHAR:
+        {
+            char16_t ch = static_cast<char16_t>(msg.wParam);
+            KeyPressEventArgs args(ch);
+            DoKeyPress(args);
+            if (args.handled)
+            {
+                msg.result = 0;
+                return true;
+            }
+            break;
+        }
     }
     return false;
 }
@@ -1091,6 +1131,254 @@ void Control::DestroyCaret()
     caretShowCount = 0;
 }
 
+bool Control::DoSysCommand(WPARAM wParam, LPARAM lParam)
+{
+    switch (wParam)
+    {
+        case SC_KEYMENU:
+        {
+            char16_t accessKey = static_cast<char16_t>(ToUpper(static_cast<char32_t>(static_cast<char16_t>(lParam))));
+            if (DoMenu(accessKey, Keys::none))
+            {
+                return true;
+            }
+            else
+            {
+                Keys modifiers = Application::GetKeyboardModifiers();
+                modifiers = modifiers | Keys::altModifier;
+                Application::SetKeyboardModifiers(modifiers);
+                if (DoKeyDown(static_cast<int>(accessKey)))
+                {
+                    Keys modifiers = Application::GetKeyboardModifiers();
+                    modifiers = modifiers & ~Keys::altModifier;
+                    Application::SetKeyboardModifiers(modifiers);
+                    return true;
+                }
+                else
+                {
+                    Keys modifiers = Application::GetKeyboardModifiers();
+                    modifiers = modifiers & ~Keys::altModifier;
+                    Application::SetKeyboardModifiers(modifiers);
+                }
+            }
+            break;
+        }
+        case SC_CLOSE:
+        {
+            KeyEventArgs args(Keys::f4, Keys::altModifier);
+            DoMenu(args);
+            if (args.handled)
+            {
+                return true;
+            }
+            break;
+        }
+    }
+    return false;
+}
+
+bool Control::DoMenu(char16_t accessKey, Keys keyCode)
+{
+    ResetKeyDownHandled();
+    Window* window = GetWindow();
+    if (window)
+    {
+        MenuBar* menuBar = window->GetMenuBar();
+        if (menuBar)
+        {
+            bool menuWantsKeys = false;
+            bool handled = menuBar->HandleAccessKey(accessKey, keyCode, menuWantsKeys);
+            if (handled)
+            {
+                SetKeyDownHandled();
+            }
+            if (menuWantsKeys)
+            {
+                SetMenuWantsKeys();
+            }
+            else
+            {
+                ResetMenuWantsKeys();
+            }
+            return handled;
+        }
+    }
+    return false;
+}
+
+void Control::DoMenu(KeyEventArgs& args)
+{
+    Window* window = GetWindow();
+    if (window)
+    {
+        MenuBar* menuBar = window->GetMenuBar();
+        if (menuBar)
+        {
+            menuBar->DoKeyDown(args);
+        }
+    }
+}
+
+bool Control::DoKeyDown(int virtualKeyCode)
+{
+    ResetKeyDownHandled();
+    Keys keyCode = static_cast<Keys>(virtualKeyCode);
+    if (MenuWantsKeys())
+    {
+        if (DoMenu(char16_t(), keyCode))
+        {
+            SetKeyDownHandled();
+            return true;
+        }
+    }
+    switch (keyCode)
+    {
+        case Keys::controlKey:
+        {
+            Keys modifiers = Application::GetKeyboardModifiers();
+            modifiers = modifiers | Keys::controlModifier;
+            Application::SetKeyboardModifiers(modifiers);
+            break;
+        }
+        case Keys::shiftKey:
+        {
+            Keys modifiers = Application::GetKeyboardModifiers();
+            modifiers = modifiers | Keys::shiftModifier;
+            Application::SetKeyboardModifiers(modifiers);
+            break;
+        }
+        case Keys::menu:
+        {
+            Keys modifiers = Application::GetKeyboardModifiers();
+            modifiers = modifiers | Keys::altModifier;
+            Application::SetKeyboardModifiers(modifiers);
+            break;
+        }
+    }
+    KeyEventArgs args(keyCode, Application::GetKeyboardModifiers());
+    DoMenu(args);
+    if (args.handled)
+    {
+        SetKeyDownHandled();
+        return true;
+    }
+    DispatchKeyDown(args);
+    if (args.handled)
+    {
+        SetKeyDownHandled();
+        return true;
+    }
+    return false;
+}
+
+bool Control::DoKeyUp(int virtualKeyCode)
+{
+    Keys keyCode = static_cast<Keys>(virtualKeyCode);
+    switch (keyCode)
+    {
+        case Keys::controlKey:
+        {
+            Keys modifiers = Application::GetKeyboardModifiers();
+            modifiers = modifiers & ~Keys::controlModifier;
+            Application::SetKeyboardModifiers(modifiers);
+            break;
+        }
+        case Keys::shiftKey:
+        {
+            Keys modifiers = Application::GetKeyboardModifiers();
+            modifiers = modifiers & ~Keys::shiftModifier;
+            Application::SetKeyboardModifiers(modifiers);
+            break;
+        }
+        case Keys::menu:
+        {
+            Keys modifiers = Application::GetKeyboardModifiers();
+            modifiers = modifiers & ~Keys::altModifier;
+            Application::SetKeyboardModifiers(modifiers);
+            break;
+        }
+    }
+    if (KeyDownHandled() || MenuWantsKeys())
+    {
+        return KeyDownHandled();
+    }
+    Keys modifiers = Keys::none;
+    switch (keyCode)
+    {
+        case Keys::controlKey:
+        {
+            modifiers = modifiers | Keys::controlModifier;
+            break;
+        }
+        case Keys::shiftKey:
+        {
+            modifiers = modifiers | Keys::shiftModifier;
+            break;
+        }
+        case Keys::menu:
+        {
+            modifiers = modifiers | Keys::altModifier;
+            break;
+        }
+    }
+    KeyEventArgs args(keyCode, modifiers);
+    DispatchKeyUp(args);
+    if (args.handled)
+    {
+        return true;
+    }
+    return false;
+}
+
+void Control::DoKeyPress(KeyPressEventArgs& args)
+{
+    if (KeyDownHandled() || MenuWantsKeys())
+    {
+        args.handled = KeyDownHandled();
+        return;
+    }
+    DispatchKeyPress(args);
+}
+
+void Control::DispatchKeyDown(KeyEventArgs& args)
+{
+    OnKeyDown(args);
+    if (!args.handled)
+    {
+        Control* parent = ParentControl();
+        if (parent)
+        {
+            parent->DispatchKeyDown(args);
+        }
+    }
+}
+
+void Control::DispatchKeyUp(KeyEventArgs& args)
+{
+    OnKeyUp(args);
+    if (!args.handled)
+    {
+        Control* parent = ParentControl();
+        if (parent)
+        {
+            parent->DispatchKeyUp(args);
+        }
+    }
+}
+
+void Control::DispatchKeyPress(KeyPressEventArgs& args)
+{
+    OnKeyPress(args);
+    if (!args.handled)
+    {
+        Control* parent = ParentControl();
+        if (parent)
+        {
+            parent->DispatchKeyPress(args);
+        }
+    }
+}
+
 void Control::OnPaint(PaintEventArgs& args)
 {
     paint.Fire(args);
@@ -1201,6 +1489,21 @@ void Control::OnMouseHover(MouseEventArgs& args)
 void Control::OnMouseDoubleClick(MouseEventArgs& args)
 {
     mouseDoubleClick.Fire(args);
+}
+
+void Control::OnKeyDown(KeyEventArgs& args)
+{
+    keyDown.Fire(args);
+}
+
+void Control::OnKeyUp(KeyEventArgs& args)
+{
+    keyUp.Fire(args);
+}
+
+void Control::OnKeyPress(KeyPressEventArgs& args)
+{
+    keyPress.Fire(args);
 }
 
 void Control::SetCaretLocation()

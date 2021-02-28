@@ -9,6 +9,7 @@
 #include <cmajor/wing/Cursor.hpp>
 #include <cmajor/wing/Event.hpp>
 #include <cmajor/wing/Graphics.hpp>
+#include <cmajor/wing/Keys.hpp>
 #include <cmajor/wing/Wing.hpp>
 #include <memory>
 #include <string>
@@ -163,6 +164,28 @@ struct TimerEventArgs
 
 using TimerEvent = EventWithArgs<TimerEventArgs>;
 
+struct KeyEventArgs
+{
+    KeyEventArgs(Keys keyCode_, Keys modifiers_) : keyCode(keyCode_), modifiers(modifiers_), keyData(keyCode | modifiers), handled(false), suppressKeyPress(false) {}
+    Keys keyCode;
+    Keys modifiers;
+    Keys keyData;
+    bool handled;
+    bool suppressKeyPress;
+};
+
+using KeyDownEvent = EventWithArgs<KeyEventArgs>;
+using KeyUpEvent = EventWithArgs<KeyEventArgs>;
+
+struct KeyPressEventArgs
+{
+    KeyPressEventArgs(char16_t keyChar_) : keyChar(keyChar_), handled(false) {}
+    char16_t keyChar;
+    bool handled;
+};
+
+using KeyPressEvent = EventWithArgs<KeyPressEventArgs>;
+
 struct WING_API ControlCreateParams
 {
     ControlCreateParams();
@@ -203,7 +226,9 @@ enum class ControlFlags : int
     doubleBuffered = 1 << 6,
     mouseInClient = 1 << 7,
     lbuttonPressed = 1 << 8,
-    mouseHoverTimerStarted = 1 << 9
+    mouseHoverTimerStarted = 1 << 9,
+    keyDownHandled = 1 << 10,
+    menuWantsKeys = 1 << 11
 };
 
 WING_API inline ControlFlags operator&(ControlFlags left, ControlFlags right)
@@ -267,6 +292,9 @@ public:
     MouseMoveEvent& MouseMove() { return mouseMove; }
     MouseHoverEvent& MouseHover() { return mouseHover; }
     MouseDoubleClickEvent& MouseDoubleClick() { return mouseDoubleClick; }
+    KeyDownEvent& KeyDown() { return keyDown; }
+    KeyUpEvent& KeyUp() { return keyUp; }
+    KeyPressEvent& KeyPress() { return keyPress; }
     const Color& BackgroundColor() const { return backgroundColor; }
     const Point& Location() const { return location; }
     void SetLocation(const Point& newLocation);
@@ -327,6 +355,12 @@ public:
     bool MouseHoverTimerStarted() const { return GetFlag(ControlFlags::mouseHoverTimerStarted); }
     void SetMouseHoverTimerStarted() { SetFlag(ControlFlags::mouseHoverTimerStarted); }
     void ResetMouseHoverTimerStarted() { ResetFlag(ControlFlags::mouseHoverTimerStarted); }
+    bool KeyDownHandled() const { return GetFlag(ControlFlags::keyDownHandled); }
+    void SetKeyDownHandled() { SetFlag(ControlFlags::keyDownHandled); }
+    void ResetKeyDownHandled() { ResetFlag(ControlFlags::keyDownHandled); }
+    bool MenuWantsKeys() const { return GetFlag(ControlFlags::menuWantsKeys); }
+    void SetMenuWantsKeys() { SetFlag(ControlFlags::menuWantsKeys); }
+    void ResetMenuWantsKeys() { ResetFlag(ControlFlags::menuWantsKeys); }
     void SetTimer(int timerId, int durationMs);
     void KillTimer(int timerId);
     int MouseHoverMs() const { return mouseHoverMs; }
@@ -358,6 +392,9 @@ protected:
     virtual void OnMouseMove(MouseEventArgs& args);
     virtual void OnMouseHover(MouseEventArgs& args);
     virtual void OnMouseDoubleClick(MouseEventArgs& args);
+    virtual void OnKeyDown(KeyEventArgs& args);
+    virtual void OnKeyUp(KeyEventArgs& args);
+    virtual void OnKeyPress(KeyPressEventArgs& args);
     virtual void SetCaretLocation();
     virtual void SetCursor();
 private:
@@ -377,6 +414,15 @@ private:
     void DoDestroyCaret();
     void CreateCaret();
     void DestroyCaret();
+    bool DoSysCommand(WPARAM wParam, LPARAM lParam);
+    bool DoMenu(char16_t accessKey, Keys keyCode);
+    void DoMenu(KeyEventArgs& args);
+    bool DoKeyDown(int virtualKeyCode);
+    bool DoKeyUp(int virtualKeyCode);
+    void DoKeyPress(KeyPressEventArgs& args);
+    void DispatchKeyDown(KeyEventArgs& args);
+    void DispatchKeyUp(KeyEventArgs& args);
+    void DispatchKeyPress(KeyPressEventArgs& args);
     std::string windowClassName;
     uint32_t windowClassStyle;
     int64_t windowClassBackgroundColor;
@@ -413,6 +459,9 @@ private:
     MouseMoveEvent mouseMove;
     MouseHoverEvent mouseHover;
     MouseDoubleClickEvent mouseDoubleClick;
+    KeyDownEvent keyDown;
+    KeyUpEvent keyUp;
+    KeyPressEvent keyPress;
     std::vector<Control*> createList;
     Cursor arrowCursor;
     int mouseHoverMs;
