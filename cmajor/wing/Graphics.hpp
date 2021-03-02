@@ -95,6 +95,16 @@ WING_API inline bool operator!=(const Size& s, const Size& t)
     return !(s == t);
 }
 
+WING_API inline bool operator==(const Color& left, const Color& right)
+{
+    return left.GetValue() == right.GetValue();
+}
+
+WING_API inline bool operator!=(const Color& left, const Color& right)
+{
+    return !(left == right);
+}
+
 WING_API Point GetMessagePos();
 WING_API Rect ToRect(const RECT& winRect);
 WING_API RECT ToWinRect(const Rect& rect);

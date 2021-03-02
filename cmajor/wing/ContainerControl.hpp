@@ -32,6 +32,11 @@ protected:
     bool ProcessMessage(Message& msg) override;
     virtual void OnControlAdded(ControlEventArgs& args);
     virtual void OnControlRemoved(ControlEventArgs& args);
+    void OnChildContentChanged(ControlEventArgs& args) override;
+    void OnChildContentLocationChanged(ControlEventArgs& args) override;
+    void OnChildContentSizeChanged(ControlEventArgs& args) override;
+    void OnChildGotFocus(ControlEventArgs& args) override;
+    void OnChildLostFocus(ControlEventArgs& args) override;
 private:
     Container children;
     ControlAddedEvent controlAdded;

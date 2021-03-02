@@ -21,6 +21,7 @@ public:
     Icon& operator=(const Icon&) = delete;
     Icon& operator=(Icon&& that) noexcept;
     ~Icon();
+    bool IsIcon() const override { return true; }
     HICON Handle() const { return handle; }
     bool Standard() const { return standard; }
 private:

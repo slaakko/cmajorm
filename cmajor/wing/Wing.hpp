@@ -35,8 +35,6 @@ struct WING_API Message
     uint32_t LParamHiDWord() const { return static_cast<uint32_t>((lParam >> 32) & 0xFFFFFFFF); }
     uint16_t WParamLoWord() const { return static_cast<uint16_t>(wParam & 0xFFFF); }
     uint16_t WParamHiWord() const { return static_cast<uint16_t>((wParam >> 16) & 0xFFFF); }
-    int LParamX() const { return static_cast<uint16_t>(LParamLoDWord()); }
-    int LParamY() const { return static_cast<uint16_t>(LParamLoDWord() >> 16); }
     HWND handle;
     UINT message;
     WPARAM wParam;

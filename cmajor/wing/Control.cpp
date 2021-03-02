@@ -11,6 +11,7 @@
 #include <cmajor/wing/Container.hpp>
 #include <cmajor/wing/Buffer.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <windowsx.h>
 
 namespace cmajor { namespace wing {
 
@@ -53,13 +54,13 @@ ControlCreateParams& ControlCreateParams::WindowStyle(int windowStyle_)
     return *this;
 }
 
-ControlCreateParams& ControlCreateParams::WindowClassBackgroundColor(int64_t windowClassBackgroundColor_)
+ControlCreateParams& ControlCreateParams::WindowClassBackgroundColor(int windowClassBackgroundColor_)
 {
     windowClassBackgroundColor = windowClassBackgroundColor_;
     return *this;
 }
 
-ControlCreateParams& ControlCreateParams::BackgroundColor(Color backgroundColor_)
+ControlCreateParams& ControlCreateParams::BackgroundColor(const Color& backgroundColor_)
 {
     backgroundColor = backgroundColor_;
     return *this;
@@ -512,6 +513,52 @@ void Control::SetSizeInternal(const Size& newSize)
     }
 }
 
+void Control::SetContentLocationInternal(const Point& newContentLocation)
+{
+    if (contentLocation != newContentLocation)
+    {
+        contentLocation = newContentLocation;
+        OnContentLocationChanged();
+    }
+}
+
+void Control::SetContentLocation(const Point& newContentLocation)
+{
+    if (contentLocation != newContentLocation)
+    {
+        SetContentLocationInternal(newContentLocation);
+        Control* parentControl = ParentControl();
+        if (parentControl)
+        {
+            ControlEventArgs args(this);
+            parentControl->OnChildContentLocationChanged(args);
+        }
+    }
+}
+
+void Control::SetContentSizeInternal(const Size& newContentSize)
+{
+    if (contentSize != newContentSize)
+    {
+        contentSize = newContentSize;
+        OnContentSizeChanged();
+    }
+}
+
+void Control::SetContentSize(const Size& newContentSize)
+{
+    if (contentSize != newContentSize)
+    {
+        SetContentSizeInternal(newContentSize);
+        Control* parentControl = ParentControl();
+        if (parentControl)
+        {
+            ControlEventArgs args(this);
+            parentControl->OnChildContentSizeChanged(args);
+        }
+    }
+}
+
 const Font& Control::GetFont() const
 {
     if (!font.IsNull())
@@ -652,7 +699,7 @@ bool Control::ProcessMessage(Message& msg)
         }
         case WM_MOUSEMOVE:
         {
-            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(msg.wParam), 0);
+            MouseEventArgs args(Point(GET_X_LPARAM(msg.lParam), GET_Y_LPARAM(msg.lParam)), static_cast<MouseButtons>(msg.wParam), 0);
             DoMouseMove(args);
             msg.result = 0;
             return true;
@@ -665,35 +712,35 @@ bool Control::ProcessMessage(Message& msg)
         }
         case WM_LBUTTONDOWN:
         {
-            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::lbutton), 1);
+            MouseEventArgs args(Point(GET_X_LPARAM(msg.lParam), GET_Y_LPARAM(msg.lParam)), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::lbutton), 1);
             DoMouseDown(args);
             msg.result = 0;
             return true;
         }
         case WM_LBUTTONUP:
         {
-            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::lbutton), 1);
+            MouseEventArgs args(Point(GET_X_LPARAM(msg.lParam), GET_Y_LPARAM(msg.lParam)), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::lbutton), 1);
             DoMouseUp(args);
             msg.result = 0;
             return true;
         }
         case WM_LBUTTONDBLCLK:
         {
-            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::lbutton), 2);
+            MouseEventArgs args(Point(GET_X_LPARAM(msg.lParam), GET_Y_LPARAM(msg.lParam)), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::lbutton), 2);
             DoMouseDoubleClick(args);
             msg.result = 0;
             return true;
         }
         case WM_RBUTTONDOWN:
         {
-            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::rbutton), 1);
+            MouseEventArgs args(Point(GET_X_LPARAM(msg.lParam), GET_Y_LPARAM(msg.lParam)), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::rbutton), 1);
             DoMouseDown(args);
             msg.result = 0;
             return true;
         }
         case WM_RBUTTONUP:
         {
-            MouseEventArgs args(Point(msg.LParamX(), msg.LParamY()), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::rbutton), 1);
+            MouseEventArgs args(Point(GET_X_LPARAM(msg.lParam), GET_Y_LPARAM(msg.lParam)), static_cast<MouseButtons>(static_cast<MouseButtons>(msg.wParam) | MouseButtons::rbutton), 1);
             DoMouseUp(args);
             msg.result = 0;
             return true;
@@ -1442,6 +1489,36 @@ void Control::OnLocationChanged()
 void Control::OnSizeChanged()
 {
     sizeChanged.Fire();
+}
+
+void Control::OnContentChanged()
+{
+    contentChanged.Fire();
+}
+
+void Control::OnChildContentChanged(ControlEventArgs& args)
+{
+    childContentChanged.Fire(args);
+}
+
+void Control::OnContentLocationChanged()
+{
+    contentLocationChanged.Fire();
+}
+
+void Control::OnChildContentLocationChanged(ControlEventArgs& args)
+{
+    childContentLocationChanged.Fire(args);
+}
+
+void Control::OnContentSizeChanged()
+{
+    contentSizeChanged.Fire();
+}
+
+void Control::OnChildContentSizeChanged(ControlEventArgs& args)
+{
+    childContentSizeChanged.Fire(args);
 }
 
 void Control::OnMouseEnter()

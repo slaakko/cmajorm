@@ -48,8 +48,8 @@ struct WING_API WindowCreateParams
     WindowCreateParams& WindowClassName(const std::string& windowClassName_);
     WindowCreateParams& WindowClassStyle(uint32_t windowClassStyle_);
     WindowCreateParams& WindowStyle(int windowStyle_);
-    WindowCreateParams& WindowClassBackgroundColor(int64_t windowClassBackgroundColor_);
-    WindowCreateParams& BackgroundColor(Color backgroundColor_);
+    WindowCreateParams& WindowClassBackgroundColor(int windowClassBackgroundColor_);
+    WindowCreateParams& BackgroundColor(const Color& backgroundColor_);
     WindowCreateParams& Text(const std::string& text_);
     WindowCreateParams& Location(Point location_);
     WindowCreateParams& SetSize(Size size_);

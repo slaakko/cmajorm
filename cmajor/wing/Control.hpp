@@ -38,6 +38,12 @@ using VisibleChangedEvent = Event;
 using EnabledChangedEvent = Event;
 using LocationChangedEvent = Event;
 using SizeChangedEvent = Event;
+using ContentChangedEvent = Event;
+using ChildContentChangedEvent = EventWithArgs<ControlEventArgs>;
+using ContentLocationChangedEvent = Event;
+using ChildContentLocationChangedEvent = EventWithArgs<ControlEventArgs>;
+using ContentSizeChangedEvent = Event;
+using ChildContentSizeChangedEvent = EventWithArgs<ControlEventArgs>; 
 
 WING_API inline int DefaultChildWindowStyle()
 {
@@ -193,8 +199,8 @@ struct WING_API ControlCreateParams
     ControlCreateParams& WindowClassName(const std::string& windowClassName_);
     ControlCreateParams& WindowClassStyle(uint32_t windowClassStyle_);
     ControlCreateParams& WindowStyle(int windowStyle_);
-    ControlCreateParams& WindowClassBackgroundColor(int64_t windowClassBackgroundColor_);
-    ControlCreateParams& BackgroundColor(Color backgroundColor_);
+    ControlCreateParams& WindowClassBackgroundColor(int windowClassBackgroundColor_);
+    ControlCreateParams& BackgroundColor(const Color& backgroundColor_);
     ControlCreateParams& Text(const std::string& text_);
     ControlCreateParams& Location(Point location_);
     ControlCreateParams& SetSize(Size size_);
@@ -285,6 +291,12 @@ public:
     EnabledChangedEvent& EnabledChanged() { return enabledChanged; }
     LocationChangedEvent& LocationChanged() { return locationChanged; }
     SizeChangedEvent& SizeChanged() { return sizeChanged; }
+    ContentChangedEvent& ContentChanged() { return contentChanged; }
+    ChildContentChangedEvent& ChildContentChanged() { return childContentChanged; }
+    ContentLocationChangedEvent& ContentLocationChanged() { return contentLocationChanged; }
+    ChildContentLocationChangedEvent& ChildContentLocationChanged() { return childContentLocationChanged; }
+    ContentSizeChangedEvent& ContentSizeChanged() { return contentSizeChanged; }
+    ChildContentSizeChangedEvent& ChildContentSizeChanged() { return childContentSizeChanged; }
     MouseEnterEvent& MouseEnter() { return mouseEnter; }
     MouseLeaveEvent& MouseLeave() { return mouseLeave; }
     MouseDownEvent& MouseDown() { return mouseDown; }
@@ -302,6 +314,12 @@ public:
     const Size& GetSize() const { return size; }
     void SetSize(const Size& newSize);
     void SetSizeInternal(const Size& newSize);
+    const Point& ContentLocation() const { return contentLocation; }
+    void SetContentLocationInternal(const Point& newContentLocation);
+    void SetContentLocation(const Point& newContentLocation);
+    const Size& ContentSize() const { return contentSize; }
+    void SetContentSizeInternal(const Size& newContentSize);
+    void SetContentSize(const Size& newContentSize);
     Anchors GetAnchors() const { return anchors; }
     Dock GetDock() const { return dock; }
     Point GetCursorPos();
@@ -366,6 +384,11 @@ public:
     int MouseHoverMs() const { return mouseHoverMs; }
     void SetMouseHoverMs(int mouseHoverMs_) { mouseHoverMs = mouseHoverMs_; }
     bool ProcessMessageInternal(Message& msg) { return ProcessMessage(msg); }
+    void FireChildGotFocus(ControlEventArgs& args) { OnChildGotFocus(args); }
+    void FireChildLostFocus(ControlEventArgs& args) { OnChildLostFocus(args); }
+    void FireChildContentChanged(ControlEventArgs& args) { OnChildContentChanged(args); }
+    void FireChildContentLocationChanged(ControlEventArgs& args) { OnChildContentLocationChanged(args); }
+    void FireChildContentSizeChanged(ControlEventArgs& args) { OnChildContentSizeChanged(args); }
 protected:
     virtual bool IsDecoratorControl() const { return false; }
     virtual void TranslateChildGraphics(Graphics& graphics);
@@ -385,6 +408,12 @@ protected:
     virtual void OnEnabledChanged();
     virtual void OnLocationChanged();
     virtual void OnSizeChanged();
+    virtual void OnContentChanged();
+    virtual void OnChildContentChanged(ControlEventArgs& args);
+    virtual void OnContentLocationChanged();
+    virtual void OnChildContentLocationChanged(ControlEventArgs& args);
+    virtual void OnContentSizeChanged();
+    virtual void OnChildContentSizeChanged(ControlEventArgs& args);
     virtual void OnMouseEnter();
     virtual void OnMouseLeave();
     virtual void OnMouseDown(MouseEventArgs& args);
@@ -430,6 +459,8 @@ private:
     Color backgroundColor;
     Point location;
     Size size;
+    Point contentLocation;
+    Size contentSize;
     Anchors anchors;
     Dock dock;
     std::string text;
@@ -451,6 +482,12 @@ private:
     EnabledChangedEvent enabledChanged;
     LocationChangedEvent locationChanged;
     SizeChangedEvent sizeChanged;
+    ContentChangedEvent contentChanged;
+    ChildContentChangedEvent childContentChanged;
+    ContentLocationChangedEvent contentLocationChanged;
+    ChildContentLocationChangedEvent childContentLocationChanged;
+    ContentSizeChangedEvent contentSizeChanged;
+    ChildContentSizeChangedEvent childContentSizeChanged;
     PaintEvent paint;
     MouseEnterEvent mouseEnter;
     MouseLeaveEvent mouseLeave;

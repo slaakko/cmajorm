@@ -195,4 +195,54 @@ void ContainerControl::OnControlRemoved(ControlEventArgs& args)
     controlRemoved.Fire(args);
 }
 
+void ContainerControl::OnChildContentChanged(ControlEventArgs& args)
+{
+    Control::OnChildContentChanged(args);
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->FireChildContentChanged(args);
+    }
+}
+
+void ContainerControl::OnChildContentLocationChanged(ControlEventArgs& args)
+{
+    Control::OnChildContentLocationChanged(args);
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->FireChildContentLocationChanged(args);
+    }
+}
+
+void ContainerControl::OnChildContentSizeChanged(ControlEventArgs& args)
+{
+    Control::OnChildContentSizeChanged(args);
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->FireChildContentSizeChanged(args);
+    }
+}
+
+void ContainerControl::OnChildGotFocus(ControlEventArgs& args) 
+{
+    Control::OnChildGotFocus(args);
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->FireChildGotFocus(args);
+    }
+}
+
+void ContainerControl::OnChildLostFocus(ControlEventArgs& args) 
+{
+    Control::OnChildLostFocus(args);
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->FireChildLostFocus(args);
+    }
+}
+
 } } // cmajor::wing

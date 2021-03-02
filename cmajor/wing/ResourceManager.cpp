@@ -40,6 +40,7 @@ Cursor& ResourceManager::GetCursor(const std::string& cursorName)
         }
         std::unique_ptr<Resource> resource(new Cursor(LoadCursorByName(cursorName)));
         cursor = static_cast<Cursor*>(resource.get());
+        resourceMap[cursorName] = resource.get();
         resources.push_back(std::move(resource));
         return *cursor;
     }
@@ -62,6 +63,7 @@ Icon& ResourceManager::GetIcon(const std::string& iconName)
         }
         std::unique_ptr<Resource> resource(new Icon(LoadIconByName(iconName)));
         icon = static_cast<Icon*>(resource.get());
+        resourceMap[iconName] = resource.get();
         resources.push_back(std::move(resource));
         return *icon;
     }

@@ -7,6 +7,7 @@
 #include <cmajor/wing/Wing.hpp>
 #include <cmajor/wing/Application.hpp>
 #include <cmajor/wing/Menu.hpp>
+#include <cmajor/wing/SplitContainer.hpp>
 #include <cmajor/wing/Window.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <soulng/util/InitDone.hpp>
@@ -38,6 +39,8 @@ class MainWindow : public Window
 public:
     MainWindow();
 private:
+    int VerticalSplitterDistance();
+    int HorizontalSplitterDistance();
     void NewProjectClick();
     void OpenProjectClick();
     void CloseSolutionClick();
@@ -118,6 +121,8 @@ private:
     MenuItem* homepageMenuItem;
     MenuItem* localDocumentationMenuItem;
     MenuItem* aboutMenuItem;
+    SplitContainer* verticalSplitContainer;
+    SplitContainer* horizontalSplitContainer;
 };
 
 MainWindow::MainWindow() : Window(WindowCreateParams().Text("Cmajor Code")), 
@@ -160,7 +165,9 @@ MainWindow::MainWindow() : Window(WindowCreateParams().Text("Cmajor Code")),
     closeExternalTabsMenuItem(nullptr),
     homepageMenuItem(nullptr),
     localDocumentationMenuItem(nullptr),
-    aboutMenuItem(nullptr)
+    aboutMenuItem(nullptr),
+    verticalSplitContainer(nullptr),
+    horizontalSplitContainer(nullptr)
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -369,6 +376,25 @@ MainWindow::MainWindow() : Window(WindowCreateParams().Text("Cmajor Code")),
     helpMenuItem->AddMenuItem(aboutMenuItemPtr.release());
     menuBar->AddMenuItem(helpMenuItem.release());
     AddChild(menuBar.release());
+
+    std::unique_ptr<SplitContainer> verticalSplitContainerPtr(
+        new SplitContainer(SplitContainerCreateParams(SplitterOrientation::vertical).SplitterDistance(VerticalSplitterDistance()).SetDock(Dock::fill)));
+    verticalSplitContainer = verticalSplitContainerPtr.get();
+    AddChild(verticalSplitContainerPtr.release());
+    std::unique_ptr<SplitContainer> horizontalSplitContainerPtr(
+        new SplitContainer(SplitContainerCreateParams(SplitterOrientation::horizontal).SplitterDistance(HorizontalSplitterDistance()).SetDock(Dock::fill)));
+    horizontalSplitContainer = horizontalSplitContainerPtr.get();
+    verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.release());
+}
+
+int MainWindow::VerticalSplitterDistance()
+{
+    return 0;
+}
+
+int MainWindow::HorizontalSplitterDistance()
+{
+    return 0;
 }
 
 void MainWindow::NewProjectClick()

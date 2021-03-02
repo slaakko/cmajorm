@@ -58,13 +58,13 @@ WindowCreateParams& WindowCreateParams::WindowStyle(int windowStyle_)
     return *this;
 }
 
-WindowCreateParams& WindowCreateParams::WindowClassBackgroundColor(int64_t windowClassBackgroundColor_)
+WindowCreateParams& WindowCreateParams::WindowClassBackgroundColor(int windowClassBackgroundColor_)
 {
     controlCreateParams.WindowClassBackgroundColor(windowClassBackgroundColor_);
     return *this;
 }
 
-WindowCreateParams& WindowCreateParams::BackgroundColor(Color backgroundColor_)
+WindowCreateParams& WindowCreateParams::BackgroundColor(const Color& backgroundColor_)
 {
     controlCreateParams.BackgroundColor(backgroundColor_);
     return *this;

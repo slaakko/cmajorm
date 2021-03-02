@@ -39,6 +39,7 @@ public:
     Cursor& operator=(const Cursor&) = delete;
     Cursor& operator=(Cursor&& that) noexcept;
     ~Cursor();
+    bool IsCursor() const override { return true; }
     HCURSOR Handle() const { return handle; }
     bool Standard() const { return standard; }
 private:

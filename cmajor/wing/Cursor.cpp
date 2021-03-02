@@ -58,6 +58,10 @@ Cursor LoadCursorByName(const std::string& cursorName)
 {
     std::u16string name = ToUtf16(cursorName);
     HANDLE handle = LoadImage(Instance(),  LPCWSTR(name.c_str()), IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE);
+    if (!handle)
+    {
+        throw WindowsException(GetLastError());
+    }
     return Cursor(static_cast<HCURSOR>(handle), false);
 }
 
