@@ -1193,7 +1193,6 @@ namespace cmcode
                     }
                     else if (ext == ".cmp")
                     {
-                        UniquePtr<Cm.Ast.Project> project = ReadProject(filePath, contents);
                         string solutionFilePath = Path.ChangeExtension(filePath, ".cms");
                         if (File.Exists(solutionFilePath))
                         {
@@ -1201,6 +1200,7 @@ namespace cmcode
                         }
                         else
                         {
+                            UniquePtr<Cm.Ast.Project> project = ReadProject(filePath, contents);
                             solution.Reset(new Cm.Ast.Solution(project->Name(), solutionFilePath));
                             solution->SetActiveProject(project.Get());
                             solution->AddProject(Rvalue(project));

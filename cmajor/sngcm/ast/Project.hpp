@@ -177,6 +177,7 @@ public:
     std::string Id() const;
     void AddDependsOnId(const std::string& dependsOnId);
     const std::vector<std::string>& DependsOnIds() const { return dependsOnIds; }
+    void Save();
 private:
     BackEnd backend;
     std::string toolChain;

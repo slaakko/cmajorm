@@ -68,6 +68,10 @@ public:
     std::vector<Project*> CreateBuildOrder();
     void AddDeclaration(SolutionDeclaration* declaration);
     void ResolveDeclarations();
+    Project* ActiveProject() const { return activeProject; }
+    void SetActiveProject(Project* activeProject_) { activeProject = activeProject_; }
+    void SortByProjectName();
+    void Save();
 private:
     std::u32string name;
     std::string filePath;
@@ -76,6 +80,7 @@ private:
     std::vector<std::string> projectFilePaths;
     std::vector<std::string> relativeProjectFilePaths;
     std::vector<std::unique_ptr<Project>> projects;
+    Project* activeProject;
     std::u32string activeProjectName;
     std::vector<std::unique_ptr<ProjectDependencyDeclaration>> additionalDependencyDeclarations;
     std::unordered_map<std::u32string, ProjectDependencyDeclaration*> dependencyMap;

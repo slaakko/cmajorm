@@ -591,4 +591,28 @@ void Project::AddDependsOnId(const std::string& dependsOnId)
     dependsOnIds.push_back(dependsOnId);
 }
 
+void Project::Save()
+{
+    std::ofstream file(filePath);
+    CodeFormatter formatter(file);
+    formatter.WriteLine("project " + ToUtf8(name) + ";");
+    formatter.WriteLine("target=" + TargetStr(target) + ";");
+    for (const std::string& relativeReferenceFilePath : relativeReferencedProjectFilePaths)
+    {
+        formatter.WriteLine("reference <" + relativeReferenceFilePath + ">;");
+    }
+    for (const std::string& relativeSourceFilePath : relativeSourceFilePaths)
+    {
+        formatter.WriteLine("source <" + relativeSourceFilePath + ">;");
+    }
+    for (const std::string& relativeResourceFilePath : relativeResourceFilePaths)
+    {
+        formatter.WriteLine("resource <" + relativeResourceFilePath + ">;");
+    }
+    for (const std::string& relativeTextFilePath : relativeTextFilePaths)
+    {
+        formatter.WriteLine("text <" + relativeTextFilePath + ">;");
+    }
+}
+
 } } // namespace sngcm::ast

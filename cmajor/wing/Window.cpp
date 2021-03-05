@@ -7,6 +7,7 @@
 #include <cmajor/wing/Application.hpp>
 #include <cmajor/wing/Button.hpp>
 #include <cmajor/wing/Menu.hpp>
+#include <cmajor/wing/Icon.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {
@@ -135,6 +136,16 @@ Window::Window(WindowCreateParams& createParams) :
         const WCHAR* familyStr = (const WCHAR*)familyName.c_str();
         SetFont(Font(FontFamily(familyStr), fontSize, fontStyle, Unit::UnitPoint));
     }
+}
+
+void Window::SetIcon(const Icon& icon)
+{
+    ::SetClassLongPtr(Handle(), GCLP_HICON, reinterpret_cast<int64_t>(icon.Handle()));
+}
+
+void Window::SetSmallIcon(const Icon& icon)
+{
+    ::SetClassLongPtr(Handle(), GCLP_HICONSM, reinterpret_cast<int64_t>(icon.Handle()));;
 }
 
 void Window::Close()

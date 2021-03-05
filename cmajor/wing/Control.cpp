@@ -659,6 +659,35 @@ void Control::KillTimer(int timerId)
     }
 }
 
+void Control::SetContentChanged()
+{
+    OnContentChanged();
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        ControlEventArgs args(this);
+        parentControl->OnChildContentChanged(args);
+    }
+}
+
+void Control::ScrollLineDown()
+{
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->ScrollLineDown();
+    }
+}
+
+void Control::ScrollLineUp()
+{
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->ScrollLineUp();
+    }
+}
+
 void Control::TranslateChildGraphics(Graphics& graphics)
 {
     Control* parentControl = ParentControl();
@@ -744,6 +773,32 @@ bool Control::ProcessMessage(Message& msg)
             DoMouseUp(args);
             msg.result = 0;
             return true;
+        }
+        case WM_HSCROLL:
+        {
+            int value = LOWORD(msg.wParam);
+            DoHScroll(value);
+            msg.result = 0;
+            return true;
+        }
+        case WM_VSCROLL:
+        {
+            int value = LOWORD(msg.wParam);
+            DoVScroll(value);
+            msg.result = 0;
+            return true;
+        }
+        case WM_MOUSEWHEEL:
+        {
+            int value = GET_WHEEL_DELTA_WPARAM(msg.wParam);
+            MouseWheelEventArgs args(value);
+            DoMouseWheel(args);
+            if (args.handled)
+            {
+                msg.result = 0;
+                return true;
+            }
+            break;
         }
         case WM_SETFOCUS:
         {
@@ -1089,6 +1144,23 @@ void Control::DoMouseHover()
         args.location = pt;
         OnMouseHover(args);
     }
+}
+
+void Control::DoVScroll(int value)
+{
+    IntArgs args(value);
+    OnVScroll(args);
+}
+
+void Control::DoHScroll(int value)
+{
+    IntArgs args(value);
+    OnHScroll(args);
+}
+
+void Control::DoMouseWheel(MouseWheelEventArgs& args)
+{
+    OnMouseWheel(args);
 }
 
 Point Control::GetCursorPos()
@@ -1566,6 +1638,21 @@ void Control::OnMouseHover(MouseEventArgs& args)
 void Control::OnMouseDoubleClick(MouseEventArgs& args)
 {
     mouseDoubleClick.Fire(args);
+}
+
+void Control::OnHScroll(IntArgs& args)
+{
+    hscroll.Fire(args);
+}
+
+void Control::OnVScroll(IntArgs& args)
+{
+    vscroll.Fire(args);
+}
+
+void Control::OnMouseWheel(MouseWheelEventArgs& args)
+{
+    mouseWheel.Fire(args);
 }
 
 void Control::OnKeyDown(KeyEventArgs& args)

@@ -6,12 +6,21 @@
 #include <sngcm/ast/Solution.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Path.hpp>
+#include <algorithm>
 #include <unordered_set>
 
 namespace sngcm { namespace ast {
 
 using namespace soulng::util;
 using namespace soulng::unicode;
+
+struct ByProjectName
+{
+    bool operator()(const std::unique_ptr<Project>& left, const std::unique_ptr<Project>& right) const
+    {
+        return left->Name() < right->Name();
+    }
+};
 
 SolutionDeclaration::SolutionDeclaration()
 {
@@ -38,7 +47,7 @@ void ProjectDependencyDeclaration::AddDependency(const std::u32string& dependsOn
     dependsOnProjects.push_back(dependsOn);
 }
 
-Solution::Solution(const std::u32string& name_, const std::string& filePath_) : name(name_), filePath(filePath_), basePath(filePath)
+Solution::Solution(const std::u32string& name_, const std::string& filePath_) : name(name_), filePath(filePath_), basePath(filePath), activeProject(nullptr)
 {
     basePath.remove_filename();
 }
@@ -86,6 +95,40 @@ void Solution::ResolveDeclarations()
         {
             throw std::runtime_error("unknown solution declaration");
         }
+    }
+}
+
+void Solution::SortByProjectName()
+{
+    std::sort(projects.begin(), projects.end(), ByProjectName());
+}
+
+void Solution::Save()
+{
+    std::ofstream file(filePath);
+    CodeFormatter formatter(file);
+    formatter.WriteLine("solution " + ToUtf8(name) + ";");
+    std::string solutionDir = Path::GetDirectoryName(filePath);
+    relativeProjectFilePaths.clear();
+    for (const std::unique_ptr<Project>& project : projects)
+    {
+        std::string projectFilePath = project->FilePath();
+        std::string projectDir = Path::GetDirectoryName(projectFilePath);
+        std::string relativeProjectDir = MakeRelativeDirPath(projectDir, solutionDir);
+        std::string relativeProjectFilePath = Path::Combine(relativeProjectDir, Path::GetFileName(projectFilePath));
+        relativeProjectFilePaths.push_back(relativeProjectFilePath);
+    }
+    for (const std::string& relativeProjectFilePath : relativeProjectFilePaths)
+    {
+        formatter.WriteLine("project <" + relativeProjectFilePath + ">;");
+    }
+    if (activeProject)
+    {
+        formatter.WriteLine("activeProject " + ToUtf8(activeProject->Name()) + ";");
+    }
+    for (const std::unique_ptr<Project>& project : projects)
+    {
+        project->Save();
     }
 }
 

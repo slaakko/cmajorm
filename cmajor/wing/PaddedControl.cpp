@@ -23,6 +23,11 @@ PaddedControlCreateParams::PaddedControlCreateParams(Control* child_) :
     controlCreateParams.BackgroundColor(child->BackgroundColor());
 }
 
+PaddedControlCreateParams& PaddedControlCreateParams::Defaults()
+{
+    return *this;
+}
+
 PaddedControlCreateParams& PaddedControlCreateParams::WindowClassName(const std::string& windowClassName_)
 {
     controlCreateParams.WindowClassName(windowClassName_);

@@ -17,6 +17,7 @@ WING_API Size PaddedSize(const Size& size, const Padding& padding);
 struct WING_API PaddedControlCreateParams
 {
     PaddedControlCreateParams(Control* child_);
+    PaddedControlCreateParams& Defaults();
     PaddedControlCreateParams& WindowClassName(const std::string& windowClassName_);
     PaddedControlCreateParams& WindowClassStyle(uint32_t windowClassStyle_);
     PaddedControlCreateParams& WindowStyle(int windowStyle_);

@@ -80,6 +80,8 @@ public:
     void SetDialogResult(DialogResult dialogResult_) { dialogResult = dialogResult_; }
     void MouseUpNotificationInternal(MouseEventArgs& args) { MouseUpNotification(args); }
     MenuBar* GetMenuBar() const { return menuBar; }
+    void SetIcon(const Icon& icon);
+    void SetSmallIcon(const Icon& icon);
 protected:
     virtual void MouseUpNotification(MouseEventArgs& args);
     bool ProcessMessage(Message& msg) override;

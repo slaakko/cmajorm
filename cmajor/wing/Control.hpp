@@ -45,6 +45,11 @@ using ChildContentLocationChangedEvent = EventWithArgs<ControlEventArgs>;
 using ContentSizeChangedEvent = Event;
 using ChildContentSizeChangedEvent = EventWithArgs<ControlEventArgs>; 
 
+WING_API inline int DoubleClickWindowClassStyle()
+{
+    return CS_DBLCLKS;
+}
+
 WING_API inline int DefaultChildWindowStyle()
 {
     return WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS;
@@ -73,6 +78,11 @@ WING_API inline Point DefaultLocation()
 WING_API inline Size DefaultSize()
 {
     return Size(CW_USEDEFAULT, CW_USEDEFAULT);
+}
+
+WING_API inline int DefaultMouseHoverMs()
+{
+    return 300;
 }
 
 WING_API inline Size DefaultMouseHoverSize()
@@ -124,6 +134,14 @@ inline Anchors operator~(Anchors anchors)
 enum class Dock : int
 {
     none = 0, top = 1, bottom = 2, left = 3, right = 4, fill = 5
+};
+
+struct ScrollUnits
+{
+    ScrollUnits() : vertical(0), horizontal(0) {}
+    ScrollUnits(int vertical_, int horizontal_) : vertical(vertical_), horizontal(horizontal_) {}
+    int vertical;
+    int horizontal;
 };
 
 enum class MouseButtons : int
@@ -191,6 +209,24 @@ struct KeyPressEventArgs
 };
 
 using KeyPressEvent = EventWithArgs<KeyPressEventArgs>;
+
+struct IntArgs
+{
+    IntArgs(int value_) : value(value_) {}
+    int value;
+};
+
+using HScrollEvent = EventWithArgs<IntArgs>;
+using VScrollEvent = EventWithArgs<IntArgs>;
+
+struct MouseWheelEventArgs
+{
+    MouseWheelEventArgs(int value_) : value(value_), handled(false) {}
+    int value;
+    bool handled;
+};
+
+using MouseWheelEvent = EventWithArgs<MouseWheelEventArgs>;
 
 struct WING_API ControlCreateParams
 {
@@ -304,6 +340,9 @@ public:
     MouseMoveEvent& MouseMove() { return mouseMove; }
     MouseHoverEvent& MouseHover() { return mouseHover; }
     MouseDoubleClickEvent& MouseDoubleClick() { return mouseDoubleClick; }
+    HScrollEvent& HScroll() { return hscroll; }
+    VScrollEvent& VScroll() { return vscroll; }
+    MouseWheelEvent& MouseWhee() { return mouseWheel; }
     KeyDownEvent& KeyDown() { return keyDown; }
     KeyUpEvent& KeyUp() { return keyUp; }
     KeyPressEvent& KeyPress() { return keyPress; }
@@ -322,6 +361,8 @@ public:
     void SetContentSize(const Size& newContentSize);
     Anchors GetAnchors() const { return anchors; }
     Dock GetDock() const { return dock; }
+    const ScrollUnits& GetScrollUnits() const { return scrollUnits; }
+    void SetScrollUnits(const ScrollUnits& scrollUnits_) { scrollUnits = scrollUnits_; }
     Point GetCursorPos();
     Point ScreenToClient(const Point& pt);
     Point ClientToScreen(const Point& pt);
@@ -384,11 +425,14 @@ public:
     int MouseHoverMs() const { return mouseHoverMs; }
     void SetMouseHoverMs(int mouseHoverMs_) { mouseHoverMs = mouseHoverMs_; }
     bool ProcessMessageInternal(Message& msg) { return ProcessMessage(msg); }
+    void SetContentChanged();
     void FireChildGotFocus(ControlEventArgs& args) { OnChildGotFocus(args); }
     void FireChildLostFocus(ControlEventArgs& args) { OnChildLostFocus(args); }
     void FireChildContentChanged(ControlEventArgs& args) { OnChildContentChanged(args); }
     void FireChildContentLocationChanged(ControlEventArgs& args) { OnChildContentLocationChanged(args); }
     void FireChildContentSizeChanged(ControlEventArgs& args) { OnChildContentSizeChanged(args); }
+    virtual void ScrollLineDown();
+    virtual void ScrollLineUp();
 protected:
     virtual bool IsDecoratorControl() const { return false; }
     virtual void TranslateChildGraphics(Graphics& graphics);
@@ -421,6 +465,9 @@ protected:
     virtual void OnMouseMove(MouseEventArgs& args);
     virtual void OnMouseHover(MouseEventArgs& args);
     virtual void OnMouseDoubleClick(MouseEventArgs& args);
+    virtual void OnHScroll(IntArgs& args);
+    virtual void OnVScroll(IntArgs& args);
+    virtual void OnMouseWheel(MouseWheelEventArgs& args);
     virtual void OnKeyDown(KeyEventArgs& args);
     virtual void OnKeyUp(KeyEventArgs& args);
     virtual void OnKeyPress(KeyPressEventArgs& args);
@@ -439,6 +486,9 @@ private:
     void DoMouseUp(MouseEventArgs& args);
     void DoMouseDoubleClick(MouseEventArgs& args);
     void DoMouseHover();
+    void DoVScroll(int value);
+    void DoHScroll(int value);
+    void DoMouseWheel(MouseWheelEventArgs& args);
     void DoCreateAndShowCaret();
     void DoDestroyCaret();
     void CreateCaret();
@@ -496,6 +546,9 @@ private:
     MouseMoveEvent mouseMove;
     MouseHoverEvent mouseHover;
     MouseDoubleClickEvent mouseDoubleClick;
+    HScrollEvent hscroll;
+    VScrollEvent vscroll;
+    MouseWheelEvent mouseWheel;
     KeyDownEvent keyDown;
     KeyUpEvent keyUp;
     KeyPressEvent keyPress;
@@ -504,6 +557,7 @@ private:
     int mouseHoverMs;
     Point mouseHoverLocation;
     Size mouseHoverRectSize;
+    ScrollUnits scrollUnits;
 };
 
 WING_API HWND LParamHandle(Message& msg);
