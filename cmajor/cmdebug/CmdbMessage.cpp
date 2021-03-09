@@ -1,1002 +1,867 @@
 #include "CmdbMessage.hpp"
-#include <sngjson/json/JsonImport.hpp>
-#include <sngjson/json/JsonExport.hpp>
-#include <utility>
+#include <sngxml/serialization/XmlExport.hpp>
+#include <sngxml/serialization/XmlImport.hpp>
+#include <soulng/util/Unicode.hpp>
 
-Location::Location() : func(), file(), line(), scol(), ecol(), level()
+using namespace soulng::unicode;
+
+Location::Location()
+    : func(), file(), line(), scol(), ecol(), level()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> Location::ToJson() const
+Location::Location(sngxml::dom::Element* element)
+    : func(), file(), line(), scol(), ecol(), level()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(func);
-    object->AddField(U"func", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(file);
-    object->AddField(U"file", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(line);
-    object->AddField(U"line", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(scol);
-    object->AddField(U"scol", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(ecol);
-    object->AddField(U"ecol", std::move(fieldValue4));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(level);
-    object->AddField(U"level", std::move(fieldValue5));
-    return object;
+    sngxml::xmlser::FromXml(element, "func", func);
+    sngxml::xmlser::FromXml(element, "file", file);
+    sngxml::xmlser::FromXml(element, "line", line);
+    sngxml::xmlser::FromXml(element, "scol", scol);
+    sngxml::xmlser::FromXml(element, "ecol", ecol);
+    sngxml::xmlser::FromXml(element, "level", level);
 }
 
-Location::Location(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> Location::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "func", func);
-    sngjson::json::FromJson(__json_value, "file", file);
-    sngjson::json::FromJson(__json_value, "line", line);
-    sngjson::json::FromJson(__json_value, "scol", scol);
-    sngjson::json::FromJson(__json_value, "ecol", ecol);
-    sngjson::json::FromJson(__json_value, "level", level);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(func, "func").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(file, "file").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(line, "line").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(scol, "scol").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ecol, "ecol").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(level, "level").release()));
+    return element;
 }
 
-Type::Type() : name(), id()
+Type::Type()
+    : name(), id()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> Type::ToJson() const
+Type::Type(sngxml::dom::Element* element)
+    : name(), id()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(name);
-    object->AddField(U"name", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(id);
-    object->AddField(U"id", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "name", name);
+    sngxml::xmlser::FromXml(element, "id", id);
 }
 
-Type::Type(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> Type::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "name", name);
-    sngjson::json::FromJson(__json_value, "id", id);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(name, "name").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(id, "id").release()));
+    return element;
 }
 
-Result::Result() : staticType(), dynamicType(), initialized(), value()
+Result::Result()
+    : staticType(), dynamicType(), initialized(), value()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> Result::ToJson() const
+Result::Result(sngxml::dom::Element* element)
+    : staticType(), dynamicType(), initialized(), value()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(staticType);
-    object->AddField(U"staticType", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(dynamicType);
-    object->AddField(U"dynamicType", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(initialized);
-    object->AddField(U"initialized", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(value);
-    object->AddField(U"value", std::move(fieldValue3));
-    return object;
+    sngxml::xmlser::FromXml(element, "staticType", staticType);
+    sngxml::xmlser::FromXml(element, "dynamicType", dynamicType);
+    sngxml::xmlser::FromXml(element, "initialized", initialized);
+    sngxml::xmlser::FromXml(element, "value", value);
 }
 
-Result::Result(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> Result::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "staticType", staticType);
-    sngjson::json::FromJson(__json_value, "dynamicType", dynamicType);
-    sngjson::json::FromJson(__json_value, "initialized", initialized);
-    sngjson::json::FromJson(__json_value, "value", value);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(staticType, "staticType").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(dynamicType, "dynamicType").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(initialized, "initialized").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(value, "value").release()));
+    return element;
 }
 
-ChildResult::ChildResult() : expr(), name(), type(), dynType(), value(), count()
+ChildResult::ChildResult()
+    : expr(), name(), type(), dynType(), value(), count()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> ChildResult::ToJson() const
+ChildResult::ChildResult(sngxml::dom::Element* element)
+    : expr(), name(), type(), dynType(), value(), count()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(expr);
-    object->AddField(U"expr", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(name);
-    object->AddField(U"name", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(type);
-    object->AddField(U"type", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(dynType);
-    object->AddField(U"dynType", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(value);
-    object->AddField(U"value", std::move(fieldValue4));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(count);
-    object->AddField(U"count", std::move(fieldValue5));
-    return object;
+    sngxml::xmlser::FromXml(element, "expr", expr);
+    sngxml::xmlser::FromXml(element, "name", name);
+    sngxml::xmlser::FromXml(element, "type", type);
+    sngxml::xmlser::FromXml(element, "dynType", dynType);
+    sngxml::xmlser::FromXml(element, "value", value);
+    sngxml::xmlser::FromXml(element, "count", count);
 }
 
-ChildResult::ChildResult(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> ChildResult::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "expr", expr);
-    sngjson::json::FromJson(__json_value, "name", name);
-    sngjson::json::FromJson(__json_value, "type", type);
-    sngjson::json::FromJson(__json_value, "dynType", dynType);
-    sngjson::json::FromJson(__json_value, "value", value);
-    sngjson::json::FromJson(__json_value, "count", count);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(expr, "expr").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(name, "name").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(type, "type").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(dynType, "dynType").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(value, "value").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(count, "count").release()));
+    return element;
 }
 
-TargetState::TargetState() : stopReason(), exitCode(), breakpointId(), signalName(), signalMeaning()
+TargetState::TargetState()
+    : stopReason(), exitCode(), breakpointId(), signalName(), signalMeaning()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> TargetState::ToJson() const
+TargetState::TargetState(sngxml::dom::Element* element)
+    : stopReason(), exitCode(), breakpointId(), signalName(), signalMeaning()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(stopReason);
-    object->AddField(U"stopReason", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(exitCode);
-    object->AddField(U"exitCode", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(breakpointId);
-    object->AddField(U"breakpointId", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(signalName);
-    object->AddField(U"signalName", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(signalMeaning);
-    object->AddField(U"signalMeaning", std::move(fieldValue4));
-    return object;
+    sngxml::xmlser::FromXml(element, "stopReason", stopReason);
+    sngxml::xmlser::FromXml(element, "exitCode", exitCode);
+    sngxml::xmlser::FromXml(element, "breakpointId", breakpointId);
+    sngxml::xmlser::FromXml(element, "signalName", signalName);
+    sngxml::xmlser::FromXml(element, "signalMeaning", signalMeaning);
 }
 
-TargetState::TargetState(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> TargetState::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "stopReason", stopReason);
-    sngjson::json::FromJson(__json_value, "exitCode", exitCode);
-    sngjson::json::FromJson(__json_value, "breakpointId", breakpointId);
-    sngjson::json::FromJson(__json_value, "signalName", signalName);
-    sngjson::json::FromJson(__json_value, "signalMeaning", signalMeaning);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(stopReason, "stopReason").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(exitCode, "exitCode").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpointId, "breakpointId").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(signalName, "signalName").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(signalMeaning, "signalMeaning").release()));
+    return element;
 }
 
-SourceLoc::SourceLoc() : path(), line()
+SourceLoc::SourceLoc()
+    : path(), line()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> SourceLoc::ToJson() const
+SourceLoc::SourceLoc(sngxml::dom::Element* element)
+    : path(), line()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(path);
-    object->AddField(U"path", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(line);
-    object->AddField(U"line", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "path", path);
+    sngxml::xmlser::FromXml(element, "line", line);
 }
 
-SourceLoc::SourceLoc(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> SourceLoc::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "path", path);
-    sngjson::json::FromJson(__json_value, "line", line);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(path, "path").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(line, "line").release()));
+    return element;
 }
 
-BreakpointInfo::BreakpointInfo() : success(), breakpointId(), numInsts(), location(), error()
+BreakpointInfo::BreakpointInfo()
+    : success(), breakpointId(), numInsts(), location(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> BreakpointInfo::ToJson() const
+BreakpointInfo::BreakpointInfo(sngxml::dom::Element* element)
+    : success(), breakpointId(), numInsts(), location(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(breakpointId);
-    object->AddField(U"breakpointId", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(numInsts);
-    object->AddField(U"numInsts", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(location);
-    object->AddField(U"location", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue4));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "breakpointId", breakpointId);
+    sngxml::xmlser::FromXml(element, "numInsts", numInsts);
+    sngxml::xmlser::FromXml(element, "location", location);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-BreakpointInfo::BreakpointInfo(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> BreakpointInfo::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "breakpointId", breakpointId);
-    sngjson::json::FromJson(__json_value, "numInsts", numInsts);
-    sngjson::json::FromJson(__json_value, "location", location);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpointId, "breakpointId").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(numInsts, "numInsts").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(location, "location").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-StartRequest::StartRequest() : messageKind(), breakpointLocations()
+StartRequest::StartRequest()
+    : breakpointLocations()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> StartRequest::ToJson() const
+StartRequest::StartRequest(sngxml::dom::Element* element)
+    : breakpointLocations()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(breakpointLocations);
-    object->AddField(U"breakpointLocations", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "breakpointLocations", breakpointLocations);
 }
 
-StartRequest::StartRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> StartRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "breakpointLocations", breakpointLocations);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpointLocations, "breakpointLocations").release()));
+    return element;
 }
 
-StartReply::StartReply() : messageKind(), success(), location(), state(), breakpointInfos(), error()
+StartReply::StartReply()
+    : success(), location(), state(), breakpointInfos(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> StartReply::ToJson() const
+StartReply::StartReply(sngxml::dom::Element* element)
+    : success(), location(), state(), breakpointInfos(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(location);
-    object->AddField(U"location", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(state);
-    object->AddField(U"state", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(breakpointInfos);
-    object->AddField(U"breakpointInfos", std::move(fieldValue4));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue5));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "location", location);
+    sngxml::xmlser::FromXml(element, "state", state);
+    sngxml::xmlser::FromXml(element, "breakpointInfos", breakpointInfos);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-StartReply::StartReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> StartReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "location", location);
-    sngjson::json::FromJson(__json_value, "state", state);
-    sngjson::json::FromJson(__json_value, "breakpointInfos", breakpointInfos);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(location, "location").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(state, "state").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpointInfos, "breakpointInfos").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-StopRequest::StopRequest() : messageKind()
+StopRequest::StopRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> StopRequest::ToJson() const
+StopRequest::StopRequest(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-StopRequest::StopRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> StopRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-StopReply::StopReply() : messageKind()
+StopReply::StopReply()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> StopReply::ToJson() const
+StopReply::StopReply(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-StopReply::StopReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> StopReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-GenericErrorReply::GenericErrorReply() : messageKind(), errorMessage()
+GenericErrorReply::GenericErrorReply()
+    : errorMessage()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> GenericErrorReply::ToJson() const
+GenericErrorReply::GenericErrorReply(sngxml::dom::Element* element)
+    : errorMessage()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(errorMessage);
-    object->AddField(U"errorMessage", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "errorMessage", errorMessage);
 }
 
-GenericErrorReply::GenericErrorReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> GenericErrorReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "errorMessage", errorMessage);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(errorMessage, "errorMessage").release()));
+    return element;
 }
 
-ContinueRequest::ContinueRequest() : messageKind()
+ContinueRequest::ContinueRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> ContinueRequest::ToJson() const
+ContinueRequest::ContinueRequest(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-ContinueRequest::ContinueRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> ContinueRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-ContinueReply::ContinueReply() : messageKind(), success(), location(), state(), error()
+ContinueReply::ContinueReply()
+    : success(), location(), state(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> ContinueReply::ToJson() const
+ContinueReply::ContinueReply(sngxml::dom::Element* element)
+    : success(), location(), state(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(location);
-    object->AddField(U"location", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(state);
-    object->AddField(U"state", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue4));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "location", location);
+    sngxml::xmlser::FromXml(element, "state", state);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-ContinueReply::ContinueReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> ContinueReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "location", location);
-    sngjson::json::FromJson(__json_value, "state", state);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(location, "location").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(state, "state").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-NextRequest::NextRequest() : messageKind()
+NextRequest::NextRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> NextRequest::ToJson() const
+NextRequest::NextRequest(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-NextRequest::NextRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> NextRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-NextReply::NextReply() : messageKind(), success(), location(), state(), error()
+NextReply::NextReply()
+    : success(), location(), state(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> NextReply::ToJson() const
+NextReply::NextReply(sngxml::dom::Element* element)
+    : success(), location(), state(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(location);
-    object->AddField(U"location", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(state);
-    object->AddField(U"state", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue4));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "location", location);
+    sngxml::xmlser::FromXml(element, "state", state);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-NextReply::NextReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> NextReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "location", location);
-    sngjson::json::FromJson(__json_value, "state", state);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(location, "location").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(state, "state").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-StepRequest::StepRequest() : messageKind()
+StepRequest::StepRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> StepRequest::ToJson() const
+StepRequest::StepRequest(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-StepRequest::StepRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> StepRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-StepReply::StepReply() : messageKind(), success(), location(), state(), error()
+StepReply::StepReply()
+    : success(), location(), state(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> StepReply::ToJson() const
+StepReply::StepReply(sngxml::dom::Element* element)
+    : success(), location(), state(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(location);
-    object->AddField(U"location", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(state);
-    object->AddField(U"state", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue4));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "location", location);
+    sngxml::xmlser::FromXml(element, "state", state);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-StepReply::StepReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> StepReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "location", location);
-    sngjson::json::FromJson(__json_value, "state", state);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(location, "location").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(state, "state").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-FinishRequest::FinishRequest() : messageKind()
+FinishRequest::FinishRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> FinishRequest::ToJson() const
+FinishRequest::FinishRequest(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-FinishRequest::FinishRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> FinishRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-FinishReply::FinishReply() : messageKind(), success(), location(), state(), error()
+FinishReply::FinishReply()
+    : success(), location(), state(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> FinishReply::ToJson() const
+FinishReply::FinishReply(sngxml::dom::Element* element)
+    : success(), location(), state(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(location);
-    object->AddField(U"location", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(state);
-    object->AddField(U"state", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue4));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "location", location);
+    sngxml::xmlser::FromXml(element, "state", state);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-FinishReply::FinishReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> FinishReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "location", location);
-    sngjson::json::FromJson(__json_value, "state", state);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(location, "location").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(state, "state").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-UntilRequest::UntilRequest() : messageKind(), sourceLoc()
+UntilRequest::UntilRequest()
+    : sourceLoc()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> UntilRequest::ToJson() const
+UntilRequest::UntilRequest(sngxml::dom::Element* element)
+    : sourceLoc()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(sourceLoc);
-    object->AddField(U"sourceLoc", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "sourceLoc", sourceLoc);
 }
 
-UntilRequest::UntilRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> UntilRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "sourceLoc", sourceLoc);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceLoc, "sourceLoc").release()));
+    return element;
 }
 
-UntilReply::UntilReply() : messageKind(), success(), location(), state(), error()
+UntilReply::UntilReply()
+    : success(), location(), state(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> UntilReply::ToJson() const
+UntilReply::UntilReply(sngxml::dom::Element* element)
+    : success(), location(), state(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(location);
-    object->AddField(U"location", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(state);
-    object->AddField(U"state", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue4));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "location", location);
+    sngxml::xmlser::FromXml(element, "state", state);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-UntilReply::UntilReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> UntilReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "location", location);
-    sngjson::json::FromJson(__json_value, "state", state);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(location, "location").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(state, "state").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-BreakRequest::BreakRequest() : messageKind(), breakpointLocation()
+BreakRequest::BreakRequest()
+    : breakpointLocation()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> BreakRequest::ToJson() const
+BreakRequest::BreakRequest(sngxml::dom::Element* element)
+    : breakpointLocation()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(breakpointLocation);
-    object->AddField(U"breakpointLocation", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "breakpointLocation", breakpointLocation);
 }
 
-BreakRequest::BreakRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> BreakRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "breakpointLocation", breakpointLocation);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpointLocation, "breakpointLocation").release()));
+    return element;
 }
 
-BreakReply::BreakReply() : messageKind(), breakpointInfo()
+BreakReply::BreakReply()
+    : breakpointInfo()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> BreakReply::ToJson() const
+BreakReply::BreakReply(sngxml::dom::Element* element)
+    : breakpointInfo()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(breakpointInfo);
-    object->AddField(U"breakpointInfo", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "breakpointInfo", breakpointInfo);
 }
 
-BreakReply::BreakReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> BreakReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "breakpointInfo", breakpointInfo);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpointInfo, "breakpointInfo").release()));
+    return element;
 }
 
-DeleteRequest::DeleteRequest() : messageKind(), breakpointId()
+DeleteRequest::DeleteRequest()
+    : breakpointId()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> DeleteRequest::ToJson() const
+DeleteRequest::DeleteRequest(sngxml::dom::Element* element)
+    : breakpointId()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(breakpointId);
-    object->AddField(U"breakpointId", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "breakpointId", breakpointId);
 }
 
-DeleteRequest::DeleteRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> DeleteRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "breakpointId", breakpointId);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpointId, "breakpointId").release()));
+    return element;
 }
 
-DeleteReply::DeleteReply() : messageKind(), success(), error()
+DeleteReply::DeleteReply()
+    : success(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> DeleteReply::ToJson() const
+DeleteReply::DeleteReply(sngxml::dom::Element* element)
+    : success(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue2));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-DeleteReply::DeleteReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> DeleteReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-DepthRequest::DepthRequest() : messageKind()
+DepthRequest::DepthRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> DepthRequest::ToJson() const
+DepthRequest::DepthRequest(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-DepthRequest::DepthRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> DepthRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-DepthReply::DepthReply() : messageKind(), success(), depth(), error()
+DepthReply::DepthReply()
+    : success(), depth(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> DepthReply::ToJson() const
+DepthReply::DepthReply(sngxml::dom::Element* element)
+    : success(), depth(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(depth);
-    object->AddField(U"depth", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue3));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "depth", depth);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-DepthReply::DepthReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> DepthReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "depth", depth);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(depth, "depth").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-FramesRequest::FramesRequest() : messageKind(), lowFrame(), highFrame()
+FramesRequest::FramesRequest()
+    : lowFrame(), highFrame()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> FramesRequest::ToJson() const
+FramesRequest::FramesRequest(sngxml::dom::Element* element)
+    : lowFrame(), highFrame()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(lowFrame);
-    object->AddField(U"lowFrame", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(highFrame);
-    object->AddField(U"highFrame", std::move(fieldValue2));
-    return object;
+    sngxml::xmlser::FromXml(element, "lowFrame", lowFrame);
+    sngxml::xmlser::FromXml(element, "highFrame", highFrame);
 }
 
-FramesRequest::FramesRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> FramesRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "lowFrame", lowFrame);
-    sngjson::json::FromJson(__json_value, "highFrame", highFrame);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(lowFrame, "lowFrame").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(highFrame, "highFrame").release()));
+    return element;
 }
 
-FramesReply::FramesReply() : messageKind(), success(), frames(), error()
+FramesReply::FramesReply()
+    : success(), frames(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> FramesReply::ToJson() const
+FramesReply::FramesReply(sngxml::dom::Element* element)
+    : success(), frames(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(frames);
-    object->AddField(U"frames", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue3));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "frames", frames);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-FramesReply::FramesReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> FramesReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "frames", frames);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(frames, "frames").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-EvaluateRequest::EvaluateRequest() : messageKind(), expression()
+EvaluateRequest::EvaluateRequest()
+    : expression()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> EvaluateRequest::ToJson() const
+EvaluateRequest::EvaluateRequest(sngxml::dom::Element* element)
+    : expression()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(expression);
-    object->AddField(U"expression", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "expression", expression);
 }
 
-EvaluateRequest::EvaluateRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> EvaluateRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "expression", expression);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(expression, "expression").release()));
+    return element;
 }
 
-EvaluateReply::EvaluateReply() : messageKind(), success(), result(), error()
+EvaluateReply::EvaluateReply()
+    : success(), result(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> EvaluateReply::ToJson() const
+EvaluateReply::EvaluateReply(sngxml::dom::Element* element)
+    : success(), result(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(result);
-    object->AddField(U"result", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue3));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "result", result);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-EvaluateReply::EvaluateReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> EvaluateReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "result", result);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(result, "result").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-CountRequest::CountRequest() : messageKind(), expression()
+CountRequest::CountRequest()
+    : expression()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> CountRequest::ToJson() const
+CountRequest::CountRequest(sngxml::dom::Element* element)
+    : expression()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(expression);
-    object->AddField(U"expression", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "expression", expression);
 }
 
-CountRequest::CountRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> CountRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "expression", expression);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(expression, "expression").release()));
+    return element;
 }
 
-CountReply::CountReply() : messageKind(), success(), count(), error()
+CountReply::CountReply()
+    : success(), count(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> CountReply::ToJson() const
+CountReply::CountReply(sngxml::dom::Element* element)
+    : success(), count(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(count);
-    object->AddField(U"count", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue3));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "count", count);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-CountReply::CountReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> CountReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "count", count);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(count, "count").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-EvaluateChildRequest::EvaluateChildRequest() : messageKind(), expression(), start(), count()
+EvaluateChildRequest::EvaluateChildRequest()
+    : expression(), start(), count()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> EvaluateChildRequest::ToJson() const
+EvaluateChildRequest::EvaluateChildRequest(sngxml::dom::Element* element)
+    : expression(), start(), count()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(expression);
-    object->AddField(U"expression", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(start);
-    object->AddField(U"start", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(count);
-    object->AddField(U"count", std::move(fieldValue3));
-    return object;
+    sngxml::xmlser::FromXml(element, "expression", expression);
+    sngxml::xmlser::FromXml(element, "start", start);
+    sngxml::xmlser::FromXml(element, "count", count);
 }
 
-EvaluateChildRequest::EvaluateChildRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> EvaluateChildRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "expression", expression);
-    sngjson::json::FromJson(__json_value, "start", start);
-    sngjson::json::FromJson(__json_value, "count", count);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(expression, "expression").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(start, "start").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(count, "count").release()));
+    return element;
 }
 
-EvaluateChildReply::EvaluateChildReply() : messageKind(), success(), results(), error()
+EvaluateChildReply::EvaluateChildReply()
+    : success(), results(), error()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> EvaluateChildReply::ToJson() const
+EvaluateChildReply::EvaluateChildReply(sngxml::dom::Element* element)
+    : success(), results(), error()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(results);
-    object->AddField(U"results", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue3));
-    return object;
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "results", results);
+    sngxml::xmlser::FromXml(element, "error", error);
 }
 
-EvaluateChildReply::EvaluateChildReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> EvaluateChildReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "results", results);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(results, "results").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 
-TargetRunningRequest::TargetRunningRequest() : messageKind()
+TargetRunningRequest::TargetRunningRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> TargetRunningRequest::ToJson() const
+TargetRunningRequest::TargetRunningRequest(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-TargetRunningRequest::TargetRunningRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> TargetRunningRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-TargetRunningReply::TargetRunningReply() : messageKind()
+TargetRunningReply::TargetRunningReply()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> TargetRunningReply::ToJson() const
+TargetRunningReply::TargetRunningReply(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-TargetRunningReply::TargetRunningReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> TargetRunningReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-TargetInputRequest::TargetInputRequest() : messageKind()
+TargetInputRequest::TargetInputRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> TargetInputRequest::ToJson() const
+TargetInputRequest::TargetInputRequest(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-TargetInputRequest::TargetInputRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> TargetInputRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-TargetInputReply::TargetInputReply() : messageKind(), line(), eof()
+TargetInputReply::TargetInputReply()
+    : line(), eof()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> TargetInputReply::ToJson() const
+TargetInputReply::TargetInputReply(sngxml::dom::Element* element)
+    : line(), eof()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(line);
-    object->AddField(U"line", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(eof);
-    object->AddField(U"eof", std::move(fieldValue2));
-    return object;
+    sngxml::xmlser::FromXml(element, "line", line);
+    sngxml::xmlser::FromXml(element, "eof", eof);
 }
 
-TargetInputReply::TargetInputReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> TargetInputReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "line", line);
-    sngjson::json::FromJson(__json_value, "eof", eof);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(line, "line").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(eof, "eof").release()));
+    return element;
 }
 
-TargetOutputRequest::TargetOutputRequest() : messageKind(), handle(), output()
+TargetOutputRequest::TargetOutputRequest()
+    : handle(), output()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> TargetOutputRequest::ToJson() const
+TargetOutputRequest::TargetOutputRequest(sngxml::dom::Element* element)
+    : handle(), output()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(handle);
-    object->AddField(U"handle", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(output);
-    object->AddField(U"output", std::move(fieldValue2));
-    return object;
+    sngxml::xmlser::FromXml(element, "handle", handle);
+    sngxml::xmlser::FromXml(element, "output", output);
 }
 
-TargetOutputRequest::TargetOutputRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> TargetOutputRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "handle", handle);
-    sngjson::json::FromJson(__json_value, "output", output);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(handle, "handle").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(output, "output").release()));
+    return element;
 }
 
-TargetOutputReply::TargetOutputReply() : messageKind()
+TargetOutputReply::TargetOutputReply()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> TargetOutputReply::ToJson() const
+TargetOutputReply::TargetOutputReply(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-TargetOutputReply::TargetOutputReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> TargetOutputReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-LogMessageRequest::LogMessageRequest() : messageKind(), logMessage()
+LogMessageRequest::LogMessageRequest()
+    : logMessage()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> LogMessageRequest::ToJson() const
+LogMessageRequest::LogMessageRequest(sngxml::dom::Element* element)
+    : logMessage()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(logMessage);
-    object->AddField(U"logMessage", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "logMessage", logMessage);
 }
 
-LogMessageRequest::LogMessageRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> LogMessageRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "logMessage", logMessage);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(logMessage, "logMessage").release()));
+    return element;
 }
 
-LogMessageReply::LogMessageReply() : messageKind()
+LogMessageReply::LogMessageReply()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> LogMessageReply::ToJson() const
+LogMessageReply::LogMessageReply(sngxml::dom::Element* element)
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
 }
 
-LogMessageReply::LogMessageReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> LogMessageReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 

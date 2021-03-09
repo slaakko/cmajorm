@@ -122,7 +122,7 @@ SNGXML_SERIALIZATION_API inline std::string ToString(const duration& dur)
 }
 
 template<class T>
-concept XmlExportableClassType = requires(T t, const std::string& u) { t.ToXml(u); };
+concept XmlExportableClassType = std::is_class_v<T> && requires(T t, const std::string& u) { t.ToXml(u); };
 
 template<class T>
 concept XmlExportableScalarType = 

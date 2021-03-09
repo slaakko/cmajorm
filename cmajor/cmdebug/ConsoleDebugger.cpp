@@ -25,7 +25,7 @@ void ConsoleDebuggerOutputWriter::WriteLogMessage(const std::string& message)
     formatter.WriteLine(message);
 }
 
-void ConsoleDebuggerOutputWriter::WriteJsonValue(JsonValue* jsonValue)
+void ConsoleDebuggerOutputWriter::WriteJsonValue(soulng::util::JsonValue* jsonValue)
 {
     jsonValue->Write(formatter);
 }

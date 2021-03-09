@@ -1,2 +1,2 @@
 @echo off
-jsongen -v BuildServerMessage.json-schema
+xmlsergen -v BuildServerMessage.xml-schema

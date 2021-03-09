@@ -207,17 +207,17 @@ enum class Keys : int
     zoom = 251
 };
 
-inline Keys operator|(Keys left, Keys right)
+inline constexpr Keys operator|(Keys left, Keys right)
 {
     return Keys(int(left) | int(right));
 }
 
-inline Keys operator&(Keys left, Keys right)
+inline constexpr Keys operator&(Keys left, Keys right)
 {
     return Keys(int(left) & int(right));
 }
 
-inline Keys operator~(Keys k)
+inline constexpr Keys operator~(Keys k)
 {
     return Keys(~int(k));
 }

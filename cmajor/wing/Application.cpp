@@ -39,6 +39,11 @@ int Application::Run(Window& mainWindow)
     return wing::Run();
 }
 
+void Application::ProcessMessages()
+{
+    wing::MessageLoop();
+}
+
 bool Application::ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result)
 {
     Control* window = windowManager.GetWindow(handle);

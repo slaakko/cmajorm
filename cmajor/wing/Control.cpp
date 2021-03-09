@@ -642,6 +642,36 @@ void Control::Invalidate(const Rect& rect, bool eraseBackground)
     InvalidateRect(handle, &winRect, eraseBackground);
 }
 
+void Control::SetFocus()
+{
+    ::SetFocus(handle);
+    Window* window = GetWindow();
+    if (window)
+    {
+        window->SetFocusedControl(this);
+    }
+}
+
+void Control::SetText(const std::string& text_)
+{
+    if (text != text_)
+    {
+        text = text_;
+        std::u16string txt = ToUtf16(text);
+        ::SetWindowText(handle, (LPCWSTR)txt.c_str());
+        OnTextChanged();
+    }
+}
+
+void Control::SetTextInternal(const std::string& text_)
+{
+    if (text != text_)
+    {
+        text = text_;
+        OnTextChanged();
+    }
+}
+
 void Control::SetTimer(int timerId, int durationMs)
 {
     int retval = ::SetTimer(handle, timerId, durationMs, nullptr);
@@ -713,6 +743,11 @@ void Control::TranslateContentLocation(Point& location)
     {
         parentControl->TranslateContentLocation(location);
     }
+}
+
+void Control::CreateCaret()
+{
+    ::CreateCaret(handle, nullptr, 1, 15);
 }
 
 bool Control::ProcessMessage(Message& msg)
@@ -1200,6 +1235,29 @@ Point Control::ClientToScreen(const Point& pt)
     return Point(p.x, p.y);
 }
 
+Point Control::GetCaretPos() const
+{
+    POINT cp;
+    bool succeeded = ::GetCaretPos(&cp);
+    if (!succeeded)
+    {
+        throw WindowsException(GetLastError());
+    }
+    return Point(cp.x, cp.y);
+}
+
+void Control::SetCaretPos(const Point& caretPos)
+{
+    if (CaretCreated())
+    {
+        bool succeeded = ::SetCaretPos(caretPos.X, caretPos.Y);
+        if (!succeeded)
+        {
+            throw WindowsException(GetLastError());
+        }
+    }
+}
+
 void Control::BringToFront()
 {
     BringWindowToTop(handle);
@@ -1227,11 +1285,6 @@ void Control::DoCreateAndShowCaret()
         SetCaretLocation();
         ShowCaret();
     }
-}
-
-void Control::CreateCaret()
-{
-    ::CreateCaret(Handle(), nullptr, 1, 15);
 }
 
 void Control::DoDestroyCaret()
@@ -1538,6 +1591,11 @@ void Control::OnChildLostFocus(ControlEventArgs& args)
     childLostFocus.Fire(args);
 }
 
+void Control::OnTextChanged()
+{
+    textChanged.Fire();
+}
+
 void Control::OnTimer(TimerEventArgs& args)
 {
     timer.Fire(args);
@@ -1640,6 +1698,11 @@ void Control::OnMouseDoubleClick(MouseEventArgs& args)
     mouseDoubleClick.Fire(args);
 }
 
+void Control::OnRightClick(RightClickEventArgs& args)
+{
+    rightClick.Fire(args);
+}
+
 void Control::OnHScroll(IntArgs& args)
 {
     hscroll.Fire(args);
@@ -1672,7 +1735,7 @@ void Control::OnKeyPress(KeyPressEventArgs& args)
 
 void Control::SetCaretLocation()
 {
-    SetCaretPos(0, 0);
+    SetCaretPos(Point(0, 0));
 }
 
 void Control::SetCursor()

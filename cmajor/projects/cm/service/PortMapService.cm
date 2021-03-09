@@ -5,13 +5,14 @@
 
 using Cm.Service;
 using System;
+using System.Text;
 using System.Collections;
 using System.Dom;
 using System.XPath;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
-using System.Json;
+using System.Xml.Serialization;
 
 namespace Cm.Service.PortMap
 {
@@ -20,69 +21,73 @@ namespace Cm.Service.PortMap
         return Path.Combine(CmCodeLogDir(), "portmap.service.log");
     }
 
-    [json]
-    class GetFreePortNumberRequest
+    [xml]
+    public class GetFreePortNumberRequest
     {
-        public nothrow GetFreePortNumberRequest(const string& programName_, int pid_, const string& time_) :
-            message("GetFreePortNumberRequest"), programName(programName_), pid(ToString(pid_)), time(time_)
+        public nothrow GetFreePortNumberRequest()
         {
         }
-        public string message;
-        public string programName;
-        public string pid;
-        public string time;
-    }
-
-    [json]
-    class GetFreePortNumberReply
-    {
-        public nothrow GetFreePortNumberReply() : message("GetFreePortNumberReply")
+        public nothrow GetFreePortNumberRequest(const string& processName_, int pid_) : processName(processName_), pid(pid_)
         {
         }
-        public string message;
-        public string portNumber;
+        public string processName;
+        public int pid;
     }
 
-    [json]
-    class StopPortMapServerRequest
+    [xml]
+    public class GetFreePortNumberReply
     {
-        public nothrow StopPortMapServerRequest() : message("StopPortMapServerRequest")
+        public nothrow GetFreePortNumberReply()
         {
         }
-        public string message;
+        public int portNumber;
     }
 
-    [json]
+    [xml]
+    public class StopPortMapServerRequest
+    {
+        public nothrow StopPortMapServerRequest()
+        {
+        }
+    }
+
+    [xml]
+    public class StopPortMapServerReply
+    {
+        public nothrow StopPortMapServerReply()
+        {
+        }
+    }
+
+    [xml]
     public class PortLease
     {
-        public string portNumber;
-        public string programName;
-        public string pid;
-        public string leaseStartTime;
-        public string leaseRenewalTime;
+        public int portNumber;
+        public string processName;
+        public int pid;
+        public DateTime leaseStartTime;
+        public DateTime leaseRenewalTime;
         public string leaseState;
     }
 
-    [json]
-    class ViewPortLeaseRequest
+    [xml]
+    public class ViewPortLeaseRequest
     {
-        public nothrow ViewPortLeaseRequest() : message("ViewPortLeaseRequest")
+        public nothrow ViewPortLeaseRequest()
         {
         }
-        public string message;
     }
 
-    [json]
-    class ViewPortLeaseReply
+    [xml]
+    public class ViewPortLeaseReply
     {
-        public nothrow ViewPortLeaseReply() : message("ViewPortLeaseReply")
+        public nothrow ViewPortLeaseReply()
         {
         }
-        public string message;
         public List<PortLease> portLeases;
     }
 
-    string PortMapConfigFileName()
+    public string PortMapConfigFileName()
     {
         string cmajorRootDir = Cm.Ast.CmajorRootDir();
         string cmajorConfigDir = Path.Combine(cmajorRootDir, "config");
@@ -90,7 +95,7 @@ namespace Cm.Service.PortMap
         return Path.Combine(cmajorConfigDir, "cmpm.config.xml");
     }
 
-    int GetPortMapServicePortNumber()
+    public int GetPortMapServicePortNumber()
     {
         try
         {
@@ -146,19 +151,9 @@ namespace Cm.Service.PortMap
         return -1;
     }
 
-    string GetMessage(JsonValue* jsonValue)
+    string GetMessage(Element* element)
     {
-        if (jsonValue is JsonObject*)
-        {
-            JsonObject* jsonObject = cast<JsonObject*>(jsonValue);
-            JsonValue* message = jsonObject->GetField("message");
-            if (message != null && message is JsonString*)
-            {
-                JsonString* messageStr = cast<JsonString*>(message);
-                return ToUtf8(messageStr->Value());
-            }
-        }
-        return string();
+        return ToUtf8(element->Name());
     }
 
     public void StartPortMapServer()
@@ -192,15 +187,24 @@ namespace Cm.Service.PortMap
         }
         TcpSocket portMapServerConnection("localhost", ToString(port));
         StopPortMapServerRequest request;
-        UniquePtr<JsonValue> requestValue = request.ToJson();
-        string requestStr = requestValue->ToString();
+        UniquePtr<Element> requestElement = request.ToXml("stopPortMapServerRequest");
+        Document requestDoc;
+        requestDoc.AppendChild(UniquePtr<Node>(requestElement.Release()));
+        StringWriter writer;
+        CodeFormatter formatter(writer);
+        requestDoc.Write(formatter);
+        string requestStr = writer.GetString();
         Write(portMapServerConnection, requestStr);
         string replyStr = ReadStr(portMapServerConnection);
-        UniquePtr<JsonValue> replyValue = ParseJson(replyStr);
-        string message = GetMessage(replyValue.Get());
+        UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+        string message = GetMessage(replyDoc->DocumentElement());
+        if (message == "stopPortMapServerReply")
+        {
+            StopPortMapServerReply reply(replyDoc->DocumentElement());
+        }
     }
 
-    public int GetFreePortNumber(const string& programName, int pid, int& portMapServicePortNumber)
+    public int GetFreePortNumber(const string& processName, int pid, int& portMapServicePortNumber)
     {
         portMapServicePortNumber = -1;
         try
@@ -222,28 +226,28 @@ namespace Cm.Service.PortMap
                 try
                 {
                     TcpSocket portMapServerConnection("localhost", ToString(port));
-                    GetFreePortNumberRequest request(programName, pid, GetCurrentDateTime().ToString());
-                    UniquePtr<JsonValue> requestValue = request.ToJson();
-                    string requestStr = requestValue->ToString();
+                    GetFreePortNumberRequest request(processName, pid);
+                    UniquePtr<Element> requestElement = request.ToXml("getFreePortNumberRequest");
+                    Document requestDoc;
+                    requestDoc.AppendChild(UniquePtr<Node>(requestElement.Release()));
+                    StringWriter writer;
+                    CodeFormatter formatter(writer);
+                    requestDoc.Write(formatter);
+                    string requestStr = writer.GetString();
                     Write(portMapServerConnection, requestStr);
                     string replyStr = ReadStr(portMapServerConnection);
-                    UniquePtr<JsonValue> replyValue = ParseJson(replyStr);
-                    string message = GetMessage(replyValue.Get());
-                    if (message == "GetFreePortNumberReply")
+                    UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+                    string message = GetMessage(replyDoc->DocumentElement());
+                    if (message == "getFreePortNumberReply")
                     {
-                        GetFreePortNumberReply reply(replyValue.Get());
-                        string portNumberStr = reply.portNumber;
-                        if (portNumberStr.IsEmpty())
-                        {
-                            throw Exception("portNumber field in 'GetFreePortNumberReply' is empty");
-                        }
-                        int freePortNumber = ParseInt(portNumberStr);
+                        GetFreePortNumberReply reply(replyDoc->DocumentElement());
+                        int freePortNumber = reply.portNumber;
                         portMapServicePortNumber = port;
                         return freePortNumber;
                     }
                     else
                     {
-                        throw Exception("'GetFreePortNumberReply' expected, message=" + message);
+                        throw Exception("'getFreePortNumberReply' expected, message=" + message);
                     }
                 }
                 catch (const Exception& ex)
@@ -291,20 +295,25 @@ namespace Cm.Service.PortMap
             {
                 TcpSocket portMapServerConnection("localhost", ToString(port));
                 ViewPortLeaseRequest request;
-                UniquePtr<JsonValue> requestValue = request.ToJson();
-                string requestStr = requestValue->ToString();
+                UniquePtr<Element> requestElement = request.ToXml("viewPortLeaseRequest");
+                Document requestDoc;
+                requestDoc.AppendChild(UniquePtr<Node>(requestElement.Release()));
+                StringWriter writer;
+                CodeFormatter formatter(writer);
+                requestDoc.Write(formatter);
+                string requestStr = writer.GetString();
                 Write(portMapServerConnection, requestStr);
                 string replyStr = ReadStr(portMapServerConnection);
-                UniquePtr<JsonValue> replyValue = ParseJson(replyStr);
-                string message = GetMessage(replyValue.Get());
-                if (message == "ViewPortLeaseReply")
+                UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+                string message = GetMessage(replyDoc->DocumentElement());
+                if (message == "viewPortLeaseReply")
                 {
-                    ViewPortLeaseReply reply(replyValue.Get());
+                    ViewPortLeaseReply reply(replyDoc->DocumentElement());
                     return reply.portLeases;
                 }
                 else
                 {
-                    throw Exception("ViewPortLeaseReply expected");
+                    throw Exception("viewPortLeaseReply expected, message=" + message);
                 }
             }
             catch (const Exception& ex)

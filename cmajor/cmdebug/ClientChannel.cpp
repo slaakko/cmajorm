@@ -4,13 +4,23 @@
 // =================================
 
 #include <cmajor/cmdebug/ClientChannel.hpp>
-#include <sngjson/json/JsonLexer.hpp>
-#include <sngjson/json/JsonParser.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <sstream>
 
 namespace cmajor { namespace debug {
 
 using namespace soulng::unicode;
+
+std::string ToString(const std::unique_ptr<Document>& messageDoc)
+{
+    std::stringstream strStream;
+    CodeFormatter formatter(strStream);
+    messageDoc->Write(formatter);
+    return strStream.str();
+}
 
 ClientChannelUser::~ClientChannelUser()
 {
@@ -47,15 +57,15 @@ void ClientChannel::Run()
 {
     try
     {
-        std::unique_ptr<JsonValue> message = GetMessage();
+        std::unique_ptr<Document> message = GetMessage();
         while (message)
         {
             std::string replyStr;
-            if (user->IsIdleChannelMessage(message.get()))
+            if (user->IsIdleChannelMessage(message->DocumentElement()))
             {
                 if (sendIdleMessages)
                 {
-                    std::string messageStr = message->ToString();
+                    std::string messageStr = ToString(message);
                     Write(socket, messageStr);
                     replyStr = ReadStr(socket);
                 }
@@ -67,13 +77,12 @@ void ClientChannel::Run()
             }
             else
             {
-                std::string messageStr = message->ToString();
+                std::string messageStr = ToString(message);
                 Write(socket, messageStr);
                 replyStr = ReadStr(socket);
             }
-            JsonLexer lexer(ToUtf32(replyStr), "", 0);
-            std::unique_ptr<JsonValue> reply = JsonParser::Parse(lexer);
-            user->ProcessReceivedClientChannelMessage(reply.get());
+            std::unique_ptr<Document> reply = ParseDocument(ToUtf32(replyStr), "socket");
+            user->ProcessReceivedClientChannelMessage(reply->DocumentElement());
             message = GetMessage();
         }
     }
@@ -83,22 +92,34 @@ void ClientChannel::Run()
     }
 }
 
-std::unique_ptr<JsonValue> ClientChannel::GetMessage()
+std::unique_ptr<Document> ClientChannel::GetMessage()
 {
     std::unique_lock<std::mutex> lock(messageQueueMtx);
     if (!messageEnqueued.wait_for(lock, std::chrono::milliseconds{ timeoutMs }, [this] { return !messageQueue.empty(); }))
     {
-        return user->GetIdleClientChannelMessage();
+        std::unique_ptr<Element> idleChannelMessage = user->GetIdleClientChannelMessage();
+        std::unique_ptr<Document> message(new Document());
+        message->AppendChild(std::unique_ptr<Node>(idleChannelMessage.release()));
+        return message;
     }
-    std::unique_ptr<JsonValue> message(std::move(messageQueue.front()));
+    std::unique_ptr<Document> message(std::move(messageQueue.front()));
     messageQueue.pop_front();
     return message;
 }
 
-void ClientChannel::SendMessage(JsonValue* message)
+void ClientChannel::SendMessage(Element* message)
 {
     std::lock_guard<std::mutex> lock(messageQueueMtx);
-    messageQueue.push_back(std::unique_ptr<JsonValue>(message));
+    if (message)
+    {
+        std::unique_ptr<Document> doc(new Document());
+        doc->AppendChild(std::unique_ptr<Node>(message));
+        messageQueue.push_back(std::move(doc));
+    }
+    else
+    {
+        messageQueue.push_back(std::unique_ptr<Document>());
+    }
     messageEnqueued.notify_one();
 }
 

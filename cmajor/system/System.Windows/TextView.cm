@@ -2751,11 +2751,11 @@ namespace System.Windows
         {
             return pasteEvent;
         }
-        public void InvalidateLineCol(int lineNumber, int columNumber)
+        public void InvalidateLineCol(int lineNumber, int columnNumber)
         {
             if (charHeight != 0 && charWidth != 0)
             {
-                Point pt(cast<int>(charWidth * (columNumber - 1)), cast<int>(charHeight * (lineNumber - 1)));
+                Point pt(cast<int>(charWidth * (columnNumber - 1)), cast<int>(charHeight * (lineNumber - 1)));
                 TranslateContentLocation(pt);
                 Size size = GetSize();
                 Size sz(size.w - pt.x, cast<int>(charHeight + 1.5f));

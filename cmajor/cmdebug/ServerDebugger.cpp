@@ -8,8 +8,9 @@
 #include <cmajor/cmdebug/CmdbMessage.hpp>
 #include <cmajor/cmdebug/CmdbMessageMap.hpp>
 #include <cmajor/cmdebug/Debugger.hpp>
-#include <sngjson/json/JsonLexer.hpp>
-#include <sngjson/json/JsonParser.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/Document.hpp>
 #include <sngcm/ast/Project.hpp>
 #include <soulng/util/LogFileWriter.hpp>
 #include <soulng/util/Path.hpp>
@@ -41,12 +42,12 @@ Location ToLocation(const Frame& frame, bool includeLevel)
     Location loc;
     loc.func = frame.func;
     loc.file = frame.file;
-    loc.line = std::to_string(frame.line);
-    loc.scol = std::to_string(frame.scol);
-    loc.ecol = std::to_string(frame.ecol);
+    loc.line = frame.line;
+    loc.scol = frame.scol;
+    loc.ecol = frame.ecol;
     if (includeLevel)
     {
-        loc.level = std::to_string(frame.level);
+        loc.level = frame.level;
     }
     return loc;
 }
@@ -58,7 +59,7 @@ Location ToLocation(const Frame& frame)
 
 SourceLocation ToSourceLocation(const SourceLoc& breakpointLocation)
 {
-    SourceLocation sourceLocation(breakpointLocation.path, boost::lexical_cast<int>(breakpointLocation.line));
+    SourceLocation sourceLocation(breakpointLocation.path, breakpointLocation.line);
     return sourceLocation;
 }
 
@@ -114,32 +115,32 @@ public:
     void StartServer();
     void StopServer();
     void RunServer();
-    void LogRequest(JsonValue* request);
-    void LogReply(JsonValue* reply);
-    std::unique_ptr<JsonValue> ProcessRequest(JsonValue* requestMessage);
-    std::unique_ptr<JsonValue> GetIdleClientChannelMessage() override;
-    bool IsIdleChannelMessage(JsonValue* message) const override;
+    void LogRequest(const std::unique_ptr<Document>& requestDoc);
+    void LogReply(Document& replyDoc);
+    std::unique_ptr<Element> ProcessRequest(Element* requestElement);
+    std::unique_ptr<Element> GetIdleClientChannelMessage() override;
+    bool IsIdleChannelMessage(Element* message) const override;
     void ClientChannelError(const std::string& error) override;
-    void ProcessReceivedClientChannelMessage(JsonValue* message) override;
-    void ProcessTargetRunningReply(JsonValue* message);
-    void ProcessTargetInputReply(JsonValue* message);
-    void ProcessTargetOutputReply(JsonValue* message);
-    std::unique_ptr<JsonValue> ProcessStartRequest(const StartRequest& startRequest);
+    void ProcessReceivedClientChannelMessage(Element* message) override;
+    void ProcessTargetRunningReply(Element* message);
+    void ProcessTargetInputReply(Element* message);
+    void ProcessTargetOutputReply(Element* message);
+    std::unique_ptr<Element> ProcessStartRequest(const StartRequest& startRequest);
     std::vector<BreakpointInfo> SetBreakpoints(const std::vector<SourceLoc>& breakpointLocations);
     BreakpointInfo SetBreakpoint(const SourceLocation& sourceLocation);
-    std::unique_ptr<JsonValue> ProcessStopRequest(const StopRequest& stopRequest);
-    std::unique_ptr<JsonValue> ProcessContinueRequest(const ContinueRequest& continueRequest);
-    std::unique_ptr<JsonValue> ProcessNextRequest(const NextRequest& stopRequest);
-    std::unique_ptr<JsonValue> ProcessStepRequest(const StepRequest& stepRequest);
-    std::unique_ptr<JsonValue> ProcessFinishRequest(const FinishRequest& finishRequst);
-    std::unique_ptr<JsonValue> ProcessUntilRequest(const UntilRequest& untilRequest);
-    std::unique_ptr<JsonValue> ProcessBreakRequest(const BreakRequest& breakRequest);
-    std::unique_ptr<JsonValue> ProcessDeleteRequest(const DeleteRequest& deleteRequest);
-    std::unique_ptr<JsonValue> ProcessDepthRequest(const DepthRequest& depthRequest);
-    std::unique_ptr<JsonValue> ProcessFramesRequest(const FramesRequest& framesRequest);
-    std::unique_ptr<JsonValue> ProcessCountRequest(const CountRequest& countRequest);
-    std::unique_ptr<JsonValue> ProcessEvaluateChildRequest(const EvaluateChildRequest& evaluateChildRequest);
-    std::unique_ptr<JsonValue> ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest);
+    std::unique_ptr<Element> ProcessStopRequest(const StopRequest& stopRequest);
+    std::unique_ptr<Element> ProcessContinueRequest(const ContinueRequest& continueRequest);
+    std::unique_ptr<Element> ProcessNextRequest(const NextRequest& stopRequest);
+    std::unique_ptr<Element> ProcessStepRequest(const StepRequest& stepRequest);
+    std::unique_ptr<Element> ProcessFinishRequest(const FinishRequest& finishRequst);
+    std::unique_ptr<Element> ProcessUntilRequest(const UntilRequest& untilRequest);
+    std::unique_ptr<Element> ProcessBreakRequest(const BreakRequest& breakRequest);
+    std::unique_ptr<Element> ProcessDeleteRequest(const DeleteRequest& deleteRequest);
+    std::unique_ptr<Element> ProcessDepthRequest(const DepthRequest& depthRequest);
+    std::unique_ptr<Element> ProcessFramesRequest(const FramesRequest& framesRequest);
+    std::unique_ptr<Element> ProcessCountRequest(const CountRequest& countRequest);
+    std::unique_ptr<Element> ProcessEvaluateChildRequest(const EvaluateChildRequest& evaluateChildRequest);
+    std::unique_ptr<Element> ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest);
     void DoEvaluateChildRequest(Project* project, const std::string& expression, int start, int count, EvaluateChildReply& reply, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
     void EvaluateSpecializationTypeChildRequest(DIClassTemplateSpecializationType* specializationType, const std::string& expression, int start, int count,
         EvaluateChildReply& reply, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
@@ -160,7 +161,7 @@ public:
     std::string GetUStringValue(const std::string& expression);
     EvaluateReply DoEvaluate(const std::string& expression);
     void GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState);
-    MessageKind GetMessageKind(JsonValue* message, std::string& messageKindStr);
+    MessageKind GetMessageKind(Element* message, std::string& messageKindStr);
     void AddStopResultToResult() override; 
     void Proceed() override;
     void ResetConsole() override;
@@ -245,9 +246,8 @@ void ServerDebugger::WriteLogMessage(const std::string& logMessage)
     if (clientChannel)
     {
         LogMessageRequest logMessageRequest;
-        logMessageRequest.messageKind = "logMessageRequest";
         logMessageRequest.logMessage = logMessage;
-        std::unique_ptr<JsonValue> request = logMessageRequest.ToJson();
+        std::unique_ptr<Element> request = logMessageRequest.ToXml("logMessageRequest");
         clientChannel->SendMessage(request.release());
     }
 }
@@ -293,12 +293,16 @@ void ServerDebugger::RunServer()
             std::string request = ReadStr(socket);
             std::u32string content = ToUtf32(request);
             if (content.empty()) return;
-            JsonLexer lexer(content, "", 0);
-            std::unique_ptr<JsonValue> requestJsonValue(JsonParser::Parse(lexer));
-            LogRequest(requestJsonValue.get());
-            std::unique_ptr<JsonValue> replyJsonValue = ProcessRequest(requestJsonValue.get());
-            LogReply(replyJsonValue.get());
-            std::string reply = replyJsonValue->ToString();
+            std::unique_ptr<Document> requestDoc = ParseDocument(content, "socket");
+            LogRequest(requestDoc);
+            std::unique_ptr<Element> replyElement = ProcessRequest(requestDoc->DocumentElement());
+            Document replyDoc;
+            replyDoc.AppendChild(std::unique_ptr<Node>(replyElement.release()));
+            LogReply(replyDoc);
+            std::stringstream strStream;
+            CodeFormatter formatter(strStream);
+            replyDoc.Write(formatter);
+            std::string reply = strStream.str();
             Write(socket, reply);
         }
     }
@@ -311,7 +315,7 @@ void ServerDebugger::RunServer()
     }
 }
 
-void ServerDebugger::LogRequest(JsonValue* request)
+void ServerDebugger::LogRequest(const std::unique_ptr<Document>& requestDoc)
 {
     if (log)
     {
@@ -320,11 +324,11 @@ void ServerDebugger::LogRequest(JsonValue* request)
         writer.WriteCurrentDateTime();
         writer << "request:" << std::endl;
         CodeFormatter formatter(writer.LogFile());
-        request->Write(formatter);
+        requestDoc->Write(formatter);
     }
 }
 
-void ServerDebugger::LogReply(JsonValue* reply)
+void ServerDebugger::LogReply(Document& replyDoc)
 {
     if (log)
     {
@@ -333,11 +337,11 @@ void ServerDebugger::LogReply(JsonValue* reply)
         writer.WriteCurrentDateTime();
         writer << "reply:" << std::endl;
         CodeFormatter formatter(writer.LogFile());
-        reply->Write(formatter);
+        replyDoc.Write(formatter);
     }
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessRequest(JsonValue* requestMessage)
+std::unique_ptr<Element> ServerDebugger::ProcessRequest(Element* requestMessage)
 {
     ClientChannel channel(this, socket, targetRunningIntervalMs);
     ClientChannelGuard channelGuard(this, &channel);
@@ -418,42 +422,21 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessRequest(JsonValue* requestMess
         default:
         {
             GenericErrorReply genericErrorReply;
-            genericErrorReply.messageKind = "genericErrorReply";
-            if (messageKindStr.empty())
-            {
-                genericErrorReply.errorMessage = "request has no 'messageKind' field";
-            }
-            else
-            {
-                genericErrorReply.errorMessage = "unknown request 'messageKind' value: '" + messageKindStr + "'";
-            }
-            return genericErrorReply.ToJson();
+            genericErrorReply.errorMessage = "unknown request: messageKind='" + messageKindStr + "'";
+            return genericErrorReply.ToXml("genericErrorReply");
         }
     }
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::GetIdleClientChannelMessage()
+std::unique_ptr<Element> ServerDebugger::GetIdleClientChannelMessage()
 {
     TargetRunningRequest targetRunningRequest;
-    targetRunningRequest.messageKind = "targetRunningRequest";
-    return targetRunningRequest.ToJson();
+    return targetRunningRequest.ToXml("targetRunningRequest");
 }
 
-bool ServerDebugger::IsIdleChannelMessage(JsonValue* message) const
+bool ServerDebugger::IsIdleChannelMessage(Element* message) const
 {
-    if (message->Type() == JsonValueType::object)
-    {
-        JsonObject* messageObject = static_cast<JsonObject*>(message);
-        JsonValue* messageKindField = messageObject->GetField(U"messageKind");
-        if (messageKindField && messageKindField->Type() == JsonValueType::string)
-        {
-            JsonString* messageKind = static_cast<JsonString*>(messageKindField);
-            if (messageKind->Value() == U"targetRunningRequest")
-            {
-                return true;
-            }
-        }
-    }
+    if (message->Name() == U"targetRunningRequest") return true;
     return false;
 }
 
@@ -462,7 +445,7 @@ void ServerDebugger::ClientChannelError(const std::string& error)
     std::cerr << error << std::endl;
 }
 
-void ServerDebugger::ProcessReceivedClientChannelMessage(JsonValue* message)
+void ServerDebugger::ProcessReceivedClientChannelMessage(Element* message)
 {
     std::string messageKindStr;
     MessageKind messageKind = GetMessageKind(message, messageKindStr);
@@ -486,13 +469,13 @@ void ServerDebugger::ProcessReceivedClientChannelMessage(JsonValue* message)
     }
 }
 
-void ServerDebugger::ProcessTargetRunningReply(JsonValue* message)
+void ServerDebugger::ProcessTargetRunningReply(Element* message)
 {
     std::lock_guard<std::mutex> lock(targetIOMutex);
     targetRunningReply = TargetRunningReply(message);
 }
 
-void ServerDebugger::ProcessTargetInputReply(JsonValue* message)
+void ServerDebugger::ProcessTargetInputReply(Element* message)
 {
     std::lock_guard<std::mutex> lock(targetIOMutex);
     targetInputReply = TargetInputReply(message);
@@ -500,7 +483,7 @@ void ServerDebugger::ProcessTargetInputReply(JsonValue* message)
     targetInputReplyReceivedVar.notify_one();
 }
 
-void ServerDebugger::ProcessTargetOutputReply(JsonValue* message)
+void ServerDebugger::ProcessTargetOutputReply(Element* message)
 {
     std::lock_guard<std::mutex> lock(targetIOMutex);
     targetOutputReply = TargetOutputReply(message);
@@ -508,10 +491,9 @@ void ServerDebugger::ProcessTargetOutputReply(JsonValue* message)
     targetOutputReplyReceivedVar.notify_one();
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessStartRequest(const StartRequest& startRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessStartRequest(const StartRequest& startRequest)
 {
     StartReply startReply;
-    startReply.messageKind = "startReply";
     try
     {
         StartDebugging();
@@ -528,7 +510,7 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessStartRequest(const StartReques
         startReply.success = false;
         startReply.error = ex.what();
     }
-    return startReply.ToJson();
+    return startReply.ToXml("startReply");
 }
 
 std::vector<BreakpointInfo> ServerDebugger::SetBreakpoints(const std::vector<SourceLoc>& breakpointLocations)
@@ -570,7 +552,7 @@ BreakpointInfo ServerDebugger::SetBreakpoint(const SourceLocation& location)
                 JsonValue* numInstsField = breakpointObject->GetField(U"numInsts");
                 if (numInstsField && numInstsField->Type() == JsonValueType::string)
                 {
-                    info.numInsts = ToUtf8(static_cast<JsonString*>(numInstsField)->Value());
+                    info.numInsts = boost::lexical_cast<int>(ToUtf8(static_cast<JsonString*>(numInstsField)->Value()));
                 }
                 JsonValue* locationField = breakpointObject->GetField(U"location");
                 if (locationField && locationField->Type() == JsonValueType::object)
@@ -589,7 +571,7 @@ BreakpointInfo ServerDebugger::SetBreakpoint(const SourceLocation& location)
                     JsonValue* lineField = locationObject->GetField(U"line");
                     if (lineField && lineField->Type() == JsonValueType::string)
                     {
-                        info.location.line = ToUtf8(static_cast<JsonString*>(lineField)->Value());
+                        info.location.line = boost::lexical_cast<int>(ToUtf8(static_cast<JsonString*>(lineField)->Value()));
                     }
                 }
             }
@@ -603,22 +585,20 @@ BreakpointInfo ServerDebugger::SetBreakpoint(const SourceLocation& location)
     return info;
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessStopRequest(const StopRequest& stopRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessStopRequest(const StopRequest& stopRequest)
 {
     StopReply stopReply;
-    stopReply.messageKind = "stopReply";
     exiting = true;
-    return stopReply.ToJson();
+    return stopReply.ToXml("stopReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessContinueRequest(const ContinueRequest& continueRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessContinueRequest(const ContinueRequest& continueRequest)
 {
     if (clientChannel)
     {
         clientChannel->StartSendingIdleMessages();
     }
     ContinueReply continueReply;
-    continueReply.messageKind = "continueReply";
     try
     {
         Continue();
@@ -633,17 +613,16 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessContinueRequest(const Continue
     {
         clientChannel->StopSendingIdleMessages();
     }
-    return continueReply.ToJson();
+    return continueReply.ToXml("continueReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessNextRequest(const NextRequest& stopRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessNextRequest(const NextRequest& stopRequest)
 {
     if (clientChannel)
     {
         clientChannel->StartSendingIdleMessages();
     }
     NextReply nextReply;
-    nextReply.messageKind = "nextReply";
     try
     {
         Next();
@@ -658,17 +637,16 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessNextRequest(const NextRequest&
     {
         clientChannel->StopSendingIdleMessages();
     }
-    return nextReply.ToJson();
+    return nextReply.ToXml("nextReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessStepRequest(const StepRequest& stepRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessStepRequest(const StepRequest& stepRequest)
 {
     if (clientChannel)
     {
         clientChannel->StartSendingIdleMessages();
     }
     StepReply stepReply;
-    stepReply.messageKind = "stepReply";
     try
     {
         Step();
@@ -683,17 +661,16 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessStepRequest(const StepRequest&
     {
         clientChannel->StopSendingIdleMessages();
     }
-    return stepReply.ToJson();
+    return stepReply.ToXml("stepReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessFinishRequest(const FinishRequest& finishRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessFinishRequest(const FinishRequest& finishRequest)
 {
     if (clientChannel)
     {
         clientChannel->StartSendingIdleMessages();
     }
     FinishReply finishReply;
-    finishReply.messageKind = "finishReply";
     try
     {
         Finish();
@@ -708,17 +685,16 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessFinishRequest(const FinishRequ
     {
         clientChannel->StopSendingIdleMessages();
     }
-    return finishReply.ToJson();
+    return finishReply.ToXml("finishReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessUntilRequest(const UntilRequest& untilRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessUntilRequest(const UntilRequest& untilRequest)
 {
     if (clientChannel)
     {
         clientChannel->StartSendingIdleMessages();
     }
     UntilReply untilReply;
-    untilReply.messageKind = "untilReply";
     try
     {
         SourceLocation sourceLocation = ToSourceLocation(untilRequest.sourceLoc);
@@ -734,13 +710,12 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessUntilRequest(const UntilReques
     {
         clientChannel->StopSendingIdleMessages();
     }
-    return untilReply.ToJson();
+    return untilReply.ToXml("untilReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessBreakRequest(const BreakRequest& breakRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessBreakRequest(const BreakRequest& breakRequest)
 {
     BreakReply breakReply;
-    breakReply.messageKind = "breakReply";
     try
     {
         SourceLocation location = ToSourceLocation(breakRequest.breakpointLocation);
@@ -754,13 +729,12 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessBreakRequest(const BreakReques
         breakpointInfo.error = ex.what();
         breakReply.breakpointInfo = breakpointInfo;
     }
-    return breakReply.ToJson();
+    return breakReply.ToXml("breakReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessDeleteRequest(const DeleteRequest& deleteRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessDeleteRequest(const DeleteRequest& deleteRequest)
 {
     DeleteReply deleteReply;
-    deleteReply.messageKind = "deleteReply";
     try
     {
         Delete(deleteRequest.breakpointId);
@@ -785,13 +759,12 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessDeleteRequest(const DeleteRequ
         deleteReply.success = false;
         deleteReply.error = ex.what();
     }
-    return deleteReply.ToJson();
+    return deleteReply.ToXml("deleteReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessDepthRequest(const DepthRequest& depthRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessDepthRequest(const DepthRequest& depthRequest)
 {
     DepthReply depthReply;
-    depthReply.messageKind = "depthReply";
     try
     {
         Depth();
@@ -807,7 +780,7 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessDepthRequest(const DepthReques
             JsonValue* depthField = resultObject->GetField(U"depth");
             if (depthField && depthField->Type() == JsonValueType::string)
             {
-                depthReply.depth = ToUtf8(static_cast<JsonString*>(depthField)->Value());
+                depthReply.depth = boost::lexical_cast<int>(ToUtf8(static_cast<JsonString*>(depthField)->Value()));
             }
             JsonValue* errorField = resultObject->GetField(U"error");
             if (errorField && errorField->Type() == JsonValueType::string)
@@ -821,16 +794,15 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessDepthRequest(const DepthReques
         depthReply.success = false;
         depthReply.error = ex.what();
     }
-    return depthReply.ToJson();
+    return depthReply.ToXml("depthReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessFramesRequest(const FramesRequest& framesRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessFramesRequest(const FramesRequest& framesRequest)
 {
     FramesReply framesReply;
-    framesReply.messageKind = "framesReply";
     try
     {
-        Frames(boost::lexical_cast<int>(framesRequest.lowFrame), boost::lexical_cast<int>(framesRequest.highFrame));
+        Frames(framesRequest.lowFrame, framesRequest.highFrame);
         JsonValue* result = GetResult();
         if (result && result->Type() == JsonValueType::object)
         {
@@ -863,13 +835,12 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessFramesRequest(const FramesRequ
         framesReply.success = false;
         framesReply.error = ex.what();
     }
-    return framesReply.ToJson();
+    return framesReply.ToXml("framesReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessCountRequest(const CountRequest& countRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessCountRequest(const CountRequest& countRequest)
 {
     CountReply countReply;
-    countReply.messageKind = "countReply";
     Instruction* stoppedInstruction = StoppedInstruction();
     if (stoppedInstruction)
     {
@@ -878,7 +849,7 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessCountRequest(const CountReques
         {
             int localVariableCount = function->LocalVariables().size();
             countReply.success = true;
-            countReply.count = std::to_string(localVariableCount);
+            countReply.count = localVariableCount;
         }
         else
         {
@@ -891,17 +862,16 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessCountRequest(const CountReques
         countReply.success = false;
         countReply.error = "not stopped";
     }
-    return countReply.ToJson();
+    return countReply.ToXml("countReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateChildRequest(const EvaluateChildRequest& evaluateChildRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessEvaluateChildRequest(const EvaluateChildRequest& evaluateChildRequest)
 {
     EvaluateChildReply evaluateChildReply;
-    evaluateChildReply.messageKind = "evaluateChildReply";
     try
     {
-        int start = boost::lexical_cast<int>(evaluateChildRequest.start);
-        int count = boost::lexical_cast<int>(evaluateChildRequest.count);
+        int start = evaluateChildRequest.start;
+        int count = evaluateChildRequest.count;
         Instruction* stoppedInstruction = StoppedInstruction();
         if (stoppedInstruction)
         {
@@ -931,7 +901,7 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateChildRequest(const Eva
                             {
                                 result.dynType = dynType->Name();
                             }
-                            result.count = std::to_string(count);
+                            result.count = count;
                             evaluateChildReply.results.push_back(result);
                         }
                     }
@@ -968,10 +938,10 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateChildRequest(const Eva
         evaluateChildReply.success = false;
         evaluateChildReply.error = ex.what();
     }
-    return evaluateChildReply.ToJson();
+    return evaluateChildReply.ToXml("evaluateChildReply");
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest)
 {
     EvaluateReply evaluateReply = DoEvaluate(evaluateRequest.expression);
     if (evaluateReply.success)
@@ -1005,7 +975,7 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const Evaluate
             evaluateReply.error = ex.what();
         }
     }
-    return evaluateReply.ToJson();
+    return evaluateReply.ToXml("evaluateReply");
 }
 
 void ServerDebugger::DoEvaluateChildRequest(Project* project, const std::string& expression, int start, int count, EvaluateChildReply& reply,
@@ -1111,7 +1081,7 @@ void ServerDebugger::EvaluateContainerTypeChildRequest(DIClassTemplateSpecializa
                 {
                     result.dynType = dynType->Name();
                 }
-                result.count = std::to_string(count);
+                result.count = count;
                 reply.results.push_back(std::move(result));
             }
             reply.success = true;
@@ -1157,7 +1127,7 @@ void ServerDebugger::EvaluateClassTypeChildRequest(DIClassType* classType, const
             {
                 childResult.dynType = dynType->Name();
             }
-            childResult.count = std::to_string(count);
+            childResult.count = count;
             reply.results.push_back(childResult);
         }
         ++index;
@@ -1182,7 +1152,7 @@ void ServerDebugger::EvaluateClassTypeChildRequest(DIClassType* classType, const
             {
                 childResult.dynType = dynType->Name();
             }
-            childResult.count = std::to_string(count);
+            childResult.count = count;
             reply.results.push_back(childResult);
         }
         ++index;
@@ -1576,7 +1546,6 @@ std::string ServerDebugger::GetUStringValue(const std::string& expression)
 EvaluateReply ServerDebugger::DoEvaluate(const std::string& expression)
 {
     EvaluateReply evaluateReply;
-    evaluateReply.messageKind = "evaluateReply";
     try
     {
         Print(expression);
@@ -1674,15 +1643,10 @@ void ServerDebugger::GetLocationResult(bool& success, std::string& error, Locati
     targetState = state;
 }
 
-MessageKind ServerDebugger::GetMessageKind(JsonValue* message, std::string& messageKindStr)
+MessageKind ServerDebugger::GetMessageKind(Element* message, std::string& messageKindStr)
 {
-    if (message->Type() == JsonValueType::object)
-    {
-        JsonObject* messageObject = static_cast<JsonObject*>(message);
-        messageKindStr = messageObject->GetStringField(U"messageKind");
-        return messageMap.GetMessageKind(messageKindStr);
-    }
-    return MessageKind::none;
+    messageKindStr = ToUtf8(message->Name());
+    return messageMap.GetMessageKind(messageKindStr);
 }
 
 void ServerDebugger::AddStopResultToResult()
@@ -1843,8 +1807,7 @@ std::string ServerDebugger::GetTargetInputBytes()
 {
     targetInputReplyReceived = false;
     TargetInputRequest targetInputRequest;
-    targetInputRequest.messageKind = "targetInputRequest";
-    std::unique_ptr<JsonValue> request = targetInputRequest.ToJson();
+    std::unique_ptr<Element> request = targetInputRequest.ToXml("targetInputRequest");
     clientChannel->SendMessage(request.release());
     std::unique_lock<std::mutex> lock(targetIOMutex);
     targetInputReplyReceivedVar.wait(lock, [this] { return targetInputReplyReceived; });
@@ -1867,10 +1830,9 @@ std::string ServerDebugger::GetTargetInputBytes()
 void ServerDebugger::WriteTargetOuput(int handle, const std::string& s)
 {
     TargetOutputRequest targetOutputRequest;
-    targetOutputRequest.messageKind = "targetOutputRequest";
-    targetOutputRequest.handle = std::to_string(handle);
+    targetOutputRequest.handle = handle;
     targetOutputRequest.output = s;
-    std::unique_ptr<JsonValue> request = targetOutputRequest.ToJson();
+    std::unique_ptr<Element> request = targetOutputRequest.ToXml("targetOutputRequest");
     clientChannel->SendMessage(request.release());
     std::unique_lock<std::mutex> lock(targetIOMutex);
     targetOutputReplyReceivedVar.wait(lock, [this] { return targetOutputReplyReceived; });
@@ -1906,3 +1868,4 @@ void RunDebuggerServer(const std::string& executable, const std::vector<std::str
 }
 
 } } // namespace cmajor::debug
+

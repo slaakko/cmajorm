@@ -7,7 +7,9 @@ using System;
 using System.Collections;
 using System.Threading;
 using System.Net.Sockets;
-using System.Json;
+using System.Dom;
+using System.Text;
+using System.Xml.Serialization;
 using Cm.Service;
 
 namespace Cm.Service.Debug
@@ -287,8 +289,8 @@ namespace Cm.Service.Debug
                 Sleep(Duration.FromSeconds(serverStartWaitSeconds));
                 socket.Connect("localhost", ToString(port));
                 List<Breakpoint*> breakpoints = SendStartRequest(breakpointCollection);
-                UniquePtr<JsonValue> reply = ReadReply(MessageKind.startReply);
-                ProcessStartReply(reply.Get(), breakpoints);
+                UniquePtr<Document> reply = ReadReply(MessageKind.startReply);
+                ProcessStartReply(reply->DocumentElement(), breakpoints);
                 LogMessage("DebugService: Debug Server started.");
             }
             state = State.debuggingStarted;
@@ -305,15 +307,15 @@ namespace Cm.Service.Debug
                     breakpoints.Add(breakpoint);
                     SourceLoc breakpointLocation;
                     breakpointLocation.path = bpList.FilePath();
-                    breakpointLocation.line = ToString(breakpoint->line);
+                    breakpointLocation.line = breakpoint->line;
                     startRequest.breakpointLocations.Add(breakpointLocation);
                 }
             }
-            UniquePtr<JsonValue> request = startRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = startRequest.ToXml("startRequest");
+            WriteRequest(request.Release());
             return breakpoints;
         }
-        private void ProcessStartReply(JsonValue* reply, const List<Breakpoint*>& breakpoints)
+        private void ProcessStartReply(Element* reply, const List<Breakpoint*>& breakpoints)
         {
             StartReply startReply(reply);
             if (startReply.success)
@@ -329,7 +331,7 @@ namespace Cm.Service.Debug
                     }
                     else
                     {
-                        breakpoint->disabled = true; 
+                        breakpoint->disabled = true;
                     }
                 }
                 if (setDebugLocation != SetDebugLocationMethod())
@@ -357,8 +359,8 @@ namespace Cm.Service.Debug
             {
                 RequestGuard requestGuard(this);
                 SendStopRequest();
-                UniquePtr<JsonValue> reply = ReadReply(MessageKind.stopReply);
-                ProcessStopReply(reply.Get());
+                UniquePtr<Document> reply = ReadReply(MessageKind.stopReply);
+                ProcessStopReply(reply->DocumentElement());
             }
             socket.Close();
             debugServer.Reset();
@@ -368,10 +370,10 @@ namespace Cm.Service.Debug
         private void SendStopRequest()
         {
             StopRequest stopRequest;
-            UniquePtr<JsonValue> request = stopRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = stopRequest.ToXml("stopRequest");
+            WriteRequest(request.Release());
         }
-        private void ProcessStopReply(JsonValue* reply)
+        private void ProcessStopReply(Element* reply)
         {
             StopReply stopReply(reply);
             LogMessage("debugging stopped");
@@ -381,16 +383,16 @@ namespace Cm.Service.Debug
             targetState.Reset();
             RequestGuard requestGuard(this);
             SendContinueRequest();
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.continueReply);
-            ProcessContinueReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.continueReply);
+            ProcessContinueReply(reply->DocumentElement());
         }
         private void SendContinueRequest()
         {
             ContinueRequest continueRequest;
-            UniquePtr<JsonValue> request = continueRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = continueRequest.ToXml("continueRequest");
+            WriteRequest(request.Release());
         }
-        private void ProcessContinueReply(JsonValue* reply)
+        private void ProcessContinueReply(Element* reply)
         {
             ContinueReply continueReply(reply);
             if (continueReply.success)
@@ -411,16 +413,16 @@ namespace Cm.Service.Debug
             targetState.Reset();
             RequestGuard requestGuard(this);
             SendNextRequest();
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.nextReply);
-            ProcessNextReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.nextReply);
+            ProcessNextReply(reply->DocumentElement());
         }
         private void SendNextRequest()
         {
             NextRequest nextRequest;
-            UniquePtr<JsonValue> request = nextRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = nextRequest.ToXml("nextRequest");
+            WriteRequest(request.Release());
         }
-        private void ProcessNextReply(JsonValue* reply)
+        private void ProcessNextReply(Element* reply)
         {
             NextReply nextReply(reply);
             if (nextReply.success)
@@ -441,16 +443,16 @@ namespace Cm.Service.Debug
             targetState.Reset();
             RequestGuard requestGuard(this);
             SendStepRequest();
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.stepReply);
-            ProcessStepReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.stepReply);
+            ProcessStepReply(reply->DocumentElement());
         }
         private void SendStepRequest()
         {
             StepRequest stepRequest;
-            UniquePtr<JsonValue> request = stepRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = stepRequest.ToXml("stepRequest");
+            WriteRequest(request.Release());
         }
-        private void ProcessStepReply(JsonValue* reply)
+        private void ProcessStepReply(Element* reply)
         {
             StepReply stepReply(reply);
             if (stepReply.success)
@@ -471,16 +473,16 @@ namespace Cm.Service.Debug
             targetState.Reset();
             RequestGuard requestGuard(this);
             SendFinishRequest();
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.finishReply);
-            ProcessFinishReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.finishReply);
+            ProcessFinishReply(reply->DocumentElement());
         }
         private void SendFinishRequest()
         {
             FinishRequest finishRequest;
-            UniquePtr<JsonValue> request = finishRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = finishRequest.ToXml("finishRequest");
+            WriteRequest(request.Release());
         }
-        private void ProcessFinishReply(JsonValue* reply)
+        private void ProcessFinishReply(Element* reply)
         {
             FinishReply finishReply(reply);
             if (finishReply.success)
@@ -501,19 +503,19 @@ namespace Cm.Service.Debug
             targetState.Reset();
             RequestGuard requestGuard(this);
             SendUntilRequest(filePath, line);
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.untilReply);
-            ProcessUntilReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.untilReply);
+            ProcessUntilReply(reply->DocumentElement());
         }
         private void SendUntilRequest(const string& filePath, int line)
         {
             SourceLoc sourceLoc;
             sourceLoc.path = filePath;
-            sourceLoc.line = ToString(line);
+            sourceLoc.line = line;
             UntilRequest untilRequest(sourceLoc);
-            UniquePtr<JsonValue> request = untilRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = untilRequest.ToXml("untilRequest");
+            WriteRequest(request.Release());
         }
-        private void ProcessUntilReply(JsonValue* reply)
+        private void ProcessUntilReply(Element* reply)
         {
             UntilReply untilReply(reply);
             if (untilReply.success)
@@ -533,18 +535,18 @@ namespace Cm.Service.Debug
         {
             RequestGuard requestGuard(this);
             SendBreakRequest(filePath, breakpoint);
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.breakReply);
-            ProcessBreakReply(reply.Get(), breakpoint);
+            UniquePtr<Document> reply = ReadReply(MessageKind.breakReply);
+            ProcessBreakReply(reply->DocumentElement(), breakpoint);
         }
         private void SendBreakRequest(const string& filePath, Breakpoint* breakpoint)
         {
             BreakRequest breakRequest;
             breakRequest.breakpointLocation.path = filePath;
-            breakRequest.breakpointLocation.line = ToString(breakpoint->line);
-            UniquePtr<JsonValue> request = breakRequest.ToJson();
-            WriteRequest(request.Get());
+            breakRequest.breakpointLocation.line = breakpoint->line;
+            UniquePtr<Element> request = breakRequest.ToXml("breakRequest");
+            WriteRequest(request.Release());
         }
-        private void ProcessBreakReply(JsonValue* reply, Breakpoint* breakpoint)
+        private void ProcessBreakReply(Element* reply, Breakpoint* breakpoint)
         {
             BreakReply breakReply(reply);
             breakpoint->info = breakReply.breakpointInfo;
@@ -561,17 +563,17 @@ namespace Cm.Service.Debug
         {
             RequestGuard requestGuard(this);
             SendDeleteRequest(breakpointId);
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.deleteReply);
-            ProcessDeleteReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.deleteReply);
+            ProcessDeleteReply(reply->DocumentElement());
         }
         private void SendDeleteRequest(const string& breakpointId)
         {
             DeleteRequest deleteRequest;
             deleteRequest.breakpointId = breakpointId;
-            UniquePtr<JsonValue> request = deleteRequest.ToJson();
+            UniquePtr<Element> request = deleteRequest.ToXml("deleteRequest");
             WriteRequest(request.Get());
         }
-        private void ProcessDeleteReply(JsonValue* reply)
+        private void ProcessDeleteReply(Element* reply)
         {
             DeleteReply deleteReply(reply);
             if (deleteReply.success)
@@ -587,23 +589,23 @@ namespace Cm.Service.Debug
         {
             RequestGuard requestGuard(this);
             SendDepthRequest();
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.depthReply);
+            UniquePtr<Document> reply = ReadReply(MessageKind.depthReply);
             int depth = -1;
-            ProcessDepthReply(reply.Get(), depth);
+            ProcessDepthReply(reply->DocumentElement(), depth);
             return depth;
         }
         private void SendDepthRequest()
         {
             DepthRequest depthRequest;
-            UniquePtr<JsonValue> request = depthRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = depthRequest.ToXml("depthRequest");
+            WriteRequest(request.Release());
         }
-        private void ProcessDepthReply(JsonValue* reply, int& depth)
+        private void ProcessDepthReply(Element* reply, int& depth)
         {
             DepthReply depthReply(reply);
             if (depthReply.success)
             {
-                depth = ParseInt(depthReply.depth); 
+                depth = depthReply.depth;
             }
             else
             {
@@ -614,18 +616,18 @@ namespace Cm.Service.Debug
         {
             RequestGuard requestGuard(this);
             SendFramesRequest(lowFrame, highFrame);
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.framesReply);
-            return ProcessFramesReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.framesReply);
+            return ProcessFramesReply(reply->DocumentElement());
         }
         private void SendFramesRequest(int lowFrame, int highFrame)
         {
             FramesRequest framesRequest;
-            framesRequest.lowFrame = ToString(lowFrame);
-            framesRequest.highFrame = ToString(highFrame);
-            UniquePtr<JsonValue> request = framesRequest.ToJson();
-            WriteRequest(request.Get());
+            framesRequest.lowFrame = lowFrame;
+            framesRequest.highFrame = highFrame;
+            UniquePtr<Element> request = framesRequest.ToXml("framesRequest");
+            WriteRequest(request.Release());
         }
-        private Pair<List<Location>, bool> ProcessFramesReply(JsonValue* reply)
+        private Pair<List<Location>, bool> ProcessFramesReply(Element* reply)
         {
             FramesReply framesReply(reply);
             if (framesReply.success)
@@ -642,26 +644,26 @@ namespace Cm.Service.Debug
         {
             RequestGuard requestGuard(this);
             SendLocalVariableCountRequest();
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.countReply);
+            UniquePtr<Document> reply = ReadReply(MessageKind.countReply);
             int count = -1;
-            ProcessLocalVariableCountReply(reply.Get(), count);
+            ProcessLocalVariableCountReply(reply->DocumentElement(), count);
             return count;
         }
         private void SendLocalVariableCountRequest()
         {
             CountRequest countRequest;
             countRequest.expression = "@locals";
-            UniquePtr<JsonValue> request = countRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = countRequest.ToXml("countRequest");
+            WriteRequest(request.Release());
         }
-        private void ProcessLocalVariableCountReply(JsonValue* reply, int& count)
+        private void ProcessLocalVariableCountReply(Element* reply, int& count)
         {
             CountReply countReply(reply);
             if (countReply.success)
             {
                 try
                 {
-                    count = ParseInt(countReply.count);
+                    count = countReply.count;
                 }
                 catch (const Exception& ex)
                 {
@@ -679,19 +681,19 @@ namespace Cm.Service.Debug
         {
             RequestGuard requestGuard(this);
             SendEvaluateLocalVariablesRequest(start, count);
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateChildReply);
-            return ProcessEvaluateLocalVariablesReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.evaluateChildReply);
+            return ProcessEvaluateLocalVariablesReply(reply->DocumentElement());
         }
         private void SendEvaluateLocalVariablesRequest(int start, int count)
         {
             EvaluateChildRequest evaluateChildRequest;
             evaluateChildRequest.expression = "@locals";
-            evaluateChildRequest.start = ToString(start);
-            evaluateChildRequest.count = ToString(count);
-            UniquePtr<JsonValue> request = evaluateChildRequest.ToJson();
-            WriteRequest(request.Get());
+            evaluateChildRequest.start = start;
+            evaluateChildRequest.count = count;
+            UniquePtr<Element> request = evaluateChildRequest.ToXml("evaluateChildRequest");
+            WriteRequest(request.Release());
         }
-        private Pair<List<ChildResult>, bool> ProcessEvaluateLocalVariablesReply(JsonValue* reply)
+        private Pair<List<ChildResult>, bool> ProcessEvaluateLocalVariablesReply(Element* reply)
         {
             EvaluateChildReply evaluateChildReply(reply);
             if (evaluateChildReply.success)
@@ -708,19 +710,19 @@ namespace Cm.Service.Debug
         {
             RequestGuard requestGuard(this);
             SendEvaluateChildRequest(expr, start, count);
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateChildReply);
-            return ProcessEvaluateChildReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.evaluateChildReply);
+            return ProcessEvaluateChildReply(reply->DocumentElement());
         }
         private void SendEvaluateChildRequest(const string& expr, int start, int count)
         {
             EvaluateChildRequest evaluateChildRequest;
             evaluateChildRequest.expression = expr;
-            evaluateChildRequest.start = ToString(start);
-            evaluateChildRequest.count = ToString(count);
-            UniquePtr<JsonValue> request = evaluateChildRequest.ToJson();
-            WriteRequest(request.Get());
+            evaluateChildRequest.start = start;
+            evaluateChildRequest.count = count;
+            UniquePtr<Element> request = evaluateChildRequest.ToXml("evaluateChildRequest");
+            WriteRequest(request.Release());
         }
-        private Pair<List<ChildResult>, bool> ProcessEvaluateChildReply(JsonValue* reply)
+        private Pair<List<ChildResult>, bool> ProcessEvaluateChildReply(Element* reply)
         {
             EvaluateChildReply evaluateChildReply(reply);
             if (evaluateChildReply.success)
@@ -736,17 +738,17 @@ namespace Cm.Service.Debug
         public Pair<string, bool> Evaluate(const string& expr)
         {
             SendEvaluateRequest(expr);
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateReply);
-            return ProcessEvaluateReply(reply.Get());
+            UniquePtr<Document> reply = ReadReply(MessageKind.evaluateReply);
+            return ProcessEvaluateReply(reply->DocumentElement());
         }
         private void SendEvaluateRequest(const string& expr)
         {
             EvaluateRequest evaluateRequest;
             evaluateRequest.expression = expr;
-            UniquePtr<JsonValue> request = evaluateRequest.ToJson();
-            WriteRequest(request.Get());
+            UniquePtr<Element> request = evaluateRequest.ToXml("evaluateRequest");
+            WriteRequest(request.Release());
         }
-        private Pair<string, bool> ProcessEvaluateReply(JsonValue* reply)
+        private Pair<string, bool> ProcessEvaluateReply(Element* reply)
         {
             EvaluateReply evaluateReply(reply);
             if (evaluateReply.success)
@@ -777,7 +779,7 @@ namespace Cm.Service.Debug
             }
             targetState = state;
         }
-        private void ProcessMessage(JsonValue* message, MessageKind messageKind, const string& messageKindStr)
+        private void ProcessMessage(Element* message, MessageKind messageKind, const string& messageKindStr)
         {
             switch (messageKind)
             {
@@ -825,8 +827,8 @@ namespace Cm.Service.Debug
                 targetRunning();
             }
             TargetRunningReply targetRunningReply;
-            UniquePtr<JsonValue> reply = targetRunningReply.ToJson();
-            WriteReply(reply.Get());
+            UniquePtr<Element> reply = targetRunningReply.ToXml("targetRunningReply");
+            WriteReply(reply.Release());
         }
         private void ProcessTargetInputRequest(const TargetInputRequest& targetInputRequest)
         {
@@ -837,78 +839,76 @@ namespace Cm.Service.Debug
             }
             if (ServerRunning())
             {
-                UniquePtr<JsonValue> reply = targetInputReply.ToJson();
-                WriteReply(reply.Get());
+                UniquePtr<Element> reply = targetInputReply.ToXml("targetInputReply");
+                WriteReply(reply.Release());
             }
         }
         private void ProcessTargetOutputRequest(const TargetOutputRequest& targetOutputRequest)
         {
-            int handle = ParseInt(targetOutputRequest.handle);
+            int handle = targetOutputRequest.handle;
             if (writeTargetOutput != WriteTargetOutputMethod())
             {
                 writeTargetOutput(handle, targetOutputRequest.output);
             }
             TargetOutputReply targetOutputReply;
-            UniquePtr<JsonValue> reply = targetOutputReply.ToJson();
-            WriteReply(reply.Get());
+            UniquePtr<Element> reply = targetOutputReply.ToXml("targetOutputReply");
+            WriteReply(reply.Release());
         }
         private void ProcessLogMessageRequest(const LogMessageRequest& logMessageRequest)
         {
             LogMessage(logMessageRequest.logMessage);
             LogMessageReply logMessageReply;
-            UniquePtr<JsonValue> reply = logMessageReply.ToJson();
-            WriteReply(reply.Get());
+            UniquePtr<Element> reply = logMessageReply.ToXml("logMessageReply");
+            WriteReply(reply.Release());
         }
         private void ProcessErrorReply(const GenericErrorReply& errorReply)
         {
             LogMessage("error from debug server: " + errorReply.errorMessage);
         }
-        private MessageKind GetMessageKind(JsonValue* message, string& messageKindStr)
+        private MessageKind GetMessageKind(Element* message, string& messageKindStr)
         {
-            messageKindStr = "unknown message kind";
-            if (message is JsonObject*)
+            messageKindStr = ToUtf8(message->Name());
+            Map<string, MessageKind>.ConstIterator it = messageKindMap.CFind(messageKindStr);
+            if (it != messageKindMap.CEnd())
             {
-                JsonObject* jsonObject = cast<JsonObject*>(message);
-                JsonValue* messageKindValue = jsonObject->GetField("messageKind");
-                if (messageKindValue is JsonString*)
-                {
-                    JsonString* messageKind = cast<JsonString*>(messageKindValue);
-                    messageKindStr = ToUtf8(messageKind->Value());
-                    Map<string, MessageKind>.ConstIterator it = messageKindMap.CFind(messageKindStr);
-                    if (it != messageKindMap.CEnd())
-                    {
-                        return it->second;
-                    }
-                }
+                return it->second;
             }
             return MessageKind.none;
         }
-        private void WriteRequest(JsonValue* request)
+        private void WriteRequest(Element* request)
         {
-            string requestStr = request->ToString();
+            Document requestDoc;
+            requestDoc.AppendChild(UniquePtr<Node>(request));
+            StringWriter writer;
+            CodeFormatter formatter(writer);
+            requestDoc.Write(formatter);
+            string requestStr = writer.GetString();
             Write(socket, requestStr);
         }
-        private void WriteReply(JsonValue* reply)
+        private void WriteReply(Element* reply)
         {
-            string replyStr = reply->ToString();
+            Document replyDoc;
+            replyDoc.AppendChild(UniquePtr<Node>(reply));
+            StringWriter writer;
+            CodeFormatter formatter(writer);
+            replyDoc.Write(formatter);
+            string replyStr = writer.GetString();
             Write(socket, replyStr);
         }
-        private UniquePtr<JsonValue> ReadReply(MessageKind replyMessageKind)
+        private UniquePtr<Document> ReadReply(MessageKind replyMessageKind)
         {
             string replyStr = ReadStr(socket);
-            JsonLexer lexer(ToUtf32(replyStr), "", 0);
-            UniquePtr<JsonValue> replyValue = JsonParser.Parse(lexer);
+            UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
             string messageKindStr;
-            MessageKind messageKind = GetMessageKind(replyValue.Get(), messageKindStr);
+            MessageKind messageKind = GetMessageKind(replyDoc->DocumentElement(), messageKindStr);
             while (messageKind != replyMessageKind)
             {
-                ProcessMessage(replyValue.Get(), messageKind, messageKindStr);
+                ProcessMessage(replyDoc->DocumentElement(), messageKind, messageKindStr);
                 replyStr = ReadStr(socket);
-                JsonLexer lexer(ToUtf32(replyStr), "", 0);
-                replyValue = JsonParser.Parse(lexer);
-                messageKind = GetMessageKind(replyValue.Get(), messageKindStr);
+                replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+                messageKind = GetMessageKind(replyDoc->DocumentElement(), messageKindStr);
             }
-            return replyValue;
+            return replyDoc;
         }
         public nothrow State GetState() const
         {

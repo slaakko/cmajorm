@@ -1,0 +1,270 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+class Location
+{
+    string func;
+    string file;
+    int line;
+    int scol;
+    int ecol;
+    int level;
+}
+
+class Type
+{
+    string name;
+    string id;
+}
+
+class Result
+{
+    Type staticType;
+    Type dynamicType;
+    bool initialized;
+    string value;
+}
+
+class ChildResult
+{
+    string expr;
+    string name;
+    string type;
+    string dynType;
+    string value;
+    int count;
+}
+
+class TargetState
+{
+    string stopReason;
+    string exitCode;
+    string breakpointId;
+    string signalName;
+    string signalMeaning;
+}
+
+class SourceLoc
+{
+    string path;
+    int line;
+}
+
+class BreakpointInfo
+{
+    bool success;
+    string breakpointId;
+    int numInsts;
+    Location location;
+    string error;
+}
+
+class StartRequest
+{
+    SourceLoc[] breakpointLocations;
+}
+
+class StartReply
+{
+    bool success;
+    Location location;
+    TargetState state;
+    BreakpointInfo[] breakpointInfos;
+    string error;
+}
+
+class StopRequest
+{
+}
+
+class StopReply
+{
+}
+
+class GenericErrorReply
+{
+    string errorMessage;
+}
+
+class ContinueRequest
+{
+}
+
+class ContinueReply
+{
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+class NextRequest
+{
+}
+
+class NextReply
+{
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+class StepRequest
+{
+}
+
+class StepReply
+{
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+class FinishRequest
+{
+}
+
+class FinishReply
+{
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+class UntilRequest
+{
+    SourceLoc sourceLoc;
+}
+
+class UntilReply
+{
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+class BreakRequest
+{
+    SourceLoc breakpointLocation;
+}
+
+class BreakReply
+{
+    BreakpointInfo breakpointInfo;
+}
+
+class DeleteRequest
+{
+    string breakpointId;
+}
+
+class DeleteReply
+{
+    bool success;
+    string error;
+}
+
+class DepthRequest
+{
+}
+
+class DepthReply
+{
+    bool success;
+    int depth;
+    string error;
+}
+
+class FramesRequest
+{
+    int lowFrame;
+    int highFrame;
+}
+
+class FramesReply
+{
+    bool success;
+    Location[] frames;
+    string error;
+}
+
+class EvaluateRequest
+{
+    string expression;
+}
+
+class EvaluateReply
+{
+    bool success;
+    Result result;
+    string error;
+}
+
+class CountRequest
+{
+    string expression;
+}
+
+class CountReply
+{
+    bool success;
+    int count;
+    string error;
+}
+
+class EvaluateChildRequest
+{
+    string expression;
+    int start;
+    int count;
+}
+
+class EvaluateChildReply
+{
+    bool success;
+    ChildResult[] results;
+    string error;
+}
+
+class TargetRunningRequest
+{
+}
+
+class TargetRunningReply
+{
+}
+
+class TargetInputRequest
+{
+}
+
+class TargetInputReply
+{
+    string line;
+    bool eof;
+}
+
+class TargetOutputRequest
+{
+    int handle;
+    string output;
+}
+
+class TargetOutputReply
+{
+}
+
+class LogMessageRequest
+{
+    string logMessage;
+}
+
+class LogMessageReply
+{
+}

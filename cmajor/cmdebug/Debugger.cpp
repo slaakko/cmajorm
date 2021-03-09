@@ -141,7 +141,11 @@ bool GetBreakpointResults(GdbResults* results, std::string& file, int& line, int
     }
     catch (const std::exception& ex)
     {
-        if (result && result->Type() == JsonValueType::object)
+        if (!result)
+        {
+            result.reset(new JsonObject());
+        }
+        if (result->Type() == JsonValueType::object)
         {
             JsonObject* resultObject = static_cast<JsonObject*>(result.get());
             resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
@@ -573,7 +577,11 @@ Instruction* Debugger::GetInstructionForCppLocation(const std::string& cppFile, 
     }
     catch (const std::exception& ex)
     {
-        if (result && result->Type() == JsonValueType::object)
+        if (!result)
+        {
+            result.reset(new JsonObject());
+        }
+        if (result->Type() == JsonValueType::object)
         {
             JsonObject* resultObject = static_cast<JsonObject*>(result.get());
             resultObject->AddField(U"instGetError", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
@@ -631,6 +639,10 @@ void Debugger::AddStopResultToResult()
 {
     if (stopResult)
     {
+        if (!result)
+        {
+            result.reset(new JsonObject());
+        }
         if (result->Type() == JsonValueType::object)
         {
             JsonObject* resultObject = static_cast<JsonObject*>(result.get());
@@ -2221,7 +2233,7 @@ void Debugger::ProcessVarCreateReply(GdbReply* reply)
     }
     if (!success)
     {
-        if (result->Type() == JsonValueType::object)
+        if (result && result->Type() == JsonValueType::object)
         {
             JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
             jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-var-create")));

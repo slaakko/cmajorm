@@ -8,6 +8,7 @@
 #include <soulng/lexer/Keyword.hpp>
 #include <soulng/lexer/Span.hpp>
 #include <soulng/lexer/ParsingLog.hpp>
+#include <set>
 #include <vector>
 #include <list>
 #include <map>
@@ -80,6 +81,9 @@ public:
     TokenLine TokenizeLine(const std::u32string& line, int lineNumber, int startState);
     void SetSyncTokens(const std::vector<int>& syncTokens_);
     bool Synchronize();
+    void SetBlockCommentStates(const std::set<int>& blockCommentStates_);
+    const std::set<int>& BlockCommentStates() const;
+    void SetCommentTokenId(int commentTokenId_) { commentTokenId = commentTokenId_; }
     LexerFlags Flags() const { return flags; }
     bool GetFlag(LexerFlags flag) const { return (flags & flag) != LexerFlags::none; }
     void SetFlag(LexerFlags flag) { flags = flags | flag; }
@@ -87,6 +91,7 @@ public:
 protected:
     Lexeme lexeme;
     int32_t line;
+    virtual int GetCommentTokenId() const { return -1; }
 private:
     std::u32string content;
     std::string fileName;
@@ -103,6 +108,8 @@ private:
     bool countLines;
     char32_t separatorChar;
     LexerFlags flags;
+    std::set<int> blockCommentStates;
+    int commentTokenId;
     void NextToken();
 };
 

@@ -35,6 +35,8 @@ UTIL_API std::string CharStr(char c);
 UTIL_API std::u32string CharStr(char32_t c);
 UTIL_API std::string StringStr(const std::string& s);
 UTIL_API std::u32string StringStr(const std::u32string& s);
+UTIL_API std::string MakeStringLiteral(const std::string& s);
+UTIL_API std::u32string MakeStringLiteral(const std::u32string& s);
 UTIL_API std::string QuotedPath(const std::string& path);
 UTIL_API bool LastComponentsEqual(const std::string& s0, const std::string& s1, char componentSeparator);
 UTIL_API bool StartsWith(const std::string& s, const std::string& prefix);

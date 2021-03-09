@@ -1,5 +1,5 @@
 
-// this file has been automatically generated from 'D:/work/soulng-project/sngcm/cmlexer/CmajorLexer.lexer' using soulng lexer generator slg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmlexer/CmajorLexer.lexer' using soulng lexer generator slg version 3.10.0
 
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 #include <map>
@@ -34,6 +34,7 @@ namespace CmajorTokens
         tokenIdMap[U"CLASS"] = 45;
         tokenIdMap[U"COLON"] = 119;
         tokenIdMap[U"COMMA"] = 117;
+        tokenIdMap[U"COMMENT"] = 122;
         tokenIdMap[U"CONCEPT"] = 74;
         tokenIdMap[U"CONST"] = 61;
         tokenIdMap[U"CONSTEXPR"] = 62;
@@ -131,6 +132,7 @@ namespace CmajorTokens
         tokenIdMap[U"WHERE"] = 75;
         tokenIdMap[U"WHILE"] = 52;
         tokenIdMap[U"WINAPI"] = 43;
+        tokenIdMap[U"WS"] = 123;
     }
 
     int GetTokenId(const std::u32string& tokenName)
@@ -269,7 +271,9 @@ namespace CmajorTokens
         "ASSIGN",
         "COLON",
         "SEMICOLON",
-        "HASH"
+        "HASH",
+        "COMMENT",
+        "WS"
     };
 
     const char* GetTokenName(int tokenId)
@@ -400,7 +404,9 @@ namespace CmajorTokens
         "'='",
         "':'",
         "';'",
-        "'#'"
+        "'#'",
+        "comment",
+        "ws"
     };
 
     const char* GetTokenInfo(int tokenId)

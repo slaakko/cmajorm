@@ -76,6 +76,9 @@ public:
     void SetDefaultButton(Button* defaultButton_);
     Button* CancelButton() const { return cancelButton; }
     void SetCancelButton(Button* cancelButton_) { cancelButton = cancelButton_; }
+    Control* GetFocusedControl() const { return focusedControl; }
+    void ResetFocusedControl() { focusedControl = nullptr; }
+    void SetFocusedControl(Control* focusedControl_) { focusedControl = focusedControl_; }
     DialogResult GetDialogResult() const { return dialogResult; }
     void SetDialogResult(DialogResult dialogResult_) { dialogResult = dialogResult_; }
     void MouseUpNotificationInternal(MouseEventArgs& args) { MouseUpNotification(args); }
@@ -100,6 +103,7 @@ private:
     bool mainWindow;
     Button* defaultButton;
     Button* cancelButton;
+    Control* focusedControl;
     MenuBar* menuBar;
     DialogResult dialogResult;
     WindowClosingEvent windowClosing;

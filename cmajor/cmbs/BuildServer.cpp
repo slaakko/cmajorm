@@ -25,9 +25,9 @@
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/lexer/ParsingException.hpp>
-#include <sngjson/json/JsonImport.hpp>
-#include <sngjson/json/JsonLexer.hpp>
-#include <sngjson/json/JsonParser.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/Document.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <thread>
@@ -42,7 +42,7 @@ namespace cmbs {
 using namespace sngcm::ast;
 using namespace soulng::util;
 using namespace soulng::unicode;
-using namespace sngjson::json;
+using namespace sngxml::dom;
 using namespace cmajor::mid;
 using namespace cmajor::symbols;
 
@@ -114,7 +114,9 @@ public:
     void StartLogThread();
     void RunLog();
     void StopLogThread();
-    std::string GetMessageKind(JsonValue* message) const;
+    std::string GetMessageKind(Element* element) const;
+    std::string DocumentToString(Document& doc) const;
+    std::string ElementToString(Element* element) const;
     void SetRequestInProgress();
     void ResetRequestInProgress();
     bool StopRequested() const { return stopRequested; }
@@ -216,15 +218,13 @@ void BuildServer::Run()
             RequestGuard requestGuard(this);
             std::string request = ReadStr(socket);
             std::u32string content = ToUtf32(request);
-            JsonLexer lexer(content, "", 0);
-            std::unique_ptr<JsonValue> requestJsonValue(JsonParser::Parse(lexer));
-            std::string messageKind = GetMessageKind(requestJsonValue.get());
+            std::unique_ptr<Document> requestDoc = ParseDocument(content, "socket");
+            std::string messageKind = GetMessageKind(requestDoc->DocumentElement());
             if (messageKind == "stopRequest")
             {
                 StopReply reply;
-                reply.messageKind = "stopReply";
-                std::unique_ptr<JsonValue> replyJsonValue = reply.ToJson();
-                std::string replyStr = replyJsonValue->ToString();
+                std::unique_ptr<Element> replyElement = reply.ToXml("stopReply");
+                std::string replyStr = ElementToString(replyElement.release());
                 Write(socket, replyStr);
                 if (log)
                 {
@@ -233,7 +233,7 @@ void BuildServer::Run()
                     writer.WriteCurrentDateTime();
                     writer << "stop request received:" << std::endl;
                     CodeFormatter formatter(writer.LogFile());
-                    requestJsonValue->Write(formatter);
+                    requestDoc->Write(formatter);
                 }
                 stopRequested = true;
                 if (exitVar && exiting)
@@ -251,18 +251,20 @@ void BuildServer::Run()
                     writer.WriteCurrentDateTime();
                     writer << "build request received:" << std::endl;
                     CodeFormatter formatter(writer.LogFile());
-                    requestJsonValue->Write(formatter);
+                    requestDoc->Write(formatter);
                 }
-                BuildRequest buildRequest(requestJsonValue.get());
+                BuildRequest buildRequest(requestDoc->DocumentElement());
                 BuildReply buildReply = ProcessBuildRequest(buildRequest, &writer);
-                std::unique_ptr<JsonValue> replyJsonValue = buildReply.ToJson();
+                std::unique_ptr<Element> replyElement = buildReply.ToXml("buildReply");
+                Document replyDoc; 
+                replyDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(replyElement.release()));
                 if (log)
                 {
                     writer << "build reply:" << std::endl;
                     CodeFormatter formatter(writer.LogFile());
-                    replyJsonValue->Write(formatter);
+                    replyDoc.Write(formatter);
                 }
-                std::string reply = replyJsonValue->ToString();
+                std::string reply = DocumentToString(replyDoc);
                 Write(socket, reply);
             }
             else if (messageKind == "cacheModuleRequest")
@@ -274,18 +276,20 @@ void BuildServer::Run()
                     writer.WriteCurrentDateTime();
                     writer << "cache module request received:" << std::endl;
                     CodeFormatter formatter(writer.LogFile());
-                    requestJsonValue->Write(formatter);
+                    requestDoc->Write(formatter);
                 }
-                CacheModuleRequest cacheModuleRequest(requestJsonValue.get());
+                CacheModuleRequest cacheModuleRequest(requestDoc->DocumentElement());
                 CacheModuleReply cacheModuleReply = ProcessCacheModuleRequest(cacheModuleRequest);
-                std::unique_ptr<JsonValue> replyJsonValue = cacheModuleReply.ToJson();
+                std::unique_ptr<Element> replyElement = cacheModuleReply.ToXml("cacheModuleReply");
+                Document replyDoc;
+                replyDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(replyElement.release()));
                 if (log)
                 {
                     writer << "cache module reply:" << std::endl;
                     CodeFormatter formatter(writer.LogFile());
-                    replyJsonValue->Write(formatter);
+                    replyDoc.Write(formatter);
                 }
-                std::string reply = replyJsonValue->ToString();
+                std::string reply = DocumentToString(replyDoc);
                 Write(socket, reply);
             }
             else if (messageKind == "getDefinitionRequest")
@@ -297,18 +301,20 @@ void BuildServer::Run()
                     writer.WriteCurrentDateTime();
                     writer << "get definition request received:" << std::endl;
                     CodeFormatter formatter(writer.LogFile());
-                    requestJsonValue->Write(formatter);
+                    requestDoc->Write(formatter);
                 }
-                GetDefinitionRequest getDefinitionRequest(requestJsonValue.get());
+                GetDefinitionRequest getDefinitionRequest(requestDoc->DocumentElement());
                 GetDefinitionReply getDefinitionReply = ProcessGetDefinitionRequest(getDefinitionRequest);
-                std::unique_ptr<JsonValue> replyJsonValue = getDefinitionReply.ToJson();
+                std::unique_ptr<Element> replyElement = getDefinitionReply.ToXml("getDefinitionReply");
+                Document replyDoc;
+                replyDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(replyElement.release()));
                 if (log)
                 {
                     writer << "get definition reply:" << std::endl;
                     CodeFormatter formatter(writer.LogFile());
-                    replyJsonValue->Write(formatter);
+                    replyDoc.Write(formatter);
                 }
-                std::string reply = replyJsonValue->ToString();
+                std::string reply = DocumentToString(replyDoc);
                 Write(socket, reply);
             }
             else
@@ -347,7 +353,6 @@ void BuildServer::WriteGenericErrorReply(const std::string& messageKind)
     soulng::util::Tracer tracer(BuildServer_WriteGenericErrorReply);
 #endif // TRACE
     GenericErrorReply genericErrorReply;
-    genericErrorReply.messageKind = "genericErrorReply";
     if (messageKind.empty())
     {
         genericErrorReply.error = "request message has no 'messageKind' field";
@@ -356,8 +361,8 @@ void BuildServer::WriteGenericErrorReply(const std::string& messageKind)
     {
         genericErrorReply.error = "request message has unknown 'messageKind' field value '" + messageKind + "'";
     }
-    std::unique_ptr<JsonValue> replyJsonValue = genericErrorReply.ToJson();
-    std::string reply = replyJsonValue->ToString();
+    std::unique_ptr<Element> replyElement = genericErrorReply.ToXml("genericErrorReply");
+    std::string reply = ElementToString(replyElement.release());
     Write(socket, reply);
 }
 
@@ -368,7 +373,6 @@ BuildReply BuildServer::ProcessBuildRequest(const BuildRequest& buildRequest, Lo
 #endif // TRACE
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     BuildReply buildReply;
-    buildReply.messageKind = "buildReply";
     try
     {
         cmajor::symbols::ResetGlobalFlags();
@@ -420,7 +424,6 @@ CacheModuleReply BuildServer::ProcessCacheModuleRequest(const CacheModuleRequest
     soulng::util::Tracer tracer(BuildServer_ProcessCacheModuleRequest);
 #endif // TRACE
     CacheModuleReply reply;
-    reply.messageKind = "cacheModuleReply";
     try
     {
         sngcm::ast::BackEnd backend = sngcm::ast::BackEnd::llvm;
@@ -475,7 +478,6 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
 #endif // TRACE
     cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::updateSourceFileModuleMap);
     GetDefinitionReply reply;
-    reply.messageKind = "getDefinitionReply";
     try
     {
         sngcm::ast::BackEnd backend = sngcm::ast::BackEnd::llvm;
@@ -559,9 +561,9 @@ GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionR
                         throw std::runtime_error("file path for file index " + std::to_string(definitionLocation->fileIndex) + " not found from module '" + moduleName + "'");
                     }
                     reply.definitionLocation.file = filePath;
-                    reply.definitionLocation.line = std::to_string(definitionLocation->line);
-                    reply.definitionLocation.scol = std::to_string(definitionLocation->scol);
-                    reply.definitionLocation.ecol = std::to_string(definitionLocation->ecol);
+                    reply.definitionLocation.line = definitionLocation->line;
+                    reply.definitionLocation.scol = definitionLocation->scol;
+                    reply.definitionLocation.ecol = definitionLocation->ecol;
                     reply.ok = true;
                 }
                 else
@@ -1098,26 +1100,23 @@ void BuildServer::RunLog()
         if (timeout)
         {
             ProgressMessage progressMessage;
-            progressMessage.messageKind = "progressMessage";
-            std::unique_ptr<JsonValue> progress = progressMessage.ToJson();
-            std::string message = progress->ToString();
+            std::unique_ptr<Element> progress = progressMessage.ToXml("progressMessage");
+            std::string message = ElementToString(progress.release());
             Write(socket, message);
             continue;
         }
         LogMessageRequest logMessageRequest;
-        logMessageRequest.messageKind = "logMessageRequest";
         logMessageRequest.message = message;
-        std::unique_ptr<JsonValue> logRequest = logMessageRequest.ToJson();
-        std::string request = logRequest->ToString();
+        std::unique_ptr<Element> logRequest = logMessageRequest.ToXml("logMessageRequest");
+        std::string request = ElementToString(logRequest.release());
         Write(socket, request);
         std::string reply = ReadStr(socket);
         std::u32string content = ToUtf32(reply);
-        JsonLexer lexer(content, "", 0);
-        std::unique_ptr<JsonValue> logReply = JsonParser::Parse(lexer);
-        std::string messageKind = GetMessageKind(logReply.get());
+        std::unique_ptr<Document> logReply = ParseDocument(content, "socket");
+        std::string messageKind = GetMessageKind(logReply->DocumentElement());
         if (messageKind == "logMessageReply")
         {
-            LogMessageReply logMessageReply(logReply.get());
+            LogMessageReply logMessageReply(logReply->DocumentElement());
             if (!logMessageReply.ok)
             {
                 throw std::runtime_error("log message refused by client");
@@ -1201,17 +1200,27 @@ void BuildServer::StopLogThread()
     }
 }
 
-std::string BuildServer::GetMessageKind(JsonValue* message) const
+std::string BuildServer::GetMessageKind(Element* element) const
 {
 #ifdef TRACE
     soulng::util::Tracer tracer(BuildServer_GetMessageKind);
 #endif // TRACE
-    if (message->Type() == JsonValueType::object)
-    {
-        JsonObject* messageObject = static_cast<JsonObject*>(message);
-        return messageObject->GetStringField(U"messageKind");
-    }
-    return std::string();
+    return ToUtf8(element->Name());
+}
+
+std::string BuildServer::DocumentToString(Document& doc) const
+{
+    std::stringstream strStream;
+    CodeFormatter formatter(strStream);
+    doc.Write(formatter);
+    return strStream.str();
+}
+
+std::string BuildServer::ElementToString(Element* element) const
+{
+    Document doc;
+    doc.AppendChild(std::unique_ptr<sngxml::dom::Node>(element));
+    return DocumentToString(doc);
 }
 
 void RunServer(BuildServer* server)

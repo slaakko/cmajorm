@@ -31,7 +31,9 @@ SOULNG_LEXER_API std::string GetEndTokenInfo();
 
 struct SOULNG_LEXER_API TokenLine
 {
+    TokenLine() : startState(0), endState(0) {}
     std::vector<Token> tokens;
+    int startState;
     int endState;
 };
 

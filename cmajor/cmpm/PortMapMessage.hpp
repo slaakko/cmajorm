@@ -1,93 +1,113 @@
-#ifndef HPP_E9A7CDC085758979427A3E510D8D38DC3640E725
-#define HPP_E9A7CDC085758979427A3E510D8D38DC3640E725
-#include <soulng/util/Json.hpp>
-#include <string>
+#ifndef PORTMAPMESSAGE_HPP_DC8E9733F60B35A671F1CC8A29699D85F1D0FE2B
+#define PORTMAPMESSAGE_HPP_DC8E9733F60B35A671F1CC8A29699D85F1D0FE2B
+#include <sngxml/dom/Element.hpp>
+#include <soulng/util/Time.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <chrono>
 #include <vector>
+#include <string>
 #include <memory>
+#include <stdint.h>
 
-struct GetFreePortNumberRequest
+using date = soulng::util::Date;
+using datetime = soulng::util::DateTime;
+using timestamp = soulng::util::Timestamp;
+using time_point = std::chrono::steady_clock::time_point;
+using duration = std::chrono::steady_clock::duration;
+using uuid = boost::uuids::uuid;
+
+class GetFreePortNumberRequest
 {
+public:
     GetFreePortNumberRequest();
-    GetFreePortNumberRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string message;
-    std::string programName;
-    std::string pid;
-    std::string time;
+    GetFreePortNumberRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    std::string processName;
+    int32_t pid;
 };
 
-struct GetFreePortNumberReply
+class GetFreePortNumberReply
 {
+public:
     GetFreePortNumberReply();
-    GetFreePortNumberReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string message;
-    std::string portNumber;
+    GetFreePortNumberReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    int32_t portNumber;
 };
 
-struct ExtendPortLeaseRequest
+class ExtendPortLeaseRequest
 {
+public:
     ExtendPortLeaseRequest();
-    ExtendPortLeaseRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string message;
-    std::string programName;
-    std::string pid;
-    std::vector<std::string> portNumbers;
+    ExtendPortLeaseRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    std::string processName;
+    int32_t pid;
+    std::vector<int32_t> portNumbers;
 };
 
-struct ExtendPortLeaseReply
+class ExtendPortLeaseReply
 {
+public:
     ExtendPortLeaseReply();
-    ExtendPortLeaseReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string message;
+    ExtendPortLeaseReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct StopPortMapServerRequest
+class StopPortMapServerRequest
 {
+public:
     StopPortMapServerRequest();
-    StopPortMapServerRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string message;
+    StopPortMapServerRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct StopPortMapServerReply
+class StopPortMapServerReply
 {
+public:
     StopPortMapServerReply();
-    StopPortMapServerReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string message;
+    StopPortMapServerReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct PortLease
+class PortLease
 {
+public:
     PortLease();
-    PortLease(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string portNumber;
-    std::string programName;
-    std::string pid;
-    std::string leaseStartTime;
-    std::string leaseRenewalTime;
+    PortLease(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    int32_t portNumber;
+    std::string processName;
+    int32_t pid;
+    datetime leaseStartTime;
+    datetime leaseRenewalTime;
     std::string leaseState;
 };
 
-struct ViewPortLeaseRequest
+class ViewPortLeaseRequest
 {
+public:
     ViewPortLeaseRequest();
-    ViewPortLeaseRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string message;
+    ViewPortLeaseRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct ViewPortLeaseReply
+class ViewPortLeaseReply
 {
+public:
     ViewPortLeaseReply();
-    ViewPortLeaseReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string message;
+    ViewPortLeaseReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::vector<PortLease> portLeases;
 };
 
-#endif // HPP_E9A7CDC085758979427A3E510D8D38DC3640E725
+#endif // PORTMAPMESSAGE_HPP_DC8E9733F60B35A671F1CC8A29699D85F1D0FE2B

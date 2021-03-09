@@ -1,0 +1,53 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+class GetFreePortNumberRequest
+{
+    string processName;
+    int pid;
+}
+
+class GetFreePortNumberReply
+{
+    int portNumber;
+}
+
+class ExtendPortLeaseRequest
+{
+    string processName;
+    int pid;
+    int[] portNumbers;
+}
+
+class ExtendPortLeaseReply
+{
+}
+
+class StopPortMapServerRequest
+{
+}
+
+class StopPortMapServerReply
+{
+}
+
+class PortLease
+{
+    int portNumber;
+    string processName;
+    int pid;
+    datetime leaseStartTime;
+    datetime leaseRenewalTime;
+    string leaseState;
+}
+
+class ViewPortLeaseRequest
+{
+}
+
+class ViewPortLeaseReply
+{
+    PortLease[] portLeases;
+}

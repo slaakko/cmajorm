@@ -3,27 +3,23 @@
 // Distributed under the MIT license
 // =================================
 
-struct StopRequest
+class StopRequest
 {
-    string messageKind;
 }
 
-struct StopReply
+class StopReply
 {
-    string messageKind;
 }
 
-struct KeepAliveRequest
+class KeepAliveRequest
 {
-    string messageKind;
 }
 
-struct KeepAliveReply
+class KeepAliveReply
 {
-    string messageKind;
 }
 
-struct BuildRequest
+class BuildRequest
 {
     string messageKind;
     string backend;
@@ -51,19 +47,18 @@ struct BuildRequest
     bool justMyCode;
 }
 
-struct CompileError
+class CompileError
 {
     string message;
     string project;
     string file;
-    string line;
-    string scol;
-    string ecol;
+    int line;
+    int scol;
+    int ecol;
 }
 
-struct BuildReply
+class BuildReply
 {
-    string messageKind;
     bool requestValid;
     string requestErrorMessage;
     string logException;
@@ -72,55 +67,48 @@ struct BuildReply
     CompileError[] errors;
 }
 
-struct LogMessageRequest
+class LogMessageRequest
 {
-    string messageKind;
     string message;
 }
 
-struct LogMessageReply
+class LogMessageReply
 {
-    string messageKind;
     bool ok;
 }
 
-struct ProgressMessage
+class ProgressMessage
 {
-    string messageKind;
 }
 
-struct GenericErrorReply
+class GenericErrorReply
 {
-    string messageKind;
     string error;
 }
 
-struct CacheModuleRequest
+class CacheModuleRequest
 {
-    string messageKind;
     string projectName;
     string projectFilePath;
     string backend;
     string config;
 }
 
-struct CacheModuleReply
+class CacheModuleReply
 {
-    string messageKind;
     string error;
 }
 
-struct SourceLocation
+class SourceLocation
 {
     string file;
-    string line;
-    string scol;
-    string ecol;
+    int line;
+    int scol;
+    int ecol;
 }
 
-struct GetDefinitionRequest
+class GetDefinitionRequest
 {
-    string messageKind;
     string projectName;
     string projectFilePath;
     string backend;
@@ -129,11 +117,9 @@ struct GetDefinitionRequest
     SourceLocation identifierLocation;
 }
 
-struct GetDefinitionReply
+class GetDefinitionReply
 {
-    string messageKind;
     SourceLocation definitionLocation;
     bool ok;
     string error;
 }
-

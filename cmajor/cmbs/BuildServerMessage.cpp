@@ -1,439 +1,367 @@
 #include "BuildServerMessage.hpp"
-#include <sngjson/json/JsonImport.hpp>
-#include <sngjson/json/JsonExport.hpp>
-#include <utility>
+#include <sngxml/serialization/XmlExport.hpp>
+#include <sngxml/serialization/XmlImport.hpp>
+#include <soulng/util/Unicode.hpp>
 
-StopRequest::StopRequest() : messageKind()
+using namespace soulng::unicode;
+
+StopRequest::StopRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> StopRequest::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
-}
-
-StopRequest::StopRequest(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-}
-
-StopReply::StopReply() : messageKind()
+StopRequest::StopRequest(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> StopReply::ToJson() const
+std::unique_ptr<sngxml::dom::Element> StopRequest::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-StopReply::StopReply(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-}
-
-KeepAliveRequest::KeepAliveRequest() : messageKind()
+StopReply::StopReply()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> KeepAliveRequest::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
-}
-
-KeepAliveRequest::KeepAliveRequest(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-}
-
-KeepAliveReply::KeepAliveReply() : messageKind()
+StopReply::StopReply(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> KeepAliveReply::ToJson() const
+std::unique_ptr<sngxml::dom::Element> StopReply::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-KeepAliveReply::KeepAliveReply(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-}
-
-BuildRequest::BuildRequest() : messageKind(), backend(), config(), optimizationLevel(), filePath(), defines(), numBuildThreads(), toolChain(), verbose(), quiet(), clean(), strictNothrow(), emitIR(), emitOptIR(), linkWithDebugRuntime(), linkUsingMsLink(), rebuild(), buildAllDependencies(), forceDebugInfo(), forceNoDebugInfo(), disableModuleCache(), singleThreadedCompile(), disableCodeGen(), justMyCode()
+KeepAliveRequest::KeepAliveRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> BuildRequest::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(backend);
-    object->AddField(U"backend", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(config);
-    object->AddField(U"config", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(optimizationLevel);
-    object->AddField(U"optimizationLevel", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(filePath);
-    object->AddField(U"filePath", std::move(fieldValue4));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(defines);
-    object->AddField(U"defines", std::move(fieldValue5));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue6 = sngjson::json::ToJson(numBuildThreads);
-    object->AddField(U"numBuildThreads", std::move(fieldValue6));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue7 = sngjson::json::ToJson(toolChain);
-    object->AddField(U"toolChain", std::move(fieldValue7));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue8 = sngjson::json::ToJson(verbose);
-    object->AddField(U"verbose", std::move(fieldValue8));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue9 = sngjson::json::ToJson(quiet);
-    object->AddField(U"quiet", std::move(fieldValue9));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue10 = sngjson::json::ToJson(clean);
-    object->AddField(U"clean", std::move(fieldValue10));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue11 = sngjson::json::ToJson(strictNothrow);
-    object->AddField(U"strictNothrow", std::move(fieldValue11));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue12 = sngjson::json::ToJson(emitIR);
-    object->AddField(U"emitIR", std::move(fieldValue12));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue13 = sngjson::json::ToJson(emitOptIR);
-    object->AddField(U"emitOptIR", std::move(fieldValue13));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue14 = sngjson::json::ToJson(linkWithDebugRuntime);
-    object->AddField(U"linkWithDebugRuntime", std::move(fieldValue14));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue15 = sngjson::json::ToJson(linkUsingMsLink);
-    object->AddField(U"linkUsingMsLink", std::move(fieldValue15));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue16 = sngjson::json::ToJson(rebuild);
-    object->AddField(U"rebuild", std::move(fieldValue16));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue17 = sngjson::json::ToJson(buildAllDependencies);
-    object->AddField(U"buildAllDependencies", std::move(fieldValue17));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue18 = sngjson::json::ToJson(forceDebugInfo);
-    object->AddField(U"forceDebugInfo", std::move(fieldValue18));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue19 = sngjson::json::ToJson(forceNoDebugInfo);
-    object->AddField(U"forceNoDebugInfo", std::move(fieldValue19));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue20 = sngjson::json::ToJson(disableModuleCache);
-    object->AddField(U"disableModuleCache", std::move(fieldValue20));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue21 = sngjson::json::ToJson(singleThreadedCompile);
-    object->AddField(U"singleThreadedCompile", std::move(fieldValue21));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue22 = sngjson::json::ToJson(disableCodeGen);
-    object->AddField(U"disableCodeGen", std::move(fieldValue22));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue23 = sngjson::json::ToJson(justMyCode);
-    object->AddField(U"justMyCode", std::move(fieldValue23));
-    return object;
-}
-
-BuildRequest::BuildRequest(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "backend", backend);
-    sngjson::json::FromJson(__json_value, "config", config);
-    sngjson::json::FromJson(__json_value, "optimizationLevel", optimizationLevel);
-    sngjson::json::FromJson(__json_value, "filePath", filePath);
-    sngjson::json::FromJson(__json_value, "defines", defines);
-    sngjson::json::FromJson(__json_value, "numBuildThreads", numBuildThreads);
-    sngjson::json::FromJson(__json_value, "toolChain", toolChain);
-    sngjson::json::FromJson(__json_value, "verbose", verbose);
-    sngjson::json::FromJson(__json_value, "quiet", quiet);
-    sngjson::json::FromJson(__json_value, "clean", clean);
-    sngjson::json::FromJson(__json_value, "strictNothrow", strictNothrow);
-    sngjson::json::FromJson(__json_value, "emitIR", emitIR);
-    sngjson::json::FromJson(__json_value, "emitOptIR", emitOptIR);
-    sngjson::json::FromJson(__json_value, "linkWithDebugRuntime", linkWithDebugRuntime);
-    sngjson::json::FromJson(__json_value, "linkUsingMsLink", linkUsingMsLink);
-    sngjson::json::FromJson(__json_value, "rebuild", rebuild);
-    sngjson::json::FromJson(__json_value, "buildAllDependencies", buildAllDependencies);
-    sngjson::json::FromJson(__json_value, "forceDebugInfo", forceDebugInfo);
-    sngjson::json::FromJson(__json_value, "forceNoDebugInfo", forceNoDebugInfo);
-    sngjson::json::FromJson(__json_value, "disableModuleCache", disableModuleCache);
-    sngjson::json::FromJson(__json_value, "singleThreadedCompile", singleThreadedCompile);
-    sngjson::json::FromJson(__json_value, "disableCodeGen", disableCodeGen);
-    sngjson::json::FromJson(__json_value, "justMyCode", justMyCode);
-}
-
-CompileError::CompileError() : message(), project(), file(), line(), scol(), ecol()
+KeepAliveRequest::KeepAliveRequest(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> CompileError::ToJson() const
+std::unique_ptr<sngxml::dom::Element> KeepAliveRequest::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(project);
-    object->AddField(U"project", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(file);
-    object->AddField(U"file", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(line);
-    object->AddField(U"line", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(scol);
-    object->AddField(U"scol", std::move(fieldValue4));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(ecol);
-    object->AddField(U"ecol", std::move(fieldValue5));
-    return object;
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-CompileError::CompileError(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "message", message);
-    sngjson::json::FromJson(__json_value, "project", project);
-    sngjson::json::FromJson(__json_value, "file", file);
-    sngjson::json::FromJson(__json_value, "line", line);
-    sngjson::json::FromJson(__json_value, "scol", scol);
-    sngjson::json::FromJson(__json_value, "ecol", ecol);
-}
-
-BuildReply::BuildReply() : messageKind(), requestValid(), requestErrorMessage(), logException(), time(), success(), errors()
+KeepAliveReply::KeepAliveReply()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> BuildReply::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(requestValid);
-    object->AddField(U"requestValid", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(requestErrorMessage);
-    object->AddField(U"requestErrorMessage", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(logException);
-    object->AddField(U"logException", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(time);
-    object->AddField(U"time", std::move(fieldValue4));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue5));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue6 = sngjson::json::ToJson(errors);
-    object->AddField(U"errors", std::move(fieldValue6));
-    return object;
-}
-
-BuildReply::BuildReply(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "requestValid", requestValid);
-    sngjson::json::FromJson(__json_value, "requestErrorMessage", requestErrorMessage);
-    sngjson::json::FromJson(__json_value, "logException", logException);
-    sngjson::json::FromJson(__json_value, "time", time);
-    sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "errors", errors);
-}
-
-LogMessageRequest::LogMessageRequest() : messageKind(), message()
+KeepAliveReply::KeepAliveReply(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> LogMessageRequest::ToJson() const
+std::unique_ptr<sngxml::dom::Element> KeepAliveReply::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue1));
-    return object;
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-LogMessageRequest::LogMessageRequest(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "message", message);
-}
-
-LogMessageReply::LogMessageReply() : messageKind(), ok()
+BuildRequest::BuildRequest()
+    : messageKind(), backend(), config(), optimizationLevel(), filePath(), defines(), numBuildThreads(), toolChain(), verbose(), quiet(), clean(), strictNothrow(), emitIR(), emitOptIR(), linkWithDebugRuntime(), linkUsingMsLink(), rebuild(), buildAllDependencies(), forceDebugInfo(), forceNoDebugInfo(), disableModuleCache(), singleThreadedCompile(), disableCodeGen(), justMyCode()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> LogMessageReply::ToJson() const
+BuildRequest::BuildRequest(sngxml::dom::Element* element)
+    : messageKind(), backend(), config(), optimizationLevel(), filePath(), defines(), numBuildThreads(), toolChain(), verbose(), quiet(), clean(), strictNothrow(), emitIR(), emitOptIR(), linkWithDebugRuntime(), linkUsingMsLink(), rebuild(), buildAllDependencies(), forceDebugInfo(), forceNoDebugInfo(), disableModuleCache(), singleThreadedCompile(), disableCodeGen(), justMyCode()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(ok);
-    object->AddField(U"ok", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "messageKind", messageKind);
+    sngxml::xmlser::FromXml(element, "backend", backend);
+    sngxml::xmlser::FromXml(element, "config", config);
+    sngxml::xmlser::FromXml(element, "optimizationLevel", optimizationLevel);
+    sngxml::xmlser::FromXml(element, "filePath", filePath);
+    sngxml::xmlser::FromXml(element, "defines", defines);
+    sngxml::xmlser::FromXml(element, "numBuildThreads", numBuildThreads);
+    sngxml::xmlser::FromXml(element, "toolChain", toolChain);
+    sngxml::xmlser::FromXml(element, "verbose", verbose);
+    sngxml::xmlser::FromXml(element, "quiet", quiet);
+    sngxml::xmlser::FromXml(element, "clean", clean);
+    sngxml::xmlser::FromXml(element, "strictNothrow", strictNothrow);
+    sngxml::xmlser::FromXml(element, "emitIR", emitIR);
+    sngxml::xmlser::FromXml(element, "emitOptIR", emitOptIR);
+    sngxml::xmlser::FromXml(element, "linkWithDebugRuntime", linkWithDebugRuntime);
+    sngxml::xmlser::FromXml(element, "linkUsingMsLink", linkUsingMsLink);
+    sngxml::xmlser::FromXml(element, "rebuild", rebuild);
+    sngxml::xmlser::FromXml(element, "buildAllDependencies", buildAllDependencies);
+    sngxml::xmlser::FromXml(element, "forceDebugInfo", forceDebugInfo);
+    sngxml::xmlser::FromXml(element, "forceNoDebugInfo", forceNoDebugInfo);
+    sngxml::xmlser::FromXml(element, "disableModuleCache", disableModuleCache);
+    sngxml::xmlser::FromXml(element, "singleThreadedCompile", singleThreadedCompile);
+    sngxml::xmlser::FromXml(element, "disableCodeGen", disableCodeGen);
+    sngxml::xmlser::FromXml(element, "justMyCode", justMyCode);
 }
 
-LogMessageReply::LogMessageReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> BuildRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "ok", ok);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(messageKind, "messageKind").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(optimizationLevel, "optimizationLevel").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(filePath, "filePath").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(defines, "defines").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(numBuildThreads, "numBuildThreads").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(toolChain, "toolChain").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(verbose, "verbose").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(quiet, "quiet").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(clean, "clean").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(strictNothrow, "strictNothrow").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(emitIR, "emitIR").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(emitOptIR, "emitOptIR").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(linkWithDebugRuntime, "linkWithDebugRuntime").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(linkUsingMsLink, "linkUsingMsLink").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(rebuild, "rebuild").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(buildAllDependencies, "buildAllDependencies").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(forceDebugInfo, "forceDebugInfo").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(forceNoDebugInfo, "forceNoDebugInfo").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(disableModuleCache, "disableModuleCache").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(singleThreadedCompile, "singleThreadedCompile").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(disableCodeGen, "disableCodeGen").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(justMyCode, "justMyCode").release()));
+    return element;
 }
 
-ProgressMessage::ProgressMessage() : messageKind()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> ProgressMessage::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
-}
-
-ProgressMessage::ProgressMessage(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-}
-
-GenericErrorReply::GenericErrorReply() : messageKind(), error()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> GenericErrorReply::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue1));
-    return object;
-}
-
-GenericErrorReply::GenericErrorReply(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "error", error);
-}
-
-CacheModuleRequest::CacheModuleRequest() : messageKind(), projectName(), projectFilePath(), backend(), config()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> CacheModuleRequest::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(projectName);
-    object->AddField(U"projectName", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(projectFilePath);
-    object->AddField(U"projectFilePath", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(backend);
-    object->AddField(U"backend", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(config);
-    object->AddField(U"config", std::move(fieldValue4));
-    return object;
-}
-
-CacheModuleRequest::CacheModuleRequest(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "projectName", projectName);
-    sngjson::json::FromJson(__json_value, "projectFilePath", projectFilePath);
-    sngjson::json::FromJson(__json_value, "backend", backend);
-    sngjson::json::FromJson(__json_value, "config", config);
-}
-
-CacheModuleReply::CacheModuleReply() : messageKind(), error()
+CompileError::CompileError()
+    : message(), project(), file(), line(), scol(), ecol()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> CacheModuleReply::ToJson() const
+CompileError::CompileError(sngxml::dom::Element* element)
+    : message(), project(), file(), line(), scol(), ecol()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "message", message);
+    sngxml::xmlser::FromXml(element, "project", project);
+    sngxml::xmlser::FromXml(element, "file", file);
+    sngxml::xmlser::FromXml(element, "line", line);
+    sngxml::xmlser::FromXml(element, "scol", scol);
+    sngxml::xmlser::FromXml(element, "ecol", ecol);
 }
 
-CacheModuleReply::CacheModuleReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> CompileError::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(message, "message").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(project, "project").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(file, "file").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(line, "line").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(scol, "scol").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ecol, "ecol").release()));
+    return element;
 }
 
-SourceLocation::SourceLocation() : file(), line(), scol(), ecol()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> SourceLocation::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(file);
-    object->AddField(U"file", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(line);
-    object->AddField(U"line", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(scol);
-    object->AddField(U"scol", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(ecol);
-    object->AddField(U"ecol", std::move(fieldValue3));
-    return object;
-}
-
-SourceLocation::SourceLocation(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "file", file);
-    sngjson::json::FromJson(__json_value, "line", line);
-    sngjson::json::FromJson(__json_value, "scol", scol);
-    sngjson::json::FromJson(__json_value, "ecol", ecol);
-}
-
-GetDefinitionRequest::GetDefinitionRequest() : messageKind(), projectName(), projectFilePath(), backend(), config(), identifier(), identifierLocation()
+BuildReply::BuildReply()
+    : requestValid(), requestErrorMessage(), logException(), time(), success(), errors()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> GetDefinitionRequest::ToJson() const
+BuildReply::BuildReply(sngxml::dom::Element* element)
+    : requestValid(), requestErrorMessage(), logException(), time(), success(), errors()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(projectName);
-    object->AddField(U"projectName", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(projectFilePath);
-    object->AddField(U"projectFilePath", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(backend);
-    object->AddField(U"backend", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(config);
-    object->AddField(U"config", std::move(fieldValue4));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(identifier);
-    object->AddField(U"identifier", std::move(fieldValue5));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue6 = sngjson::json::ToJson(identifierLocation);
-    object->AddField(U"identifierLocation", std::move(fieldValue6));
-    return object;
+    sngxml::xmlser::FromXml(element, "requestValid", requestValid);
+    sngxml::xmlser::FromXml(element, "requestErrorMessage", requestErrorMessage);
+    sngxml::xmlser::FromXml(element, "logException", logException);
+    sngxml::xmlser::FromXml(element, "time", time);
+    sngxml::xmlser::FromXml(element, "success", success);
+    sngxml::xmlser::FromXml(element, "errors", errors);
 }
 
-GetDefinitionRequest::GetDefinitionRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> BuildReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "projectName", projectName);
-    sngjson::json::FromJson(__json_value, "projectFilePath", projectFilePath);
-    sngjson::json::FromJson(__json_value, "backend", backend);
-    sngjson::json::FromJson(__json_value, "config", config);
-    sngjson::json::FromJson(__json_value, "identifier", identifier);
-    sngjson::json::FromJson(__json_value, "identifierLocation", identifierLocation);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(requestValid, "requestValid").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(requestErrorMessage, "requestErrorMessage").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(logException, "logException").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(time, "time").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(errors, "errors").release()));
+    return element;
 }
 
-GetDefinitionReply::GetDefinitionReply() : messageKind(), definitionLocation(), ok(), error()
+LogMessageRequest::LogMessageRequest()
+    : message()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> GetDefinitionReply::ToJson() const
+LogMessageRequest::LogMessageRequest(sngxml::dom::Element* element)
+    : message()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(definitionLocation);
-    object->AddField(U"definitionLocation", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(ok);
-    object->AddField(U"ok", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue3));
-    return object;
+    sngxml::xmlser::FromXml(element, "message", message);
 }
 
-GetDefinitionReply::GetDefinitionReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> LogMessageRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
-    sngjson::json::FromJson(__json_value, "definitionLocation", definitionLocation);
-    sngjson::json::FromJson(__json_value, "ok", ok);
-    sngjson::json::FromJson(__json_value, "error", error);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(message, "message").release()));
+    return element;
+}
+
+LogMessageReply::LogMessageReply()
+    : ok()
+{
+}
+
+LogMessageReply::LogMessageReply(sngxml::dom::Element* element)
+    : ok()
+{
+    sngxml::xmlser::FromXml(element, "ok", ok);
+}
+
+std::unique_ptr<sngxml::dom::Element> LogMessageReply::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok").release()));
+    return element;
+}
+
+ProgressMessage::ProgressMessage()
+{
+}
+
+ProgressMessage::ProgressMessage(sngxml::dom::Element* element)
+{
+}
+
+std::unique_ptr<sngxml::dom::Element> ProgressMessage::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
+}
+
+GenericErrorReply::GenericErrorReply()
+    : error()
+{
+}
+
+GenericErrorReply::GenericErrorReply(sngxml::dom::Element* element)
+    : error()
+{
+    sngxml::xmlser::FromXml(element, "error", error);
+}
+
+std::unique_ptr<sngxml::dom::Element> GenericErrorReply::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
+}
+
+CacheModuleRequest::CacheModuleRequest()
+    : projectName(), projectFilePath(), backend(), config()
+{
+}
+
+CacheModuleRequest::CacheModuleRequest(sngxml::dom::Element* element)
+    : projectName(), projectFilePath(), backend(), config()
+{
+    sngxml::xmlser::FromXml(element, "projectName", projectName);
+    sngxml::xmlser::FromXml(element, "projectFilePath", projectFilePath);
+    sngxml::xmlser::FromXml(element, "backend", backend);
+    sngxml::xmlser::FromXml(element, "config", config);
+}
+
+std::unique_ptr<sngxml::dom::Element> CacheModuleRequest::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectName, "projectName").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config").release()));
+    return element;
+}
+
+CacheModuleReply::CacheModuleReply()
+    : error()
+{
+}
+
+CacheModuleReply::CacheModuleReply(sngxml::dom::Element* element)
+    : error()
+{
+    sngxml::xmlser::FromXml(element, "error", error);
+}
+
+std::unique_ptr<sngxml::dom::Element> CacheModuleReply::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
+}
+
+SourceLocation::SourceLocation()
+    : file(), line(), scol(), ecol()
+{
+}
+
+SourceLocation::SourceLocation(sngxml::dom::Element* element)
+    : file(), line(), scol(), ecol()
+{
+    sngxml::xmlser::FromXml(element, "file", file);
+    sngxml::xmlser::FromXml(element, "line", line);
+    sngxml::xmlser::FromXml(element, "scol", scol);
+    sngxml::xmlser::FromXml(element, "ecol", ecol);
+}
+
+std::unique_ptr<sngxml::dom::Element> SourceLocation::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(file, "file").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(line, "line").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(scol, "scol").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ecol, "ecol").release()));
+    return element;
+}
+
+GetDefinitionRequest::GetDefinitionRequest()
+    : projectName(), projectFilePath(), backend(), config(), identifier(), identifierLocation()
+{
+}
+
+GetDefinitionRequest::GetDefinitionRequest(sngxml::dom::Element* element)
+    : projectName(), projectFilePath(), backend(), config(), identifier(), identifierLocation()
+{
+    sngxml::xmlser::FromXml(element, "projectName", projectName);
+    sngxml::xmlser::FromXml(element, "projectFilePath", projectFilePath);
+    sngxml::xmlser::FromXml(element, "backend", backend);
+    sngxml::xmlser::FromXml(element, "config", config);
+    sngxml::xmlser::FromXml(element, "identifier", identifier);
+    sngxml::xmlser::FromXml(element, "identifierLocation", identifierLocation);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetDefinitionRequest::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectName, "projectName").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(identifier, "identifier").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(identifierLocation, "identifierLocation").release()));
+    return element;
+}
+
+GetDefinitionReply::GetDefinitionReply()
+    : definitionLocation(), ok(), error()
+{
+}
+
+GetDefinitionReply::GetDefinitionReply(sngxml::dom::Element* element)
+    : definitionLocation(), ok(), error()
+{
+    sngxml::xmlser::FromXml(element, "definitionLocation", definitionLocation);
+    sngxml::xmlser::FromXml(element, "ok", ok);
+    sngxml::xmlser::FromXml(element, "error", error);
+}
+
+std::unique_ptr<sngxml::dom::Element> GetDefinitionReply::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(definitionLocation, "definitionLocation").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
+    return element;
 }
 

@@ -52,6 +52,11 @@ WNDPROC GetWndProc()
     return WndProc;
 }
 
+bool KeyPressed(int virtualKeyCode)
+{
+    return (GetKeyState(virtualKeyCode) & 0x8000) != 0;
+}
+
 KeyPreviewFunction keyPreview;
 
 void SetKeyPreviewFunction(KeyPreviewFunction keyPreviewFun)
@@ -103,6 +108,61 @@ int Run()
         }
     }
     return msg.wParam;
+}
+
+int MessageLoop()
+{
+    DWORD queueStatus = GetQueueStatus(QS_ALLEVENTS);
+    bool messageWaiting = HIWORD(queueStatus) != 0;
+    if (messageWaiting)
+    {
+        MSG msg;
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            bool handled = false;
+            if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+            {
+                if (keyPreview)
+                {
+                    uint32_t keyCode = msg.wParam;
+                    if (keyPreview)
+                    {
+                        KeyState keyState = KeyState::none;
+                        if (msg.message == WM_KEYDOWN)
+                        {
+                            keyState = keyState | KeyState::down;
+                        }
+                        short shiftState = GetKeyState(VK_SHIFT);
+                        bool shift = (shiftState & (1 << 16)) != 0;
+                        if (shift)
+                        {
+                            keyState = keyState | KeyState::shift;
+                        }
+                        short controlState = GetKeyState(VK_CONTROL);
+                        bool control = (controlState & (1 << 16)) != 0;
+                        if (control)
+                        {
+                            keyState = keyState | KeyState::control;
+                        }
+                        short altState = GetKeyState(VK_MENU);
+                        bool alt = (altState & (1 << 16)) != 0;
+                        if (alt)
+                        {
+                            keyState = keyState | KeyState::alt;
+                        }
+                        keyPreview(keyCode, keyState, handled);
+                    }
+                }
+            }
+            if (!handled)
+            {
+                DispatchMessage(&msg);
+            }
+        }
+        return msg.wParam;
+    }
+    return 1;
 }
 
 ULONG_PTR gdiplusToken;

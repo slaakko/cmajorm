@@ -28,6 +28,7 @@ public:
     static Window* ActiveWindow() { return activeWindow; }
     static Keys GetKeyboardModifiers() { return keyboardModifiers; }
     static void SetKeyboardModifiers(Keys keyboardModifiers_) { keyboardModifiers = keyboardModifiers_; }
+    static void ProcessMessages();
 private:
     static bool ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result);
     static void ModelessWindowKeyPreview(WPARAM keyCode, KeyState keyState, bool& handled);

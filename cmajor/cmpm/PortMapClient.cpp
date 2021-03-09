@@ -6,10 +6,12 @@
 #include <cmajor/cmpm/PortMapClient.hpp>
 #include <cmajor/cmpm/PortMapServer.hpp>
 #include <cmajor/cmpm/PortMapMessage.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/Parser.hpp>
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Unicode.hpp>
-#include <sngjson/json/JsonLexer.hpp>
-#include <sngjson/json/JsonParser.hpp>
+#include <sstream>
 #include <memory>
 #include <thread>
 #include <mutex>
@@ -21,15 +23,13 @@ namespace cmajor { namespace cmpm {
 using namespace soulng::util;
 using namespace soulng::unicode;
 
-
-
 class PortMapClient
 {
 public:
     static void Init();
     static void Done();
     static PortMapClient& Instance() { return *instance; }
-    void Start(int portMapServicePort, const std::vector<int>& portNumbers, const std::string& programName, int pid);
+    void Start(int portMapServicePort, const std::vector<int>& portNumbers, const std::string& processName, int pid);
     void Stop();
     void Run();
 private:
@@ -38,7 +38,7 @@ private:
     void ExtendPortLease();
     int portMapServicePort;
     std::vector<int> portNumbers;
-    std::string programName;
+    std::string processName;
     int pid;
     std::thread clientThread;
     std::condition_variable exitVar;
@@ -59,7 +59,7 @@ void PortMapClient::Done()
     instance.reset();
 }
 
-PortMapClient::PortMapClient() : portMapServicePort(-1), portNumbers(), programName(), pid(-1), exiting(false), run(false)
+PortMapClient::PortMapClient() : portMapServicePort(-1), portNumbers(), processName(), pid(-1), exiting(false), run(false)
 {
 }
 
@@ -83,32 +83,23 @@ void PortMapClient::ExtendPortLease()
     {
         TcpSocket socket("localhost", std::to_string(portMapServicePort));
         ExtendPortLeaseRequest request;
-        request.message = "ExtendPortLeaseRequest";
-        request.programName = programName;
-        request.pid = std::to_string(pid);
+        request.processName = processName;
+        request.pid = pid;
         for (int port : portNumbers)
         {
-            request.portNumbers.push_back(std::to_string(port));
+            request.portNumbers.push_back(port);
         }
-        std::unique_ptr<JsonValue> requestValue = request.ToJson();
-        std::string requestStr = requestValue->ToString();
+        std::unique_ptr<sngxml::dom::Element> requestValue = request.ToXml("extendPortLeaseRequest");
+        std::stringstream strStream; 
+        CodeFormatter formatter(strStream);
+        requestValue->Write(formatter);
+        std::string requestStr = strStream.str();
         Write(socket, requestStr);
         std::string replyStr = ReadStr(socket);
-        JsonLexer lexer(ToUtf32(replyStr), "", 0);
-        std::unique_ptr<JsonValue> replyValue = JsonParser::Parse(lexer);
-        if (replyValue->Type() == JsonValueType::object)
-        {
-            JsonObject* replyObject = static_cast<JsonObject*>(replyValue.get());
-            JsonValue* messageValue = replyObject->GetField(U"message");
-            if (messageValue && messageValue->Type() == JsonValueType::string)
-            {
-                JsonString* messageStr = static_cast<JsonString*>(messageValue);
-                if (messageStr->Value() == U"ExtendPortLeaseReply")
-                {
-                    ExtendPortLeaseReply reply(replyValue.get());
-                }
-            }
-        }
+        std::unique_ptr<sngxml::dom::Document> replyDoc = sngxml::dom::ParseDocument(ToUtf32(replyStr), "socket");
+        sngxml::dom::Element* replyElement = replyDoc->DocumentElement();
+        if (replyElement->Name() == U"extendPortLeaseReply")
+        ExtendPortLeaseReply reply(replyElement);
     }
     catch (...)
     {
@@ -126,11 +117,11 @@ void RunPortMapClient(PortMapClient* client)
     }
 }
 
-void PortMapClient::Start(int portMapServicePort_, const std::vector<int>& portNumbers_, const std::string& programName_, int pid_)
+void PortMapClient::Start(int portMapServicePort_, const std::vector<int>& portNumbers_, const std::string& processName_, int pid_)
 {
     portMapServicePort = portMapServicePort_;
     portNumbers = portNumbers_;
-    programName = programName_;
+    processName = processName_;
     pid = pid_;
     clientThread = std::thread{ RunPortMapClient, this };
 }
@@ -155,9 +146,9 @@ void DonePortMapClient()
     PortMapClient::Done();
 }
 
-void StartPortMapClient(int portMapServicePort, const std::vector<int>& portNumbers, const std::string& programName, int pid)
+void StartPortMapClient(int portMapServicePort, const std::vector<int>& portNumbers, const std::string& processName, int pid)
 {
-    PortMapClient::Instance().Start(portMapServicePort, portNumbers, programName, pid);
+    PortMapClient::Instance().Start(portMapServicePort, portNumbers, processName, pid);
 }
 
 void StopPortMapClient()

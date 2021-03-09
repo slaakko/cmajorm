@@ -1,7 +1,7 @@
 #ifndef CmajorTokens_HPP
 #define CmajorTokens_HPP
 
-// this file has been automatically generated from 'D:/work/soulng-project/sngcm/cmlexer/CmajorLexer.lexer' using soulng lexer generator slg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmlexer/CmajorLexer.lexer' using soulng lexer generator slg version 3.10.0
 
 #include <sngcm/cmlexer/TokenValueParsers.hpp>
 #include <sngcm/cmlexer/CmajorLexerApi.hpp>
@@ -131,6 +131,8 @@ namespace CmajorTokens
     const int COLON = 119;
     const int SEMICOLON = 120;
     const int HASH = 121;
+    const int COMMENT = 122;
+    const int WS = 123;
 
     SNGCM_LEXER_API void InitTokenIdMap();
     SNGCM_LEXER_API int GetTokenId(const std::u32string& tokenName);

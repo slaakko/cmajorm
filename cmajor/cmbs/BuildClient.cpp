@@ -9,41 +9,47 @@
 #include <cmajor/cmbs_trace/TraceFunctions.hpp>
 #include <soulng/util/Trace.hpp>
 #endif
-#include <sngjson/json/JsonLexer.hpp>
-#include <sngjson/json/JsonParser.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
 #include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <iostream>
+#include <sstream>
 
 namespace cmbs {
 
 using namespace soulng::util;
 using namespace soulng::unicode;
+using namespace sngxml::dom;
 
-std::string GetMessageKind(JsonValue* message) 
+std::string GetMessageKind(Element* element) 
 {
 #ifdef TRACE
     soulng::util::Tracer tracer(GetMessageKind_f);
 #endif // TRACE
-    if (message->Type() == JsonValueType::object)
-    {
-        JsonObject* messageObject = static_cast<JsonObject*>(message);
-        return messageObject->GetStringField(U"messageKind");
-    }
-    return std::string();
+    return ToUtf8(element->Name());
 }
 
-std::unique_ptr<JsonValue> ReadMessage(TcpSocket& socket)
+std::unique_ptr<Document> ReadMessage(TcpSocket& socket)
 {
 #ifdef TRACE
     soulng::util::Tracer tracer(ReadMessage_f);
 #endif // TRACE
     std::string message = ReadStr(socket);
     std::u32string content = ToUtf32(message);
-    JsonLexer lexer(content, "", 0);
-    std::unique_ptr<JsonValue> messageValue(JsonParser::Parse(lexer));
-    return messageValue;
+    return ParseDocument(content, "socket");
+}
+
+std::string ElementToString(Element* element)
+{
+    Document doc;
+    doc.AppendChild(std::unique_ptr<Node>(element));
+    std::stringstream strStream;
+    CodeFormatter formatter(strStream);
+    doc.Write(formatter);
+    return strStream.str();
 }
 
 void ProcessBuildReply(const BuildReply& buildReply)
@@ -77,32 +83,31 @@ void RunRequest(const std::string& requestFilePath, int port)
     std::string request = ReadFile(requestFilePath);
     TcpSocket socket("localhost", std::to_string(port));
     Write(socket, request);
-    std::unique_ptr<JsonValue> message = ReadMessage(socket);
-    std::string messageKind = GetMessageKind(message.get());
+    std::unique_ptr<Document> message = ReadMessage(socket);
+    std::string messageKind = GetMessageKind(message->DocumentElement());
     while (messageKind == "logMessageRequest" || messageKind == "progressMessage")
     {
         if (messageKind == "logMessageRequest")
         {
-            LogMessageRequest request(message.get());
+            LogMessageRequest request(message->DocumentElement());
             std::cout << request.message << std::endl;
             LogMessageReply replyMessage;
-            replyMessage.messageKind = "logMessageReply";
             replyMessage.ok = true;
-            std::unique_ptr<JsonValue> replyMessageValue(replyMessage.ToJson());
-            std::string reply = replyMessageValue->ToString();
+            std::unique_ptr<Element> replyMessageValue(replyMessage.ToXml("logMessageReply"));
+            std::string reply = ElementToString(replyMessageValue.release());
             Write(socket, reply);
         }
         message = ReadMessage(socket);
-        messageKind = GetMessageKind(message.get());
+        messageKind = GetMessageKind(message->DocumentElement());
     }
     if (messageKind == "buildReply")
     {
-        BuildReply reply(message.get());
+        BuildReply reply(message->DocumentElement());
         ProcessBuildReply(reply);
     }
     else if (messageKind == "genericErrorReply")
     {
-        GenericErrorReply reply(message.get());
+        GenericErrorReply reply(message->DocumentElement());
         throw std::runtime_error("generic error received: " + reply.error);
     }
     else

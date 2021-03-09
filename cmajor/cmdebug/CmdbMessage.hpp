@@ -1,61 +1,82 @@
-#ifndef HPP_119B103F454BFA5EB7848C8361DFF12FF7084219
-#define HPP_119B103F454BFA5EB7848C8361DFF12FF7084219
-#include <soulng/util/Json.hpp>
-#include <string>
+#ifndef CMDBMESSAGE_HPP_9A6DA1BD20F12675B0E78EEAF8B950F3D0DDB92E
+#define CMDBMESSAGE_HPP_9A6DA1BD20F12675B0E78EEAF8B950F3D0DDB92E
+#include <sngxml/dom/Element.hpp>
+#include <soulng/util/Time.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <chrono>
 #include <vector>
+#include <string>
 #include <memory>
+#include <stdint.h>
 
-struct Location
+using date = soulng::util::Date;
+using datetime = soulng::util::DateTime;
+using timestamp = soulng::util::Timestamp;
+using time_point = std::chrono::steady_clock::time_point;
+using duration = std::chrono::steady_clock::duration;
+using uuid = boost::uuids::uuid;
+
+class Location
 {
+public:
     Location();
-    Location(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    Location(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string func;
     std::string file;
-    std::string line;
-    std::string scol;
-    std::string ecol;
-    std::string level;
+    int32_t line;
+    int32_t scol;
+    int32_t ecol;
+    int32_t level;
 };
 
-struct Type
+class Type
 {
+public:
     Type();
-    Type(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    Type(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string name;
     std::string id;
 };
 
-struct Result
+class Result
 {
+public:
     Result();
-    Result(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    Result(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     Type staticType;
     Type dynamicType;
     bool initialized;
     std::string value;
 };
 
-struct ChildResult
+class ChildResult
 {
+public:
     ChildResult();
-    ChildResult(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    ChildResult(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string expr;
     std::string name;
     std::string type;
     std::string dynType;
     std::string value;
-    std::string count;
+    int32_t count;
 };
 
-struct TargetState
+class TargetState
 {
+public:
     TargetState();
-    TargetState(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    TargetState(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string stopReason;
     std::string exitCode;
     std::string breakpointId;
@@ -63,42 +84,48 @@ struct TargetState
     std::string signalMeaning;
 };
 
-struct SourceLoc
+class SourceLoc
 {
+public:
     SourceLoc();
-    SourceLoc(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    SourceLoc(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string path;
-    std::string line;
+    int32_t line;
 };
 
-struct BreakpointInfo
+class BreakpointInfo
 {
+public:
     BreakpointInfo();
-    BreakpointInfo(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    BreakpointInfo(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     std::string breakpointId;
-    std::string numInsts;
+    int32_t numInsts;
     Location location;
     std::string error;
 };
 
-struct StartRequest
+class StartRequest
 {
+public:
     StartRequest();
-    StartRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    StartRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::vector<SourceLoc> breakpointLocations;
 };
 
-struct StartReply
+class StartReply
 {
+public:
     StartReply();
-    StartReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    StartReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     Location location;
     TargetState state;
@@ -106,338 +133,373 @@ struct StartReply
     std::string error;
 };
 
-struct StopRequest
+class StopRequest
 {
+public:
     StopRequest();
-    StopRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    StopRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct StopReply
+class StopReply
 {
+public:
     StopReply();
-    StopReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    StopReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct GenericErrorReply
+class GenericErrorReply
 {
+public:
     GenericErrorReply();
-    GenericErrorReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    GenericErrorReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string errorMessage;
 };
 
-struct ContinueRequest
+class ContinueRequest
 {
+public:
     ContinueRequest();
-    ContinueRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    ContinueRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct ContinueReply
+class ContinueReply
 {
+public:
     ContinueReply();
-    ContinueReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    ContinueReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     Location location;
     TargetState state;
     std::string error;
 };
 
-struct NextRequest
+class NextRequest
 {
+public:
     NextRequest();
-    NextRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    NextRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct NextReply
+class NextReply
 {
+public:
     NextReply();
-    NextReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    NextReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     Location location;
     TargetState state;
     std::string error;
 };
 
-struct StepRequest
+class StepRequest
 {
+public:
     StepRequest();
-    StepRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    StepRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct StepReply
+class StepReply
 {
+public:
     StepReply();
-    StepReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    StepReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     Location location;
     TargetState state;
     std::string error;
 };
 
-struct FinishRequest
+class FinishRequest
 {
+public:
     FinishRequest();
-    FinishRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    FinishRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct FinishReply
+class FinishReply
 {
+public:
     FinishReply();
-    FinishReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    FinishReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     Location location;
     TargetState state;
     std::string error;
 };
 
-struct UntilRequest
+class UntilRequest
 {
+public:
     UntilRequest();
-    UntilRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    UntilRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     SourceLoc sourceLoc;
 };
 
-struct UntilReply
+class UntilReply
 {
+public:
     UntilReply();
-    UntilReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    UntilReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     Location location;
     TargetState state;
     std::string error;
 };
 
-struct BreakRequest
+class BreakRequest
 {
+public:
     BreakRequest();
-    BreakRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    BreakRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     SourceLoc breakpointLocation;
 };
 
-struct BreakReply
+class BreakReply
 {
+public:
     BreakReply();
-    BreakReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    BreakReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     BreakpointInfo breakpointInfo;
 };
 
-struct DeleteRequest
+class DeleteRequest
 {
+public:
     DeleteRequest();
-    DeleteRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    DeleteRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string breakpointId;
 };
 
-struct DeleteReply
+class DeleteReply
 {
+public:
     DeleteReply();
-    DeleteReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    DeleteReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     std::string error;
 };
 
-struct DepthRequest
+class DepthRequest
 {
+public:
     DepthRequest();
-    DepthRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    DepthRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct DepthReply
+class DepthReply
 {
+public:
     DepthReply();
-    DepthReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    DepthReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
-    std::string depth;
+    int32_t depth;
     std::string error;
 };
 
-struct FramesRequest
+class FramesRequest
 {
+public:
     FramesRequest();
-    FramesRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
-    std::string lowFrame;
-    std::string highFrame;
+    FramesRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    int32_t lowFrame;
+    int32_t highFrame;
 };
 
-struct FramesReply
+class FramesReply
 {
+public:
     FramesReply();
-    FramesReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    FramesReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     std::vector<Location> frames;
     std::string error;
 };
 
-struct EvaluateRequest
+class EvaluateRequest
 {
+public:
     EvaluateRequest();
-    EvaluateRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    EvaluateRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string expression;
 };
 
-struct EvaluateReply
+class EvaluateReply
 {
+public:
     EvaluateReply();
-    EvaluateReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    EvaluateReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     Result result;
     std::string error;
 };
 
-struct CountRequest
+class CountRequest
 {
+public:
     CountRequest();
-    CountRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    CountRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string expression;
 };
 
-struct CountReply
+class CountReply
 {
+public:
     CountReply();
-    CountReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    CountReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
-    std::string count;
+    int32_t count;
     std::string error;
 };
 
-struct EvaluateChildRequest
+class EvaluateChildRequest
 {
+public:
     EvaluateChildRequest();
-    EvaluateChildRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    EvaluateChildRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string expression;
-    std::string start;
-    std::string count;
+    int32_t start;
+    int32_t count;
 };
 
-struct EvaluateChildReply
+class EvaluateChildReply
 {
+public:
     EvaluateChildReply();
-    EvaluateChildReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    EvaluateChildReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     bool success;
     std::vector<ChildResult> results;
     std::string error;
 };
 
-struct TargetRunningRequest
+class TargetRunningRequest
 {
+public:
     TargetRunningRequest();
-    TargetRunningRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    TargetRunningRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct TargetRunningReply
+class TargetRunningReply
 {
+public:
     TargetRunningReply();
-    TargetRunningReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    TargetRunningReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct TargetInputRequest
+class TargetInputRequest
 {
+public:
     TargetInputRequest();
-    TargetInputRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    TargetInputRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct TargetInputReply
+class TargetInputReply
 {
+public:
     TargetInputReply();
-    TargetInputReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    TargetInputReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string line;
     bool eof;
 };
 
-struct TargetOutputRequest
+class TargetOutputRequest
 {
+public:
     TargetOutputRequest();
-    TargetOutputRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
-    std::string handle;
+    TargetOutputRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    int32_t handle;
     std::string output;
 };
 
-struct TargetOutputReply
+class TargetOutputReply
 {
+public:
     TargetOutputReply();
-    TargetOutputReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    TargetOutputReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-struct LogMessageRequest
+class LogMessageRequest
 {
+public:
     LogMessageRequest();
-    LogMessageRequest(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    LogMessageRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
     std::string logMessage;
 };
 
-struct LogMessageReply
+class LogMessageReply
 {
+public:
     LogMessageReply();
-    LogMessageReply(soulng::util::JsonValue* __json_value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
+    LogMessageReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
 };
 
-#endif // HPP_119B103F454BFA5EB7848C8361DFF12FF7084219
+#endif // CMDBMESSAGE_HPP_9A6DA1BD20F12675B0E78EEAF8B950F3D0DDB92E

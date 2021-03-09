@@ -9,19 +9,22 @@
 #include <cmajor/cmbs_trace/TraceFunctions.hpp>
 #include <soulng/util/Trace.hpp>
 #endif
-#include <sngjson/json/JsonLexer.hpp>
-#include <sngjson/json/JsonParser.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
 #include <soulng/util/LogFileWriter.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
+#include <sstream>
 #include <memory>
 #include <thread>
 #include <chrono>
 
 namespace cmbs {
 
+using namespace sngxml::dom;
 using namespace soulng::util;
 using namespace soulng::unicode;
 
@@ -76,7 +79,8 @@ private:
     bool started;
     bool exit;
     std::chrono::time_point<std::chrono::steady_clock> keepAliveReceivedTimePoint;
-    std::string GetMessage(JsonValue* messageValue);
+    std::string GetMessage(Element* element);
+    std::string ElementToString(Element* element);
     KeepAliveReply ProcessKeepAliveRequest(const KeepAliveRequest& request);
     std::condition_variable* exitVar;
     bool* exiting;
@@ -89,22 +93,22 @@ KeepAliveServer::KeepAliveServer() : exit(false), started(false), keepAliveServe
 #endif // TRACE
 }
 
-std::string KeepAliveServer::GetMessage(JsonValue* messageValue)
+std::string KeepAliveServer::GetMessage(Element* element)
 {
 #ifdef TRACE
     soulng::util::Tracer tracer(KeepAliveServer_GetMessage);
 #endif // TRACE
-    if (messageValue->Type() == JsonValueType::object)
-    {
-        JsonObject* jsonObject = static_cast<JsonObject*>(messageValue);
-        JsonValue* message = jsonObject->GetField(U"messageKind");
-        if (message && message->Type() == JsonValueType::string)
-        {
-            JsonString* messageStr = static_cast<JsonString*>(message);
-            return ToUtf8(messageStr->Value());
-        }
-    }
-    return std::string();
+    return ToUtf8(element->Name());
+}
+
+std::string KeepAliveServer::ElementToString(Element* element)
+{
+    Document doc;
+    doc.AppendChild(std::unique_ptr<Node>(element));
+    std::stringstream strStream;
+    CodeFormatter formatter(strStream);
+    doc.Write(formatter);
+    return strStream.str();
 }
 
 KeepAliveReply KeepAliveServer::ProcessKeepAliveRequest(const KeepAliveRequest& request)
@@ -115,7 +119,6 @@ KeepAliveReply KeepAliveServer::ProcessKeepAliveRequest(const KeepAliveRequest& 
     std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
     keepAliveReceivedTimePoint = now;
     KeepAliveReply reply;
-    reply.messageKind = "keepAliveReply";
     return reply;
 }
 
@@ -136,15 +139,14 @@ void KeepAliveServer::Run()
         try
         {
             std::string requestStr = ReadStr(socket);
-            JsonLexer lexer(ToUtf32(requestStr), "", 0);
-            std::unique_ptr<JsonValue> requestValue = JsonParser::Parse(lexer);
-            std::string message = GetMessage(requestValue.get());
+            std::unique_ptr<Document> requestDoc = ParseDocument(ToUtf32(requestStr), "socket");
+            std::string message = GetMessage(requestDoc->DocumentElement());
             if (message == "keepAliveRequest")
             {
-                KeepAliveRequest request(requestValue.get());
+                KeepAliveRequest request(requestDoc->DocumentElement());
                 KeepAliveReply reply = ProcessKeepAliveRequest(request);
-                std::unique_ptr<JsonValue> replyValue = reply.ToJson();
-                std::string replyStr = replyValue->ToString();
+                std::unique_ptr<Element> replyElement = reply.ToXml("keepAliveReply");
+                std::string replyStr = ElementToString(replyElement.release());
                 Write(socket, replyStr);
             }
             else

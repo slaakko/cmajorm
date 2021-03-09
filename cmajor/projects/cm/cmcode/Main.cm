@@ -112,21 +112,9 @@ namespace cmcode
 
     public SourceSpan GetSourceSpan(const Location& loc)
     {
-        int line = 0;
-        short scol = 0;
-        short ecol = 0;
-        if (!loc.line.IsEmpty())
-        {
-            line = ParseInt(loc.line);
-        }
-        if (!loc.scol.IsEmpty())
-        {
-            scol = ParseShort(loc.scol);
-        }
-        if (!loc.ecol.IsEmpty())
-        {
-            ecol = ParseShort(loc.ecol);
-        }
+        int line = loc.line;
+        short scol = cast<short>(loc.scol);
+        short ecol = cast<short>(loc.ecol);
         SourceSpan span(line, scol, ecol);
         return span;
     }
@@ -2328,9 +2316,9 @@ namespace cmcode
                             sourceLocation.file = cmajorEditor->FilePath();
                             int line = sourceCodeView->CaretLine();
                             int column = sourceCodeView->CaretColumn();
-                            sourceLocation.line = ToString(line);
-                            sourceLocation.scol = ToString(column);
-                            sourceLocation.ecol = ToString(column);
+                            sourceLocation.line = line;
+                            sourceLocation.scol = column;
+                            sourceLocation.ecol = column;
                         }
                     }
                 }
@@ -2368,9 +2356,9 @@ namespace cmcode
                 Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
                 if (sourceCodeView != null)
                 {
-                    int line = ParseInt(location.line);
-                    int scol = ParseInt(location.scol);
-                    int ecol = ParseInt(location.ecol);
+                    int line = location.line;
+                    int scol = location.scol;
+                    int ecol = location.ecol;
                     Selection selection;
                     selection.start.line = line;
                     selection.start.column = scol;
@@ -3679,9 +3667,9 @@ namespace cmcode
                     TextView* textView = editor->GetTextView();
                     if (textView != null)
                     {
-                        int line = ParseInt(error->line);
-                        int scol = ParseInt(error->scol);
-                        int ecol = ParseInt(error->ecol);
+                        int line = error->line;
+                        int scol = error->scol;
+                        int ecol = error->ecol;
                         textView->EnsureLineVisible(line);
                         textView->SetCaretLineCol(Min(line, cast<int>(textView->Lines().Count())), 1 + textView->LineNumberFieldLength());
                         textView->ScrollToCaret();
@@ -4348,9 +4336,9 @@ namespace cmcode
                         int ecol = column;
                         identifier = ToUtf8(id);
                         sourceLocation.file = textView->FilePath();
-                        sourceLocation.line = ToString(line);
-                        sourceLocation.scol = ToString(scol);
-                        sourceLocation.ecol = ToString(ecol);
+                        sourceLocation.line = line;
+                        sourceLocation.scol = scol;
+                        sourceLocation.ecol = ecol;
                         return true;
                     }
                 }

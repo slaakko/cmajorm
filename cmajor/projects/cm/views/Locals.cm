@@ -127,7 +127,7 @@ namespace Cm.Views
                     text.Append(" = ").Append(data->Result().value);
                 }
                 node->SetText(text);
-                int count = ParseInt(data->Result().count);
+                int count = data->Result().count;
                 if (count == 0)
                 {
                     node->RemoveChildren();
@@ -221,7 +221,7 @@ namespace Cm.Views
                 {
                     ChildResultNodeData* childNodeData = cast<ChildResultNodeData*>(nodeData);
                     treeViewNode->RemoveChildren();
-                    int count = ParseInt(childNodeData->Result().count);
+                    int count = childNodeData->Result().count;
                     for (int i = 0; i < count; ++i)
                     {
                         string nodeText = ToString(i);
@@ -337,7 +337,7 @@ namespace Cm.Views
                             nodeText.Append(" = ").Append(nodeData->Result().value);
                         }
                         node->SetText(nodeText);
-                        int cnt = ParseInt(nodeData->Result().count);
+                        int cnt = nodeData->Result().count;
                         if (cnt > 0)
                         {
                             TreeViewNode* dummyNode = new TreeViewNode();

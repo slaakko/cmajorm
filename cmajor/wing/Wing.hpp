@@ -56,6 +56,16 @@ struct WING_API Padding
     int bottom;
 };
 
+WING_API inline bool operator==(const Padding& left, const Padding& right)
+{
+    return left.left == right.left && left.top == right.top && left.right == right.right && left.bottom == right.bottom;
+}
+
+WING_API inline bool operator!=(const Padding& left, const Padding& right)
+{
+    return !(left == right);
+}
+
 enum class KeyState : int
 {
     none = 0, down = 1 << 0, shift = 1 << 1, control = 1 << 2, alt = 1 << 3
@@ -76,6 +86,8 @@ WING_API inline KeyState operator~(KeyState state)
     return KeyState(~int(state));
 }
 
+WING_API bool KeyPressed(int virtualKeyCode);
+
 using KeyPreviewFunction = void (*)(WPARAM keyCode, KeyState keyState, bool& handled);
 
 WING_API void SetKeyPreviewFunction(KeyPreviewFunction keyPreviewFun);
@@ -84,6 +96,7 @@ WING_API HINSTANCE Instance();
 WING_API WNDPROC GetWndProc();
 
 WING_API int Run();
+WING_API int MessageLoop();
 
 WING_API void WingInit(HINSTANCE instance_);
 WING_API void WingDone();

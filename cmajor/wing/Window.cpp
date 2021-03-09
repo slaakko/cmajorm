@@ -127,6 +127,7 @@ Window::Window(WindowCreateParams& createParams) :
     mainWindow(false),
     defaultButton(nullptr),
     cancelButton(nullptr),
+    focusedControl(nullptr),
     menuBar(nullptr),
     dialogResult(DialogResult::none)
 {

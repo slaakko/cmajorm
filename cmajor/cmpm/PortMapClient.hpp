@@ -13,7 +13,7 @@ namespace cmajor { namespace cmpm {
 
 CMPM_API void InitPortMapClient();
 CMPM_API void DonePortMapClient();
-CMPM_API void StartPortMapClient(int portMapServicePort, const std::vector<int>& portNumbers, const std::string& programName, int pid);
+CMPM_API void StartPortMapClient(int portMapServicePort, const std::vector<int>& portNumbers, const std::string& processName, int pid);
 CMPM_API void StopPortMapClient();
 
 } } // namespace cmajor::cmpm

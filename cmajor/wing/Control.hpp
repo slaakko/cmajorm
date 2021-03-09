@@ -34,6 +34,7 @@ using GotFocusEvent = Event;
 using ChildGotFocusEvent = EventWithArgs<ControlEventArgs>;
 using LostFocusEvent = Event;
 using ChildLostFocusEvent = EventWithArgs<ControlEventArgs>;
+using TextChangedEvent = Event;
 using VisibleChangedEvent = Event;
 using EnabledChangedEvent = Event;
 using LocationChangedEvent = Event;
@@ -116,17 +117,17 @@ enum class Anchors : int
     none = 0, top = 1 << 0, bottom = 1 << 1, left = 1 << 2, right = 1 << 3
 };
 
-inline Anchors operator|(Anchors left, Anchors right)
+WING_API inline Anchors operator|(Anchors left, Anchors right)
 {
     return Anchors(int(left) | int(right));
 }
 
-inline Anchors operator&(Anchors left, Anchors right)
+WING_API inline Anchors operator&(Anchors left, Anchors right)
 {
     return Anchors(int(left) & int(right));
 }
 
-inline Anchors operator~(Anchors anchors)
+WING_API inline Anchors operator~(Anchors anchors)
 {
     return Anchors(~int(anchors));
 }
@@ -136,7 +137,7 @@ enum class Dock : int
     none = 0, top = 1, bottom = 2, left = 3, right = 4, fill = 5
 };
 
-struct ScrollUnits
+struct WING_API ScrollUnits
 {
     ScrollUnits() : vertical(0), horizontal(0) {}
     ScrollUnits(int vertical_, int horizontal_) : vertical(vertical_), horizontal(horizontal_) {}
@@ -149,27 +150,34 @@ enum class MouseButtons : int
     none = 0, lbutton = 1, rbutton = 2, shift = 4, control = 8, mbutton = 16, xbutton1 = 32, xbutton2 = 64
 };
 
-inline MouseButtons operator|(MouseButtons left, MouseButtons right)
+WING_API inline MouseButtons operator|(MouseButtons left, MouseButtons right)
 {
     return MouseButtons(int(left) | int(right));
 }
 
-inline MouseButtons operator&(MouseButtons left, MouseButtons right)
+WING_API inline MouseButtons operator&(MouseButtons left, MouseButtons right)
 {
     return MouseButtons(int(left) & int(right));
 }
 
-inline MouseButtons operator~(MouseButtons buttons)
+WING_API inline MouseButtons operator~(MouseButtons buttons)
 {
     return MouseButtons(~int(buttons));
 }
 
-struct MouseEventArgs
+struct WING_API MouseEventArgs
 {
     MouseEventArgs(const Point& location_, MouseButtons buttons_, int clicks_) : location(location_), buttons(buttons_), clicks(clicks_) {}
     Point location;
     MouseButtons buttons;
     int clicks;
+};
+
+struct WING_API RightClickEventArgs
+{
+    RightClickEventArgs(Control* control_, const Point location_) : control(control_), location(location_) {}
+    Control* control;
+    Point location;
 };
 
 using MouseEnterEvent = Event;
@@ -179,8 +187,9 @@ using MouseUpEvent = EventWithArgs<MouseEventArgs>;
 using MouseMoveEvent = EventWithArgs<MouseEventArgs>;
 using MouseHoverEvent = EventWithArgs<MouseEventArgs>;
 using MouseDoubleClickEvent = EventWithArgs<MouseEventArgs>;
+using RightClickEvent = EventWithArgs<RightClickEventArgs>;
 
-struct TimerEventArgs
+struct WING_API TimerEventArgs
 {
     TimerEventArgs(int timerId_) : timerId(timerId_) {}
     int timerId;
@@ -188,7 +197,7 @@ struct TimerEventArgs
 
 using TimerEvent = EventWithArgs<TimerEventArgs>;
 
-struct KeyEventArgs
+struct WING_API KeyEventArgs
 {
     KeyEventArgs(Keys keyCode_, Keys modifiers_) : keyCode(keyCode_), modifiers(modifiers_), keyData(keyCode | modifiers), handled(false), suppressKeyPress(false) {}
     Keys keyCode;
@@ -201,7 +210,7 @@ struct KeyEventArgs
 using KeyDownEvent = EventWithArgs<KeyEventArgs>;
 using KeyUpEvent = EventWithArgs<KeyEventArgs>;
 
-struct KeyPressEventArgs
+struct WING_API KeyPressEventArgs
 {
     KeyPressEventArgs(char16_t keyChar_) : keyChar(keyChar_), handled(false) {}
     char16_t keyChar;
@@ -210,7 +219,7 @@ struct KeyPressEventArgs
 
 using KeyPressEvent = EventWithArgs<KeyPressEventArgs>;
 
-struct IntArgs
+struct WING_API IntArgs
 {
     IntArgs(int value_) : value(value_) {}
     int value;
@@ -219,7 +228,7 @@ struct IntArgs
 using HScrollEvent = EventWithArgs<IntArgs>;
 using VScrollEvent = EventWithArgs<IntArgs>;
 
-struct MouseWheelEventArgs
+struct WING_API MouseWheelEventArgs
 {
     MouseWheelEventArgs(int value_) : value(value_), handled(false) {}
     int value;
@@ -333,6 +342,7 @@ public:
     ChildContentLocationChangedEvent& ChildContentLocationChanged() { return childContentLocationChanged; }
     ContentSizeChangedEvent& ContentSizeChanged() { return contentSizeChanged; }
     ChildContentSizeChangedEvent& ChildContentSizeChanged() { return childContentSizeChanged; }
+    TextChangedEvent& TextChanged() { return textChanged; }
     MouseEnterEvent& MouseEnter() { return mouseEnter; }
     MouseLeaveEvent& MouseLeave() { return mouseLeave; }
     MouseDownEvent& MouseDown() { return mouseDown; }
@@ -340,9 +350,10 @@ public:
     MouseMoveEvent& MouseMove() { return mouseMove; }
     MouseHoverEvent& MouseHover() { return mouseHover; }
     MouseDoubleClickEvent& MouseDoubleClick() { return mouseDoubleClick; }
+    RightClickEvent& RightClick() { return rightClick; }
     HScrollEvent& HScroll() { return hscroll; }
     VScrollEvent& VScroll() { return vscroll; }
-    MouseWheelEvent& MouseWhee() { return mouseWheel; }
+    MouseWheelEvent& MouseWheel() { return mouseWheel; }
     KeyDownEvent& KeyDown() { return keyDown; }
     KeyUpEvent& KeyUp() { return keyUp; }
     KeyPressEvent& KeyPress() { return keyPress; }
@@ -354,7 +365,7 @@ public:
     void SetSize(const Size& newSize);
     void SetSizeInternal(const Size& newSize);
     const Point& ContentLocation() const { return contentLocation; }
-    void SetContentLocationInternal(const Point& newContentLocation);
+    virtual void SetContentLocationInternal(const Point& newContentLocation);
     void SetContentLocation(const Point& newContentLocation);
     const Size& ContentSize() const { return contentSize; }
     void SetContentSizeInternal(const Size& newContentSize);
@@ -366,6 +377,8 @@ public:
     Point GetCursorPos();
     Point ScreenToClient(const Point& pt);
     Point ClientToScreen(const Point& pt);
+    Point GetCaretPos() const;
+    void SetCaretPos(const Point& caretPos);
     HWND Handle() const { return handle; }
     void BringToFront();
     Control* TopControl() const;
@@ -380,6 +393,10 @@ public:
     void Invalidate(bool eraseBackground);
     void Invalidate(const Rect& rect);
     void Invalidate(const Rect& rect, bool eraseBackground);
+    void SetFocus();
+    const std::string& Text() const { return text; }
+    void SetText(const std::string& text_);
+    void SetTextInternal(const std::string& text_);
     bool GetFlag(ControlFlags flag) const { return (flags & flag) != ControlFlags::none; }
     void SetFlag(ControlFlags flag) { flags = flags | flag; }
     void ResetFlag(ControlFlags flag) { flags = flags & ~flag; }
@@ -438,6 +455,7 @@ protected:
     virtual void TranslateChildGraphics(Graphics& graphics);
     virtual void TranslateMousePos(Point& location);
     virtual void TranslateContentLocation(Point& location);
+    virtual void CreateCaret();
     virtual bool ProcessMessage(Message& msg);
     virtual void OnPaint(PaintEventArgs& args);
     virtual void OnClick();
@@ -447,6 +465,7 @@ protected:
     virtual void OnChildGotFocus(ControlEventArgs& args);
     virtual void OnLostFocus();
     virtual void OnChildLostFocus(ControlEventArgs& args);
+    virtual void OnTextChanged();
     virtual void OnTimer(TimerEventArgs& args);
     virtual void OnVisibleChanged();
     virtual void OnEnabledChanged();
@@ -465,6 +484,7 @@ protected:
     virtual void OnMouseMove(MouseEventArgs& args);
     virtual void OnMouseHover(MouseEventArgs& args);
     virtual void OnMouseDoubleClick(MouseEventArgs& args);
+    virtual void OnRightClick(RightClickEventArgs& args);
     virtual void OnHScroll(IntArgs& args);
     virtual void OnVScroll(IntArgs& args);
     virtual void OnMouseWheel(MouseWheelEventArgs& args);
@@ -491,7 +511,6 @@ private:
     void DoMouseWheel(MouseWheelEventArgs& args);
     void DoCreateAndShowCaret();
     void DoDestroyCaret();
-    void CreateCaret();
     void DestroyCaret();
     bool DoSysCommand(WPARAM wParam, LPARAM lParam);
     bool DoMenu(char16_t accessKey, Keys keyCode);
@@ -538,6 +557,7 @@ private:
     ChildContentLocationChangedEvent childContentLocationChanged;
     ContentSizeChangedEvent contentSizeChanged;
     ChildContentSizeChangedEvent childContentSizeChanged;
+    TextChangedEvent textChanged;
     PaintEvent paint;
     MouseEnterEvent mouseEnter;
     MouseLeaveEvent mouseLeave;
@@ -546,6 +566,7 @@ private:
     MouseMoveEvent mouseMove;
     MouseHoverEvent mouseHover;
     MouseDoubleClickEvent mouseDoubleClick;
+    RightClickEvent rightClick;
     HScrollEvent hscroll;
     VScrollEvent vscroll;
     MouseWheelEvent mouseWheel;

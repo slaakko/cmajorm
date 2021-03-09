@@ -7,7 +7,7 @@ using System;
 using System.Collections;
 using System.Threading;
 using System.Net.Sockets;
-using System.Json;
+using System.Dom;
 using System.Text;
 using System.IO;
 using Cm.Service;
@@ -341,15 +341,15 @@ namespace Cm.Service.Build
         {
             TcpSocket socket("localhost", ToString(port));
             StopRequest stopRequest;
-            UniquePtr<JsonValue> requestJsonValue = stopRequest.ToJson();
-            string requestStr = requestJsonValue->ToString();
+            UniquePtr<Element> requestElement = stopRequest.ToXml("stopRequest");
+            string requestStr = ElementToString(requestElement.Release());
             Write(socket, requestStr);
             string replyStr = ReadStr(socket);
-            UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
-            string messageKind = GetMessageKind(replyJsonValue.Get());
+            UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+            string messageKind = GetMessageKind(replyDoc->DocumentElement());
             if (messageKind == "stopReply")
             {
-                StopReply reply(replyJsonValue.Get());
+                StopReply reply(replyDoc->DocumentElement());
             }
             else
             {
@@ -360,15 +360,15 @@ namespace Cm.Service.Build
         {
             TcpSocket socket("localhost", ToString(keepAliveServerPort));
             KeepAliveRequest keepAliveRequest;
-            UniquePtr<JsonValue> requestJsonValue = keepAliveRequest.ToJson();
-            string requestStr = requestJsonValue->ToString();
+            UniquePtr<Element> requestElement = keepAliveRequest.ToXml("keepAliveRequest");
+            string requestStr = ElementToString(requestElement.Release());
             Write(socket, requestStr);
             string replyStr = ReadStr(socket);
-            UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
-            string messageKind = GetMessageKind(replyJsonValue.Get());
+            UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+            string messageKind = GetMessageKind(replyDoc->DocumentElement());
             if (messageKind == "keepAliveReply")
             {
-                KeepAliveReply reply(replyJsonValue.Get());
+                KeepAliveReply reply(replyDoc->DocumentElement());
             }
             else
             {
@@ -387,50 +387,55 @@ namespace Cm.Service.Build
                         return List<CompileError>();
                     }
                 }
-                UniquePtr<JsonValue> requestJsonValue = request.ToJson();
-                StreamWriter requestWriter(File.CreateText(Path.Combine(CmCodeLogDir(), "build-request.json")));
+                UniquePtr<Element> requestElement = request.ToXml("buildRequest");
+                Document requestDoc;
+                requestDoc.AppendChild(UniquePtr<System.Dom.Node>(requestElement.Release()));
+                StreamWriter requestWriter(File.CreateText(Path.Combine(CmCodeLogDir(), "build-request.xml")));
                 CodeFormatter requestFormatter(requestWriter);
-                requestJsonValue->Write(requestFormatter);
+                requestDoc.Write(requestFormatter);
                 if (saveRequestOnly) return List<CompileError>();
                 TcpSocket socket("localhost", ToString(port));
-                string requestStr = requestJsonValue->ToString();
+                StringWriter writer;
+                CodeFormatter formatter(writer);
+                requestDoc.Write(formatter);
+                string requestStr = writer.GetString();
                 Write(socket, requestStr);
                 string replyStr = ReadStr(socket);
-                UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
-                string messageKind = GetMessageKind(replyJsonValue.Get());
+                UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+                string messageKind = GetMessageKind(replyDoc->DocumentElement());
                 while (messageKind == "logMessageRequest" || messageKind == "progressMessage")
                 {
                     if (messageKind == "logMessageRequest")
                     {
-                        LogMessageRequest logMessageRequest(replyJsonValue.Get());
+                        LogMessageRequest logMessageRequest(replyDoc->DocumentElement());
                         string message = logMessageRequest.message;
                         LogMessage(message);
                         LogMessageReply logMessageReply;
                         logMessageReply.ok = true;
-                        UniquePtr<JsonValue> logMessageReplyJsonValue = logMessageReply.ToJson();
-                        string logMessageReplyStr = logMessageReplyJsonValue->ToString();
+                        UniquePtr<Element> logMessageReplyElement = logMessageReply.ToXml("logMessageReply");
+                        string logMessageReplyStr = ElementToString(logMessageReplyElement.Release());
                         Write(socket, logMessageReplyStr);
                     }
                     else if (messageKind == "progressMessage")
                     {
-                        ProgressMessage progressMessage(replyJsonValue.Get());
+                        ProgressMessage progressMessage(replyDoc->DocumentElement());
                         notifyProgress();
                     }
                     replyStr = ReadStr(socket);
-                    replyJsonValue = ParseJson(replyStr);
-                    messageKind = GetMessageKind(replyJsonValue.Get());
+                    replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+                    messageKind = GetMessageKind(replyDoc->DocumentElement());
                 }
                 if (messageKind == "buildReply")
                 {
-                    StreamWriter replyWriter(File.CreateText(Path.Combine(CmCodeLogDir(), "build-reply.json")));
+                    StreamWriter replyWriter(File.CreateText(Path.Combine(CmCodeLogDir(), "build-reply.xml")));
                     CodeFormatter replyFormatter(replyWriter);
-                    replyJsonValue->Write(replyFormatter);
-                    BuildReply buildReply(replyJsonValue.Get());
+                    replyDoc->Write(replyFormatter);
+                    BuildReply buildReply(replyDoc->DocumentElement());
                     return ProcessBuildReply(buildReply);
                 }
                 else if (messageKind == "genericErrorReply")
                 {
-                    GenericErrorReply genericErrorReply(replyJsonValue.Get());
+                    GenericErrorReply genericErrorReply(replyDoc->DocumentElement());
                     LogMessage("BuildService: ProcessBuildRequest: generic error reply received: " + genericErrorReply.error);
                 }
                 else
@@ -479,13 +484,13 @@ namespace Cm.Service.Build
                         return;
                     }
                 }
-                UniquePtr<JsonValue> requestJsonValue = cacheModuleRequest.ToJson();
+                UniquePtr<Element> requestElement = cacheModuleRequest.ToXml("cacheModuleRequest");
                 TcpSocket socket("localhost", ToString(port));
-                string requestStr = requestJsonValue->ToString();
+                string requestStr = ElementToString(requestElement.Release());
                 Write(socket, requestStr);
                 string replyStr = ReadStr(socket);
-                UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
-                string messageKind = GetMessageKind(replyJsonValue.Get());
+                UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+                string messageKind = GetMessageKind(replyDoc->DocumentElement());
             }
             catch (const Exception& ex)
             {
@@ -507,16 +512,16 @@ namespace Cm.Service.Build
                         return reply;
                     }
                 }
-                UniquePtr<JsonValue> requestJsonValue = request.ToJson();
+                UniquePtr<Element> requestElement = request.ToXml("getDefinitionRequest");
                 TcpSocket socket("localhost", ToString(port));
-                string requestStr = requestJsonValue->ToString();
+                string requestStr = ElementToString(requestElement.Release());
                 Write(socket, requestStr);
                 string replyStr = ReadStr(socket);
-                UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
-                string messageKind = GetMessageKind(replyJsonValue.Get());
+                UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+                string messageKind = GetMessageKind(replyDoc->DocumentElement());
                 if (messageKind == "getDefinitionReply")
                 {
-                    reply = GetDefinitionReply(replyJsonValue.Get());
+                    reply = GetDefinitionReply(replyDoc->DocumentElement());
                 }
                 else
                 {
@@ -532,20 +537,19 @@ namespace Cm.Service.Build
             }
             return reply;
         }
-        private string GetMessageKind(JsonValue* jsonValue)
+        private string GetMessageKind(Element* element)
         {
-            if (jsonValue is JsonObject*)
-            {
-                JsonObject* jsonObject = cast<JsonObject*>(jsonValue);
-                JsonValue* messageKindValue = jsonObject->GetField(u"messageKind");
-                if (messageKindValue is JsonString*)
-                {
-                    JsonString* messageKindStr = cast<JsonString*>(messageKindValue);
-                    string messageKind = ToUtf8(messageKindStr->Value());
-                    return messageKind;
-                }
-            }
-            return string();
+            string messageKind = ToUtf8(element->Name());
+            return messageKind;
+        }
+        private string ElementToString(Element* element)
+        {
+            Document doc;
+            doc.AppendChild(UniquePtr<System.Dom.Node>(element));
+            StringWriter writer;
+            CodeFormatter formatter(writer);
+            doc.Write(formatter);
+            return writer.GetString();
         }
         private void Progress()
         {

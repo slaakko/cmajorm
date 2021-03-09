@@ -1,197 +1,169 @@
 #include "PortMapMessage.hpp"
-#include <sngjson/json/JsonImport.hpp>
-#include <sngjson/json/JsonExport.hpp>
-#include <utility>
+#include <sngxml/serialization/XmlExport.hpp>
+#include <sngxml/serialization/XmlImport.hpp>
+#include <soulng/util/Unicode.hpp>
 
-GetFreePortNumberRequest::GetFreePortNumberRequest() : message(), programName(), pid(), time()
+using namespace soulng::unicode;
+
+GetFreePortNumberRequest::GetFreePortNumberRequest()
+    : processName(), pid()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> GetFreePortNumberRequest::ToJson() const
+GetFreePortNumberRequest::GetFreePortNumberRequest(sngxml::dom::Element* element)
+    : processName(), pid()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(programName);
-    object->AddField(U"programName", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(pid);
-    object->AddField(U"pid", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(time);
-    object->AddField(U"time", std::move(fieldValue3));
-    return object;
+    sngxml::xmlser::FromXml(element, "processName", processName);
+    sngxml::xmlser::FromXml(element, "pid", pid);
 }
 
-GetFreePortNumberRequest::GetFreePortNumberRequest(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> GetFreePortNumberRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "message", message);
-    sngjson::json::FromJson(__json_value, "programName", programName);
-    sngjson::json::FromJson(__json_value, "pid", pid);
-    sngjson::json::FromJson(__json_value, "time", time);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(processName, "processName").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(pid, "pid").release()));
+    return element;
 }
 
-GetFreePortNumberReply::GetFreePortNumberReply() : message(), portNumber()
+GetFreePortNumberReply::GetFreePortNumberReply()
+    : portNumber()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> GetFreePortNumberReply::ToJson() const
+GetFreePortNumberReply::GetFreePortNumberReply(sngxml::dom::Element* element)
+    : portNumber()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(portNumber);
-    object->AddField(U"portNumber", std::move(fieldValue1));
-    return object;
+    sngxml::xmlser::FromXml(element, "portNumber", portNumber);
 }
 
-GetFreePortNumberReply::GetFreePortNumberReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> GetFreePortNumberReply::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "message", message);
-    sngjson::json::FromJson(__json_value, "portNumber", portNumber);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portNumber, "portNumber").release()));
+    return element;
 }
 
-ExtendPortLeaseRequest::ExtendPortLeaseRequest() : message(), programName(), pid(), portNumbers()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> ExtendPortLeaseRequest::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(programName);
-    object->AddField(U"programName", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(pid);
-    object->AddField(U"pid", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(portNumbers);
-    object->AddField(U"portNumbers", std::move(fieldValue3));
-    return object;
-}
-
-ExtendPortLeaseRequest::ExtendPortLeaseRequest(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "message", message);
-    sngjson::json::FromJson(__json_value, "programName", programName);
-    sngjson::json::FromJson(__json_value, "pid", pid);
-    sngjson::json::FromJson(__json_value, "portNumbers", portNumbers);
-}
-
-ExtendPortLeaseReply::ExtendPortLeaseReply() : message()
+ExtendPortLeaseRequest::ExtendPortLeaseRequest()
+    : processName(), pid(), portNumbers()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> ExtendPortLeaseReply::ToJson() const
+ExtendPortLeaseRequest::ExtendPortLeaseRequest(sngxml::dom::Element* element)
+    : processName(), pid(), portNumbers()
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue0));
-    return object;
+    sngxml::xmlser::FromXml(element, "processName", processName);
+    sngxml::xmlser::FromXml(element, "pid", pid);
+    sngxml::xmlser::FromXml(element, "portNumbers", portNumbers);
 }
 
-ExtendPortLeaseReply::ExtendPortLeaseReply(soulng::util::JsonValue* __json_value)
+std::unique_ptr<sngxml::dom::Element> ExtendPortLeaseRequest::ToXml(const std::string& fieldName) const
 {
-    sngjson::json::FromJson(__json_value, "message", message);
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(processName, "processName").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(pid, "pid").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portNumbers, "portNumbers").release()));
+    return element;
 }
 
-StopPortMapServerRequest::StopPortMapServerRequest() : message()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> StopPortMapServerRequest::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue0));
-    return object;
-}
-
-StopPortMapServerRequest::StopPortMapServerRequest(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "message", message);
-}
-
-StopPortMapServerReply::StopPortMapServerReply() : message()
+ExtendPortLeaseReply::ExtendPortLeaseReply()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> StopPortMapServerReply::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue0));
-    return object;
-}
-
-StopPortMapServerReply::StopPortMapServerReply(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "message", message);
-}
-
-PortLease::PortLease() : portNumber(), programName(), pid(), leaseStartTime(), leaseRenewalTime(), leaseState()
+ExtendPortLeaseReply::ExtendPortLeaseReply(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> PortLease::ToJson() const
+std::unique_ptr<sngxml::dom::Element> ExtendPortLeaseReply::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(portNumber);
-    object->AddField(U"portNumber", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(programName);
-    object->AddField(U"programName", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(pid);
-    object->AddField(U"pid", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(leaseStartTime);
-    object->AddField(U"leaseStartTime", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(leaseRenewalTime);
-    object->AddField(U"leaseRenewalTime", std::move(fieldValue4));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(leaseState);
-    object->AddField(U"leaseState", std::move(fieldValue5));
-    return object;
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-PortLease::PortLease(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "portNumber", portNumber);
-    sngjson::json::FromJson(__json_value, "programName", programName);
-    sngjson::json::FromJson(__json_value, "pid", pid);
-    sngjson::json::FromJson(__json_value, "leaseStartTime", leaseStartTime);
-    sngjson::json::FromJson(__json_value, "leaseRenewalTime", leaseRenewalTime);
-    sngjson::json::FromJson(__json_value, "leaseState", leaseState);
-}
-
-ViewPortLeaseRequest::ViewPortLeaseRequest() : message()
+StopPortMapServerRequest::StopPortMapServerRequest()
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> ViewPortLeaseRequest::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue0));
-    return object;
-}
-
-ViewPortLeaseRequest::ViewPortLeaseRequest(soulng::util::JsonValue* __json_value)
-{
-    sngjson::json::FromJson(__json_value, "message", message);
-}
-
-ViewPortLeaseReply::ViewPortLeaseReply() : message(), portLeases()
+StopPortMapServerRequest::StopPortMapServerRequest(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<soulng::util::JsonValue> ViewPortLeaseReply::ToJson() const
+std::unique_ptr<sngxml::dom::Element> StopPortMapServerRequest::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
-    object->AddField(U"message", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(portLeases);
-    object->AddField(U"portLeases", std::move(fieldValue1));
-    return object;
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
 }
 
-ViewPortLeaseReply::ViewPortLeaseReply(soulng::util::JsonValue* __json_value)
+StopPortMapServerReply::StopPortMapServerReply()
 {
-    sngjson::json::FromJson(__json_value, "message", message);
-    sngjson::json::FromJson(__json_value, "portLeases", portLeases);
+}
+
+StopPortMapServerReply::StopPortMapServerReply(sngxml::dom::Element* element)
+{
+}
+
+std::unique_ptr<sngxml::dom::Element> StopPortMapServerReply::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
+}
+
+PortLease::PortLease()
+    : portNumber(), processName(), pid(), leaseStartTime(), leaseRenewalTime(), leaseState()
+{
+}
+
+PortLease::PortLease(sngxml::dom::Element* element)
+    : portNumber(), processName(), pid(), leaseStartTime(), leaseRenewalTime(), leaseState()
+{
+    sngxml::xmlser::FromXml(element, "portNumber", portNumber);
+    sngxml::xmlser::FromXml(element, "processName", processName);
+    sngxml::xmlser::FromXml(element, "pid", pid);
+    sngxml::xmlser::FromXml(element, "leaseStartTime", leaseStartTime);
+    sngxml::xmlser::FromXml(element, "leaseRenewalTime", leaseRenewalTime);
+    sngxml::xmlser::FromXml(element, "leaseState", leaseState);
+}
+
+std::unique_ptr<sngxml::dom::Element> PortLease::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portNumber, "portNumber").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(processName, "processName").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(pid, "pid").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(leaseStartTime, "leaseStartTime").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(leaseRenewalTime, "leaseRenewalTime").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(leaseState, "leaseState").release()));
+    return element;
+}
+
+ViewPortLeaseRequest::ViewPortLeaseRequest()
+{
+}
+
+ViewPortLeaseRequest::ViewPortLeaseRequest(sngxml::dom::Element* element)
+{
+}
+
+std::unique_ptr<sngxml::dom::Element> ViewPortLeaseRequest::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
+}
+
+ViewPortLeaseReply::ViewPortLeaseReply()
+    : portLeases()
+{
+}
+
+ViewPortLeaseReply::ViewPortLeaseReply(sngxml::dom::Element* element)
+    : portLeases()
+{
+    sngxml::xmlser::FromXml(element, "portLeases", portLeases);
+}
+
+std::unique_ptr<sngxml::dom::Element> ViewPortLeaseReply::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(portLeases, "portLeases").release()));
+    return element;
 }
 

@@ -9,8 +9,6 @@
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/xpath/XPathEvaluate.hpp>
-#include <sngjson/json/JsonLexer.hpp>
-#include <sngjson/json/JsonParser.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/LogFileWriter.hpp>
 #include <soulng/util/Path.hpp>
@@ -67,18 +65,18 @@ std::string LogFilePath()
 
 struct PortEntry
 {
-    PortEntry() : portNumber(-1), programName(), pid(), leaseStartTime(), leaseRenewalTime(), leaseTimePoint()
+    PortEntry() : portNumber(-1), processName(), pid(), leaseStartTime(), leaseRenewalTime(), leaseTimePoint()
     {
     }
-    PortEntry(int portNumber_, const std::string& programName_, int pid_, const std::string& leaseStartTime_) :
-        portNumber(portNumber_), programName(programName_), pid(pid_), leaseStartTime(leaseStartTime_), leaseRenewalTime(), leaseTimePoint(std::chrono::steady_clock::now())
+    PortEntry(int portNumber_, const std::string& processName_, int pid_) :
+        portNumber(portNumber_), processName(processName_), pid(pid_), leaseStartTime(soulng::util::GetCurrentDateTime()), leaseRenewalTime(), leaseTimePoint(std::chrono::steady_clock::now())
     {
     }
     int portNumber;
-    std::string programName;
+    std::string processName;
     int pid;
-    std::string leaseStartTime;
-    std::string leaseRenewalTime;
+    datetime leaseStartTime;
+    datetime leaseRenewalTime;
     std::chrono::time_point<std::chrono::steady_clock> leaseTimePoint;
 };
 
@@ -99,8 +97,8 @@ private:
     std::map<int, PortEntry> portEntryMap;
     TcpSocket listenSocket;
     bool exiting;
-    std::string GetMessage(JsonValue* messageValue);
-    int GetNextPortNumber(const std::string& programName, int pid, const std::string& leaseStartTime);
+    std::string GetMessage(sngxml::dom::Element* element);
+    int GetNextPortNumber(const std::string& processName, int pid);
     PortEntry* GetPortEntry(int portNumber) const;
     GetFreePortNumberReply ProcessGetFreePortNumberRequest(const GetFreePortNumberRequest& request);
     ExtendPortLeaseReply ProcessExtendPortLeaseRequest(const ExtendPortLeaseRequest& request);
@@ -203,19 +201,9 @@ PortMapServer::PortMapServer() : portMapServicePort(54321), startPortRange(54300
     }
 }
 
-std::string PortMapServer::GetMessage(JsonValue* messageValue)
+std::string PortMapServer::GetMessage(sngxml::dom::Element* element)
 {
-    if (messageValue->Type() == JsonValueType::object)
-    {
-        JsonObject* jsonObject = static_cast<JsonObject*>(messageValue);
-        JsonValue* message = jsonObject->GetField(U"message");
-        if (message && message->Type() == JsonValueType::string)
-        {
-            JsonString* messageStr = static_cast<JsonString*>(message);
-            return ToUtf8(messageStr->Value());
-        }
-    }
-    return std::string();
+    return ToUtf8(element->Name());
 }
 
 PortEntry* PortMapServer::GetPortEntry(int portNumber) const
@@ -229,7 +217,7 @@ PortEntry* PortMapServer::GetPortEntry(int portNumber) const
     return nullptr;
 }
 
-int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, const std::string& leaseStartTime)
+int PortMapServer::GetNextPortNumber(const std::string& processName, int pid)
 {
     if (nextPortNumber > endPortRange)
     {
@@ -239,7 +227,7 @@ int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, co
     if (entry == nullptr)
     {
         int portNumber = nextPortNumber++;
-        portEntryMap[portNumber] = PortEntry(portNumber, programName, pid, leaseStartTime);
+        portEntryMap[portNumber] = PortEntry(portNumber, processName, pid);
         return portNumber;
     }
     else
@@ -248,10 +236,10 @@ int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, co
         if (std::chrono::duration_cast<std::chrono::seconds>(now - entry->leaseTimePoint).count() > leaseExpirationTimeSecs)
         {
             ++nextPortNumber;
-            entry->programName = programName;
+            entry->processName = processName;
             entry->pid = pid;
-            entry->leaseStartTime = leaseStartTime;
-            entry->leaseRenewalTime.clear();
+            entry->leaseStartTime = GetCurrentDateTime();
+            entry->leaseRenewalTime = datetime();
             entry->leaseTimePoint = now;
             return entry->portNumber;
         }
@@ -266,7 +254,7 @@ int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, co
             if (entry == nullptr)
             {
                 int portNumber = nextPortNumber++;
-                portEntryMap[portNumber] = PortEntry(portNumber, programName, pid, leaseStartTime);
+                portEntryMap[portNumber] = PortEntry(portNumber, processName, pid);
                 return portNumber;
             }
             else
@@ -274,10 +262,10 @@ int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, co
                 if (std::chrono::duration_cast<std::chrono::seconds>(now - entry->leaseTimePoint).count() > leaseExpirationTimeSecs)
                 {
                     ++nextPortNumber;
-                    entry->programName = programName;
+                    entry->processName = processName;
                     entry->pid = pid;
-                    entry->leaseStartTime = leaseStartTime;
-                    entry->leaseRenewalTime.clear();
+                    entry->leaseStartTime = GetCurrentDateTime();
+                    entry->leaseRenewalTime = datetime();
                     entry->leaseTimePoint = now;
                     return entry->portNumber;
                 }
@@ -290,44 +278,40 @@ int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, co
 
 GetFreePortNumberReply PortMapServer::ProcessGetFreePortNumberRequest(const GetFreePortNumberRequest& request)
 {
-    int portNumber = GetNextPortNumber(request.programName, boost::lexical_cast<int>(request.pid), request.time);
+    int portNumber = GetNextPortNumber(request.processName, request.pid);
     GetFreePortNumberReply reply;
-    reply.message = "GetFreePortNumberReply";
-    reply.portNumber = std::to_string(portNumber);
+    reply.portNumber = portNumber;
     return reply;
 }
 
 ExtendPortLeaseReply PortMapServer::ProcessExtendPortLeaseRequest(const ExtendPortLeaseRequest& request)
 {
-    for (const std::string& portNumberStr : request.portNumbers)
+    for (int port : request.portNumbers)
     {
-        int port = boost::lexical_cast<int>(portNumberStr);
         PortEntry* entry = GetPortEntry(port);
         if (entry != nullptr)
         {
             std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
-            entry->leaseRenewalTime = GetCurrentDateTime().ToString();
+            entry->leaseRenewalTime = GetCurrentDateTime();
             entry->leaseTimePoint = now;
-            entry->programName = request.programName;
-            entry->pid = boost::lexical_cast<int>(request.pid);
+            entry->processName = request.processName;
+            entry->pid = request.pid;
         }
     }
     ExtendPortLeaseReply reply;
-    reply.message = "ExtendPortLeaseReply";
     return reply;
 }
 
 ViewPortLeaseReply PortMapServer::ProcessViewPortLeaseRequest(const ViewPortLeaseRequest& request)
 {
     ViewPortLeaseReply reply;
-    reply.message = "ViewPortLeaseReply";
     for (const std::pair<int, PortEntry>& p : portEntryMap)
     {
         const PortEntry& portEntry = p.second;
         PortLease portLease;
-        portLease.portNumber = std::to_string(portEntry.portNumber);
-        portLease.programName = portEntry.programName;
-        portLease.pid = std::to_string(portEntry.pid);
+        portLease.portNumber = portEntry.portNumber;
+        portLease.processName = portEntry.processName;
+        portLease.pid = portEntry.pid;
         portLease.leaseStartTime = portEntry.leaseStartTime;
         portLease.leaseRenewalTime = portEntry.leaseRenewalTime;
         std::string leaseStateStr = "valid";
@@ -345,7 +329,6 @@ ViewPortLeaseReply PortMapServer::ProcessViewPortLeaseRequest(const ViewPortLeas
 StopPortMapServerReply PortMapServer::ProcessStopPortMapServerRequest(const StopPortMapServerRequest& request)
 {
     StopPortMapServerReply reply;
-    reply.message = "StopPortMapServerReply";
     exiting = true;
     return reply;
 }
@@ -362,41 +345,52 @@ void PortMapServer::Run()
         try
         {
             std::string requestStr = ReadStr(socket);
-            JsonLexer lexer(ToUtf32(requestStr), "", 0);
-            std::unique_ptr<JsonValue> requestValue = JsonParser::Parse(lexer);
-            std::string message = GetMessage(requestValue.get());
+            std::unique_ptr<sngxml::dom::Document> requestDoc = sngxml::dom::ParseDocument(ToUtf32(requestStr), "socket");
+            std::string message = GetMessage(requestDoc->DocumentElement());
             if (!message.empty())
             {
-                if (message == "GetFreePortNumberRequest")
+                if (message == "getFreePortNumberRequest")
                 {
-                    GetFreePortNumberRequest request(requestValue.get());
+                    GetFreePortNumberRequest request(requestDoc->DocumentElement());
                     GetFreePortNumberReply reply = ProcessGetFreePortNumberRequest(request);
-                    std::unique_ptr<JsonValue> replyValue = reply.ToJson();
-                    std::string replyStr = replyValue->ToString();
+                    std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("getFreePortNumberReply");
+                    std::stringstream strStream;
+                    CodeFormatter formatter(strStream);
+                    replyValue->Write(formatter);
+                    std::string replyStr = strStream.str();
                     Write(socket, replyStr);
                 }
-                else if (message == "ExtendPortLeaseRequest")
+                else if (message == "extendPortLeaseRequest")
                 {
-                    ExtendPortLeaseRequest request(requestValue.get());
+                    ExtendPortLeaseRequest request(requestDoc->DocumentElement());
                     ExtendPortLeaseReply reply = ProcessExtendPortLeaseRequest(request);
-                    std::unique_ptr<JsonValue> replyValue = reply.ToJson();
-                    std::string replyStr = replyValue->ToString();
+                    std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("extendPortLeaseReply");
+                    std::stringstream strStream;
+                    CodeFormatter formatter(strStream);
+                    replyValue->Write(formatter);
+                    std::string replyStr = strStream.str();
                     Write(socket, replyStr);
                 }
-                else if (message == "StopPortMapServerRequest")
+                else if (message == "stopPortMapServerRequest")
                 {
-                    StopPortMapServerRequest request(requestValue.get());
+                    StopPortMapServerRequest request(requestDoc->DocumentElement());
                     StopPortMapServerReply reply = ProcessStopPortMapServerRequest(request);
-                    std::unique_ptr<JsonValue> replyValue = reply.ToJson();
-                    std::string replyStr = replyValue->ToString();
+                    std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("stopPortMapServerReply");
+                    std::stringstream strStream;
+                    CodeFormatter formatter(strStream);
+                    replyValue->Write(formatter);
+                    std::string replyStr = strStream.str();
                     Write(socket, replyStr);
                 }
-                else if (message == "ViewPortLeaseRequest")
+                else if (message == "viewPortLeaseRequest")
                 {
-                    ViewPortLeaseRequest request(requestValue.get());
+                    ViewPortLeaseRequest request(requestDoc->DocumentElement());
                     ViewPortLeaseReply reply = ProcessViewPortLeaseRequest(request);
-                    std::unique_ptr<JsonValue> replyValue = reply.ToJson();
-                    std::string replyStr = replyValue->ToString();
+                    std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("viewPortLeaseReply");
+                    std::stringstream strStream;
+                    CodeFormatter formatter(strStream);
+                    replyValue->Write(formatter);
+                    std::string replyStr = strStream.str();
                     Write(socket, replyStr);
                 }
             }

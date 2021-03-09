@@ -46,13 +46,13 @@ namespace Cm.Views
                 {
                     TreeViewNode* node = new TreeViewNode("Port " + portLease.portNumber);
                     treeView->Root()->AddChild(node);
-                    TreeViewNode* programNode = new TreeViewNode("Program: " + portLease.programName);
+                    TreeViewNode* programNode = new TreeViewNode("Process: " + portLease.processName);
                     node->AddChild(programNode);
                     TreeViewNode* pidNode = new TreeViewNode("PID: " + portLease.pid);
                     node->AddChild(pidNode);
-                    TreeViewNode* leaseStartTimeNode = new TreeViewNode("Lease start time: " + portLease.leaseStartTime);
+                    TreeViewNode* leaseStartTimeNode = new TreeViewNode("Lease start time: " + portLease.leaseStartTime.ToString());
                     node->AddChild(leaseStartTimeNode);
-                    TreeViewNode* leaseRenewalTimeNode = new TreeViewNode("Lease renewal time: " + portLease.leaseRenewalTime);
+                    TreeViewNode* leaseRenewalTimeNode = new TreeViewNode("Lease renewal time: " + portLease.leaseRenewalTime.ToString());
                     node->AddChild(leaseRenewalTimeNode);
                     TreeViewNode* leaseStateNode = new TreeViewNode("Lease state: " + portLease.leaseState);
                     node->AddChild(leaseStateNode);

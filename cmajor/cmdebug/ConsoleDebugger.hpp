@@ -17,7 +17,7 @@ class DEBUG_API ConsoleDebuggerOutputWriter : public DebuggerOutputWriter
 public:
     ConsoleDebuggerOutputWriter(CodeFormatter& formatter_);
     void WriteLogMessage(const std::string& message) override;
-    void WriteJsonValue(JsonValue* jsonValue) override;
+    void WriteJsonValue(soulng::util::JsonValue* jsonValue) override;
     void WriteWarning(const std::string& warning) override;
 private:
     CodeFormatter& formatter;

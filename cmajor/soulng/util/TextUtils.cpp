@@ -281,6 +281,22 @@ std::u32string StringStr(const std::u32string& s)
     return r;
 }
 
+std::string MakeStringLiteral(const std::string& s)
+{
+    std::string result = "\"";
+    result.append(StringStr(s));
+    result.append(1, '"');
+    return result;
+}
+
+std::u32string MakeStringLiteral(const std::u32string& s)
+{
+    std::u32string result = U"\"";
+    result.append(StringStr(s));
+    result.append(1, '"');
+    return result;
+}
+
 std::string QuotedPath(const std::string& path)
 {
     if (path.find(' ') != std::string::npos)
@@ -329,7 +345,6 @@ bool EndsWith(const std::u32string& s, const std::u32string& suffix)
     int m = int(s.length());
     return m >= n && s.substr(m - n, n) == suffix;
 }
-
 
 std::string NarrowString(const char* str, int length)
 {

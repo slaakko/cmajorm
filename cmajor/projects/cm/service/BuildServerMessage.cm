@@ -5,52 +5,48 @@
 
 using System;
 using System.Collections;
+using System.Xml.Serialization;
 
 namespace Cm.Service.Build
 {
-    [json]
+    [xml]
     public class StopRequest
     {
-        public nothrow StopRequest() : messageKind("stopRequest")
+        public nothrow StopRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class StopReply
     {
-        public nothrow StopReply() : messageKind("stopReply")
+        public nothrow StopReply()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class KeepAliveRequest
     {
-        public nothrow KeepAliveRequest() : messageKind("keepAliveRequest")
+        public nothrow KeepAliveRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class KeepAliveReply
     {
-        public nothrow KeepAliveReply() : messageKind("keepAliveReply")
+        public nothrow KeepAliveReply() 
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class BuildRequest
     {
-        public nothrow BuildRequest() : messageKind("buildRequest")
+        public nothrow BuildRequest() 
         {
         }
-        public string messageKind;
         public string backend;
         public string config;
         public string optimizationLevel;
@@ -76,24 +72,23 @@ namespace Cm.Service.Build
         public bool justMyCode;
     }
 
-    [json]
+    [xml]
     public class CompileError
     {
         public string message;
         public string project;
         public string file;
-        public string line;
-        public string scol;
-        public string ecol;
+        public int line;
+        public int scol;
+        public int ecol;
     }
 
-    [json]
+    [xml]
     public class BuildReply
     {
-        public nothrow BuildReply() : messageKind("buildReply")
+        public nothrow BuildReply() 
         {
         }
-        public string messageKind;
         public bool requestValid;
         public string requestErrorMessage;
         public string logException;
@@ -102,58 +97,55 @@ namespace Cm.Service.Build
         public List<CompileError> errors;
     }
 
-    [json]
+    [xml]
     public class LogMessageRequest
     {
-        public nothrow LogMessageRequest() : messageKind("logMessageRequest")
+        public nothrow LogMessageRequest() 
         {
         }
-        public string messageKind;
         public string message;
     }
 
-    [json]
+    [xml]
     public class LogMessageReply
     {
-        public nothrow LogMessageReply() : messageKind("logMessageReply")
+        public nothrow LogMessageReply() 
         {
         }
         public string messageKind;
         public bool ok;
     }
 
-    [json]
+    [xml]
     public class ProgressMessage
     {
-        public nothrow ProgressMessage() : messageKind("progressMessage")
+        public nothrow ProgressMessage() 
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class GenericErrorReply
     {
-        public nothrow GenericErrorReply() : messageKind("genericErrorReply")
+        public nothrow GenericErrorReply() 
         {
         }
-        public string messageKind;
         public string error;
     }
 
-    [json]
+    [xml]
     public class SourceLocation
     {
         public nothrow SourceLocation()
         {
         }
-        public nothrow SourceLocation(const string& file_, const string& line_, const string& scol_, const string& ecol_) : file(file_), line(line_), scol(scol_), ecol(ecol_)
+        public nothrow SourceLocation(const string& file_, int line_, int scol_, int ecol_) : file(file_), line(line_), scol(scol_), ecol(ecol_)
         {
         }
         public string file;
-        public string line;
-        public string scol;
-        public string ecol;
+        public int line;
+        public int scol;
+        public int ecol;
     }
 
     public nothrow bool operator==(const SourceLocation& left, const SourceLocation& right)
@@ -161,13 +153,12 @@ namespace Cm.Service.Build
         return left.file == right.file && left.line == right.line;
     }
 
-    [json]
+    [xml]
     public class GetDefinitionRequest
     {
-        public nothrow GetDefinitionRequest() : messageKind("getDefinitionRequest")
+        public nothrow GetDefinitionRequest() 
         {
         }
-        public string messageKind;
         public string projectName;
         public string projectFilePath;
         public string backend;
@@ -176,40 +167,35 @@ namespace Cm.Service.Build
         public SourceLocation identifierLocation;
     }
 
-    [json]
+    [xml]
     public class GetDefinitionReply
     {
-        public nothrow GetDefinitionReply() : messageKind("getDefinitionReply")
+        public nothrow GetDefinitionReply() 
         {
         }
-        public string messageKind;
         public SourceLocation definitionLocation;
         public bool ok;
         public string error;
     }
 
-    [json]
+    [xml]
     public class CacheModuleRequest
     {
-        public nothrow CacheModuleRequest() : messageKind("cacheModuleRequest")
+        public nothrow CacheModuleRequest() 
         {
         }
-        public string messageKind;
         public string projectName;
         public string projectFilePath;
         public string backend;
         public string config;
     }
 
-    [json]
+    [xml]
     public class CacheModuleReply
     {
-        public nothrow CacheModuleReply() : messageKind("cacheModuleReply")
+        public nothrow CacheModuleReply() 
         {
         }
-        public string messageKind;
         public string error;
     }
 }
-
-

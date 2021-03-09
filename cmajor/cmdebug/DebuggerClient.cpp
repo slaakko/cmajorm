@@ -7,8 +7,9 @@
 #include <cmajor/cmdebug/CmdbMessage.hpp>
 #include <cmajor/cmdebug/CmdbMessageMap.hpp>
 #include <cmajor/cmdebug/DebugInfo.hpp>
-#include <sngjson/json/JsonLexer.hpp>
-#include <sngjson/json/JsonParser.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/Document.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -18,6 +19,7 @@
 
 namespace cmajor { namespace debug {
 
+using namespace sngxml::dom;
 using namespace soulng::util;
 using namespace soulng::unicode;
 
@@ -69,12 +71,12 @@ public:
 class ChildrenCommand : public ClientCommand
 {
 public:
-    ChildrenCommand(const std::string& expr_, const std::string& start_, const std::string& count_);
+    ChildrenCommand(const std::string& expr_, int start_, int count_);
     void Execute(DebuggerClient& client) override;
 private:
     std::string expr;
-    std::string start;
-    std::string count;
+    int start;
+    int count;
 };
 
 class EvaluateCommand : public ClientCommand
@@ -130,7 +132,7 @@ std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
             std::vector<std::string> paramVec = Split(params, ',');
             if (paramVec.size() == 3)
             {
-                return std::unique_ptr<ClientCommand>(new ChildrenCommand(paramVec[0], paramVec[1], paramVec[2]));
+                return std::unique_ptr<ClientCommand>(new ChildrenCommand(paramVec[0], boost::lexical_cast<int>(paramVec[1]), boost::lexical_cast<int>(paramVec[2])));
             }
             else
             {
@@ -166,14 +168,14 @@ std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
             {
                 SourceLoc sourceLoc;
                 sourceLoc.path = "";
-                sourceLoc.line = params[0];
+                sourceLoc.line = boost::lexical_cast<int>(params[0]);
                 return std::unique_ptr<ClientCommand>(new BreakCommand(sourceLoc));
             }
             else if (paramVec.size() == 2)
             {
                 SourceLoc sourceLoc;
                 sourceLoc.path = paramVec[0];
-                sourceLoc.line = paramVec[1];
+                sourceLoc.line = boost::lexical_cast<int>(paramVec[1]);
                 return std::unique_ptr<ClientCommand>(new BreakCommand(sourceLoc));
             }
             else
@@ -196,34 +198,34 @@ class DebuggerClient
 {
 public:
     DebuggerClient(int port);
-    MessageKind GetMessageKind(JsonValue* message, std::string& messageKindStr);
+    MessageKind GetMessageKind(Element* element, std::string& messageKindStr);
     void Start();
     void Stop();
     void Continue();
     void Next();
     void Step();
     void Locals();
-    void Children(const std::string& expr, const std::string& start, const std::string& count);
+    void Children(const std::string& expr, int start, int count);
     void Evaluate(const std::string& expr);
     void Break(const SourceLoc& location);
-    void WriteRequest(JsonValue* request);
-    void WriteReply(JsonValue* reply);
-    std::unique_ptr<JsonValue> ReadReply(MessageKind replyMessageKind);
-    void ProcessMessage(JsonValue* message, MessageKind messageKind, const std::string& messageKindStr);
+    void WriteRequest(Element* request);
+    void WriteReply(Element* reply);
+    std::unique_ptr<Document> ReadReply(MessageKind replyMessageKind);
+    void ProcessMessage(Element* message, MessageKind messageKind, const std::string& messageKindStr);
     void ProcessTargetRunningRequest(const TargetRunningRequest& targetRunningRequest);
     void ProcessTargetInputRequest(const TargetInputRequest& targetInputRequest);
     void ProcessTargetOutputRequest(const TargetOutputRequest& targetOutputRequest);
     void ProcessLogMessageRequest(const LogMessageRequest& logMessageRequest);
     void ProcessErrorReply(const GenericErrorReply& errorReply);
-    void ProcessStartReply(JsonValue* reply);
-    void ProcessStopReply(JsonValue* reply);
-    void ProcessContinueReply(JsonValue* reply);
-    void ProcessNextReply(JsonValue* reply);
-    void ProcessStepReply(JsonValue* reply);
-    int ProcessCountReply(JsonValue* reply);
-    void ProcessEvaluateChildReply(JsonValue* reply);
-    void ProcessEvaluateReply(JsonValue* reply);
-    void ProcessBreakReply(JsonValue* reply);
+    void ProcessStartReply(Element* reply);
+    void ProcessStopReply(Element* reply);
+    void ProcessContinueReply(Element* reply);
+    void ProcessNextReply(Element* reply);
+    void ProcessStepReply(Element* reply);
+    int ProcessCountReply(Element* reply);
+    void ProcessEvaluateChildReply(Element* reply);
+    void ProcessEvaluateReply(Element* reply);
+    void ProcessBreakReply(Element* reply);
     bool Stopped() const { return stopped; }
 private:
     MessageMap messageMap;
@@ -236,18 +238,13 @@ DebuggerClient::DebuggerClient(int port_) : port(port_), stopped(false)
 {
 }
 
-MessageKind DebuggerClient::GetMessageKind(JsonValue* message, std::string& messageKindStr)
+MessageKind DebuggerClient::GetMessageKind(Element* element, std::string& messageKindStr)
 {
-    if (message->Type() == JsonValueType::object)
-    {
-        JsonObject* messageObject = static_cast<JsonObject*>(message);
-        messageKindStr = messageObject->GetStringField(U"messageKind");
-        return messageMap.GetMessageKind(messageKindStr);
-    }
-    return MessageKind::none;
+    messageKindStr = ToUtf8(element->Name());
+    return messageMap.GetMessageKind(messageKindStr);
 }
 
-void DebuggerClient::ProcessMessage(JsonValue* message, MessageKind messageKind, const std::string& messageKindStr)
+void DebuggerClient::ProcessMessage(Element* message, MessageKind messageKind, const std::string& messageKindStr)
 {
     switch (messageKind)
     {
@@ -287,15 +284,13 @@ void DebuggerClient::ProcessMessage(JsonValue* message, MessageKind messageKind,
 void DebuggerClient::ProcessTargetRunningRequest(const TargetRunningRequest& targetRunningRequest)
 {
     TargetRunningReply targetRunningReply;
-    targetRunningReply.messageKind = "targetRunningReply";
-    std::unique_ptr<JsonValue> reply = targetRunningReply.ToJson();
-    WriteReply(reply.get());
+    std::unique_ptr<Element> reply = targetRunningReply.ToXml("targetRunningReply");
+    WriteReply(reply.release());
 }
 
 void DebuggerClient::ProcessTargetInputRequest(const TargetInputRequest& targetInputRequest)
 {
     TargetInputReply targetInputReply;
-    targetInputReply.messageKind = "targetInputReply";
     std::string line;
     if (std::getline(std::cin, line))
     {
@@ -305,13 +300,13 @@ void DebuggerClient::ProcessTargetInputRequest(const TargetInputRequest& targetI
     {
         targetInputReply.eof = true;
     }
-    std::unique_ptr<JsonValue> reply = targetInputReply.ToJson();
-    WriteReply(reply.get());
+    std::unique_ptr<Element> reply = targetInputReply.ToXml("targetInputReply");
+    WriteReply(reply.release());
 }
 
 void DebuggerClient::ProcessTargetOutputRequest(const TargetOutputRequest& targetOutputRequest)
 {
-    int handle = boost::lexical_cast<int>(targetOutputRequest.handle);
+    int handle = targetOutputRequest.handle;
     if (handle == 1)
     {
         std::cout << targetOutputRequest.output;
@@ -321,18 +316,16 @@ void DebuggerClient::ProcessTargetOutputRequest(const TargetOutputRequest& targe
         std::cerr << targetOutputRequest.output;
     }
     TargetOutputReply targetOutputReply;
-    targetOutputReply.messageKind = "targetOutputReply";
-    std::unique_ptr<JsonValue> reply = targetOutputReply.ToJson();
-    WriteReply(reply.get());
+    std::unique_ptr<Element> reply = targetOutputReply.ToXml("targetOutputReply");
+    WriteReply(reply.release());
 }
 
 void DebuggerClient::ProcessLogMessageRequest(const LogMessageRequest& logMessageRequest)
 {
     std::cout << logMessageRequest.logMessage << std::endl;
     LogMessageReply logMessageReply;
-    logMessageReply.messageKind = "logMessageReply";
-    std::unique_ptr<JsonValue> reply = logMessageReply.ToJson();
-    WriteReply(reply.get());
+    std::unique_ptr<Element> reply = logMessageReply.ToXml("logMessageReply");
+    WriteReply(reply.release());
 }
 
 void DebuggerClient::ProcessErrorReply(const GenericErrorReply& errorReply)
@@ -340,48 +333,55 @@ void DebuggerClient::ProcessErrorReply(const GenericErrorReply& errorReply)
     std::cerr << errorReply.errorMessage << std::endl;
 }
 
-void DebuggerClient::WriteRequest(JsonValue* request)
+void DebuggerClient::WriteRequest(Element* request)
 {
-    std::string requestStr = request->ToString();
+    Document requestDoc;
+    requestDoc.AppendChild(std::unique_ptr<Node>(request));
+    std::stringstream strStream;
+    CodeFormatter formatter(strStream);
+    requestDoc.Write(formatter);
+    std::string requestStr = strStream.str();
     Write(socket, requestStr);
 }
 
-void DebuggerClient::WriteReply(JsonValue* reply)
+void DebuggerClient::WriteReply(Element* reply)
 {
-    std::string replyStr = reply->ToString();
+    Document replyDoc;
+    replyDoc.AppendChild(std::unique_ptr<Node>(reply));
+    std::stringstream strStream;
+    CodeFormatter formatter(strStream);
+    replyDoc.Write(formatter);
+    std::string replyStr = strStream.str();
     Write(socket, replyStr);
 }
 
-std::unique_ptr<JsonValue> DebuggerClient::ReadReply(MessageKind replyMessageKind)
+std::unique_ptr<Document> DebuggerClient::ReadReply(MessageKind replyMessageKind)
 {
     std::string replyStr = ReadStr(socket);
-    JsonLexer lexer(ToUtf32(replyStr), "", 0);
-    std::unique_ptr<JsonValue> replyValue = JsonParser::Parse(lexer);
+    std::unique_ptr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
     std::string messageKindStr;
-    MessageKind messageKind = GetMessageKind(replyValue.get(), messageKindStr);
+    MessageKind messageKind = GetMessageKind(replyDoc->DocumentElement(), messageKindStr);
     while (messageKind != replyMessageKind)
     {
-        ProcessMessage(replyValue.get(), messageKind, messageKindStr);
+        ProcessMessage(replyDoc->DocumentElement(), messageKind, messageKindStr);
         replyStr = ReadStr(socket);
-        JsonLexer lexer(ToUtf32(replyStr), "", 0);
-        replyValue = JsonParser::Parse(lexer);
-        messageKind = GetMessageKind(replyValue.get(), messageKindStr);
+        replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
+        messageKind = GetMessageKind(replyDoc->DocumentElement(), messageKindStr);
     }
-    return replyValue;
+    return replyDoc;
 }
 
 void DebuggerClient::Start()
 {
     socket.Connect("localhost", std::to_string(port));
     StartRequest startRequest;
-    startRequest.messageKind = "startRequest";
-    std::unique_ptr<JsonValue> request = startRequest.ToJson();
-    WriteRequest(request.get());
-    std::unique_ptr<JsonValue> replyValue = ReadReply(MessageKind::startReply);
-    ProcessStartReply(replyValue.get());
+    std::unique_ptr<Element> request = startRequest.ToXml("startRequest");
+    WriteRequest(request.release());
+    std::unique_ptr<Document> replyDoc = ReadReply(MessageKind::startReply);
+    ProcessStartReply(replyDoc->DocumentElement());
 }
 
-void DebuggerClient::ProcessStartReply(JsonValue* reply)
+void DebuggerClient::ProcessStartReply(Element* reply)
 {
     StartReply startReply(reply);
 }
@@ -389,14 +389,13 @@ void DebuggerClient::ProcessStartReply(JsonValue* reply)
 void DebuggerClient::Stop()
 {
     StopRequest stopRequest;
-    stopRequest.messageKind = "stopRequest";
-    std::unique_ptr<JsonValue> request = stopRequest.ToJson();
-    WriteRequest(request.get());
-    std::unique_ptr<JsonValue> replyValue = ReadReply(MessageKind::stopReply);
-    ProcessStopReply(replyValue.get());
+    std::unique_ptr<Element> request = stopRequest.ToXml("stopRequest");
+    WriteRequest(request.release());
+    std::unique_ptr<Document> replyDoc = ReadReply(MessageKind::stopReply);
+    ProcessStopReply(replyDoc->DocumentElement());
 }
 
-void DebuggerClient::ProcessStopReply(JsonValue* reply)
+void DebuggerClient::ProcessStopReply(Element* reply)
 {
     StopReply stopReply(reply);
     stopped = true;
@@ -405,14 +404,13 @@ void DebuggerClient::ProcessStopReply(JsonValue* reply)
 void DebuggerClient::Continue()
 {
     ContinueRequest continueRequest;
-    continueRequest.messageKind = "continueRequest";
-    std::unique_ptr<JsonValue> request = continueRequest.ToJson();
-    WriteRequest(request.get());
-    std::unique_ptr<JsonValue> replyValue = ReadReply(MessageKind::continueReply);
-    ProcessContinueReply(replyValue.get());
+    std::unique_ptr<Element> request = continueRequest.ToXml("continueRequest");
+    WriteRequest(request.release());
+    std::unique_ptr<Document> replyDoc = ReadReply(MessageKind::continueReply);
+    ProcessContinueReply(replyDoc->DocumentElement());
 }
 
-void DebuggerClient::ProcessContinueReply(JsonValue* reply)
+void DebuggerClient::ProcessContinueReply(Element* reply)
 {
     ContinueReply continueReply(reply);
 }
@@ -420,14 +418,13 @@ void DebuggerClient::ProcessContinueReply(JsonValue* reply)
 void DebuggerClient::Next()
 {
     NextRequest nextRequest;
-    nextRequest.messageKind = "nextRequest";
-    std::unique_ptr<JsonValue> request = nextRequest.ToJson();
-    WriteRequest(request.get());
-    std::unique_ptr<JsonValue> replyValue = ReadReply(MessageKind::nextReply);
-    ProcessNextReply(replyValue.get());
+    std::unique_ptr<Element> request = nextRequest.ToXml("nextRequest");
+    WriteRequest(request.release());
+    std::unique_ptr<Document> replyDoc = ReadReply(MessageKind::nextReply);
+    ProcessNextReply(replyDoc->DocumentElement());
 }
 
-void DebuggerClient::ProcessNextReply(JsonValue* reply)
+void DebuggerClient::ProcessNextReply(Element* reply)
 {
     NextReply nextReply(reply);
 }
@@ -435,14 +432,13 @@ void DebuggerClient::ProcessNextReply(JsonValue* reply)
 void DebuggerClient::Step()
 {
     StepRequest stepRequest;
-    stepRequest.messageKind = "stepRequest";
-    std::unique_ptr<JsonValue> request = stepRequest.ToJson();
-    WriteRequest(request.get());
-    std::unique_ptr<JsonValue> replyValue = ReadReply(MessageKind::stepReply);
-    ProcessStepReply(replyValue.get());
+    std::unique_ptr<Element> request = stepRequest.ToXml("stepRequest");
+    WriteRequest(request.release());
+    std::unique_ptr<Document> replyDoc = ReadReply(MessageKind::stepReply);
+    ProcessStepReply(replyDoc->DocumentElement());
 }
 
-void DebuggerClient::ProcessStepReply(JsonValue* reply)
+void DebuggerClient::ProcessStepReply(Element* reply)
 {
     StepReply stepReply(reply);
 }
@@ -450,31 +446,29 @@ void DebuggerClient::ProcessStepReply(JsonValue* reply)
 void DebuggerClient::Locals()
 {
     CountRequest countRequest;
-    countRequest.messageKind = "countRequest";
     countRequest.expression = "@locals";
-    std::unique_ptr<JsonValue> request = countRequest.ToJson();
-    WriteRequest(request.get());
-    std::unique_ptr<JsonValue> replyValue = ReadReply(MessageKind::countReply);
-    int numLocals = ProcessCountReply(replyValue.get());
+    std::unique_ptr<Element> request = countRequest.ToXml("countRequest");
+    WriteRequest(request.release());
+    std::unique_ptr<Document> countReplyDoc = ReadReply(MessageKind::countReply);
+    int numLocals = ProcessCountReply(countReplyDoc->DocumentElement());
     EvaluateChildRequest evaluateChildRequest;
-    evaluateChildRequest.messageKind = "evaluateChildRequest";
     evaluateChildRequest.expression = "@locals";
-    evaluateChildRequest.start = std::to_string(0);
-    evaluateChildRequest.count = std::to_string(numLocals);
-    std::unique_ptr<JsonValue> req = evaluateChildRequest.ToJson();
-    WriteRequest(req.get());
-    std::unique_ptr<JsonValue> replyVal = ReadReply(MessageKind::evaluateChildReply);
-    ProcessEvaluateChildReply(replyVal.get());
+    evaluateChildRequest.start = 0;
+    evaluateChildRequest.count = numLocals;
+    std::unique_ptr<Element> req = evaluateChildRequest.ToXml("evaluateChildRequest");
+    WriteRequest(req.release());
+    std::unique_ptr<Document> replyDoc = ReadReply(MessageKind::evaluateChildReply);
+    ProcessEvaluateChildReply(replyDoc->DocumentElement());
 }
 
-int DebuggerClient::ProcessCountReply(JsonValue* reply)
+int DebuggerClient::ProcessCountReply(Element* reply)
 {
     CountReply countReply(reply);
-    int numLocals = boost::lexical_cast<int>(countReply.count);
+    int numLocals = countReply.count;
     return numLocals;
 }
 
-void DebuggerClient::ProcessEvaluateChildReply(JsonValue* reply)
+void DebuggerClient::ProcessEvaluateChildReply(Element* reply)
 {
     EvaluateChildReply evaluateChildReply(reply);
     int n = evaluateChildReply.results.size();
@@ -486,11 +480,11 @@ void DebuggerClient::ProcessEvaluateChildReply(JsonValue* reply)
         {
             s.append(" = ").append(childResult.value);
         }
-        std::cout << s << " : [" << childResult.expr << ", " << childResult.type << ", " << childResult.count << "]" << std::endl;;
+        std::cout << s << " : [" << childResult.expr << ", " << childResult.type << ", " << childResult.count << "]" << std::endl;
     }
 }
 
-void DebuggerClient::ProcessEvaluateReply(JsonValue* reply)
+void DebuggerClient::ProcessEvaluateReply(Element* reply)
 {
     EvaluateReply evaluateReply(reply);
     if (evaluateReply.success)
@@ -503,44 +497,41 @@ void DebuggerClient::ProcessEvaluateReply(JsonValue* reply)
     }
 }
 
-void DebuggerClient::ProcessBreakReply(JsonValue* reply)
+void DebuggerClient::ProcessBreakReply(Element* reply)
 {
     BreakReply breakReply(reply);
 }
 
-void DebuggerClient::Children(const std::string& expr, const std::string& start, const std::string& count)
+void DebuggerClient::Children(const std::string& expr, int start, int count)
 {
     EvaluateChildRequest evaluateChildRequest;
-    evaluateChildRequest.messageKind = "evaluateChildRequest";
     evaluateChildRequest.expression = expr;
     evaluateChildRequest.start = start;
     evaluateChildRequest.count = count;
-    std::unique_ptr<JsonValue> req = evaluateChildRequest.ToJson();
+    std::unique_ptr<Element> req = evaluateChildRequest.ToXml("evaluateChildRequest");
     WriteRequest(req.get());
-    std::unique_ptr<JsonValue> replyVal = ReadReply(MessageKind::evaluateChildReply);
-    ProcessEvaluateChildReply(replyVal.get());
+    std::unique_ptr<Document> replyDoc = ReadReply(MessageKind::evaluateChildReply);
+    ProcessEvaluateChildReply(replyDoc->DocumentElement());
 }
 
 void DebuggerClient::Evaluate(const std::string& expr)
 {
     EvaluateRequest evaluateRequest;
-    evaluateRequest.messageKind = "evaluateRequest";
     evaluateRequest.expression = expr;
-    std::unique_ptr<JsonValue> request = evaluateRequest.ToJson();
-    WriteRequest(request.get());
-    std::unique_ptr<JsonValue> reply = ReadReply(MessageKind::evaluateReply);
-    ProcessEvaluateReply(reply.get());
+    std::unique_ptr<Element> request = evaluateRequest.ToXml("evaluateRequest");
+    WriteRequest(request.release());
+    std::unique_ptr<Document> reply = ReadReply(MessageKind::evaluateReply);
+    ProcessEvaluateReply(reply->DocumentElement());
 }
 
 void DebuggerClient::Break(const SourceLoc& location)
 {
     BreakRequest breakRequest;
-    breakRequest.messageKind = "breakRequest";
     breakRequest.breakpointLocation = location;
-    std::unique_ptr<JsonValue> request = breakRequest.ToJson();
-    WriteRequest(request.get());
-    std::unique_ptr<JsonValue> reply = ReadReply(MessageKind::breakReply);
-    ProcessBreakReply(reply.get());
+    std::unique_ptr<Element> request = breakRequest.ToXml("breakRequest");
+    WriteRequest(request.release());
+    std::unique_ptr<Document> reply = ReadReply(MessageKind::breakReply);
+    ProcessBreakReply(reply->DocumentElement());
 }
 
 ClientCommand::~ClientCommand()
@@ -577,7 +568,7 @@ void LocalsCommand::Execute(DebuggerClient& client)
     client.Locals();
 }
 
-ChildrenCommand::ChildrenCommand(const std::string& expr_, const std::string& start_, const std::string& count_) : expr(expr_), start(start_), count(count_)
+ChildrenCommand::ChildrenCommand(const std::string& expr_, int start_, int count_) : expr(expr_), start(start_), count(count_)
 {
 }
 

@@ -1,2 +1,2 @@
 @echo off
-jsongen -v PortMapMessage.json-schema
+xmlsergen -v PortMapMessage.xml-schema

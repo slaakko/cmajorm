@@ -22,9 +22,6 @@ using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
 
 template<class T>
-concept XmlConstructible = requires(sngxml::dom::Element* element) { T(element); };
-
-template<class T>
 concept XmlImportable = 
 std::is_fundamental_v<T> ||
 std::is_same_v<T, std::string> ||
@@ -36,6 +33,12 @@ std::is_same_v<T, datetime> ||
 std::is_same_v<T, timestamp> ||
 std::is_same_v<T, time_point> ||
 std::is_same_v<T, duration>;
+
+template<class T>
+concept XmlConstructible = std::is_class_v<T> && requires(sngxml::dom::Element* element)
+{ 
+    T(element); 
+};
 
 SNGXML_SERIALIZATION_API sngxml::dom::Element* GetXmlFieldElement(const std::string& fieldName, sngxml::dom::Element* fromElement);
 

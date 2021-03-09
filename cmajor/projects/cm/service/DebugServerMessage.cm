@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using System.Xml.Serialization;
 
 namespace Cm.Service.Debug
 {
@@ -18,15 +19,15 @@ namespace Cm.Service.Debug
         logMessageRequest, logMessageReply
     }
 
-    [json]
+    [xml]
     public class Location
     {
         public string func;
         public string file;
-        public string line;
-        public string scol;
-        public string ecol;
-        public string level;
+        public int line;
+        public int scol;
+        public int ecol;
+        public int level;
     }
 
     public nothrow bool operator==(const Location& left, const Location& right)
@@ -34,14 +35,14 @@ namespace Cm.Service.Debug
         return left.func == right.func && left.file == right.file && left.line == right.line && left.scol == right.scol && left.ecol == right.ecol && left.level == right.level;
     }
 
-    [json]
+    [xml]
     public class Type
     {
         public string id;
         public string name;
     }
 
-    [json]
+    [xml]
     public class Result
     {
         public Type staticType;
@@ -50,7 +51,7 @@ namespace Cm.Service.Debug
         public string value;
     }
 
-    [json]
+    [xml]
     public class ChildResult
     {
         public string expr;
@@ -58,10 +59,10 @@ namespace Cm.Service.Debug
         public string type;
         public string dynType;
         public string value;
-        public string count;
+        public int count;
     }
 
-    [json]
+    [xml]
     public class TargetState
     {
         public nothrow void Reset()
@@ -79,40 +80,38 @@ namespace Cm.Service.Debug
         public string signalMeaning;
     }
 
-    [json]
+    [xml]
     public class SourceLoc
     {
         public string path;
-        public string line;
+        public int line;
     }
 
-    [json]
+    [xml]
     public class BreakpointInfo
     {
         public bool success;
         public string breakpointId;
-        public string numInsts;
+        public int numInsts;
         public Location location;
         public string error;
     }
 
-    [json]
+    [xml]
     public class StartRequest
     {
-        public nothrow StartRequest() : messageKind("startRequest")
+        public nothrow StartRequest()
         {
         }
-        public string messageKind;
         public List<SourceLoc> breakpointLocations;
     }
 
-    [json]
+    [xml]
     public class StartReply
     {
-        public nothrow StartReply() : messageKind("startReply")
+        public nothrow StartReply()
         {
         }
-        public string messageKind;
         public bool success;
         public Location location;
         public TargetState state;
@@ -120,372 +119,337 @@ namespace Cm.Service.Debug
         public string error;
     }
 
-    [json]
+    [xml]
     public class StopRequest
     {
-        public nothrow StopRequest() : messageKind("stopRequest")
+        public nothrow StopRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class StopReply
     {
-        public nothrow StopReply() : messageKind("stopReply")
+        public nothrow StopReply()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class GenericErrorReply
     {
-        public nothrow GenericErrorReply() : messageKind("genericErrorReply")
+        public nothrow GenericErrorReply()
         {
         }
-        public string messageKind;
         public string errorMessage;
     }
 
-    [json]
+    [xml]
     public class ContinueRequest
     {
-        public nothrow ContinueRequest() : messageKind("continueRequest")
+        public nothrow ContinueRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class ContinueReply
     {
-        public nothrow ContinueReply() : messageKind("continueReply")
+        public nothrow ContinueReply()
         {
         }
-        public string messageKind;
         public bool success;
         public Location location;
         public TargetState state;
         public string error;
     }
 
-    [json]
+    [xml]
     public class NextRequest
     {
-        public nothrow NextRequest() : messageKind("nextRequest")
+        public nothrow NextRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class NextReply
     {
-        public nothrow NextReply() : messageKind("nextReply")
+        public nothrow NextReply()
         {
         }
-        public string messageKind;
         public bool success;
         public Location location;
         public TargetState state;
         public string error;
     }
 
-    [json]
+    [xml]
     public class StepRequest
     {
-        public nothrow StepRequest() : messageKind("stepRequest")
+        public nothrow StepRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class StepReply
     {
-        public nothrow StepReply() : messageKind("stepReply")
+        public nothrow StepReply()
         {
         }
-        public string messageKind;
         public bool success;
         public Location location;
         public TargetState state;
         public string error;
     }
 
-    [json]
+    [xml]
     public class FinishRequest
     {
-        public nothrow FinishRequest() : messageKind("finishRequest")
+        public nothrow FinishRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class FinishReply
     {
-        public nothrow FinishReply() : messageKind("finishReply")
+        public nothrow FinishReply()
         {
         }
-        public string messageKind;
         public bool success;
         public Location location;
         public TargetState state;
         public string error;
     }
 
-    [json]
+    [xml]
     public class UntilRequest
     {
-        public nothrow UntilRequest(const SourceLoc& sourceLoc_) : sourceLoc(sourceLoc_), messageKind("untilRequest")
+        public nothrow UntilRequest(const SourceLoc& sourceLoc_) : sourceLoc(sourceLoc_)
         {
         }
-        public string messageKind;
         public SourceLoc sourceLoc;
     }
 
-    [json]
+    [xml]
     public class UntilReply
     {
-        public nothrow UntilReply() : messageKind("untilReply")
+        public nothrow UntilReply()
         {
         }
-        public string messageKind;
         public bool success;
         public Location location;
         public TargetState state;
         public string error;
     }
 
-    [json]
+    [xml]
     public class BreakRequest
     {
-        public nothrow BreakRequest() : messageKind("breakRequest")
+        public nothrow BreakRequest()
         {
         }
-        public string messageKind;
         public SourceLoc breakpointLocation;
     }
 
-    [json]
+    [xml]
     public class BreakReply
     {
-        public nothrow BreakReply() : messageKind("breakReply")
+        public nothrow BreakReply()
         {
         }
-        public string messageKind;
         public BreakpointInfo breakpointInfo;
     }
 
-    [json]
+    [xml]
     public class DeleteRequest
     {
-        public nothrow DeleteRequest() : messageKind("deleteRequest")
+        public nothrow DeleteRequest()
         {
         }
-        public string messageKind;
         public string breakpointId;
     }
 
-    [json]
+    [xml]
     public class DeleteReply
     {
-        public nothrow DeleteReply() : messageKind("deleteReply")
+        public nothrow DeleteReply()
         {
         }
-        public string messageKind;
         public bool success;
         public string error;
     }
 
-    [json]
+    [xml]
     public class DepthRequest
     {
-        public nothrow DepthRequest() : messageKind("depthRequest")
+        public nothrow DepthRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class DepthReply
     {
-        public nothrow DepthReply() : messageKind("depthReply")
+        public nothrow DepthReply()
         {
         }
-        public string messageKind;
         public bool success;
-        public string depth;
+        public int depth;
         public string error;
     }
 
-    [json]
+    [xml]
     public class FramesRequest
     {
-        public nothrow FramesRequest() : messageKind("framesRequest")
+        public nothrow FramesRequest()
         {
         }
-        public string messageKind;
-        public string lowFrame;
-        public string highFrame;
+        public int lowFrame;
+        public int highFrame;
     }
 
-    [json]
+    [xml]
     public class FramesReply
     {
-        public nothrow FramesReply() : messageKind("framesReply")
+        public nothrow FramesReply()
         {
         }
-        public string messageKind;
         public bool success;
         public List<Location> frames;
         public string error;
     }
 
-    [json]
+    [xml]
     public class CountRequest
     {
-        public nothrow CountRequest() : messageKind("countRequest")
+        public nothrow CountRequest()
         {
         }
-        public string messageKind;
         public string expression;
     }
 
-    [json]
+    [xml]
     public class CountReply
     {
-        public nothrow CountReply() : messageKind("countReply")
+        public nothrow CountReply()
         {
         }
-        public string messageKind;
         public bool success;
-        public string count;
+        public int count;
         public string error;
     }
 
-    [json]
+    [xml]
     public class EvaluateChildRequest
     {
-        public nothrow EvaluateChildRequest() : messageKind("evaluateChildRequest")
+        public nothrow EvaluateChildRequest()
         {
         }
-        public string messageKind;
         public string expression;
-        public string start;
-        public string count;
+        public int start;
+        public int count;
     }
 
-    [json]
+    [xml]
     public class EvaluateChildReply
     {
-        public nothrow EvaluateChildReply() : messageKind("evaluateChildReply")
+        public nothrow EvaluateChildReply()
         {
         }
-        public string messageKind;
         public bool success;
         public List<ChildResult> results;
         public string error;
     }
 
-    [json]
+    [xml]
     public class EvaluateRequest
     {
-        public nothrow EvaluateRequest() : messageKind("evaluateRequest")
+        public nothrow EvaluateRequest()
         {
         }
-        public string messageKind;
         public string expression;
     }
 
-    [json]
+    [xml]
     public class EvaluateReply
     {
-        public nothrow EvaluateReply() : messageKind("evaluateReply")
+        public nothrow EvaluateReply()
         {
         }
-        public string messageKind;
         public bool success;
         public Result result;
         public string error;
     }
 
-    [json]
+    [xml]
     public class TargetRunningRequest
     {
-        public nothrow TargetRunningRequest() : messageKind("targetRunningRequest")
+        public nothrow TargetRunningRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class TargetRunningReply
     {
-        public nothrow TargetRunningReply() : messageKind("targetRunningReply")
+        public nothrow TargetRunningReply()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class TargetInputRequest
     {
-        public nothrow TargetInputRequest() : messageKind("targetInputRequest")
+        public nothrow TargetInputRequest()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class TargetInputReply
     {
-        public nothrow TargetInputReply() : messageKind("targetInputReply")
+        public nothrow TargetInputReply()
         {
         }
-        public string messageKind;
         public string line;
         public bool eof;
     }
 
-    [json]
+    [xml]
     public class TargetOutputRequest
     {
-        public nothrow TargetOutputRequest() : messageKind("targetOutputRequest")
+        public nothrow TargetOutputRequest()
         {
         }
-        public string messageKind;
-        public string handle;
+        public int handle;
         public string output;
     }
 
-    [json]
+    [xml]
     public class TargetOutputReply
     {
-        public nothrow TargetOutputReply() : messageKind("targetOutputReply")
+        public nothrow TargetOutputReply()
         {
         }
-        public string messageKind;
     }
 
-    [json]
+    [xml]
     public class LogMessageRequest
     {
-        public nothrow LogMessageRequest() : messageKind("logMessageRequest")
+        public nothrow LogMessageRequest()
         {
         }
-        public string messageKind;
         public string logMessage;
     }
 
-    [json]
+    [xml]
     public class LogMessageReply
     {
-        public nothrow LogMessageReply() : messageKind("logMessageReply")
+        public nothrow LogMessageReply()
         {
         }
-        public string messageKind;
     }
 }
