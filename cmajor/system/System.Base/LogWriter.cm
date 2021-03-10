@@ -9,6 +9,10 @@ namespace System.IO
 {
     public class LogWriter
     {
+        public LogWriter() : 
+            logFilePath(), writer(Console.Out())
+        {
+        }
         public LogWriter(const string& logFilePath_) :
             logFilePath(logFilePath_), writer(SharedPtr<ByteStream>(new FileByteStream(logFilePath, cast<OpenMode>(OpenMode.append))))
         {
@@ -20,10 +24,16 @@ namespace System.IO
         public void WriteLine(const string& str)
         {
             writer << str << endl();
+            writer.Flush();
         }
         public void WriteLine()
         {
             writer.WriteLine();
+            writer.Flush();
+        }
+        public nothrow inline const string& LogFilePath() const
+        {
+            return logFilePath;
         }
         public nothrow inline StreamWriter& GetStreamWriter()
         {

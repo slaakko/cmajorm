@@ -10,33 +10,33 @@ using System.Xml.Serialization;
 namespace Cm.Service.Build
 {
     [xml]
-    public class StopRequest
+    public class StopBuildRequest
     {
-        public nothrow StopRequest()
+        public nothrow StopBuildRequest()
         {
         }
     }
 
     [xml]
-    public class StopReply
+    public class StopBuildReply
     {
-        public nothrow StopReply()
+        public nothrow StopBuildReply()
         {
         }
     }
 
     [xml]
-    public class KeepAliveRequest
+    public class KeepAliveBuildRequest
     {
-        public nothrow KeepAliveRequest()
+        public nothrow KeepAliveBuildRequest()
         {
         }
     }
 
     [xml]
-    public class KeepAliveReply
+    public class KeepAliveBuildReply
     {
-        public nothrow KeepAliveReply() 
+        public nothrow KeepAliveBuildReply()
         {
         }
     }
@@ -44,7 +44,7 @@ namespace Cm.Service.Build
     [xml]
     public class BuildRequest
     {
-        public nothrow BuildRequest() 
+        public nothrow BuildRequest()
         {
         }
         public string backend;
@@ -86,7 +86,7 @@ namespace Cm.Service.Build
     [xml]
     public class BuildReply
     {
-        public nothrow BuildReply() 
+        public nothrow BuildReply()
         {
         }
         public bool requestValid;
@@ -98,48 +98,47 @@ namespace Cm.Service.Build
     }
 
     [xml]
-    public class LogMessageRequest
+    public class LogBuildMessageRequest
     {
-        public nothrow LogMessageRequest() 
+        public nothrow LogBuildMessageRequest()
         {
         }
         public string message;
     }
 
     [xml]
-    public class LogMessageReply
+    public class LogBuildMessageReply
     {
-        public nothrow LogMessageReply() 
+        public nothrow LogBuildMessageReply()
         {
         }
-        public string messageKind;
         public bool ok;
     }
 
     [xml]
-    public class ProgressMessage
+    public class BuildProgressMessage
     {
-        public nothrow ProgressMessage() 
+        public nothrow BuildProgressMessage()
         {
         }
     }
 
     [xml]
-    public class GenericErrorReply
+    public class GenericBuildErrorReply
     {
-        public nothrow GenericErrorReply() 
+        public nothrow GenericBuildErrorReply()
         {
         }
         public string error;
     }
 
     [xml]
-    public class SourceLocation
+    public class DefinitionSourceLocation
     {
-        public nothrow SourceLocation()
+        public nothrow DefinitionSourceLocation()
         {
         }
-        public nothrow SourceLocation(const string& file_, int line_, int scol_, int ecol_) : file(file_), line(line_), scol(scol_), ecol(ecol_)
+        public nothrow DefinitionSourceLocation(const string& file_, int line_, int scol_, int ecol_) : file(file_), line(line_), scol(scol_), ecol(ecol_)
         {
         }
         public string file;
@@ -148,7 +147,7 @@ namespace Cm.Service.Build
         public int ecol;
     }
 
-    public nothrow bool operator==(const SourceLocation& left, const SourceLocation& right)
+    public nothrow bool operator==(const DefinitionSourceLocation& left, const DefinitionSourceLocation& right)
     {
         return left.file == right.file && left.line == right.line;
     }
@@ -156,7 +155,7 @@ namespace Cm.Service.Build
     [xml]
     public class GetDefinitionRequest
     {
-        public nothrow GetDefinitionRequest() 
+        public nothrow GetDefinitionRequest()
         {
         }
         public string projectName;
@@ -164,16 +163,16 @@ namespace Cm.Service.Build
         public string backend;
         public string config;
         public string identifier;
-        public SourceLocation identifierLocation;
+        public DefinitionSourceLocation identifierLocation;
     }
 
     [xml]
     public class GetDefinitionReply
     {
-        public nothrow GetDefinitionReply() 
+        public nothrow GetDefinitionReply()
         {
         }
-        public SourceLocation definitionLocation;
+        public DefinitionSourceLocation definitionLocation;
         public bool ok;
         public string error;
     }
@@ -181,7 +180,7 @@ namespace Cm.Service.Build
     [xml]
     public class CacheModuleRequest
     {
-        public nothrow CacheModuleRequest() 
+        public nothrow CacheModuleRequest()
         {
         }
         public string projectName;
@@ -193,7 +192,7 @@ namespace Cm.Service.Build
     [xml]
     public class CacheModuleReply
     {
-        public nothrow CacheModuleReply() 
+        public nothrow CacheModuleReply()
         {
         }
         public string error;

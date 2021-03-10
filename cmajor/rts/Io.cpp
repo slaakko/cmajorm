@@ -9,8 +9,6 @@
 #include <soulng/util/Error.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
-#include <atomic>
-#include <mutex>
 #ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
@@ -19,46 +17,597 @@
 #include <unistd.h>
 #endif
 
-bool fileTableInitialized = false;
-
 namespace cmajor { namespace rt {
 
 using namespace soulng::unicode;
 
+const int defaultStdBufferSize = 2048;
+
+enum class FileTableFlags : int
+{
+    none = 0, stdInInUtf16Mode = 1 << 0, stdOutInUtf16Mode = 1 << 1, stdErrInUtf16Mode = 1 << 2
+};
+
+inline FileTableFlags operator|(FileTableFlags left, FileTableFlags right)
+{
+    return FileTableFlags(int(left) | int(right));
+}
+
+inline FileTableFlags operator&(FileTableFlags left, FileTableFlags right)
+{
+    return FileTableFlags(int(left) & int(right));
+}
+
+inline FileTableFlags operator~(FileTableFlags flags)
+{
+    return FileTableFlags(~int(flags));
+}
+
+void FlushStdOutAndStdErr();
+
+class File
+{
+public:
+    File();
+    virtual ~File();
+    virtual bool CanDispose() const { return true; }
+    virtual bool Close(int32_t& errorStringHandle) = 0;
+    virtual int64_t Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle) = 0;
+    virtual bool WriteByte(uint8_t x, int32_t& errorStringHandle) = 0;
+    virtual int64_t Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle) = 0;
+    virtual int32_t ReadByte() = 0;
+    virtual bool Eof() const = 0;
+    virtual bool GetError(int32_t& errorStringHandle) const = 0;
+    virtual bool Seek(int64_t pos, Origin origin, int32_t& errorStringHandle) = 0;
+    virtual int64_t Tell(int32_t& errorStringHandle) = 0;
+    virtual bool Flush(int32_t& errorStringHandle) = 0;
+};
+
+File::File()
+{
+}
+
+File::~File()
+{
+}
+
+class StdInputFile : public File
+{
+public:
+    StdInputFile();
+    bool CanDispose() const override { return false; }
+    bool Close(int32_t& errorStringHandle) override;
+    int64_t Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    bool WriteByte(uint8_t x, int32_t& errorStringHandle) override;
+    int64_t Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    int32_t ReadByte() override;
+    bool Eof() const override;
+    bool GetError(int32_t& errorStringHandle) const override;
+    bool Seek(int64_t pos, Origin origin, int32_t& errorStringHandle) override;
+    int64_t Tell(int32_t& errorStringHandle) override;
+    bool Flush(int32_t& errorStringHandle) override;
+};
+
+StdInputFile::StdInputFile()
+{
+}
+
+bool StdInputFile::Close(int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    return true;
+}
+
+int64_t StdInputFile::Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot write to STDIN");
+    return -1;
+}
+
+bool StdInputFile::WriteByte(uint8_t x, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot write to STDIN");
+    return false;
+}
+
+int64_t StdInputFile::Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
+{
+    FlushStdOutAndStdErr();
+    if (cmajor::rt::IsCmdbSessionOpen())
+    {
+        return cmajor::rt::ReadBytesFromCmdbSession(buffer, count);
+    }
+    errorStringHandle = -1;
+    int64_t result = std::fread(buffer, 1, count, stdin);
+    if (ferror(stdin))
+    {
+        errorStringHandle = InstallError("could not read from STDIN: " + std::string(strerror(errno)));
+        return -1;
+    }
+    return result;
+}
+
+int32_t StdInputFile::ReadByte()
+{
+    FlushStdOutAndStdErr();
+    if (cmajor::rt::IsCmdbSessionOpen())
+    {
+        uint8_t buffer = '\0';
+        if (cmajor::rt::ReadBytesFromCmdbSession(&buffer, 1) == 1)
+        {
+            return buffer;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    int32_t result = std::fgetc(stdin);
+    if (result == EOF)
+    {
+        return -1;
+    }
+    return result;
+}
+
+bool StdInputFile::Eof() const
+{
+    return std::feof(stdin);
+}
+
+bool StdInputFile::GetError(int32_t& errorStringHandle) const
+{
+    if (std::ferror(stdin))
+    {
+        errorStringHandle = InstallError("STDIN: " + std::string(std::strerror(errno)));
+        return true;
+    }
+    return false;
+}
+
+bool StdInputFile::Seek(int64_t pos, Origin origin, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot seek STDIN");
+    return false;
+}
+
+int64_t StdInputFile::Tell(int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot tell STDIN");
+    return -1;
+}
+
+bool StdInputFile::Flush(int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    return true;
+}
+
+class StdOutputFile : public File
+{
+public:
+    StdOutputFile(FILE* file_, int handle_, const std::string& name_);
+    bool CanDispose() const override { return false; }
+    bool Close(int32_t& errorStringHandle) override;
+    int64_t Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    bool WriteByte(uint8_t x, int32_t& errorStringHandle) override;
+    int64_t Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    int32_t ReadByte() override;
+    bool Eof() const override;
+    bool GetError(int32_t& errorStringHandle) const override;
+    bool Seek(int64_t pos, Origin origin, int32_t& errorStringHandle) override;
+    int64_t Tell(int32_t& errorStringHandle) override;
+    bool Flush(int32_t& errorStringHandle) override;
+private:
+    FILE* file;
+    int handle;
+    std::string name;
+};
+
+StdOutputFile::StdOutputFile(FILE* file_, int handle_, const std::string& name_) : file(file_), handle(handle_), name(name_)
+{
+}
+
+bool StdOutputFile::Close(int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    return true;
+}
+
+int64_t StdOutputFile::Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
+{
+    if (cmajor::rt::IsCmdbSessionOpen())
+    {
+        cmajor::rt::WriteBytesToCmdbSession(handle, buffer, count);
+        return count;
+    }
+    errorStringHandle = -1;
+    int64_t result = std::fwrite(buffer, 1, count, file);
+    if (result != count)
+    {
+        errorStringHandle = InstallError("could not write to : " + name + ": " + strerror(errno));
+        return -1;
+    }
+    return result;
+}
+
+bool StdOutputFile::WriteByte(uint8_t x, int32_t& errorStringHandle)
+{
+    if (cmajor::rt::IsCmdbSessionOpen())
+    {
+        uint8_t buffer = x;
+        cmajor::rt::WriteBytesToCmdbSession(handle, &buffer, 1);
+        return 1;
+    }
+    errorStringHandle = -1;
+    int result = std::fputc(x, file);
+    if (result == EOF)
+    {
+        errorStringHandle = InstallError("could not write to '" + name + "': " + strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+int64_t StdOutputFile::Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot read from " + name);
+    return -1;
+}
+
+int32_t StdOutputFile::ReadByte()
+{
+    return -1;
+}
+
+bool StdOutputFile::Eof() const
+{
+    return std::feof(file);
+}
+
+bool StdOutputFile::GetError(int32_t& errorStringHandle) const
+{
+    if (std::ferror(file))
+    {
+        errorStringHandle = InstallError(name + ": " + std::string(std::strerror(errno)));
+        return true;
+    }
+    return false;
+}
+
+bool StdOutputFile::Seek(int64_t pos, Origin origin, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot seek " + name);
+    return false;
+}
+
+int64_t StdOutputFile::Tell(int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot tell " + name);
+    return -1;
+}
+
+bool StdOutputFile::Flush(int32_t& errorStringHandle)
+{
+    int result = fflush(file);
+    if (result != 0)
+    {
+        errorStringHandle = InstallError("could not flush " + name + ": " + strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+class StdUnicodeInputFile : public File
+{
+public:
+    StdUnicodeInputFile();
+    bool CanDispose() const override { return false; }
+    bool Close(int32_t& errorStringHandle) override;
+    int64_t Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    bool WriteByte(uint8_t x, int32_t& errorStringHandle) override;
+    int64_t Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    int32_t ReadByte() override;
+    bool Eof() const override;
+    bool GetError(int32_t& errorStringHandle) const override;
+    bool Seek(int64_t pos, Origin origin, int32_t& errorStringHandle) override;
+    int64_t Tell(int32_t& errorStringHandle) override;
+    bool Flush(int32_t& errorStringHandle) override;
+private:
+    int bufferSize;
+    void AllocateBuffer();
+    std::string stdInBuf;
+    std::unique_ptr<char16_t[]> utf16buffer;
+};
+
+StdUnicodeInputFile::StdUnicodeInputFile() : bufferSize(defaultStdBufferSize)
+{
+}
+
+void StdUnicodeInputFile::AllocateBuffer()
+{
+    if (!utf16buffer)
+    {
+        utf16buffer.reset(new char16_t[bufferSize]);
+    }
+}
+
+bool StdUnicodeInputFile::Close(int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    return true;
+}
+
+int64_t StdUnicodeInputFile::Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot write to STDIN");
+    return -1;
+}
+
+bool StdUnicodeInputFile::WriteByte(uint8_t x, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot write to STDIN");
+    return false;
+}
+
+int64_t StdUnicodeInputFile::Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
+{
+    FlushStdOutAndStdErr();
+    if (cmajor::rt::IsCmdbSessionOpen())
+    {
+        return cmajor::rt::ReadBytesFromCmdbSession(buffer, count);
+    }
+    AllocateBuffer();
+    int64_t result = 0;
+    if (stdInBuf.empty())
+    {
+        int64_t utf16result = std::fread(utf16buffer.get(), sizeof(char16_t), bufferSize, stdin);
+        std::u16string utf16Str;
+        for (int i = 0; i < utf16result; ++i)
+        {
+            utf16Str.append(1, utf16buffer[i]);
+        }
+        stdInBuf = ToUtf8(utf16Str);
+    }
+    if (!stdInBuf.empty())
+    {
+        result = 0;
+        uint8_t* p = buffer;
+        while (result < count && !stdInBuf.empty())
+        {
+            uint8_t x = static_cast<uint8_t>(stdInBuf[0]);
+            *p++ = x;
+            stdInBuf.erase(stdInBuf.begin());
+            ++result;
+        }
+    }
+    if (result < count)
+    {
+        if (ferror(stdin))
+        {
+            errorStringHandle = InstallError("could not read from STDIN: " + std::string(strerror(errno)));
+            return -1;
+        }
+    }
+    return result;
+}
+
+int32_t StdUnicodeInputFile::ReadByte()
+{
+    FlushStdOutAndStdErr();
+    if (cmajor::rt::IsCmdbSessionOpen())
+    {
+        uint8_t buffer = '\0';
+        if (cmajor::rt::ReadBytesFromCmdbSession(&buffer, 1) == 1)
+        {
+            return buffer;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    if (stdInBuf.empty())
+    {
+        uint8_t buffer = '\0';
+        int errorStringHandle = -1;
+        int result = std::fgetwc(stdin);
+        if (result == WEOF)
+        {
+            return -1;
+        }
+        else
+        {
+            std::u16string utf16Str(1, result);
+            stdInBuf = ToUtf8(utf16Str);
+        }
+    }
+    if (!stdInBuf.empty())
+    {
+        uint8_t x = static_cast<uint8_t>(stdInBuf[0]);
+        stdInBuf.erase(stdInBuf.begin());
+        return x;
+    }
+    return -1;
+}
+
+bool StdUnicodeInputFile::Eof() const
+{
+    return std::feof(stdin);
+}
+
+bool StdUnicodeInputFile::GetError(int32_t& errorStringHandle) const
+{
+    if (std::ferror(stdin))
+    {
+        errorStringHandle = InstallError("STDIN: " + std::string(std::strerror(errno)));
+        return true;
+    }
+    return false;
+}
+
+bool StdUnicodeInputFile::Seek(int64_t pos, Origin origin, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot seek STDIN");
+    return false;
+}
+
+int64_t StdUnicodeInputFile::Tell(int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot tell STDIN");
+    return -1;
+}
+
+bool StdUnicodeInputFile::Flush(int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    return true;
+}
+
+class StdUnicodeOutputFile : public File
+{
+public:
+    StdUnicodeOutputFile(FILE* file_, int handle_, const std::string& name_);
+    bool CanDispose() const override { return false; }
+    bool Close(int32_t& errorStringHandle) override;
+    int64_t Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    bool WriteByte(uint8_t x, int32_t& errorStringHandle) override;
+    int64_t Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    int32_t ReadByte() override;
+    bool Eof() const override;
+    bool GetError(int32_t& errorStringHandle) const override;
+    bool Seek(int64_t pos, Origin origin, int32_t& errorStringHandle) override;
+    int64_t Tell(int32_t& errorStringHandle) override;
+    bool Flush(int32_t& errorStringHandle) override;
+private:
+    FILE* file;
+    int handle;
+    std::string name;
+    Utf8ToUtf32Engine engine;
+};
+
+StdUnicodeOutputFile::StdUnicodeOutputFile(FILE* file_, int handle_, const std::string& name_) : file(file_), handle(handle_), name(name_)
+{
+}
+
+bool StdUnicodeOutputFile::Close(int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    return true;
+}
+
+int64_t StdUnicodeOutputFile::Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
+{
+    if (cmajor::rt::IsCmdbSessionOpen())
+    {
+        cmajor::rt::WriteBytesToCmdbSession(handle, buffer, count);
+        return count;
+    }
+    errorStringHandle = -1;
+    std::u32string utf32Chars;
+    const uint8_t* e = buffer + count;
+    for (const uint8_t* p = buffer; p != e; ++p)
+    {
+        engine.Put(*p);
+        if (engine.ResulReady())
+        {
+            utf32Chars.append(1, engine.Result());
+        }
+    }
+    std::u16string utf16Chars(ToUtf16(utf32Chars));
+    if (!utf16Chars.empty())
+    {
+        int64_t utf16result = std::fwrite(utf16Chars.c_str(), sizeof(char16_t), utf16Chars.length(), file);
+        if (utf16result != utf16Chars.length())
+        {
+            errorStringHandle = InstallError("could not write to : " + name + ": " + strerror(errno));
+            return -1;
+        }
+    }
+    int64_t result = count;
+    return result;
+}
+
+bool StdUnicodeOutputFile::WriteByte(uint8_t x, int32_t& errorStringHandle)
+{
+    if (cmajor::rt::IsCmdbSessionOpen())
+    {
+        uint8_t buffer = x;
+        cmajor::rt::WriteBytesToCmdbSession(handle, &buffer, 1);
+        return 1;
+    }
+    return Write(&x, 1, errorStringHandle) == 1;
+}
+
+int64_t StdUnicodeOutputFile::Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot read from " + name);
+    return -1;
+}
+
+int32_t StdUnicodeOutputFile::ReadByte()
+{
+    return -1;
+}
+
+bool StdUnicodeOutputFile::Eof() const
+{
+    return std::feof(file);
+}
+
+bool StdUnicodeOutputFile::GetError(int32_t& errorStringHandle) const
+{
+    if (std::ferror(file))
+    {
+        errorStringHandle = InstallError(name + ": " + std::strerror(errno));
+        return true;
+    }
+    return false;
+}
+
+bool StdUnicodeOutputFile::Seek(int64_t pos, Origin origin, int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot seek " + name);
+    return false;
+}
+
+int64_t StdUnicodeOutputFile::Tell(int32_t& errorStringHandle)
+{
+    errorStringHandle = InstallError("cannot tell " + name);
+    return -1;
+}
+
+bool StdUnicodeOutputFile::Flush(int32_t& errorStringHandle)
+{
+    int result = fflush(file);
+    if (result != 0)
+    {
+        errorStringHandle = InstallError("could not flush " + name + ": " + strerror(errno));
+        return false;
+    }
+    return true;
+}
+
 class FileTable
 {
 public:
-    ~FileTable();
     static void Init();
     static void Done();
-    static FileTable& Instance() { Assert(instance, "file table not initialized"); return *instance; }
-    int32_t OpenFile(const char* filePath, OpenMode openMode);
-    void CloseFile(int32_t fileHandle);
-    void WriteFile(int32_t fileHandle, const uint8_t* buffer, int64_t count);
-    void WriteByte(int32_t fileHandle, int8_t x);
-    int64_t ReadFile(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize);
-    int32_t ReadByte(int32_t fileHandle);
-    void SeekFile(int32_t fileHandle, int64_t pos, Origin origin);
-    int64_t TellFile(int32_t fileHandle);
-    void FlushStdoutAndStderr();
-    void FlushAll();
+    static FileTable& Instance() { return *instance; }
+    ~FileTable();
+    bool GetFlag(FileTableFlags flag) const { return (flags & flag) != FileTableFlags::none; }
+    void SetFlag(FileTableFlags flag) { flags = flags | flag; }
+    File* StdInput() const { return stdInput.get(); }
+    File* StdOutput() const { return stdOutput.get(); }
+    File* StdError() const { return stdError.get(); }
+    void FlushStdOutAndStdErr();
 private:
-    static std::unique_ptr<FileTable> instance;
-    const int32_t maxNoLockFileHandles = 256;
-    std::vector<FILE*> files;
-    std::vector<std::string> filePaths;
-    std::unordered_map<int32_t, FILE*> fileMap;
-    std::unordered_map<int32_t, std::string> filePathMap;
-    Utf8ToUtf32Engine stdoutUtf8ToUtf32Engine;
-    Utf8ToUtf32Engine stderrUtf8ToUtf32Engine;
-    std::atomic<int32_t> nextFileHandle;
-    std::atomic<int32_t> nextLineId;
-    std::mutex mtx;
-    bool stdinInUtf16Mode;
-    std::string stdinBuf;
-    bool stdoutInUtf16Mode;
-    bool stderrInUtf16Mode;
     FileTable();
+    FileTableFlags flags;
+    std::unique_ptr<File> stdInput;
+    std::unique_ptr<File> stdOutput;
+    std::unique_ptr<File> stdError;
+    static std::unique_ptr<FileTable> instance;
 };
 
 std::unique_ptr<FileTable> FileTable::instance;
@@ -66,828 +615,504 @@ std::unique_ptr<FileTable> FileTable::instance;
 void FileTable::Init()
 {
     instance.reset(new FileTable());
-    fileTableInitialized = true;
 }
 
 void FileTable::Done()
 {
-    fileTableInitialized = false;
     instance.reset();
 }
 
-FileTable::FileTable() : stdinInUtf16Mode(false), stdoutInUtf16Mode(false), stderrInUtf16Mode(false), nextFileHandle(3), nextLineId(1)
+FileTable::FileTable() : flags(FileTableFlags::none)
 {
-    files.resize(maxNoLockFileHandles);
-    filePaths.resize(maxNoLockFileHandles);
-    files[0] = stdin;
-    files[1] = stdout;
-    files[2] = stderr;
-    std::fflush(stdout);
-    std::fflush(stderr);
-#if defined(_WIN32) && !defined(__MINGW32__)
+    FlushStdOutAndStdErr();
+#if defined( _WIN32) && !defined(__MINGW32__)
     if (_isatty(0))
     {
         _setmode(0, _O_U16TEXT);
-        stdinInUtf16Mode = true;
+        SetFlag(FileTableFlags::stdInInUtf16Mode);
+        stdInput.reset(new StdUnicodeInputFile());
+    }
+    else
+    {
+        stdInput.reset(new StdInputFile());
     }
     if (_isatty(1))
     {
         _setmode(1, _O_U16TEXT);
-        stdoutInUtf16Mode = true;
+        SetFlag(FileTableFlags::stdOutInUtf16Mode);
+        stdOutput.reset(new StdUnicodeOutputFile(stdout, 1, "STDOUT"));
+    }
+    else
+    {
+        stdOutput.reset(new StdOutputFile(stdout, 1, "STDOUT"));
     }
     if (_isatty(2))
     {
         _setmode(2, _O_U16TEXT);
-        stderrInUtf16Mode = true;
+        SetFlag(FileTableFlags::stdErrInUtf16Mode);
+        stdError.reset(new StdUnicodeOutputFile(stderr, 2, "STDERR"));
     }
+    else
+    {
+        stdError.reset(new StdOutputFile(stderr, 2, "STDERR"));
+    }
+#else
+    stdInput.reset(new StdInputFile());
+    stdOutput.reset(new StdOutputFile(stdout, 1, "STDOUT"));
+    stdError.reset(new StdOutputFile(stderr, 2, "STDERR"));
 #endif
 }
 
 FileTable::~FileTable()
 {
-    std::fflush(stdout);
-    std::fflush(stderr);
-#ifdef _WIN32
-    if (stdinInUtf16Mode)
+    FlushStdOutAndStdErr();
+#if defined(_WIN32) && !defined(__MINGW32__)
+    if (GetFlag(FileTableFlags::stdInInUtf16Mode))
     {
         _setmode(0, _O_TEXT);
     }
-    if (stdoutInUtf16Mode)
+    if (GetFlag(FileTableFlags::stdOutInUtf16Mode))
     {
         _setmode(1, _O_TEXT);
     }
-    if (stderrInUtf16Mode)
+    if (GetFlag(FileTableFlags::stdErrInUtf16Mode))
     {
         _setmode(2, _O_TEXT);
     }
 #endif
 }
 
-int32_t FileTable::OpenFile(const char* filePath, OpenMode openMode)
-{
-    const char* mode = nullptr;
-    if ((openMode & OpenMode::read) != OpenMode::none)
-    {
-        if ((openMode & (OpenMode::write | OpenMode::append)) != OpenMode::none)
-        {
-            throw FileSystemError("open mode not supported");
-        }
-        if ((openMode & OpenMode::binary) != OpenMode::none)
-        {
-            mode = "rb";
-        }
-        else
-        {
-            mode = "r";
-        }
-    }
-    else if ((openMode & OpenMode::write) != OpenMode::none)
-    {
-        if ((openMode & (OpenMode::read | OpenMode::append)) != OpenMode::none)
-        {
-            throw FileSystemError("open mode not supported");
-        }
-        if ((openMode & OpenMode::binary) != OpenMode::none)
-        {
-            mode = "wb";
-        }
-        else
-        {
-            mode = "w";
-        }
-    }
-    else if ((openMode & OpenMode::append) != OpenMode::none)
-    {
-        if ((openMode & (OpenMode::read | OpenMode::write)) != OpenMode::none)
-        {
-            throw FileSystemError("open mode not supported");
-        }
-        if ((openMode & OpenMode::binary) != OpenMode::none)
-        {
-            mode = "ab";
-        }
-        else
-        {
-            mode = "a";
-        }
-    }
-    else
-    {
-        throw FileSystemError("open mode supported");
-    }
-    FILE* file = std::fopen(filePath, mode);
-    if (!file)
-    {
-        throw FileSystemError("could not open file '" + std::string(filePath) + "': " + strerror(errno));
-    }
-    int32_t fileHandle = nextFileHandle++;
-    if (fileHandle < maxNoLockFileHandles)
-    {
-        files[fileHandle] = file;
-        filePaths[fileHandle] = filePath;
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        fileMap[fileHandle] = file;
-        filePathMap[fileHandle] = filePath;
-    }
-    return fileHandle;
-}
-
-void FileTable::CloseFile(int32_t fileHandle)
-{
-    FILE* file = nullptr;
-    std::string filePath;
-    if (fileHandle < 0)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    else if (fileHandle < maxNoLockFileHandles)
-    {
-        file = files[fileHandle];
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = fileMap.find(fileHandle);
-        if (it != fileMap.cend())
-        {
-            file = it->second;
-        }
-        else
-        {
-            throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-        }
-    }
-    if (!file)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    int result = fclose(file);
-    if (result != 0)
-    {
-        std::string filePath;
-        if (fileHandle < maxNoLockFileHandles)
-        {
-            filePath = filePaths[fileHandle];
-        }
-        else
-        {
-            filePath = filePathMap[fileHandle];
-        }
-        throw FileSystemError("could not close file '" + filePath + "': " + strerror(errno));
-    }
-}
-
-void FileTable::WriteFile(int32_t fileHandle, const uint8_t* buffer, int64_t count)
-{
-    FILE* file = nullptr;
-    if (fileHandle < 0)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    else if (fileHandle < maxNoLockFileHandles)
-    {
-        file = files[fileHandle];
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = fileMap.find(fileHandle);
-        if (it != fileMap.cend())
-        {
-            file = it->second;
-        }
-        else
-        {
-            throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-        }
-    }
-    if (!file)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    int32_t result = 0;
-    if (fileHandle == 1 && stdoutInUtf16Mode || fileHandle == 2 && stderrInUtf16Mode)
-    {
-        std::u32string utf32Chars;
-        Utf8ToUtf32Engine* engine = nullptr;
-        if (fileHandle == 1)
-        {
-            engine = &stdoutUtf8ToUtf32Engine;
-        }
-        else if (fileHandle == 2)
-        {
-            engine = &stderrUtf8ToUtf32Engine;
-        }
-        else
-        {
-            throw std::runtime_error("internal error: unicode conversion engine not set");
-        }
-        const uint8_t* e = buffer + count;
-        for (const uint8_t* p = buffer; p != e; ++p)
-        {
-            engine->Put(*p);
-            if (engine->ResulReady())
-            {
-                utf32Chars.append(1, engine->Result());
-            }
-        }
-        std::u16string utf16Chars(ToUtf16(utf32Chars));
-        if (!utf16Chars.empty())
-        {
-            result = int32_t(std::fwrite(utf16Chars.c_str(), sizeof(char16_t), utf16Chars.length(), file));
-            count = utf16Chars.length();
-        }
-        else
-        {
-            result = 0;
-            count = 0;
-        }
-    }
-    else
-    {
-        result = int32_t(std::fwrite(buffer, 1, count, file));
-    }
-    if (result != count)
-    {
-        std::string filePath;
-        if (fileHandle < maxNoLockFileHandles)
-        {
-            filePath = filePaths[fileHandle];
-        }
-        else
-        {
-            filePath = filePathMap[fileHandle];
-        }
-        throw FileSystemError("could not write to '" + filePath + "': " + strerror(errno));
-    }
-}
-
-void FileTable::WriteByte(int32_t fileHandle, int8_t x)
-{
-    FILE* file = nullptr;
-    if (fileHandle < 0)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    else if (fileHandle < maxNoLockFileHandles)
-    {
-        file = files[fileHandle];
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = fileMap.find(fileHandle);
-        if (it != fileMap.cend())
-        {
-            file = it->second;
-        }
-        else
-        {
-            throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-        }
-    }
-    if (!file)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    int32_t result = 0;
-    if (fileHandle == 1 && stdoutInUtf16Mode || fileHandle == 2 && stderrInUtf16Mode)
-    {
-        std::u32string utf32Chars;
-        Utf8ToUtf32Engine* engine = nullptr;
-        if (fileHandle == 1)
-        {
-            engine = &stdoutUtf8ToUtf32Engine;
-        }
-        else if (fileHandle == 2)
-        {
-            engine = &stderrUtf8ToUtf32Engine;
-        }
-        else
-        {
-            throw std::runtime_error("internal error: unicode conversion engine not set");
-        }
-        engine->Put(x);
-        if (engine->ResulReady())
-        {
-            utf32Chars.append(1, engine->Result());
-        }
-        if (!utf32Chars.empty())
-        {
-            std::u16string utf16Chars(ToUtf16(utf32Chars));
-            result = int32_t(std::fwrite(utf16Chars.c_str(), sizeof(char16_t), utf16Chars.length(), file));
-            if (result != utf16Chars.length())
-            {
-                std::string filePath;
-                if (fileHandle < maxNoLockFileHandles)
-                {
-                    filePath = filePaths[fileHandle];
-                }
-                else
-                {
-                    filePath = filePathMap[fileHandle];
-                }
-                throw FileSystemError("could not write to '" + filePath + "': " + strerror(errno));
-            }
-        }
-    }
-    else
-    {
-        result = std::fputc(x, file);
-    }
-    if (result == EOF)
-    {
-        std::string filePath;
-        if (fileHandle < maxNoLockFileHandles)
-        {
-            filePath = filePaths[fileHandle];
-        }
-        else
-        {
-            filePath = filePathMap[fileHandle];
-        }
-        throw FileSystemError("could not write to '" + filePath + "': " + strerror(errno));
-    }
-}
-
-int64_t FileTable::ReadFile(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize)
-{
-    if (fileHandle == 0)
-    {
-        FlushStdoutAndStderr();
-    }
-    FILE* file = nullptr;
-    if (fileHandle < 0)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    else if (fileHandle < maxNoLockFileHandles)
-    {
-        file = files[fileHandle];
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = fileMap.find(fileHandle);
-        if (it != fileMap.cend())
-        {
-            file = it->second;
-        }
-        else
-        {
-            throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-        }
-    }
-    if (!file)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    int64_t result = 0;
-    int64_t count = 0;
-    if (fileHandle == 0 && stdinInUtf16Mode)
-    {
-        if (stdinBuf.empty())
-        {
-            std::unique_ptr<uint16_t[]> wbuf(new uint16_t[bufferSize]);
-            result = int32_t(std::fread(wbuf.get(), sizeof(char16_t), bufferSize, file));
-            count = bufferSize;
-            std::u16string utf16Str;
-            for (int i = 0; i < result; ++i)
-            {
-                utf16Str.append(1, wbuf.get()[i]);
-            }
-            stdinBuf = ToUtf8(utf16Str);
-        }
-        if (!stdinBuf.empty())
-        {
-            result = 0;
-            count = bufferSize;
-            uint8_t* p = buffer;
-            while (result < count && !stdinBuf.empty())
-            {
-                uint8_t x = static_cast<uint8_t>(stdinBuf[0]);
-                *p++ = x;
-                stdinBuf.erase(stdinBuf.begin());
-                ++result;
-            }
-        }
-    }
-    else
-    {
-        result = int32_t(std::fread(buffer, 1, bufferSize, file));
-        count = bufferSize;
-    }
-    if (result < count)
-    {
-        if (std::ferror(file) != 0)
-        {
-            std::string filePath;
-            if (fileHandle < maxNoLockFileHandles)
-            {
-                filePath = filePaths[fileHandle];
-            }
-            else
-            {
-                filePath = filePathMap[fileHandle];
-            }
-            throw FileSystemError("could not read from '" + filePath + "': " + strerror(errno));
-        }
-    }
-    return result;
-}
-
-int32_t FileTable::ReadByte(int32_t fileHandle)
-{
-    if (fileHandle == 0)
-    {
-        FlushStdoutAndStderr();
-    }
-    FILE* file = nullptr;
-    if (fileHandle < 0)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    else if (fileHandle < maxNoLockFileHandles)
-    {
-        file = files[fileHandle];
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = fileMap.find(fileHandle);
-        if (it != fileMap.cend())
-        {
-            file = it->second;
-        }
-        else
-        {
-            throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-        }
-    }
-    if (!file)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    int32_t result = 0; 
-    if (fileHandle == 0 && stdinInUtf16Mode)
-    {
-        if (stdinBuf.empty())
-        {
-            result = std::fgetwc(file);
-            if (result == WEOF)
-            {
-                if (std::ferror(file) != 0)
-                {
-                    std::string filePath;
-                    if (fileHandle < maxNoLockFileHandles)
-                    {
-                        filePath = filePaths[fileHandle];
-                    }
-                    else
-                    {
-                        filePath = filePathMap[fileHandle];
-                    }
-                    throw FileSystemError("could not read from '" + filePath + "': " + strerror(errno));
-                }
-                else
-                {
-                    result = -1;
-                }
-            }
-            else
-            {
-                char16_t wc = result;
-                std::u16string utf16Str(1, wc);
-                stdinBuf = ToUtf8(utf16Str);
-            }
-        }
-        if (!stdinBuf.empty())
-        {
-            result = static_cast<uint8_t>(stdinBuf[0]);
-            stdinBuf.erase(stdinBuf.begin());
-        }
-    }
-    else
-    {
-        result = std::fgetc(file);
-        if (result == EOF)
-        {
-            if (std::ferror(file) != 0)
-            {
-                std::string filePath;
-                if (fileHandle < maxNoLockFileHandles)
-                {
-                    filePath = filePaths[fileHandle];
-                }
-                else
-                {
-                    filePath = filePathMap[fileHandle];
-                }
-                throw FileSystemError("could not read from '" + filePath + "': " + strerror(errno));
-            }
-            else
-            {
-                result = -1;
-            }
-        }
-    }
-    return result;
-}
-
-void FileTable::SeekFile(int32_t fileHandle, int64_t pos, Origin origin)
-{
-    FILE* file = nullptr;
-    if (fileHandle < 0)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    else if (fileHandle < maxNoLockFileHandles)
-    {
-        file = files[fileHandle];
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = fileMap.find(fileHandle);
-        if (it != fileMap.cend())
-        {
-            file = it->second;
-        }
-        else
-        {
-            throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-        }
-    }
-    if (!file)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    int o = 0;
-    switch (origin)
-    {
-        case Origin::seekSet: o = SEEK_SET; break;
-        case Origin::seekCur: o = SEEK_CUR; break;
-        case Origin::seekEnd: o = SEEK_END; break;
-    }
-#ifdef _WIN32
-    int32_t result = _fseeki64(file, pos, o);
-#else
-    int32_t result = fseek(file, pos, o);
-#endif
-    if (result != 0)
-    {
-        std::string filePath;
-        if (fileHandle < maxNoLockFileHandles)
-        {
-            filePath = filePaths[fileHandle];
-        }
-        else
-        {
-            filePath = filePathMap[fileHandle];
-        }
-        throw FileSystemError("could not seek '" + filePath + "': " + strerror(errno));
-    }
-}
-
-int64_t FileTable::TellFile(int32_t fileHandle)
-{
-    FILE* file = nullptr;
-    if (fileHandle < 0)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-    else if (fileHandle < maxNoLockFileHandles)
-    {
-        file = files[fileHandle];
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = fileMap.find(fileHandle);
-        if (it != fileMap.cend())
-        {
-            file = it->second;
-        }
-        else
-        {
-            throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-        }
-    }
-    if (!file)
-    {
-        throw FileSystemError("invalid file handle " + std::to_string(fileHandle));
-    }
-#ifdef _WIN32
-    int64_t result = _ftelli64(file);
-#else
-    int64_t result = ftell(file);
-#endif
-    if (result == -1)
-    {
-        std::string filePath;
-        if (fileHandle < maxNoLockFileHandles)
-        {
-            filePath = filePaths[fileHandle];
-        }
-        else
-        {
-            filePath = filePathMap[fileHandle];
-        }
-        throw FileSystemError("could not tell file position of  '" + filePath + "': " + strerror(errno));
-    }
-    return result;
-}
-
-void FileTable::FlushStdoutAndStderr()
+void FileTable::FlushStdOutAndStdErr()
 {
     std::fflush(stdout);
     std::fflush(stderr);
 }
 
-void FileTable::FlushAll()
+void FlushStdOutAndStdErr()
 {
-    std::lock_guard<std::mutex> lock(mtx);
-    for (FILE* file : files)
+    FileTable::Instance().FlushStdOutAndStdErr();
+}
+
+class RegularFile : public File
+{
+public:
+    RegularFile(FILE* file_, const std::string& filePath_);
+    ~RegularFile();
+    bool Close(int32_t& errorStringHandle) override;
+    int64_t Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    bool WriteByte(uint8_t x, int32_t& errorStringHandle) override;
+    int64_t Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle) override;
+    int32_t ReadByte() override;
+    bool Eof() const override;
+    bool GetError(int32_t& errorStringHandle) const override;
+    bool Seek(int64_t pos, Origin origin, int32_t& errorStringHandle) override;
+    int64_t Tell(int32_t& errorStringHandle) override;
+    bool Flush(int32_t& errorStringHandle) override;
+private:
+    std::string filePath;
+    FILE* file;
+};
+
+RegularFile::RegularFile(FILE* file_, const std::string& filePath_) : file(file_), filePath(filePath_)
+{
+}
+
+RegularFile::~RegularFile()
+{
+    if (file)
     {
-        std::fflush(file);
+        int32_t errorStringHandle = -1;
+        Close(errorStringHandle);
     }
-    for (const auto& p : fileMap)
+}
+
+bool RegularFile::Close(int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    int result = std::fclose(file);
+    file = nullptr;
+    if (result != 0)
     {
-        std::fflush(p.second);
+        errorStringHandle = InstallError("could not close file '" + std::string(filePath) + "': " + strerror(errno));
+        return false;
     }
-    FlushStdoutAndStderr();
+    return true;
 }
 
-FileSystemError::FileSystemError(const std::string& message_) : std::runtime_error(message_)
+int64_t RegularFile::Write(const uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
 {
+    errorStringHandle = -1;
+    int64_t result = std::fwrite(buffer, 1, count, file);
+    if (result != count)
+    {
+        errorStringHandle = InstallError("could not write to file '" + filePath + "': " + strerror(errno));
+        return -1;
+    }
+    return result;
 }
 
-void InitIo()
+bool RegularFile::WriteByte(uint8_t x, int32_t& errorStringHandle)
 {
-    FileTable::Init();
+    errorStringHandle = -1;
+    int result = std::fputc(x, file);
+    if (result == EOF)
+    {
+        errorStringHandle = InstallError("could not write to file '" + filePath + "': " + strerror(errno));
+        return false;
+    }
+    return true;
 }
 
-void DoneIo()
+int64_t RegularFile::Read(uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
 {
-    FileTable::Done();
+    errorStringHandle = -1;
+    int64_t result = std::fread(buffer, 1, count, file);
+    if (ferror(file))
+    {
+        errorStringHandle = InstallError("could not read from file '" + filePath + "': " + strerror(errno));
+        return -1;
+    }
+    return result;
+}
+
+int32_t RegularFile::ReadByte()
+{
+    int result = std::fgetc(file);
+    if (result == EOF)
+    {
+        return -1;
+    }
+    return result;
+}
+
+bool RegularFile::Eof() const
+{
+    return std::feof(file);
+}
+
+bool RegularFile::GetError(int32_t& errorStringHandle) const
+{
+    if (std::ferror(file))
+    {
+        errorStringHandle = InstallError(filePath + ": " + std::strerror(errno));
+        return true;
+    }
+    return false;
+}
+
+bool RegularFile::Seek(int64_t pos, Origin origin, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    int seekOrigin = SEEK_SET;
+    switch (origin)
+    {
+    case Origin::seekCur:
+    {
+        seekOrigin = SEEK_CUR;
+        break;
+    }
+    case Origin::seekEnd:
+    {
+        seekOrigin = SEEK_END;
+        break;
+    }
+    case Origin::seekSet:
+    {
+        seekOrigin = SEEK_SET;
+        break;
+    }
+    }
+    int result = fseek(file, pos, seekOrigin);
+    if (result != 0)
+    {
+        errorStringHandle = InstallError("could not seek file '" + filePath + "': " + strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+int64_t RegularFile::Tell(int32_t& errorStringHandle)
+{
+    int64_t result = ftell(file);
+    if (result == -1)
+    {
+        errorStringHandle = InstallError("could not tell file '" + filePath + "': " + strerror(errno));
+        return -1;
+    }
+    return result;
+}
+
+bool RegularFile::Flush(int32_t& errorStringHandle)
+{
+    int result = fflush(file);
+    if (result != 0)
+    {
+        errorStringHandle = InstallError("could not flush file '" + filePath + "': " + strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+void* OpenFile(const char* filePath, OpenMode openMode, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    std::string mode;
+    if ((openMode & OpenMode::read) != OpenMode::none && (openMode & OpenMode::write) == OpenMode::none)
+    {
+        mode += "r";
+    }
+    if ((openMode & OpenMode::write) != OpenMode::none)
+    {
+        mode += "w";
+        if ((openMode & OpenMode::read) != OpenMode::none)
+        {
+            mode += "+";
+        }
+    }
+    if ((openMode & OpenMode::append) != OpenMode::none)
+    {
+        if ((openMode & (OpenMode::read | OpenMode::write)) != OpenMode::none)
+        {
+            errorStringHandle = InstallError("could not open file '" + std::string(filePath) + "': open mode not supported");
+            return nullptr;
+        }
+        else
+        {
+            mode += "a";
+        }
+    }
+    if ((openMode & OpenMode::binary) != OpenMode::none)
+    {
+        mode += "b";
+    }
+    FILE* file = std::fopen(filePath, mode.c_str());
+    if (!file)
+    {
+        errorStringHandle = InstallError("could not open file '" + std::string(filePath) + "': " + strerror(errno));
+        return nullptr;
+    }
+    return new RegularFile(file, filePath);
+}
+
+void* OpenStdFile(int handle, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    switch (handle)
+    {
+        case 0: return FileTable::Instance().StdInput();
+        case 1: return FileTable::Instance().StdOutput();
+        case 2: return FileTable::Instance().StdError();
+        default:
+        {
+            errorStringHandle = InstallError("invalid standard file handle " + std::to_string(handle));
+            break;
+        }
+    }
+    return nullptr;
+}
+
+bool CloseFile(void* fileHandle, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    if (!fileHandle)
+    {
+        errorStringHandle = InstallError("could not close file: invalid file handle");
+        return false;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    return file->Close(errorStringHandle);
+}
+
+bool DisposeFile(void* fileHandle, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    if (!fileHandle)
+    {
+        errorStringHandle = InstallError("could not dispose file: invalid file handle");
+        return false;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    if (file->CanDispose())
+    {
+        delete file;
+    }
+    return true;
+}
+
+int64_t WriteFile(void* fileHandle, const uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    if (!fileHandle)
+    {
+        errorStringHandle = InstallError("could not write to file: invalid file handle");
+        return -1;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    return file->Write(buffer, count, errorStringHandle);
+}
+
+bool WriteByte(void* fileHandle, int8_t x, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    if (!fileHandle)
+    {
+        errorStringHandle = InstallError("could not write to file: invalid file handle");
+        return false;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    return file->WriteByte(x, errorStringHandle);
+}
+
+int64_t ReadFile(void* fileHandle, uint8_t* buffer, int64_t bufferSize, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    if (!fileHandle)
+    {
+        errorStringHandle = InstallError("could not read from file: invalid file handle");
+        return -1;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    return file->Read(buffer, bufferSize, errorStringHandle);
+}
+
+int32_t ReadByte(void* fileHandle)
+{
+    if (!fileHandle)
+    {
+        return -1;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    return file->ReadByte();
+}
+
+bool Eof(void* fileHandle)
+{
+    if (!fileHandle) return true;
+    File* file = static_cast<File*>(fileHandle);
+    return file->Eof();
+}
+
+bool GetFileError(void* fileHandle, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    if (!fileHandle)
+    {
+        errorStringHandle = InstallError("could get file error: invalid file handle");
+        return false;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    return file->GetError(errorStringHandle);
+}
+
+bool SeekFile(void* fileHandle, int64_t pos, Origin origin, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    if (!fileHandle)
+    {
+        errorStringHandle = InstallError("could not seek file: invalid file handle");
+        return false;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    return file->Seek(pos, origin, errorStringHandle);
+}
+
+int64_t TellFile(void* fileHandle, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    if (!fileHandle)
+    {
+        errorStringHandle = InstallError("could not tell file: invalid file handle");
+        return -1;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    return file->Tell(errorStringHandle);
+}
+
+bool FlushFile(void* fileHandle, int32_t& errorStringHandle)
+{
+    errorStringHandle = -1;
+    if (!fileHandle)
+    {
+        errorStringHandle = InstallError("could not flush file: invalid file handle");
+        return false;
+    }
+    File* file = static_cast<File*>(fileHandle);
+    return file->Flush(errorStringHandle);
 }
 
 } }  // namespace cmajor::rt
 
-extern "C" RT_API int32_t RtOpen(const char* filePath, OpenMode openMode)
+void* RtOpen(const char* filePath, OpenMode openMode, int32_t& errorStringHandle)
 {
-    try
-    {
-        return cmajor::rt::FileTable::Instance().OpenFile(filePath, openMode);
-    }
-    catch (const cmajor::rt::FileSystemError& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
+    return cmajor::rt::OpenFile(filePath, openMode, errorStringHandle);
 }
 
-extern "C" RT_API int32_t RtClose(int32_t fileHandle)
+void* RtOpenStdFile(int handle, int32_t& errorStringHandle)
 {
-    try
-    {
-        cmajor::rt::FileTable::Instance().CloseFile(fileHandle);
-        return 0;
-    }
-    catch (const cmajor::rt::FileSystemError& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
+    return cmajor::rt::OpenStdFile(handle, errorStringHandle);
 }
 
-extern "C" RT_API int32_t RtWrite(int32_t fileHandle, const uint8_t* buffer, int64_t count)
+bool RtClose(void* fileHandle, int32_t& errorStringHandle)
 {
-    try
-    {
-        if ((fileHandle == 1 || fileHandle == 2) && cmajor::rt::IsCmdbSessionOpen())
-        {
-            cmajor::rt::WriteBytesToCmdbSession(fileHandle, buffer, count);
-        }
-        else
-        {
-            cmajor::rt::FileTable::Instance().WriteFile(fileHandle, buffer, count);
-        }
-        return 0;
-    }
-    catch (const cmajor::rt::FileSystemError& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
-    catch (const soulng::unicode::UnicodeException& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
+    return cmajor::rt::CloseFile(fileHandle, errorStringHandle);
 }
 
-extern "C" RT_API int32_t RtWriteByte(int32_t fileHandle, uint8_t x)
+bool RtDisposeFile(void* fileHandle, int32_t& errorStringHandle)
 {
-    try
-    {
-        if ((fileHandle == 1 || fileHandle == 2) && cmajor::rt::IsCmdbSessionOpen())
-        {
-            uint8_t buffer = x;
-            cmajor::rt::WriteBytesToCmdbSession(fileHandle, &buffer, 1);
-        }
-        else
-        {
-            cmajor::rt::FileTable::Instance().WriteByte(fileHandle, x);
-        }
-        return 0;
-    }
-    catch (const cmajor::rt::FileSystemError& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
-    catch (const soulng::unicode::UnicodeException& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
+    return cmajor::rt::DisposeFile(fileHandle, errorStringHandle);
 }
 
-extern "C" RT_API int64_t RtRead(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize)
+int64_t RtWrite(void* fileHandle, const uint8_t* buffer, int64_t count, int32_t& errorStringHandle)
 {
-    try
-    {
-        if (fileHandle == 0 && cmajor::rt::IsCmdbSessionOpen())
-        {
-            return cmajor::rt::ReadBytesFromCmdbSession(buffer, bufferSize);
-        }
-        else
-        {
-            return cmajor::rt::FileTable::Instance().ReadFile(fileHandle, buffer, bufferSize);
-        }
-    }
-    catch (const cmajor::rt::FileSystemError& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
+    return cmajor::rt::WriteFile(fileHandle, buffer, count, errorStringHandle);
 }
 
-extern "C" RT_API int32_t RtReadByte(int32_t fileHandle)
+bool RtWriteByte(void* fileHandle, uint8_t x, int32_t& errorStringHandle)
 {
-    try
-    {
-        if (fileHandle == 0 && cmajor::rt::IsCmdbSessionOpen())
-        {
-            uint8_t buffer = 0;
-            if (cmajor::rt::ReadBytesFromCmdbSession(&buffer, 1) == 1)
-            {
-                return buffer;
-            }
-            else
-            {
-                return -1;
-            }
-        }
-        else
-        {
-            return cmajor::rt::FileTable::Instance().ReadByte(fileHandle);
-        }
-    }
-    catch (const cmajor::rt::FileSystemError& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
+    return cmajor::rt::WriteByte(fileHandle, x, errorStringHandle);
 }
 
-extern "C" RT_API int32_t RtSeek(int32_t fileHandle, int64_t pos, Origin origin)
+int64_t RtRead(void* fileHandle, uint8_t* buffer, int64_t bufferSize, int32_t& errorStringHandle)
 {
-    try
-    {
-        cmajor::rt::FileTable::Instance().SeekFile(fileHandle, pos, origin);
-        return 0;
-    }
-    catch (const cmajor::rt::FileSystemError& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
+    return cmajor::rt::ReadFile(fileHandle, buffer, bufferSize, errorStringHandle);
 }
 
-extern "C" RT_API int64_t RtTell(int32_t fileHandle)
+int32_t RtReadByte(void* fileHandle)
 {
-    try
-    {
-        return cmajor::rt::FileTable::Instance().TellFile(fileHandle);
-    }
-    catch (const cmajor::rt::FileSystemError& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
+    return cmajor::rt::ReadByte(fileHandle);
 }
 
-extern "C" RT_API bool RtFileExists(const char* filePath)
+bool RtEof(void* fileHandle)
+{
+    return cmajor::rt::Eof(fileHandle);
+}
+
+bool RtGetFileError(void* fileHandle, int32_t& errorStringHandle)
+{
+    return cmajor::rt::GetFileError(fileHandle, errorStringHandle);
+}
+
+bool RtSeek(void* fileHandle, int64_t pos, Origin origin, int32_t& errorStringHandle)
+{
+    return cmajor::rt::SeekFile(fileHandle, pos, origin, errorStringHandle);
+}
+
+int64_t RtTell(void* fileHandle, int32_t& errorStringHandle)
+{
+    return cmajor::rt::TellFile(fileHandle, errorStringHandle);
+}
+
+bool RtFlush(void* fileHandle, int32_t& errorStringHandle)
+{
+    return cmajor::rt::FlushFile(fileHandle, errorStringHandle);
+}
+
+bool RtFileExists(const char* filePath)
 {
     return boost::filesystem::exists(filePath);
 }
 
-extern "C" RT_API bool RtLastWriteTimeLess(const char* filePath1, const char* filePath2)
+bool RtLastWriteTimeLess(const char* filePath1, const char* filePath2)
 {
     boost::filesystem::path f1 = filePath1;
     boost::filesystem::path f2 = filePath2;
@@ -898,70 +1123,73 @@ extern "C" RT_API bool RtLastWriteTimeLess(const char* filePath1, const char* fi
     return false;
 }
 
-extern "C" RT_API int32_t RtGetFileSize(const char* filePath, uint64_t* fileSize)
+int64_t RtGetFileSize(const char* filePath, int32_t& errorStringHandle)
 {
-    try
+    errorStringHandle = -1;
+    boost::system::error_code ec;
+    int64_t fileSize = boost::filesystem::file_size(filePath, ec);
+    if (ec)
     {
-        boost::system::error_code ec;
-        *fileSize = boost::filesystem::file_size(filePath, ec);
-        if (ec)
-        {
-            throw std::runtime_error(ec.message());
-        }
+        errorStringHandle = cmajor::rt::InstallError("could not get size of file '" + std::string(filePath) + "': " + ec.message());
+        return -1;
     }
-    catch (const std::exception& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
-    return 0;
+    return fileSize;
 }
 
-extern "C" RT_API int32_t RtRemoveFile(const char* filePath)
+bool RtRemoveFile(const char* filePath, int32_t& errorStringHandle)
 {
-    try
+    errorStringHandle = -1;
+    boost::system::error_code ec;
+    boost::filesystem::remove(filePath, ec);
+    if (ec)
     {
-        boost::system::error_code ec;
-        boost::filesystem::remove(filePath, ec);
-        if (ec)
-        {
-            throw std::runtime_error(ec.message());
-        }
+        errorStringHandle = cmajor::rt::InstallError("could not remove file '" + std::string(filePath) + "': " + ec.message());
+        return false;
     }
-    catch (const std::exception& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
-    return 0;
+    return true;
 }
 
-extern "C" RT_API int32_t RtCopyFile(const char* sourceFilePath, const char* targetFilePath)
+bool RtCopyFile(const char* sourceFilePath, const char* targetFilePath, int32_t& errorStringHandle)
 {
-    try
+    errorStringHandle = -1;
+    boost::system::error_code ec;
+    boost::filesystem::copy(sourceFilePath, targetFilePath, ec);
+    if (ec)
     {
-        boost::system::error_code ec;
-        boost::filesystem::copy(sourceFilePath, targetFilePath, ec);
-        if (ec)
-        {
-            throw std::runtime_error(ec.message());
-        }
+        errorStringHandle = cmajor::rt::InstallError("could not copy file '" + std::string(sourceFilePath) + "': " + ec.message());
+        return false;
     }
-    catch (const std::exception& ex)
-    {
-        return cmajor::rt::InstallError(ex.what());
-    }
-    return 0;
+    return true;
 }
 
-extern "C" RT_API void RtFlushAll()
+bool RtMoveFile(const char* sourceFilePath, const char* targetFilePath, int32_t& errorStringHandle)
 {
-    cmajor::rt::FileTable::Instance().FlushAll();
+    errorStringHandle = -1;
+    boost::system::error_code ec;
+    boost::filesystem::rename(sourceFilePath, targetFilePath, ec);
+    if (ec)
+    {
+        errorStringHandle = cmajor::rt::InstallError("could not move file '" + std::string(sourceFilePath) + "': " + ec.message());
+        return false;
+    }
+    return true;
 }
 
-extern "C" RT_API bool RtIsConsoleHandle(int handle)
+bool RtIsConsoleHandle(int handle)
 {
 #ifdef _WIN32
     return _isatty(handle);
 #else
     return isatty(handle);
 #endif
+}
+
+extern "C" void InitIo()
+{
+    cmajor::rt::FileTable::Init();
+}
+
+extern "C" void DoneIo()
+{
+    cmajor::rt::FileTable::Done();
 }

@@ -86,7 +86,9 @@ extern "C" RT_API void RtSetLineNumber(int32_t lineNumber)
         std::stringstream s;
         s << "internal error: " << ex.what() << "\n";
         std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
         exit(exitCodeInternalError);
     }
 }
@@ -104,12 +106,15 @@ extern "C" RT_API void RtExitFunction()
         std::stringstream s;
         s << "internal error: " << ex.what() << "\n";
         std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdError = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdError, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
+        RtFlush(stdError, errorStringHandle);
         exit(exitCodeInternalError);
     }
 }
 
-extern "C" RT_API void RtPrintCallStack(int fileHandle)
+extern "C" RT_API void RtPrintCallStack(void* fileHandle)
 {
     std::stringstream s;
     cmajor::rt::CallStack* callStack = cmajor::rt::callStack;
@@ -126,7 +131,9 @@ extern "C" RT_API void RtPrintCallStack(int fileHandle)
         s << location.functionName << " " << location.sourceFilePath << ":" << location.lineNumber << "\n";
     }
     std::string str = s.str();
-    RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+    int32_t errorStringHandle = -1;
+    RtWrite(fileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
+    RtFlush(fileHandle, errorStringHandle);
 }
 
 extern "C" RT_API const char* RtGetStackTrace()

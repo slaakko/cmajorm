@@ -32,7 +32,9 @@ void ExecuteThreadFunction(ThreadFunction threadFunction, int32_t threadId)
     catch (...)
     {
         std::string str = "exception escaped from thread " + std::to_string(threadId) + "\n";
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
         RtPrintCallStack(stdErrFileHandle);
         RtExit(exitCodeExceptionEscapedFromThread);
     }
@@ -47,7 +49,9 @@ void ExecuteThreadFunctionWithParam(ThreadFunctionWithParam threadFunction, void
     catch (...)
     {
         std::string str = "exception escaped from thread " + std::to_string(threadId) + "\n";
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
         RtPrintCallStack(stdErrFileHandle);
         RtExit(exitCodeExceptionEscapedFromThread);
     }
@@ -62,7 +66,9 @@ void ExecuteThreadMethod(ThreadMethod threadMethod, void* object, int32_t thread
     catch (...)
     {
         std::string str = "exception escaped from thread " + std::to_string(threadId) + "\n";
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
         RtPrintCallStack(stdErrFileHandle);
         RtExit(exitCodeExceptionEscapedFromThread);
     }
@@ -77,7 +83,9 @@ void ExecuteThreadMethodWithParam(ThreadMethodWithParam threadMethod, void* obje
     catch (...)
     {
         std::string str = "exception escaped from thread " + std::to_string(threadId) + "\n";
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
         RtPrintCallStack(stdErrFileHandle);
         RtExit(exitCodeExceptionEscapedFromThread);
     }

@@ -171,11 +171,11 @@ namespace System.Security
     public string GetSha1FileDigest(const string& filePath)
     {
         Sha1 sha1;
-        ulong n = File.Size(filePath);
-        if (n > 0u)
+        long n = File.Size(filePath);
+        if (n > 0)
         {
             BinaryReader reader = File.OpenBinary(filePath);
-            for (ulong i = 0u; i < n; ++i)
+            for (long i = 0; i < n; ++i)
             {
                 sha1.Process(reader.ReadByte());
             }
@@ -188,11 +188,11 @@ namespace System.Security
         Sha1 sha1;
         for (const string& filePath : filePaths)
         {
-            ulong n = File.Size(filePath);
-            if (n > 0u)
+            long n = File.Size(filePath);
+            if (n > 0)
             {
                 BinaryReader reader = File.OpenBinary(filePath);
-                for (ulong i = 0u; i < n; ++i)
+                for (long i = 0; i < n; ++i)
                 {
                     sha1.Process(reader.ReadByte());
                 }

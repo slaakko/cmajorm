@@ -177,6 +177,10 @@ namespace System.IO
             Write(dateTime);
             WriteLine();
         }
+        public void Flush()
+        {
+            stream->Flush();
+        }
         public nothrow const SharedPtr<ByteStream>& ContainedStream()
         {
             return stream;

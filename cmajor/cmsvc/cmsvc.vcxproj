@@ -125,6 +125,7 @@
       <AdditionalIncludeDirectories>..;../..;C:\boost\include\boost-1_74</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,6 +144,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..;../..;C:\boost\include\boost-1_74</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -154,6 +156,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BuildServerMessage.hpp" />
     <ClInclude Include="InitDone.hpp" />
     <ClInclude Include="Request.hpp" />
     <ClInclude Include="RequestDispatcher.hpp" />
@@ -161,10 +164,14 @@
     <ClInclude Include="Message.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BuildServerMessage.cpp" />
     <ClCompile Include="InitDone.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="Request.cpp" />
     <ClCompile Include="RequestDispatcher.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BuildServerMessage.xml-schema" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -65,7 +65,9 @@ boost::multiprecision::uint128_t ClassIdMap::GetClassId(const boost::uuids::uuid
         std::stringstream s;
         s << "internal error : class id for type id " << typeId << " not found.\n";
         std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
         exit(exitCodeInternalError);
     }
 }
@@ -105,7 +107,9 @@ void InitClasses(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphi
         std::stringstream s;
         s << "internal error in program initialization: " << ex.what() << "\n";
         std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
         exit(exitCodeInternalError);
     }
 }

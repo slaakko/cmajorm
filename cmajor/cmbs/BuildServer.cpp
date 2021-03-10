@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/cmbs/BuildServer.hpp>
-#include <cmajor/cmbs/BuildServerMessage.hpp>
+#include <cmajor/cmsvc/BuildServerMessage.hpp>
 #include <cmajor/cmbs/Error.hpp>
 #include <cmajor/build/Build.hpp>
 #include <cmajor/symbols/Module.hpp>
@@ -220,10 +220,10 @@ void BuildServer::Run()
             std::u32string content = ToUtf32(request);
             std::unique_ptr<Document> requestDoc = ParseDocument(content, "socket");
             std::string messageKind = GetMessageKind(requestDoc->DocumentElement());
-            if (messageKind == "stopRequest")
+            if (messageKind == "stopBuildRequest")
             {
-                StopReply reply;
-                std::unique_ptr<Element> replyElement = reply.ToXml("stopReply");
+                StopBuildReply reply;
+                std::unique_ptr<Element> replyElement = reply.ToXml("stopBuildReply");
                 std::string replyStr = ElementToString(replyElement.release());
                 Write(socket, replyStr);
                 if (log)
@@ -231,7 +231,7 @@ void BuildServer::Run()
                     LogFileWriter writer(logFilePath);
                     writer.WriteLine("================================================================================");
                     writer.WriteCurrentDateTime();
-                    writer << "stop request received:" << std::endl;
+                    writer << "stop build request received:" << std::endl;
                     CodeFormatter formatter(writer.LogFile());
                     requestDoc->Write(formatter);
                 }
@@ -352,16 +352,9 @@ void BuildServer::WriteGenericErrorReply(const std::string& messageKind)
 #ifdef TRACE
     soulng::util::Tracer tracer(BuildServer_WriteGenericErrorReply);
 #endif // TRACE
-    GenericErrorReply genericErrorReply;
-    if (messageKind.empty())
-    {
-        genericErrorReply.error = "request message has no 'messageKind' field";
-    }
-    else
-    {
-        genericErrorReply.error = "request message has unknown 'messageKind' field value '" + messageKind + "'";
-    }
-    std::unique_ptr<Element> replyElement = genericErrorReply.ToXml("genericErrorReply");
+    GenericBuildErrorReply genericBuildErrorReply;
+    genericBuildErrorReply.error = "unknown request message: '" + messageKind + "'";
+    std::unique_ptr<Element> replyElement = genericBuildErrorReply.ToXml("genericBuildErrorReply");
     std::string reply = ElementToString(replyElement.release());
     Write(socket, reply);
 }
@@ -1099,25 +1092,25 @@ void BuildServer::RunLog()
         if (endOfLog) return;
         if (timeout)
         {
-            ProgressMessage progressMessage;
-            std::unique_ptr<Element> progress = progressMessage.ToXml("progressMessage");
+            BuildProgressMessage buildProgressMessage;
+            std::unique_ptr<Element> progress = buildProgressMessage.ToXml("buildProgressMessage");
             std::string message = ElementToString(progress.release());
             Write(socket, message);
             continue;
         }
-        LogMessageRequest logMessageRequest;
-        logMessageRequest.message = message;
-        std::unique_ptr<Element> logRequest = logMessageRequest.ToXml("logMessageRequest");
+        LogBuildMessageRequest logBuildMessageRequest;
+        logBuildMessageRequest.message = message;
+        std::unique_ptr<Element> logRequest = logBuildMessageRequest.ToXml("logBuildMessageRequest");
         std::string request = ElementToString(logRequest.release());
         Write(socket, request);
         std::string reply = ReadStr(socket);
         std::u32string content = ToUtf32(reply);
         std::unique_ptr<Document> logReply = ParseDocument(content, "socket");
         std::string messageKind = GetMessageKind(logReply->DocumentElement());
-        if (messageKind == "logMessageReply")
+        if (messageKind == "logBuildMessageReply")
         {
-            LogMessageReply logMessageReply(logReply->DocumentElement());
-            if (!logMessageReply.ok)
+            LogBuildMessageReply logBuildMessageReply(logReply->DocumentElement());
+            if (!logBuildMessageReply.ok)
             {
                 throw std::runtime_error("log message refused by client");
             }
@@ -1133,7 +1126,7 @@ void BuildServer::RunLog()
             {
                 error = "unknown 'messageKind' field value '" + messageKind + "'";
             }
-            throw std::runtime_error("invalid logMessageReply received: " + error);
+            throw std::runtime_error("invalid logBuildMessageReply received: " + error);
         }
     }
 }

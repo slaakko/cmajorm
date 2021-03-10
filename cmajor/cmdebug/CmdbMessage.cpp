@@ -177,30 +177,30 @@ std::unique_ptr<sngxml::dom::Element> BreakpointInfo::ToXml(const std::string& f
     return element;
 }
 
-StartRequest::StartRequest()
+StartDebugRequest::StartDebugRequest()
     : breakpointLocations()
 {
 }
 
-StartRequest::StartRequest(sngxml::dom::Element* element)
+StartDebugRequest::StartDebugRequest(sngxml::dom::Element* element)
     : breakpointLocations()
 {
     sngxml::xmlser::FromXml(element, "breakpointLocations", breakpointLocations);
 }
 
-std::unique_ptr<sngxml::dom::Element> StartRequest::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> StartDebugRequest::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpointLocations, "breakpointLocations").release()));
     return element;
 }
 
-StartReply::StartReply()
+StartDebugReply::StartDebugReply()
     : success(), location(), state(), breakpointInfos(), error()
 {
 }
 
-StartReply::StartReply(sngxml::dom::Element* element)
+StartDebugReply::StartDebugReply(sngxml::dom::Element* element)
     : success(), location(), state(), breakpointInfos(), error()
 {
     sngxml::xmlser::FromXml(element, "success", success);
@@ -210,7 +210,7 @@ StartReply::StartReply(sngxml::dom::Element* element)
     sngxml::xmlser::FromXml(element, "error", error);
 }
 
-std::unique_ptr<sngxml::dom::Element> StartReply::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> StartDebugReply::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(success, "success").release()));
@@ -221,46 +221,46 @@ std::unique_ptr<sngxml::dom::Element> StartReply::ToXml(const std::string& field
     return element;
 }
 
-StopRequest::StopRequest()
+StopDebugRequest::StopDebugRequest()
 {
 }
 
-StopRequest::StopRequest(sngxml::dom::Element* element)
+StopDebugRequest::StopDebugRequest(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<sngxml::dom::Element> StopRequest::ToXml(const std::string& fieldName) const
-{
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    return element;
-}
-
-StopReply::StopReply()
-{
-}
-
-StopReply::StopReply(sngxml::dom::Element* element)
-{
-}
-
-std::unique_ptr<sngxml::dom::Element> StopReply::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> StopDebugRequest::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     return element;
 }
 
-GenericErrorReply::GenericErrorReply()
+StopDebugReply::StopDebugReply()
+{
+}
+
+StopDebugReply::StopDebugReply(sngxml::dom::Element* element)
+{
+}
+
+std::unique_ptr<sngxml::dom::Element> StopDebugReply::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
+}
+
+GenericDebugErrorReply::GenericDebugErrorReply()
     : errorMessage()
 {
 }
 
-GenericErrorReply::GenericErrorReply(sngxml::dom::Element* element)
+GenericDebugErrorReply::GenericDebugErrorReply(sngxml::dom::Element* element)
     : errorMessage()
 {
     sngxml::xmlser::FromXml(element, "errorMessage", errorMessage);
 }
 
-std::unique_ptr<sngxml::dom::Element> GenericErrorReply::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> GenericDebugErrorReply::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(errorMessage, "errorMessage").release()));
@@ -833,33 +833,33 @@ std::unique_ptr<sngxml::dom::Element> TargetOutputReply::ToXml(const std::string
     return element;
 }
 
-LogMessageRequest::LogMessageRequest()
+LogDebugMessageRequest::LogDebugMessageRequest()
     : logMessage()
 {
 }
 
-LogMessageRequest::LogMessageRequest(sngxml::dom::Element* element)
+LogDebugMessageRequest::LogDebugMessageRequest(sngxml::dom::Element* element)
     : logMessage()
 {
     sngxml::xmlser::FromXml(element, "logMessage", logMessage);
 }
 
-std::unique_ptr<sngxml::dom::Element> LogMessageRequest::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> LogDebugMessageRequest::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(logMessage, "logMessage").release()));
     return element;
 }
 
-LogMessageReply::LogMessageReply()
+LogDebugMessageReply::LogDebugMessageReply()
 {
 }
 
-LogMessageReply::LogMessageReply(sngxml::dom::Element* element)
+LogDebugMessageReply::LogDebugMessageReply(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<sngxml::dom::Element> LogMessageReply::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> LogDebugMessageReply::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     return element;

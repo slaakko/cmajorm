@@ -55,7 +55,9 @@ void Allocation::Print(const std::string& title) const
         s.append(" : info '").append(info).append("'");
     }
     s.append("\n");
-    RtWrite(2, (const uint8_t*)s.c_str(), s.length());
+    int32_t errorStringHandle = -1;
+    void* stdErr = RtOpenStdFile(2, errorStringHandle);
+    RtWrite(stdErr, (const uint8_t*)s.c_str(), s.length(), errorStringHandle);
 }
 
 struct SerialLess
@@ -145,7 +147,9 @@ void DebugHeap::Dispose(void* ptr)
     else if (debugHeap)
     {
         std::string s = "disposing : allocation not found\n";
-        RtWrite(2, (const uint8_t*)s.c_str(), s.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, (const uint8_t*)s.c_str(), s.length(), errorStringHandle);
         RtPrintCallStack(2);
     }
 }
@@ -164,7 +168,9 @@ void DebugHeap::PrintLeaks()
     if (!leaks.empty())
     {
         std::string title = std::to_string(leaks.size()) + " memory leaks:\n";
-        RtWrite(2, (const uint8_t*)title.c_str(), title.size());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, (const uint8_t*)title.c_str(), title.size(), errorStringHandle);
         std::sort(leaks.begin(), leaks.end(), SerialLess());
         int i = 0;
         for (const Allocation* leak : leaks)
@@ -219,7 +225,9 @@ extern "C" RT_API void* RtMemAllocInfo(int64_t size, const char* info)
         std::stringstream s;
         s << "program out of memory\n";
         std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
         RtPrintCallStack(stdErrFileHandle);
         exit(exitCodeOutOfMemory);
     }

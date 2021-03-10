@@ -215,8 +215,8 @@ public:
     void ProcessTargetRunningRequest(const TargetRunningRequest& targetRunningRequest);
     void ProcessTargetInputRequest(const TargetInputRequest& targetInputRequest);
     void ProcessTargetOutputRequest(const TargetOutputRequest& targetOutputRequest);
-    void ProcessLogMessageRequest(const LogMessageRequest& logMessageRequest);
-    void ProcessErrorReply(const GenericErrorReply& errorReply);
+    void ProcessLogMessageRequest(const LogDebugMessageRequest& logDebugMessageRequest);
+    void ProcessErrorReply(const GenericDebugErrorReply& errorReply);
     void ProcessStartReply(Element* reply);
     void ProcessStopReply(Element* reply);
     void ProcessContinueReply(Element* reply);
@@ -268,13 +268,13 @@ void DebuggerClient::ProcessMessage(Element* message, MessageKind messageKind, c
         }
         case MessageKind::logMessageRequest:
         {
-            LogMessageRequest logMessageRequest(message);
-            ProcessLogMessageRequest(logMessageRequest);
+            LogDebugMessageRequest logDebugMessageRequest(message);
+            ProcessLogMessageRequest(logDebugMessageRequest);
             break;
         }
         case MessageKind::genericErrorReply:
         {
-            GenericErrorReply errorReply(message);
+            GenericDebugErrorReply errorReply(message);
             ProcessErrorReply(errorReply);
             break;
         }
@@ -320,15 +320,15 @@ void DebuggerClient::ProcessTargetOutputRequest(const TargetOutputRequest& targe
     WriteReply(reply.release());
 }
 
-void DebuggerClient::ProcessLogMessageRequest(const LogMessageRequest& logMessageRequest)
+void DebuggerClient::ProcessLogMessageRequest(const LogDebugMessageRequest& logDebugMessageRequest)
 {
-    std::cout << logMessageRequest.logMessage << std::endl;
-    LogMessageReply logMessageReply;
-    std::unique_ptr<Element> reply = logMessageReply.ToXml("logMessageReply");
+    std::cout << logDebugMessageRequest.logMessage << std::endl;
+    LogDebugMessageReply logDebugMessageReply;
+    std::unique_ptr<Element> reply = logDebugMessageReply.ToXml("logDebugMessageReply");
     WriteReply(reply.release());
 }
 
-void DebuggerClient::ProcessErrorReply(const GenericErrorReply& errorReply)
+void DebuggerClient::ProcessErrorReply(const GenericDebugErrorReply& errorReply)
 {
     std::cerr << errorReply.errorMessage << std::endl;
 }
@@ -374,8 +374,8 @@ std::unique_ptr<Document> DebuggerClient::ReadReply(MessageKind replyMessageKind
 void DebuggerClient::Start()
 {
     socket.Connect("localhost", std::to_string(port));
-    StartRequest startRequest;
-    std::unique_ptr<Element> request = startRequest.ToXml("startRequest");
+    StartDebugRequest startDebugRequest;
+    std::unique_ptr<Element> request = startDebugRequest.ToXml("startDebugRequest");
     WriteRequest(request.release());
     std::unique_ptr<Document> replyDoc = ReadReply(MessageKind::startReply);
     ProcessStartReply(replyDoc->DocumentElement());
@@ -383,13 +383,13 @@ void DebuggerClient::Start()
 
 void DebuggerClient::ProcessStartReply(Element* reply)
 {
-    StartReply startReply(reply);
+    StartDebugReply startDebugReply(reply);
 }
 
 void DebuggerClient::Stop()
 {
-    StopRequest stopRequest;
-    std::unique_ptr<Element> request = stopRequest.ToXml("stopRequest");
+    StopDebugRequest stopDebugRequest;
+    std::unique_ptr<Element> request = stopDebugRequest.ToXml("stopDebugRequest");
     WriteRequest(request.release());
     std::unique_ptr<Document> replyDoc = ReadReply(MessageKind::stopReply);
     ProcessStopReply(replyDoc->DocumentElement());
@@ -397,7 +397,7 @@ void DebuggerClient::Stop()
 
 void DebuggerClient::ProcessStopReply(Element* reply)
 {
-    StopReply stopReply(reply);
+    StopDebugReply stopDebugReply(reply);
     stopped = true;
 }
 

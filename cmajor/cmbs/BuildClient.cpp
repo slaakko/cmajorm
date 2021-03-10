@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/cmbs/BuildClient.hpp>
-#include <cmajor/cmbs/BuildServerMessage.hpp>
+#include <cmajor/cmsvc/BuildServerMessage.hpp>
 #ifdef TRACE
 #include <cmajor/cmbs_trace/TraceFunctions.hpp>
 #include <soulng/util/Trace.hpp>
@@ -85,15 +85,15 @@ void RunRequest(const std::string& requestFilePath, int port)
     Write(socket, request);
     std::unique_ptr<Document> message = ReadMessage(socket);
     std::string messageKind = GetMessageKind(message->DocumentElement());
-    while (messageKind == "logMessageRequest" || messageKind == "progressMessage")
+    while (messageKind == "logBuildMessageRequest" || messageKind == "buildProgressMessage")
     {
-        if (messageKind == "logMessageRequest")
+        if (messageKind == "logBuildMessageRequest")
         {
-            LogMessageRequest request(message->DocumentElement());
+            LogBuildMessageRequest request(message->DocumentElement());
             std::cout << request.message << std::endl;
-            LogMessageReply replyMessage;
+            LogBuildMessageReply replyMessage;
             replyMessage.ok = true;
-            std::unique_ptr<Element> replyMessageValue(replyMessage.ToXml("logMessageReply"));
+            std::unique_ptr<Element> replyMessageValue(replyMessage.ToXml("logBuildMessageReply"));
             std::string reply = ElementToString(replyMessageValue.release());
             Write(socket, reply);
         }
@@ -105,9 +105,9 @@ void RunRequest(const std::string& requestFilePath, int port)
         BuildReply reply(message->DocumentElement());
         ProcessBuildReply(reply);
     }
-    else if (messageKind == "genericErrorReply")
+    else if (messageKind == "genericBuildErrorReply")
     {
-        GenericErrorReply reply(message->DocumentElement());
+        GenericBuildErrorReply reply(message->DocumentElement());
         throw std::runtime_error("generic error received: " + reply.error);
     }
     else

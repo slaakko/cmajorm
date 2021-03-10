@@ -125,12 +125,12 @@ public:
     void ProcessTargetRunningReply(Element* message);
     void ProcessTargetInputReply(Element* message);
     void ProcessTargetOutputReply(Element* message);
-    std::unique_ptr<Element> ProcessStartRequest(const StartRequest& startRequest);
+    std::unique_ptr<Element> ProcessStartRequest(const StartDebugRequest& startDebugRequest);
     std::vector<BreakpointInfo> SetBreakpoints(const std::vector<SourceLoc>& breakpointLocations);
     BreakpointInfo SetBreakpoint(const SourceLocation& sourceLocation);
-    std::unique_ptr<Element> ProcessStopRequest(const StopRequest& stopRequest);
+    std::unique_ptr<Element> ProcessStopRequest(const StopDebugRequest& stopDebugRequest);
     std::unique_ptr<Element> ProcessContinueRequest(const ContinueRequest& continueRequest);
-    std::unique_ptr<Element> ProcessNextRequest(const NextRequest& stopRequest);
+    std::unique_ptr<Element> ProcessNextRequest(const NextRequest& nextRequest);
     std::unique_ptr<Element> ProcessStepRequest(const StepRequest& stepRequest);
     std::unique_ptr<Element> ProcessFinishRequest(const FinishRequest& finishRequst);
     std::unique_ptr<Element> ProcessUntilRequest(const UntilRequest& untilRequest);
@@ -245,9 +245,9 @@ void ServerDebugger::WriteLogMessage(const std::string& logMessage)
 {
     if (clientChannel)
     {
-        LogMessageRequest logMessageRequest;
-        logMessageRequest.logMessage = logMessage;
-        std::unique_ptr<Element> request = logMessageRequest.ToXml("logMessageRequest");
+        LogDebugMessageRequest logDebugMessageRequest;
+        logDebugMessageRequest.logMessage = logMessage;
+        std::unique_ptr<Element> request = logDebugMessageRequest.ToXml("logDebugMessageRequest");
         clientChannel->SendMessage(request.release());
     }
 }
@@ -351,13 +351,13 @@ std::unique_ptr<Element> ServerDebugger::ProcessRequest(Element* requestMessage)
     {
         case MessageKind::startRequest:
         {
-            StartRequest startRequest(requestMessage);
-            return ProcessStartRequest(startRequest);
+            StartDebugRequest startDebugRequest(requestMessage);
+            return ProcessStartRequest(startDebugRequest);
         }
         case MessageKind::stopRequest:
         {
-            StopRequest stopRequest(requestMessage);
-            return ProcessStopRequest(stopRequest);
+            StopDebugRequest stopDebugRequest(requestMessage);
+            return ProcessStopRequest(stopDebugRequest);
         }
         case MessageKind::continueRequest:
         {
@@ -421,9 +421,9 @@ std::unique_ptr<Element> ServerDebugger::ProcessRequest(Element* requestMessage)
         }
         default:
         {
-            GenericErrorReply genericErrorReply;
-            genericErrorReply.errorMessage = "unknown request: messageKind='" + messageKindStr + "'";
-            return genericErrorReply.ToXml("genericErrorReply");
+            GenericDebugErrorReply genericDebugErrorReply;
+            genericDebugErrorReply.errorMessage = "unknown request: messageKind='" + messageKindStr + "'";
+            return genericDebugErrorReply.ToXml("genericDebugErrorReply");
         }
     }
 }
@@ -491,26 +491,26 @@ void ServerDebugger::ProcessTargetOutputReply(Element* message)
     targetOutputReplyReceivedVar.notify_one();
 }
 
-std::unique_ptr<Element> ServerDebugger::ProcessStartRequest(const StartRequest& startRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessStartRequest(const StartDebugRequest& startDebugRequest)
 {
-    StartReply startReply;
+    StartDebugReply startDebugReply;
     try
     {
         StartDebugging();
-        startReply.location = location;
-        startReply.state = state;
+        startDebugReply.location = location;
+        startDebugReply.state = state;
         OutputWriter()->WriteLogMessage("setting breakpoints...");
-        std::vector<BreakpointInfo> breakpointInfos = SetBreakpoints(startRequest.breakpointLocations);
-        startReply.breakpointInfos = breakpointInfos;
-        startReply.success = true;
+        std::vector<BreakpointInfo> breakpointInfos = SetBreakpoints(startDebugRequest.breakpointLocations);
+        startDebugReply.breakpointInfos = breakpointInfos;
+        startDebugReply.success = true;
         OutputWriter()->WriteLogMessage("breakpoints set");
     }
     catch (const std::exception& ex)
     {
-        startReply.success = false;
-        startReply.error = ex.what();
+        startDebugReply.success = false;
+        startDebugReply.error = ex.what();
     }
-    return startReply.ToXml("startReply");
+    return startDebugReply.ToXml("startDebugReply");
 }
 
 std::vector<BreakpointInfo> ServerDebugger::SetBreakpoints(const std::vector<SourceLoc>& breakpointLocations)
@@ -585,11 +585,11 @@ BreakpointInfo ServerDebugger::SetBreakpoint(const SourceLocation& location)
     return info;
 }
 
-std::unique_ptr<Element> ServerDebugger::ProcessStopRequest(const StopRequest& stopRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessStopRequest(const StopDebugRequest& stopDebugRequest)
 {
-    StopReply stopReply;
+    StopDebugReply stopDebugReply;
     exiting = true;
-    return stopReply.ToXml("stopReply");
+    return stopDebugReply.ToXml("stopDebugReply");
 }
 
 std::unique_ptr<Element> ServerDebugger::ProcessContinueRequest(const ContinueRequest& continueRequest)
@@ -616,7 +616,7 @@ std::unique_ptr<Element> ServerDebugger::ProcessContinueRequest(const ContinueRe
     return continueReply.ToXml("continueReply");
 }
 
-std::unique_ptr<Element> ServerDebugger::ProcessNextRequest(const NextRequest& stopRequest)
+std::unique_ptr<Element> ServerDebugger::ProcessNextRequest(const NextRequest& nextRequest)
 {
     if (clientChannel)
     {

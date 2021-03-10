@@ -55,7 +55,10 @@ void Allocation::Print(const std::string& title) const
         s.append(" : info '").append(info).append("'");
     }
     s.append("\n");
-    RtWrite(2, (const uint8_t*)s.c_str(), s.length());
+    int32_t errorStringHandle = -1;
+    void* stdError = RtOpenStdFile(2, errorStringHandle);
+    RtWrite(stdError, (const uint8_t*)s.c_str(), s.length(), errorStringHandle);
+    RtFlush(stdError, errorStringHandle);
 }
 
 struct SerialLess
@@ -104,7 +107,10 @@ void DebugHeap::Allocate(void* ptr, int64_t size, const char* info)
         if (serial == debugSerial)
         {
             allocationMap[ptr].Print("allocating");
-            RtPrintCallStack(2);
+            int32_t errorStringHandle = -1;
+            void* stdError = RtOpenStdFile(2, errorStringHandle);
+            RtPrintCallStack(stdError);
+            RtFlush(stdError, errorStringHandle);
         }
     }
     else
@@ -129,7 +135,10 @@ void DebugHeap::Dispose(void* ptr)
             alloc.Print("dangling");
             if (debugSerial == alloc.Serial())
             {
-                RtPrintCallStack(2);
+                int32_t errorStringHandle = -1;
+                void* stdError = RtOpenStdFile(2, errorStringHandle);
+                RtPrintCallStack(stdError);
+                RtFlush(stdError, errorStringHandle);
             }
         }
         else
@@ -137,7 +146,10 @@ void DebugHeap::Dispose(void* ptr)
             if (debugSerial == alloc.Serial())
             {
                 alloc.Print("disposing");
-                RtPrintCallStack(2);
+                int32_t errorStringHandle = -1;
+                void* stdError = RtOpenStdFile(2, errorStringHandle);
+                RtPrintCallStack(stdError);
+                RtFlush(stdError, errorStringHandle);
             }
             alloc.SetDisposed(true);
         }
@@ -145,8 +157,11 @@ void DebugHeap::Dispose(void* ptr)
     else if (debugHeap)
     {
         std::string s = "disposing : allocation not found\n";
-        RtWrite(2, (const uint8_t*)s.c_str(), s.length());
-        RtPrintCallStack(2);
+        int32_t errorStringHandle = -1;
+        void* stdError = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdError, (const uint8_t*)s.c_str(), s.length(), errorStringHandle);
+        RtPrintCallStack(stdError);
+        RtFlush(stdError, errorStringHandle);
     }
 }
 
@@ -164,7 +179,10 @@ void DebugHeap::PrintLeaks()
     if (!leaks.empty())
     {
         std::string title = std::to_string(leaks.size()) + " memory leaks:\n";
-        RtWrite(2, (const uint8_t*)title.c_str(), title.size());
+        int32_t errorStringHandle = -1;
+        void* stdError = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdError, (const uint8_t*)title.c_str(), title.size(), errorStringHandle);
+        RtFlush(stdError, errorStringHandle);
         std::sort(leaks.begin(), leaks.end(), SerialLess());
         int i = 0;
         for (const Allocation* leak : leaks)
@@ -219,8 +237,11 @@ extern "C" RT_API void* RtMemAllocInfo(int64_t size, const char* info)
         std::stringstream s;
         s << "program out of memory\n";
         std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
-        RtPrintCallStack(stdErrFileHandle);
+        int32_t errorStringHandle = -1;
+        void* stdError = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdError, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
+        RtPrintCallStack(stdError);
+        RtFlush(stdError, errorStringHandle);
         exit(exitCodeOutOfMemory);
     }
     int serial = cmajor::rt::DebugHeap::Instance().NextSerial();

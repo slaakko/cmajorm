@@ -340,39 +340,39 @@ namespace Cm.Service.Build
         private void SendReceiveStopRequest()
         {
             TcpSocket socket("localhost", ToString(port));
-            StopRequest stopRequest;
-            UniquePtr<Element> requestElement = stopRequest.ToXml("stopRequest");
+            StopBuildRequest stopBuildRequest;
+            UniquePtr<Element> requestElement = stopBuildRequest.ToXml("stopBuildRequest");
             string requestStr = ElementToString(requestElement.Release());
             Write(socket, requestStr);
             string replyStr = ReadStr(socket);
             UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
             string messageKind = GetMessageKind(replyDoc->DocumentElement());
-            if (messageKind == "stopReply")
+            if (messageKind == "stopBuildReply")
             {
-                StopReply reply(replyDoc->DocumentElement());
+                StopBuildReply reply(replyDoc->DocumentElement());
             }
             else
             {
-                throw Exception("stopReply expected, unknown reply message kind '" + messageKind + "' received");
+                throw Exception("stopBuildReply expected, unknown reply message kind '" + messageKind + "' received");
             }
         }
         private void SendReceiveKeepAliveRequest()
         {
             TcpSocket socket("localhost", ToString(keepAliveServerPort));
-            KeepAliveRequest keepAliveRequest;
-            UniquePtr<Element> requestElement = keepAliveRequest.ToXml("keepAliveRequest");
+            KeepAliveBuildRequest keepAliveBuildRequest;
+            UniquePtr<Element> requestElement = keepAliveBuildRequest.ToXml("keepAliveBuildRequest");
             string requestStr = ElementToString(requestElement.Release());
             Write(socket, requestStr);
             string replyStr = ReadStr(socket);
             UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
             string messageKind = GetMessageKind(replyDoc->DocumentElement());
-            if (messageKind == "keepAliveReply")
+            if (messageKind == "keepAliveBuildReply")
             {
-                KeepAliveReply reply(replyDoc->DocumentElement());
+                KeepAliveBuildReply reply(replyDoc->DocumentElement());
             }
             else
             {
-                throw Exception("keepAliveReply expected, unknown reply message kind '" + messageKind + "' received");
+                throw Exception("keepAliveBuildReply expected, unknown reply message kind '" + messageKind + "' received");
             }
         }
         public List<CompileError> ProcessBuildRequest(const BuildRequest& request)
@@ -403,22 +403,22 @@ namespace Cm.Service.Build
                 string replyStr = ReadStr(socket);
                 UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
                 string messageKind = GetMessageKind(replyDoc->DocumentElement());
-                while (messageKind == "logMessageRequest" || messageKind == "progressMessage")
+                while (messageKind == "logBuildMessageRequest" || messageKind == "buildProgressMessage")
                 {
-                    if (messageKind == "logMessageRequest")
+                    if (messageKind == "logBuildMessageRequest")
                     {
-                        LogMessageRequest logMessageRequest(replyDoc->DocumentElement());
-                        string message = logMessageRequest.message;
+                        LogBuildMessageRequest logBuildMessageRequest(replyDoc->DocumentElement());
+                        string message = logBuildMessageRequest.message;
                         LogMessage(message);
-                        LogMessageReply logMessageReply;
-                        logMessageReply.ok = true;
-                        UniquePtr<Element> logMessageReplyElement = logMessageReply.ToXml("logMessageReply");
-                        string logMessageReplyStr = ElementToString(logMessageReplyElement.Release());
-                        Write(socket, logMessageReplyStr);
+                        LogBuildMessageReply logBuildMessageReply;
+                        logBuildMessageReply.ok = true;
+                        UniquePtr<Element> logBuildMessageReplyElement = logBuildMessageReply.ToXml("logBuildMessageReply");
+                        string logBuildMessageReplyStr = ElementToString(logBuildMessageReplyElement.Release());
+                        Write(socket, logBuildMessageReplyStr);
                     }
-                    else if (messageKind == "progressMessage")
+                    else if (messageKind == "buildProgressMessage")
                     {
-                        ProgressMessage progressMessage(replyDoc->DocumentElement());
+                        BuildProgressMessage buildProgressMessage(replyDoc->DocumentElement());
                         notifyProgress();
                     }
                     replyStr = ReadStr(socket);
@@ -433,10 +433,10 @@ namespace Cm.Service.Build
                     BuildReply buildReply(replyDoc->DocumentElement());
                     return ProcessBuildReply(buildReply);
                 }
-                else if (messageKind == "genericErrorReply")
+                else if (messageKind == "genericBuildErrorReply")
                 {
-                    GenericErrorReply genericErrorReply(replyDoc->DocumentElement());
-                    LogMessage("BuildService: ProcessBuildRequest: generic error reply received: " + genericErrorReply.error);
+                    GenericBuildErrorReply genericBuildErrorReply(replyDoc->DocumentElement());
+                    LogMessage("BuildService: ProcessBuildRequest: generic error reply received: " + genericBuildErrorReply.error);
                 }
                 else
                 {

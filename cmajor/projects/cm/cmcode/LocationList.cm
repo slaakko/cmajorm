@@ -50,7 +50,7 @@ namespace cmcode
                 nextToolButton->SetState(ToolButton.State.disabled);
             }
         }
-        public nothrow void AddLocation(const SourceLocation& location)
+        public nothrow void AddLocation(const DefinitionSourceLocation& location)
         {
             while (locations.Count() > maxLocations)
             {
@@ -60,7 +60,7 @@ namespace cmcode
             currentIndex = cast<int>(locations.Count());
             UpdateToolButtons();
         }
-        public nothrow void GotoPreviousLocation(const SourceLocation& currentLocation)
+        public nothrow void GotoPreviousLocation(const DefinitionSourceLocation& currentLocation)
         {
             while (CanGotoPrev())
             {
@@ -73,7 +73,7 @@ namespace cmcode
             }
             UpdateToolButtons();
         }
-        public nothrow void GotoNextLocation(const SourceLocation& currentLocation)
+        public nothrow void GotoNextLocation(const DefinitionSourceLocation& currentLocation)
         {
             while (CanGotoNext())
             {
@@ -92,7 +92,7 @@ namespace cmcode
         }
         private int currentIndex;
         private MainWindow* mainWindow;
-        private List<SourceLocation> locations;
+        private List<DefinitionSourceLocation> locations;
         private ToolButton* prevToolButton;
         private ToolButton* nextToolButton;
     }

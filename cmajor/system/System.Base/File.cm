@@ -14,15 +14,15 @@ namespace System.IO
         {
             return RtFileExists(filePath.Chars());
         }
-        public static ulong Size(const string& filePath)
+        public static long Size(const string& filePath)
         {
-            ulong fileSize = 0u;
-            int result = RtGetFileSize(filePath.Chars(), &fileSize);
-            if (result < 0)
+            int errorStringHandle = -1;
+            long fileSize = RtGetFileSize(filePath.Chars(), errorStringHandle);
+            if (fileSize == -1)
             {
-                string errorMessage = RtGetError(result);
-                RtDisposeError(result);
-                throw FileSystemException("could not get size of file '" + filePath + "': " + errorMessage);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
+                throw FileSystemException(errorMessage);
             }
             else
             {
@@ -98,29 +98,32 @@ namespace System.IO
         }
         public static void Remove(const string& filePath)
         {
-            if (Exists(filePath))
+            int errorStringHandle = -1;
+            if (!RtRemoveFile(filePath.Chars(), errorStringHandle))
             {
-                int result = RtRemoveFile(filePath.Chars());
-                if ( result < 0)
-                {
-                    string errorMessage = RtGetError(result);
-                    RtDisposeError(result);
-                    throw FileSystemException("could not remove file '" + filePath + "': " + errorMessage);
-                }
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
+                throw FileSystemException(errorMessage);
             }            
-            else
-            {
-                throw FileSystemException("could not remove file '" + filePath + "': file not found");
-            }
         }
         public static void Copy(const string& sourceFilePath, const string& targetFilePath)
         {
-            int result = RtCopyFile(sourceFilePath.Chars(), targetFilePath.Chars());
-            if ( result < 0)
+            int errorStringHandle = -1;
+            if (!RtCopyFile(sourceFilePath.Chars(), targetFilePath.Chars(), errorStringHandle))
             {
-                string errorMessage = RtGetError(result);
-                RtDisposeError(result);
-                throw FileSystemException("could not copy file '" + sourceFilePath + "' to file '" + targetFilePath + "': " + errorMessage);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
+                throw FileSystemException(errorMessage);
+            }
+        }
+        public static void Move(const string& sourceFilePath, const string& targetFilePath)
+        {
+            int errorStringHandle = -1;
+            if (!RtMoveFile(sourceFilePath.Chars(), targetFilePath.Chars(), errorStringHandle))
+            {
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
+                throw FileSystemException(errorMessage);
             }
         }
     }

@@ -171,11 +171,11 @@ namespace Cm.Service.Debug
         }
         private void InitMessageKindMap()
         {
-            messageKindMap["startRequest"] = MessageKind.startRequest;
-            messageKindMap["startReply"] = MessageKind.startReply;
-            messageKindMap["stopRequest"] = MessageKind.stopRequest;
-            messageKindMap["stopReply"] = MessageKind.stopReply;
-            messageKindMap["genericErrorReply"] = MessageKind.genericErrorReply;
+            messageKindMap["startDebugRequest"] = MessageKind.startRequest;
+            messageKindMap["startDebugReply"] = MessageKind.startReply;
+            messageKindMap["stopDebugRequest"] = MessageKind.stopRequest;
+            messageKindMap["stopDebugReply"] = MessageKind.stopReply;
+            messageKindMap["genericDebugErrorReply"] = MessageKind.genericErrorReply;
             messageKindMap["continueRequest"] = MessageKind.continueRequest;
             messageKindMap["continueReply"] = MessageKind.continueReply;
             messageKindMap["nextRequest"] = MessageKind.nextRequest;
@@ -206,8 +206,8 @@ namespace Cm.Service.Debug
             messageKindMap["targetInputReply"] = MessageKind.targetInputReply;
             messageKindMap["targetOutputRequest"] = MessageKind.targetOutputRequest;
             messageKindMap["targetOutputReply"] = MessageKind.targetOutputReply;
-            messageKindMap["logMessageRequest"] = MessageKind.logMessageRequest;
-            messageKindMap["logMessageReply"] = MessageKind.logMessageReply;
+            messageKindMap["logDebugMessageRequest"] = MessageKind.logMessageRequest;
+            messageKindMap["logDebugMessageReply"] = MessageKind.logMessageReply;
         }
         private string MakeDebugServerStartCommand()
         {
@@ -298,7 +298,7 @@ namespace Cm.Service.Debug
         private List<Breakpoint*> SendStartRequest(const BreakpointCollection& breakpointCollection)
         {
             List<Breakpoint*> breakpoints;
-            StartRequest startRequest;
+            StartDebugRequest startDebugRequest;
             for (const Pair<string, BreakpointList>& p : breakpointCollection.BreakpointListMap())
             {
                 const BreakpointList& bpList = p.second;
@@ -308,23 +308,23 @@ namespace Cm.Service.Debug
                     SourceLoc breakpointLocation;
                     breakpointLocation.path = bpList.FilePath();
                     breakpointLocation.line = breakpoint->line;
-                    startRequest.breakpointLocations.Add(breakpointLocation);
+                    startDebugRequest.breakpointLocations.Add(breakpointLocation);
                 }
             }
-            UniquePtr<Element> request = startRequest.ToXml("startRequest");
+            UniquePtr<Element> request = startDebugRequest.ToXml("startDebugRequest");
             WriteRequest(request.Release());
             return breakpoints;
         }
         private void ProcessStartReply(Element* reply, const List<Breakpoint*>& breakpoints)
         {
-            StartReply startReply(reply);
-            if (startReply.success)
+            StartDebugReply startDebugReply(reply);
+            if (startDebugReply.success)
             {
                 int n = cast<int>(breakpoints.Count());
                 for (int i = 0; i < n; ++i)
                 {
                     Breakpoint* breakpoint = breakpoints[i];
-                    breakpoint->info = startReply.breakpointInfos[i];
+                    breakpoint->info = startDebugReply.breakpointInfos[i];
                     if (breakpoint->info.success)
                     {
                         breakpoint->disabled = false;
@@ -336,12 +336,12 @@ namespace Cm.Service.Debug
                 }
                 if (setDebugLocation != SetDebugLocationMethod())
                 {
-                    setDebugLocation(startReply.location, true);
+                    setDebugLocation(startDebugReply.location, true);
                 }
             }
             else
             {
-                LogMessage("start request failed: " + startReply.error);
+                LogMessage("start debug request failed: " + startDebugReply.error);
             }
         }
         public void Stop()
@@ -369,13 +369,13 @@ namespace Cm.Service.Debug
         }
         private void SendStopRequest()
         {
-            StopRequest stopRequest;
-            UniquePtr<Element> request = stopRequest.ToXml("stopRequest");
+            StopDebugRequest stopDebugRequest;
+            UniquePtr<Element> request = stopDebugRequest.ToXml("stopDebugRequest");
             WriteRequest(request.Release());
         }
         private void ProcessStopReply(Element* reply)
         {
-            StopReply stopReply(reply);
+            StopDebugReply stopDebugReply(reply);
             LogMessage("debugging stopped");
         }
         public void Continue()
@@ -803,13 +803,13 @@ namespace Cm.Service.Debug
                 }
                 case MessageKind.logMessageRequest:
                 {
-                    LogMessageRequest logMessageRequest(message);
-                    ProcessLogMessageRequest(logMessageRequest);
+                    LogDebugMessageRequest logDebugMessageRequest(message);
+                    ProcessLogMessageRequest(logDebugMessageRequest);
                     break;
                 }
                 case MessageKind.genericErrorReply:
                 {
-                    GenericErrorReply errorReply(message);
+                    GenericDebugErrorReply errorReply(message);
                     ProcessErrorReply(errorReply);
                     break;
                 }
@@ -854,14 +854,14 @@ namespace Cm.Service.Debug
             UniquePtr<Element> reply = targetOutputReply.ToXml("targetOutputReply");
             WriteReply(reply.Release());
         }
-        private void ProcessLogMessageRequest(const LogMessageRequest& logMessageRequest)
+        private void ProcessLogMessageRequest(const LogDebugMessageRequest& logDebugMessageRequest)
         {
-            LogMessage(logMessageRequest.logMessage);
-            LogMessageReply logMessageReply;
-            UniquePtr<Element> reply = logMessageReply.ToXml("logMessageReply");
+            LogMessage(logDebugMessageRequest.logMessage);
+            LogDebugMessageReply logDebugMessageReply;
+            UniquePtr<Element> reply = logDebugMessageReply.ToXml("logDebugMessageReply");
             WriteReply(reply.Release());
         }
-        private void ProcessErrorReply(const GenericErrorReply& errorReply)
+        private void ProcessErrorReply(const GenericDebugErrorReply& errorReply)
         {
             LogMessage("error from debug server: " + errorReply.errorMessage);
         }

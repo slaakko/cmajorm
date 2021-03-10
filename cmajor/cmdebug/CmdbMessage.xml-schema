@@ -61,12 +61,12 @@ class BreakpointInfo
     string error;
 }
 
-class StartRequest
+class StartDebugRequest
 {
     SourceLoc[] breakpointLocations;
 }
 
-class StartReply
+class StartDebugReply
 {
     bool success;
     Location location;
@@ -75,15 +75,15 @@ class StartReply
     string error;
 }
 
-class StopRequest
+class StopDebugRequest
 {
 }
 
-class StopReply
+class StopDebugReply
 {
 }
 
-class GenericErrorReply
+class GenericDebugErrorReply
 {
     string errorMessage;
 }
@@ -260,11 +260,11 @@ class TargetOutputReply
 {
 }
 
-class LogMessageRequest
+class LogDebugMessageRequest
 {
     string logMessage;
 }
 
-class LogMessageReply
+class LogDebugMessageReply
 {
 }

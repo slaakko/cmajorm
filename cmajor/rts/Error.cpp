@@ -139,7 +139,9 @@ void RtFailAssertion(const char* assertion, const char* function, const char* so
         std::stringstream s;
         s << "assertion '" << assertion << "' failed in function '" << function << "' at " << sourceFilePath << ":" << lineNumber << "\n";
         std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdErr = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
         RtPrintCallStack(stdErrFileHandle);
         exit(exitCodeAssertionFailed);
     }

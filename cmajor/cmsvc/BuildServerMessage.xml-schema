@@ -1,0 +1,127 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/cmsvc/ServiceApi.hpp>
+
+class api(CMSVC_API) StopBuildRequest
+{
+}
+
+class api(CMSVC_API) StopBuildReply
+{
+}
+
+class api(CMSVC_API) KeepAliveBuildRequest
+{
+}
+
+class api(CMSVC_API) KeepAliveBuildReply
+{
+}
+
+class api(CMSVC_API) BuildRequest
+{
+    string messageKind;
+    string backend;
+    string config;
+    string optimizationLevel;
+    string filePath;
+    string[] defines;
+    string numBuildThreads;
+    string toolChain;
+    bool verbose;
+    bool quiet;
+    bool clean;
+    bool strictNothrow;
+    bool emitIR;
+    bool emitOptIR;
+    bool linkWithDebugRuntime;
+    bool linkUsingMsLink;
+    bool rebuild;
+    bool buildAllDependencies;
+    bool forceDebugInfo;
+    bool forceNoDebugInfo;
+    bool disableModuleCache;
+    bool singleThreadedCompile;
+    bool disableCodeGen;
+    bool justMyCode;
+}
+
+class api(CMSVC_API) CompileError
+{
+    string message;
+    string project;
+    string file;
+    int line;
+    int scol;
+    int ecol;
+}
+
+class api(CMSVC_API) BuildReply
+{
+    bool requestValid;
+    string requestErrorMessage;
+    string logException;
+    string time;
+    bool success;
+    CompileError[] errors;
+}
+
+class api(CMSVC_API) LogBuildMessageRequest
+{
+    string message;
+}
+
+class api(CMSVC_API) LogBuildMessageReply
+{
+    bool ok;
+}
+
+class api(CMSVC_API) BuildProgressMessage
+{
+}
+
+class api(CMSVC_API) GenericBuildErrorReply
+{
+    string error;
+}
+
+class api(CMSVC_API) CacheModuleRequest
+{
+    string projectName;
+    string projectFilePath;
+    string backend;
+    string config;
+}
+
+class api(CMSVC_API) CacheModuleReply
+{
+    string error;
+}
+
+class api(CMSVC_API) DefinitionSourceLocation
+{
+    string file;
+    int line;
+    int scol;
+    int ecol;
+}
+
+class api(CMSVC_API) GetDefinitionRequest
+{
+    string projectName;
+    string projectFilePath;
+    string backend;
+    string config;
+    string identifier;
+    DefinitionSourceLocation identifierLocation;
+}
+
+class api(CMSVC_API) GetDefinitionReply
+{
+    DefinitionSourceLocation definitionLocation;
+    bool ok;
+    string error;
+}

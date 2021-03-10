@@ -142,7 +142,10 @@ extern "C" RT_API void RtBeginStaticInitCriticalSection(void* staticClassId)
         std::stringstream s;
         s << "internal error: " << ex.what() << "\n";
         std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdError = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdError, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
+        RtFlush(stdError, errorStringHandle);
         exit(exitCodeInternalError);
     }
 }
@@ -159,7 +162,10 @@ extern "C" RT_API void RtEndStaticInitCriticalSection(void* staticClassId)
         std::stringstream s;
         s << "internal error: " << ex.what() << "\n";
         std::string str = s.str();
-        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        int32_t errorStringHandle = -1;
+        void* stdError = RtOpenStdFile(2, errorStringHandle);
+        RtWrite(stdError, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
+        RtFlush(stdError, errorStringHandle);
         exit(exitCodeInternalError);
     }
 }

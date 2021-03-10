@@ -109,21 +109,21 @@ public:
     std::string error;
 };
 
-class StartRequest
+class StartDebugRequest
 {
 public:
-    StartRequest();
-    StartRequest(sngxml::dom::Element* element);
+    StartDebugRequest();
+    StartDebugRequest(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
     std::vector<SourceLoc> breakpointLocations;
 };
 
-class StartReply
+class StartDebugReply
 {
 public:
-    StartReply();
-    StartReply(sngxml::dom::Element* element);
+    StartDebugReply();
+    StartDebugReply(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
     bool success;
@@ -133,29 +133,29 @@ public:
     std::string error;
 };
 
-class StopRequest
+class StopDebugRequest
 {
 public:
-    StopRequest();
-    StopRequest(sngxml::dom::Element* element);
+    StopDebugRequest();
+    StopDebugRequest(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
 };
 
-class StopReply
+class StopDebugReply
 {
 public:
-    StopReply();
-    StopReply(sngxml::dom::Element* element);
+    StopDebugReply();
+    StopDebugReply(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
 };
 
-class GenericErrorReply
+class GenericDebugErrorReply
 {
 public:
-    GenericErrorReply();
-    GenericErrorReply(sngxml::dom::Element* element);
+    GenericDebugErrorReply();
+    GenericDebugErrorReply(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
     std::string errorMessage;
@@ -483,21 +483,21 @@ public:
 public:
 };
 
-class LogMessageRequest
+class LogDebugMessageRequest
 {
 public:
-    LogMessageRequest();
-    LogMessageRequest(sngxml::dom::Element* element);
+    LogDebugMessageRequest();
+    LogDebugMessageRequest(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
     std::string logMessage;
 };
 
-class LogMessageReply
+class LogDebugMessageReply
 {
 public:
-    LogMessageReply();
-    LogMessageReply(sngxml::dom::Element* element);
+    LogDebugMessageReply();
+    LogDebugMessageReply(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
 };

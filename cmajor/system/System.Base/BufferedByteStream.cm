@@ -7,6 +7,52 @@ using System;
 
 namespace System.IO
 {
+    public class IOBuffer
+    {
+        public nothrow IOBuffer(long size_) : size(size_), mem(null)
+        {
+        #if (MEM_DEBUG)
+            mem = MemAlloc(size, typename(*this));
+        #else
+            mem = MemAlloc(size);
+        #endif
+        }
+        suppress IOBuffer(const IOBuffer&);
+        suppress void operator=(const IOBuffer&);
+        public nothrow IOBuffer(IOBuffer&& that): size(that.size), mem(that.mem)
+        {
+            that.size = 0;
+            that.mem = null;
+        }
+        public nothrow default void operator=(IOBuffer&& that);
+        public ~IOBuffer()
+        {
+            if (mem != null)
+            {
+                MemFree(mem);
+            }            
+        }
+        public nothrow inline long Size() const 
+        {
+            return size;
+        }
+        public nothrow inline void* Mem() const
+        {
+            return mem;
+        }
+        public nothrow inline byte operator[](long index) const
+        {
+            #assert(index >= 0 && index < size);
+            return cast<byte*>(mem)[index];
+        }
+        public nothrow inline byte& operator[](long index) 
+        {
+            return cast<byte*>(mem)[index];
+        }
+        private long size;
+        private void* mem;
+    }
+
     public class BufferedByteStream : ByteStream
     {
         public nothrow BufferedByteStream(const SharedPtr<ByteStream>& baseStream_) : this(baseStream_, 4096)
@@ -85,6 +131,7 @@ namespace System.IO
             if (end != 0)
             {
                 baseStream->Write(cast<byte*>(buffer.Mem()), end);
+                baseStream->Flush();
                 end = 0;
             }
         }

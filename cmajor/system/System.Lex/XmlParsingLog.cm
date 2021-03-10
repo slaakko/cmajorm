@@ -74,9 +74,9 @@ namespace System.Lex
     }
     public ustring XmlHexEscape(uchar c)
     {
-        OutputStringStream s;
-        s << "&#x" << ToHexString(cast<uint>(c)) << ";";
-        return ToUtf32(s.Str());
+        StringWriter writer;
+        writer << "&#x" << ToHexString(cast<uint>(c)) << ";";
+        return ToUtf32(writer.GetString());
     }
     public ustring XmlCharStr(uchar c)
     {

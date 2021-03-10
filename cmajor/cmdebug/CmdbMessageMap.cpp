@@ -9,11 +9,11 @@ namespace cmajor { namespace debug {
 
 MessageMap::MessageMap()
 {
-    map["startRequest"] = MessageKind::startRequest;
-    map["startReply"] = MessageKind::startReply;
-    map["stopRequest"] = MessageKind::stopRequest;
-    map["stopReply"] = MessageKind::stopReply;
-    map["genericErrorReply"] = MessageKind::genericErrorReply;
+    map["startDebugRequest"] = MessageKind::startRequest;
+    map["startDebugReply"] = MessageKind::startReply;
+    map["stopDebugRequest"] = MessageKind::stopRequest;
+    map["stopDebugReply"] = MessageKind::stopReply;
+    map["genericDebugErrorReply"] = MessageKind::genericErrorReply;
     map["continueRequest"] = MessageKind::continueRequest;
     map["continueReply"] = MessageKind::continueReply;
     map["nextRequest"] = MessageKind::nextRequest;
@@ -44,8 +44,8 @@ MessageMap::MessageMap()
     map["targetInputReply"] = MessageKind::targetInputReply;
     map["targetOutputRequest"] = MessageKind::targetOutputRequest;
     map["targetOutputReply"] = MessageKind::targetOutputReply;
-    map["logMessageRequest"] = MessageKind::logMessageRequest;
-    map["logMessageReply"] = MessageKind::logMessageReply;
+    map["logDebugMessageRequest"] = MessageKind::logMessageRequest;
+    map["logDebugMessageReply"] = MessageKind::logMessageReply;
 }
 
 MessageKind MessageMap::GetMessageKind(const std::string& messageKindStr)

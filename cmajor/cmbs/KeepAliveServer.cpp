@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/cmbs/KeepAliveServer.hpp>
-#include <cmajor/cmbs/BuildServerMessage.hpp>
+#include <cmajor/cmsvc/BuildServerMessage.hpp>
 #ifdef TRACE
 #include <cmajor/cmbs_trace/TraceFunctions.hpp>
 #include <soulng/util/Trace.hpp>
@@ -81,7 +81,7 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> keepAliveReceivedTimePoint;
     std::string GetMessage(Element* element);
     std::string ElementToString(Element* element);
-    KeepAliveReply ProcessKeepAliveRequest(const KeepAliveRequest& request);
+    KeepAliveBuildReply ProcessKeepAliveRequest(const KeepAliveBuildRequest& request);
     std::condition_variable* exitVar;
     bool* exiting;
 };
@@ -111,14 +111,14 @@ std::string KeepAliveServer::ElementToString(Element* element)
     return strStream.str();
 }
 
-KeepAliveReply KeepAliveServer::ProcessKeepAliveRequest(const KeepAliveRequest& request)
+KeepAliveBuildReply KeepAliveServer::ProcessKeepAliveRequest(const KeepAliveBuildRequest& request)
 {
 #ifdef TRACE
     soulng::util::Tracer tracer(KeepAliveServer_ProcessKeepAliveRequest);
 #endif // TRACE
     std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
     keepAliveReceivedTimePoint = now;
-    KeepAliveReply reply;
+    KeepAliveBuildReply reply;
     return reply;
 }
 
@@ -141,11 +141,11 @@ void KeepAliveServer::Run()
             std::string requestStr = ReadStr(socket);
             std::unique_ptr<Document> requestDoc = ParseDocument(ToUtf32(requestStr), "socket");
             std::string message = GetMessage(requestDoc->DocumentElement());
-            if (message == "keepAliveRequest")
+            if (message == "keepAliveBuildRequest")
             {
-                KeepAliveRequest request(requestDoc->DocumentElement());
-                KeepAliveReply reply = ProcessKeepAliveRequest(request);
-                std::unique_ptr<Element> replyElement = reply.ToXml("keepAliveReply");
+                KeepAliveBuildRequest request(requestDoc->DocumentElement());
+                KeepAliveBuildReply reply = ProcessKeepAliveRequest(request);
+                std::unique_ptr<Element> replyElement = reply.ToXml("keepAliveBuildReply");
                 std::string replyStr = ElementToString(replyElement.release());
                 Write(socket, replyStr);
             }

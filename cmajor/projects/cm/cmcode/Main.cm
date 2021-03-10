@@ -2297,9 +2297,9 @@ namespace cmcode
                 LogException(ex);
             }
         }
-        private SourceLocation GetCurrentLocation() const
+        private DefinitionSourceLocation GetCurrentLocation() const
         {
-            SourceLocation sourceLocation;
+            DefinitionSourceLocation sourceLocation;
             if (solution.IsNull()) return sourceLocation;
             TabPage* tabPage = codeTabControl->SelectedTabPage();
             if (tabPage != null)
@@ -2325,7 +2325,7 @@ namespace cmcode
             }
             return sourceLocation;
         }
-        public void GotoLocation(const SourceLocation& location)
+        public void GotoLocation(const DefinitionSourceLocation& location)
         {
             TabPage* tabPage = codeTabControl->GetTabPageByKey(location.file);
             Cm.Views.CmajorEditor* cmajorEditor = null;
@@ -2394,7 +2394,7 @@ namespace cmcode
                 LogException(ex);
             }
         }
-        public void GotoDefinition(Cm.Ast.Project* project, const string& identifier, const SourceLocation& sourceLocation)
+        public void GotoDefinition(Cm.Ast.Project* project, const string& identifier, const DefinitionSourceLocation& sourceLocation)
         {
             try
             {
@@ -4300,7 +4300,7 @@ namespace cmcode
                 LogException(ex);
             }
         }
-        private bool GetIdentifierSourceLocationAt(const Point& loc, TextView* textView, string& identifier, SourceLocation& sourceLocation)
+        private bool GetIdentifierSourceLocationAt(const Point& loc, TextView* textView, string& identifier, DefinitionSourceLocation& sourceLocation)
         {
             int line = 0;
             int column = 0;
@@ -4382,7 +4382,7 @@ namespace cmcode
                     Cm.Views.CmajorSourceCodeView* sourceCodeView = cast<Cm.Views.CmajorSourceCodeView*>(control);
                     UniquePtr<ContextMenu> contextMenu(new ContextMenu());
                     string identifier;
-                    SourceLocation sourceLocation;
+                    DefinitionSourceLocation sourceLocation;
                     if (GetIdentifierSourceLocationAt(args.location, sourceCodeView, identifier, sourceLocation))
                     {
                         MenuItem* gotoDefinitionMenuItem = new MenuItem("Go To Definition");

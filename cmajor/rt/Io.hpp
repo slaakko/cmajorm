@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <stdint.h>
 
+const int stdInFileHandle = 0;
 const int stdOutFileHandle = 1;
 const int stdErrFileHandle = 2;
 
@@ -36,34 +37,28 @@ inline OpenMode operator|(OpenMode left, OpenMode right)
     return OpenMode(uint8_t(left) | uint8_t(right));
 }
 
-extern "C" RT_API int32_t RtOpen(const char* filePath, OpenMode openMode);
-extern "C" RT_API int32_t RtClose(int32_t fileHandle);
-extern "C" RT_API int32_t RtWrite(int32_t fileHandle, const uint8_t* buffer, int64_t count);
-extern "C" RT_API int32_t RtWriteByte(int32_t fileHandle, uint8_t x);
-extern "C" RT_API int64_t RtRead(int32_t fileHandle, uint8_t* buffer, int64_t bufferSize);
-extern "C" RT_API int32_t RtReadByte(int32_t fileHandle);
-extern "C" RT_API int32_t RtSeek(int32_t fileHandle, int64_t pos,  Origin origin);
-extern "C" RT_API int64_t RtTell(int32_t fileHandle);
+extern "C" RT_API void* RtOpen(const char* filePath, OpenMode openMode, int32_t& errorStringHandle);
+extern "C" RT_API void* RtOpenStdFile(int handle, int32_t& errorStringHandle);
+extern "C" RT_API bool RtClose(void* fileHandle, int32_t& errorStringHandle);
+extern "C" RT_API bool RtDisposeFile(void* fileHandle, int32_t& errorStringHandle);
+extern "C" RT_API int64_t RtWrite(void* fileHandle, const uint8_t* buffer, int64_t count, int32_t& errorStringHandle);
+extern "C" RT_API bool RtWriteByte(void* fileHandle, uint8_t x, int32_t& errorStringHandle);
+extern "C" RT_API int64_t RtRead(void* fileHandle, uint8_t* buffer, int64_t bufferSize, int32_t& errorStringHandle);
+extern "C" RT_API int32_t RtReadByte(void* fileHandle);
+extern "C" RT_API bool RtEof(void* fileHandle);
+extern "C" RT_API bool RtGetFileError(void* fileHandle, int32_t& errorStringHandle);
+extern "C" RT_API bool RtSeek(void* fileHandle, int64_t pos,  Origin origin, int32_t& errorStringHandle);
+extern "C" RT_API int64_t RtTell(void* fileHandle, int32_t& errorStringHandle);
+extern "C" RT_API bool RtFlush(void* fileHandle, int32_t& errorStringHandle);
 extern "C" RT_API bool RtFileExists(const char* filePath);
 extern "C" RT_API bool RtLastWriteTimeLess(const char* filePath1, const char* filePath2);
-extern "C" RT_API int32_t RtGetFileSize(const char* filePath, uint64_t* fileSize);
-extern "C" RT_API int32_t RtRemoveFile(const char* filePath);
-extern "C" RT_API int32_t RtCopyFile(const char* sourceFilePath, const char* targetFilePath);
-extern "C" RT_API void RtFlushAll();
+extern "C" RT_API int64_t RtGetFileSize(const char* filePath, int32_t& errorStringHandle);
+extern "C" RT_API bool RtRemoveFile(const char* filePath, int32_t& errorStringHandle);
+extern "C" RT_API bool RtCopyFile(const char* sourceFilePath, const char* targetFilePath, int32_t& errorStringHandle);
+extern "C" RT_API bool RtMoveFile(const char* sourceFilePath, const char* targetFilePath, int32_t & errorStringHandle);
 extern "C" RT_API bool RtIsConsoleHandle(int handle);
-extern bool fileTableInitialized;
 
-namespace cmajor { namespace rt {
-
-class FileSystemError : public std::runtime_error
-{
-public:
-    FileSystemError(const std::string& message_);
-};
-
-void InitIo();
-void DoneIo();
-
-} }  // namespace cmajor::rt
+extern "C" RT_API void InitIo();
+extern "C" RT_API void DoneIo();
 
 #endif // CMAJOR_RT_IO_INCLUDED
