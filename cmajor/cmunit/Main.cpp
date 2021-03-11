@@ -314,16 +314,19 @@ void TestUnit(FileTable* fileTable, sngcm::ast::Project* project, CompileUnitNod
     {
         compileError = true;
         compileErrorMessage = ex.what();
+        std::cerr << ex.what() << std::endl;
     }
     catch (const Exception& ex)
     {
         compileError = true;
         compileErrorMessage = ex.What();
+        std::cerr << ex.What() << std::endl;
     }
     catch (const std::exception& ex)
     {
         compileError = true;
         compileErrorMessage = ex.what();
+        std::cerr << ex.what() << std::endl;
     }
     if (compileError)
     {

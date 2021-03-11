@@ -56,11 +56,12 @@ const uint8_t moduleFormat_13 = uint8_t('D');
 const uint8_t moduleFormat_14 = uint8_t('E');
 const uint8_t moduleFormat_15 = uint8_t('F');
 const uint8_t moduleFormat_16 = uint8_t('G');
-const uint8_t currentModuleFormat = moduleFormat_16;
+const uint8_t moduleFormat_17 = uint8_t('H');
+const uint8_t currentModuleFormat = moduleFormat_17;
 
 enum class ModuleFlags : uint8_t
 {
-    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4, fileIndexFilePathMapBuilt = 1 << 5, readFromModuleFile = 1 << 6
+    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4, fileIndexFilePathMapBuilt = 1 << 5, readFromModuleFile = 1 << 6, programModule = 1 << 7
 };
 
 inline ModuleFlags operator|(ModuleFlags left, ModuleFlags right)

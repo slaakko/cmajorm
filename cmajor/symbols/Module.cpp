@@ -1206,6 +1206,11 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
     }
     flags = ModuleFlags(reader.GetBinaryReader().ReadByte());
     name = reader.GetBinaryReader().ReadUtf32String();
+    bool unitTesting = GetGlobalFlag(GlobalFlags::unitTest);
+    if (unitTesting && (flags & ModuleFlags::programModule) != ModuleFlags::none)
+    {
+        throw std::runtime_error("cmunit can test only library modules, module '" + ToUtf8(name) + "' is a program module");
+    }
     reader.GetBinaryReader().ReadUuid(id);
     MapModule(this);
     backend = static_cast<sngcm::ast::BackEnd>(reader.GetBinaryReader().ReadSByte());

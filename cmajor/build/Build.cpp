@@ -3081,6 +3081,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 if (project->GetTarget() == Target::program || project->GetTarget() == Target::winguiapp || project->GetTarget() == Target::winapp)
                 {
                     CheckMainFunctionSymbol(*rootModule);
+                    rootModule->SetFlag(ModuleFlags::programModule);
                     if (!rootModule->GetSymbolTable().JsonClasses().empty())
                     {
                         CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
