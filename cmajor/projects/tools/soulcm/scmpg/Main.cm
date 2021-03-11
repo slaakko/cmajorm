@@ -109,7 +109,7 @@ public int main(int argc, const char** argv)
         {
             Console.Out() << "> " << projectFilePath << endl();
         }
-        string s = System.IO.ReadFile(projectFilePath);
+        string s = File.ReadAllText(projectFilePath);
         ustring content = ToUtf32(s);
         ProjectFileLexer lexer(content, projectFilePath, 0);
         UniquePtr<soulcm.scmpg.ProjectFile> projectFile = ProjectFileParser.Parse(lexer);
@@ -118,7 +118,7 @@ public int main(int argc, const char** argv)
         for (const string& sourceFileName : projectFile->SourceFiles())
         {
             string sourceFilePath = Path.Combine(projectFile->BasePath(), sourceFileName);
-            string s = System.IO.ReadFile(sourceFilePath);
+            string s = File.ReadAllText(sourceFilePath);
             ustring content = ToUtf32(s);
             System.Lex.XmlParsingLog log(Console.Out());
             ParserFileLexer lexer(content, sourceFilePath, index);
