@@ -54,11 +54,11 @@ string HexDumpLine(uint addr, byte* bytes, uint numBytes)
 void HexDump(const string& fileName)
 {
     Console.WriteLine(GetFullPath(fileName) + ":");
-    ulong fileSize = File.Size(fileName);
+    long fileSize = File.Size(fileName);
     BinaryReader reader = File.OpenBinary(fileName);
     byte[bytesInLine] bytes;
     uint addr = 0u;
-    ulong numRows = fileSize / bytesInLine;
+    long numRows = fileSize / bytesInLine;
     for (ulong i = 0u; i < numRows; ++i)
     {
         for (uint j = 0u; j < bytesInLine; ++j)
