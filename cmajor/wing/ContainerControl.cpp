@@ -142,6 +142,44 @@ void ContainerControl::DockChildren(Rect& parentRect)
     }
 }
 
+Control* ContainerControl::GetFirstEnabledTabStopControl() const
+{
+    Component* child = children.FirstChild();
+    while (child)
+    {
+        if (child->IsControl())
+        {
+            Control* control = static_cast<Control*>(child);
+            Control* tabStopChild = control->GetFirstEnabledTabStopControl();
+            if (tabStopChild)
+            {
+                return tabStopChild;
+            }
+        }
+        child = child->NextSibling();
+    }
+    return nullptr;
+}
+
+Control* ContainerControl::GetLastEnabledTabStopControl() const
+{
+    Component* child = children.LastChild();
+    while (child)
+    {
+        if (child->IsControl())
+        {
+            Control* control = static_cast<Control*>(child);
+            Control* tabStopChild = control->GetLastEnabledTabStopControl();
+            if (tabStopChild)
+            {
+                return tabStopChild;
+            }
+        }
+        child = child->PrevSibling();
+    }
+    return nullptr;
+}
+
 bool ContainerControl::ProcessMessage(Message& msg)
 {
     switch (msg.message)
@@ -183,16 +221,6 @@ bool ContainerControl::ProcessMessage(Message& msg)
         }
     }
     return false;
-}
-
-void ContainerControl::OnControlAdded(ControlEventArgs& args)
-{
-    controlAdded.Fire(args);
-}
-
-void ContainerControl::OnControlRemoved(ControlEventArgs& args)
-{
-    controlRemoved.Fire(args);
 }
 
 void ContainerControl::OnChildContentChanged(ControlEventArgs& args)

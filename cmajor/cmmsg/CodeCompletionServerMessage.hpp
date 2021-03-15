@@ -1,5 +1,6 @@
 #ifndef CODECOMPLETIONSERVERMESSAGE_HPP_012CDE82AB35DD9B6579D9379A99DF1EAC6DCD1F
 #define CODECOMPLETIONSERVERMESSAGE_HPP_012CDE82AB35DD9B6579D9379A99DF1EAC6DCD1F
+#include <cmajor/cmmsg/MsgApi.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <soulng/util/Time.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -16,7 +17,7 @@ using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
 
-class CodeCompletionRequest
+class MSG_API CodeCompletionRequest
 {
 public:
     CodeCompletionRequest();
@@ -28,7 +29,7 @@ public:
     time_point received;
 };
 
-class CodeCompletionReply
+class MSG_API CodeCompletionReply
 {
 public:
     CodeCompletionReply();
@@ -41,7 +42,7 @@ public:
     time_point created;
 };
 
-class LoadEditModuleRequest : public CodeCompletionRequest
+class MSG_API LoadEditModuleRequest : public CodeCompletionRequest
 {
 public:
     LoadEditModuleRequest();
@@ -53,7 +54,7 @@ public:
     std::string config;
 };
 
-class LoadEditModuleReply : public CodeCompletionReply
+class MSG_API LoadEditModuleReply : public CodeCompletionReply
 {
 public:
     LoadEditModuleReply();
@@ -69,7 +70,7 @@ public:
     time_point endLoading;
 };
 
-class ResetEditModuleCacheRequest : public CodeCompletionRequest
+class MSG_API ResetEditModuleCacheRequest : public CodeCompletionRequest
 {
 public:
     ResetEditModuleCacheRequest();
@@ -78,7 +79,7 @@ public:
 public:
 };
 
-class ResetEditModuleCacheReply : public CodeCompletionReply
+class MSG_API ResetEditModuleCacheReply : public CodeCompletionReply
 {
 public:
     ResetEditModuleCacheReply();
@@ -89,7 +90,7 @@ public:
     std::string error;
 };
 
-class ParseSourceRequest : public CodeCompletionRequest
+class MSG_API ParseSourceRequest : public CodeCompletionRequest
 {
 public:
     ParseSourceRequest();
@@ -103,7 +104,7 @@ public:
     std::u32string sourceCode;
 };
 
-class ParseSourceReply : public CodeCompletionReply
+class MSG_API ParseSourceReply : public CodeCompletionReply
 {
 public:
     ParseSourceReply();
@@ -119,7 +120,7 @@ public:
     time_point endParsing;
 };
 
-class GetCCListRequest : public CodeCompletionRequest
+class MSG_API GetCCListRequest : public CodeCompletionRequest
 {
 public:
     GetCCListRequest();
@@ -133,7 +134,7 @@ public:
     std::string ccText;
 };
 
-class GetCCListReply : public CodeCompletionReply
+class MSG_API GetCCListReply : public CodeCompletionReply
 {
 public:
     GetCCListReply();
@@ -147,7 +148,7 @@ public:
     time_point endGetCCList;
 };
 
-class GetOverloadListRequest : public CodeCompletionRequest
+class MSG_API GetOverloadListRequest : public CodeCompletionRequest
 {
 public:
     GetOverloadListRequest();
@@ -160,7 +161,7 @@ public:
     std::string functionGroup;
 };
 
-class GetOverloadListReply : public CodeCompletionReply
+class MSG_API GetOverloadListReply : public CodeCompletionReply
 {
 public:
     GetOverloadListReply();
@@ -174,38 +175,38 @@ public:
     time_point endGetOverloadList;
 };
 
-class StopRequest : public CodeCompletionRequest
+class MSG_API StopCCRequest : public CodeCompletionRequest
 {
 public:
-    StopRequest();
-    StopRequest(sngxml::dom::Element* element);
+    StopCCRequest();
+    StopCCRequest(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
 public:
 };
 
-class StopReply : public CodeCompletionReply
+class MSG_API StopCCReply : public CodeCompletionReply
 {
 public:
-    StopReply();
-    StopReply(sngxml::dom::Element* element);
+    StopCCReply();
+    StopCCReply(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
 public:
 };
 
-class KeepAliveRequest
+class MSG_API KeepAliveCCRequest
 {
 public:
-    KeepAliveRequest();
-    KeepAliveRequest(sngxml::dom::Element* element);
+    KeepAliveCCRequest();
+    KeepAliveCCRequest(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
 };
 
-class KeepAliveReply
+class MSG_API KeepAliveCCReply
 {
 public:
-    KeepAliveReply();
-    KeepAliveReply(sngxml::dom::Element* element);
+    KeepAliveCCReply();
+    KeepAliveCCReply(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
 };

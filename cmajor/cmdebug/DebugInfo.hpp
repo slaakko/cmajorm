@@ -33,6 +33,7 @@ struct DEBUG_API SourceSpan
 {
     SourceSpan() : line(0), scol(0), ecol(0) {}
     SourceSpan(int32_t line_, int16_t scol_, int16_t ecol_) : line(line_), scol(scol_), ecol(ecol_) {}
+    bool IsEmpty() const { return line == 0 && scol == 0 && ecol == 0; }
     std::string ToString() const;
     int32_t line;
     int16_t scol;

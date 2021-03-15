@@ -5,8 +5,8 @@
 
 #include <cmajor/cmdebug/ServerDebugger.hpp>
 #include <cmajor/cmdebug/ClientChannel.hpp>
-#include <cmajor/cmdebug/CmdbMessage.hpp>
-#include <cmajor/cmdebug/CmdbMessageMap.hpp>
+#include <cmajor/cmmsg/CmdbMessage.hpp>
+#include <cmajor/cmmsg/CmdbMessageMap.hpp>
 #include <cmajor/cmdebug/Debugger.hpp>
 #include <sngxml/dom/Parser.hpp>
 #include <sngxml/dom/Element.hpp>
@@ -28,6 +28,7 @@
 
 namespace cmajor { namespace debug {
 
+using namespace cmajor::msg;
 using namespace soulng::util;
 using namespace soulng::unicode;
 using namespace sngcm::ast;

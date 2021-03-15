@@ -3,7 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-class Location
+#include <cmajor/cmmsg/MsgApi.hpp>
+
+class api(MSG_API) Location
 {
     string func;
     string file;
@@ -13,13 +15,13 @@ class Location
     int level;
 }
 
-class Type
+class api(MSG_API) Type
 {
     string name;
     string id;
 }
 
-class Result
+class api(MSG_API) Result
 {
     Type staticType;
     Type dynamicType;
@@ -27,7 +29,7 @@ class Result
     string value;
 }
 
-class ChildResult
+class api(MSG_API) ChildResult
 {
     string expr;
     string name;
@@ -37,7 +39,7 @@ class ChildResult
     int count;
 }
 
-class TargetState
+class api(MSG_API) TargetState
 {
     string stopReason;
     string exitCode;
@@ -46,13 +48,13 @@ class TargetState
     string signalMeaning;
 }
 
-class SourceLoc
+class api(MSG_API) SourceLoc
 {
     string path;
     int line;
 }
 
-class BreakpointInfo
+class api(MSG_API) BreakpointInfo
 {
     bool success;
     string breakpointId;
@@ -61,12 +63,12 @@ class BreakpointInfo
     string error;
 }
 
-class StartDebugRequest
+class api(MSG_API) StartDebugRequest
 {
     SourceLoc[] breakpointLocations;
 }
 
-class StartDebugReply
+class api(MSG_API) StartDebugReply
 {
     bool success;
     Location location;
@@ -75,36 +77,24 @@ class StartDebugReply
     string error;
 }
 
-class StopDebugRequest
+class api(MSG_API) StopDebugRequest
 {
 }
 
-class StopDebugReply
+class api(MSG_API) StopDebugReply
 {
 }
 
-class GenericDebugErrorReply
+class api(MSG_API) GenericDebugErrorReply
 {
     string errorMessage;
 }
 
-class ContinueRequest
+class api(MSG_API) ContinueRequest
 {
 }
 
-class ContinueReply
-{
-    bool success;
-    Location location;
-    TargetState state;
-    string error;
-}
-
-class NextRequest
-{
-}
-
-class NextReply
+class api(MSG_API) ContinueReply
 {
     bool success;
     Location location;
@@ -112,23 +102,11 @@ class NextReply
     string error;
 }
 
-class StepRequest
+class api(MSG_API) NextRequest
 {
 }
 
-class StepReply
-{
-    bool success;
-    Location location;
-    TargetState state;
-    string error;
-}
-
-class FinishRequest
-{
-}
-
-class FinishReply
+class api(MSG_API) NextReply
 {
     bool success;
     Location location;
@@ -136,12 +114,36 @@ class FinishReply
     string error;
 }
 
-class UntilRequest
+class api(MSG_API) StepRequest
+{
+}
+
+class api(MSG_API) StepReply
+{
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+class api(MSG_API) FinishRequest
+{
+}
+
+class api(MSG_API) FinishReply
+{
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+class api(MSG_API) UntilRequest
 {
     SourceLoc sourceLoc;
 }
 
-class UntilReply
+class api(MSG_API) UntilReply
 {
     bool success;
     Location location;
@@ -149,122 +151,122 @@ class UntilReply
     string error;
 }
 
-class BreakRequest
+class api(MSG_API) BreakRequest
 {
     SourceLoc breakpointLocation;
 }
 
-class BreakReply
+class api(MSG_API) BreakReply
 {
     BreakpointInfo breakpointInfo;
 }
 
-class DeleteRequest
+class api(MSG_API) DeleteRequest
 {
     string breakpointId;
 }
 
-class DeleteReply
+class api(MSG_API) DeleteReply
 {
     bool success;
     string error;
 }
 
-class DepthRequest
+class api(MSG_API) DepthRequest
 {
 }
 
-class DepthReply
+class api(MSG_API) DepthReply
 {
     bool success;
     int depth;
     string error;
 }
 
-class FramesRequest
+class api(MSG_API) FramesRequest
 {
     int lowFrame;
     int highFrame;
 }
 
-class FramesReply
+class api(MSG_API) FramesReply
 {
     bool success;
     Location[] frames;
     string error;
 }
 
-class EvaluateRequest
+class api(MSG_API) EvaluateRequest
 {
     string expression;
 }
 
-class EvaluateReply
+class api(MSG_API) EvaluateReply
 {
     bool success;
     Result result;
     string error;
 }
 
-class CountRequest
+class api(MSG_API) CountRequest
 {
     string expression;
 }
 
-class CountReply
+class api(MSG_API) CountReply
 {
     bool success;
     int count;
     string error;
 }
 
-class EvaluateChildRequest
+class api(MSG_API) EvaluateChildRequest
 {
     string expression;
     int start;
     int count;
 }
 
-class EvaluateChildReply
+class api(MSG_API) EvaluateChildReply
 {
     bool success;
     ChildResult[] results;
     string error;
 }
 
-class TargetRunningRequest
+class api(MSG_API) TargetRunningRequest
 {
 }
 
-class TargetRunningReply
+class api(MSG_API) TargetRunningReply
 {
 }
 
-class TargetInputRequest
+class api(MSG_API) TargetInputRequest
 {
 }
 
-class TargetInputReply
+class api(MSG_API) TargetInputReply
 {
     string line;
     bool eof;
 }
 
-class TargetOutputRequest
+class api(MSG_API) TargetOutputRequest
 {
     int handle;
     string output;
 }
 
-class TargetOutputReply
+class api(MSG_API) TargetOutputReply
 {
 }
 
-class LogDebugMessageRequest
+class api(MSG_API) LogDebugMessageRequest
 {
     string logMessage;
 }
 
-class LogDebugMessageReply
+class api(MSG_API) LogDebugMessageReply
 {
 }

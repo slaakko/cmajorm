@@ -7,15 +7,18 @@
 #define CMCODE_MAIN_WINDOW_INCLUDED
 #include <cmajor/cmcode/Solution.hpp>
 #include <cmajor/cmsvc/Message.hpp>
+#include <cmajor/cmview/CmajorEditor.hpp>
 #include <cmajor/wing/Window.hpp>
 #include <cmajor/wing/Wing.hpp>
 #include <cmajor/wing/Application.hpp>
 #include <cmajor/wing/Menu.hpp>
 #include <cmajor/wing/SplitContainer.hpp>
 #include <cmajor/wing/TreeView.hpp>
+#include <cmajor/wing/TabControl.hpp>
 
 namespace cmcode {
 
+using namespace cmajor::view;
 using namespace cmajor::wing;
 
 enum class MainWindowState : int
@@ -79,6 +82,10 @@ private:
     void HomepageClick();
     void LocalDocumentationClick();
     void AboutClick();
+    void TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args);
+    CmajorEditor* AddCmajorEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project);
+    void CodeTabPageSelected();
+    void CodeTabPageRemoved(ControlEventArgs& args);
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -121,8 +128,10 @@ private:
     MenuItem* aboutMenuItem;
     SplitContainer* verticalSplitContainer;
     SplitContainer* horizontalSplitContainer;
+    TabControl* codeTabControl;
     TreeView* solutionTreeView;
     std::unique_ptr<SolutionData> solutionData;
+    std::unordered_map<TabPage*, Editor*> tabPageEditorMap;
     MainWindowState state;
 };
 

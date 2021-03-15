@@ -55,21 +55,27 @@ void EditCommandList::SetMenuItems(MenuItem* undoMenuItem_, MenuItem* redoMenuIt
 
 void EditCommandList::UpdateMenuItems()
 {
-    if (CanUndo())
+    if (undoMenuItem)
     {
-        undoMenuItem->Enable();
+        if (CanUndo())
+        {
+            undoMenuItem->Enable();
+        }
+        else
+        {
+            undoMenuItem->Disable();
+        }
     }
-    else
+    if (redoMenuItem)
     {
-        undoMenuItem->Disable();
-    }
-    if (CanRedo())
-    {
-        redoMenuItem->Enable();
-    }
-    else
-    {
-        redoMenuItem->Disable();
+        if (CanRedo())
+        {
+            redoMenuItem->Enable();
+        }
+        else
+        {
+            redoMenuItem->Disable();
+        }
     }
 }
 

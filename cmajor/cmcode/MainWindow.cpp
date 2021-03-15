@@ -6,6 +6,7 @@
 #include <cmajor/cmcode/MainWindow.hpp>
 #include <sngcm/ast/Project.hpp>
 #include <cmajor/wing/Dialog.hpp>
+#include <cmajor/wing/BorderedControl.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
 #include <cmajor/cmsvc/Message.hpp>
@@ -285,11 +286,20 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     std::unique_ptr<SplitContainer> horizontalSplitContainerPtr(
         new SplitContainer(SplitContainerCreateParams(SplitterOrientation::horizontal).SplitterDistance(HorizontalSplitterDistance()).SetDock(Dock::fill)));
     horizontalSplitContainer = horizontalSplitContainerPtr.get();
+    std::unique_ptr<TabControl> codeTabControlPtr(new TabControl(TabControlCreateParams().SetDock(Dock::fill)));
+    codeTabControl = codeTabControlPtr.get();
+    codeTabControl->TabPageSelected().AddHandler(this, &MainWindow::CodeTabPageSelected);
+    codeTabControl->ControlRemoved().AddHandler(this, &MainWindow::CodeTabPageRemoved);
+    std::unique_ptr<Control> paddedCodeTabControl(new PaddedControl(PaddedControlCreateParams(codeTabControlPtr.release()).Defaults()));
+    std::unique_ptr<Control> borderedCodeTabControl(new BorderedControl(BorderedControlCreateParams(paddedCodeTabControl.release()).SetBorderStyle(BorderStyle::single).
+        NormalSingleBorderColor(DefaultTabControlFrameColor()).FocusedSingleBorderColor(DefaultTabControlFrameColor()).SetDock(Dock::fill)));
     std::unique_ptr<TreeView> solutionTreeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
     solutionTreeView = solutionTreeViewPtr.get();
+    solutionTreeView->NodeDoubleClick().AddHandler(this, &MainWindow::TreeViewNodeDoubleClick);
     solutionTreeView->SetDoubleBuffered();
     std::unique_ptr<PaddedControl> paddedTreeViewPtr(new PaddedControl(PaddedControlCreateParams(solutionTreeViewPtr.release()).Defaults()));
     std::unique_ptr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(ScrollableControlCreateParams(paddedTreeViewPtr.release()).SetDock(Dock::fill)));
+    horizontalSplitContainer->Pane1Container()->AddChild(borderedCodeTabControl.release());
     horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeViewPtr.release());
     verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.release());
     AddChild(verticalSplitContainerPtr.release());
@@ -649,6 +659,160 @@ void MainWindow::LocalDocumentationClick()
 void MainWindow::AboutClick()
 {
     ShowInfoMessageBox(Handle(), "About");
+}
+
+void MainWindow::TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args)
+{
+    try
+    {
+        TreeViewNode* node = args.node;
+        if (node->Data())
+        {
+            SolutionTreeViewNodeData* data = static_cast<SolutionTreeViewNodeData*>(node->Data());
+            if (data->kind == SolutionTreeViewNodeDataKind::solution || data->kind == SolutionTreeViewNodeDataKind::project)
+            {
+                switch (node->State())
+                {
+                    case TreeViewNodeState::collapsed:
+                    {
+                        node->ExpandAll();
+                        break;
+                    }
+                    case TreeViewNodeState::expanded:
+                    {
+                        node->CollapseAll();
+                        break;
+                    }
+                }
+            }
+            else if (data->kind == SolutionTreeViewNodeDataKind::file)
+            {
+                std::string ext = Path::GetExtension(data->fileName);
+                if (ext == ".cm")
+                {
+                    TabPage* prevTabPage = codeTabControl->GetTabPageByKey(data->key);
+                    if (prevTabPage)
+                    {
+                        codeTabControl->SetSelectedTabPage(prevTabPage);
+                    }
+                    else
+                    {
+                        AddCmajorEditor(data->fileName, data->key, data->filePath, data->project);
+                        // LoadEditModule(data->project->FilePath()); todo
+                    }
+                }
+                else if (ext == ".xml")
+                {
+
+                }
+                else 
+                {
+
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project)
+{
+    std::unique_ptr<TabPage> tabPage(new TabPage(fileName, key));
+    BreakpointList* breakpointList = nullptr;
+    if (project)
+    {
+        ProjectData* projectData = solutionData->GetProjectDataByProject(project);
+        if (projectData)
+        {
+            breakpointList = &projectData->GetBreakpointCollection().GetBreakpointList(filePath);
+        }
+    }
+    if (!breakpointList)
+    {
+        breakpointList = &solutionData->GetSolutionBreakpointCollection().GetBreakpointList(filePath);
+    }
+    std::unique_ptr<CmajorEditor> editorPtr(new CmajorEditor(CmajorEditorCreateParams(filePath, CmajorSourceCodeViewCreateParams().Defaults(), DebugStripCreateParams(breakpointList).Defaults()).Defaults()));
+    CmajorEditor* editor = editorPtr.get();
+    CmajorSourceCodeView* sourceCodeView = editor->SourceCodeView();
+    if (sourceCodeView)
+    {
+        // todo
+        DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
+        if (debugStrip)
+        {
+            // todo
+        }
+        sourceCodeView->SetFocus();
+    }
+    tabPage->AddChild(editorPtr.release());
+    codeTabControl->AddTabPage(tabPage.release());
+    tabPageEditorMap[tabPage.get()] = editor;
+    return editor;
+}
+
+void MainWindow::CodeTabPageSelected()
+{
+    TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+/*  TODO:
+    Editor* editor = GetEditorByTabPage(selectedTabPage);
+    if (editor)
+    {
+        gotoLineMenuItem->Enable();
+        sourceFilePathStatusBarItem->SetText(editor->FilePath());
+        editor->Select();
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            if (!textView->IsSelectionEmpty())
+            {
+                copyMenuItem->Enable();
+                cutMenuItem->Enable();
+            }
+            else
+            {
+                copyMenuItem->Disable();
+                cutMenuItem->Disable();
+            }
+        }
+    }
+*/
+}
+
+void MainWindow::CodeTabPageRemoved(ControlEventArgs& args)
+{
+/*  TODO:
+    HideCodeCompletionList();
+    Control* removedControl = args.control;
+    if (removedControl is TabPage*)
+    {
+        TabPage* removedTabPage = cast<TabPage*>(removedControl);
+        Cm.Views.Editor* editor = GetEditorByTabPage(removedTabPage);
+        if (editor != null)
+        {
+            if (editor->IsDirty())
+            {
+                MessageBoxResult result = MessageBox.Show(editor->FilePath() + " is modified. Save changes?", "Question", this, MessageBoxType.MB_YESNO);
+                if (result == MessageBoxResult.yes)
+                {
+                    editor->Save();
+                }
+            }
+        }
+        editorByTabPageMap.Remove(removedTabPage);
+        if (removedTabPage == debugTabPage)
+        {
+            debugTabPage = null;
+        }
+    }
+    if (codeTabControl->TabPages().IsEmpty())
+    {
+        sourceFilePathStatusBarItem->SetText("");
+        ResetFocusedControl();
+    }
+*/
 }
 
 } // namespace cmcode

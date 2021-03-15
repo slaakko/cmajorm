@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/cmbs/BuildServer.hpp>
-#include <cmajor/cmsvc/BuildServerMessage.hpp>
+#include <cmajor/cmmsg/BuildServerMessage.hpp>
 #include <cmajor/cmbs/Error.hpp>
 #include <cmajor/build/Build.hpp>
 #include <cmajor/symbols/Module.hpp>

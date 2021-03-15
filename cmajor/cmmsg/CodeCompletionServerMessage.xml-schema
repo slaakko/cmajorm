@@ -3,27 +3,29 @@
 // Distributed under the MIT license
 // =================================
 
-base class CodeCompletionRequest
+#include <cmajor/cmmsg/MsgApi.hpp>
+
+base class api(MSG_API) CodeCompletionRequest
 {
     time_point created;
     time_point received;
 }
 
-base class CodeCompletionReply
+base class api(MSG_API) CodeCompletionReply
 {
     time_point requestCreated;
     time_point requestReceived;
     time_point created;
 }
 
-class LoadEditModuleRequest : CodeCompletionRequest
+class api(MSG_API) LoadEditModuleRequest : CodeCompletionRequest
 {
     string projectFilePath;
     string backend;
     string config;
 }
 
-class LoadEditModuleReply : CodeCompletionReply
+class api(MSG_API) LoadEditModuleReply : CodeCompletionReply
 {
     string key;
     string result;
@@ -34,17 +36,17 @@ class LoadEditModuleReply : CodeCompletionReply
     time_point endLoading;
 }
 
-class ResetEditModuleCacheRequest : CodeCompletionRequest
+class api(MSG_API) ResetEditModuleCacheRequest : CodeCompletionRequest
 {
 }
 
-class ResetEditModuleCacheReply : CodeCompletionReply
+class api(MSG_API) ResetEditModuleCacheReply : CodeCompletionReply
 {
     string result;
     string error;
 }
 
-class ParseSourceRequest : CodeCompletionRequest
+class api(MSG_API) ParseSourceRequest : CodeCompletionRequest
 {
     string projectFilePath;
     string backend;
@@ -53,7 +55,7 @@ class ParseSourceRequest : CodeCompletionRequest
     ustring sourceCode;
 }
 
-class ParseSourceReply : CodeCompletionReply
+class api(MSG_API) ParseSourceReply : CodeCompletionReply
 {
     bool ok;
     string error;
@@ -64,7 +66,7 @@ class ParseSourceReply : CodeCompletionReply
     time_point endParsing;
 }
 
-class GetCCListRequest : CodeCompletionRequest
+class api(MSG_API) GetCCListRequest : CodeCompletionRequest
 {
     string projectFilePath;
     string backend;
@@ -73,7 +75,7 @@ class GetCCListRequest : CodeCompletionRequest
     string ccText;
 }
 
-class GetCCListReply : CodeCompletionReply
+class api(MSG_API) GetCCListReply : CodeCompletionReply
 {
     bool ok;
     string error;
@@ -82,7 +84,7 @@ class GetCCListReply : CodeCompletionReply
     time_point endGetCCList;
 }
 
-class GetOverloadListRequest : CodeCompletionRequest
+class api(MSG_API) GetOverloadListRequest : CodeCompletionRequest
 {
     string projectFilePath;
     string backend;
@@ -90,7 +92,7 @@ class GetOverloadListRequest : CodeCompletionRequest
     string functionGroup;
 }
 
-class GetOverloadListReply : CodeCompletionReply
+class api(MSG_API) GetOverloadListReply : CodeCompletionReply
 {
     bool ok;
     string error;
@@ -99,18 +101,18 @@ class GetOverloadListReply : CodeCompletionReply
     time_point endGetOverloadList;
 }
 
-class StopRequest : CodeCompletionRequest
+class api(MSG_API) StopCCRequest : CodeCompletionRequest
 {
 }
 
-class StopReply : CodeCompletionReply
+class api(MSG_API) StopCCReply : CodeCompletionReply
 {
 }
 
-class KeepAliveRequest
+class api(MSG_API) KeepAliveCCRequest
 {
 }
 
-class KeepAliveReply
+class api(MSG_API) KeepAliveCCReply
 {
 }

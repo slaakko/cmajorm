@@ -5,6 +5,7 @@
 
 #include <cmajor/cmcode/MainWindow.hpp>
 #include <cmajor/cmsvc/InitDone.hpp>
+#include <cmajor/cmview/InitDone.hpp>
 #include <sngcm/cmparser/CommandLine.hpp>
 #include <soulng/lexer/TrivialLexer.hpp>
 #include <cmajor/wing/InitDone.hpp>
@@ -22,9 +23,11 @@ struct InitDone
         sngxml::xpath::Init();
         cmajor::wing::Init(instance);
         cmajor::service::Init();
+        cmajor::view::Init();
     }
     ~InitDone()
     {
+        cmajor::view::Done();
         cmajor::service::Done();
         cmajor::wing::Done();
         sngxml::xpath::Done();

@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/cmbs/KeepAliveServer.hpp>
-#include <cmajor/cmsvc/BuildServerMessage.hpp>
+#include <cmajor/cmmsg/BuildServerMessage.hpp>
 #ifdef TRACE
 #include <cmajor/cmbs_trace/TraceFunctions.hpp>
 #include <soulng/util/Trace.hpp>

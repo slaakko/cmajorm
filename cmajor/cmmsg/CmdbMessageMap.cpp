@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/cmdebug/CmdbMessageMap.hpp>
+#include <cmajor/cmmsg/CmdbMessageMap.hpp>
 
-namespace cmajor { namespace debug {
+namespace cmajor { namespace msg {
 
 MessageMap::MessageMap()
 {

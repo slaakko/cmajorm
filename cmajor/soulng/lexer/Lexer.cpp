@@ -396,8 +396,8 @@ std::u32string Lexer::RestOfLine(int maxLineLength)
 
 TokenLine Lexer::TokenizeLine(const std::u32string& line, int lineNumber, int startState)
 {
-    const char32_t* pos = line.c_str();
-    const char32_t* end = line.c_str() + line.length();
+    pos = line.c_str();
+    end = line.c_str() + line.length();
     TokenLine tokenLine;
     tokenLine.startState = startState;
     lexeme.begin = pos;

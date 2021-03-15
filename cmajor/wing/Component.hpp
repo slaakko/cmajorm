@@ -22,6 +22,7 @@ public:
     virtual bool IsMenuItemBase() const { return false; }
     virtual bool IsMenuControl() const { return false; }
     virtual bool IsTreeViewNode() const { return false; }
+    virtual bool IsTabPage() const { return false; }
     Container* GetContainer() const { return container; }
     void SetContainer(Container* container_) { container = container_; }
     Component* NextSibling() const { return nextSibling; }

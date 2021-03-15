@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/wing/PaddedControl.hpp>
+#include <cmajor/wing/ContainerControl.hpp>
 
 namespace cmajor { namespace wing {
 
@@ -97,11 +98,17 @@ PaddedControlCreateParams& PaddedControlCreateParams::SetPadding(const Padding& 
 PaddedControl::PaddedControl(PaddedControlCreateParams& createParams) : Control(createParams.controlCreateParams), padding(createParams.padding), child(createParams.child), container(this)
 {
     container.AddChild(child);
+    SetChildPos();
 }
 
-ContainerControl* PaddedControl::GetContainerControl() const
+Control* PaddedControl::GetFirstEnabledTabStopControl() const
 {
-    return child->GetContainerControl();
+    return child->GetFirstEnabledTabStopControl();
+}
+
+Control* PaddedControl::GetLastEnabledTabStopControl() const
+{
+    return child->GetLastEnabledTabStopControl();
 }
 
 void PaddedControl::OnPaint(PaintEventArgs& args)
@@ -179,8 +186,8 @@ void PaddedControl::SetChildPos()
     Rect childRect(loc, size);
     childRect.X = childRect.X + padding.left;
     childRect.Y = childRect.Y + padding.top;
-    childRect.Width = childRect.Width + padding.Horizontal();
-    childRect.Height = childRect.Height + padding.Vertical();
+    childRect.Width = childRect.Width - padding.Horizontal();
+    childRect.Height = childRect.Height - padding.Vertical();
     child->SetLocation(Point(childRect.X, childRect.Y));
     child->SetSize(Size(childRect.Width, childRect.Height));
 }

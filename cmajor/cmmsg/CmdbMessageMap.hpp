@@ -3,12 +3,13 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_DEBUG_CMDB_MESSAGE_MAP_INCLUDED
-#define CMAJOR_DEBUG_CMDB_MESSAGE_MAP_INCLUDED
+#ifndef CMAJOR_MSG_CMDB_MESSAGE_MAP_INCLUDED
+#define CMAJOR_MSG_CMDB_MESSAGE_MAP_INCLUDED
+#include <cmajor/cmmsg/MsgApi.hpp>
 #include <string>
 #include <map>
 
-namespace cmajor { namespace debug {
+namespace cmajor { namespace msg {
 
 enum class MessageKind
 {
@@ -19,7 +20,7 @@ enum class MessageKind
     targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply, logMessageRequest, logMessageReply
 };
 
-class MessageMap
+class MSG_API MessageMap
 {
 public:
     MessageMap();

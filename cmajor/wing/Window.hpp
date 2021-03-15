@@ -77,8 +77,10 @@ public:
     Button* CancelButton() const { return cancelButton; }
     void SetCancelButton(Button* cancelButton_) { cancelButton = cancelButton_; }
     Control* GetFocusedControl() const { return focusedControl; }
-    void ResetFocusedControl() { focusedControl = nullptr; }
     void SetFocusedControl(Control* focusedControl_) { focusedControl = focusedControl_; }
+    void ResetFocusedControl() { focusedControl = nullptr; }
+    void FocusNext();
+    void FocusPrev();
     DialogResult GetDialogResult() const { return dialogResult; }
     void SetDialogResult(DialogResult dialogResult_) { dialogResult = dialogResult_; }
     void MouseUpNotificationInternal(MouseEventArgs& args) { MouseUpNotification(args); }

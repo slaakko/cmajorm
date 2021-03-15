@@ -164,8 +164,8 @@ public:
     bool IsCCOpen() const { return (flags & TextViewFlags::ccOpen) != TextViewFlags::none; }
     void SetCCOpen() { flags = flags | TextViewFlags::ccOpen; }
     void ResetCCOpen() { flags = flags & ~TextViewFlags::ccOpen; }
-    const std::vector<std::u32string>& Lines() const { return lines; }
-    std::vector<std::u32string>& Lines() { return lines; }
+    const std::vector<std::unique_ptr<std::u32string>>& Lines() const { return lines; }
+    std::vector<std::unique_ptr<std::u32string>>& Lines() { return lines; }
     void AddLine(const std::u32string& line);
     int CaretLine() const { return caretLine; }
     int CaretColumn() const { return caretColumn - LineNumberFieldLength(); }
@@ -337,7 +337,7 @@ private:
     int indentSize;
     Padding padding;
     Selection selection;
-    std::vector<std::u32string> lines;
+    std::vector<std::unique_ptr<std::u32string>> lines;
     std::string filePath;
     std::u32string cctext;
     EditCommandList editCommandList;

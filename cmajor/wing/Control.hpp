@@ -188,6 +188,8 @@ using MouseMoveEvent = EventWithArgs<MouseEventArgs>;
 using MouseHoverEvent = EventWithArgs<MouseEventArgs>;
 using MouseDoubleClickEvent = EventWithArgs<MouseEventArgs>;
 using RightClickEvent = EventWithArgs<RightClickEventArgs>;
+using ControlAddedEvent = EventWithArgs<ControlEventArgs>;
+using ControlRemovedEvent = EventWithArgs<ControlEventArgs>;
 
 struct WING_API TimerEventArgs
 {
@@ -308,6 +310,7 @@ public:
     virtual bool IsWindow() const { return false; }
     virtual bool IsMenuBar() const { return false; }
     virtual bool IsMenuBox() const { return false; }
+    virtual bool IsTabControl() const { return false; }
     virtual ContainerControl* GetContainerControl() const;
     Window* GetWindow() const;
     void AddChildVisual(Control* child);
@@ -354,6 +357,8 @@ public:
     HScrollEvent& HScroll() { return hscroll; }
     VScrollEvent& VScroll() { return vscroll; }
     MouseWheelEvent& MouseWheel() { return mouseWheel; }
+    ControlAddedEvent& ControlAdded() { return controlAdded; }
+    ControlRemovedEvent& ControlRemoved() { return controlRemoved; }
     KeyDownEvent& KeyDown() { return keyDown; }
     KeyUpEvent& KeyUp() { return keyUp; }
     KeyPressEvent& KeyPress() { return keyPress; }
@@ -450,6 +455,10 @@ public:
     void FireChildContentSizeChanged(ControlEventArgs& args) { OnChildContentSizeChanged(args); }
     virtual void ScrollLineDown();
     virtual void ScrollLineUp();
+    virtual Control* GetFirstEnabledTabStopControl() const;
+    virtual Control* GetLastEnabledTabStopControl() const;
+    void TranslateContentLocationInternal(Point& location) { TranslateContentLocation(location); }
+    void TranslateMousePosInternal(Point& location) { TranslateMousePos(location); }
 protected:
     virtual bool IsDecoratorControl() const { return false; }
     virtual void TranslateChildGraphics(Graphics& graphics);
@@ -491,6 +500,8 @@ protected:
     virtual void OnKeyDown(KeyEventArgs& args);
     virtual void OnKeyUp(KeyEventArgs& args);
     virtual void OnKeyPress(KeyPressEventArgs& args);
+    virtual void OnControlAdded(ControlEventArgs& args);
+    virtual void OnControlRemoved(ControlEventArgs& args);
     virtual void SetCaretLocation();
     virtual void SetCursor();
 private:
@@ -570,6 +581,8 @@ private:
     HScrollEvent hscroll;
     VScrollEvent vscroll;
     MouseWheelEvent mouseWheel;
+    ControlAddedEvent controlAdded;
+    ControlRemovedEvent controlRemoved;
     KeyDownEvent keyDown;
     KeyUpEvent keyUp;
     KeyPressEvent keyPress;

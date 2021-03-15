@@ -1,6 +1,6 @@
 #ifndef BUILDSERVERMESSAGE_HPP_9B23CE3BD05810A5126B0F5B6C9EDFB50250F5D2
 #define BUILDSERVERMESSAGE_HPP_9B23CE3BD05810A5126B0F5B6C9EDFB50250F5D2
-#include <cmajor/cmsvc/ServiceApi.hpp>
+#include <cmajor/cmmsg/MsgApi.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <soulng/util/Time.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -17,7 +17,7 @@ using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
 
-class CMSVC_API StopBuildRequest
+class MSG_API StopBuildRequest
 {
 public:
     StopBuildRequest();
@@ -26,7 +26,7 @@ public:
 public:
 };
 
-class CMSVC_API StopBuildReply
+class MSG_API StopBuildReply
 {
 public:
     StopBuildReply();
@@ -35,7 +35,7 @@ public:
 public:
 };
 
-class CMSVC_API KeepAliveBuildRequest
+class MSG_API KeepAliveBuildRequest
 {
 public:
     KeepAliveBuildRequest();
@@ -44,7 +44,7 @@ public:
 public:
 };
 
-class CMSVC_API KeepAliveBuildReply
+class MSG_API KeepAliveBuildReply
 {
 public:
     KeepAliveBuildReply();
@@ -53,7 +53,7 @@ public:
 public:
 };
 
-class CMSVC_API BuildRequest
+class MSG_API BuildRequest
 {
 public:
     BuildRequest();
@@ -86,7 +86,7 @@ public:
     bool justMyCode;
 };
 
-class CMSVC_API CompileError
+class MSG_API CompileError
 {
 public:
     CompileError();
@@ -101,7 +101,7 @@ public:
     int32_t ecol;
 };
 
-class CMSVC_API BuildReply
+class MSG_API BuildReply
 {
 public:
     BuildReply();
@@ -116,7 +116,7 @@ public:
     std::vector<CompileError> errors;
 };
 
-class CMSVC_API LogBuildMessageRequest
+class MSG_API LogBuildMessageRequest
 {
 public:
     LogBuildMessageRequest();
@@ -126,7 +126,7 @@ public:
     std::string message;
 };
 
-class CMSVC_API LogBuildMessageReply
+class MSG_API LogBuildMessageReply
 {
 public:
     LogBuildMessageReply();
@@ -136,7 +136,7 @@ public:
     bool ok;
 };
 
-class CMSVC_API BuildProgressMessage
+class MSG_API BuildProgressMessage
 {
 public:
     BuildProgressMessage();
@@ -145,7 +145,7 @@ public:
 public:
 };
 
-class CMSVC_API GenericBuildErrorReply
+class MSG_API GenericBuildErrorReply
 {
 public:
     GenericBuildErrorReply();
@@ -155,7 +155,7 @@ public:
     std::string error;
 };
 
-class CMSVC_API CacheModuleRequest
+class MSG_API CacheModuleRequest
 {
 public:
     CacheModuleRequest();
@@ -168,7 +168,7 @@ public:
     std::string config;
 };
 
-class CMSVC_API CacheModuleReply
+class MSG_API CacheModuleReply
 {
 public:
     CacheModuleReply();
@@ -178,7 +178,7 @@ public:
     std::string error;
 };
 
-class CMSVC_API DefinitionSourceLocation
+class MSG_API DefinitionSourceLocation
 {
 public:
     DefinitionSourceLocation();
@@ -191,7 +191,7 @@ public:
     int32_t ecol;
 };
 
-class CMSVC_API GetDefinitionRequest
+class MSG_API GetDefinitionRequest
 {
 public:
     GetDefinitionRequest();
@@ -206,7 +206,7 @@ public:
     DefinitionSourceLocation identifierLocation;
 };
 
-class CMSVC_API GetDefinitionReply
+class MSG_API GetDefinitionReply
 {
 public:
     GetDefinitionReply();

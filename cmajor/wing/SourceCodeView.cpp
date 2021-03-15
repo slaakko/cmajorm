@@ -202,7 +202,7 @@ void SourceCodeView::OnLinesChanged()
     numLineNumberDigits = Log10(n + 1);
     for (int i = 0; i < n; ++i)
     {
-        const std::u32string& line = Lines()[i];
+        const std::u32string& line = *Lines()[i];
         TokenLine tokenLine = TokenizeLine(line, i + 1, state);
         state = tokenLine.endState;
         tokenLines.push_back(std::move(tokenLine));
@@ -213,7 +213,7 @@ void SourceCodeView::OnLineChanged(LineEventArgs& args)
 {
     TextView::OnLineChanged(args);
     int lineIndex = args.lineIndex;
-    const std::u32string& line = Lines()[lineIndex];
+    const std::u32string& line = *Lines()[lineIndex];
     int state = 0;
     if (lineIndex > 0 && !tokenLines.empty())
     {
@@ -223,7 +223,8 @@ void SourceCodeView::OnLineChanged(LineEventArgs& args)
     {
         tokenLines.push_back(TokenLine());
     }
-    tokenLines[lineIndex] = TokenizeLine(line, lineIndex + 1, state);
+    TokenLine tokenLine = TokenizeLine(line, lineIndex + 1, state);
+    tokenLines[lineIndex] = std::move(tokenLine);
 }
 
 void SourceCodeView::OnLineDeleted(LineEventArgs& args)
@@ -242,12 +243,13 @@ void SourceCodeView::OnLineInserted(LineEventArgs& args)
     {
         tokenLines.push_back(TokenLine());
     }
-    std::u32string& line = Lines()[lineIndex];
+    std::u32string& line = *Lines()[lineIndex];
     if (lineIndex > 0)
     {
         state = tokenLines[lineIndex - 1].endState;
     }
-    tokenLines.insert(tokenLines.begin() + lineIndex, TokenizeLine(line, lineIndex + 1, state));
+    TokenLine tokenLine = TokenizeLine(line, lineIndex + 1, state);
+    tokenLines.insert(tokenLines.begin() + lineIndex, std::move(tokenLine));
     Invalidate();
 }
 
@@ -298,7 +300,7 @@ std::u32string SourceCodeView::GetText(const SourceSpan& sourceSpan) const
 {
     if (sourceSpan.line >= 1 && sourceSpan.line <= Lines().size())
     {
-        const std::u32string& line = Lines()[sourceSpan.line - 1];
+        const std::u32string& line = *Lines()[sourceSpan.line - 1];
         if (sourceSpan.scol >= 1 && sourceSpan.scol <= line.length())
         {
             int n = sourceSpan.ecol - sourceSpan.scol;

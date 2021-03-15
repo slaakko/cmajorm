@@ -154,6 +154,140 @@ void Window::Close()
     PostMessage(Handle(), WM_CLOSE, 0, 0);
 }
 
+void Window::FocusNext()
+{
+    if (focusedControl == nullptr)
+    {
+        Component* child = Children().FirstChild();
+        while (child)
+        {
+            if (child->IsControl())
+            {
+                Control* control = static_cast<Control*>(child);
+                Control* tabStopChild = control->GetFirstEnabledTabStopControl();
+                if (tabStopChild)
+                {
+                    tabStopChild->SetFocus();
+                    focusedControl = tabStopChild;
+                    return;
+                }
+            }
+            child = child->NextSibling();
+        }
+    }
+    else
+    {
+        Component* parent = nullptr;
+        Component* child = focusedControl;
+        Container* container = child->GetContainer();
+        if (container)
+        {
+            parent = container->Parent();
+        }
+        while (child)
+        {
+            child = child->NextSibling();
+            while (child)
+            {
+                if (child->IsControl())
+                {
+                    Control* control = static_cast<Control*>(child);
+                    Control* tabStopChild = control->GetFirstEnabledTabStopControl();
+                    if (tabStopChild)
+                    {
+                        tabStopChild->SetFocus();
+                        focusedControl = tabStopChild;
+                        return;
+                    }
+                }
+                child = child->NextSibling();
+            }
+            child = parent;
+            if (parent)
+            {
+                container = parent->GetContainer();
+                if (container)
+                {
+                    parent = container->Parent();
+                }
+                else
+                {
+                    parent = nullptr;
+                }
+            }
+        }
+        focusedControl = nullptr;
+        FocusNext();
+    }
+}
+
+void Window::FocusPrev()
+{
+    if (focusedControl == nullptr)
+    {
+        Component* child = Children().LastChild();
+        while (child)
+        {
+            if (child->IsControl())
+            {
+                Control* control = static_cast<Control*>(child);
+                Control* tabStopChild = control->GetLastEnabledTabStopControl();
+                if (tabStopChild)
+                {
+                    tabStopChild->SetFocus();
+                    focusedControl = tabStopChild;
+                    return;
+                }
+            }
+            child = child->PrevSibling();
+        }
+    }
+    else
+    {
+        Component* parent = nullptr;
+        Component* child = focusedControl;
+        Container* container = child->GetContainer();
+        if (container)
+        {
+            parent = container->Parent();
+        }
+        while (child)
+        {
+            child = child->PrevSibling();
+            while (child)
+            {
+                if (child->IsControl())
+                {
+                    Control* control = static_cast<Control*>(child);
+                    Control* tabStopChild = control->GetLastEnabledTabStopControl();
+                    if (tabStopChild)
+                    {
+                        tabStopChild->SetFocus();
+                        focusedControl = tabStopChild;
+                        return;
+                    }
+                }
+                child = child->PrevSibling();
+            }
+            child = parent;
+            if (parent)
+            {
+                container = parent->GetContainer();
+                if (container)
+                {
+                    parent = container->Parent();
+                }
+                else
+                {
+                    parent = nullptr;
+                }
+            }
+        }
+        focusedControl = nullptr;
+        FocusPrev();
+    }
+}
+
 void Window::SetDefaultButton(Button* defaultButton_)
 {
     if (defaultButton != defaultButton_)

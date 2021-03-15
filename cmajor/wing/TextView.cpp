@@ -255,7 +255,7 @@ void TextView::ResetCCDirty()
 
 void TextView::AddLine(const std::u32string& line)
 {
-    lines.push_back(line);
+    lines.push_back(std::unique_ptr<std::u32string>(new std::u32string(line)));
     SetMaxLineLength();
     SetTextExtent();
 }
@@ -287,7 +287,7 @@ void TextView::SetMaxLineLength()
     int n = lines.size();
     for (int i = 0; i < n; ++i)
     {
-        const std::u32string& line = lines[i];
+        const std::u32string& line = *lines[i];
         if (line.length() > maxLineLength)
         {
             maxLineLength = line.length();
@@ -376,10 +376,14 @@ void TextView::SetTextContent(const std::u32string& textContent)
 {
     maxLineLength = 0;
     maxLineIndex = 0;
-    lines = SplitTextIntoLines(textContent);
+    lines.clear();
+    std::vector<std::u32string> splitLines = SplitTextIntoLines(textContent);
+    for (std::u32string& line : splitLines)
+    {
+        lines.push_back(std::unique_ptr<std::u32string>(new std::u32string(std::move(line))));
+    }
     lineStartIndeces = CalculateLineStartIndeces(textContent);
     SetMaxLineLength();
-    SetTextExtent();
     OnLinesChanged();
     SetContentChanged();
     SetChanged();
@@ -413,7 +417,7 @@ char32_t TextView::GetCharAt(int line, int col) const
     }
     if (line >= 1 && line <= lines.size() && col >= 1 && col <= lineLength)
     {
-        return lines[line - 1][col - 1];
+        return (*lines[line - 1])[col - 1];
     }
     return '\0';
 }
@@ -606,9 +610,9 @@ void TextView::ScrollToCaret()
 void TextView::SaveText()
 {
     std::ofstream file(filePath);
-    for (const std::u32string& line : lines)
+    for (const std::unique_ptr<std::u32string>& line : lines)
     {
-        file << ToUtf8(line) << "\n";
+        file << ToUtf8(*line) << "\n";
     }
 }
 
@@ -667,7 +671,7 @@ void TextView::ReplaceCCText(const std::u32string& replacement)
     int caretColumnIndex = std::max(0, caretColumn - 1);
     if (caretLineIndex < lines.size())
     {
-        std::u32string& line = lines[caretLineIndex];
+        std::u32string& line = *lines[caretLineIndex];
         while (caretColumnIndex > line.length())
         {
             --caretColumnIndex;
@@ -705,7 +709,7 @@ std::u32string TextView::GetCursorText() const
     long n = lines.size();
     for (long i = 0; i < n; ++i)
     {
-        const std::u32string& line = lines[i];
+        const std::u32string& line = *lines[i];
         int lineNumber = static_cast<int>(i + 1);
         if (lineNumber == caretLine)
         {
@@ -747,9 +751,9 @@ void TextView::InsertChar(int lineIndex, int columnIndex, char32_t c)
 {
     while (lineIndex >= lines.size())
     {
-        lines.push_back(std::u32string());
+        lines.push_back(std::unique_ptr<std::u32string>(new std::u32string()));
     }
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     line.insert(columnIndex, 1, c);
     if (c == '}' && StartsWith(line, std::u32string(IndentSize(), ' ')))
     {
@@ -795,9 +799,9 @@ void TextView::InsertLines(int lineIndex, int columnIndex, const std::vector<std
     {
         while (lineIndex >= lines.size())
         {
-            lines.push_back(std::u32string());
+            lines.push_back(std::unique_ptr<std::u32string>(new std::u32string()));
         }
-        std::u32string& line = lines[lineIndex];
+        std::u32string& line = *lines[lineIndex];
         line.insert(columnIndex, linesToInsert.front());
         LineEventArgs args(lineIndex, -1);
         OnLineChanged(args);
@@ -812,12 +816,12 @@ void TextView::InsertLines(int lineIndex, int columnIndex, const std::vector<std
         int indent = 0;
         if (lineIndex > 0 && lineIndex < lines.size())
         {
-            indent = GetIndent(lines[lineIndex - 1], lineIndex - 1);
+            indent = GetIndent(*lines[lineIndex - 1], lineIndex - 1);
         }
         int indentLineIndex = lineIndex - 1;
         for (const std::u32string& lineToInsert : linesToInsert)
         {
-            lines.insert(lines.begin() + lineIndex, lineToInsert);
+            lines.insert(lines.begin() + lineIndex, std::unique_ptr<std::u32string>(new std::u32string(lineToInsert)));
             SetLineNumberFieldLength(static_cast<int>(lines.size()));
             LineEventArgs args(lineIndex, indentLineIndex);
             OnLineInserted(args);
@@ -837,9 +841,9 @@ void TextView::NewLine(int lineIndex, int columnIndex)
 {
     while (lineIndex >= lines.size())
     {
-        lines.push_back(std::u32string());
+        lines.push_back(std::unique_ptr<std::u32string>(new std::u32string()));
     }
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     std::u32string toInsert = TrimEnd(line.substr(columnIndex));
     bool lineChanged = false;
     if (!toInsert.empty())
@@ -858,10 +862,10 @@ void TextView::NewLine(int lineIndex, int columnIndex)
         LineEventArgs changedArgs(lineIndex, -1);
         OnLineChanged(changedArgs);
     }
-    lines.insert(lines.begin() + lineIndex + 1, toInsert);
+    lines.insert(lines.begin() + lineIndex + 1, std::unique_ptr<std::u32string>(new std::u32string(toInsert)));
     SetLineNumberFieldLength(static_cast<int>(lines.size()));
     int indentLineIndex = lineIndex;
-    while (indentLineIndex >= 0 && IsEmptyOrSpaceLine(lines[indentLineIndex]))
+    while (indentLineIndex >= 0 && IsEmptyOrSpaceLine(*lines[indentLineIndex]))
     {
         --indentLineIndex;
     }
@@ -872,7 +876,7 @@ void TextView::NewLine(int lineIndex, int columnIndex)
     LineEventArgs insertedArgs(lineIndex + 1, indentLineIndex);
     OnLineInserted(insertedArgs);
     SetTextExtent();
-    SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength() + GetIndent(lines[indentLineIndex], indentLineIndex));
+    SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength() + GetIndent(*lines[indentLineIndex], indentLineIndex));
     ScrollToCaret();
     Invalidate();
     SetDirty();
@@ -883,9 +887,9 @@ void TextView::Tab(int lineIndex, int columnIndex)
 {
     while (lineIndex >= lines.size())
     {
-        lines.push_back(std::u32string());
+        lines.push_back(std::unique_ptr<std::u32string>(new std::u32string()));
     }
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     line.insert(columnIndex, std::u32string(IndentSize(), ' '));
     if (line.length() > maxLineLength)
     {
@@ -905,7 +909,7 @@ void TextView::Tab(int lineIndex, int columnIndex)
 void TextView::Backtab(int lineIndex, int columnIndex)
 {
     if (lineIndex >= lines.size()) return;
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     int targetCol = std::max(1, columnIndex - IndentSize() + 1);
     int numSpaces = 0;
     int col = 0;
@@ -936,7 +940,7 @@ void TextView::Backtab(int lineIndex, int columnIndex)
 
 void TextView::AddSpaces(int lineIndex, int columnIndex, int numSpaces)
 {
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     line.insert(columnIndex - numSpaces, std::u32string(numSpaces, ' '));
     LineEventArgs args(lineIndex, -1);
     OnLineChanged(args);
@@ -949,7 +953,7 @@ void TextView::AddSpaces(int lineIndex, int columnIndex, int numSpaces)
 
 void TextView::RemoveSpaces(int lineIndex, int columnIndex, int numSpaces)
 {
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     line.erase(columnIndex - numSpaces, numSpaces);
     LineEventArgs args(lineIndex, -1);
     OnLineChanged(args);
@@ -963,7 +967,7 @@ void TextView::RemoveSpaces(int lineIndex, int columnIndex, int numSpaces)
 void TextView::DeleteChar(int lineIndex, int columnIndex, int indent, int numSpaces, bool removeIndent)
 {
     if (lineIndex >= lines.size()) return;
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     if (removeIndent)
     {
         line.insert(0, std::u32string(IndentSize(), ' '));
@@ -983,7 +987,7 @@ void TextView::DeleteChar(int lineIndex, int columnIndex, int indent, int numSpa
             {
                 line.append(std::u32string(numSpaces, ' '));
             }
-            std::u32string nextLine = lines[lineIndex + 1];
+            std::u32string nextLine = *lines[lineIndex + 1];
             line.append(nextLine.substr(indent));
             LineEventArgs changedArgs(lineIndex, -1);
             OnLineChanged(changedArgs);
@@ -1014,7 +1018,7 @@ void TextView::DeleteLines(int lineIndex, int columnIndex, const std::vector<std
 {
     if (linesToDelete.size() == 1)
     {
-        std::u32string& line = lines[lineIndex];
+        std::u32string& line = *lines[lineIndex];
         line.erase(columnIndex, linesToDelete.front().length());
         LineEventArgs args(lineIndex, -1);
         OnLineChanged(args);
@@ -1057,7 +1061,7 @@ SelectionData TextView::GetSelection() const
     if (selection.IsEmpty()) return SelectionData();
     if (selection.start.line == selection.end.line)
     {
-        std::u32string s = lines[selection.start.line - 1].substr(selection.start.column - 1, selection.end.column - selection.start.column);
+        std::u32string s = (*lines[selection.start.line - 1]).substr(selection.start.column - 1, selection.end.column - selection.start.column);
         int indent = MinIndent(s);
         SelectionData selectionData(Unindent(s, indent), indent, 0);
         return selectionData;
@@ -1065,16 +1069,16 @@ SelectionData TextView::GetSelection() const
     else
     {
         int numTrailingSpaces = 0;
-        std::u32string s = lines[selection.start.line - 1].substr(selection.start.column - 1).append(1, '\n');
+        std::u32string s = (*lines[selection.start.line - 1]).substr(selection.start.column - 1).append(1, '\n');
         for (int i = selection.start.line; i < selection.end.line - 1; ++i)
         {
-            s.append(lines[i]).append(1, '\n');
+            s.append(*lines[i]).append(1, '\n');
         }
         if (selection.end.line - 1 < lines.size())
         {
-            if (!lines[selection.end.line - 1].substr(0, selection.end.column - 1).empty())
+            if (!(*lines[selection.end.line - 1]).substr(0, selection.end.column - 1).empty())
             {
-                std::u32string lastLine = lines[selection.end.line - 1].substr(0, selection.end.column - 1);
+                std::u32string lastLine = (*lines[selection.end.line - 1]).substr(0, selection.end.column - 1);
                 numTrailingSpaces = GetNumTrailingSpaces(lastLine);
                 s.append(lastLine).append(1, '\n');
             }
@@ -1107,7 +1111,7 @@ void TextView::InsertSelection(const Selection& selectionToInsert, const Selecti
             {
                 selectedText.insert(0, std::u32string(selectionData.indent, ' '));
             }
-            lines.insert(lines.begin() + lineIndex, selectedText);
+            lines.insert(lines.begin() + lineIndex, std::unique_ptr<std::u32string>(new std::u32string(selectedText)));
             LineEventArgs args(lineIndex, -1);
             OnLineInserted(args);
             SetCaretLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
@@ -1120,7 +1124,7 @@ void TextView::InsertSelection(const Selection& selectionToInsert, const Selecti
             {
                 selectedText.insert(0, std::u32string(selectionData.indent, ' '));
             }
-            lines[lineIndex].insert(selectionToInsert.start.column - 1, selectedText);
+            (*lines[lineIndex]).insert(selectionToInsert.start.column - 1, selectedText);
             LineEventArgs args(lineIndex, -1);
             OnLineChanged(args);
             SetCaretLineCol(lineIndex + 1, selectionToInsert.start.column + LineNumberFieldLength());
@@ -1139,7 +1143,7 @@ void TextView::InsertSelection(const Selection& selectionToInsert, const Selecti
             {
                 firstSelectionLine.insert(0, selectionData.indent, ' ');
             }
-            lines[startLineIndex].insert(selectionToInsert.start.column - 1, firstSelectionLine);
+            (*lines[startLineIndex]).insert(selectionToInsert.start.column - 1, firstSelectionLine);
             LineEventArgs changeArgs(startLineIndex, -1);
             OnLineChanged(changeArgs);
             ++startLineIndex;
@@ -1151,7 +1155,7 @@ void TextView::InsertSelection(const Selection& selectionToInsert, const Selecti
             {
                 firstSelectionLine.insert(0, selectionData.indent, ' ');
             }
-            lines.insert(lines.begin() + startLineIndex, firstSelectionLine);
+            lines.insert(lines.begin() + startLineIndex, std::unique_ptr<std::u32string>(new std::u32string(firstSelectionLine)));
             LineEventArgs args(startLineIndex, -1);
             OnLineInserted(args);
             ++startLineIndex;
@@ -1164,7 +1168,7 @@ void TextView::InsertSelection(const Selection& selectionToInsert, const Selecti
             {
                 selectionLine.insert(0, selectionData.indent, ' ');
             }
-            lines.insert(lines.begin() + i, selectionLine);
+            lines.insert(lines.begin() + i, std::unique_ptr<std::u32string>(new std::u32string(std::move(selectionLine))));
             LineEventArgs args(i, -1);
             OnLineInserted(args);
         }
@@ -1180,13 +1184,13 @@ void TextView::InsertSelection(const Selection& selectionToInsert, const Selecti
         }
         if (wholeLine)
         {
-            lines.insert(lines.begin() + endLineIndex, lastLine);
+            lines.insert(lines.begin() + endLineIndex, std::unique_ptr<std::u32string>(new std::u32string(std::move(lastLine))));
             LineEventArgs args(endLineIndex, -1);
             OnLineInserted(args);
         }
         else
         {
-            lines[endLineIndex].insert(0, lastLine);
+            (*lines[endLineIndex]).insert(0, lastLine);
             LineEventArgs args(endLineIndex, -1);
             OnLineChanged(args);
         }
@@ -1214,7 +1218,7 @@ void TextView::RemoveSelection()
         else
         {
             int lineIndex = selection.start.line - 1;
-            lines[lineIndex].erase(selection.start.column - 1, selection.end.column - selection.start.column);
+            (*lines[lineIndex]).erase(selection.start.column - 1, selection.end.column - selection.start.column);
             LineEventArgs args(lineIndex, -1);
             OnLineChanged(args);
             SetCaretLineCol(lineIndex + 1, selection.start.column + LineNumberFieldLength());
@@ -1226,7 +1230,7 @@ void TextView::RemoveSelection()
         int endLineIndex = selection.end.line - 1;
         if (selection.start.column > 1)
         {
-            lines[startLineIndex].erase(selection.start.column - 1, GetLineLength(startLineIndex + 1) - selection.start.column + 1);
+            (*lines[startLineIndex]).erase(selection.start.column - 1, GetLineLength(startLineIndex + 1) - selection.start.column + 1);
             LineEventArgs args(startLineIndex, -1);
             OnLineChanged(args);
             ++startLineIndex;
@@ -1256,7 +1260,7 @@ void TextView::RemoveSelection()
             }
             else
             {
-                lines[endLineIndex].erase(0, selection.end.column - 1);
+                (*lines[endLineIndex]).erase(0, selection.end.column - 1);
                 LineEventArgs args(endLineIndex, -1);
                 OnLineChanged(args);
             }
@@ -1278,9 +1282,9 @@ void TextView::IndentSelection()
     std::u32string indentString(IndentSize(), ' ');
     for (int i = startLineIndex; i <= endLineIndex; ++i)
     {
-        if (lines[i].empty()) continue;
-        if (i == selection.end.line - 1 && lines[i].substr(0, selection.end.column - 1).empty()) continue;
-        lines[i].insert(0, indentString);
+        if ((*lines[i]).empty()) continue;
+        if (i == selection.end.line - 1 && (*lines[i]).substr(0, selection.end.column - 1).empty()) continue;
+        (*lines[i]).insert(0, indentString);
         LineEventArgs args(i, -1);
         OnLineChanged(args);
     }
@@ -1297,14 +1301,14 @@ void TextView::UnindentSelection()
     std::u32string indentString(IndentSize(), ' ');
     for (int i = startLineIndex; i <= endLineIndex; ++i)
     {
-        std::u32string line = lines[i];
+        std::u32string line = *lines[i];
         if (i == endLineIndex)
         {
             line = line.substr(0, selection.end.column - 1);
         }
         if (StartsWith(line, indentString)) 
         {
-            lines[i].erase(0, IndentSize());
+            (*lines[i]).erase(0, IndentSize());
             LineEventArgs args(i, -1);
             OnLineChanged(args);
         }
@@ -1413,7 +1417,7 @@ int TextView::GetLineLength(int lineNumber) const
     int lineLength = 0;
     if (lineNumber >= 1 && lineNumber <= lines.size())
     {
-        lineLength = lines[lineNumber - 1].length();
+        lineLength = (*lines[lineNumber - 1]).length();
     }
     return lineLength;
 }
@@ -2240,13 +2244,20 @@ void TextView::Measure(Graphics& graphics)
     {
         if (!lines.empty() && maxLineLength > 0)
         {
-            ms = ToUtf8(lines[maxLineIndex]);
+            ms = ToUtf8(*lines[maxLineIndex]);
             measure = true;
         }
     }
     if (measure)
     {
+        std::vector<const Font*> fnts;
+        const Font* font = &GetFont();
+        fnts.push_back(font);
         for (const std::unique_ptr<Font>& font : fonts)
+        {
+            fnts.push_back(font.get());
+        }
+        for (const Font* font : fnts)
         {
             Gdiplus::TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
             CheckGraphicsStatus(graphics.SetTextRenderingHint(Gdiplus::TextRenderingHint::TextRenderingHintClearTypeGridFit));
@@ -2299,7 +2310,7 @@ void TextView::DrawLine(Graphics& graphics, int lineIndex, const PointF& origin)
 {
     const Font& font = GetFont();
     PointF pt(origin);
-    const std::u32string& line = lines[lineIndex];
+    const std::u32string& line = *lines[lineIndex];
     std::string s(ToUtf8(line));
     Brush* brush = GetOrInsertBrush(textColor);
     DrawString(graphics, s, font, pt, *brush);
@@ -2317,6 +2328,7 @@ SolidBrush* TextView::GetOrInsertBrush(const Color& color)
         std::unique_ptr<SolidBrush> solidBrushPtr(new SolidBrush(color));
         SolidBrush* solidBrush = solidBrushPtr.get();
         brushMap[color.GetValue()] = solidBrush;
+        brushes.push_back(std::move(solidBrushPtr));
         return solidBrush;
     }
 }
@@ -2466,11 +2478,11 @@ void TextView::OnLineInserted(LineEventArgs& args)
 {
     lineInserted.Fire(args);
     int lineIndex = args.lineIndex;
-    std::u32string& line = Lines()[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     int indent = 0;
-    if (args.indentLineIndex >= 0 && args.indentLineIndex < Lines().size())
+    if (args.indentLineIndex >= 0 && args.indentLineIndex < lines.size())
     {
-        indent = GetIndent(Lines()[args.indentLineIndex], args.indentLineIndex);
+        indent = GetIndent(*lines[args.indentLineIndex], args.indentLineIndex);
     }
     if (indent != 0)
     {
@@ -2511,9 +2523,9 @@ void TextView::AddInsertCharCommand(int lineIndex, int columnIndex, char32_t c)
     bool removeIndent = false;
     while (lineIndex >= lines.size())
     {
-        lines.push_back(std::u32string());
+        lines.push_back(std::unique_ptr<std::u32string>(new std::u32string()));
     }
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     if (c == '}' && StartsWith(line, std::u32string(IndentSize(), ' ')))
     {
         removeIndent = true;
@@ -2530,9 +2542,9 @@ void TextView::AddNewLineCommand(int lineIndex, int columnIndex)
 {
     while (lineIndex >= lines.size())
     {
-        lines.push_back(std::u32string());
+        lines.push_back(std::unique_ptr<std::u32string>(new std::u32string()));
     }
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     int indent = 0;
     bool countIndent = false;
     int i = columnIndex - 1;
@@ -2569,7 +2581,7 @@ void TextView::AddTabCommand(int lineIndex, int columnIndex)
 
 void TextView::AddBacktabCommand(int lineIndex, int columnIndex)
 {
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     int targetCol = std::max(1, columnIndex - IndentSize() + 1);
     int numSpaces = 0;
     for (int i = columnIndex; i >= targetCol; --i)
@@ -2589,7 +2601,7 @@ void TextView::AddBacktabCommand(int lineIndex, int columnIndex)
 void TextView::AddDeleteCharCommand(int lineIndex, int columnIndex)
 {
     if (lineIndex >= lines.size()) return;
-    std::u32string& line = lines[lineIndex];
+    std::u32string& line = *lines[lineIndex];
     if (columnIndex < line.length())
     {
         char32_t c = line[columnIndex];

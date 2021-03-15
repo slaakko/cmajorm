@@ -718,6 +718,30 @@ void Control::ScrollLineUp()
     }
 }
 
+Control* Control::GetFirstEnabledTabStopControl() const
+{
+    if (GetFlag(ControlFlags::tabStop) && !Disabled())
+    {
+        return const_cast<Control*>(this);
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+Control* Control::GetLastEnabledTabStopControl() const
+{
+    if (GetFlag(ControlFlags::tabStop) && !Disabled())
+    {
+        return const_cast<Control*>(this);
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 void Control::TranslateChildGraphics(Graphics& graphics)
 {
     Control* parentControl = ParentControl();
@@ -1731,6 +1755,16 @@ void Control::OnKeyUp(KeyEventArgs& args)
 void Control::OnKeyPress(KeyPressEventArgs& args)
 {
     keyPress.Fire(args);
+}
+
+void Control::OnControlAdded(ControlEventArgs& args)
+{
+    controlAdded.Fire(args);
+}
+
+void Control::OnControlRemoved(ControlEventArgs& args)
+{
+    controlRemoved.Fire(args);
 }
 
 void Control::SetCaretLocation()

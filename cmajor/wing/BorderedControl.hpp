@@ -76,6 +76,8 @@ public:
     bool IsDecoratorControl() const override { return true; }
     Control* Child() const { return child; }
     ContainerControl* GetContainerControl() const override;
+    Control* GetFirstEnabledTabStopControl() const override;
+    Control* GetLastEnabledTabStopControl() const override;
 protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnLocationChanged() override;

@@ -10,9 +10,6 @@
 
 namespace cmajor { namespace wing {
 
-using ControlAddedEvent = EventWithArgs<ControlEventArgs>;
-using ControlRemovedEvent = EventWithArgs<ControlEventArgs>;
-
 class WING_API ContainerControl : public Control
 {
 public:
@@ -22,16 +19,16 @@ public:
     ContainerControl* GetContainerControl() const override;
     void AddChild(Control* child);
     std::unique_ptr<Control> RemoveChild(Control* child);
+    const Container& Children() const { return children; }
+    Container& Children() { return children; }
     void InsertChildBefore(Control* child, Control* before);
     void InsertChildAfter(Control* child, Control* after);
     void DockChildren();
     void DockChildren(Rect& parentRect);
-    ControlAddedEvent& ControlAdded() { return controlAdded; }
-    ControlRemovedEvent& ControlRemoved() { return controlRemoved; }
+    Control* GetFirstEnabledTabStopControl() const override;
+    Control* GetLastEnabledTabStopControl() const override;
 protected:
     bool ProcessMessage(Message& msg) override;
-    virtual void OnControlAdded(ControlEventArgs& args);
-    virtual void OnControlRemoved(ControlEventArgs& args);
     void OnChildContentChanged(ControlEventArgs& args) override;
     void OnChildContentLocationChanged(ControlEventArgs& args) override;
     void OnChildContentSizeChanged(ControlEventArgs& args) override;
@@ -39,8 +36,6 @@ protected:
     void OnChildLostFocus(ControlEventArgs& args) override;
 private:
     Container children;
-    ControlAddedEvent controlAdded;
-    ControlRemovedEvent controlRemoved;
 };
 
 } } // cmajor::wing

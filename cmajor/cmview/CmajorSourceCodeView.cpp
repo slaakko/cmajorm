@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmview/CmajorSourceCodeView.hpp>
+#include <cmajor/cmview/DebugStrip.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -138,7 +139,7 @@ CmajorSourceCodeViewCreateParams& CmajorSourceCodeViewCreateParams::DebugLocatio
 }
 
 CmajorSourceCodeView::CmajorSourceCodeView(CmajorSourceCodeViewCreateParams& createParams) : 
-    SourceCodeView(createParams.sourceCodeViewCreateParams), lexer(std::u32string(), "", 0), 
+    SourceCodeView(createParams.sourceCodeViewCreateParams), lexer(nullptr, nullptr, std::string(), 0),
     debugLocationBackgroundColor(createParams.debugLocationBackgroundColor),
     debugLocationTextColor(createParams.debugLocationTextColor),
     debugLocationPadding(createParams.debugLocationPadding),
@@ -158,12 +159,11 @@ CmajorSourceCodeView::CmajorSourceCodeView(CmajorSourceCodeViewCreateParams& cre
 
 void CmajorSourceCodeView::ToggleBreakpoint()
 {
-/*  TODO
     if (debugStrip)
     {
         int line = CaretLine();
         Breakpoint* bp = debugStrip->GetBreakpoint(line);
-        if (bp != null)
+        if (bp)
         {
             debugStrip->RemoveBreakpoint(bp);
             debugStrip->Invalidate();
@@ -175,7 +175,6 @@ void CmajorSourceCodeView::ToggleBreakpoint()
             debugStrip->Invalidate();
         }
     }
-*/
 }
 
 TokenLine CmajorSourceCodeView::TokenizeLine(const std::u32string& line, int lineNumber, int startState)
@@ -303,13 +302,11 @@ SourceCodeTokenKind CmajorSourceCodeView::GetTokenKind(const Token& token) const
 void CmajorSourceCodeView::DrawHilites(Graphics& graphics, int lineIndex, const PointF& origin)
 {
     if (!debugStrip) return;
-/*  TODO 
     SourceSpan debugLocation = debugStrip->DebugLocation();
     if (!debugLocation.IsEmpty() && debugLocation.line == lineIndex + 1)
     {
         DrawDebugLocationHilite(graphics, debugLocation, origin);
     }
-*/
 }
 
 void CmajorSourceCodeView::DrawDebugLocationHilite(Graphics& graphics, const SourceSpan& debugLocation, const PointF& origin)

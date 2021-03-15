@@ -35,6 +35,8 @@ public:
     void ScrollLineDown() override;
     void ScrollLineUp() override;
     Control* Child() const { return child; }
+    Control* GetFirstEnabledTabStopControl() const override;
+    Control* GetLastEnabledTabStopControl() const override;
 protected:
     void TranslateChildGraphics(Graphics& graphics) override;
     void TranslateMousePos(Point& location) override;

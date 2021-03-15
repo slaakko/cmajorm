@@ -329,63 +329,63 @@ std::unique_ptr<sngxml::dom::Element> GetOverloadListReply::ToXml(const std::str
     return element;
 }
 
-StopRequest::StopRequest()
+StopCCRequest::StopCCRequest()
     : CodeCompletionRequest()
 {
 }
 
-StopRequest::StopRequest(sngxml::dom::Element* element)
+StopCCRequest::StopCCRequest(sngxml::dom::Element* element)
     : CodeCompletionRequest(sngxml::xmlser::GetXmlFieldElement("base", element))
 {
 }
 
-std::unique_ptr<sngxml::dom::Element> StopRequest::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> StopCCRequest::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(CodeCompletionRequest::ToXml("base").release()));
     return element;
 }
 
-StopReply::StopReply()
+StopCCReply::StopCCReply()
     : CodeCompletionReply()
 {
 }
 
-StopReply::StopReply(sngxml::dom::Element* element)
+StopCCReply::StopCCReply(sngxml::dom::Element* element)
     : CodeCompletionReply(sngxml::xmlser::GetXmlFieldElement("base", element))
 {
 }
 
-std::unique_ptr<sngxml::dom::Element> StopReply::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> StopCCReply::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(CodeCompletionReply::ToXml("base").release()));
     return element;
 }
 
-KeepAliveRequest::KeepAliveRequest()
+KeepAliveCCRequest::KeepAliveCCRequest()
 {
 }
 
-KeepAliveRequest::KeepAliveRequest(sngxml::dom::Element* element)
+KeepAliveCCRequest::KeepAliveCCRequest(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<sngxml::dom::Element> KeepAliveRequest::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> KeepAliveCCRequest::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     return element;
 }
 
-KeepAliveReply::KeepAliveReply()
+KeepAliveCCReply::KeepAliveCCReply()
 {
 }
 
-KeepAliveReply::KeepAliveReply(sngxml::dom::Element* element)
+KeepAliveCCReply::KeepAliveCCReply(sngxml::dom::Element* element)
 {
 }
 
-std::unique_ptr<sngxml::dom::Element> KeepAliveReply::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> KeepAliveCCReply::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     return element;

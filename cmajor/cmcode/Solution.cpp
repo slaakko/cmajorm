@@ -86,15 +86,18 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, Tr
     for (const auto& project : solution->Projects())
     {
         std::string projectName = ToUtf8(project->Name());
+        std::unique_ptr<ProjectData> projectData(new ProjectData(project.get()));
+        projectDataMap[project.get()] = projectData.get();
+        projectDataVec.push_back(std::move(projectData));
         std::unique_ptr<TreeViewNode> projectNode(new TreeViewNode(projectName));
-        std::unique_ptr<SolutionTreeViewNodeData> projectData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::project, nullptr, project.get(), std::string(), std::string()));
-        projectNode->SetData(projectData.get());
+        std::unique_ptr<SolutionTreeViewNodeData> projectTreeViewData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::project, nullptr, project.get(), std::string(), std::string()));
+        projectNode->SetData(projectTreeViewData.get());
         if (project.get() == solution->ActiveProject())
         {
             activeProjectNode = projectNode.get();
             projectNode->SetActive();
         }
-        treeViewData.push_back(std::move(projectData));
+        treeViewData.push_back(std::move(projectTreeViewData));
         std::vector<std::unique_ptr<SolutionTreeViewNodeData>> fileData;
         for (const std::string& sourceFilePath : project->SourceFilePaths())
         {
@@ -168,6 +171,19 @@ SolutionTreeViewNodeData* SolutionData::GetSolutionTreeViewNodeDataByKey(const s
 {
     auto it = treeViewDataMap.find(key);
     if (it != treeViewDataMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+ProjectData* SolutionData::GetProjectDataByProject(sngcm::ast::Project* project) const
+{
+    auto it = projectDataMap.find(project);
+    if (it != projectDataMap.cend())
     {
         return it->second;
     }

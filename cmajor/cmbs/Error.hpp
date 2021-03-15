@@ -6,7 +6,7 @@
 #ifndef CMBS_ERROR_INCLUDED
 #define CMBS_ERROR_INCLUDED
 #include <soulng/lexer/ParsingException.hpp>
-#include <cmajor/cmsvc/BuildServerMessage.hpp>
+#include <cmajor/cmmsg/BuildServerMessage.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <vector>
 

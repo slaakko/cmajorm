@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/wing/BorderedControl.hpp>
+#include <cmajor/wing/ContainerControl.hpp>
 
 namespace cmajor { namespace wing {
 
@@ -169,9 +170,23 @@ BorderedControl::BorderedControl(BorderedControlCreateParams& createParams) :
     container.AddChild(child);
 }
 
+Control* BorderedControl::GetFirstEnabledTabStopControl() const
+{
+    return child->GetFirstEnabledTabStopControl();
+}
+
+Control* BorderedControl::GetLastEnabledTabStopControl() const
+{
+    return child->GetLastEnabledTabStopControl();
+}
+
 ContainerControl* BorderedControl::GetContainerControl() const
 {
-    return child->GetContainerControl();
+    if (child->IsContainerControl())
+    {
+        return static_cast<ContainerControl*>(child);
+    }
+    return Control::GetContainerControl();
 }
 
 void BorderedControl::OnPaint(PaintEventArgs& args)

@@ -43,6 +43,10 @@ namespace Cm.Service.Debug
         public nothrow BreakpointList()
         {
         }
+        public ~BreakpointList()
+        {
+            Clear();
+        }
         public nothrow inline bool IsEmpty() const
         {
             return breakpoints.IsEmpty();
@@ -80,8 +84,9 @@ namespace Cm.Service.Debug
         {
             for (Breakpoint* bp : breakpoints)
             {
-                RemoveBreakpoint(bp);
+                delete bp;
             }
+            breakpoints.Clear();
         }
         public nothrow inline const string& FilePath() const
         {

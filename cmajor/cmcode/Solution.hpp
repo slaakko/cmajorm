@@ -5,6 +5,7 @@
 
 #ifndef CMCODE_SOLUTION_INCLUDED
 #define CMCODE_SOLUTION_INCLUDED
+#include <cmajor/cmcode/Project.hpp>
 #include <sngcm/ast/Project.hpp>
 #include <sngcm/ast/Solution.hpp>
 #include <cmajor/wing/TreeView.hpp>
@@ -42,6 +43,8 @@ public:
     TreeViewNode* ActiveProjectNode() const { return activeProjectNode; }
     void SetActiveProjectNode(TreeViewNode* activeProjectNode_) { activeProjectNode = activeProjectNode_; }
     SolutionTreeViewNodeData* GetSolutionTreeViewNodeDataByKey(const std::string& key) const;
+    ProjectData* GetProjectDataByProject(sngcm::ast::Project* project) const;
+    BreakpointCollection& GetSolutionBreakpointCollection() { return solutionBreakpointCollection; }
 private:
     void SetActiveProject();
     TreeView* solutionTreeView;
@@ -49,6 +52,9 @@ private:
     std::vector<std::unique_ptr<SolutionTreeViewNodeData>> treeViewData;
     std::map<std::string, SolutionTreeViewNodeData*> treeViewDataMap;
     TreeViewNode* activeProjectNode;
+    std::vector<std::unique_ptr<ProjectData>> projectDataVec;
+    std::unordered_map<sngcm::ast::Project*, ProjectData*> projectDataMap;
+    BreakpointCollection solutionBreakpointCollection;
 };
 
 } // namespace cmcode

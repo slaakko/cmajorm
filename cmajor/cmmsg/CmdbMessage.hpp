@@ -1,5 +1,6 @@
 #ifndef CMDBMESSAGE_HPP_9A6DA1BD20F12675B0E78EEAF8B950F3D0DDB92E
 #define CMDBMESSAGE_HPP_9A6DA1BD20F12675B0E78EEAF8B950F3D0DDB92E
+#include <cmajor/cmmsg/MsgApi.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <soulng/util/Time.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -16,7 +17,7 @@ using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
 
-class Location
+class MSG_API Location
 {
 public:
     Location();
@@ -31,7 +32,7 @@ public:
     int32_t level;
 };
 
-class Type
+class MSG_API Type
 {
 public:
     Type();
@@ -42,7 +43,7 @@ public:
     std::string id;
 };
 
-class Result
+class MSG_API Result
 {
 public:
     Result();
@@ -55,7 +56,7 @@ public:
     std::string value;
 };
 
-class ChildResult
+class MSG_API ChildResult
 {
 public:
     ChildResult();
@@ -70,7 +71,7 @@ public:
     int32_t count;
 };
 
-class TargetState
+class MSG_API TargetState
 {
 public:
     TargetState();
@@ -84,7 +85,7 @@ public:
     std::string signalMeaning;
 };
 
-class SourceLoc
+class MSG_API SourceLoc
 {
 public:
     SourceLoc();
@@ -95,7 +96,7 @@ public:
     int32_t line;
 };
 
-class BreakpointInfo
+class MSG_API BreakpointInfo
 {
 public:
     BreakpointInfo();
@@ -109,7 +110,7 @@ public:
     std::string error;
 };
 
-class StartDebugRequest
+class MSG_API StartDebugRequest
 {
 public:
     StartDebugRequest();
@@ -119,7 +120,7 @@ public:
     std::vector<SourceLoc> breakpointLocations;
 };
 
-class StartDebugReply
+class MSG_API StartDebugReply
 {
 public:
     StartDebugReply();
@@ -133,7 +134,7 @@ public:
     std::string error;
 };
 
-class StopDebugRequest
+class MSG_API StopDebugRequest
 {
 public:
     StopDebugRequest();
@@ -142,7 +143,7 @@ public:
 public:
 };
 
-class StopDebugReply
+class MSG_API StopDebugReply
 {
 public:
     StopDebugReply();
@@ -151,7 +152,7 @@ public:
 public:
 };
 
-class GenericDebugErrorReply
+class MSG_API GenericDebugErrorReply
 {
 public:
     GenericDebugErrorReply();
@@ -161,7 +162,7 @@ public:
     std::string errorMessage;
 };
 
-class ContinueRequest
+class MSG_API ContinueRequest
 {
 public:
     ContinueRequest();
@@ -170,7 +171,7 @@ public:
 public:
 };
 
-class ContinueReply
+class MSG_API ContinueReply
 {
 public:
     ContinueReply();
@@ -183,7 +184,7 @@ public:
     std::string error;
 };
 
-class NextRequest
+class MSG_API NextRequest
 {
 public:
     NextRequest();
@@ -192,7 +193,7 @@ public:
 public:
 };
 
-class NextReply
+class MSG_API NextReply
 {
 public:
     NextReply();
@@ -205,7 +206,7 @@ public:
     std::string error;
 };
 
-class StepRequest
+class MSG_API StepRequest
 {
 public:
     StepRequest();
@@ -214,7 +215,7 @@ public:
 public:
 };
 
-class StepReply
+class MSG_API StepReply
 {
 public:
     StepReply();
@@ -227,7 +228,7 @@ public:
     std::string error;
 };
 
-class FinishRequest
+class MSG_API FinishRequest
 {
 public:
     FinishRequest();
@@ -236,7 +237,7 @@ public:
 public:
 };
 
-class FinishReply
+class MSG_API FinishReply
 {
 public:
     FinishReply();
@@ -249,7 +250,7 @@ public:
     std::string error;
 };
 
-class UntilRequest
+class MSG_API UntilRequest
 {
 public:
     UntilRequest();
@@ -259,7 +260,7 @@ public:
     SourceLoc sourceLoc;
 };
 
-class UntilReply
+class MSG_API UntilReply
 {
 public:
     UntilReply();
@@ -272,7 +273,7 @@ public:
     std::string error;
 };
 
-class BreakRequest
+class MSG_API BreakRequest
 {
 public:
     BreakRequest();
@@ -282,7 +283,7 @@ public:
     SourceLoc breakpointLocation;
 };
 
-class BreakReply
+class MSG_API BreakReply
 {
 public:
     BreakReply();
@@ -292,7 +293,7 @@ public:
     BreakpointInfo breakpointInfo;
 };
 
-class DeleteRequest
+class MSG_API DeleteRequest
 {
 public:
     DeleteRequest();
@@ -302,7 +303,7 @@ public:
     std::string breakpointId;
 };
 
-class DeleteReply
+class MSG_API DeleteReply
 {
 public:
     DeleteReply();
@@ -313,7 +314,7 @@ public:
     std::string error;
 };
 
-class DepthRequest
+class MSG_API DepthRequest
 {
 public:
     DepthRequest();
@@ -322,7 +323,7 @@ public:
 public:
 };
 
-class DepthReply
+class MSG_API DepthReply
 {
 public:
     DepthReply();
@@ -334,7 +335,7 @@ public:
     std::string error;
 };
 
-class FramesRequest
+class MSG_API FramesRequest
 {
 public:
     FramesRequest();
@@ -345,7 +346,7 @@ public:
     int32_t highFrame;
 };
 
-class FramesReply
+class MSG_API FramesReply
 {
 public:
     FramesReply();
@@ -357,7 +358,7 @@ public:
     std::string error;
 };
 
-class EvaluateRequest
+class MSG_API EvaluateRequest
 {
 public:
     EvaluateRequest();
@@ -367,7 +368,7 @@ public:
     std::string expression;
 };
 
-class EvaluateReply
+class MSG_API EvaluateReply
 {
 public:
     EvaluateReply();
@@ -379,7 +380,7 @@ public:
     std::string error;
 };
 
-class CountRequest
+class MSG_API CountRequest
 {
 public:
     CountRequest();
@@ -389,7 +390,7 @@ public:
     std::string expression;
 };
 
-class CountReply
+class MSG_API CountReply
 {
 public:
     CountReply();
@@ -401,7 +402,7 @@ public:
     std::string error;
 };
 
-class EvaluateChildRequest
+class MSG_API EvaluateChildRequest
 {
 public:
     EvaluateChildRequest();
@@ -413,7 +414,7 @@ public:
     int32_t count;
 };
 
-class EvaluateChildReply
+class MSG_API EvaluateChildReply
 {
 public:
     EvaluateChildReply();
@@ -425,7 +426,7 @@ public:
     std::string error;
 };
 
-class TargetRunningRequest
+class MSG_API TargetRunningRequest
 {
 public:
     TargetRunningRequest();
@@ -434,7 +435,7 @@ public:
 public:
 };
 
-class TargetRunningReply
+class MSG_API TargetRunningReply
 {
 public:
     TargetRunningReply();
@@ -443,7 +444,7 @@ public:
 public:
 };
 
-class TargetInputRequest
+class MSG_API TargetInputRequest
 {
 public:
     TargetInputRequest();
@@ -452,7 +453,7 @@ public:
 public:
 };
 
-class TargetInputReply
+class MSG_API TargetInputReply
 {
 public:
     TargetInputReply();
@@ -463,7 +464,7 @@ public:
     bool eof;
 };
 
-class TargetOutputRequest
+class MSG_API TargetOutputRequest
 {
 public:
     TargetOutputRequest();
@@ -474,7 +475,7 @@ public:
     std::string output;
 };
 
-class TargetOutputReply
+class MSG_API TargetOutputReply
 {
 public:
     TargetOutputReply();
@@ -483,7 +484,7 @@ public:
 public:
 };
 
-class LogDebugMessageRequest
+class MSG_API LogDebugMessageRequest
 {
 public:
     LogDebugMessageRequest();
@@ -493,7 +494,7 @@ public:
     std::string logMessage;
 };
 
-class LogDebugMessageReply
+class MSG_API LogDebugMessageReply
 {
 public:
     LogDebugMessageReply();

@@ -214,6 +214,11 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmwingd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmwing.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmwing.lib ..\lib
 
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmmsgd.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmmsgd.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmmsg.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmmsg.lib ..\lib
+
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsvcd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmsvcd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmsvc.dll ..\bin

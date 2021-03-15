@@ -115,6 +115,16 @@ void ScrollableControl::ScrollLineUp()
     }
 }
 
+Control* ScrollableControl::GetFirstEnabledTabStopControl() const
+{
+    return child->GetFirstEnabledTabStopControl();
+}
+
+Control* ScrollableControl::GetLastEnabledTabStopControl() const
+{
+    return child->GetLastEnabledTabStopControl();
+}
+
 void ScrollableControl::TranslateChildGraphics(Graphics& graphics)
 {
     int dx = -hpos * scrollUnits.horizontal;

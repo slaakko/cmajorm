@@ -151,13 +151,13 @@ namespace Cm.Service.CodeCompletion
         {
             rootElementName = "getOverloadListRequest";
         }
-        public override void Visit(StopRequest& request)
+        public override void Visit(StopCCRequest& request)
         {
-            rootElementName = "stopRequest";
+            rootElementName = "stopCCRequest";
         }
         public string rootElementName;
     }
-    
+
     public class CodeCompletionService : ServiceBase
     {
         public nothrow CodeCompletionService(CodeCompletionServiceArgs& args_) :
@@ -168,7 +168,7 @@ namespace Cm.Service.CodeCompletion
             replyRegistry.RegisterReply("parseSourceReply", new CodeCompletionReplyFactory<ParseSourceReply>());
             replyRegistry.RegisterReply("getCCListReply", new CodeCompletionReplyFactory<GetCCListReply>());
             replyRegistry.RegisterReply("getOverloadListReply", new CodeCompletionReplyFactory<GetOverloadListReply>());
-            replyRegistry.RegisterReply("stopReply", new CodeCompletionReplyFactory<StopReply>());
+            replyRegistry.RegisterReply("stopCCReply", new CodeCompletionReplyFactory<StopCCReply>());
         }
         public nothrow void SetCodeCompletionReplyHandlerFunction(CodeCompletionReplyHandlerFunction codeCompletionReplyHandlerFunction_)
         {
@@ -358,8 +358,8 @@ namespace Cm.Service.CodeCompletion
         private void SendReceiveKeepAliveRequest()
         {
             TcpSocket keepAliveSocket("localhost", ToString(keepAliveServerPort));
-            KeepAliveRequest keepAliveRequest;
-            UniquePtr<Element> requestElement = keepAliveRequest.ToXml("keepAliveRequest");
+            KeepAliveCCRequest keepAliveRequest;
+            UniquePtr<Element> requestElement = keepAliveRequest.ToXml("keepAliveCCRequest");
             Document requestDoc;
             requestDoc.AppendChild(UniquePtr<Node>(requestElement.Release()));
             StringWriter stringWriter;
@@ -369,11 +369,11 @@ namespace Cm.Service.CodeCompletion
             string replyStr = ReadStr(keepAliveSocket);
             UniquePtr<Document> replyDoc = ParseDocument(ToUtf32(replyStr), "socket");
             string messageKind = ToUtf8(replyDoc->DocumentElement()->Name());
-            if (messageKind != "keepAliveReply")
+            if (messageKind != "keepAliveCCReply")
             {
-                throw Exception("keepAliveReply expected, unknown reply message kind '" + messageKind + "' received");
+                throw Exception("keepAliveCCReply expected, unknown reply message kind '" + messageKind + "' received");
             }
-            KeepAliveReply reply(replyDoc->DocumentElement());
+            KeepAliveCCReply reply(replyDoc->DocumentElement());
         }
         private void Run()
         {

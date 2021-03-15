@@ -5,7 +5,7 @@
 
 #include <cmajor/cmccs/CodeCompletionServer.hpp>
 #include <cmajor/cmccs/KeepAliveServer.hpp>
-#include <cmajor/cmccs/CodeCompletionServerMessage.hpp>
+#include <cmajor/cmmsg/CodeCompletionServerMessage.hpp>
 #include <cmajor/build/Build.hpp>
 #include <cmajor/binder/Access.hpp>
 #include <cmajor/binder/TypeBinding.hpp>
@@ -49,7 +49,7 @@ public:
     std::unique_ptr<CodeCompletionReply> HandleRequest(const ParseSourceRequest& request, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const GetCCListRequest& request, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const GetOverloadListRequest& request, std::string& rootElementName);
-    std::unique_ptr<CodeCompletionReply> HandleRequest(const StopRequest& request, std::string& rootElementName);
+    std::unique_ptr<CodeCompletionReply> HandleRequest(const StopCCRequest& request, std::string& rootElementName);
 private:
     static std::unique_ptr<CodeCompletionServer> instance;
     CodeCompletionServer();
@@ -85,7 +85,7 @@ CodeCompletionServer::CodeCompletionServer() : port(-1), version(), exit(false),
     requestKindMap["parseSourceRequest"] = CodeCompletionRequestKind::parseSourceRequest;
     requestKindMap["getCCListRequest"] = CodeCompletionRequestKind::getCCListRequest;
     requestKindMap["getOverloadListRequest"] = CodeCompletionRequestKind::getOverloadListRequest;
-    requestKindMap["stopRequest"] = CodeCompletionRequestKind::stopRequest;
+    requestKindMap["stopCCRequest"] = CodeCompletionRequestKind::stopRequest;
     SetReadProjectFunction(cmajor::build::ReadProject);
     SetTypeBindingFunction(cmajor::binder::BindTypes);
     SetAccessCheckFunction(cmajor::binder::HasAccess);
@@ -125,8 +125,8 @@ void CodeCompletionServer::Stop()
     {
         if (!stopRequestReceived)
         {
-            StopRequest request;
-            std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("stopRequest");
+            StopCCRequest request;
+            std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("stopCCRequest");
             sngxml::dom::Document requestDoc;
             requestDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(requestElement.release()));
             std::stringstream s;
@@ -218,7 +218,7 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(sngxml:
             }
             case CodeCompletionRequestKind::stopRequest:
             {
-                StopRequest request(requestElement);
+                StopCCRequest request(requestElement);
                 return HandleRequest(request, rootElementName);
             }
             default:
@@ -389,10 +389,10 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const G
     return std::unique_ptr<CodeCompletionReply>(reply.release());
 }
 
-std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const StopRequest& request, std::string& rootElementName)
+std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const StopCCRequest& request, std::string& rootElementName)
 {
-    rootElementName = "stopReply";
-    std::unique_ptr<CodeCompletionReply> reply(new StopReply());
+    rootElementName = "stopCCReply";
+    std::unique_ptr<CodeCompletionReply> reply(new StopCCReply());
     stopRequestReceived = true;
     reply->created = std::chrono::steady_clock::now();
     reply->requestCreated = request.created;

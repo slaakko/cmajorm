@@ -193,7 +193,7 @@ namespace Cm.Service.CodeCompletion
     }
 
     [xml]
-    public class StopRequest : CodeCompletionRequest
+    public class StopCCRequest : CodeCompletionRequest
     {
         public override void Accept(Visitor& visitor)
         {
@@ -202,17 +202,17 @@ namespace Cm.Service.CodeCompletion
     }
 
     [xml]
-    public class StopReply : CodeCompletionReply
+    public class StopCCReply : CodeCompletionReply
     {
     }
 
     [xml]
-    public class KeepAliveRequest
+    public class KeepAliveCCRequest
     {
     }
 
     [xml]
-    public class KeepAliveReply
+    public class KeepAliveCCReply
     {
     }
 
@@ -224,7 +224,7 @@ namespace Cm.Service.CodeCompletion
         public virtual void Visit(ParseSourceRequest& request) {}
         public virtual void Visit(GetCCListRequest& request) {}
         public virtual void Visit(GetOverloadListRequest& request) {}
-        public virtual void Visit(StopRequest& request) {}
+        public virtual void Visit(StopCCRequest& request) {}
     }
 }
 

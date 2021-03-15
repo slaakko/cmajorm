@@ -52,7 +52,7 @@ std::function<void(ArgsT&)> MakeHandler(T* t, void (T::* pm)(ArgsT&))
 }
 
 template <typename ArgsT>
-class WING_API EventWithArgs 
+class EventWithArgs 
 {
 public:
     EventWithArgs() : nextHandlerId(0)

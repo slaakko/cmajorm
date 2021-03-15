@@ -40,8 +40,9 @@ public:
     PaddedControl(PaddedControlCreateParams& createParams);
     Control* Child() const { return child; }
     bool IsDecoratorControl() const override { return true; }
-    ContainerControl* GetContainerControl() const override;
     const Padding& GetPadding() const { return padding; }
+    Control* GetFirstEnabledTabStopControl() const override;
+    Control* GetLastEnabledTabStopControl() const override;
 protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnLocationChanged() override;

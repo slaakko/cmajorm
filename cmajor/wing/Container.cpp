@@ -59,7 +59,7 @@ std::unique_ptr<Component> Container::RemoveChild(Component* child)
     }
     if (child == lastChild)
     {
-        child = child->PrevSibling();
+        lastChild = child->PrevSibling();
     }
     child->SetContainer(nullptr);
     child->SetNextSibling(nullptr);

@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/cmccs/KeepAliveServer.hpp>
-#include <cmajor/cmccs/CodeCompletionServerMessage.hpp>
+#include <cmajor/cmmsg/CodeCompletionServerMessage.hpp>
 #include <sngxml/dom/Parser.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/LogFileWriter.hpp>
@@ -87,15 +87,15 @@ void KeepAliveServer::Run()
         {
             std::string requestStr = ReadStr(socket);
             std::unique_ptr<sngxml::dom::Document> requestDoc = sngxml::dom::ParseDocument(ToUtf32(requestStr), "socket");
-            if (requestDoc->DocumentElement()->Name() != U"keepAliveRequest")
+            if (requestDoc->DocumentElement()->Name() != U"keepAliveCCRequest")
             {
                 throw std::runtime_error("unknown request kind received");
             }
-            KeepAliveRequest keepAliveRequest(requestDoc->DocumentElement());
+            KeepAliveCCRequest keepAliveRequest(requestDoc->DocumentElement());
             keepAliveReceivedTimePoint = std::chrono::steady_clock::now();
-            KeepAliveReply keepAliveReply;
+            KeepAliveCCReply keepAliveReply;
             sngxml::dom::Document replyDoc;
-            std::unique_ptr<sngxml::dom::Element> replyElement = keepAliveReply.ToXml("keepAliveReply");
+            std::unique_ptr<sngxml::dom::Element> replyElement = keepAliveReply.ToXml("keepAliveCCReply");
             replyDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(replyElement.release()));
             std::stringstream s;
             CodeFormatter formatter(s);
