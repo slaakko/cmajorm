@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmsvc/Message.hpp>
+#include <cmajor/cmsvc/Request.hpp>
 #include <list>
 #include <mutex>
 #include <memory>
@@ -86,6 +87,7 @@ void SetServiceMessageHandlerView(wing::Window* view)
 
 void PutServiceMessage(ServiceMessage* message)
 {
+    if (Exiting()) return;
     ServiceMessageQueue::Instance().Put(message);
     if (serviceMessageHandlerView)
     {

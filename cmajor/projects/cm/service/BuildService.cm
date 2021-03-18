@@ -25,7 +25,7 @@ namespace Cm.Service.Build
     public class BuildServiceArgs
     {
         public BuildServiceArgs() :
-            port(defaultPort), keepAliveServerPort(defaultKeepAliveServerPort), log(false), wait(false),
+            port(defaultPort), keepAliveServerPort(defaultKeepAliveServerPort), log(false), wait(false), progress(true),
             serverStartWaitSeconds(1), serverStopWaitSeconds(10), saveRequestOnly(false), debugServer(false)
         {
         }
@@ -59,6 +59,11 @@ namespace Cm.Service.Build
             wait = wait_;
             return *this;
         }
+        public nothrow BuildServiceArgs& Progress(bool progress_)
+        {
+            progress = progress_;
+            return *this;
+        }
         public nothrow BuildServiceArgs& ServerStartWaitSeconds(int serverStartWaitSeconds_)
         {
             serverStartWaitSeconds = serverStartWaitSeconds_;
@@ -90,6 +95,7 @@ namespace Cm.Service.Build
         public int keepAliveServerPort;
         public bool log;
         public bool wait;
+        public bool progress;
         public bool saveRequestOnly;
         public int serverStartWaitSeconds;
         public int serverStopWaitSeconds;
@@ -157,6 +163,10 @@ namespace Cm.Service.Build
             if (args.wait)
             {
                 serverStartCommand.Append(" --wait");
+            }
+            if (args.progress)
+            {
+                serverStartCommand.Append(" --progress");
             }
             return serverStartCommand;
         }

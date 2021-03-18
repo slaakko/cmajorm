@@ -16,6 +16,7 @@ enum class DialogResult : int
 
 class Button;
 class MenuBar;
+class ContextMenu;
 
 struct CancelArgs
 {
@@ -85,6 +86,11 @@ public:
     void SetDialogResult(DialogResult dialogResult_) { dialogResult = dialogResult_; }
     void MouseUpNotificationInternal(MouseEventArgs& args) { MouseUpNotification(args); }
     MenuBar* GetMenuBar() const { return menuBar; }
+    ContextMenu* GetContextMenu() const { return contextMenu; }
+    void SetContextMenu(ContextMenu* contextMenu_);
+    void ShowContextMenu(ContextMenu* contextMenu_, Point& ptInScreenCoords);
+    void RemoveContextMenu();
+    void HideContextMenu();
     void SetIcon(const Icon& icon);
     void SetSmallIcon(const Icon& icon);
 protected:
@@ -107,6 +113,7 @@ private:
     Button* cancelButton;
     Control* focusedControl;
     MenuBar* menuBar;
+    ContextMenu* contextMenu;
     DialogResult dialogResult;
     WindowClosingEvent windowClosing;
     WindowClosedEvent windowClosed;

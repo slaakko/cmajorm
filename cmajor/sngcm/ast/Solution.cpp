@@ -132,6 +132,22 @@ void Solution::Save()
     }
 }
 
+void Solution::RemoveProject(Project* project)
+{
+    for (auto it = projects.begin(); it != projects.end(); ++it)
+    {
+        if (it->get() == project)
+        {
+            if (activeProject == project)
+            {
+                activeProject = nullptr;
+            }
+            projects.erase(it);
+            break;
+        }
+    }
+}
+
 void Solution::AddProject(std::unique_ptr<Project>&& project)
 {
     projects.push_back(std::move(project));

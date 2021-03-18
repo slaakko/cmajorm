@@ -129,6 +129,7 @@ Window::Window(WindowCreateParams& createParams) :
     cancelButton(nullptr),
     focusedControl(nullptr),
     menuBar(nullptr),
+    contextMenu(nullptr),
     dialogResult(DialogResult::none)
 {
     if (!fontFamilyName.empty())
@@ -136,6 +137,56 @@ Window::Window(WindowCreateParams& createParams) :
         std::u16string familyName = ToUtf16(fontFamilyName);
         const WCHAR* familyStr = (const WCHAR*)familyName.c_str();
         SetFont(Font(FontFamily(familyStr), fontSize, fontStyle, Unit::UnitPoint));
+    }
+}
+
+void Window::SetContextMenu(ContextMenu* contextMenu_)
+{
+    RemoveContextMenu();
+    contextMenu = contextMenu_;
+    AddChild(contextMenu);
+}
+
+void Window::ShowContextMenu(ContextMenu* contextMenu_, Point& ptInScreenCoords)
+{
+    SetContextMenu(contextMenu_);
+    Point windowLoc = Location();
+    Size windowSize = GetSize();
+    Point windowEdgeLoc(windowLoc.X + windowSize.Width, windowLoc.Y + windowSize.Height);
+    Point screenWindowEdgeLoc = ClientToScreen(windowEdgeLoc);
+    contextMenu->CalculateSize();
+    Size contextMenuSize = contextMenu->GetSize();
+    if (ptInScreenCoords.X + contextMenuSize.Width >= screenWindowEdgeLoc.X)
+    {
+        ptInScreenCoords.X = ptInScreenCoords.X - contextMenuSize.Width;
+    }
+    if (ptInScreenCoords.Y + contextMenuSize.Height >= screenWindowEdgeLoc.Y)
+    {
+        ptInScreenCoords.Y = ptInScreenCoords.Y - contextMenuSize.Height;
+    }
+    Point loc = ScreenToClient(ptInScreenCoords);
+    contextMenu->SetLocation(loc);
+    contextMenu->BringToFront();
+    contextMenu->Show();
+    contextMenu->Invalidate();
+    contextMenu->Update();
+}
+
+void Window::RemoveContextMenu()
+{
+    if (contextMenu)
+    {
+        HideContextMenu();
+        RemoveChild(contextMenu);
+        contextMenu = nullptr;
+    }
+}
+
+void Window::HideContextMenu()
+{
+    if (contextMenu)
+    {
+        contextMenu->Hide();
     }
 }
 

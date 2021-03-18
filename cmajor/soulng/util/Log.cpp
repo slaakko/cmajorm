@@ -127,10 +127,17 @@ std::string FetchLogMessage(bool& endOfLog, int timeoutMs, bool& timeout)
 {
     endOfLog = false;
     std::unique_lock<std::mutex> lock(logMutex);
-    if (!messageEnqueuedOrEndLog.wait_for(lock, std::chrono::milliseconds{ timeoutMs }, []{ return !log.empty() || endLog; }))
+    if (timeoutMs)
     {
-        timeout = true;
-        return std::string();
+        if (!messageEnqueuedOrEndLog.wait_for(lock, std::chrono::milliseconds{ timeoutMs }, [] { return !log.empty() || endLog; }))
+        {
+            timeout = true;
+            return std::string();
+        }
+    }
+    else
+    {
+        messageEnqueuedOrEndLog.wait(lock, [] { return !log.empty() || endLog; });
     }
     if (!log.empty())
     {

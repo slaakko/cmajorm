@@ -15,7 +15,7 @@ const int SM_SERVICE_MESSAGE_AVAILABLE = WM_USER + 1;
 
 enum class ServiceMessageKind : int
 {
-    clearOutput = 0, outputMessage = 1
+    clearOutput = 0, outputMessage = 1, buildReply = 2, buildError = 3, stopBuild = 4
 };
 
 class CMSVC_API ServiceMessage

@@ -5,6 +5,7 @@
 
 #include <cmajor/cmpm/PortMapServer.hpp>
 #include <cmajor/cmpm/PortMapMessage.hpp>
+#include <cmajor/cmsvc/Config.hpp>
 #include <sngxml/dom/Parser.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
@@ -26,42 +27,9 @@
 
 namespace cmajor { namespace cmpm {
 
+using namespace cmajor::service;
 using namespace soulng::util;
 using namespace soulng::unicode;
-
-std::string CmajorRootDir()
-{
-    char* e = getenv("CMAJOR_ROOT");
-    if (e == nullptr || !*e)
-    {
-        throw std::runtime_error("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory.");
-    }
-    return std::string(e);
-}
-
-std::string CmajorConfigDir()
-{
-    std::string configDir = Path::Combine(CmajorRootDir(), "config");
-    boost::filesystem::create_directories(configDir);
-    return configDir;
-}
-
-std::string ConfigFilePath()
-{
-    return Path::Combine(CmajorConfigDir(), "cmpm.config.xml");
-}
-
-std::string CmajorLogDir()
-{
-    std::string logDir = Path::Combine(CmajorRootDir(), "log");
-    boost::filesystem::create_directories(logDir);
-    return logDir;
-}
-
-std::string LogFilePath()
-{
-    return Path::Combine(CmajorLogDir(), "cmpms.log");
-}
 
 struct PortEntry
 {
@@ -120,7 +88,7 @@ void PortMapServer::Done()
 
 PortMapServer::PortMapServer() : portMapServicePort(54321), startPortRange(54300), endPortRange(54320), nextPortNumber(-1), exiting(false)
 {
-    std::string configFilePath = ConfigFilePath();
+    std::string configFilePath = PortMapConfigFilePath();
     std::unique_ptr<sngxml::dom::Document> configDoc;
     if (boost::filesystem::exists(configFilePath))
     {
@@ -401,7 +369,7 @@ void PortMapServer::Run()
         }
         catch (const std::exception& ex)
         {
-            LogFileWriter writer(LogFilePath());
+            LogFileWriter writer(PortMapLogFilePath());
             writer.WriteCurrentDateTime();
             writer << "cmpms got exception '" << ex.what() << "'" << std::endl;
         }

@@ -3,37 +3,39 @@
 // Distributed under the MIT license
 // =================================
 
-class GetFreePortNumberRequest
+#include <cmajor/cmpm/Api.hpp>
+
+class api(CMPM_API) GetFreePortNumberRequest
 {
     string processName;
     int pid;
 }
 
-class GetFreePortNumberReply
+class api(CMPM_API) GetFreePortNumberReply
 {
     int portNumber;
 }
 
-class ExtendPortLeaseRequest
+class api(CMPM_API) ExtendPortLeaseRequest
 {
     string processName;
     int pid;
     int[] portNumbers;
 }
 
-class ExtendPortLeaseReply
+class api(CMPM_API) ExtendPortLeaseReply
 {
 }
 
-class StopPortMapServerRequest
+class api(CMPM_API) StopPortMapServerRequest
 {
 }
 
-class StopPortMapServerReply
+class api(CMPM_API) StopPortMapServerReply
 {
 }
 
-class PortLease
+class api(CMPM_API) PortLease
 {
     int portNumber;
     string processName;
@@ -43,11 +45,11 @@ class PortLease
     string leaseState;
 }
 
-class ViewPortLeaseRequest
+class api(CMPM_API) ViewPortLeaseRequest
 {
 }
 
-class ViewPortLeaseReply
+class api(CMPM_API) ViewPortLeaseReply
 {
     PortLease[] portLeases;
 }

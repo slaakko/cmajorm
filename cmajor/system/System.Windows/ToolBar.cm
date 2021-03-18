@@ -535,9 +535,7 @@ namespace System.Windows
         {
             return toolBar;
         }
-        public abstract void Draw(Graphics& graphics, const Point& origin)
-        {
-        }
+        public abstract void Draw(Graphics& graphics, const Point& origin);
         public nothrow inline const Point& Location() const
         {
             return location;
@@ -703,8 +701,7 @@ namespace System.Windows
             OnMouseEnter();
         }
         internal void MouseHoverInternal()
-    
-   {
+        {
             ToolBar* toolBar = GetToolBar();
             if (!toolTip.IsEmpty() && toolBar != null)
             {
@@ -860,7 +857,7 @@ namespace System.Windows
             startRightInnerMediumDarkLoc.y = startRightInnerMediumDarkLoc.y + 2;
             Point endRightInnerMediumDarkLoc = location;
             endRightInnerMediumDarkLoc.x = endRightInnerMediumDarkLoc.x + size.w - 3;
-            endRightInnerMediumDarkLoc.y = endRightInnerMediumDarkLoc.y + size.h - 3;;
+            endRightInnerMediumDarkLoc.y = endRightInnerMediumDarkLoc.y + size.h - 3;
             graphics.DrawLineChecked(mediumDarkPen, startRightInnerMediumDarkLoc, endRightInnerMediumDarkLoc);
             Point startBottomInnerMediumDarkLoc = location;
             startBottomInnerMediumDarkLoc.x = startBottomInnerMediumDarkLoc.x + 2;

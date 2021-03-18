@@ -77,6 +77,8 @@ void PrintHelp()
     std::cout << std::endl;
     std::cout << "--log | -l" << std::endl;
     std::cout << "  Write log to %CMAJOR_ROOT%/log/cmbs.log (by default C:\\cmajor\\log\\cmbs.log)." << std::endl;
+    std::cout << "--progress | -g" << std::endl;
+    std::cout << "  Send progress messages." << std::endl;
     std::cout << std::endl;
     std::cout << "--port=PORT | -p=PORT" << std::endl;
     std::cout << "  Set server port number to PORT." << std::endl;
@@ -106,9 +108,9 @@ struct KeepAliveServerRun
 
 struct BuildServerRun
 {
-    BuildServerRun(int port, const std::string& version, bool log, std::condition_variable* exitVar, bool* exiting)
+    BuildServerRun(int port, const std::string& version, bool log, bool progress, std::condition_variable* exitVar, bool* exiting)
     {
-        cmbs::StartBuildServer(port, version, log, exitVar, exiting);
+        cmbs::StartBuildServer(port, version, log, progress, exitVar, exiting);
     }
     ~BuildServerRun()
     {
@@ -149,6 +151,7 @@ int main(int argc, const char** argv)
     bool exiting = false;
     bool log = false;
     bool wait = false;
+    bool progress = false;
     try
     {
         int port = 54325;
@@ -172,6 +175,10 @@ int main(int argc, const char** argv)
                 else if (arg == "--wait")
                 {
                     wait = true;
+                }
+                else if (arg == "--progress")
+                {
+                    progress = true;
                 }
                 else if (arg.find('=') != std::string::npos)
                 {
@@ -261,6 +268,11 @@ int main(int argc, const char** argv)
                                 wait = true;
                                 break;
                             }
+                            case 'g':
+                            {
+                                progress = true;
+                                break;
+                            }
                             default:
                             {
                                 throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
@@ -279,7 +291,7 @@ int main(int argc, const char** argv)
             std::this_thread::sleep_for(std::chrono::seconds{ 60 });
         }
         KeepAliveServerRun runKeepAliveServer(keepAliveServerPort, &exitVar, &exiting);
-        BuildServerRun runBuildServer(port, version, log, &exitVar, &exiting);
+        BuildServerRun runBuildServer(port, version, log, progress, &exitVar, &exiting);
         std::vector<int> ports;
         if (portMapServicePort != -1)
         {

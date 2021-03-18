@@ -781,22 +781,23 @@ void MenuBox::OnMouseMove(MouseEventArgs& args)
     }
 }
 
-ContextMenu::ContextMenu() : MenuBox(nullptr, new MenuItem("root")), rootItemPtr(RootItem()), latestOpenedMenuItem(nullptr), selectedMenuItem(nullptr), latestMouseDownMenuItem(nullptr)
+ContextMenu::ContextMenu() : MenuBox(nullptr, new MenuItem("root")), menuItems(this), latestOpenedMenuItem(nullptr), selectedMenuItem(nullptr), latestMouseDownMenuItem(nullptr)
 {
+    menuItems.AddChild(RootItem());
 }
 
 void ContextMenu::AddMenuItem(MenuItemBase* menuItem)
 {
-    rootItemPtr->AddMenuItem(menuItem);
+    RootItem()->AddMenuItem(menuItem);
 }
 
 void ContextMenu::CalculateSize()
 {
-    rootItemPtr->SetState(MenuItemState::open);
+    RootItem()->SetState(MenuItemState::open);
     Graphics graphics(Handle());
-    rootItemPtr->CalculateRects(graphics, GetFont(), GetStringFormat(), Point(0, 0));
+    RootItem()->CalculateRects(graphics, GetFont(), GetStringFormat(), Point(0, 0));
     Rect menuRect;
-    rootItemPtr->GetOpenRect(menuRect);
+    RootItem()->GetOpenRect(menuRect);
     Size sz;
     menuRect.GetSize(&sz);
     SetSize(sz);
@@ -804,7 +805,7 @@ void ContextMenu::CalculateSize()
 
 bool ContextMenu::HasMenuItems() const
 {
-    return !rootItemPtr->Children().IsEmpty();
+    return !RootItem()->Children().IsEmpty();
 }
 
 void ContextMenu::SetMenuInvalidated()
@@ -814,12 +815,12 @@ void ContextMenu::SetMenuInvalidated()
 
 bool ContextMenu::IsOpen() const
 {
-    return rootItemPtr->State() == MenuItemState::open;
+    return RootItem()->State() == MenuItemState::open;
 }
 
 MenuItem* ContextMenu::OpenedMenuItem() const
 {
-    return rootItemPtr.get();
+    return RootItem();
 }
 
 void ContextMenu::SetSelectedMenuItem(MenuItem* selectedMenuItem_)
@@ -848,7 +849,7 @@ void ContextMenu::OnVisibleChanged()
     MenuBox::OnVisibleChanged();
     if (!IsVisible())
     {
-        rootItemPtr->SetState(MenuItemState::closed);
+        RootItem()->SetState(MenuItemState::closed);
         ResetPaintThisMenuBox();
     }
 }

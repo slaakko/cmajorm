@@ -758,6 +758,35 @@ TabPage::TabPage(const std::string& text_, const std::string& key_) :
 {
 }
 
+void TabPage::OnKeyDown(KeyEventArgs& args)
+{
+    Control::OnKeyDown(args);
+    if (!args.handled)
+    {
+        switch (args.keyData)
+        {
+            case Keys::controlModifier | Keys::f4:
+            {
+                Close();
+                args.handled = true;
+                break;
+            }
+            case Keys::controlModifier | Keys::tab:
+            {
+                SelectNextTabPage();
+                args.handled = true;
+                break;
+            }
+            case Keys::controlModifier | Keys::shiftModifier | Keys::tab:
+            {
+                SelectPreviousTabPage();
+                args.handled = true;
+                break;
+            }
+        }
+    }
+}
+
 void TabPage::OnTextChanged()
 {
     Panel::OnTextChanged();

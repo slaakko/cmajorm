@@ -4,13 +4,20 @@
 // =================================
 
 #include <cmajor/cmcode/MainWindow.hpp>
-#include <sngcm/ast/Project.hpp>
+#include <cmajor/cmcode/Action.hpp>
+#include <cmajor/cmcode/Build.hpp>
+#include <cmajor/cmcode/ToolBar.hpp>
 #include <cmajor/wing/Dialog.hpp>
 #include <cmajor/wing/BorderedControl.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
+#include <cmajor/wing/ToolBar.hpp>
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmsvc/RequestDispatcher.hpp>
+#include <cmajor/cmsvc/PortMapService.hpp>
+#include <cmajor/cmsvc/BuildService.hpp>
+#include <cmajor/cmsvc/BuildServiceRequest.hpp>
+#include <sngcm/ast/Project.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
 
@@ -67,10 +74,33 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     homepageMenuItem(nullptr),
     localDocumentationMenuItem(nullptr),
     aboutMenuItem(nullptr),
+    prevToolButton(nullptr),
+    nextToolButton(nullptr),
+    saveToolButton(nullptr), 
+    saveAllToolButton(nullptr),
+    cppToolButton(nullptr),
+    llvmToolButton(nullptr),
+    debugToolButton(nullptr),
+    releaseToolButton(nullptr),
+    buildSolutionToolButton(nullptr),
+    buildActiveProjectToolButton(nullptr),
+    stopBuildServerToolButton(nullptr),
+    startDebuggingToolButton(nullptr),
+    stopDebuggingToolButton(nullptr),
+    showNextStatementToolButton(nullptr),
+    stepOverToolButton(nullptr),
+    stepIntoToolButton(nullptr),
+    stepOutToolButton(nullptr),
     verticalSplitContainer(nullptr),
     horizontalSplitContainer(nullptr),
+    codeTabControl(nullptr),
     solutionTreeView(nullptr),
-    state(MainWindowState::idle)
+    outputTabControl(nullptr),
+    outputTabPage(nullptr),
+    outputLogView(nullptr),
+    state(MainWindowState::idle),
+    backend("cpp"),
+    config("debug")
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -185,6 +215,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     std::unique_ptr<MenuItem> cleanSolutionMenuItemPtr(new MenuItem("&Clean Solution"));
     cleanSolutionMenuItem = cleanSolutionMenuItemPtr.get();
     cleanSolutionMenuItem->Click().AddHandler(this, &MainWindow::CleanSolutionClick);
+    buildMenuItem->AddMenuItem(cleanSolutionMenuItemPtr.release());
     buildMenuItem->AddMenuItem(new MenuItemSeparator());
     std::unique_ptr<MenuItem> buildActiveProjectMenuItemPtr(new MenuItem("Build &Active Project"));
     buildActiveProjectMenuItem = buildActiveProjectMenuItemPtr.get();
@@ -280,6 +311,142 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     menuBar->AddMenuItem(helpMenuItem.release());
     AddChild(menuBar.release());
 
+    std::unique_ptr<ToolBar> toolBarPtr(MakeToolBar());
+    ToolBar* toolBar = toolBarPtr.get();
+    std::unique_ptr<Control> borderedToolBar(new BorderedControl(BorderedControlCreateParams(toolBarPtr.release()).SetBorderStyle(BorderStyle::single).
+        NormalSingleBorderColor(DefaultToolBarBorderColor()).FocusedSingleBorderColor(DefaultToolBarBorderColor()).SetSize(toolBar->GetSize()).SetDock(Dock::top)));
+
+    std::unique_ptr<ToolButton> prevToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.prev.bitmap").SetPadding(Padding(8, 8, 8, 8)).SetToolTip("Go To Previous Location")));
+    prevToolButton = prevToolButtonPtr.get();
+    prevToolButton->Click().AddHandler(this, &MainWindow::GotoPreviousLocationClick);
+    prevToolButton->Disable();
+    toolBar->AddToolButton(prevToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> nextToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.next.bitmap").SetPadding(Padding(8, 8, 8, 8)).SetToolTip("Go To Next Location")));
+    nextToolButton = nextToolButtonPtr.get();
+    nextToolButton->Click().AddHandler(this, &MainWindow::GotoNextLocationClick);
+    nextToolButton->Disable();
+    toolBar->AddToolButton(nextToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> saveToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.save.bitmap").SetPadding(Padding(8, 8, 8, 8)).SetToolTip("Save (Ctrl+S)")));
+    saveToolButton = saveToolButtonPtr.get();
+    saveToolButton->Click().AddHandler(this, &MainWindow::SaveClick);
+    saveToolButton->Disable();
+    toolBar->AddToolButton(saveToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> saveAllToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.save.all.bitmap").SetPadding(Padding(6, 6, 6, 6)).SetToolTip("Save All (Ctrl+Shift+S)")));
+    saveAllToolButton = saveAllToolButtonPtr.get();
+    saveAllToolButton->Click().AddHandler(this, &MainWindow::SaveAllClick);
+    saveAllToolButton->Disable();
+    toolBar->AddToolButton(saveAllToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    Size textButtonSize(36, 12);
+
+    std::unique_ptr<ToolButton> cppToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("C++").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Compile using C++ Backend")));
+    cppToolButton = cppToolButtonPtr.get();
+    cppToolButton->Click().AddHandler(this, &MainWindow::CppButtonClick);
+    cppToolButton->Disable();
+    toolBar->AddToolButton(cppToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> llvmToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("LLVM").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Compile using LLVM Backend")));
+    llvmToolButton = llvmToolButtonPtr.get();
+    llvmToolButton->Click().AddHandler(this, &MainWindow::LlvmButtonClick);
+    llvmToolButton->Disable();
+    toolBar->AddToolButton(llvmToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> debugToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("Debug").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Compile using Debug Configuration")));
+    debugToolButton = debugToolButtonPtr.get();
+    debugToolButton->Click().AddHandler(this, &MainWindow::DebugButtonClick);
+    debugToolButton->Disable();
+    toolBar->AddToolButton(debugToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> releaseToolButtonPtr(new TextToolButton(TextToolButtonCreateParams("Release").Style(ToolButtonStyle::manual).SetSize(textButtonSize).SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Compile using Release Configuration")));
+    releaseToolButton = releaseToolButtonPtr.get();
+    releaseToolButton->Click().AddHandler(this, &MainWindow::ReleaseButtonClick);
+    releaseToolButton->Disable();
+    toolBar->AddToolButton(releaseToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> buildSolutionToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.build.solution.bitmap").SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Build Solution (F7)")));
+    buildSolutionToolButton = buildSolutionToolButtonPtr.get();
+    buildSolutionToolButton->Click().AddHandler(this, &MainWindow::BuildSolutionClick);
+    buildSolutionToolButton->Disable();
+    toolBar->AddToolButton(buildSolutionToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> buildActiveProjectToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.build.project.bitmap").SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Build Active Project (Ctrl+B)")));
+    buildActiveProjectToolButton = buildActiveProjectToolButtonPtr.get();
+    buildActiveProjectToolButton->Click().AddHandler(this, &MainWindow::BuildActiveProjectClick);
+    buildActiveProjectToolButton->Disable();
+    toolBar->AddToolButton(buildActiveProjectToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stopBuildServerToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.cancel.build.bitmap").SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Stop Build Server")));
+    stopBuildServerToolButton = stopBuildServerToolButtonPtr.get();
+    stopBuildServerToolButton->Click().AddHandler(this, &MainWindow::StopBuildServerClick);
+    stopBuildServerToolButton->Disable();
+    toolBar->AddToolButton(stopBuildServerToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> startDebuggingToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.start.bitmap").SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Start Debugging (F5)")));
+    startDebuggingToolButton = startDebuggingToolButtonPtr.get();
+    startDebuggingToolButton->Click().AddHandler(this, &MainWindow::StartDebuggingClick);
+    startDebuggingToolButton->Disable();
+    toolBar->AddToolButton(startDebuggingToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stopDebuggingToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.stop.bitmap").SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Stop Debugging (Shift+F5)")));
+    stopDebuggingToolButton = stopDebuggingToolButtonPtr.get();
+    stopDebuggingToolButton->Click().AddHandler(this, &MainWindow::StopDebuggingClick);
+    stopDebuggingToolButton->Disable();
+    toolBar->AddToolButton(stopDebuggingToolButtonPtr.release());
+
+    toolBar->AddToolButton(new ToolButtonSeparator());
+
+    std::unique_ptr<ToolButton> showNextStatementToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.show.next.statement.bitmap").SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Show Next Statement (Ctrl+J)")));
+    showNextStatementToolButton = showNextStatementToolButtonPtr.get();
+    showNextStatementToolButton->Click().AddHandler(this, &MainWindow::ShowNextStatementClick);
+    showNextStatementToolButton->Disable();
+    toolBar->AddToolButton(showNextStatementToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stepOverToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.step.over.bitmap").SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Step Over (F12)")));
+    stepOverToolButton = stepOverToolButtonPtr.get();
+    stepOverToolButton->Click().AddHandler(this, &MainWindow::StepOverClick);
+    stepOverToolButton->Disable();
+    toolBar->AddToolButton(stepOverToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stepIntoToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.step.into.bitmap").SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Step Into (F11)")));
+    stepIntoToolButton = stepIntoToolButtonPtr.get();
+    stepIntoToolButton->Click().AddHandler(this, &MainWindow::StepIntoClick);
+    stepIntoToolButton->Disable();
+    toolBar->AddToolButton(stepIntoToolButtonPtr.release());
+
+    std::unique_ptr<ToolButton> stepOutToolButtonPtr(new ToolButton(ToolButtonCreateParams().ToolBitMapName("cmcode.debug.step.out.bitmap").SetPadding(Padding(8, 8, 8, 8)).
+        SetToolTip("Step Out (Shift+F11)")));
+    stepOutToolButton = stepOutToolButtonPtr.get();
+    stepOutToolButton->Click().AddHandler(this, &MainWindow::StepOutClick);
+    stepOutToolButton->Disable();
+    toolBar->AddToolButton(stepOutToolButtonPtr.release());
+
+    AddChild(borderedToolBar.release());
+
     std::unique_ptr<SplitContainer> verticalSplitContainerPtr(
         new SplitContainer(SplitContainerCreateParams(SplitterOrientation::vertical).SplitterDistance(VerticalSplitterDistance()).SetDock(Dock::fill)));
     verticalSplitContainer = verticalSplitContainerPtr.get();
@@ -296,12 +463,29 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     std::unique_ptr<TreeView> solutionTreeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
     solutionTreeView = solutionTreeViewPtr.get();
     solutionTreeView->NodeDoubleClick().AddHandler(this, &MainWindow::TreeViewNodeDoubleClick);
+    solutionTreeView->NodeClick().AddHandler(this, &MainWindow::TreeViewNodeClick);
     solutionTreeView->SetDoubleBuffered();
     std::unique_ptr<PaddedControl> paddedTreeViewPtr(new PaddedControl(PaddedControlCreateParams(solutionTreeViewPtr.release()).Defaults()));
     std::unique_ptr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(ScrollableControlCreateParams(paddedTreeViewPtr.release()).SetDock(Dock::fill)));
     horizontalSplitContainer->Pane1Container()->AddChild(borderedCodeTabControl.release());
     horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeViewPtr.release());
     verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.release());
+    std::unique_ptr<TabControl> outputTabControlPtr(new TabControl(TabControlCreateParams().Defaults()));
+    outputTabControl = outputTabControlPtr.get();
+    outputTabControl->ControlRemoved().AddHandler(this, &MainWindow::OutputTabControlTabPageRemoved);
+    outputTabControl->TabPageSelected().AddHandler(this, &MainWindow::OutputTabControlTabPageSelected);
+    std::unique_ptr<Control> paddedOutputTabControl(new PaddedControl(PaddedControlCreateParams(outputTabControlPtr.release()).Defaults()));
+    std::unique_ptr<Control> borderedOutptTabControl(new BorderedControl(BorderedControlCreateParams(paddedOutputTabControl.release()).SetBorderStyle(BorderStyle::single).
+        NormalSingleBorderColor(DefaultTabControlFrameColor()).FocusedSingleBorderColor(DefaultTabControlFrameColor()).SetDock(Dock::fill)));
+    std::unique_ptr<TabPage> outputTabPagePtr(new TabPage("Output", "output"));
+    outputTabPage = outputTabPagePtr.get();
+    std::unique_ptr<LogView> outputLogViewPtr(new LogView(TextViewCreateParams().Defaults()));
+    outputLogView = outputLogViewPtr.get();
+    outputLogView->SetDoubleBuffered();
+    std::unique_ptr<Control> scrollableOutputLogView(new ScrollableControl(ScrollableControlCreateParams(outputLogViewPtr.release()).SetDock(Dock::fill)));
+    outputTabPage->AddChild(scrollableOutputLogView.release());
+    outputTabControl->AddTabPage(outputTabPagePtr.release());
+    verticalSplitContainer->Pane2Container()->AddChild(borderedOutptTabControl.release());
     AddChild(verticalSplitContainerPtr.release());
 
     SetServiceMessageHandlerView(this);
@@ -311,10 +495,13 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     {
         OpenProject(filePath);
     }
+
+    SetState(MainWindowState::idle);
 }
 
 MainWindow::~MainWindow()
 {
+    SetServiceMessageHandlerView(nullptr);
     StopRequestDispatcher();
 }
 
@@ -323,6 +510,45 @@ void MainWindow::OnWindowClosing(CancelArgs& args)
     try
     {
         Window::OnWindowClosing(args);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::OnKeyDown(KeyEventArgs& args)
+{
+    try
+    {
+        Window::OnKeyDown(args);
+        if (!args.handled)
+        {
+            switch (args.keyData)
+            {
+                case Keys::escape:
+                {
+                    RemoveContextMenu();
+                    args.handled = true;
+                    break;
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::MouseUpNotification(MouseEventArgs& args)
+{
+    try
+    {
+        if (args.buttons == MouseButtons::lbutton)
+        {
+            RemoveContextMenu();
+        }
     }
     catch (const std::exception& ex)
     {
@@ -365,18 +591,35 @@ void MainWindow::HandleServiceMessage()
                 WriteOutput(message->Text());
                 break;
             }
+            case ServiceMessageKind::buildReply:
+            {
+                BuildReplyServiceMessage* message = static_cast<BuildReplyServiceMessage*>(serviceMessage.get());
+                HandleBuildReply(message->GetBuildReply());
+                break;
+            }
+            case ServiceMessageKind::buildError:
+            {
+                BuildErrorServiceMessage* message = static_cast<BuildErrorServiceMessage*>(serviceMessage.get());
+                HandleBuildError(message->Error());
+                break;
+            }
+            case ServiceMessageKind::stopBuild:
+            {
+                HandleStopBuild();
+                break;
+            }
         }
     }
 }
 
 void MainWindow::ClearOutput()
 {
-    // todo
+    GetOutputLogView()->Clear();
 }
 
 void MainWindow::WriteOutput(const std::string& text)
 {
-    // todo
+    GetOutputLogView()->WriteLine(text);
 }
 
 void MainWindow::OpenProject(const std::string& filePath)
@@ -427,10 +670,207 @@ void MainWindow::OpenProject(const std::string& filePath)
     }
 }
 
+void MainWindow::HandleBuildReply(const BuildReply& buildReply)
+{
+    if (buildReply.requestValid)
+    {
+        if (buildReply.success)
+        {
+            PutOutputServiceMessage("build successful, time=" + buildReply.time);
+        }
+        else
+        {
+            PutOutputServiceMessage("build unsuccessful");
+            // todo: handle compile errors
+        }
+    }
+    else
+    {
+        PutOutputServiceMessage("invalid build request: " + buildReply.requestErrorMessage);
+    }
+    SetState(MainWindowState::idle);
+}
+
+void MainWindow::HandleBuildError(const std::string& buildError)
+{
+    PutOutputServiceMessage("build unsuccessful");
+    SetState(MainWindowState::idle);
+}
+
+void MainWindow::HandleStopBuild()
+{
+    SetState(MainWindowState::idle);
+}
+
 void MainWindow::SetState(MainWindowState state_)
 {
     state = state_;
-    // todo
+    newProjectMenuItem->Disable();
+    openProjectMenuItem->Disable();
+    closeSolutionMenuItem->Disable();
+    saveMenuItem->Disable();
+    saveAllMenuItem->Disable();
+    exitMenuItem->Disable();
+    copyMenuItem->Disable();
+    cutMenuItem->Disable();
+    pasteMenuItem->Disable();
+    undoMenuItem->Disable();
+    redoMenuItem->Disable();
+    gotoMenuItem->Disable();
+    searchMenuItem->Disable();
+    optionsMenuItem->Disable();
+    callStackMenuItem->Disable();
+    localsMenuItem->Disable();
+    errorsMenuItem->Disable();
+    searchResultsMenuItem->Disable();
+    portMapMenuItem->Disable();
+    buildSolutionMenuItem->Disable();
+    rebuildSolutionMenuItem->Disable();
+    cleanSolutionMenuItem->Disable();
+    buildActiveProjectMenuItem->Disable();
+    rebuildActiveProjectMenuItem->Disable();
+    cleanActiveProjectMenuItem->Disable();
+    startDebuggingMenuItem->Disable();
+    startWithoutDebuggingMenuItem->Disable();
+    terminateProcessMenuItem->Disable();
+    stopDebuggingMenuItem->Disable();
+    showNextStatementMenuItem->Disable();
+    stepOverMenuItem->Disable();
+    stepIntoMenuItem->Disable();
+    stepOutMenuItem->Disable();
+    toggleBreakpointMenuItem->Disable();
+    programArgumentsMenuItem->Disable();
+    closeAllTabsMenuItem->Disable();
+    closeExternalTabsMenuItem->Disable();
+    homepageMenuItem->Disable();
+    localDocumentationMenuItem->Disable();
+    aboutMenuItem->Disable();
+    prevToolButton->Disable();
+    nextToolButton->Disable();
+    saveToolButton->Disable();
+    saveAllToolButton->Disable();
+    cppToolButton->Disable();
+    llvmToolButton->Disable();
+    debugToolButton->Disable();
+    releaseToolButton->Disable();
+    buildSolutionToolButton->Disable();
+    buildActiveProjectToolButton->Disable();
+    stopBuildServerToolButton->Disable();
+    startDebuggingToolButton->Disable();
+    stopDebuggingToolButton->Disable();
+    showNextStatementToolButton->Disable();
+    stepOverToolButton->Disable();
+    stepIntoToolButton->Disable();
+    stepOutToolButton->Disable();
+
+    if (backend == "cpp")
+    {
+        cppToolButton->SetState(ToolButtonState::pressed);
+        llvmToolButton->SetState(ToolButtonState::normal);
+    }
+    if (backend == "llvm")
+    {
+        llvmToolButton->SetState(ToolButtonState::pressed);
+        cppToolButton->SetState(ToolButtonState::normal);
+    }
+    if (config == "debug")
+    {
+        debugToolButton->SetState(ToolButtonState::pressed);
+        releaseToolButton->SetState(ToolButtonState::normal);
+    }
+    if (config == "release")
+    {
+        releaseToolButton->SetState(ToolButtonState::pressed);
+        debugToolButton->SetState(ToolButtonState::normal);
+    }
+
+    bool solutionOpen = solutionData.get() != nullptr;
+
+    // todo:
+    // saveMenuItem
+    // copyMenuItem
+    // cutMenuItem
+    // pasteMenuItem
+    // undoMenuItem
+    // redoMenuItem
+    // gotoMenuItem
+    // callStackMenuItem
+    // localsMenuItem
+    // errorsMenuItem
+    // terminateProcessMenuItem
+    // stopDebuggingMenuItem
+    // showNextStatementMenuItem
+    // stepOverMenuItem
+    // stepIntoMenuItem
+    // stepOutMenuItem
+    // toggleBreakpointMenuItem
+    // prevToolButton
+    // nextToolButton
+    // saveToolButton
+    // stopBuildServerToolButton
+    // stopDebuggingToolButton
+    // showNextStatementToolButton
+    // stepOverToolButton
+    // stepIntoToolButton
+    // stepOutToolButton
+
+    // always on:
+
+    exitMenuItem->Enable();
+    optionsMenuItem->Enable();
+    searchResultsMenuItem->Enable();
+    portMapMenuItem->Enable();
+    closeAllTabsMenuItem->Enable();
+    closeExternalTabsMenuItem->Enable();
+    homepageMenuItem->Enable();
+    localDocumentationMenuItem->Enable();
+    aboutMenuItem->Enable();
+
+    switch (state)
+    {
+        case MainWindowState::idle: 
+        {
+            newProjectMenuItem->Enable();
+            openProjectMenuItem->Enable();
+
+            bool buildServiceRunning = BuildServiceRunning();
+
+            if (solutionOpen)
+            {
+                closeSolutionMenuItem->Enable();
+                saveAllMenuItem->Enable();
+                searchMenuItem->Enable();
+                errorsMenuItem->Enable();
+                buildSolutionMenuItem->Enable();
+                rebuildSolutionMenuItem->Enable();
+                cleanSolutionMenuItem->Enable();
+                buildActiveProjectMenuItem->Enable();
+                rebuildActiveProjectMenuItem->Enable();
+                cleanActiveProjectMenuItem->Enable();
+                startDebuggingMenuItem->Enable();
+                startWithoutDebuggingMenuItem->Enable();
+                programArgumentsMenuItem->Enable();
+                saveAllToolButton->Enable();
+                cppToolButton->Enable();
+                llvmToolButton->Enable();
+                debugToolButton->Enable();
+                releaseToolButton->Enable();
+                buildSolutionToolButton->Enable();
+                buildActiveProjectToolButton->Enable();
+                startDebuggingToolButton->Enable();
+                if (buildServiceRunning)
+                {
+                    stopBuildServerToolButton->Enable();
+                }
+            }
+            break;
+        }
+        case MainWindowState::building:
+        {
+            stopBuildServerToolButton->Enable();
+            break;
+        }
+    }
 }
 
 int MainWindow::VerticalSplitterDistance()
@@ -469,6 +909,14 @@ void MainWindow::OpenProjectClick()
     {
         ShowErrorMessageBox(Handle(), ex.what());
     }
+}
+
+bool MainWindow::CloseSolution()
+{
+    if (!solutionData) return true;
+    // todo
+    ShowInfoMessageBox(Handle(), "Close Solution");
+    return true;
 }
 
 void MainWindow::CloseSolutionClick()
@@ -558,22 +1006,235 @@ void MainWindow::PortMapClick()
 
 void MainWindow::BuildSolutionClick()
 {
-    ShowInfoMessageBox(Handle(), "Build Solution");
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        SetState(MainWindowState::building);
+        ClearOutput();
+        StartBuild(backend, config, solutionData->GetSolution()->FilePath(), BuildRequestKind::build | BuildRequestKind::buildDependencies);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
 }
 
 void MainWindow::RebuildSolutionClick()
 {
-    ShowInfoMessageBox(Handle(), "Rebuild Solution");
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        SetState(MainWindowState::building);
+        ClearOutput();
+        StartBuild(backend, config, solutionData->GetSolution()->FilePath(), BuildRequestKind::rebuild | BuildRequestKind::buildDependencies);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
 }
 
 void MainWindow::CleanSolutionClick()
 {
-    ShowInfoMessageBox(Handle(), "Clean Solution");
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        SetState(MainWindowState::building);
+        ClearOutput();
+        StartBuild(backend, config, solutionData->GetSolution()->FilePath(), BuildRequestKind::clean);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::BuildProject(sngcm::ast::Project* project)
+{
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        SetState(MainWindowState::building);
+        ClearOutput();
+        StartBuild(backend, config, project->FilePath(), BuildRequestKind::build | BuildRequestKind::buildDependencies);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::RebuildProject(sngcm::ast::Project* project)
+{
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        SetState(MainWindowState::building);
+        ClearOutput();
+        StartBuild(backend, config, project->FilePath(), BuildRequestKind::rebuild | BuildRequestKind::buildDependencies);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::CleanProject(sngcm::ast::Project* project)
+{
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        SetState(MainWindowState::building);
+        ClearOutput();
+        StartBuild(backend, config, project->FilePath(), BuildRequestKind::clean | BuildRequestKind::buildDependencies);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::SetActiveProject(sngcm::ast::Project* project, TreeViewNode* newActiveProjectNode)
+{
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        solutionData->ActiveProjectNode()->ResetActive();
+        newActiveProjectNode->SetActive();
+        solutionData->SetActiveProjectNode(newActiveProjectNode);
+        solutionData->GetSolution()->SetActiveProject(project);
+        // todo: load project settings
+        solutionTreeView->Invalidate();
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::RemoveProject(sngcm::ast::Project* project)
+{
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        sngcm::ast::Solution* solution = solutionData->GetSolution();
+        solution->RemoveProject(project);
+        solution->Save();
+        std::string solutionFilePath = solution->FilePath();
+        if (!CloseSolution())
+        {
+            return;
+        }
+        OpenProject(solutionFilePath);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::OpenFileLocation(const std::string& filePath)
+{
+    try
+    {
+        std::string directoryLocation = Path::GetDirectoryName(filePath);
+#pragma warning(disable:4311)
+#pragma warning(disable:4302)
+        if (reinterpret_cast<int>(ShellExecuteA(Handle(), "open", directoryLocation.c_str(), nullptr, nullptr, SW_SHOWNORMAL)) < 32)
+        {
+            throw std::runtime_error("shell execute failed");
+        }
+#pragma warning(default:4311)
+#pragma warning(default:4302)
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
 }
 
 void MainWindow::BuildActiveProjectClick()
 {
-    ShowInfoMessageBox(Handle(), "Build Active Project");
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        sngcm::ast::Project* activeProject = solutionData->GetSolution()->ActiveProject();
+        if (!activeProject)
+        {
+            throw std::runtime_error("no active project set for the solution");
+        }
+        SetState(MainWindowState::building);
+        ClearOutput();
+        StartBuild(backend, config, activeProject->FilePath(), BuildRequestKind::build | BuildRequestKind::buildDependencies);
+
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
 }
 
 void MainWindow::RebuildActiveProjectClick()
@@ -661,6 +1322,45 @@ void MainWindow::AboutClick()
     ShowInfoMessageBox(Handle(), "About");
 }
 
+void MainWindow::GotoPreviousLocationClick()
+{
+    ShowInfoMessageBox(Handle(), "Go To Previous Location");
+}
+
+void MainWindow::GotoNextLocationClick()
+{
+    ShowInfoMessageBox(Handle(), "Go To Next Location");
+}
+
+void MainWindow::CppButtonClick()
+{
+    backend = "cpp";
+    llvmToolButton->SetState(ToolButtonState::normal);
+}
+
+void MainWindow::LlvmButtonClick()
+{
+    backend = "llvm";
+    cppToolButton->SetState(ToolButtonState::normal);
+}
+
+void MainWindow::DebugButtonClick()
+{
+    config = "debug";
+    releaseToolButton->SetState(ToolButtonState::normal);
+}
+
+void MainWindow::ReleaseButtonClick()
+{
+    config = "release";
+    debugToolButton->SetState(ToolButtonState::normal);
+}
+
+void MainWindow::StopBuildServerClick()
+{
+    PutRequest(new cmajor::service::StopBuildRequest());
+}
+
 void MainWindow::TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args)
 {
     try
@@ -708,6 +1408,120 @@ void MainWindow::TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args)
                 else 
                 {
 
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
+{
+    try
+    {
+        TreeViewNode* node = args.node;
+        if (args.buttons == MouseButtons::lbutton)
+        {
+            node->Select();
+        }
+        else if (args.buttons == MouseButtons::rbutton)
+        {
+            clickActions.clear();
+            SolutionTreeViewNodeData* data = static_cast<SolutionTreeViewNodeData*>(node->Data());
+            switch (data->kind)
+            {
+                case SolutionTreeViewNodeDataKind::solution:
+                {
+                    std::unique_ptr<ContextMenu> contextMenu(new ContextMenu());
+                    std::unique_ptr<MenuItem> buildMenuItem(new MenuItem("Build"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new BuildSolutionAction(buildMenuItem.get(), this)));
+                    contextMenu->AddMenuItem(buildMenuItem.release());
+                    std::unique_ptr<MenuItem> rebuildMenuItem(new MenuItem("Rebuild"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new RebuildSolutionAction(rebuildMenuItem.get(), this)));
+                    contextMenu->AddMenuItem(rebuildMenuItem.release());
+                    std::unique_ptr<MenuItem> cleanMenuItem(new MenuItem("Clean"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new CleanSolutionAction(cleanMenuItem.get(), this)));
+                    contextMenu->AddMenuItem(cleanMenuItem.release());
+                    // todo: project items
+                    std::unique_ptr<MenuItem> openFileLocationMenuItem(new MenuItem("Open File Location"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new OpenFileLocationAction(openFileLocationMenuItem.get(), this, data->solution->FilePath())));
+                    contextMenu->AddMenuItem(openFileLocationMenuItem.release());
+                    if (contextMenu->HasMenuItems())
+                    {
+                        Point contentLoc = args.location;
+                        TreeView* treeView = node->GetTreeView();
+                        if (treeView)
+                        {
+                            Point treeViewContentLocation = treeView->ContentLocation();
+                            Point loc(contentLoc.X, contentLoc.Y - treeViewContentLocation.Y);
+                            Point screenLoc = solutionTreeView->ClientToScreen(loc);
+                            ShowContextMenu(contextMenu.release(), screenLoc);
+                        }
+                    }
+                    break;
+                }
+                case SolutionTreeViewNodeDataKind::project:
+                {
+                    sngcm::ast::Project* project = data->project;
+                    std::unique_ptr<ContextMenu> contextMenu(new ContextMenu());
+                    std::unique_ptr<MenuItem> buildMenuItem(new MenuItem("Build"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new BuildProjectAction(buildMenuItem.get(), this, project)));
+                    contextMenu->AddMenuItem(buildMenuItem.release());
+                    std::unique_ptr<MenuItem> rebuildMenuItem(new MenuItem("Rebuild"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new RebuildProjectAction(rebuildMenuItem.get(), this, project)));
+                    contextMenu->AddMenuItem(rebuildMenuItem.release());
+                    std::unique_ptr<MenuItem> cleanMenuItem(new MenuItem("Clean"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new CleanProjectAction(cleanMenuItem.get(), this, project)));
+                    contextMenu->AddMenuItem(cleanMenuItem.release());
+                    // todo: file items
+                    if (solutionData->GetSolution()->ActiveProject() != project)
+                    {
+                        std::unique_ptr<MenuItem> setActiveMenuItem(new MenuItem("Set Active"));
+                        clickActions.push_back(std::unique_ptr<ClickAction>(new SetActiveProjectAction(setActiveMenuItem.get(), this, project, node)));
+                        contextMenu->AddMenuItem(setActiveMenuItem.release());
+                    }
+                    std::unique_ptr<MenuItem> openFileLocationMenuItem(new MenuItem("Open File Location"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new OpenFileLocationAction(openFileLocationMenuItem.get(), this, project->FilePath())));
+                    contextMenu->AddMenuItem(openFileLocationMenuItem.release());
+                    std::unique_ptr<MenuItem> removeMenuItem(new MenuItem("Remove"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new RemoveProjectAction(removeMenuItem.get(), this, project)));
+                    contextMenu->AddMenuItem(removeMenuItem.release());
+                    if (contextMenu->HasMenuItems())
+                    {
+                        Point contentLoc = args.location;
+                        TreeView* treeView = node->GetTreeView();
+                        if (treeView)
+                        {
+                            Point treeViewContentLocation = treeView->ContentLocation();
+                            Point loc(contentLoc.X, contentLoc.Y - treeViewContentLocation.Y);
+                            Point screenLoc = solutionTreeView->ClientToScreen(loc);
+                            ShowContextMenu(contextMenu.release(), screenLoc);
+                        }
+                    }
+                    break;
+                }
+                case SolutionTreeViewNodeDataKind::file:
+                {
+                    std::unique_ptr<ContextMenu> contextMenu(new ContextMenu());
+                    std::unique_ptr<MenuItem> openFileLocationMenuItem(new MenuItem("Open File Location"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new OpenFileLocationAction(openFileLocationMenuItem.get(), this, data->filePath)));
+                    contextMenu->AddMenuItem(openFileLocationMenuItem.release());
+                    if (contextMenu->HasMenuItems())
+                    {
+                        Point contentLoc = args.location;
+                        TreeView* treeView = node->GetTreeView();
+                        if (treeView)
+                        {
+                            Point treeViewContentLocation = treeView->ContentLocation();
+                            Point loc(contentLoc.X, contentLoc.Y - treeViewContentLocation.Y);
+                            Point screenLoc = solutionTreeView->ClientToScreen(loc);
+                            ShowContextMenu(contextMenu.release(), screenLoc);
+                        }
+                    }
+                    break;
                 }
             }
         }
@@ -813,6 +1627,37 @@ void MainWindow::CodeTabPageRemoved(ControlEventArgs& args)
         ResetFocusedControl();
     }
 */
+}
+
+void MainWindow::OutputTabControlTabPageRemoved(ControlEventArgs& args)
+{
+    if (args.control == outputTabPage)
+    {
+        outputTabPage = nullptr;
+        outputLogView = nullptr;
+    }
+}
+
+void MainWindow::OutputTabControlTabPageSelected()
+{
+    // todo
+}
+
+LogView* MainWindow::GetOutputLogView()
+{
+    if (!outputLogView)
+    {
+        std::unique_ptr<TabPage> outputTabPagePtr(new TabPage("Output", "output"));
+        outputTabPage = outputTabPagePtr.get();
+        std::unique_ptr<LogView> outputLogViewPtr(new LogView(TextViewCreateParams().Defaults()));
+        outputLogView = outputLogViewPtr.get();
+        outputLogView->SetDoubleBuffered();
+        std::unique_ptr<Control> scrollableOutputLogView(new ScrollableControl(ScrollableControlCreateParams(outputLogViewPtr.release()).SetDock(Dock::fill)));
+        outputTabPage->AddChild(scrollableOutputLogView.release());
+        outputTabControl->AddTabPage(outputTabPagePtr.release());
+    }
+    outputTabPage->Select();
+    return outputLogView;
 }
 
 } // namespace cmcode

@@ -51,6 +51,7 @@ namespace System.Windows
         {
             base->OnTextChanged();
             lines = SplitIntoLines(Text());
+            SetChanged();
             Invalidate();
         }
         protected override void OnPaint(PaintEventArgs& args)

@@ -46,6 +46,75 @@ void Application::ProcessMessages()
 
 bool Application::ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result)
 {
+    switch (message)
+    {
+        case WM_KEYDOWN:
+        {
+            int virtualKeyCode = static_cast<int>(wParam);
+            Keys keyCode = static_cast<Keys>(virtualKeyCode);
+            switch (keyCode)
+            {
+                case Keys::controlKey:
+                {
+                    Keys modifiers = GetKeyboardModifiers();
+                    modifiers = modifiers | Keys::controlModifier;
+                    SetKeyboardModifiers(modifiers);
+                    result = 0;
+                    return true;
+                }
+                case Keys::shiftKey:
+                {
+                    Keys modifiers = GetKeyboardModifiers();
+                    modifiers = modifiers | Keys::shiftModifier;
+                    SetKeyboardModifiers(modifiers);
+                    result = 0;
+                    return true;
+                }
+                case Keys::menu:
+                {
+                    Keys modifiers = GetKeyboardModifiers();
+                    modifiers = modifiers | Keys::altModifier;
+                    SetKeyboardModifiers(modifiers);
+                    result = 0;
+                    return true;
+                }
+            }
+            break;
+        }
+        case WM_KEYUP:
+        {
+            int virtualKeyCode = static_cast<int>(wParam);
+            Keys keyCode = static_cast<Keys>(virtualKeyCode);
+            switch (keyCode)
+            {
+                case Keys::controlKey:
+                {
+                    Keys modifiers = GetKeyboardModifiers();
+                    modifiers = modifiers & ~Keys::controlModifier;
+                    SetKeyboardModifiers(modifiers);
+                    result = 0;
+                    return true;
+                }
+                case Keys::shiftKey:
+                {
+                    Keys modifiers = GetKeyboardModifiers();
+                    modifiers = modifiers & ~Keys::shiftModifier;
+                    SetKeyboardModifiers(modifiers);
+                    result = 0;
+                    return true;
+                }
+                case Keys::menu:
+                {
+                    Keys modifiers = GetKeyboardModifiers();
+                    modifiers = modifiers & ~Keys::altModifier;
+                    SetKeyboardModifiers(modifiers);
+                    result = 0;
+                    return true;
+                }
+            }
+            break;
+        }
+    }
     Control* window = windowManager.GetWindow(handle);
     if (window)
     {

@@ -6,6 +6,7 @@
 #ifndef CMAJOR_WING_GRAPHICS_INCLUDED
 #define CMAJOR_WING_GRAPHICS_INCLUDED
 #include <cmajor/wing/Wing.hpp>
+#include <memory>
 
 namespace cmajor { namespace wing {
 
@@ -116,6 +117,9 @@ WING_API void DrawString(Graphics& graphics, const std::string& text, const Font
 WING_API void DrawString(Graphics& graphics, const std::string& text, const Font& font, const PointF& origin, const StringFormat& stringFormat, const Brush& brush);
 WING_API void DrawString(Graphics& graphics, const std::string& text, const Font& font, const RectF& rect, const StringFormat& stringFormat, const Brush& brush);
 WING_API RectF MeasureString(Graphics& graphics, const std::string& text, const Font& font, const PointF& origin, const StringFormat& stringFormat);
+
+WING_API Color ToGray(const Color& color, const Color& transparentColor);
+WING_API std::unique_ptr<Bitmap> ToGrayBitmap(Bitmap* bm, const Color& transparentColor);
 
 } } // cmajor::wing
 

@@ -198,7 +198,7 @@ protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnVisibleChanged() override;
 private:
-    std::unique_ptr<MenuItem> rootItemPtr;
+    Container menuItems;
     MenuItem* latestOpenedMenuItem;
     MenuItem* selectedMenuItem;
     MenuItem* latestMouseDownMenuItem;

@@ -17,6 +17,11 @@ namespace cmajor { namespace wing {
 
 using namespace soulng::unicode;
 
+Color DefaultBitmapTransparentColor()
+{
+    return Color(0, 128, 128);
+}
+
 ControlCreateParams::ControlCreateParams() :
     windowClassName(),
     windowClassStyle(0),
@@ -1427,30 +1432,6 @@ bool Control::DoKeyDown(int virtualKeyCode)
             return true;
         }
     }
-    switch (keyCode)
-    {
-        case Keys::controlKey:
-        {
-            Keys modifiers = Application::GetKeyboardModifiers();
-            modifiers = modifiers | Keys::controlModifier;
-            Application::SetKeyboardModifiers(modifiers);
-            break;
-        }
-        case Keys::shiftKey:
-        {
-            Keys modifiers = Application::GetKeyboardModifiers();
-            modifiers = modifiers | Keys::shiftModifier;
-            Application::SetKeyboardModifiers(modifiers);
-            break;
-        }
-        case Keys::menu:
-        {
-            Keys modifiers = Application::GetKeyboardModifiers();
-            modifiers = modifiers | Keys::altModifier;
-            Application::SetKeyboardModifiers(modifiers);
-            break;
-        }
-    }
     KeyEventArgs args(keyCode, Application::GetKeyboardModifiers());
     DoMenu(args);
     if (args.handled)
@@ -1470,53 +1451,11 @@ bool Control::DoKeyDown(int virtualKeyCode)
 bool Control::DoKeyUp(int virtualKeyCode)
 {
     Keys keyCode = static_cast<Keys>(virtualKeyCode);
-    switch (keyCode)
-    {
-        case Keys::controlKey:
-        {
-            Keys modifiers = Application::GetKeyboardModifiers();
-            modifiers = modifiers & ~Keys::controlModifier;
-            Application::SetKeyboardModifiers(modifiers);
-            break;
-        }
-        case Keys::shiftKey:
-        {
-            Keys modifiers = Application::GetKeyboardModifiers();
-            modifiers = modifiers & ~Keys::shiftModifier;
-            Application::SetKeyboardModifiers(modifiers);
-            break;
-        }
-        case Keys::menu:
-        {
-            Keys modifiers = Application::GetKeyboardModifiers();
-            modifiers = modifiers & ~Keys::altModifier;
-            Application::SetKeyboardModifiers(modifiers);
-            break;
-        }
-    }
     if (KeyDownHandled() || MenuWantsKeys())
     {
         return KeyDownHandled();
     }
-    Keys modifiers = Keys::none;
-    switch (keyCode)
-    {
-        case Keys::controlKey:
-        {
-            modifiers = modifiers | Keys::controlModifier;
-            break;
-        }
-        case Keys::shiftKey:
-        {
-            modifiers = modifiers | Keys::shiftModifier;
-            break;
-        }
-        case Keys::menu:
-        {
-            modifiers = modifiers | Keys::altModifier;
-            break;
-        }
-    }
+    Keys modifiers = Application::GetKeyboardModifiers();
     KeyEventArgs args(keyCode, modifiers);
     DispatchKeyUp(args);
     if (args.handled)
@@ -1622,7 +1561,14 @@ void Control::OnTextChanged()
 
 void Control::OnTimer(TimerEventArgs& args)
 {
-    timer.Fire(args);
+    if (args.timerId == mouseHoverTimerId)
+    {
+        DoMouseHover();
+    }
+    else
+    {
+        timer.Fire(args);
+    }
 }
 
 void Control::OnVisibleChanged()

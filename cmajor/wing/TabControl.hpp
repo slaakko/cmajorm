@@ -227,6 +227,7 @@ public:
     const Rect& CloseRect() const { return tab.closeRect; }
     const Rect& SelectRect() const { return tab.selectRect; }
 protected:
+    void OnKeyDown(KeyEventArgs& args) override;
     void OnTextChanged() override;
 private:
     std::string key;

@@ -92,7 +92,7 @@ std::string CmbsLogFilePath()
 class BuildServer
 {
 public:
-    BuildServer(bool log_);
+    BuildServer(bool log_, bool progress_);
     ~BuildServer();
     void Start(int port, const std::string& version, std::condition_variable* exitVar, bool* exiting);
     void Stop();
@@ -125,6 +125,7 @@ public:
 private:
     int port;
     bool log;
+    bool progress;
     std::string version;
     std::atomic_bool exit;
     bool running;
@@ -162,10 +163,14 @@ struct RequestGuard
     BuildServer* server;
 };
 
-BuildServer::BuildServer(bool log_) :
-    port(54325), log(log_), version(), exit(false), listenSocket(), socket(), requestInProgress(false), 
-    lastActionTime(), stopRequested(false), logFilePath(CmbsLogFilePath()), running(false), progressIntervalMs(250), exitVar(nullptr), exiting(nullptr)
+BuildServer::BuildServer(bool log_, bool progress_) :
+    port(54325), log(log_), progress(progress_), version(), exit(false), listenSocket(), socket(), requestInProgress(false),
+    lastActionTime(), stopRequested(false), logFilePath(CmbsLogFilePath()), running(false), progressIntervalMs(0), exitVar(nullptr), exiting(nullptr)
 {
+    if (progress)
+    {
+        progressIntervalMs = 250;
+    }
 #ifdef TRACE
     soulng::util::Tracer tracer(BuildServer_BuildServer);
 #endif // TRACE
@@ -1330,14 +1335,14 @@ void BuildServer::ResetRequestInProgress()
 
 BuildServer* buildServer = nullptr;
 
-void StartBuildServer(int port, const std::string& version, bool log, std::condition_variable* exitVar, bool* exiting)
+void StartBuildServer(int port, const std::string& version, bool log, bool progress, std::condition_variable* exitVar, bool* exiting)
 {
 #ifdef TRACE
     soulng::util::Tracer tracer(StartBuildServer_f);
 #endif // TRACE
     if (!buildServer)
     {
-        buildServer = new BuildServer(log);
+        buildServer = new BuildServer(log, progress);
     }
     buildServer->Start(port, version, exitVar, exiting);
 }

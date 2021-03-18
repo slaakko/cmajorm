@@ -54,7 +54,11 @@ namespace cmcode
     [json]
     public class BuildSettings
     {
-        public nothrow BuildSettings() : numberOfProjectBuildThreads(0), singleThreadedCompile(false), generateIntermediateCodeFiles(false)
+        public nothrow BuildSettings() :
+            numberOfProjectBuildThreads(0),
+            singleThreadedCompile(false),
+            generateIntermediateCodeFiles(false),
+            generateOptimizedIntermediateCodeFiles(false)
         {
         }
         public nothrow BuildSettings(int numberOfProjectBuildThreads_, bool singleThreadedCompile_, bool generateIntermediateCodeFiles_,

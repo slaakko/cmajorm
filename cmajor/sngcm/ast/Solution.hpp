@@ -72,6 +72,7 @@ public:
     void SetActiveProject(Project* activeProject_) { activeProject = activeProject_; }
     void SortByProjectName();
     void Save();
+    void RemoveProject(Project* project);
 private:
     std::u32string name;
     std::string filePath;

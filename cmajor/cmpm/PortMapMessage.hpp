@@ -1,5 +1,6 @@
 #ifndef PORTMAPMESSAGE_HPP_DC8E9733F60B35A671F1CC8A29699D85F1D0FE2B
 #define PORTMAPMESSAGE_HPP_DC8E9733F60B35A671F1CC8A29699D85F1D0FE2B
+#include <cmajor/cmpm/Api.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <soulng/util/Time.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -16,7 +17,7 @@ using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
 
-class GetFreePortNumberRequest
+class CMPM_API GetFreePortNumberRequest
 {
 public:
     GetFreePortNumberRequest();
@@ -27,7 +28,7 @@ public:
     int32_t pid;
 };
 
-class GetFreePortNumberReply
+class CMPM_API GetFreePortNumberReply
 {
 public:
     GetFreePortNumberReply();
@@ -37,7 +38,7 @@ public:
     int32_t portNumber;
 };
 
-class ExtendPortLeaseRequest
+class CMPM_API ExtendPortLeaseRequest
 {
 public:
     ExtendPortLeaseRequest();
@@ -49,7 +50,7 @@ public:
     std::vector<int32_t> portNumbers;
 };
 
-class ExtendPortLeaseReply
+class CMPM_API ExtendPortLeaseReply
 {
 public:
     ExtendPortLeaseReply();
@@ -58,7 +59,7 @@ public:
 public:
 };
 
-class StopPortMapServerRequest
+class CMPM_API StopPortMapServerRequest
 {
 public:
     StopPortMapServerRequest();
@@ -67,7 +68,7 @@ public:
 public:
 };
 
-class StopPortMapServerReply
+class CMPM_API StopPortMapServerReply
 {
 public:
     StopPortMapServerReply();
@@ -76,7 +77,7 @@ public:
 public:
 };
 
-class PortLease
+class CMPM_API PortLease
 {
 public:
     PortLease();
@@ -91,7 +92,7 @@ public:
     std::string leaseState;
 };
 
-class ViewPortLeaseRequest
+class CMPM_API ViewPortLeaseRequest
 {
 public:
     ViewPortLeaseRequest();
@@ -100,7 +101,7 @@ public:
 public:
 };
 
-class ViewPortLeaseReply
+class CMPM_API ViewPortLeaseReply
 {
 public:
     ViewPortLeaseReply();

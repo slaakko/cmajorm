@@ -10,7 +10,7 @@
 
 namespace cmbs {
 
-void StartBuildServer(int port, const std::string& version, bool log, std::condition_variable* exitVar, bool* exiting);
+void StartBuildServer(int port, const std::string& version, bool log, bool progress, std::condition_variable* exitVar, bool* exiting);
 void StopBuildServer();
 bool BuildServerStopRequested();
 std::string CmbsLogFilePath();

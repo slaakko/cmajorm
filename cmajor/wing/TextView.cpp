@@ -642,6 +642,7 @@ Point TextView::CCPos()
 void TextView::SetCCText(const std::u32string& line, int columnIndex)
 {
     cctext.clear();
+    if (line.empty()) return;
     while (columnIndex >= line.length())
     {
         --columnIndex;

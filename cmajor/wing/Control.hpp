@@ -112,6 +112,8 @@ WING_API inline Color DefaultControlBackgroundColor()
     return GetSystemColor(DefaultControlWindowClassBackgroundColor());
 }
 
+WING_API Color DefaultBitmapTransparentColor();
+
 enum class Anchors : int
 {
     none = 0, top = 1 << 0, bottom = 1 << 1, left = 1 << 2, right = 1 << 3

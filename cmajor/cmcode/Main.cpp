@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmcode/MainWindow.hpp>
+#include <cmajor/cmcode/Config.hpp>
 #include <cmajor/cmsvc/InitDone.hpp>
 #include <cmajor/cmview/InitDone.hpp>
 #include <sngcm/cmparser/CommandLine.hpp>
@@ -24,9 +25,11 @@ struct InitDone
         cmajor::wing::Init(instance);
         cmajor::service::Init();
         cmajor::view::Init();
+        cmcode::ConfigInit();
     }
     ~InitDone()
     {
+        cmcode::ConfigDone();
         cmajor::view::Done();
         cmajor::service::Done();
         cmajor::wing::Done();

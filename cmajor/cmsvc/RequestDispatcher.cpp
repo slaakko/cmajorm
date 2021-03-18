@@ -5,6 +5,7 @@
 
 #include <cmajor/cmsvc/RequestDispatcher.hpp>
 #include <cmajor/cmsvc/Request.hpp>
+#include <cmajor/cmsvc/Message.hpp>
 #include <memory>
 #include <thread>
 
@@ -66,20 +67,19 @@ void RequestDispatcher::Run()
         std::unique_ptr<Request> request = GetRequest();
         while (request)
         {
-            HandleRequest(request.get());
+            try
+            {
+                request->Execute();
+            }
+            catch (const std::exception& ex)
+            {
+                PutOutputServiceMessage("request dispatcher: error executing " + request->Name() + ": " + std::string(ex.what()));
+            }
             request = GetRequest();
         }
     }
     catch (...)
     {
-    }
-}
-
-void RequestDispatcher::HandleRequest(Request* request)
-{
-    switch (request->Kind())
-    {
-
     }
 }
 

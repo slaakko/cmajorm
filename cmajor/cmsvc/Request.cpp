@@ -17,6 +17,7 @@ public:
     static void Done();
     static RequestQueue& Instance() { return *instance; }
     bool IsEmpty();
+    bool Exiting() const { return exiting; }
     void Put(Request* request);
     std::unique_ptr<Request> Get();
     bool RequestAvailableOrExiting() const { return !requestQueue.empty() || exiting; }
@@ -60,6 +61,7 @@ bool RequestQueue::IsEmpty()
 
 void RequestQueue::Put(Request* request)
 {
+    if (exiting) return;
     std::lock_guard<std::mutex> lock(mtx);
     requestQueue.push_back(std::unique_ptr<Request>(request));
     requestAvailableOrExiting.notify_one();
@@ -79,19 +81,7 @@ std::unique_ptr<Request> RequestQueue::Get()
     return std::unique_ptr<Request>();
 }
 
-Request::Request(RequestKind kind_) : kind(kind_)
-{
-}
-
 Request::~Request()
-{
-}
-
-StartBuildRequest::StartBuildRequest() : Request(RequestKind::startBuildRequest)
-{
-}
-
-StopBuildRequest::StopBuildRequest() : Request(RequestKind::stopBuildRequest)
 {
 }
 
@@ -108,6 +98,11 @@ std::unique_ptr<Request> GetRequest()
 void Exit()
 {
     RequestQueue::Instance().Exit();
+}
+
+bool Exiting()
+{
+    return RequestQueue::Instance().Exiting();
 }
 
 void InitRequest() 
