@@ -46,14 +46,18 @@ int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdSh
     InitDone initDone(instance);
     try
     {
-        std::u32string content = ToUtf32(cmdLine);
-        content.append(1, '\n');
-        TrivialLexer lexer(content, "", 0);
-        std::vector<std::string> args = CommandLineParser::Parse(lexer);
         std::string filePath;
-        if (!args.empty())
+        std::string commandLine(cmdLine);
+        if (!commandLine.empty())
         {
-            filePath = args[0];
+            std::u32string content = ToUtf32(commandLine);
+            content.append(1, '\n');
+            TrivialLexer lexer(content, "", 0);
+            std::vector<std::string> args = CommandLineParser::Parse(lexer);
+            if (!args.empty())
+            {
+                filePath = args[0];
+            }
         }
         MainWindow mainWindow(filePath);
         mainWindow.SetSmallIcon(Application::GetResourceManager().GetIcon("cmcode.small.icon"));

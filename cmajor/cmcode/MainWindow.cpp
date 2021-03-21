@@ -7,11 +7,13 @@
 #include <cmajor/cmcode/Action.hpp>
 #include <cmajor/cmcode/Build.hpp>
 #include <cmajor/cmcode/ToolBar.hpp>
+#include <cmajor/cmcode/SelectProjectTypeDialog.hpp>
 #include <cmajor/wing/Dialog.hpp>
 #include <cmajor/wing/BorderedControl.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
 #include <cmajor/wing/ToolBar.hpp>
+#include <cmajor/wing/MessageBox.hpp>
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmsvc/RequestDispatcher.hpp>
 #include <cmajor/cmsvc/PortMapService.hpp>
@@ -20,6 +22,9 @@
 #include <sngcm/ast/Project.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
+
+#undef min
+#undef max
 
 namespace cmcode {
 
@@ -98,6 +103,17 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     outputTabControl(nullptr),
     outputTabPage(nullptr),
     outputLogView(nullptr),
+    errorTabPage(nullptr),
+    errorView(nullptr),
+    statusBar(nullptr),
+    buildIndicatorStatuBarItem(nullptr), 
+    editorReadWriteIndicatorStatusBarItem(nullptr),
+    editorDirtyIndicatorStatusBarItem(nullptr),
+    sourceFilePathStatusBarItem(nullptr),
+    lineStatusBarItem(nullptr),
+    columnStatusBarItem(nullptr),
+    buildProgressCounter(0),
+    buildProgressTimerRunning(false),
     state(MainWindowState::idle),
     backend("cpp"),
     config("debug")
@@ -162,12 +178,12 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     redoMenuItem->SetShortcut(Keys::controlModifier | Keys::y);
     redoMenuItem->Click().AddHandler(this, &MainWindow::RedoClick);
     editMenuItem->AddMenuItem(redoMenuItemPtr.release());
-    std::unique_ptr<MenuItem> gotoMenuItemPtr(new MenuItem("&Go To Line"));
+    std::unique_ptr<MenuItem> gotoMenuItemPtr(new MenuItem("&Go To Line..."));
     gotoMenuItem = gotoMenuItemPtr.get();
     gotoMenuItem->SetShortcut(Keys::controlModifier | Keys::g);
     gotoMenuItem->Click().AddHandler(this, &MainWindow::GotoClick);
     editMenuItem->AddMenuItem(gotoMenuItemPtr.release());
-    std::unique_ptr<MenuItem> searchMenuItemPtr(new MenuItem("&Search"));
+    std::unique_ptr<MenuItem> searchMenuItemPtr(new MenuItem("&Search..."));
     searchMenuItem = searchMenuItemPtr.get();
     searchMenuItem->SetShortcut(Keys::controlModifier | Keys::f);
     searchMenuItem->Click().AddHandler(this, &MainWindow::SearchClick);
@@ -488,6 +504,34 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     verticalSplitContainer->Pane2Container()->AddChild(borderedOutptTabControl.release());
     AddChild(verticalSplitContainerPtr.release());
 
+    std::unique_ptr<StatusBar> statusBarPtr(new StatusBar(StatusBarCreateParams().Defaults()));
+    statusBar = statusBarPtr.get();
+    std::unique_ptr<StatusBarTextItem> buildIndicatorStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(1).BorderStyle(StatusBarItemBorderStyle::sunken)));
+    buildIndicatorStatuBarItem = buildIndicatorStatusBarItemPtr.get();
+    statusBar->AddItem(buildIndicatorStatusBarItemPtr.release());
+    std::unique_ptr<StatusBarTextItem> editorReadWriteIndicatorStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(3).BorderStyle(StatusBarItemBorderStyle::sunken)));
+    editorReadWriteIndicatorStatusBarItem = editorReadWriteIndicatorStatusBarItemPtr.get();
+    statusBar->AddItem(editorReadWriteIndicatorStatusBarItemPtr.release());
+    std::unique_ptr<StatusBarTextItem> editorDirtyIndicatorStausBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(1).BorderStyle(StatusBarItemBorderStyle::sunken)));
+    editorDirtyIndicatorStatusBarItem = editorDirtyIndicatorStausBarItemPtr.get();
+    statusBar->AddItem(editorDirtyIndicatorStausBarItemPtr.release());
+    std::unique_ptr<StatusBarTextItem> sourceFilePathStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(0).BorderStyle(StatusBarItemBorderStyle::sunken)));
+    sourceFilePathStatusBarItem = sourceFilePathStatusBarItemPtr.get();
+    statusBar->AddItem(sourceFilePathStatusBarItemPtr.release());
+    statusBar->AddItem(new StatusBarSpringItem());
+    std::unique_ptr<StatusBarTextItem> lineLabelStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(5).Text("Line:").BorderStyle(StatusBarItemBorderStyle::flat)));
+    statusBar->AddItem(lineLabelStatusBarItemPtr.release());
+    std::unique_ptr<StatusBarTextItem> lineStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(5).BorderStyle(StatusBarItemBorderStyle::sunken)));
+    lineStatusBarItem = lineStatusBarItemPtr.get();
+    statusBar->AddItem(lineStatusBarItemPtr.release());
+    std::unique_ptr<StatusBarTextItem> columnLabelStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(4).Text("Col:").BorderStyle(StatusBarItemBorderStyle::flat)));
+    statusBar->AddItem(columnLabelStatusBarItemPtr.release());
+    std::unique_ptr<StatusBarTextItem> columnStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(5).BorderStyle(StatusBarItemBorderStyle::sunken)));
+    columnStatusBarItem = columnStatusBarItemPtr.get();
+    statusBar->AddItem(columnStatusBarItemPtr.release());
+
+    AddChild(statusBarPtr.release());
+
     SetServiceMessageHandlerView(this);
     StartRequestDispatcher();
 
@@ -510,6 +554,10 @@ void MainWindow::OnWindowClosing(CancelArgs& args)
     try
     {
         Window::OnWindowClosing(args);
+        if (!CloseSolution())
+        {
+            args.cancelClose = true;
+        }
     }
     catch (const std::exception& ex)
     {
@@ -556,6 +604,28 @@ void MainWindow::MouseUpNotification(MouseEventArgs& args)
     }
 }
 
+void MainWindow::OnTimer(TimerEventArgs& args)
+{
+    try
+    {
+        Window::OnTimer(args);
+        if (args.timerId == buildProgressTimerId)
+        {
+            ShowBuildProgress();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::OnGotFocus()
+{
+    Window::OnGotFocus();
+    SetFocusToEditor();
+}
+
 bool MainWindow::ProcessMessage(Message& msg)
 {
     switch (msg.message)
@@ -570,6 +640,62 @@ bool MainWindow::ProcessMessage(Message& msg)
         {
             return Window::ProcessMessage(msg);
         }
+    }
+}
+
+void MainWindow::StartBuilding()
+{
+    SaveAllClick();
+    SetEditorsReadOnly();
+    SetState(MainWindowState::building);
+    ClearOutput();
+    buildProgressCounter = 0;
+    buildProgressTimerRunning = true;
+    SetTimer(buildProgressTimerId, buildProgressTimerPeriod);
+}
+
+void MainWindow::StopBuilding()
+{
+    if (buildProgressTimerRunning)
+    {
+        buildProgressTimerRunning = false;
+        KillTimer(buildProgressTimerId);
+    }
+    buildIndicatorStatuBarItem->SetText(std::string());
+    SetState(MainWindowState::idle);
+    SetEditorsReadWrite();
+}
+
+void MainWindow::ShowBuildProgress()
+{
+    if (state == MainWindowState::building)
+    {
+        std::string buildIndicatorText;
+        switch (buildProgressCounter % 4)
+        {
+            case 0:
+            {
+                buildIndicatorText = "|";
+                break;
+            }
+            case 1:
+            {
+                buildIndicatorText = "/";
+                break;
+            }
+            case 2:
+            {
+                buildIndicatorText = "-";
+                break;
+            }
+            case 3:
+            {
+                buildIndicatorText = "\\";
+                break;
+            }
+        }
+        buildIndicatorStatuBarItem->SetText(buildIndicatorText);
+        ++buildProgressCounter;
     }
 }
 
@@ -660,7 +786,7 @@ void MainWindow::OpenProject(const std::string& filePath)
         {
             throw std::runtime_error("file path '" + filePath + "' is empty or does not exist");
         }
-        // todo close code tab control files
+        codeTabControl->CloseAllTabPages();
         solutionData.reset(new SolutionData(std::move(solution), solutionTreeView));
         SetState(MainWindowState::idle);
     }
@@ -672,6 +798,7 @@ void MainWindow::OpenProject(const std::string& filePath)
 
 void MainWindow::HandleBuildReply(const BuildReply& buildReply)
 {
+    StopBuilding();
     if (buildReply.requestValid)
     {
         if (buildReply.success)
@@ -681,25 +808,29 @@ void MainWindow::HandleBuildReply(const BuildReply& buildReply)
         else
         {
             PutOutputServiceMessage("build unsuccessful");
-            // todo: handle compile errors
+            if (!buildReply.errors.empty())
+            {
+                ErrorView* errorView = GetErrorView();
+                errorView->Clear();
+                errorView->SetErrors(std::move(buildReply.errors));
+            }
         }
     }
     else
     {
         PutOutputServiceMessage("invalid build request: " + buildReply.requestErrorMessage);
     }
-    SetState(MainWindowState::idle);
 }
 
 void MainWindow::HandleBuildError(const std::string& buildError)
 {
+    StopBuilding();
     PutOutputServiceMessage("build unsuccessful");
-    SetState(MainWindowState::idle);
 }
 
 void MainWindow::HandleStopBuild()
 {
-    SetState(MainWindowState::idle);
+    StopBuilding();
 }
 
 void MainWindow::SetState(MainWindowState state_)
@@ -828,7 +959,7 @@ void MainWindow::SetState(MainWindowState state_)
 
     switch (state)
     {
-        case MainWindowState::idle: 
+        case MainWindowState::idle:
         {
             newProjectMenuItem->Enable();
             openProjectMenuItem->Enable();
@@ -871,6 +1002,227 @@ void MainWindow::SetState(MainWindowState state_)
             break;
         }
     }
+    SetEditorState();
+}
+
+void MainWindow::SetEditorState()
+{
+    bool editorOpen = !codeTabControl->TabPages().IsEmpty();
+    if (editorOpen)
+    {
+        gotoMenuItem->Enable();
+        Editor* currentEditor = CurrentEditor();
+        if (currentEditor)
+        {
+            TextView* textView = currentEditor->GetTextView();
+            if (textView)
+            {
+                std::string editorReadWriteText;
+                if (textView->IsReadOnly())
+                {
+                    editorReadWriteText = "R/O";
+                }
+                else
+                {
+                    editorReadWriteText = "R/W";
+                }
+                editorReadWriteIndicatorStatusBarItem->SetText(editorReadWriteText);
+                std::string editorDirtyText;
+                if (textView->IsDirty())
+                {
+                    editorDirtyText = "*";
+                }
+                else
+                {
+                    editorDirtyText = std::string();
+                }
+                editorDirtyIndicatorStatusBarItem->SetText(editorDirtyText);
+                sourceFilePathStatusBarItem->SetText(textView->FilePath());
+                if (!textView->IsSelectionEmpty())
+                {
+                    copyMenuItem->Enable();
+                    cutMenuItem->Enable();
+                }
+                else
+                {
+                    copyMenuItem->Disable();
+                    cutMenuItem->Disable();
+                }
+                if (textView->CaretLine() != 0)
+                {
+                    lineStatusBarItem->SetText(std::to_string(textView->CaretLine()));
+                }
+                else
+                {
+                    lineStatusBarItem->SetText(std::string());
+                }
+                if (textView->CaretColumn() != 0)
+                {
+                    columnStatusBarItem->SetText(std::to_string(textView->CaretColumn()));
+                }
+                else
+                {
+                    columnStatusBarItem->SetText(std::string());
+                }
+            }
+        }
+    }
+    else
+    {
+        editorReadWriteIndicatorStatusBarItem->SetText(std::string());
+        editorDirtyIndicatorStatusBarItem->SetText(std::string());
+        sourceFilePathStatusBarItem->SetText(std::string());
+        lineStatusBarItem->SetText(std::string());
+        columnStatusBarItem->SetText(std::string());
+    }
+}
+
+void MainWindow::SetEditorsReadOnly()
+{
+    Component* child = codeTabControl->TabPages().FirstChild();
+    while (child)
+    {
+        if (child->IsTabPage())
+        {
+            TabPage* tabPage = static_cast<TabPage*>(child);
+            Editor* editor = GetEditorByTabPage(tabPage);
+            if (editor)
+            {
+                TextView* textView = editor->GetTextView();
+                if (textView)
+                {
+                    textView->SetReadOnly();
+                }
+            }
+        }
+        child = child->NextSibling();
+    }
+}
+
+void MainWindow::SetEditorsReadWrite()
+{
+    Component* child = codeTabControl->TabPages().FirstChild();
+    while (child)
+    {
+        if (child->IsTabPage())
+        {
+            TabPage* tabPage = static_cast<TabPage*>(child);
+            Editor* editor = GetEditorByTabPage(tabPage);
+            if (editor)
+            {
+                TextView* textView = editor->GetTextView();
+                if (textView)
+                {
+                    textView->SetReadWrite();
+                }
+            }
+        }
+        child = child->NextSibling();
+    }
+}
+
+void MainWindow::SetFocusToEditor()
+{
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            textView->SetFocus();
+        }
+    }
+}
+
+void MainWindow::EditorReadOnlyChanged()
+{
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            std::string editorReadWriteText;
+            if (textView->IsReadOnly())
+            {
+                editorReadWriteText = "R/O";
+            }
+            else
+            {
+                editorReadWriteText = "R/W";
+            }
+            editorReadWriteIndicatorStatusBarItem->SetText(editorReadWriteText);
+        }
+    }
+}
+
+void MainWindow::EditorDirtyChanged()
+{
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            std::string editorDirtyText;
+            if (textView->IsDirty())
+            {
+                saveToolButton->Enable();
+                saveMenuItem->Enable();
+                editorDirtyText = "*";
+            }
+            else
+            {
+                saveToolButton->Disable();
+                saveMenuItem->Disable();
+                editorDirtyText = std::string();
+            }
+            editorDirtyIndicatorStatusBarItem->SetText(editorDirtyText);
+        }
+    }
+}
+
+void MainWindow::EditorCCDirtyChanged()
+{
+    // todo
+}
+
+void MainWindow::EditorCaretPosChanged()
+{
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            if (textView->CaretLine() != 0)
+            {
+                lineStatusBarItem->SetText(std::to_string(textView->CaretLine()));
+            }
+            else
+            {
+                lineStatusBarItem->SetText(std::string());
+            }
+            if (textView->CaretColumn() != 0)
+            {
+                columnStatusBarItem->SetText(std::to_string(textView->CaretColumn()));
+            }
+            else
+            {
+                columnStatusBarItem->SetText(std::string());
+            }
+        }
+    }
+}
+
+void MainWindow::BreakpointAdded(AddBreakpointEventArgs& args)
+{
+    ShowInfoMessageBox(Handle(), "breakpoint added");
+}
+
+void MainWindow::BreakpointRemoved(RemoveBreakpointEventArgs& args)
+{
+    ShowInfoMessageBox(Handle(), "breakpoint removed");
 }
 
 int MainWindow::VerticalSplitterDistance()
@@ -902,7 +1254,10 @@ void MainWindow::OpenProjectClick()
         bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "cms", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDiretory, fileNames);
         if (selected)
         {
-            OpenProject(GetFullPath(filePath));
+            if (CloseSolution())
+            {
+                OpenProject(GetFullPath(filePath));
+            }
         }
     }
     catch (const std::exception& ex)
@@ -913,30 +1268,104 @@ void MainWindow::OpenProjectClick()
 
 bool MainWindow::CloseSolution()
 {
-    if (!solutionData) return true;
-    // todo
-    ShowInfoMessageBox(Handle(), "Close Solution");
-    return true;
+    try
+    {
+        if (!solutionData) return true;
+        Component* child = codeTabControl->TabPages().FirstChild();
+        while (child)
+        {
+            if (child->IsTabPage())
+            {
+                TabPage* tabPage = static_cast<TabPage*>(child);
+                Editor* editor = GetEditorByTabPage(tabPage);
+                if (editor)
+                {
+                    if (editor->IsDirty())
+                    {
+                        MessageBoxResult result = MessageBox::Show(editor->FilePath() + " is modified. Save changes?", "Question", this, MB_YESNOCANCEL);
+                        if (result == MessageBoxResult::cancel) return false;
+                        else if (result == MessageBoxResult::yes)
+                        {
+                            editor->Save();
+                        }
+                    }
+                }
+            }
+            child = child->NextSibling();
+        }
+        codeTabControl->CloseAllTabPages();
+        solutionData.reset();
+        ResetFocusedControl();
+        SetEditorState();
+        return true;
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+    return false;
 }
 
 void MainWindow::CloseSolutionClick()
 {
-    ShowInfoMessageBox(Handle(), "Close Solution");
+    CloseSolution();
 }
 
 void MainWindow::SaveClick()
 {
-    ShowInfoMessageBox(Handle(), "Save");
+    try
+    {
+        Editor* editor = CurrentEditor();
+        if (editor)
+        {
+            editor->Save();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::SaveAllClick()
 {
-    ShowInfoMessageBox(Handle(), "Save All");
+    try
+    {
+        if (!solutionData) return;
+        sngcm::ast::Solution* solution = solutionData->GetSolution();
+        solution->Save();
+        sngcm::ast::Project* activeProject = solution->ActiveProject();
+        if (activeProject)
+        {
+            // todo: save project settings
+        }
+        Component* child = codeTabControl->TabPages().FirstChild();
+        while (child)
+        {
+            if (child->IsTabPage())
+            {
+                TabPage* tabPage = static_cast<TabPage*>(child);
+                Editor* editor = GetEditorByTabPage(tabPage);
+                if (editor)
+                {
+                    if (editor->IsDirty())
+                    {
+                        editor->Save();
+                    }
+                }
+            }
+            child = child->NextSibling();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::ExitClick()
 {
-    Application::Exit();
+    Close();
 }
 
 void MainWindow::CopyClick()
@@ -966,7 +1395,20 @@ void MainWindow::RedoClick()
 
 void MainWindow::GotoClick()
 {
-    ShowInfoMessageBox(Handle(), "Goto");
+    try
+    {
+        SelectProjectTypeDialog dialog;
+        DialogResult result = dialog.ShowDialog(*this);
+        if (result == DialogResult::ok)
+        {
+            sngcm::ast::Target target = dialog.GetTarget();
+            ShowInfoMessageBox(Handle(), sngcm::ast::TargetStr(target) + " selected");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::SearchClick()
@@ -1016,8 +1458,7 @@ void MainWindow::BuildSolutionClick()
         {
             throw std::runtime_error("no solution open");
         }
-        SetState(MainWindowState::building);
-        ClearOutput();
+        StartBuilding();
         StartBuild(backend, config, solutionData->GetSolution()->FilePath(), BuildRequestKind::build | BuildRequestKind::buildDependencies);
     }
     catch (const std::exception& ex)
@@ -1038,8 +1479,7 @@ void MainWindow::RebuildSolutionClick()
         {
             throw std::runtime_error("no solution open");
         }
-        SetState(MainWindowState::building);
-        ClearOutput();
+        StartBuilding();
         StartBuild(backend, config, solutionData->GetSolution()->FilePath(), BuildRequestKind::rebuild | BuildRequestKind::buildDependencies);
     }
     catch (const std::exception& ex)
@@ -1060,8 +1500,7 @@ void MainWindow::CleanSolutionClick()
         {
             throw std::runtime_error("no solution open");
         }
-        SetState(MainWindowState::building);
-        ClearOutput();
+        StartBuilding();
         StartBuild(backend, config, solutionData->GetSolution()->FilePath(), BuildRequestKind::clean);
     }
     catch (const std::exception& ex)
@@ -1082,8 +1521,7 @@ void MainWindow::BuildProject(sngcm::ast::Project* project)
         {
             throw std::runtime_error("no solution open");
         }
-        SetState(MainWindowState::building);
-        ClearOutput();
+        StartBuilding();
         StartBuild(backend, config, project->FilePath(), BuildRequestKind::build | BuildRequestKind::buildDependencies);
     }
     catch (const std::exception& ex)
@@ -1104,8 +1542,7 @@ void MainWindow::RebuildProject(sngcm::ast::Project* project)
         {
             throw std::runtime_error("no solution open");
         }
-        SetState(MainWindowState::building);
-        ClearOutput();
+        StartBuilding();
         StartBuild(backend, config, project->FilePath(), BuildRequestKind::rebuild | BuildRequestKind::buildDependencies);
     }
     catch (const std::exception& ex)
@@ -1126,8 +1563,7 @@ void MainWindow::CleanProject(sngcm::ast::Project* project)
         {
             throw std::runtime_error("no solution open");
         }
-        SetState(MainWindowState::building);
-        ClearOutput();
+        StartBuilding();
         StartBuild(backend, config, project->FilePath(), BuildRequestKind::clean | BuildRequestKind::buildDependencies);
     }
     catch (const std::exception& ex)
@@ -1226,10 +1662,8 @@ void MainWindow::BuildActiveProjectClick()
         {
             throw std::runtime_error("no active project set for the solution");
         }
-        SetState(MainWindowState::building);
-        ClearOutput();
+        StartBuilding();
         StartBuild(backend, config, activeProject->FilePath(), BuildRequestKind::build | BuildRequestKind::buildDependencies);
-
     }
     catch (const std::exception& ex)
     {
@@ -1239,12 +1673,54 @@ void MainWindow::BuildActiveProjectClick()
 
 void MainWindow::RebuildActiveProjectClick()
 {
-    ShowInfoMessageBox(Handle(), "Rebuild Active Project");
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        sngcm::ast::Project* activeProject = solutionData->GetSolution()->ActiveProject();
+        if (!activeProject)
+        {
+            throw std::runtime_error("no active project set for the solution");
+        }
+        StartBuilding();
+        StartBuild(backend, config, activeProject->FilePath(), BuildRequestKind::rebuild | BuildRequestKind::buildDependencies);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
 }
 
 void MainWindow::CleanActiveProjectClick()
 {
-    ShowInfoMessageBox(Handle(), "Clean Active Project");
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        sngcm::ast::Project* activeProject = solutionData->GetSolution()->ActiveProject();
+        if (!activeProject)
+        {
+            throw std::runtime_error("no active project set for the solution");
+        }
+        StartBuilding();
+        StartBuild(backend, config, activeProject->FilePath(), BuildRequestKind::clean | BuildRequestKind::buildDependencies);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
 }
 
 void MainWindow::StartDebuggingClick()
@@ -1532,6 +2008,19 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
     }
 }
 
+Editor* MainWindow::GetEditorByTabPage(TabPage* tabPage) const
+{
+    auto it = tabPageEditorMap.find(tabPage);
+    if (it != tabPageEditorMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project)
 {
     std::unique_ptr<TabPage> tabPage(new TabPage(fileName, key));
@@ -1553,50 +2042,43 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
     CmajorSourceCodeView* sourceCodeView = editor->SourceCodeView();
     if (sourceCodeView)
     {
-        // todo
+        sourceCodeView->DirtyChanged().AddHandler(this, &MainWindow::EditorDirtyChanged);
+        sourceCodeView->CCDirtyChanged().AddHandler(this, &MainWindow::EditorCCDirtyChanged);
+        sourceCodeView->ReadOnlyChanged().AddHandler(this, &MainWindow::EditorReadOnlyChanged);
+        sourceCodeView->CaretPosChanged().AddHandler(this, &MainWindow::EditorCaretPosChanged);
+        if (state != MainWindowState::idle)
+        {
+            sourceCodeView->SetReadOnly();
+        }
         DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
         if (debugStrip)
         {
-            // todo
+            debugStrip->BreakpointAdded().AddHandler(this, &MainWindow::BreakpointAdded);
+            debugStrip->BreakpointRemoved().AddHandler(this, &MainWindow::BreakpointRemoved);
         }
-        sourceCodeView->SetFocus();
     }
     tabPage->AddChild(editorPtr.release());
-    codeTabControl->AddTabPage(tabPage.release());
     tabPageEditorMap[tabPage.get()] = editor;
+    codeTabControl->AddTabPage(tabPage.release());
+    SetEditorState();
+    SetFocusToEditor();
     return editor;
 }
 
 void MainWindow::CodeTabPageSelected()
 {
     TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
-/*  TODO:
     Editor* editor = GetEditorByTabPage(selectedTabPage);
     if (editor)
     {
-        gotoLineMenuItem->Enable();
-        sourceFilePathStatusBarItem->SetText(editor->FilePath());
         editor->Select();
-        TextView* textView = editor->GetTextView();
-        if (textView)
-        {
-            if (!textView->IsSelectionEmpty())
-            {
-                copyMenuItem->Enable();
-                cutMenuItem->Enable();
-            }
-            else
-            {
-                copyMenuItem->Disable();
-                cutMenuItem->Disable();
-            }
-        }
+        SetEditorState();
     }
-*/
 }
 
 void MainWindow::CodeTabPageRemoved(ControlEventArgs& args)
 {
+    SetEditorState();
 /*  TODO:
     HideCodeCompletionList();
     Control* removedControl = args.control;
@@ -1636,6 +2118,12 @@ void MainWindow::OutputTabControlTabPageRemoved(ControlEventArgs& args)
         outputTabPage = nullptr;
         outputLogView = nullptr;
     }
+    else if (args.control == errorTabPage)
+    {
+        errorTabPage = nullptr;
+        errorView = nullptr;
+    }
+    // todo
 }
 
 void MainWindow::OutputTabControlTabPageSelected()
@@ -1659,5 +2147,90 @@ LogView* MainWindow::GetOutputLogView()
     outputTabPage->Select();
     return outputLogView;
 }
+
+ErrorView* MainWindow::GetErrorView()
+{
+    if (!errorView)
+    {
+        std::unique_ptr<TabPage> errorTabPagePtr(new TabPage("Errors", "errors"));
+        errorTabPage = errorTabPagePtr.get();
+        std::unique_ptr<ErrorView> errorViewPtr(new ErrorView(ErrorViewCreateParams().Defaults()));
+        errorView = errorViewPtr.get();
+        errorView->ViewError().AddHandler(this, &MainWindow::ViewError);
+        errorTabPage->AddChild(errorViewPtr.release());
+        outputTabControl->AddTabPage(errorTabPagePtr.release());
+    }
+    errorTabPage->Select();
+    return errorView;
+}
+
+void MainWindow::ViewError(ViewErrorArgs& args)
+{
+    try
+    {
+        CompileError* error = args.error;
+        if (error)
+        {
+            TabPage* tabPage = codeTabControl->GetTabPageByKey(error->file);
+            Editor* editor = nullptr;
+            if (tabPage)
+            {
+                editor = GetEditorByTabPage(tabPage);
+                tabPage->Select();
+            }
+            if (!editor)
+            {
+                SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(error->file);
+                if (data)
+                {
+                    editor = AddCmajorEditor(data->fileName, data->key, data->filePath, data->project);
+                }
+                else
+                {
+                    editor = AddCmajorEditor(Path::GetFileName(error->file), error->file, error->file, nullptr);
+                }
+            }
+            TextView* textView = editor->GetTextView();
+            if (textView)
+            {
+                int line = error->line;
+                int scol = error->scol;
+                int ecol = error->ecol;
+                textView->EnsureLineVisible(line);
+                textView->SetCaretLineCol(std::min(line, static_cast<int>(textView->Lines().size())), 1 + textView->LineNumberFieldLength());
+                textView->ScrollToCaret();
+                textView->SetFocus();
+                textView->Invalidate();
+                if (scol != 0 && ecol != 0 && scol != ecol)
+                {
+                    textView->ResetSelection();
+                    SourcePos start(line, scol);
+                    SourcePos end(line, ecol);
+                    textView->ExtendSelection(start, end);
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+Editor* MainWindow::CurrentEditor()
+{
+    if (codeTabControl->TabPages().IsEmpty()) return nullptr;
+    TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+    if (selectedTabPage)
+    {
+        Editor* editor = GetEditorByTabPage(selectedTabPage);
+        if (editor)
+        {
+            return editor;
+        }
+    }
+    return nullptr;
+}
+
 
 } // namespace cmcode

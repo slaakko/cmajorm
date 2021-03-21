@@ -229,6 +229,9 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmviewd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmview.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmview.lib ..\lib
 
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcoded.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmcode.exe ..\bin
+
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcmd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcmd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmcm.dll ..\bin

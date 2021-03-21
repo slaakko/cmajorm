@@ -13,7 +13,7 @@ class WING_API ButtonBase : public Control
 {
 public:
     ButtonBase(ControlCreateParams& createParams);
-    void DoClick() { OnClick(); }
+    void DoClick();
 };
 
 class WING_API Button : public ButtonBase

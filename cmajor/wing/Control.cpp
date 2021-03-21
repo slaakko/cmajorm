@@ -5,6 +5,7 @@
 
 #include <cmajor/wing/Control.hpp>
 #include <cmajor/wing/ContainerControl.hpp>
+#include <cmajor/wing/ListBox.hpp>
 #include <cmajor/wing/Menu.hpp>
 #include <cmajor/wing/Window.hpp>
 #include <cmajor/wing/Application.hpp>
@@ -116,6 +117,7 @@ Control::Control(ControlCreateParams& createParams) :
     handle(nullptr),
     font(),
     fontHandle(nullptr),
+    originalWndProc(nullptr),
     flags(ControlFlags::none),
     caretShowCount(0),
     arrowCursor(LoadStandardCursor(StandardCursorId::arrow)),
@@ -317,7 +319,7 @@ void Control::Hide()
 
 void Control::Enable()
 {
-    if (Disabled())
+    if (IsDisabled())
     {
         ResetDisabled();
         windowStyle = windowStyle & ~WS_DISABLED;
@@ -331,7 +333,7 @@ void Control::Enable()
 
 void Control::Disable()
 {
-    if (!Disabled())
+    if (!IsDisabled())
     {
         SetDisabled();
         windowStyle = windowStyle | WS_DISABLED;
@@ -677,6 +679,16 @@ void Control::SetTextInternal(const std::string& text_)
     }
 }
 
+std::string Control::DoGetWindowText()
+{
+    char16_t buf[1024];
+    if (GetWindowText(Handle(), (LPWSTR)&buf, 1024) == 0)
+    {
+        throw WindowsException(GetLastError());
+    }
+    return ToUtf8(buf);
+}
+
 void Control::SetTimer(int timerId, int durationMs)
 {
     int retval = ::SetTimer(handle, timerId, durationMs, nullptr);
@@ -725,7 +737,7 @@ void Control::ScrollLineUp()
 
 Control* Control::GetFirstEnabledTabStopControl() const
 {
-    if (GetFlag(ControlFlags::tabStop) && !Disabled())
+    if (GetFlag(ControlFlags::tabStop) && !IsDisabled())
     {
         return const_cast<Control*>(this);
     }
@@ -737,7 +749,7 @@ Control* Control::GetFirstEnabledTabStopControl() const
 
 Control* Control::GetLastEnabledTabStopControl() const
 {
-    if (GetFlag(ControlFlags::tabStop) && !Disabled())
+    if (GetFlag(ControlFlags::tabStop) && !IsDisabled())
     {
         return const_cast<Control*>(this);
     }
@@ -781,7 +793,17 @@ void Control::CreateCaret()
 
 bool Control::ProcessMessage(Message& msg)
 {
-    // todo originalWndProc
+    if (originalWndProc != nullptr)
+    {
+        if (msg.originalWndProc == nullptr)
+        {
+            msg.originalWndProc = originalWndProc;
+        }
+        if (msg.message != WM_COMMAND && msg.message != WM_DESTROY)
+        {
+            return false;
+        }
+    }
     switch (msg.message)
     {
         case WM_PAINT:
@@ -882,6 +904,12 @@ bool Control::ProcessMessage(Message& msg)
             msg.result = 0;
             return true;
         }
+        case WM_DESTROY:
+        {
+            DoDestroy();
+            msg.result = 0;
+            return true;
+        }
         case WM_SHOWWINDOW:
         {
             if (msg.wParam == 1)
@@ -938,6 +966,46 @@ bool Control::ProcessMessage(Message& msg)
                     case BN_KILLFOCUS:
                     {
                         child->DoLostFocus();
+                        msg.result = 0;
+                        return true;
+                    }
+                    case EN_CHANGE:
+                    {
+                        child->SetTextInternal(child->DoGetWindowText());
+                        msg.result = 0;
+                        return true;
+                    }
+                    case EN_SETFOCUS:
+                    {
+                        child->DoGotFocus();
+                        msg.result = 0;
+                        return true;
+                    }
+                    case EN_KILLFOCUS:
+                    {
+                        child->DoLostFocus();
+                        msg.result = 0;
+                        return true;
+                    }
+                    case LBN_SETFOCUS:
+                    {
+                        child->DoGotFocus();
+                        msg.result = 0;
+                        return true;
+                    }
+                    case LBN_KILLFOCUS:
+                    {
+                        child->DoLostFocus();
+                        msg.result = 0;
+                        return true;
+                    }
+                    case LBN_SELCHANGE:
+                    {
+                        if (child->IsListBox())
+                        {
+                            ListBox* listBox = static_cast<ListBox*>(child);
+                            listBox->SelectedIndexChangedInternal();
+                        }
                         msg.result = 0;
                         return true;
                     }
@@ -1108,7 +1176,10 @@ void Control::DoSetFocus()
     }
     SetFocused();
     DoGotFocus();
-    DoCreateAndShowCaret();
+    if (!CaretDisabled())
+    {
+        DoCreateAndShowCaret();
+    }
 }
 
 void Control::DoGotFocus()
@@ -1144,6 +1215,15 @@ void Control::DoTimer(int timerId)
 {
     TimerEventArgs timerEventArgs(timerId);
     OnTimer(timerEventArgs);
+}
+
+void Control::DoDestroy()
+{
+    OnDestroyed();
+    if (originalWndProc != nullptr)
+    {
+        SetWindowLongPtrW((HWND)handle, GWLP_WNDPROC, (LONG_PTR)originalWndProc);
+    }
 }
 
 void Control::DoMouseDown(MouseEventArgs& args)
@@ -1529,6 +1609,11 @@ void Control::OnCreated()
     created.Fire();
 }
 
+void Control::OnDestroyed()
+{
+    destroyed.Fire();
+}
+
 void Control::OnShown()
 {
     shown.Fire();
@@ -1721,6 +1806,17 @@ void Control::SetCaretLocation()
 void Control::SetCursor()
 {
     cmajor::wing::SetCursor(arrowCursor);
+}
+
+void Control::SubClassCommandWndProc()
+{
+    if (originalWndProc == nullptr && handle != nullptr)
+    {
+        LONG_PTR r = SetWindowLongPtrW(handle, GWLP_WNDPROC, (LONG_PTR)CommandSubClassWndProc);
+        WNDPROC wndproc = *reinterpret_cast<WNDPROC*>(&r);
+        void* result = *reinterpret_cast<void**>(&wndproc);
+        originalWndProc = result;
+    }
 }
 
 HWND LParamHandle(Message& msg)

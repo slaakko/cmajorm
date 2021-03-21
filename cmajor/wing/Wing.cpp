@@ -6,6 +6,7 @@
 #include <cmajor/wing/Wing.hpp>
 #include <cmajor/wing/Graphics.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <shobjidl_core.h>
 
 namespace cmajor { namespace wing {
 
@@ -39,12 +40,21 @@ void SetMessageProcessorFunction(MessageProcessorFunction messageProcessorFun)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LRESULT result = 0;
-    bool handled = messageProcessor(hWnd, message, wParam, lParam, result);
+    void* originalWndProc = nullptr;
+    bool handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
     if (!handled)
     {
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return result;
+}
+
+LRESULT CALLBACK CommandSubClassWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    int64_t result = 0;
+    void* originalWndProc = nullptr;
+    messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
+    return CallWindowProcW((WNDPROC)originalWndProc, hWnd, message, wParam, lParam);
 }
 
 WNDPROC GetWndProc()
@@ -165,6 +175,74 @@ int MessageLoop()
     return 1;
 }
 
+int DialogMessageLoop(HWND handle, HWND parentHandle, DialogResultFunction dialogResultFn, DialogWindowKeyPreviewFunction dialogWindowKeyPreviewFn, void* dialogWindowPtr) 
+{
+    int dialogResult = 0;
+    EnableWindow(parentHandle, false);
+    ShowWindow(handle, SW_SHOW);
+    BringWindowToTop(handle);
+    SetActiveWindow(handle);
+    bool end = false;
+    while (!end)
+    {
+        MSG msg;
+        if (GetMessage(&msg, nullptr, 0, 0))
+        {
+            TranslateMessage(&msg);
+            bool handled = false;
+            if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+            {
+                if (dialogWindowKeyPreviewFn)
+                {
+                    Keys key = static_cast<Keys>(msg.wParam);
+                    KeyState keyState = KeyState::none;
+                    if (msg.message == WM_KEYDOWN)
+                    {
+                        keyState = keyState | KeyState::down;
+                    }
+                    short shiftState = GetKeyState(VK_SHIFT);
+                    bool shift = (shiftState & (1 << 16)) != 0;
+                    if (shift)
+                    {
+                        keyState = keyState | KeyState::shift;
+                    }
+                    short controlState = GetKeyState(VK_CONTROL);
+                    bool control = (controlState & (1 << 16)) != 0;
+                    if (control)
+                    {
+                        keyState = keyState | KeyState::control;
+                    }
+                    short altState = GetKeyState(VK_MENU);
+                    bool alt = (altState & (1 << 16)) != 0;
+                    if (alt)
+                    {
+                        keyState = keyState | KeyState::alt;
+                    }
+                    dialogWindowKeyPreviewFn(dialogWindowPtr, key, keyState, handled);
+                }
+            }
+            if (!handled)
+            {
+                DispatchMessage(&msg);
+            }
+            dialogResult = dialogResultFn(dialogWindowPtr);
+            if (dialogResult != 0)
+            {
+                end = true;
+            }
+        }
+        else
+        {
+            PostQuitMessage(msg.wParam);
+            end = true;
+        }
+    }
+    EnableWindow(parentHandle, true);
+    PostMessage(handle, WM_CLOSE, 0u, 0);
+    SetActiveWindow(parentHandle);
+    return dialogResult;
+}
+
 ULONG_PTR gdiplusToken;
 Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 
@@ -207,6 +285,82 @@ void ShowInfoMessageBox(HWND handle, const std::string& message)
 void ShowErrorMessageBox(HWND handle, const std::string& message)
 {
     ShowMessageBox(handle, "error", message);
+}
+
+std::string SelectDirectory(HWND handle, const std::string& directoryPath)
+{
+    std::u16string dirPath = ToUtf16(directoryPath);
+    int bufferSize = 1024;
+    std::unique_ptr<char16_t> buffer(new char16_t[bufferSize]);
+    IFileDialog* fileDialog = nullptr;
+    if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
+    {
+        IShellItem* defaultFolder = nullptr;
+        if (!dirPath.empty())
+        {
+            if (SUCCEEDED(SHCreateItemFromParsingName((PCWSTR)dirPath.c_str(), nullptr, IID_IShellItem, (void**)&defaultFolder)))
+            {
+                if (!SUCCEEDED(fileDialog->SetDefaultFolder(defaultFolder)))
+                {
+                    fileDialog->Release();
+                    return std::string();
+                }
+            }
+        }
+        DWORD options = 0;
+        if (SUCCEEDED(fileDialog->GetOptions(&options)))
+        {
+            if (SUCCEEDED(fileDialog->SetOptions(options | FOS_PICKFOLDERS)))
+            {
+                if (SUCCEEDED(fileDialog->Show(handle)))
+                {
+                    IShellItem* result = nullptr;
+                    if (SUCCEEDED(fileDialog->GetResult(&result)))
+                    {
+                        LPWSTR name = nullptr;
+                        if (SUCCEEDED(result->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &name)))
+                        {
+                            wcsncpy((wchar_t*)buffer.get(), name, bufferSize);
+                            fileDialog->Release();
+                            result->Release();
+                            CoTaskMemFree(name);
+                            return ToUtf8(buffer.get());
+                        }
+                        else
+                        {
+                            result->Release();
+                            fileDialog->Release();
+                            return std::string();
+                        }
+                    }
+                    else
+                    {
+                        fileDialog->Release();
+                        return std::string();
+                    }
+                }
+                else
+                {
+                    fileDialog->Release();
+                    return std::string();
+                }
+            }
+            else
+            {
+                fileDialog->Release();
+                return std::string();
+            }
+        }
+        else
+        {
+            fileDialog->Release();
+            return std::string();
+        }
+    }
+    else
+    {
+        return std::string();
+    }
 }
 
 } } // cmajor::wing

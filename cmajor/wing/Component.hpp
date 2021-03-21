@@ -26,6 +26,11 @@ public:
     virtual bool IsToolBar() const { return false; }
     virtual bool IsToolButtonBase() const { return false; }
     virtual bool IsToolButton() const { return false; }
+    virtual bool IsStatusBar() const { return false; }
+    virtual bool IsStatusBarItem() const { return false; }
+    virtual bool IsStatusBarSpringItem() const { return false; }
+    virtual bool IsIconListView() const { return false; }
+    virtual bool IsIconListViewItem() const { return false; }
     Container* GetContainer() const { return container; }
     void SetContainer(Container* container_) { container = container_; }
     Component* NextSibling() const { return nextSibling; }

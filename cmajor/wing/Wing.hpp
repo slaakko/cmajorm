@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_WING_INCLUDED
 #define CMAJOR_WING_WING_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
+#include <cmajor/wing/Keys.hpp>
 #include <Windows.h>
 #include <gdiplus.h>
 #include <stdexcept>
@@ -26,11 +26,14 @@ private:
     uint64_t errorCode;
 };
 
-using MessageProcessorFunction = bool(*)(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result);
+using MessageProcessorFunction = bool(*)(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result, void*& originalWndProc);
 
 struct WING_API Message
 {
-    Message(HWND handle_, UINT message_, WPARAM wParam_, LPARAM lParam_, LRESULT result_) : handle(handle_), message(message_), wParam(wParam_), lParam(lParam_), result(result_) {}
+    Message(HWND handle_, UINT message_, WPARAM wParam_, LPARAM lParam_, LRESULT result_) : 
+        handle(handle_), message(message_), wParam(wParam_), lParam(lParam_), result(result_), originalWndProc(nullptr) 
+    {
+    }
     uint32_t LParamLoDWord() const { return static_cast<uint32_t>(lParam); }
     uint32_t LParamHiDWord() const { return static_cast<uint32_t>((lParam >> 32) & 0xFFFFFFFF); }
     uint16_t WParamLoWord() const { return static_cast<uint16_t>(wParam & 0xFFFF); }
@@ -40,6 +43,7 @@ struct WING_API Message
     WPARAM wParam;
     LPARAM lParam;
     LRESULT result;
+    void* originalWndProc;
 };
 
 WING_API void SetMessageProcessorFunction(MessageProcessorFunction messageProcessorFun);
@@ -98,6 +102,11 @@ WING_API WNDPROC GetWndProc();
 WING_API int Run();
 WING_API int MessageLoop();
 
+using DialogResultFunction = int (*)(void* dialogWindowPtr);
+using DialogWindowKeyPreviewFunction = void (*)(void* dialogWindowPtr, Keys key, KeyState keyState, bool& handled);
+
+WING_API int DialogMessageLoop(HWND handle, HWND parentHandle, DialogResultFunction dialogResultFn, DialogWindowKeyPreviewFunction dialogWindowKeyPreviewFn, void* dialogWindowPtr);
+
 WING_API void WingInit(HINSTANCE instance_);
 WING_API void WingDone();
 
@@ -108,6 +117,10 @@ WING_API Color GetSystemColor(int index);
 WING_API void ShowMessageBox(HWND handle, const std::string& caption, const std::string& message);
 WING_API void ShowInfoMessageBox(HWND handle, const std::string& message);
 WING_API void ShowErrorMessageBox(HWND handle, const std::string& message);
+
+WING_API LRESULT CALLBACK CommandSubClassWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+WING_API std::string SelectDirectory(HWND handle, const std::string& directoryPath);
 
 } } // cmajor::wing
 

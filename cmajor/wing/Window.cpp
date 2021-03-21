@@ -8,7 +8,11 @@
 #include <cmajor/wing/Button.hpp>
 #include <cmajor/wing/Menu.hpp>
 #include <cmajor/wing/Icon.hpp>
+#include <cmajor/wing/TextBox.hpp>
 #include <soulng/util/Unicode.hpp>
+
+#undef max
+#undef min
 
 namespace cmajor { namespace wing {
 
@@ -125,6 +129,7 @@ Window::Window(WindowCreateParams& createParams) :
     fontSize(createParams.fontSize), 
     fontStyle(createParams.fontStyle),
     mainWindow(false),
+    showingDialog(false),
     defaultButton(nullptr),
     cancelButton(nullptr),
     focusedControl(nullptr),
@@ -132,6 +137,12 @@ Window::Window(WindowCreateParams& createParams) :
     contextMenu(nullptr),
     dialogResult(DialogResult::none)
 {
+    KeyPreviewMethod defaultKeyPreview;
+    defaultKeyPreview.SetHandlerFunction(this, &Window::DefaultKeyPreview);
+    SetKeyPreviewMethod(defaultKeyPreview);
+    KeyPreviewMethod defaultDialogKeyPreview;
+    defaultDialogKeyPreview.SetHandlerFunction(this, &Window::DefaultKeyPreview);
+    SetDialogKeyPreviewMethod(defaultDialogKeyPreview);
     if (!fontFamilyName.empty())
     {
         std::u16string familyName = ToUtf16(fontFamilyName);
@@ -198,6 +209,112 @@ void Window::SetIcon(const Icon& icon)
 void Window::SetSmallIcon(const Icon& icon)
 {
     ::SetClassLongPtr(Handle(), GCLP_HICONSM, reinterpret_cast<int64_t>(icon.Handle()));;
+}
+
+KeyPreviewMethod Window::GetKeyPreviewMethod() const
+{
+    return keyPreviewMethod;
+}
+
+void Window::SetKeyPreviewMethod(KeyPreviewMethod& keyPreviewMethod_)
+{
+    keyPreviewMethod = keyPreviewMethod_;
+}
+
+KeyPreviewMethod Window::GetDialogKeyPreviewMethod() const
+{
+    return dialogKeyPreviewMethod;
+}
+
+void Window::SetDialogKeyPreviewMethod(KeyPreviewMethod& dialogKeyPreviewMethod_)
+{
+    dialogKeyPreviewMethod = dialogKeyPreviewMethod_;
+}
+
+void Window::DefaultKeyPreview(Keys key, KeyState keyState, bool& handled)
+{
+    if ((keyState & KeyState::down) != KeyState::none)
+    {
+        Keys modifiers = Keys::none;
+        if ((keyState & KeyState::shift) != KeyState::none)
+        {
+            modifiers = modifiers | Keys::shiftModifier;
+        }
+        if ((keyState & KeyState::control) != KeyState::none)
+        {
+            modifiers = modifiers | Keys::controlModifier;
+        }
+        if ((keyState & KeyState::alt) != KeyState::none)
+        {
+            modifiers = modifiers | Keys::altModifier;
+        }
+        key = key | modifiers;
+        switch (key)
+        {
+            case Keys::enter:
+            {
+                if (ShowingDialog())
+                {
+                    if (focusedControl)
+                    {
+                        if (focusedControl->IsTextBox())
+                        {
+                            TextBox* textBox = static_cast<TextBox*>(focusedControl);
+                            if (textBox->IsMultiline()) 
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    if (focusedControl)
+                    {
+                        if (focusedControl->IsButton())
+                        {
+                            Button* button = static_cast<Button*>(focusedControl);
+                            button->DoClick();
+                            handled = true;
+                        }
+                    }
+                    if (!handled)
+                    {
+                        if (defaultButton)
+                        {
+                            if (defaultButton->IsEnabled())
+                            {
+                                defaultButton->DoClick();
+                                handled = true;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case Keys::escape:
+            {
+                if (ShowingDialog())
+                {
+                    if (cancelButton)
+                    {
+                        cancelButton->DoClick();
+                        handled = true;
+                    }
+                }
+                break;
+            }
+            case Keys::tab:
+            {
+                FocusNext();
+                handled = true;
+                break;
+            }
+            case Keys::shiftModifier | Keys::tab:
+            {
+                FocusPrev();
+                handled = true;
+                break;
+            }
+        }
+    }
 }
 
 void Window::Close()
@@ -339,6 +456,33 @@ void Window::FocusPrev()
     }
 }
 
+struct DialogGuard
+{
+    DialogGuard(Window* window_) : window(window_) 
+    {
+        window->SetShowingDialog();
+    }
+    ~DialogGuard()
+    {
+        window->ResetShowingDialog();
+    }
+    Window* window;
+};
+
+DialogResult Window::ShowDialog(Window& parentWindow)
+{
+    DialogGuard dialogGuard(this);
+    Point parentLoc = parentWindow.Location();
+    Size parentSize = parentWindow.GetSize();
+    Size size = GetSize();
+    SetLocation(Point(std::max(0, parentLoc.X + (parentSize.Width - size.Width) / 2), std::max(0, parentLoc.Y + (parentSize.Height - size.Height) / 2)));
+    SetDialogResult(DialogResult::none);
+    DialogResultFunction dialogResultFn = cmajor::wing::GetDialogResult;
+    DialogWindowKeyPreviewFunction keyPreviewFn = cmajor::wing::DialogWindowKeyPreview;
+    int result = DialogMessageLoop(Handle(), parentWindow.Handle(), dialogResultFn, keyPreviewFn, this);
+    return static_cast<DialogResult>(result);
+}
+
 void Window::SetDefaultButton(Button* defaultButton_)
 {
     if (defaultButton != defaultButton_)
@@ -394,6 +538,79 @@ bool Window::ProcessMessage(Message& msg)
         }
     }
     return false;
+}
+
+void Window::OnKeyDown(KeyEventArgs& args)
+{
+    ContainerControl::OnKeyDown(args);
+    if (!args.handled)
+    {
+        switch (args.keyData)
+        {
+            case Keys::enter:
+            {
+                if (ShowingDialog())
+                {
+                    if (focusedControl)
+                    {
+                        if (focusedControl->IsTextBox())
+                        {
+                            TextBox* textBox = static_cast<TextBox*>(focusedControl);
+                            if (textBox->IsMultiline())
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    if (focusedControl)
+                    {
+                        if (focusedControl->IsButton())
+                        {
+                            Button* button = static_cast<Button*>(focusedControl);
+                            button->DoClick();
+                            args.handled = true;
+                        }
+                    }
+                    if (!args.handled)
+                    {
+                        if (defaultButton)
+                        {
+                            if (defaultButton->IsEnabled())
+                            {
+                                defaultButton->DoClick();
+                                args.handled = true;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case Keys::escape:
+            {
+                if (ShowingDialog())
+                {
+                    if (cancelButton)
+                    {
+                        cancelButton->DoClick();
+                        args.handled = true;
+                    }
+                }
+                break;
+            }
+            case Keys::tab:
+            {
+                FocusNext();
+                args.handled = true;
+                break;
+            }
+            case Keys::shiftModifier | Keys::tab:
+            {
+                FocusPrev();
+                args.handled = true;
+                break;
+            }
+        }
+    }
 }
 
 void Window::OnPaint(PaintEventArgs& args)
@@ -472,6 +689,19 @@ void Window::OnMouseMove(MouseEventArgs& args)
     }
 }
 
+void Window::OnGotFocus()
+{
+    ContainerControl::OnGotFocus();
+    Application::SetActiveWindow(this);
+    FocusNext();
+}
+
+void Window::OnLostFocus()
+{
+    ContainerControl::OnLostFocus();
+    Application::SetActiveWindow(nullptr);
+}
+
 void Window::OnWindowClosing(CancelArgs& args)
 {
     windowClosing.Fire(args);
@@ -491,6 +721,26 @@ void Window::OnWindowClosed(bool& processed)
     {
         windowClosed.Fire();
         processed = true;
+    }
+}
+
+int GetDialogResult(void* dialogWindowPtr)
+{
+    if (dialogWindowPtr)
+    {
+        Window* dialogWindow = static_cast<Window*>(dialogWindowPtr);
+        return static_cast<int>(dialogWindow->GetDialogResult());
+    }
+    return 0;
+}
+
+void DialogWindowKeyPreview(void* dialogWindowPtr, Keys key, KeyState keyState, bool& handled)
+{
+    if (dialogWindowPtr)
+    {
+        Window* dialogWindow = static_cast<Window*>(dialogWindowPtr);
+        KeyPreviewMethod dialogKeyPreviewMethod = dialogWindow->GetDialogKeyPreviewMethod();
+        dialogKeyPreviewMethod(key, keyState, handled);
     }
 }
 

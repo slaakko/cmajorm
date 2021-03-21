@@ -17,6 +17,12 @@ enum class BorderStyle : int
 
 WING_API int BorderWidth(BorderStyle borderStyle);
 WING_API Size BorderedSize(const Size& size, BorderStyle borderStyle);
+WING_API Color DefaultNormalSingleBorderColor();
+WING_API Color DefaultFocusedSingleBorderColor();
+WING_API Color Default3DOuterLeftTopEdgeColor();
+WING_API Color Default3DOuterRightBottomEdgeColor();
+WING_API Color Default3DInnerLeftTopEdgeColor();
+WING_API Color Default3DInnerRightBottomEdgeColor();
 
 enum class BorderedControlFlags : int
 {

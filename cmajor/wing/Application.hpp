@@ -9,10 +9,32 @@
 #include <cmajor/wing/Wing.hpp>
 #include <cmajor/wing/ResourceManager.hpp>
 #include <cmajor/wing/WindowManager.hpp>
+#include <functional>
 
 namespace cmajor { namespace wing {
 
 class Window;
+
+using KeyPreviewFn = std::function<void(Keys, KeyState, bool&)>;
+
+class KeyPreviewMethod
+{
+public:
+    KeyPreviewMethod()
+    {
+    }
+    template<class T>
+    void SetHandlerFunction(T* t, void (T::* pm)(Keys, KeyState, bool&))
+    {
+        fn = std::bind(pm, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    }
+    void operator()(Keys key, KeyState keyState, bool& handled)
+    {
+        fn(key, keyState, handled);
+    }
+private:
+    KeyPreviewFn fn;
+};
 
 class WING_API Application
 {
@@ -30,7 +52,7 @@ public:
     static void SetKeyboardModifiers(Keys keyboardModifiers_) { keyboardModifiers = keyboardModifiers_; }
     static void ProcessMessages();
 private:
-    static bool ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result);
+    static bool ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result, void*& originalWndProc);
     static void ModelessWindowKeyPreview(WPARAM keyCode, KeyState keyState, bool& handled);
     friend WING_API void ApplicationInit();
     static void Init();

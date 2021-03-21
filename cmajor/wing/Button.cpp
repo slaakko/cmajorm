@@ -7,6 +7,14 @@ ButtonBase::ButtonBase(ControlCreateParams& createParams) : Control(createParams
 {
 }
 
+void ButtonBase::DoClick()
+{
+    if (IsEnabled())
+    {
+        OnClick();
+    }
+}
+
 ControlCreateParams& MakeButtonCreateParams(ControlCreateParams& createParams)
 {
     if (createParams.windowClassName.empty())

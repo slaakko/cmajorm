@@ -12,6 +12,7 @@ namespace cmajor { namespace wing {
 
 using SelectionChangedEvent = Event;
 using DirtyChangedEvent = Event;
+using ReadOnlyChangedEvent = Event;
 using CCDirtyChangedEvent = Event;
 using CaretPosChangedEvent = Event;
 using LinesChangedEvent = Event;
@@ -28,6 +29,7 @@ using CopyEvent = Event;
 using CutEvent = Event;
 using PasteEvent = Event;
 
+const int caretTimerId = 1;
 const int defaultCaretTimerPeriod = 5000; // 5 seconds
 
 WING_API Color DefaultSelectionBackgroundColor();
@@ -147,8 +149,8 @@ public:
     void SetChanged() { flags = flags | TextViewFlags::changed; }
     void ResetChanged() { flags = flags & ~TextViewFlags::changed; }
     bool IsReadOnly() const { return (flags & TextViewFlags::readOnly) != TextViewFlags::none; }
-    void SetReadOnly() { flags = flags | TextViewFlags::readOnly; }
-    void SetReadWrite() { flags = flags & ~TextViewFlags::readOnly; }
+    void SetReadOnly();
+    void SetReadWrite();
     bool IsFixed() const { return (flags & TextViewFlags::fixed) != TextViewFlags::none; }
     void SetFixed() { flags = flags | TextViewFlags::fixed; }
     void ResetFixed() { flags = flags & ~TextViewFlags::fixed; }
@@ -227,6 +229,7 @@ public:
     void DeleteLines(int lineIndex, int columnIndex, const std::vector<std::u32string>& linesToDelete);
     void SetSelection(const Selection& selection_);
     void ResetSelection();
+    bool IsSelectionEmpty() const;
     SelectionData GetSelection() const;
     void InsertSelection(const Selection& selectionToInsert, const SelectionData& selectionData, bool wholeLine);
     void RemoveSelection();
@@ -245,7 +248,9 @@ public:
     void FirePaste();
     SelectionChangedEvent& SelectionChanged() { return selectionChanged; }
     DirtyChangedEvent& DirtyChanged() { return dirtyChanged; }
+    ReadOnlyChangedEvent& ReadOnlyChanged() { return readOnlyChanged; }
     CCDirtyChangedEvent& CCDirtyChanged() { return ccDirtyChanged; }
+    CaretPosChangedEvent& CaretPosChanged() { return caretPosChanged; }
     LineInsertedEvent& LineInserted() { return lineInserted; }
     LineChangedEvent& LineChanged() { return lineChanged; }
     LineDeletedEvent& LineDeleted() { return lineDeleted; }
@@ -297,6 +302,7 @@ protected:
     virtual void SetLineNumberFieldLength(int lineCount) {}
     virtual void OnSelectionChanged();
     virtual void OnDirtyChanged();
+    virtual void OnReadOnlyChanged();
     virtual void OnCCDirtyChanged();
     virtual void OnLineInserted(LineEventArgs& args);
     virtual void OnLineChanged(LineEventArgs& args);
@@ -352,6 +358,7 @@ private:
     std::map<DWORD, SolidBrush*> brushMap;
     SelectionChangedEvent selectionChanged;
     DirtyChangedEvent dirtyChanged;
+    ReadOnlyChangedEvent readOnlyChanged;
     CCDirtyChangedEvent ccDirtyChanged;
     CaretPosChangedEvent caretPosChanged;
     CCTextChangedEvent ccTextChanged;

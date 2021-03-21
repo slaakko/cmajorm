@@ -217,6 +217,25 @@ TextView::TextView(TextViewCreateParams& createParams) :
     stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentNear);
 }
 
+void TextView::SetReadOnly() 
+{ 
+    if (!IsReadOnly())
+    {
+        flags = flags | TextViewFlags::readOnly;
+        OnReadOnlyChanged();
+    }
+}
+
+void TextView::SetReadWrite() 
+{ 
+    if (IsReadOnly())
+    {
+        flags = flags & ~TextViewFlags::readOnly;
+        OnReadOnlyChanged();
+    }
+}
+
+
 void TextView::SetDirty()
 {
     if (!IsDirty())
@@ -614,6 +633,7 @@ void TextView::SaveText()
     {
         file << ToUtf8(*line) << "\n";
     }
+    ResetDirty();
 }
 
 void TextView::SetTextExtent()
@@ -1055,6 +1075,11 @@ void TextView::ResetSelection()
         OnSelectionChanged();
         Invalidate();
     }
+}
+
+bool TextView::IsSelectionEmpty() const
+{
+    return selection.IsEmpty();
 }
 
 SelectionData TextView::GetSelection() const
@@ -2362,7 +2387,7 @@ void TextView::CreateCaret()
     {
         Control::CreateCaret();
     }
-    SetTimer(1, caretTimerPeriod);
+    SetTimer(caretTimerId, caretTimerPeriod);
 }
 
 void TextView::SetContentLocationInternal(const Point& contentLocation)
@@ -2377,10 +2402,13 @@ void TextView::SetContentLocationInternal(const Point& contentLocation)
 void TextView::OnTimer(TimerEventArgs& args)
 {
     Control::OnTimer(args);
-    if (Focused())
+    if (args.timerId == caretTimerId)
     {
-        HideCaret();
-        ShowCaret();
+        if (Focused())
+        {
+            HideCaret();
+            ShowCaret();
+        }
     }
 }
 
@@ -2468,6 +2496,11 @@ void TextView::OnSelectionChanged()
 void TextView::OnDirtyChanged()
 {
     dirtyChanged.Fire();
+}
+
+void TextView::OnReadOnlyChanged()
+{
+    readOnlyChanged.Fire();
 }
 
 void TextView::OnCCDirtyChanged()

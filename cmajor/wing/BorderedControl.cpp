@@ -40,18 +40,48 @@ Size BorderedSize(const Size& size, BorderStyle borderStyle)
     return size;
 }
 
+Color DefaultNormalSingleBorderColor()
+{
+    return Color::Black;
+}
+
+Color DefaultFocusedSingleBorderColor()
+{
+    return Color::Blue;
+}
+
+Color Default3DOuterLeftTopEdgeColor()
+{
+    return Color(160, 160, 160);
+}
+
+Color Default3DOuterRightBottomEdgeColor()
+{
+    return Color::White;
+}
+
+Color Default3DInnerLeftTopEdgeColor()
+{
+    return Color(105, 105, 105);
+}
+
+Color Default3DInnerRightBottomEdgeColor()
+{
+    return Color(227, 227, 227);
+}
+
 BorderedControlCreateParams::BorderedControlCreateParams(Control* child_) : controlCreateParams(), child(child_), borderStyle(BorderStyle::single)
 {
     controlCreateParams.WindowClassName("wing.BorderedControl");
     controlCreateParams.WindowStyle(DefaultChildWindowStyle());
     controlCreateParams.WindowClassBackgroundColor(COLOR_WINDOW);
     controlCreateParams.BackgroundColor(child->BackgroundColor());
-    normalSingleBorderColor = Color::Black;
-    focusedSingleBorderColor = Color::Blue;
-    threeDOuterLeftTopEdgeColor = Color(160, 160, 160);
-    threeDOuterRightBottomEdgeColor = Color::White;
-    threeDInnerLeftTopEdgeColor = Color(105, 105, 105);
-    threeDInnerRightBottomEdgeColor = Color(227, 227, 227);
+    normalSingleBorderColor = DefaultNormalSingleBorderColor();
+    focusedSingleBorderColor = DefaultFocusedSingleBorderColor();
+    threeDOuterLeftTopEdgeColor = Default3DOuterLeftTopEdgeColor();
+    threeDOuterRightBottomEdgeColor = Default3DOuterRightBottomEdgeColor();
+    threeDInnerLeftTopEdgeColor = Default3DInnerLeftTopEdgeColor();
+    threeDInnerRightBottomEdgeColor = Default3DInnerRightBottomEdgeColor();
 }
 
 BorderedControlCreateParams& BorderedControlCreateParams::WindowClassName(const std::string& windowClassName_)

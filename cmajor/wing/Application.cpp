@@ -44,7 +44,7 @@ void Application::ProcessMessages()
     wing::MessageLoop();
 }
 
-bool Application::ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result)
+bool Application::ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result, void*& originalWndProc)
 {
     switch (message)
     {
@@ -120,7 +120,10 @@ bool Application::ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARA
     {
         Message msg(handle, message, wParam, lParam, result);
         bool handled = window->ProcessMessageInternal(msg); 
-        // todo
+        if (msg.originalWndProc != nullptr)
+        {
+            originalWndProc = msg.originalWndProc;
+        }
         if (handled)
         {
             result = msg.result;
@@ -132,7 +135,13 @@ bool Application::ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARA
 
 void Application::ModelessWindowKeyPreview(WPARAM keyCode, KeyState keyState, bool& handled)
 {
-    // todo
+    Window* activeWindow = ActiveWindow();
+    if (activeWindow)
+    {
+        Keys key = static_cast<Keys>(static_cast<int>(keyCode));
+        KeyPreviewMethod keyPreviewMethod = activeWindow->GetKeyPreviewMethod();
+        keyPreviewMethod(key, keyState, handled);
+    }
 }
 
 void ApplicationInit()

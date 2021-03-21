@@ -5,9 +5,13 @@
 
 #ifndef CMAJOR_WING_WINDOW_INCLUDED
 #define CMAJOR_WING_WINDOW_INCLUDED
+#include <cmajor/wing/Application.hpp>
 #include <cmajor/wing/ContainerControl.hpp>
 
 namespace cmajor { namespace wing {
+
+WING_API int GetDialogResult(void* dialogWindowPtr);
+WING_API void DialogWindowKeyPreview(void* dialogWindowPtr, Keys key, KeyState keyState, bool& handled);
 
 enum class DialogResult : int
 {
@@ -72,6 +76,9 @@ public:
     bool IsWindow() const override { return true; }
     void SetAsMainWindow() { mainWindow = true; }
     bool IsMainWindow() const { return mainWindow; }
+    bool ShowingDialog() const { return showingDialog; }
+    void SetShowingDialog() { showingDialog = true; }
+    void ResetShowingDialog() { showingDialog = false; }
     void Close();
     Button* DefaultButton() const { return defaultButton; }
     void SetDefaultButton(Button* defaultButton_);
@@ -82,6 +89,7 @@ public:
     void ResetFocusedControl() { focusedControl = nullptr; }
     void FocusNext();
     void FocusPrev();
+    DialogResult ShowDialog(Window& parentWindow);
     DialogResult GetDialogResult() const { return dialogResult; }
     void SetDialogResult(DialogResult dialogResult_) { dialogResult = dialogResult_; }
     void MouseUpNotificationInternal(MouseEventArgs& args) { MouseUpNotification(args); }
@@ -93,15 +101,23 @@ public:
     void HideContextMenu();
     void SetIcon(const Icon& icon);
     void SetSmallIcon(const Icon& icon);
+    KeyPreviewMethod GetKeyPreviewMethod() const;
+    void SetKeyPreviewMethod(KeyPreviewMethod& keyPreviewMethod_);
+    KeyPreviewMethod GetDialogKeyPreviewMethod() const;
+    void SetDialogKeyPreviewMethod(KeyPreviewMethod& dialogKeyPreviewMethod_);
+    void DefaultKeyPreview(Keys key, KeyState keyState, bool& handled);
 protected:
     virtual void MouseUpNotification(MouseEventArgs& args);
     bool ProcessMessage(Message& msg) override;
+    void OnKeyDown(KeyEventArgs& args) override;
     void OnPaint(PaintEventArgs& args) override;
     void OnControlAdded(ControlEventArgs& args) override;
     void OnControlRemoved(ControlEventArgs& args) override;
     void OnMouseDown(MouseEventArgs& args) override;
     void OnMouseUp(MouseEventArgs& args) override;
     void OnMouseMove(MouseEventArgs& args) override;
+    void OnGotFocus() override;
+    void OnLostFocus() override;
     virtual void OnWindowClosing(CancelArgs& args);
     virtual void OnWindowClosed(bool& processed);
 private:
@@ -109,6 +125,7 @@ private:
     float fontSize;
     FontStyle fontStyle;
     bool mainWindow;
+    bool showingDialog;
     Button* defaultButton;
     Button* cancelButton;
     Control* focusedControl;
@@ -117,6 +134,8 @@ private:
     DialogResult dialogResult;
     WindowClosingEvent windowClosing;
     WindowClosedEvent windowClosed;
+    KeyPreviewMethod keyPreviewMethod;
+    KeyPreviewMethod dialogKeyPreviewMethod;
 };
 
 } } // cmajor::wing

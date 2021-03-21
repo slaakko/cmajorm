@@ -427,12 +427,14 @@ void BuildService::Run()
             }
             buildServerProcess.reset();
             PutOutputServiceMessage("error: build service run: " + std::string(ex.what()));
+            StopKeepAliveThread();
             running = false;
         }
     }
     catch (const std::exception& ex)
     {
         PutOutputServiceMessage("error: could not start build server: " + std::string(ex.what()));
+        StopKeepAliveThread();
         running = false;
     }
 }

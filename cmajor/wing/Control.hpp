@@ -29,6 +29,7 @@ struct WING_API ControlEventArgs
 
 using ClickEvent = Event;
 using CreatedEvent = Event;
+using DestroyedEvent = Event;
 using ShownEvent = Event;
 using GotFocusEvent = Event;
 using ChildGotFocusEvent = EventWithArgs<ControlEventArgs>;
@@ -276,14 +277,15 @@ enum class ControlFlags : int
     focused = 1 << 1,
     caretCreated = 1 << 2,
     caretShown = 1 << 3,
-    disabled = 1 << 4,
-    tabStop = 1 << 5,
-    doubleBuffered = 1 << 6,
-    mouseInClient = 1 << 7,
-    lbuttonPressed = 1 << 8,
-    mouseHoverTimerStarted = 1 << 9,
-    keyDownHandled = 1 << 10,
-    menuWantsKeys = 1 << 11
+    caretDisabled = 1 << 4,
+    disabled = 1 << 5,
+    tabStop = 1 << 6,
+    doubleBuffered = 1 << 7,
+    mouseInClient = 1 << 8,
+    lbuttonPressed = 1 << 9,
+    mouseHoverTimerStarted = 1 << 10,
+    keyDownHandled = 1 << 11,
+    menuWantsKeys = 1 << 12
 };
 
 WING_API inline ControlFlags operator&(ControlFlags left, ControlFlags right)
@@ -313,6 +315,10 @@ public:
     virtual bool IsMenuBar() const { return false; }
     virtual bool IsMenuBox() const { return false; }
     virtual bool IsTabControl() const { return false; }
+    virtual bool IsGroupBox() const { return false; }
+    virtual bool IsRadioButton() const { return false; }
+    virtual bool IsTextBox() const { return false; }
+    virtual bool IsListBox() const { return false; }
     virtual ContainerControl* GetContainerControl() const;
     Window* GetWindow() const;
     void AddChildVisual(Control* child);
@@ -334,6 +340,7 @@ public:
     PaintEvent& Paint() { return paint; }
     ClickEvent& Click() { return click; }
     CreatedEvent& Created() { return created; }
+    DestroyedEvent& Destroyed() { return destroyed; }
     ShownEvent& Shown() { return shown; }
     GotFocusEvent& GotFocus() { return gotFocus; }
     LostFocusEvent& LostFocus() { return lostFocus; }
@@ -404,6 +411,7 @@ public:
     const std::string& Text() const { return text; }
     void SetText(const std::string& text_);
     void SetTextInternal(const std::string& text_);
+    std::string DoGetWindowText();
     bool GetFlag(ControlFlags flag) const { return (flags & flag) != ControlFlags::none; }
     void SetFlag(ControlFlags flag) { flags = flags | flag; }
     void ResetFlag(ControlFlags flag) { flags = flags & ~flag; }
@@ -423,7 +431,11 @@ public:
     bool CaretShown() { return GetFlag(ControlFlags::caretShown);  }
     void SetCaretShown() { SetFlag(ControlFlags::caretShown); }
     void ResetCaretShown() { ResetFlag(ControlFlags::caretShown); }
-    bool Disabled() const { return GetFlag(ControlFlags::disabled); }
+    bool CaretDisabled() { return GetFlag(ControlFlags::caretDisabled); }
+    void SetCaretDisabled() { SetFlag(ControlFlags::caretDisabled); }
+    void ResetCaretDisabled() { ResetFlag(ControlFlags::caretDisabled); }
+    bool IsEnabled() const { return !IsDisabled(); }
+    bool IsDisabled() const { return GetFlag(ControlFlags::disabled); }
     void SetDisabled() { SetFlag(ControlFlags::disabled); }
     void ResetDisabled() { ResetFlag(ControlFlags::disabled); }
     bool TabStop() const { return GetFlag(ControlFlags::tabStop); }
@@ -471,6 +483,7 @@ protected:
     virtual void OnPaint(PaintEventArgs& args);
     virtual void OnClick();
     virtual void OnCreated();
+    virtual void OnDestroyed();
     virtual void OnShown();
     virtual void OnGotFocus();
     virtual void OnChildGotFocus(ControlEventArgs& args);
@@ -506,6 +519,7 @@ protected:
     virtual void OnControlRemoved(ControlEventArgs& args);
     virtual void SetCaretLocation();
     virtual void SetCursor();
+    void SubClassCommandWndProc();
 private:
     void DoPaint();
     void DoMouseMove(MouseEventArgs& args);
@@ -515,6 +529,7 @@ private:
     void DoKillFocus();
     void DoLostFocus();
     void DoTimer(int timerId);
+    void DoDestroy();
     void DoMouseDown(MouseEventArgs& args);
     void DoMouseUp(MouseEventArgs& args);
     void DoMouseDoubleClick(MouseEventArgs& args);
@@ -549,11 +564,13 @@ private:
     HWND handle;
     Font font;
     FontHandle fontHandle;
+    void* originalWndProc;
     ControlFlags flags;
     int caretShowCount;
     std::unique_ptr<Buffer> buffer;
     ClickEvent click;
     CreatedEvent created;
+    DestroyedEvent destroyed;
     ShownEvent shown;
     GotFocusEvent gotFocus;
     ChildGotFocusEvent childGotFocus;

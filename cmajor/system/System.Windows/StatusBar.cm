@@ -318,7 +318,7 @@ namespace System.Windows
         }
         private nothrow inline void ResetChanged()
         {
-            flags = cast<Flags>(flags & ~Flags.changed); 
+            flags = cast<Flags>(flags & ~Flags.changed);
         }
         private Flags flags;
         private Font font;
@@ -483,7 +483,7 @@ namespace System.Windows
             graphics.DrawLineChecked(outerTopLeftPen, location, Point(location.x, location.y + size.h - 2));
             const Pen& outerRightBottomPen = statusBar->RaisedBorderOuterRightBottomPen();
             graphics.DrawLineChecked(outerRightBottomPen, Point(location.x + size.w - 1, location.y), Point(location.x + size.w - 1, location.y + size.h - 1));
-            graphics.DrawLineChecked(outerRightBottomPen, Point(location.x, location.y + size.h -1), Point(location.x + size.w - 1, location.y + size.h - 1));
+            graphics.DrawLineChecked(outerRightBottomPen, Point(location.x, location.y + size.h - 1), Point(location.x + size.w - 1, location.y + size.h - 1));
             const Pen& innerTopLeftPen = statusBar->RaisedBorderInnerTopLeftPen();
             graphics.DrawLineChecked(innerTopLeftPen, Point(location.x + 1, location.y + 1), Point(location.x + size.w - 3, location.y + 1));
             graphics.DrawLineChecked(innerTopLeftPen, Point(location.x + 1, location.y + 1), Point(location.x + 1, location.y + size.h - 3));

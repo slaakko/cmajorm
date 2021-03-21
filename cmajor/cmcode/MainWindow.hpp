@@ -9,6 +9,7 @@
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmmsg/BuildServerMessage.hpp>
 #include <cmajor/cmview/CmajorEditor.hpp>
+#include <cmajor/cmview/ErrorView.hpp>
 #include <cmajor/wing/Window.hpp>
 #include <cmajor/wing/Wing.hpp>
 #include <cmajor/wing/Application.hpp>
@@ -17,9 +18,13 @@
 #include <cmajor/wing/TreeView.hpp>
 #include <cmajor/wing/TabControl.hpp>
 #include <cmajor/wing/ToolBar.hpp>
+#include <cmajor/wing/StatusBar.hpp>
 #include <cmajor/wing/LogView.hpp>
 
 namespace cmcode {
+
+const int buildProgressTimerId = 10;
+const int buildProgressTimerPeriod = 100;
 
 using namespace cmajor::view;
 using namespace cmajor::wing;
@@ -48,7 +53,12 @@ protected:
     void OnWindowClosing(CancelArgs& args) override;
     void OnKeyDown(KeyEventArgs& args) override;
     void MouseUpNotification(MouseEventArgs& args) override;
+    void OnTimer(TimerEventArgs& args) override;
+    void OnGotFocus() override;
 private:
+    void StartBuilding();
+    void StopBuilding();
+    void ShowBuildProgress();
     void HandleServiceMessage();
     void ClearOutput();
     void WriteOutput(const std::string& text);
@@ -57,6 +67,16 @@ private:
     void HandleBuildError(const std::string& buildError);
     void HandleStopBuild();
     void SetState(MainWindowState state_);
+    void SetEditorState();
+    void SetEditorsReadOnly();
+    void SetEditorsReadWrite();
+    void SetFocusToEditor();
+    void EditorReadOnlyChanged();
+    void EditorDirtyChanged();
+    void EditorCCDirtyChanged();
+    void EditorCaretPosChanged();
+    void BreakpointAdded(AddBreakpointEventArgs& args);
+    void BreakpointRemoved(RemoveBreakpointEventArgs& args);
     int VerticalSplitterDistance();
     int HorizontalSplitterDistance();
     void NewProjectClick();
@@ -106,12 +126,16 @@ private:
     void StopBuildServerClick();
     void TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args);
     void TreeViewNodeClick(TreeViewNodeClickEventArgs& args);
+    Editor* GetEditorByTabPage(TabPage* tabPage) const;
     CmajorEditor* AddCmajorEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project);
     void CodeTabPageSelected();
     void CodeTabPageRemoved(ControlEventArgs& args);
     void OutputTabControlTabPageRemoved(ControlEventArgs& args);
     void OutputTabControlTabPageSelected();
     LogView* GetOutputLogView();
+    ErrorView* GetErrorView();
+    void ViewError(ViewErrorArgs& args);
+    Editor* CurrentEditor();
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -176,6 +200,17 @@ private:
     TabControl* outputTabControl;
     TabPage* outputTabPage;
     LogView* outputLogView;
+    TabPage* errorTabPage;
+    ErrorView* errorView;
+    StatusBar* statusBar;
+    StatusBarTextItem* buildIndicatorStatuBarItem;
+    StatusBarTextItem* editorReadWriteIndicatorStatusBarItem;
+    StatusBarTextItem* editorDirtyIndicatorStatusBarItem;
+    StatusBarTextItem* sourceFilePathStatusBarItem;
+    StatusBarTextItem* lineStatusBarItem;
+    StatusBarTextItem* columnStatusBarItem;
+    int buildProgressCounter;
+    bool buildProgressTimerRunning;
     std::unique_ptr<SolutionData> solutionData;
     std::unordered_map<TabPage*, Editor*> tabPageEditorMap;
     MainWindowState state;
