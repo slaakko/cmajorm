@@ -5,30 +5,11 @@
 
 #ifndef SOULNG_UTIL_BINARY_WRITER_INCLUDED
 #define SOULNG_UTIL_BINARY_WRITER_INCLUDED
-#include <soulng/util/UtilApi.hpp>
+#include <soulng/util/FilePtr.hpp>
 #include <string>
-#include <stdio.h>
 #include <boost/uuid/uuid.hpp>
 
 namespace soulng { namespace util {
-
-class UTIL_API FilePtr
-{
-public:
-    FilePtr(FILE* fp_) : fp(fp_)
-    {
-    }
-    ~FilePtr()
-    {
-        if (fp != nullptr)
-        {
-            fclose(fp);
-        }
-    }
-    operator FILE*() const { return fp; }
-private:
-    FILE* fp;
-};
 
 class UTIL_API BinaryWriter
 {

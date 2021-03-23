@@ -7,6 +7,7 @@
 #include <sngcm/cmlexer/ContainerFileLexer.hpp>
 #include <sngcm/cmparser/ProjectFile.hpp>
 #include <sngcm/cmparser/SolutionFile.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Sha1.hpp>
 #include <soulng/util/Unicode.hpp>

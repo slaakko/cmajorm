@@ -8,11 +8,12 @@
 #include <cmajor/cmsvc/ServiceApi.hpp>
 #include <string>
 
-namespace cmajor {namespace service {
+namespace cmajor { namespace service {
 
 CMSVC_API std::string CmajorRootDir();
 CMSVC_API std::string CmajorConfigDir();
 CMSVC_API std::string CmajorLogDir();
+CMSVC_API std::string CmajorProjectsDir();
 CMSVC_API std::string PortMapConfigFilePath();
 CMSVC_API std::string PortMapLogFilePath();
 

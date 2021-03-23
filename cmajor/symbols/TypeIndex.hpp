@@ -22,7 +22,7 @@ class TypeSymbol;
 class SYMBOLS_API TypeIndex
 {
 public:
-    void AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol, cmajor::ir::Emitter& emitter);
+    void AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol, cmajor::ir::Emitter& emittert);
     void Write(soulng::util::BinaryWriter& writer);
 private:
     std::recursive_mutex mtx;

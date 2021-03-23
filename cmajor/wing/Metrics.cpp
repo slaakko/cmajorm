@@ -183,4 +183,6 @@ void LoadMetrics()
     ScreenMetrics::Load();
 }
 
+bool ScreenMetrics::calculated = false;
+
 } } // cmajor::wing

@@ -6,6 +6,7 @@
 #include <cmajor/symbols/EditModuleCache.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/Sha1.hpp>
 #include <soulng/util/Unicode.hpp>
 

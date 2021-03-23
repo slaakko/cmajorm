@@ -6,6 +6,7 @@
 #include <sngcm/cmparser/ProjectFile.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <soulng/lexer/ParsingException.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Path.hpp>

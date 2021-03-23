@@ -4,6 +4,7 @@
 #include <sngcm/ast/Expression.hpp>
 #include <sngcm/ast/TypeExpr.hpp>
 #include <sngcm/ast/Literal.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>

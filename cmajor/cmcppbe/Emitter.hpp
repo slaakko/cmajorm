@@ -362,6 +362,8 @@ public:
     void DebugPrintDebugInfo(const std::string& filePath) override;
     void BeginSubstituteLineNumber(int32_t lineNumber) override;
     void EndSubstituteLineNumber() override;
+    void SetBoundCompileUnit(void* boundCompileUnit_) override { boundCompileUnit = boundCompileUnit_; }
+    void* GetBoundCompileUnit() const override { return boundCompileUnit; }
 private:
     cmcppbe::EmittingContext* emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;
@@ -379,6 +381,7 @@ private:
     cmcppi::Value* objectPointer;
     int32_t currentLineNumber;
     bool substituteLineNumber;
+    void* boundCompileUnit;
 };
 
 } // namespace cmcppbe

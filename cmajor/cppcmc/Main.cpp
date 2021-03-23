@@ -12,6 +12,8 @@
 #include <cmajor/cmres/InitDone.hpp>
 #include <Windows.h>
 #endif
+#include <cmajor/binder/TypeBinder.hpp>
+#include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>

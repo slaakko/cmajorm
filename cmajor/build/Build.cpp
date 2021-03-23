@@ -20,6 +20,7 @@
 #include <sngxml/dom/Parser.hpp>
 #include <sngxml/xpath/XPathEvaluate.hpp>
 #include <soulng/lexer/ParsingException.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/TypeBinder.hpp>
@@ -492,7 +493,7 @@ void GenerateLibraryCpp(Module* module, const std::vector<std::string>& objectFi
                 std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
-                    LogMessage(module->LogStreamId(), line);
+                    LogMessage(module->LogStreamId(), PlatformStringToUtf8(line));
                 }
             }
         }
@@ -551,7 +552,7 @@ void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectF
                 std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
-                    LogMessage(module->LogStreamId(), line);
+                    LogMessage(module->LogStreamId(), PlatformStringToUtf8(line));
                 }
             }
         }
@@ -613,7 +614,7 @@ void GenerateLibrarySystemX(Module* module, const std::vector<std::string>& obje
                 std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
-                    LogMessage(module->LogStreamId(), line);
+                    LogMessage(module->LogStreamId(), PlatformStringToUtf8(line));
                 }
             }
         }
@@ -673,7 +674,7 @@ void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectF
                 std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
-                    LogMessage(module->LogStreamId(), line);
+                    LogMessage(module->LogStreamId(), PlatformStringToUtf8(line));
                 }
             }
         }
@@ -1126,7 +1127,7 @@ void CreateCppProjectFile(Project* project, Module& module, const std::string& m
                 std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
-                    LogMessage(module.LogStreamId(), line);
+                    LogMessage(module.LogStreamId(), PlatformStringToUtf8(line));
                 }
             }
         }
@@ -1212,7 +1213,7 @@ void CreateCppSolutionFile(Solution* solution, const std::vector<Project*>& proj
                 std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
-                    LogMessage(-1, line);
+                    LogMessage(-1, PlatformStringToUtf8(line));
                 }
             }
         }
@@ -1336,7 +1337,7 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
                 std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
-                    LogMessage(-1, line);
+                    LogMessage(-1, PlatformStringToUtf8(line));
                 }
             }
         }
@@ -1401,7 +1402,7 @@ void LinkSystemX(const std::string& executableFilePath, const std::string& libra
                 std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
-                    LogMessage(-1, line);
+                    LogMessage(-1, PlatformStringToUtf8(line));
                 }
             }
         }
@@ -1511,7 +1512,7 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
                 std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
-                    LogMessage(-1, line);
+                    LogMessage(-1, PlatformStringToUtf8(line));
                 }
             }
         }
@@ -3220,7 +3221,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
     }
     catch (const std::exception& ex)
     {
-        LogMessage(-1, "project: " + ToUtf8(project->Name()) + ": " + ex.what());
+        LogMessage(-1, "project: " + ToUtf8(project->Name()) + ": " + PlatformStringToUtf8(ex.what())); 
         throw;
     }
 }
@@ -3268,18 +3269,20 @@ std::string CurrentProjectDebugMsStr()
 class ProjectQueue
 {
 public:
-    ProjectQueue(bool& stop_, const std::string& name_);
+    ProjectQueue(bool& stop_, const std::string& name_, std::mutex* mtx_);
     void Put(Project* project);
     Project* Get();
+    void Stop();
 private:
     std::string name;
     std::list<Project*> queue;
-    std::mutex mtx;
+    std::mutex* mtx;
     std::condition_variable cond;
     bool& stop;
 };
 
-ProjectQueue::ProjectQueue(bool& stop_, const std::string& name_) : stop(stop_), name(name_)
+
+ProjectQueue::ProjectQueue(bool& stop_, const std::string& name_, std::mutex* mtx_) : stop(stop_), name(name_), mtx(mtx_)
 {
 }
 
@@ -3290,7 +3293,7 @@ void ProjectQueue::Put(Project* project)
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         LogMessage(-1, CurrentProjectDebugMsStr() + ">ProjectQueue(" + name + ")::Put: " + CurrentThreadIdStr() + " " + ToUtf8(project->Name())); 
     }
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard<std::mutex> lock(*mtx);
     queue.push_back(project);
     cond.notify_one();
     if (buildDebug)
@@ -3307,26 +3310,16 @@ Project* ProjectQueue::Get()
         {
             LogMessage(-1, CurrentProjectDebugMsStr() + ">ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr());
         }
-        std::unique_lock<std::mutex> lock(mtx);
-        if (cond.wait_for(lock, std::chrono::duration<std::uint64_t>(std::chrono::seconds(buildGetTimeoutSecs)), [this]{ return stop || !queue.empty(); }))
+        std::unique_lock<std::mutex> lock(*mtx);
+        cond.wait(lock, [this] { return stop || !queue.empty(); });
+        if (stop) return nullptr;
+        Project* project = queue.front();
+        queue.pop_front();
+        if (buildDebug)
         {
-            if (stop) return nullptr;
-            Project* project = queue.front();
-            queue.pop_front();
-            if (buildDebug)
-            {
-                LogMessage(-1, CurrentProjectDebugMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " got project " + ToUtf8(project->Name()));
-            }
-            return project;
+            LogMessage(-1, CurrentProjectDebugMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " got project " + ToUtf8(project->Name()));
         }
-        else
-        {
-            if (buildDebug)
-            {
-                LogMessage(-1, CurrentProjectDebugMsStr() + "<ProjectQueue(" + name + ")::Get: " + CurrentThreadIdStr() + " timeout");
-            }
-            return nullptr;
-        }
+        return project;
     }
     if (buildDebug)
     {
@@ -3335,17 +3328,25 @@ Project* ProjectQueue::Get()
     return nullptr;
 }
 
+void ProjectQueue::Stop()
+{
+    stop = true;
+    cond.notify_all();
+}
+
 struct BuildData
 {
-    BuildData(bool& stop_, ProjectQueue& buildQueue_, ProjectQueue& readyQueue_, std::vector<std::unique_ptr<Module>>& rootModules_, bool& isSystemSolution_, std::set<std::string>& builtProjects_) :
-        stop(stop_), buildQueue(buildQueue_), readyQueue(readyQueue_), rootModules(rootModules_), isSystemSolution(isSystemSolution_), builtProjects(builtProjects_)
+    BuildData(std::mutex* mtx_, bool& stop_, 
+        ProjectQueue& buildQueue_, ProjectQueue& readyQueue_, std::vector<std::unique_ptr<Module>>& rootModules_, bool& isSystemSolution_, 
+        std::set<std::string>& builtProjects_) :
+        mtx(mtx_), stop(stop_), buildQueue(buildQueue_), readyQueue(readyQueue_), rootModules(rootModules_), isSystemSolution(isSystemSolution_), builtProjects(builtProjects_)
     {
     }
+    std::mutex* mtx;
     bool& stop;
     ProjectQueue& buildQueue;
     ProjectQueue& readyQueue;
     std::vector<std::unique_ptr<Module>>& rootModules;
-    std::mutex exceptionMutex;
     std::vector<std::exception_ptr> exceptions;
     bool& isSystemSolution;
     std::set<std::string>& builtProjects;
@@ -3365,7 +3366,6 @@ void ProjectBuilder(BuildData* buildData)
                 {
                     buildData->isSystemSolution = true;
                 }
-                toBuild->SetBuilt();
                 buildData->readyQueue.Put(toBuild);
             }
             toBuild = buildData->buildQueue.Get();
@@ -3377,9 +3377,10 @@ void ProjectBuilder(BuildData* buildData)
         {
             LogMessage(-1, CurrentProjectDebugMsStr() + ">ProjectBuilder()::catch " + CurrentThreadIdStr());
         }
-        std::lock_guard<std::mutex> lock(buildData->exceptionMutex);
+        std::lock_guard<std::mutex> lock(*buildData->mtx);
         buildData->exceptions.push_back(std::current_exception());
-        buildData->stop = true;
+        buildData->buildQueue.Stop();
+        buildData->readyQueue.Stop();
         if (buildDebug)
         {
             LogMessage(-1, CurrentProjectDebugMsStr() + "<ProjectBuilder()::catch " + CurrentThreadIdStr());
@@ -3531,9 +3532,10 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
             {
                 buildDebug = false;
             }
-            ProjectQueue buildQueue(stopBuild, "build");
-            ProjectQueue readyQueue(stopBuild, "ready");
-            BuildData buildData(stopBuild, buildQueue, readyQueue, rootModules, isSystemSolution, builtProjects);
+            std::mutex mtx;
+            ProjectQueue buildQueue(stopBuild, "build", &mtx);
+            ProjectQueue readyQueue(stopBuild, "ready", &mtx);
+            BuildData buildData(&mtx, stopBuild, buildQueue, readyQueue, rootModules, isSystemSolution, builtProjects);
             std::vector<std::thread> threads;
             for (int i = 0; i < numThreads; ++i)
             {
@@ -3563,6 +3565,7 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
                 Project* ready = readyQueue.Get();
                 if (ready)
                 {
+                    ready->SetBuilt();      
                     --numProjectsToBuild;
                     if (buildLogWriter)
                     {

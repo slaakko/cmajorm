@@ -378,6 +378,8 @@ public:
     void DebugPrintDebugInfo(const std::string& filePath) override;
     void BeginSubstituteLineNumber(int32_t lineNumber) override;
     void EndSubstituteLineNumber() override;
+    void SetBoundCompileUnit(void* boundCompileUnit_) override { }
+    void* GetBoundCompileUnit() const override { return nullptr; }
 private:
     cmajor::ir::EmittingContext& emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;

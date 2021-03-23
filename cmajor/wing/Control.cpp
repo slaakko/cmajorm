@@ -665,7 +665,10 @@ void Control::SetText(const std::string& text_)
     {
         text = text_;
         std::u16string txt = ToUtf16(text);
-        ::SetWindowText(handle, (LPCWSTR)txt.c_str());
+        if (!::SetWindowTextW(handle, (LPCWSTR)txt.c_str()))
+        {
+            throw WindowsException(GetLastError());
+        }
         OnTextChanged();
     }
 }
@@ -684,7 +687,11 @@ std::string Control::DoGetWindowText()
     char16_t buf[1024];
     if (GetWindowText(Handle(), (LPWSTR)&buf, 1024) == 0)
     {
-        throw WindowsException(GetLastError());
+        DWORD lastError = GetLastError();
+        if (lastError != ERROR_SUCCESS)
+        {
+            throw WindowsException(lastError);
+        }
     }
     return ToUtf8(buf);
 }

@@ -136,6 +136,7 @@ void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     symbolTable = &boundCompileUnit.GetSymbolTable();
     module = &boundCompileUnit.GetModule();
     compileUnit = &boundCompileUnit;
+    emitter->SetBoundCompileUnit(compileUnit);
     if (!module->IsCore())
     {
         module->AddCompileUnitId(compileUnitId);

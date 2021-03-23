@@ -244,9 +244,12 @@ void RunKeepAliveThread()
 
 void BuildService::StartKeepAliveThread()
 {
-    keepAliveThreadStarted = true;
-    stopKeepAlives = false;
-    keepAliveThread = std::thread(RunKeepAliveThread);
+    if (!keepAliveThreadStarted)
+    {
+        keepAliveThreadStarted = true;
+        stopKeepAlives = false;
+        keepAliveThread = std::thread(RunKeepAliveThread);
+    }
 }
 
 void BuildService::StopKeepAliveThread()
@@ -331,6 +334,7 @@ void BuildService::ExecuteRequest(BuildServiceRequest* request)
     {
         PutOutputServiceMessage("build service: error executing " + request->Name() + ": " + std::string(ex.what()));
         request->Failed(ex.what());
+        throw;
     }
 }
 

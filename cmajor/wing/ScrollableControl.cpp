@@ -154,6 +154,7 @@ void ScrollableControl::TranslateContentLocation(Point& contentLocation)
 void ScrollableControl::OnLocationChanged()
 {
     Control::OnLocationChanged();
+    DockWindow();
     child->SetLocation(Point());
     child->SetSize(GetSize());
 }
@@ -161,6 +162,7 @@ void ScrollableControl::OnLocationChanged()
 void ScrollableControl::OnSizeChanged()
 {
     Control::OnSizeChanged();
+    DockWindow();
     child->SetLocation(Point());
     child->SetSize(GetSize());
 }

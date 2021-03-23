@@ -10,7 +10,9 @@
 
 namespace cmajor { namespace wing {
 
-const int defaultControlPadding = 3;
+const int defaultControlPadding = 4;
+
+WING_API Padding DefaultPadding();
 
 WING_API Size PaddedSize(const Size& size, const Padding& padding);
 

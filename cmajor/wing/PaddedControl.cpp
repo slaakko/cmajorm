@@ -8,6 +8,11 @@
 
 namespace cmajor { namespace wing {
 
+Padding DefaultPadding()
+{
+    return Padding(defaultControlPadding, defaultControlPadding, defaultControlPadding, defaultControlPadding);
+}
+
 Size PaddedSize(const Size& size, const Padding& padding)
 {
     return Size(size.Width + padding.Horizontal(), size.Height + padding.Vertical());

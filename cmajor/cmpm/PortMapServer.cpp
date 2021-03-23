@@ -5,7 +5,6 @@
 
 #include <cmajor/cmpm/PortMapServer.hpp>
 #include <cmajor/cmpm/PortMapMessage.hpp>
-#include <cmajor/cmsvc/Config.hpp>
 #include <sngxml/dom/Parser.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
@@ -27,9 +26,42 @@
 
 namespace cmajor { namespace cmpm {
 
-using namespace cmajor::service;
 using namespace soulng::util;
 using namespace soulng::unicode;
+
+std::string CmajorRootDir()
+{
+    char* e = getenv("CMAJOR_ROOT");
+    if (e == nullptr || !*e)
+    {
+        throw std::runtime_error("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory.");
+    }
+    return GetFullPath(std::string(e));
+}
+
+std::string CmajorConfigDir()
+{
+    std::string configDir = GetFullPath(Path::Combine(CmajorRootDir(), "config"));
+    boost::filesystem::create_directories(configDir);
+    return configDir;
+}
+
+std::string PortMapConfigFilePath()
+{
+    return GetFullPath(Path::Combine(CmajorConfigDir(), "cmpm.config.xml"));
+}
+
+std::string CmajorLogDir()
+{
+    std::string logDir = Path::Combine(CmajorRootDir(), "log");
+    boost::filesystem::create_directories(logDir);
+    return logDir;
+}
+
+std::string PortMapLogFilePath()
+{
+    return GetFullPath(Path::Combine(CmajorLogDir(), "cmpms.log"));
+}
 
 struct PortEntry
 {

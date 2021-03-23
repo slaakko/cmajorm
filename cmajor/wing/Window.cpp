@@ -7,6 +7,7 @@
 #include <cmajor/wing/Application.hpp>
 #include <cmajor/wing/Button.hpp>
 #include <cmajor/wing/Menu.hpp>
+#include <cmajor/wing/Metrics.hpp>
 #include <cmajor/wing/Icon.hpp>
 #include <cmajor/wing/TextBox.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -137,6 +138,15 @@ Window::Window(WindowCreateParams& createParams) :
     contextMenu(nullptr),
     dialogResult(DialogResult::none)
 {
+    if (Handle())
+    {
+        if (!ScreenMetrics::Calculated())
+        {
+            ScreenMetrics::SetCalculated();
+            Graphics graphics(Handle());
+            ScreenMetrics::Calculate(graphics);
+        }
+    }
     KeyPreviewMethod defaultKeyPreview;
     defaultKeyPreview.SetHandlerFunction(this, &Window::DefaultKeyPreview);
     SetKeyPreviewMethod(defaultKeyPreview);

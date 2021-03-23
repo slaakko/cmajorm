@@ -562,7 +562,17 @@ bool Project::IsUpToDate(const std::string& systemModuleFilePath) const
     return true;
 }
 
-bool Project::Ready() const
+bool Project::Built() 
+{ 
+    return built; 
+}
+
+void Project::SetBuilt()
+{
+    built = true;
+}
+
+bool Project::Ready() 
 {
     for (Project* dependOn : dependsOn)
     {

@@ -391,6 +391,8 @@ public:
     virtual void DebugPrintDebugInfo(const std::string& filePath) = 0;
     virtual void BeginSubstituteLineNumber(int32_t lineNumber) = 0;
     virtual void EndSubstituteLineNumber() = 0;
+    virtual void SetBoundCompileUnit(void* boundCompileUnit) = 0;
+    virtual void* GetBoundCompileUnit() const = 0;
 private:
     ValueStack* stack;
 };

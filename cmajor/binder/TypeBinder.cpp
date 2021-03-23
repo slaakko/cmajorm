@@ -25,6 +25,7 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Trace.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <iostream>
 
 namespace cmajor { namespace binder {
 
@@ -2534,6 +2535,15 @@ void TypeBinder::Visit(GlobalVariableNode& globalVariableNode)
 void TypeBinder::CreateMemberSymbols()
 {
     typeResolverFlags = typeResolverFlags | TypeResolverFlags::createMemberSymbols;
+}
+
+void BindClass(ClassTypeSymbol* classType, void* boundCompileUnit)
+{
+    BoundCompileUnit* compileUnit = static_cast<BoundCompileUnit*>(boundCompileUnit);
+    TypeBinder binder(*compileUnit);
+    SymbolTable& symbolTable = compileUnit->GetSymbolTable();
+    sngcm::ast::ClassNode* classNode = static_cast<ClassNode*>(symbolTable.GetNode(classType));
+    binder.BindClass(classType, classNode, true);
 }
 
 } } // namespace cmajor::binder

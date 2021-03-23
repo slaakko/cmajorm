@@ -108,6 +108,8 @@ private:
     std::vector<std::string> errors;
 };
 
+BINDER_API void BindClass(ClassTypeSymbol* classType, void* boundCompileUnit);
+
 } } // namespace cmajor::binder
 
 #endif // CMAJOR_BINDER_TYPE_BINDER_INCLUDED

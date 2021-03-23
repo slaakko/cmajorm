@@ -10,6 +10,7 @@
 #include <soulng/util/Log.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <iostream>
 #include <fstream>

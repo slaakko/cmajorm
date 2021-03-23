@@ -154,6 +154,7 @@ public:
     const std::vector<std::string>& RelativeTextFilePaths() const { return relativeTextFilePaths; }
     const std::vector<std::string>& TextFilePaths() const { return textFilePaths; }
     Target GetTarget() const { return target; }
+    void SetTarget(Target target_) { target = target_; }
     bool DependsOn(Project* that) const;
     void AddDependsOnProjects(Project* dependsOnProject);
     bool IsSystemProject() const { return isSystemProject; }
@@ -168,9 +169,9 @@ public:
     void SetIndex(int index_) { index = index_; }
     int Index() const { return index; }
     const std::vector<Project*>& DependsOnProjects() { return dependsOn; }
-    bool Built() const { return built; }
-    void SetBuilt() { built = true; }
-    bool Ready() const;
+    bool Built();
+    void SetBuilt();
+    bool Ready();
     void SetExcludeSourceFilePath(const std::string& excludeSourceFilePath_);
     void SetHash(const std::string& hash_) { hash = hash_; }
     const std::string& Hash() const { return hash; }
@@ -210,6 +211,7 @@ private:
     int index;
     std::string hash;
     std::vector<std::string> dependsOnIds;
+    std::mutex mtx;
 };
 
 

@@ -130,17 +130,23 @@ void ErrorView::SetErrors(const std::vector<CompileError>&& errors_)
             TreeViewNode* projectNode = new TreeViewNode("Module: " + error.project);
             node->AddChild(projectNode);
         }
-        TreeViewNode* file = new TreeViewNode("File: " + error.file);
-        node->AddChild(file);
-        TreeViewNode* line = new TreeViewNode("Line: " + std::to_string(error.line));
-        node->AddChild(line);
-        TreeViewNode* code = new TreeViewNode("Code:");
-        for (int i = 1; i < lines.size(); ++i)
+        if (!error.file.empty())
         {
-            TreeViewNode* codeLineNode = new TreeViewNode(ToUtf8(lines[i]));
-            code->AddChild(codeLineNode);
+            TreeViewNode* file = new TreeViewNode("File: " + error.file);
+            node->AddChild(file);
+            TreeViewNode* line = new TreeViewNode("Line: " + std::to_string(error.line));
+            node->AddChild(line);
         }
-        node->AddChild(code);
+        if (lines.size() > 1)
+        {
+            TreeViewNode* code = new TreeViewNode("Code:");
+            for (int i = 1; i < lines.size(); ++i)
+            {
+                TreeViewNode* codeLineNode = new TreeViewNode(ToUtf8(lines[i]));
+                code->AddChild(codeLineNode);
+            }
+            node->AddChild(code);
+        }
         node->SetData(&error);
         treeView->Root()->AddChild(node);
     }
@@ -155,6 +161,7 @@ void ErrorView::TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args)
 
 void ErrorView::OnViewError(CompileError* error)
 {
+    if (!error || error->file.empty()) return;
     ViewErrorArgs args(error);
     viewError.Fire(args);
 }

@@ -38,33 +38,39 @@ std::vector<CompileError> SymbolsExceptionToErrors(const cmajor::symbols::Except
     CompileError mainError;
     mainError.message = ex.Message();
     cmajor::symbols::Module* mod = cmajor::symbols::GetModuleById(ex.DefinedModuleId());
-    Span span = ex.Defined();
-    std::u32string code = mod->GetErrorLines(span);
-    mainError.message.append("\n").append(ToUtf8(code));
-    mainError.project = ToUtf8(mod->Name());
-    mainError.file = mod->GetFilePath(span.fileIndex);
-    mainError.line = span.line;
-    int startCol = 0;
-    int endCol = 0;
-    mod->GetColumns(span, startCol, endCol);
-    mainError.scol = startCol;
-    mainError.ecol = endCol;
+    if (mod)
+    {
+        Span span = ex.Defined();
+        std::u32string code = mod->GetErrorLines(span);
+        mainError.message.append("\n").append(ToUtf8(code));
+        mainError.project = ToUtf8(mod->Name());
+        mainError.file = mod->GetFilePath(span.fileIndex);
+        mainError.line = span.line;
+        int startCol = 0;
+        int endCol = 0;
+        mod->GetColumns(span, startCol, endCol);
+        mainError.scol = startCol;
+        mainError.ecol = endCol;
+    }
     errors.push_back(mainError);
     for (const std::pair<Span, boost::uuids::uuid>& spanModuleId : ex.References())
     {
         CompileError referenceError;
         referenceError.message = "See:";
         cmajor::symbols::Module* mod = cmajor::symbols::GetModuleById(spanModuleId.second);
-        std::u32string code = mod->GetErrorLines(spanModuleId.first);
-        referenceError.message.append("\n").append(ToUtf8(code));
-        referenceError.file = mod->GetFilePath(spanModuleId.first.fileIndex);
-        referenceError.line = spanModuleId.first.line;
-        int startCol = 0;
-        int endCol = 0;
-        mod->GetColumns(spanModuleId.first, startCol, endCol);
-        referenceError.scol = startCol;
-        referenceError.ecol = endCol;
-        errors.push_back(referenceError);
+        if (mod)
+        {
+            std::u32string code = mod->GetErrorLines(spanModuleId.first);
+            referenceError.message.append("\n").append(ToUtf8(code));
+            referenceError.file = mod->GetFilePath(spanModuleId.first.fileIndex);
+            referenceError.line = spanModuleId.first.line;
+            int startCol = 0;
+            int endCol = 0;
+            mod->GetColumns(spanModuleId.first, startCol, endCol);
+            referenceError.scol = startCol;
+            referenceError.ecol = endCol;
+            errors.push_back(referenceError);
+        }
     }
     return errors;
 }

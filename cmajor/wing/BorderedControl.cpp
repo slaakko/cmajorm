@@ -198,6 +198,7 @@ BorderedControl::BorderedControl(BorderedControlCreateParams& createParams) :
     threeDInnerRightBottomEdgeColor(createParams.threeDInnerRightBottomEdgeColor)
 {
     container.AddChild(child);
+    SetChildPos();
 }
 
 Control* BorderedControl::GetFirstEnabledTabStopControl() const
@@ -282,10 +283,7 @@ void BorderedControl::OnChildContentSizeChanged(ControlEventArgs& args)
 void BorderedControl::OnChildGotFocus(ControlEventArgs& args)
 {
     Control::OnChildGotFocus(args);
-    if (args.control == child)
-    {
-        flags = flags | BorderedControlFlags::childFocused;
-    }
+    flags = flags | BorderedControlFlags::childFocused;
     Control* parentControl = ParentControl();
     if (parentControl)
     {
@@ -297,10 +295,7 @@ void BorderedControl::OnChildGotFocus(ControlEventArgs& args)
 void BorderedControl::OnChildLostFocus(ControlEventArgs& args)
 {
     Control::OnChildLostFocus(args);
-    if (args.control == child)
-    {
-        flags = flags & ~BorderedControlFlags::childFocused;
-    }
+    flags = flags & ~BorderedControlFlags::childFocused;
     Control* parentControl = ParentControl();
     if (parentControl)
     {

@@ -41,6 +41,13 @@ std::string CmajorLogDir()
     return logDir;
 }
 
+std::string CmajorProjectsDir()
+{
+    std::string projectsDir = Path::Combine(CmajorRootDir(), "projects");
+    boost::filesystem::create_directories(projectsDir);
+    return projectsDir;
+}
+
 std::string PortMapLogFilePath()
 {
     return GetFullPath(Path::Combine(CmajorLogDir(), "cmpms.log"));

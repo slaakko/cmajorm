@@ -7,6 +7,8 @@
 #include <cmajor/cmbs/BuildClient.hpp>
 #include <cmajor/cmbs/KeepAliveServer.hpp>
 #include <cmajor/cmpm/PortMapClient.hpp>
+#include <cmajor/binder/TypeBinder.hpp>
+#include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Process.hpp>
 #include <sngcm/ast/InitDone.hpp>
@@ -288,7 +290,7 @@ int main(int argc, const char** argv)
         }
         if (wait)
         {
-            std::this_thread::sleep_for(std::chrono::seconds{ 60 });
+            std::this_thread::sleep_for(std::chrono::seconds{ 45 });
         }
         KeepAliveServerRun runKeepAliveServer(keepAliveServerPort, &exitVar, &exiting);
         BuildServerRun runBuildServer(port, version, log, progress, &exitVar, &exiting);

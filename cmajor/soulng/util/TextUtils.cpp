@@ -13,6 +13,12 @@
 #include <algorithm>
 #include <stdexcept>
 #include <thread>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
+#undef min
+#undef max
 
 namespace soulng { namespace util {
 
@@ -589,5 +595,29 @@ std::string Format(const std::string& s, int width, FormatWidth fw, FormatJustif
     }
     return result;
 }
+
+#ifdef _WIN32
+
+std::string PlatformStringToUtf8(const std::string& platformString)
+{
+    if (platformString.empty()) return std::string();
+    int bufSize = 4096;
+    std::unique_ptr<char16_t> wbuf(new char16_t[bufSize]);
+    int result = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, platformString.c_str(), -1, (LPWSTR)wbuf.get(), bufSize);
+    if (result == 0)
+    {
+        return "<error converting platform string to UTF-16>";
+    }
+    return ToUtf8(wbuf.get());
+}
+
+#else
+
+std::string PlatformStringToUtf8(const std::string& platformString)
+{
+    return platformString;
+}
+
+#endif
 
 } } // namespace soulng::util

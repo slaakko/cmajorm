@@ -29,6 +29,7 @@ bool ServerLogging()
 bool DebugWait()
 {
     return false;
+    //return true;
 }
 
 class Config

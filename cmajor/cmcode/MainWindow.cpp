@@ -7,6 +7,7 @@
 #include <cmajor/cmcode/Action.hpp>
 #include <cmajor/cmcode/Build.hpp>
 #include <cmajor/cmcode/ToolBar.hpp>
+#include <cmajor/cmcode/NewProjectDialog.hpp>
 #include <cmajor/cmcode/SelectProjectTypeDialog.hpp>
 #include <cmajor/wing/Dialog.hpp>
 #include <cmajor/wing/BorderedControl.hpp>
@@ -14,6 +15,7 @@
 #include <cmajor/wing/ScrollableControl.hpp>
 #include <cmajor/wing/ToolBar.hpp>
 #include <cmajor/wing/MessageBox.hpp>
+#include <cmajor/cmsvc/Config.hpp>
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmsvc/RequestDispatcher.hpp>
 #include <cmajor/cmsvc/PortMapService.hpp>
@@ -32,11 +34,6 @@ using namespace cmajor::service;
 using namespace sngcm::ast;
 using namespace soulng::unicode;
 using namespace soulng::util;
-
-std::string CmajorProjectDirectory()
-{
-    return GetFullPath(Path::Combine(CmajorRootDir(), "projects"));
-}
 
 MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams().Text("Cmajor Code")),
     newProjectMenuItem(nullptr),
@@ -1237,7 +1234,48 @@ int MainWindow::HorizontalSplitterDistance()
 
 void MainWindow::NewProjectClick()
 {
-    ShowInfoMessageBox(Handle(), "New Project");
+    try
+    {
+        NewProjectDialog dialog;
+        dialog.SetProjectLocation(CmajorProjectsDir());
+        if (dialog.ShowDialog(*this) == DialogResult::ok)
+        {
+            bool sameDir = dialog.PlaceSolutionInSameDirectory();
+            std::string solutionFilePath;
+            std::string projectFilePath;
+            if (!sameDir)
+            {
+                solutionFilePath = Path::Combine(dialog.GetProjectLocation(), Path::Combine(dialog.GetSolutionName(), dialog.GetSolutionName() + ".cms"));
+                projectFilePath = Path::Combine(dialog.GetProjectLocation(), Path::Combine(dialog.GetSolutionName(), Path::Combine(dialog.GetProjectName(), dialog.GetProjectName() + ".cmp")));
+                std::string solutionDir = Path::GetDirectoryName(solutionFilePath);
+                boost::filesystem::create_directories(solutionDir);
+                std::string projectDir = Path::GetDirectoryName(projectFilePath);
+                boost::filesystem::create_directories(projectDir);
+            }
+            else
+            {
+                projectFilePath = Path::Combine(dialog.GetProjectLocation(), Path::Combine(dialog.GetProjectName(), dialog.GetProjectName() + ".cmp"));
+                solutionFilePath = Path::ChangeExtension(projectFilePath, ".cms");
+                std::string projectDir = Path::GetDirectoryName(projectFilePath);
+                boost::filesystem::create_directories(projectDir);
+            }
+            std::unique_ptr<sngcm::ast::Solution> solution(new sngcm::ast::Solution(ToUtf32(dialog.GetSolutionName()), solutionFilePath));
+            std::unique_ptr<sngcm::ast::Project> project(new sngcm::ast::Project(ToUtf32(dialog.GetProjectName()), projectFilePath, "debug", sngcm::ast::BackEnd::llvm, "gcc", sngcm::ast::SystemDirKind::regular));
+            project->SetTarget(dialog.GetProjectType());
+            solution->SetActiveProject(project.get());
+            solution->AddProject(std::move(project));
+            solution->Save();
+            if (!CloseSolution())
+            { 
+                return;
+            }
+            OpenProject(solutionFilePath);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::OpenProjectClick()
@@ -1247,7 +1285,7 @@ void MainWindow::OpenProjectClick()
         std::vector<std::pair<std::string, std::string>> descriptionFilterPairs;
         descriptionFilterPairs.push_back(std::make_pair("Cmajor Solution Files (*.cms)", "*.cms"));
         descriptionFilterPairs.push_back(std::make_pair("Cmajor Project Files (*.cmp)", "*.cmp"));
-        std::string initialDirectory = CmajorProjectDirectory();
+        std::string initialDirectory = CmajorProjectsDir();
         std::string filePath;
         std::string currentDiretory;
         std::vector<std::string> fileNames;
@@ -1308,7 +1346,10 @@ bool MainWindow::CloseSolution()
 
 void MainWindow::CloseSolutionClick()
 {
-    CloseSolution();
+    if (CloseSolution())
+    {
+        solutionTreeView->SetRoot(nullptr);
+    }
 }
 
 void MainWindow::SaveClick()
@@ -1395,20 +1436,7 @@ void MainWindow::RedoClick()
 
 void MainWindow::GotoClick()
 {
-    try
-    {
-        SelectProjectTypeDialog dialog;
-        DialogResult result = dialog.ShowDialog(*this);
-        if (result == DialogResult::ok)
-        {
-            sngcm::ast::Target target = dialog.GetTarget();
-            ShowInfoMessageBox(Handle(), sngcm::ast::TargetStr(target) + " selected");
-        }
-    }
-    catch (const std::exception& ex)
-    {
-        ShowErrorMessageBox(Handle(), ex.what());
-    }
+    ShowInfoMessageBox(Handle(), "Goto");
 }
 
 void MainWindow::SearchClick()

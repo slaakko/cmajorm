@@ -1,6 +1,7 @@
 #include <sngcm/ast/InitDone.hpp>
 #include <sngcm/ast/SourceToken.hpp>
 #include <sngcm/cmparser/SourceTokenParser.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Unicode.hpp>

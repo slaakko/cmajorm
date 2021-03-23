@@ -112,8 +112,11 @@ public:
     static void Calculate(Graphics& graphics);
     static Metrics& Get() { return metrics; }
     static void Set(Metrics& metrics_);
+    static bool Calculated() { return calculated; }
+    static void SetCalculated() { calculated = true; }
 private:
     static Metrics metrics;
+    static bool calculated;
 };
 
 WING_API void LoadMetrics();

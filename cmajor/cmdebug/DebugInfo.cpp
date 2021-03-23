@@ -10,6 +10,7 @@
 #include <cmajor/cmdebug/DebuggerOutputWriter.hpp>
 #include <soulng/util/Ansi.hpp>
 #include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
