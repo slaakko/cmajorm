@@ -113,6 +113,9 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     buildProgressCounter(0),
     buildProgressTimerRunning(false),
     setMaximizedSplitterDistance(false),
+    sizeChanged(false),
+    verticalSplitContainerFactor(0),
+    horizontalSplitContainerFactor(0),
     state(MainWindowState::idle),
     backend("cpp"),
     config("debug")
@@ -463,11 +466,13 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     AddChild(borderedToolBar.release());
 
     std::unique_ptr<SplitContainer> verticalSplitContainerPtr(
-        new SplitContainer(SplitContainerCreateParams(SplitterOrientation::vertical).SplitterDistance(VerticalSplitterDistance()).SetDock(Dock::fill)));
+        new SplitContainer(SplitContainerCreateParams(SplitterOrientation::vertical).SplitterDistance(0).SetDock(Dock::fill)));
     verticalSplitContainer = verticalSplitContainerPtr.get();
+    verticalSplitContainer->SplitterDistanceChanged().AddHandler(this, &MainWindow::VerticalSplitContainerSplitterDistanceChanged);
     std::unique_ptr<SplitContainer> horizontalSplitContainerPtr(
-        new SplitContainer(SplitContainerCreateParams(SplitterOrientation::horizontal).SplitterDistance(HorizontalSplitterDistance()).SetDock(Dock::fill)));
+        new SplitContainer(SplitContainerCreateParams(SplitterOrientation::horizontal).SplitterDistance(0).SetDock(Dock::fill)));
     horizontalSplitContainer = horizontalSplitContainerPtr.get();
+    horizontalSplitContainer->SplitterDistanceChanged().AddHandler(this, &MainWindow::HorizontalSplitContainerSplitterDistanceChanged);
     std::unique_ptr<TabControl> codeTabControlPtr(new TabControl(TabControlCreateParams().SetDock(Dock::fill)));
     codeTabControl = codeTabControlPtr.get();
     codeTabControl->TabPageSelected().AddHandler(this, &MainWindow::CodeTabPageSelected);
@@ -684,6 +689,23 @@ void MainWindow::OnSizeChanged()
         const WindowSettings& windowSettings = GetWindowSettings();
         horizontalSplitContainer->SetSplitterDistance(windowSettings.maximizedHorizontalSplitterDistance);
         verticalSplitContainer->SetSplitterDistance(windowSettings.maximizedVerticalSplitterDistance);
+    }
+    statusBar->SetChanged();
+    statusBar->Invalidate();
+    if (GetWindowState() == WindowState::normal)
+    {
+        sizeChanged = true;
+        if (verticalSplitContainerFactor != 0)
+        {
+            int splitterDistance = static_cast<int>(verticalSplitContainerFactor * verticalSplitContainer->GetSize().Height);
+            verticalSplitContainer->SetSplitterDistance(splitterDistance);
+        }
+        if (horizontalSplitContainerFactor != 0)
+        {
+            int splitterDistance = static_cast<int>(horizontalSplitContainerFactor * horizontalSplitContainer->GetSize().Width);
+            horizontalSplitContainer->SetSplitterDistance(splitterDistance);
+        }
+        sizeChanged = false;
     }
 }
 
@@ -1315,14 +1337,20 @@ void MainWindow::BreakpointRemoved(RemoveBreakpointEventArgs& args)
     ShowInfoMessageBox(Handle(), "breakpoint removed");
 }
 
-int MainWindow::VerticalSplitterDistance()
+void MainWindow::VerticalSplitContainerSplitterDistanceChanged()
 {
-    return 0;
+    if (GetWindowState() == WindowState::normal && !sizeChanged)
+    {
+        verticalSplitContainerFactor = (verticalSplitContainer->GetSize().Height - verticalSplitContainer->Pane2Container()->GetSize().Height) / (1.0f * verticalSplitContainer->GetSize().Height);
+    }
 }
 
-int MainWindow::HorizontalSplitterDistance()
+void MainWindow::HorizontalSplitContainerSplitterDistanceChanged()
 {
-    return 0;
+    if (GetWindowState() == WindowState::normal && !sizeChanged)
+    {
+        horizontalSplitContainerFactor = (horizontalSplitContainer->GetSize().Width - horizontalSplitContainer->Pane2Container()->GetSize().Width) / (1.0f * horizontalSplitContainer->GetSize().Width);
+    }
 }
 
 void MainWindow::NewProjectClick()

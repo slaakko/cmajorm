@@ -81,8 +81,8 @@ private:
     void EditorCaretPosChanged();
     void BreakpointAdded(AddBreakpointEventArgs& args);
     void BreakpointRemoved(RemoveBreakpointEventArgs& args);
-    int VerticalSplitterDistance();
-    int HorizontalSplitterDistance();
+    void VerticalSplitContainerSplitterDistanceChanged();
+    void HorizontalSplitContainerSplitterDistanceChanged();
     void NewProjectClick();
     void OpenProjectClick();
     bool CloseSolution();
@@ -216,6 +216,9 @@ private:
     int buildProgressCounter;
     bool buildProgressTimerRunning;
     bool setMaximizedSplitterDistance;
+    bool sizeChanged;
+    float verticalSplitContainerFactor;
+    float horizontalSplitContainerFactor;
     std::unique_ptr<SolutionData> solutionData;
     std::unordered_map<TabPage*, Editor*> tabPageEditorMap;
     MainWindowState state;
