@@ -34,6 +34,24 @@ int Application::Run(Window& mainWindow)
 {
     mainWindow.SetAsMainWindow();
     SetMainWindow(&mainWindow);
+    switch (mainWindow.GetWindowState())
+    {
+        case WindowState::normal:
+        {
+            mainWindow.ShowWindow(SW_SHOWNORMAL);
+            break;
+        }
+        case WindowState::maximized:
+        {
+            mainWindow.ShowWindow(SW_MAXIMIZE);
+            break;
+        }
+        case WindowState::minimized:
+        {
+            mainWindow.ShowWindow(SW_MINIMIZE);
+            break;
+        }
+    }
     mainWindow.Show();
     mainWindow.Update();
     return wing::Run();

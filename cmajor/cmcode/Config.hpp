@@ -9,12 +9,16 @@
 
 namespace cmcode {
 
+const int configurationSavePeriod = 3000;
+const int configurationSaveTimerId = 11;
+
 bool UseDebugServers();
 bool ServerLogging();
 bool DebugWait();
 void LoadConfiguration();
 void SaveConfiguration();
 const BuildSettings& GetBuildSettings();
+WindowSettings& GetWindowSettings();
 void ConfigInit();
 void ConfigDone();
 

@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmcode/MainWindow.hpp>
+#include <cmajor/cmcode/Config.hpp>
 #include <cmajor/cmcode/Action.hpp>
 #include <cmajor/cmcode/Build.hpp>
 #include <cmajor/cmcode/ToolBar.hpp>
@@ -111,6 +112,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     columnStatusBarItem(nullptr),
     buildProgressCounter(0),
     buildProgressTimerRunning(false),
+    setMaximizedSplitterDistance(false),
     state(MainWindowState::idle),
     backend("cpp"),
     config("debug")
@@ -538,10 +540,20 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     }
 
     SetState(MainWindowState::idle);
+    LoadConfigurationSettings();
+
+    SetTimer(configurationSaveTimerId, configurationSavePeriod);
 }
 
 MainWindow::~MainWindow()
 {
+    try
+    {
+        SaveConfiguration();
+    }
+    catch (...)
+    {
+    }
     SetServiceMessageHandlerView(nullptr);
     StopRequestDispatcher();
 }
@@ -610,6 +622,10 @@ void MainWindow::OnTimer(TimerEventArgs& args)
         {
             ShowBuildProgress();
         }
+        else if (args.timerId == configurationSaveTimerId)
+        {
+            SaveConfigurationSettings();
+        }
     }
     catch (const std::exception& ex)
     {
@@ -638,6 +654,83 @@ bool MainWindow::ProcessMessage(Message& msg)
             return Window::ProcessMessage(msg);
         }
     }
+}
+
+void MainWindow::OnWindowStateChanged()
+{
+    Window::OnWindowStateChanged();
+    const WindowSettings& windowSettings = GetWindowSettings();
+    if (GetWindowState() == WindowState::normal)
+    {
+        SetLocation(Point(windowSettings.location.x, windowSettings.location.y));
+        SetSize(Size(windowSettings.size.width, windowSettings.size.height));
+        horizontalSplitContainer->DockWindow();
+        verticalSplitContainer->DockWindow();
+        horizontalSplitContainer->SetSplitterDistance(windowSettings.normalHorizontalSplitterDistance);
+        verticalSplitContainer->SetSplitterDistance(windowSettings.normalVerticalSplitterDistance);
+    }
+    else if (GetWindowState() == WindowState::maximized)
+    {
+        setMaximizedSplitterDistance = true;
+    }
+}
+
+void MainWindow::OnSizeChanged()
+{
+    Window::OnSizeChanged();
+    if (GetWindowState() == WindowState::maximized && setMaximizedSplitterDistance)
+    {
+        setMaximizedSplitterDistance = false;
+        const WindowSettings& windowSettings = GetWindowSettings();
+        horizontalSplitContainer->SetSplitterDistance(windowSettings.maximizedHorizontalSplitterDistance);
+        verticalSplitContainer->SetSplitterDistance(windowSettings.maximizedVerticalSplitterDistance);
+    }
+}
+
+void MainWindow::LoadConfigurationSettings()
+{
+    LoadConfiguration();
+    const WindowSettings& windowSettings = GetWindowSettings();
+    SetWindowState(WindowState(windowSettings.windowState));
+    if (GetWindowState() == WindowState::normal)
+    {
+        SetLocation(Point(windowSettings.location.x, windowSettings.location.y));
+        SetSize(Size(windowSettings.size.width, windowSettings.size.height));
+        horizontalSplitContainer->SetSplitterDistance(windowSettings.normalHorizontalSplitterDistance);
+        verticalSplitContainer->SetSplitterDistance(windowSettings.normalVerticalSplitterDistance);
+    }
+    else if (GetWindowState() == WindowState::maximized)
+    {
+        setMaximizedSplitterDistance = true;
+    }
+}
+
+void MainWindow::SaveConfigurationSettings()
+{
+    WindowState windowState = GetWindowState();
+    WindowSettings& windowSettings = GetWindowSettings();
+    windowSettings.windowState = static_cast<int>(windowState);
+    if (windowState == WindowState::normal)
+    {
+        Point location = Location();
+        WindowLocation windowLocation;
+        windowLocation.x = location.X;
+        windowLocation.y = location.Y;
+        windowSettings.location = windowLocation;
+        Size size = GetSize();
+        WindowSize windowSize;
+        windowSize.width = size.Width;
+        windowSize.height = size.Height;
+        windowSettings.size = windowSize;
+        windowSettings.normalHorizontalSplitterDistance = horizontalSplitContainer->SplitterDistance();
+        windowSettings.normalVerticalSplitterDistance = verticalSplitContainer->SplitterDistance();
+    }
+    else if (windowState == WindowState::maximized)
+    {
+        windowSettings.maximizedHorizontalSplitterDistance = horizontalSplitContainer->SplitterDistance();
+        windowSettings.maximizedVerticalSplitterDistance = verticalSplitContainer->SplitterDistance();
+    }
+    cmcode::SaveConfiguration();
 }
 
 void MainWindow::StartBuilding()

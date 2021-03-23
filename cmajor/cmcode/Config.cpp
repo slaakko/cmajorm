@@ -104,4 +104,9 @@ void ConfigDone()
     Config::Done();
 }
 
+WindowSettings& GetWindowSettings()
+{
+    return Config::Instance().GetConfiguration().windowSettings;
+}
+
 } // namespace cmcode

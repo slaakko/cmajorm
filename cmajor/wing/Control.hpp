@@ -310,8 +310,8 @@ public:
     ~Control();
     bool IsControl() const override { return true; }
     virtual bool IsContainerControl() const { return false; }
-    virtual bool IsButton() const { return false; }
     virtual bool IsWindow() const { return false; }
+    virtual bool IsButton() const { return false; }
     virtual bool IsMenuBar() const { return false; }
     virtual bool IsMenuBox() const { return false; }
     virtual bool IsTabControl() const { return false; }

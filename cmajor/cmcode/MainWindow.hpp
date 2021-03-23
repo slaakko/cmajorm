@@ -50,12 +50,16 @@ public:
     void OpenFileLocation(const std::string& filePath);
 protected:
     bool ProcessMessage(Message& msg) override;
+    void OnWindowStateChanged() override;
+    void OnSizeChanged() override;
     void OnWindowClosing(CancelArgs& args) override;
     void OnKeyDown(KeyEventArgs& args) override;
     void MouseUpNotification(MouseEventArgs& args) override;
     void OnTimer(TimerEventArgs& args) override;
     void OnGotFocus() override;
 private:
+    void SaveConfigurationSettings();
+    void LoadConfigurationSettings();
     void StartBuilding();
     void StopBuilding();
     void ShowBuildProgress();
@@ -211,6 +215,7 @@ private:
     StatusBarTextItem* columnStatusBarItem;
     int buildProgressCounter;
     bool buildProgressTimerRunning;
+    bool setMaximizedSplitterDistance;
     std::unique_ptr<SolutionData> solutionData;
     std::unordered_map<TabPage*, Editor*> tabPageEditorMap;
     MainWindowState state;

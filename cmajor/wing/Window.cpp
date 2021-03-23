@@ -131,6 +131,7 @@ Window::Window(WindowCreateParams& createParams) :
     fontStyle(createParams.fontStyle),
     mainWindow(false),
     showingDialog(false),
+    windowState(WindowState::normal),
     defaultButton(nullptr),
     cancelButton(nullptr),
     focusedControl(nullptr),
@@ -325,6 +326,20 @@ void Window::DefaultKeyPreview(Keys key, KeyState keyState, bool& handled)
             }
         }
     }
+}
+
+void Window::SetWindowState(WindowState newWindowState)
+{
+    if (windowState != newWindowState)
+    {
+        windowState = newWindowState;
+        OnWindowStateChanged();
+    }
+}
+
+void Window::ShowWindow(int showCommand)
+{
+    ::ShowWindow(Handle(), showCommand);
 }
 
 void Window::Close()
@@ -540,7 +555,12 @@ bool Window::ProcessMessage(Message& msg)
             }
             break;
         }
-        case WM_COMMAND: case WM_MOVE: case WM_SIZE: case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK: case WM_RBUTTONDOWN: case WM_RBUTTONUP:
+        case WM_SIZE:
+        {
+            DoWindowStateChanged(msg.wParam);
+            return ContainerControl::ProcessMessage(msg);
+        }
+        case WM_COMMAND: case WM_MOVE: case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK: case WM_RBUTTONDOWN: case WM_RBUTTONUP:
         case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL: case WM_TIMER: case WM_SETFOCUS: case WM_KILLFOCUS:
         case WM_SHOWWINDOW: case WM_CLIPBOARDUPDATE:
         {
@@ -712,6 +732,11 @@ void Window::OnLostFocus()
     Application::SetActiveWindow(nullptr);
 }
 
+void Window::OnWindowStateChanged()
+{
+    windowStateChanged.Fire();
+}
+
 void Window::OnWindowClosing(CancelArgs& args)
 {
     windowClosing.Fire(args);
@@ -731,6 +756,28 @@ void Window::OnWindowClosed(bool& processed)
     {
         windowClosed.Fire();
         processed = true;
+    }
+}
+
+void Window::DoWindowStateChanged(int sizeType)
+{
+    switch (sizeType)
+    {
+        case SIZE_RESTORED:
+        {
+            SetWindowState(WindowState::normal);
+            break;
+        }
+        case SIZE_MAXIMIZED:
+        {
+            SetWindowState(WindowState::maximized);
+            break;
+        }
+        case SIZE_MINIMIZED:
+        {
+            SetWindowState(WindowState::minimized);
+            break;
+        }
     }
 }
 

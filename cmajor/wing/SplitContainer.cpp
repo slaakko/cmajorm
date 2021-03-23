@@ -606,20 +606,7 @@ void SplitContainer::SetSplitterDistance(int splitterDistance_)
 {
     Size size = GetSize();
     int maxDistance = 1;
-    switch (splitter->Orientation())
-    {
-        case SplitterOrientation::horizontal:
-        {
-            maxDistance = size.Width - defaultSplitterWidth;
-            break;
-        }
-        case SplitterOrientation::vertical:
-        {
-            maxDistance = size.Height - defaultSplitterWidth;
-            break;
-        }
-    }
-    if (splitterDistance_ < 1 || splitterDistance_ >= maxDistance) return;
+    if (splitterDistance_ < 1) return;
     int prevSplitterDistance = splitterDistance;
     splitterDistance = splitterDistance_;
     switch (splitter->Orientation())

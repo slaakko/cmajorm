@@ -29,6 +29,44 @@ public:
     bool generateOptimizedIntermediateCodeFiles;
 };
 
+class WindowLocation
+{
+public:
+    WindowLocation();
+    WindowLocation(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    int32_t x;
+    int32_t y;
+};
+
+class WindowSize
+{
+public:
+    WindowSize();
+    WindowSize(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    int32_t width;
+    int32_t height;
+};
+
+class WindowSettings
+{
+public:
+    WindowSettings();
+    WindowSettings(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    int32_t windowState;
+    WindowLocation location;
+    WindowSize size;
+    int32_t maximizedHorizontalSplitterDistance;
+    int32_t maximizedVerticalSplitterDistance;
+    int32_t normalHorizontalSplitterDistance;
+    int32_t normalVerticalSplitterDistance;
+};
+
 class Configuration
 {
 public:
@@ -37,6 +75,7 @@ public:
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
     BuildSettings buildSettings;
+    WindowSettings windowSettings;
 };
 
 #endif // CONFIGURATION_HPP_56000706C340B369A09096983E04F15C5672838E
