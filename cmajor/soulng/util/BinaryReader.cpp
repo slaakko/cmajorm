@@ -7,33 +7,18 @@
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Error.hpp>
 #include <cstring>
-#include <algorithm>
 
 namespace soulng { namespace util {
 
 using namespace soulng::unicode;
 
 BinaryReader::BinaryReader(const std::string& fileName_) : 
-    fileName(fileName_), file(OpenRead(fileName.c_str())), buffer(), bufp(buffer), bufend(buffer), pos(0)
+    fileName(fileName_), file(fileName), begin(reinterpret_cast<const uint8_t*>(file.Begin())), end(reinterpret_cast<const uint8_t*>(file.End())), pos(0)
 {
 }
 
 BinaryReader::~BinaryReader()
 {
-}
-
-void BinaryReader::FillBuf()
-{
-    size_t result = std::fread(buffer, 1, N, file);
-    if (result < N)
-    {
-        if (std::ferror(file))
-        {
-            throw std::runtime_error("error reading '" + fileName + "': " + std::strerror(errno));
-        }
-    }
-    bufp = buffer;
-    bufend = buffer + result;
 }
 
 bool BinaryReader::ReadBool()
@@ -44,15 +29,8 @@ bool BinaryReader::ReadBool()
 
 uint8_t BinaryReader::ReadByte()
 {
-    if (bufp == bufend)
-    {
-        FillBuf();
-    }
-    if (bufp == bufend)
-    {
-        CheckEof();
-    }
-    uint8_t x = *bufp++;
+    CheckEof();
+    uint8_t x = *begin++;
     ++pos;
     return x;
 }
@@ -241,28 +219,13 @@ void BinaryReader::ReadUuid(boost::uuids::uuid& uuid)
 
 void BinaryReader::Skip(uint32_t size)
 {
-    if (size > 0)
-    {
-        uint32_t m = std::min(size, static_cast<uint32_t>(bufend - bufp));
-        pos += m;
-        bufp += m;
-        size -= m;
-    }
-    if (size > 0)
-    {
-        pos += size;
-        int result = std::fseek(file, pos, SEEK_SET);
-        if (result != 0)
-        {
-            throw std::runtime_error("seek failed: " + std::string(std::strerror(errno)));
-        }
-        bufp = bufend;
-    }
+    begin += size;
+    pos += size;
 }
 
 void BinaryReader::CheckEof()
 {
-    if (std::feof(file))
+    if (begin == end)
     {
         throw std::runtime_error("unexpected end of file '" + fileName + "'");
     }

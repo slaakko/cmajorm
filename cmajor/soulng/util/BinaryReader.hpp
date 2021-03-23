@@ -5,8 +5,8 @@
 
 #ifndef SOULNG_UTIL_BINARY_READER_INCLUDED
 #define SOULNG_UTIL_BINARY_READER_INCLUDED
-#include <soulng/util/FilePtr.hpp>
-#include <string>
+#include <soulng/util/UtilApi.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <boost/uuid/uuid.hpp>
 
 namespace soulng { namespace util {
@@ -41,14 +41,11 @@ public:
     void ReadUuid(boost::uuids::uuid& uuid);
     uint32_t Pos() const { return pos; }
     void Skip(uint32_t size);
-    void FillBuf();
 private:
     std::string fileName;
-    FilePtr file;
-    static const int N = 8192;
-    uint8_t buffer[N];
-    uint8_t* bufp;
-    uint8_t* bufend;
+    MappedInputFile file;
+    const uint8_t* begin;
+    const uint8_t* end;
     uint32_t pos;
     void CheckEof();
 };
