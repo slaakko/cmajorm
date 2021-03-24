@@ -172,6 +172,19 @@ ConceptNode* AstReader::ReadConceptNode()
     }
 }
 
+TemplateIdNode* AstReader::ReadTemplateIdNode()
+{
+    Node* node = ReadNode();
+    if (node->GetNodeType() == NodeType::templateIdNode)
+    {
+        return static_cast<TemplateIdNode*>(node);
+    }
+    else
+    {
+        throw std::runtime_error("template id node expected");
+    }
+}
+
 ConditionalCompilationExpressionNode* AstReader::ReadConditionalCompilationExpressionNode()
 {
     Node* node = ReadNode();

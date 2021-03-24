@@ -17,6 +17,7 @@
 [cpp]#include <sngcm/cmparser/Constant.hpp>
 [cpp]#include <sngcm/cmparser/Delegate.hpp>
 [cpp]#include <sngcm/cmparser/GlobalVariable.hpp>
+[cpp]#include <sngcm/cmparser/Template.hpp>
 [cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
 [cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
 
@@ -40,6 +41,7 @@ parser api(SNGCM_PARSER_API) CompileUnitParser
     using DelegateParser.Delegate;
     using DelegateParser.ClassDelegate;
     using GlobalVariableParser.GlobalVariable;
+    using TemplateParser.InstantiationRequest;
 
     CompileUnit(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<CompileUnitNode> compileUnit) : sngcm::ast::CompileUnitNode*
         ::= empty{ compileUnit.reset(new CompileUnitNode(span, *moduleId, lexer.FileName())); }
@@ -92,6 +94,7 @@ parser api(SNGCM_PARSER_API) CompileUnitParser
         |   DelegateDefinition(moduleId, ctx):delegateDefinition{ return delegateDefinition; }
         |   ClassDelegateDefinition(moduleId, ctx):classDelegateDefinition{ return classDelegateDefinition; }
         |   GlobalVariableDefinition(moduleId, ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+        |   InstantiationRequestDeclaration(moduleId, ctx):instantiationRequestDeclaration{ return instantiationRequestDeclaration; }
         ;
 
     NamespaceDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns, var std::unique_ptr<NamespaceNode> nsNode, var Span s) : NamespaceNode*
@@ -140,6 +143,10 @@ parser api(SNGCM_PARSER_API) CompileUnitParser
 
     GlobalVariableDefinition(boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu) : GlobalVariableNode*
         ::= GlobalVariable(moduleId, ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+        ;
+
+    InstantiationRequestDeclaration(boost::uuids::uuid* moduleId, ParsingContext* ctx) : FullInstantiationRequestNode*
+        ::= InstantiationRequest(moduleId, ctx):instantiationRequest{ return instantiationRequest; }
         ;
 
     ruleinfo

@@ -25,6 +25,7 @@ class ConstraintNode;
 class WhereConstraintNode;
 class ConceptIdNode;
 class ConceptNode;
+class TemplateIdNode;
 class ConditionalCompilationExpressionNode;
 class ConditionalCompilationPartNode;
 class AttributesNode;
@@ -47,6 +48,7 @@ public:
     WhereConstraintNode* ReadWhereConstraintNode();
     ConceptIdNode* ReadConceptIdNode();
     ConceptNode* ReadConceptNode();
+    TemplateIdNode* ReadTemplateIdNode();
     ConditionalCompilationExpressionNode* ReadConditionalCompilationExpressionNode();
     ConditionalCompilationPartNode* ReadConditionalCompilationPartNode();
     Specifiers ReadSpecifiers();

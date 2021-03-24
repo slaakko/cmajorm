@@ -567,7 +567,7 @@ soulng::parser::Match TypeExprParser::PrimaryTypeExpr(CmajorLexer& lexer, boost:
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     std::unique_ptr<Node> basicType;
-    std::unique_ptr<Node> templateId;
+    std::unique_ptr<TemplateIdNode> templateId;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -605,7 +605,7 @@ soulng::parser::Match TypeExprParser::PrimaryTypeExpr(CmajorLexer& lexer, boost:
                     {
                         int64_t pos = lexer.GetPos();
                         soulng::parser::Match match = TemplateParser::TemplateId(lexer, moduleId, ctx);
-                        templateId.reset(static_cast<Node*>(match.value));
+                        templateId.reset(static_cast<TemplateIdNode*>(match.value));
                         if (match.hit)
                         {
                             {

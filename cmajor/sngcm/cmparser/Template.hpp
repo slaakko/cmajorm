@@ -18,6 +18,7 @@ struct SNGCM_PARSER_API TemplateParser
     static soulng::parser::Match TemplateId(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
     static soulng::parser::Match TemplateParameter(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
     static soulng::parser::Match TemplateParameterList(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::Node* owner);
+    static soulng::parser::Match InstantiationRequest(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
 };
 
 #endif // TEMPLATE_HPP

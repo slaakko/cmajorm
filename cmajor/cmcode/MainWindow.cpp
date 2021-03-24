@@ -669,8 +669,6 @@ void MainWindow::OnWindowStateChanged()
     {
         SetLocation(Point(windowSettings.location.x, windowSettings.location.y));
         SetSize(Size(windowSettings.size.width, windowSettings.size.height));
-        horizontalSplitContainer->DockWindow();
-        verticalSplitContainer->DockWindow();
         horizontalSplitContainer->SetSplitterDistance(windowSettings.normalHorizontalSplitterDistance);
         verticalSplitContainer->SetSplitterDistance(windowSettings.normalVerticalSplitterDistance);
     }

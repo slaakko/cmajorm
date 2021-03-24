@@ -54,6 +54,7 @@ class NamespaceImportNode;
 class IdentifierNode;
 class CursorIdNode;
 class TemplateIdNode;
+class FullInstantiationRequestNode;
 class FunctionNode;
 class FunctionPtrNode;
 class ClassNode;
@@ -244,6 +245,7 @@ public:
     virtual void Visit(IdentifierNode& identifierNode) {}
     virtual void Visit(CursorIdNode& cursorIdNode) {}
     virtual void Visit(TemplateIdNode& templateIdNode) {}
+    virtual void Visit(FullInstantiationRequestNode& fullInstantiationRequestNode) {}
     virtual void Visit(FunctionNode& functionNode) {}
     virtual void Visit(FunctionPtrNode& functionPtrNode) {}
     virtual void Visit(ClassNode& classNode) {}

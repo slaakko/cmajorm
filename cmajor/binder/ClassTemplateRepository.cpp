@@ -114,6 +114,10 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     const Span& span,  const boost::uuids::uuid& moduleId)
 {
     if (classTemplateSpecialization->IsBound()) return;
+    if (classTemplateSpecialization->FullName() == U"String<char>")
+    {
+        int x = 0;
+    }
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     ClassTypeSymbol* classTemplate = classTemplateSpecialization->GetClassTemplate();
     Node* node = symbolTable.GetNodeNoThrow(classTemplate);
@@ -344,6 +348,7 @@ bool ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
                 boundCompileUnit.RemoveLastFileScope();
             }
         }
+        std::lock_guard<std::recursive_mutex> lock(boundCompileUnit.GetModule().GetLock());
         FunctionSymbol* master = memberFunction;
         master->ResetImmutable();
         memberFunction = master->Copy();

@@ -86,6 +86,7 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         inlineFunction->SetHasArtificialBody();
     }
     currentNs->AddMember(functionInstanceNode);
+    std::lock_guard<std::recursive_mutex> lock(boundCompileUnit.GetModule().GetLock());
     symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
     if (!inlineFunction->Parent()->IsClassTypeSymbol())
     {

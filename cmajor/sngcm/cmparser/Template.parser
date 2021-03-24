@@ -22,7 +22,7 @@ parser api(SNGCM_PARSER_API) TemplateParser
     using IdentifierParser.QualifiedId;
     using TypeExprParser.TypeExpr;
 
-    TemplateId(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId, var Span e) : Node*
+    TemplateId(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId, var Span e) : TemplateIdNode*
         ::= empty{ ctx->BeginParsingTemplateId(); }
             (QualifiedId(moduleId):primary{ templateId.reset(new TemplateIdNode(span, *moduleId, primary)); }
             LANGLE{ ++lexer.leftAngleCount; }
@@ -46,8 +46,18 @@ parser api(SNGCM_PARSER_API) TemplateParser
         ::= LANGLE (TemplateParameter(moduleId, ctx):tp{ owner->AddTemplateParameter(tp); } % COMMA) RANGLE!
         ;
 
+    InstantiationRequest(boost::uuids::uuid* moduleId, ParsingContext* ctx, var Span s, var std::unique_ptr<FullInstantiationRequestNode> fullInstantiationRequestNode) : FullInstantiationRequestNode*
+        ::= (NEW{ s = span; } CLASS TemplateId(moduleId, ctx):templateId{ s.end = span.end; fullInstantiationRequestNode.reset(new FullInstantiationRequestNode(s, *moduleId, templateId)); } SEMICOLON)
+        {
+            return fullInstantiationRequestNode.release();
+        }
+        ;
+
     ruleinfo
     {
-        (TemplateId, "template identifier"), (TemplateParameter, "template parameter"), (TemplateParameterList, "template parameter list")
+        (TemplateId, "template identifier"), 
+        (TemplateParameter, "template parameter"), 
+        (TemplateParameterList, "template parameter list"),
+        (InstantiationRequest, "instantiation request")
     }
 }

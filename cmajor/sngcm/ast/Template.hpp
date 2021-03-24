@@ -48,6 +48,20 @@ private:
     std::unique_ptr<Node> defaultTemplateArgument;
 };
 
+class SNGCM_AST_API FullInstantiationRequestNode : public Node
+{
+public:
+    FullInstantiationRequestNode(const Span& span_, const boost::uuids::uuid& moduleId_);
+    FullInstantiationRequestNode(const Span& span_, const boost::uuids::uuid& moduleId_, TemplateIdNode* templateId_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    TemplateIdNode* TemplateId() const { return templateId.get(); }
+private:
+    std::unique_ptr<TemplateIdNode> templateId;
+};
+
 } } // namespace sngcm::ast
 
 #endif // SNGCM_AST_TEMPLATE_INCLUDED

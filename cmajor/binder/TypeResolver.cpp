@@ -388,6 +388,7 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
         templateIdNode.GetSpan(), templateIdNode.ModuleId());
     if (classTemplateSpecialization->GetModule()->IsImmutable())
     {
+        std::lock_guard<std::recursive_mutex> lock(boundCompileUnit.GetModule().Lock());
         classTemplateSpecialization = boundCompileUnit.GetSymbolTable().CopyClassTemplateSpecialization(classTemplateSpecialization);
     }
     if (!classTemplateSpecialization->IsBound())

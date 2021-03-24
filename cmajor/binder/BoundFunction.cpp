@@ -68,6 +68,7 @@ void BoundFunction::AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall
             if (!firstTry)
             {
                 ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(destructorSymbol->Parent());
+                std::lock_guard<std::recursive_mutex> lock(GetBoundCompileUnit()->GetModule().GetLock());
                 ClassTemplateSpecializationSymbol* copy = GetBoundCompileUnit()->GetSymbolTable().CopyClassTemplateSpecialization(specialization);
                 GetBoundCompileUnit()->GetClassTemplateRepository().BindClassTemplateSpecialization(copy, currentContainerScope, span, moduleId);
                 int index = destructorSymbol->GetIndex();

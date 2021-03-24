@@ -1357,6 +1357,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
                     if (!firstTry)
                     {
                         ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(bestFun->Parent());
+                        std::lock_guard<std::recursive_mutex> lock(boundCompileUnit.GetModule().GetLock());
                         ClassTemplateSpecializationSymbol* copy = boundCompileUnit.GetSymbolTable().CopyClassTemplateSpecialization(specialization);
                         boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(
                             copy, boundCompileUnit.GetSymbolTable().GlobalNs().GetContainerScope(), span, moduleId);
@@ -1477,6 +1478,7 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
                 bool firstTry = boundCompileUnit.InstantiateClassTemplateMemberFunction(singleBest, containerScope, boundFunction, span, moduleId);
                 if (!firstTry)
                 {
+                    std::lock_guard<std::recursive_mutex> lock(boundCompileUnit.GetModule().Lock());
                     ClassTemplateSpecializationSymbol* copy = boundCompileUnit.GetSymbolTable().CopyClassTemplateSpecialization(specialization);
                     boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(copy, boundCompileUnit.GetSymbolTable().GlobalNs().GetContainerScope(), span, moduleId);
                     int index = singleBest->GetIndex();

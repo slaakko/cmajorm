@@ -693,6 +693,7 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
             if (!firstTry)
             {
                 ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(conversion->Parent());
+                std::lock_guard<std::recursive_mutex> lock(symbolTable.GetModule()->GetLock());
                 ClassTemplateSpecializationSymbol* copy = symbolTable.CopyClassTemplateSpecialization(specialization);
                 classTemplateRepository.BindClassTemplateSpecialization(copy, symbolTable.GlobalNs().GetContainerScope(), span, moduleId);
                 int index = conversion->GetIndex();

@@ -130,4 +130,35 @@ void TemplateParameterNode::Read(AstReader& reader)
     }
 }
 
+FullInstantiationRequestNode::FullInstantiationRequestNode(const Span& span_, const boost::uuids::uuid& moduleId_) : Node(NodeType::fullInstantiationRequestNode, span_, moduleId_), templateId()
+{
+}
+
+FullInstantiationRequestNode::FullInstantiationRequestNode(const Span& span_, const boost::uuids::uuid& moduleId_, TemplateIdNode* templateId_) :
+    Node(NodeType::fullInstantiationRequestNode, span_, moduleId_), templateId(templateId_)
+{
+}
+
+Node* FullInstantiationRequestNode::Clone(CloneContext& cloneContext) const
+{
+    return new FullInstantiationRequestNode(GetSpan(), ModuleId(), static_cast<TemplateIdNode*>(templateId->Clone(cloneContext)));
+}
+
+void FullInstantiationRequestNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void FullInstantiationRequestNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    writer.Write(templateId.get());
+}
+
+void FullInstantiationRequestNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    templateId.reset(reader.ReadTemplateIdNode());
+}
+
 } } // namespace sngcm::ast

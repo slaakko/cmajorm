@@ -34,6 +34,7 @@ struct SNGCM_PARSER_API CompileUnitParser
     static soulng::parser::Match DelegateDefinition(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
     static soulng::parser::Match ClassDelegateDefinition(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
     static soulng::parser::Match GlobalVariableDefinition(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu);
+    static soulng::parser::Match InstantiationRequestDeclaration(CmajorLexer& lexer, boost::uuids::uuid* moduleId, ParsingContext* ctx);
 };
 
 #endif // COMPILEUNIT_HPP

@@ -349,10 +349,6 @@ void StatementBinder::Visit(FunctionNode& functionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&functionNode);
     Assert(symbol->GetSymbolType() == SymbolType::functionSymbol, "function symbol expected");
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
-    if (functionSymbol->GroupName() == U"Identity")
-    {
-        int x = 0;
-    }
     if (!dontCheckDuplicateFunctionSymbols)
     {
         functionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
@@ -380,6 +376,19 @@ void StatementBinder::Visit(FunctionNode& functionNode)
     boundCompileUnit.GetAttributeBinder()->GenerateImplementation(functionNode.GetAttributes(), symbol, this);
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
+}
+
+void StatementBinder::Visit(FullInstantiationRequestNode& fullInstantiationRequestNode)
+{
+    TypeSymbol* type = ResolveType(fullInstantiationRequestNode.TemplateId(), boundCompileUnit, containerScope);
+    if (type->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol)
+    {
+        throw Exception("full instantiation request expects subject template identifier to be a class template specialization", 
+            fullInstantiationRequestNode.GetSpan(),
+            fullInstantiationRequestNode.ModuleId());
+    }
+    ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
+    specialization->SetHasFullInstantiation();
 }
 
 void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)

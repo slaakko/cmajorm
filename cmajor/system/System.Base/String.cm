@@ -15,7 +15,7 @@ namespace System
     {
         return "";
     }
-    
+
     public nothrow const wchar* EmptyString(wchar x)
     {
         return w"";
@@ -168,7 +168,7 @@ namespace System
                     chars[len++] = c;
                 }
                 chars[len] = '\0';
-            }            
+            }
             return *this;
         }
         public nothrow inline String<CharT>& Append(const CharT* that)
@@ -491,7 +491,7 @@ namespace System
         private nothrow void Grow(long minRes)
         {
             minRes = MemGrow(minRes);
-        #if (MEM_DEBUG)            
+        #if (MEM_DEBUG)
             CharT* newChars = cast<CharT*>(MemAlloc(sizeof(CharT) * minRes, typename(*this)));
         #else
             CharT* newChars = cast<CharT*>(MemAlloc(sizeof(CharT) * minRes));
@@ -585,7 +585,7 @@ namespace System
         }
         return true;
     }
-    
+
     public ustring ToLower(const ustring& s)
     {
         ustring lower;
@@ -595,7 +595,7 @@ namespace System
         }
         return lower;
     }
-    
+
     public ustring ToUpper(const ustring& s)
     {
         ustring upper;
@@ -605,22 +605,22 @@ namespace System
         }
         return upper;
     }
-    
+
     public wstring ToLower(const wstring& s)
     {
         return ToUtf16(ToLower(ToUtf32(s)));
     }
-    
+
     public wstring ToUpper(const wstring& s)
     {
         return ToUtf16(ToUpper(ToUtf32(s)));
     }
-    
+
     public string ToLower(const string& s)
     {
         return ToUtf8(ToLower(ToUtf32(s)));
     }
-    
+
     public string ToUpper(const string& s)
     {
         return ToUtf8(ToUpper(ToUtf32(s)));

@@ -49,7 +49,7 @@ parser api(SNGCM_PARSER_API) ClassParser
     using DelegateParser.ClassDelegate;
 
     Class(boost::uuids::uuid* moduleId, ParsingContext* ctx, var std::unique_ptr<ClassNode> cls, var Span s, var Span specifierSpan, var Span classSpan, var Span beginBraceSpan, var Span endBraceSpan) : ClassNode*
-        ::= empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } CLASS{ classSpan = span; } Identifier(moduleId):id
+        ::= empty{ s = span; } Attributes(moduleId):attrs? (Specifiers:specifiers{ specifierSpan = span; } - NEW) CLASS{ classSpan = span; } Identifier(moduleId):id
         {
             s.end = span.end;
             cls.reset(new ClassNode(s, *moduleId, specifiers, id, attrs));

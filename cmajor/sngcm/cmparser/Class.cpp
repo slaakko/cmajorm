@@ -122,13 +122,46 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                                             soulng::parser::Match match(false);
                                             soulng::parser::Match* parentMatch14 = &match;
                                             {
-                                                int64_t pos = lexer.GetPos();
-                                                soulng::lexer::Span span = lexer.GetSpan();
-                                                soulng::parser::Match match = SpecifierParser::Specifiers(lexer);
-                                                specifiers.reset(static_cast<soulng::parser::Value<sngcm::ast::Specifiers>*>(match.value));
+                                                soulng::parser::Match match(false);
+                                                soulng::parser::Match* parentMatch15 = &match;
+                                                int64_t save = lexer.GetPos();
+                                                {
+                                                    soulng::parser::Match match(false);
+                                                    soulng::parser::Match* parentMatch16 = &match;
+                                                    {
+                                                        int64_t pos = lexer.GetPos();
+                                                        soulng::lexer::Span span = lexer.GetSpan();
+                                                        soulng::parser::Match match = SpecifierParser::Specifiers(lexer);
+                                                        specifiers.reset(static_cast<soulng::parser::Value<sngcm::ast::Specifiers>*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            specifierSpan = span;
+                                                        }
+                                                        *parentMatch16 = match;
+                                                    }
+                                                    *parentMatch15 = match;
+                                                }
                                                 if (match.hit)
                                                 {
-                                                    specifierSpan = span;
+                                                    soulng::parser::Match match(false);
+                                                    soulng::parser::Match* parentMatch17 = &match;
+                                                    {
+                                                        int64_t tmp = lexer.GetPos();
+                                                        lexer.SetPos(save);
+                                                        save = tmp;
+                                                        soulng::parser::Match match(false);
+                                                        if (*lexer == NEW)
+                                                        {
+                                                            ++lexer;
+                                                            match.hit = true;
+                                                        }
+                                                        *parentMatch17 = match;
+                                                    }
+                                                    if (!match.hit)
+                                                    {
+                                                        lexer.SetPos(save);
+                                                    }
+                                                    *parentMatch15 = soulng::parser::Match(!match.hit, match.value);
                                                 }
                                                 *parentMatch14 = match;
                                             }
@@ -141,10 +174,10 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                                 if (match.hit)
                                 {
                                     soulng::parser::Match match(false);
-                                    soulng::parser::Match* parentMatch15 = &match;
+                                    soulng::parser::Match* parentMatch18 = &match;
                                     {
                                         soulng::parser::Match match(false);
-                                        soulng::parser::Match* parentMatch16 = &match;
+                                        soulng::parser::Match* parentMatch19 = &match;
                                         {
                                             int64_t pos = lexer.GetPos();
                                             soulng::lexer::Span span = lexer.GetSpan();
@@ -158,9 +191,9 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                                             {
                                                 classSpan = span;
                                             }
-                                            *parentMatch16 = match;
+                                            *parentMatch19 = match;
                                         }
-                                        *parentMatch15 = match;
+                                        *parentMatch18 = match;
                                     }
                                     *parentMatch7 = match;
                                 }
@@ -169,10 +202,10 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                             if (match.hit)
                             {
                                 soulng::parser::Match match(false);
-                                soulng::parser::Match* parentMatch17 = &match;
+                                soulng::parser::Match* parentMatch20 = &match;
                                 {
                                     soulng::parser::Match match(false);
-                                    soulng::parser::Match* parentMatch18 = &match;
+                                    soulng::parser::Match* parentMatch21 = &match;
                                     {
                                         int64_t pos = lexer.GetPos();
                                         soulng::lexer::Span span = lexer.GetSpan();
@@ -185,9 +218,9 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                                             cls->SetSpecifierSpan(specifierSpan);
                                             cls->SetClassSpan(classSpan);
                                         }
-                                        *parentMatch18 = match;
+                                        *parentMatch21 = match;
                                     }
-                                    *parentMatch17 = match;
+                                    *parentMatch20 = match;
                                 }
                                 *parentMatch6 = match;
                             }
@@ -196,23 +229,23 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                         if (match.hit)
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch19 = &match;
+                            soulng::parser::Match* parentMatch22 = &match;
                             {
                                 soulng::parser::Match match(true);
                                 int64_t save = lexer.GetPos();
-                                soulng::parser::Match* parentMatch20 = &match;
+                                soulng::parser::Match* parentMatch23 = &match;
                                 {
                                     soulng::parser::Match match = TemplateParser::TemplateParameterList(lexer, moduleId, ctx, cls.get());
                                     if (match.hit)
                                     {
-                                        *parentMatch20 = match;
+                                        *parentMatch23 = match;
                                     }
                                     else
                                     {
                                         lexer.SetPos(save);
                                     }
                                 }
-                                *parentMatch19 = match;
+                                *parentMatch22 = match;
                             }
                             *parentMatch5 = match;
                         }
@@ -221,23 +254,23 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                     if (match.hit)
                     {
                         soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch21 = &match;
+                        soulng::parser::Match* parentMatch24 = &match;
                         {
                             soulng::parser::Match match(true);
                             int64_t save = lexer.GetPos();
-                            soulng::parser::Match* parentMatch22 = &match;
+                            soulng::parser::Match* parentMatch25 = &match;
                             {
                                 soulng::parser::Match match = ClassParser::InheritanceAndInterfaces(lexer, moduleId, ctx, cls.get());
                                 if (match.hit)
                                 {
-                                    *parentMatch22 = match;
+                                    *parentMatch25 = match;
                                 }
                                 else
                                 {
                                     lexer.SetPos(save);
                                 }
                             }
-                            *parentMatch21 = match;
+                            *parentMatch24 = match;
                         }
                         *parentMatch4 = match;
                     }
@@ -246,17 +279,17 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                 if (match.hit)
                 {
                     soulng::parser::Match match(false);
-                    soulng::parser::Match* parentMatch23 = &match;
+                    soulng::parser::Match* parentMatch26 = &match;
                     {
                         soulng::parser::Match match(true);
                         int64_t save = lexer.GetPos();
-                        soulng::parser::Match* parentMatch24 = &match;
+                        soulng::parser::Match* parentMatch27 = &match;
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch25 = &match;
+                            soulng::parser::Match* parentMatch28 = &match;
                             {
                                 soulng::parser::Match match(false);
-                                soulng::parser::Match* parentMatch26 = &match;
+                                soulng::parser::Match* parentMatch29 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
                                     soulng::parser::Match match = ConceptParser::WhereConstraint(lexer, moduleId, ctx);
@@ -265,20 +298,20 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                                     {
                                         cls->SetConstraint(constraint.release());
                                     }
-                                    *parentMatch26 = match;
+                                    *parentMatch29 = match;
                                 }
-                                *parentMatch25 = match;
+                                *parentMatch28 = match;
                             }
                             if (match.hit)
                             {
-                                *parentMatch24 = match;
+                                *parentMatch27 = match;
                             }
                             else
                             {
                                 lexer.SetPos(save);
                             }
                         }
-                        *parentMatch23 = match;
+                        *parentMatch26 = match;
                     }
                     *parentMatch3 = match;
                 }
@@ -287,15 +320,15 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
             if (match.hit)
             {
                 soulng::parser::Match match(false);
-                soulng::parser::Match* parentMatch27 = &match;
+                soulng::parser::Match* parentMatch30 = &match;
                 {
                     soulng::parser::Match match(false);
-                    soulng::parser::Match* parentMatch28 = &match;
+                    soulng::parser::Match* parentMatch31 = &match;
                     {
                         int64_t pos = lexer.GetPos();
                         soulng::lexer::Span span = lexer.GetSpan();
                         soulng::parser::Match match(true);
-                        soulng::parser::Match* parentMatch29 = &match;
+                        soulng::parser::Match* parentMatch32 = &match;
                         {
                             soulng::lexer::Span span = lexer.GetSpan();
                             soulng::parser::Match match(false);
@@ -306,7 +339,7 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                             }
                             if (match.hit)
                             {
-                                *parentMatch29 = match;
+                                *parentMatch32 = match;
                             }
                             else
                             {
@@ -317,9 +350,9 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                         {
                             beginBraceSpan = span;
                         }
-                        *parentMatch28 = match;
+                        *parentMatch31 = match;
                     }
-                    *parentMatch27 = match;
+                    *parentMatch30 = match;
                 }
                 *parentMatch2 = match;
             }
@@ -328,10 +361,10 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
         if (match.hit)
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch30 = &match;
+            soulng::parser::Match* parentMatch33 = &match;
             {
                 soulng::parser::Match match = ClassParser::ClassContent(lexer, moduleId, ctx, cls.get());
-                *parentMatch30 = match;
+                *parentMatch33 = match;
             }
             *parentMatch1 = match;
         }
@@ -340,15 +373,15 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch31 = &match;
+        soulng::parser::Match* parentMatch34 = &match;
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch32 = &match;
+            soulng::parser::Match* parentMatch35 = &match;
             {
                 int64_t pos = lexer.GetPos();
                 soulng::lexer::Span span = lexer.GetSpan();
                 soulng::parser::Match match(true);
-                soulng::parser::Match* parentMatch33 = &match;
+                soulng::parser::Match* parentMatch36 = &match;
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
                     soulng::parser::Match match(false);
@@ -359,7 +392,7 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                     }
                     if (match.hit)
                     {
-                        *parentMatch33 = match;
+                        *parentMatch36 = match;
                     }
                     else
                     {
@@ -378,9 +411,9 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                         return soulng::parser::Match(true, cls.release());
                     }
                 }
-                *parentMatch32 = match;
+                *parentMatch35 = match;
             }
-            *parentMatch31 = match;
+            *parentMatch34 = match;
         }
         *parentMatch0 = match;
     }
@@ -602,7 +635,7 @@ soulng::parser::Match ClassParser::BaseClassOrInterface(CmajorLexer& lexer, boos
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("BaseClassOrInterface"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    std::unique_ptr<Node> templateId;
+    std::unique_ptr<TemplateIdNode> templateId;
     std::unique_ptr<IdentifierNode> qid;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -613,7 +646,7 @@ soulng::parser::Match ClassParser::BaseClassOrInterface(CmajorLexer& lexer, boos
         {
             int64_t pos = lexer.GetPos();
             soulng::parser::Match match = TemplateParser::TemplateId(lexer, moduleId, ctx);
-            templateId.reset(static_cast<Node*>(match.value));
+            templateId.reset(static_cast<TemplateIdNode*>(match.value));
             if (match.hit)
             {
                 {

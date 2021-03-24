@@ -3514,7 +3514,7 @@ soulng::parser::Match ExpressionParser::Primary(CmajorLexer& lexer, boost::uuids
     std::unique_ptr<Node> expr;
     std::unique_ptr<LiteralNode> literal;
     std::unique_ptr<Node> basicType;
-    std::unique_ptr<Node> templateId;
+    std::unique_ptr<TemplateIdNode> templateId;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<Node> sizeOf;
     std::unique_ptr<Node> typeName;
@@ -3724,7 +3724,7 @@ soulng::parser::Match ExpressionParser::Primary(CmajorLexer& lexer, boost::uuids
                                                     {
                                                         int64_t pos = lexer.GetPos();
                                                         soulng::parser::Match match = TemplateParser::TemplateId(lexer, moduleId, ctx);
-                                                        templateId.reset(static_cast<Node*>(match.value));
+                                                        templateId.reset(static_cast<TemplateIdNode*>(match.value));
                                                         if (match.hit)
                                                         {
                                                             {
@@ -5436,7 +5436,7 @@ soulng::parser::Match ExpressionParser::InvokeExpr(CmajorLexer& lexer, boost::uu
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
-    std::unique_ptr<Node> templateId;
+    std::unique_ptr<TemplateIdNode> templateId;
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<IdentifierNode> dotMemberId;
     soulng::parser::Match match(false);
@@ -5471,7 +5471,7 @@ soulng::parser::Match ExpressionParser::InvokeExpr(CmajorLexer& lexer, boost::uu
                                         int64_t pos = lexer.GetPos();
                                         soulng::lexer::Span span = lexer.GetSpan();
                                         soulng::parser::Match match = TemplateParser::TemplateId(lexer, moduleId, ctx);
-                                        templateId.reset(static_cast<Node*>(match.value));
+                                        templateId.reset(static_cast<TemplateIdNode*>(match.value));
                                         if (match.hit)
                                         {
                                             s = span;

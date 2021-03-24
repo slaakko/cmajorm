@@ -51,7 +51,7 @@ enum class NodeType : uint8_t
     isNode, asNode, indexingNode, invokeNode, postfixIncrementNode, postfixDecrementNode, sizeOfNode, typeNameNode, typeIdNode, castNode, constructNode, newNode, thisNode, baseNode,
     conditionalCompilationDisjunctionNode, conditionalCompilationConjunctionNode, conditionalCompilationNotNode, conditionalCompilationPrimaryNode, conditionalCompilationPartNode, conditionalCompilationStatementNode,
     uuidLiteralNode, cursorIdNode, parenthesizedExpressionNode, globalVariableNode, parenthesizedCondCompExpressionNode, labeledStatementNode, commentNode, functionPtrNode, 
-    syncNode, syncStatementNode, attributeNode, attributesNode,
+    syncNode, syncStatementNode, attributeNode, attributesNode, fullInstantiationRequestNode,
     maxNode
 };
 

@@ -1742,7 +1742,6 @@ const boost::uuids::uuid& SymbolTable::GetPositionId(int index) const
 
 void SymbolTable::AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol)
 {
-    std::lock_guard<std::recursive_mutex> lock(module->GetLock());
     functionSymbols.push_back(std::move(functionSymbol));
 }
 

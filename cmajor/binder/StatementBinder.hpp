@@ -30,6 +30,7 @@ public:
     void Visit(ClassNode& classNode) override;
     void Visit(MemberVariableNode& memberVariableNode) override;
     void Visit(FunctionNode& functionNode) override;
+    void Visit(FullInstantiationRequestNode& fullInstantiationRequestNode) override;
     void Visit(StaticConstructorNode& staticConstructorNode) override;
     void Visit(ConstructorNode& constructorNode) override;
     void Visit(DestructorNode& destructorNode) override;
