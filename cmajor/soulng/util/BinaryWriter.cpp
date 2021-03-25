@@ -10,7 +10,7 @@ namespace soulng { namespace util {
 
 using namespace soulng::unicode;
 
-BinaryWriter::BinaryWriter(const std::string& fileName_) : fileName(fileName_), file(OpenWrite(fileName.c_str())), bufp(buffer), bufend(buffer + N), pos(0)
+BinaryWriter::BinaryWriter(const std::string& fileName_) : fileName(fileName_), file(OpenWrite(fileName.c_str()), fileName, LockKind::write), buffer(), bufp(buffer), bufend(buffer + N), pos(0)
 {
     if (!file)
     {

@@ -21,6 +21,7 @@ public:
     const char* Begin() const;
     const char* End() const;
 private:
+    std::string fileName;
     MappedInputFileImpl* impl;
 };
 

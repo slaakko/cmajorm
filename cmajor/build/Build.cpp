@@ -355,14 +355,18 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSources(Module* module, const
 {
     try
     {
-        int numCores = std::thread::hardware_concurrency();
-        if (numCores == 0 || sourceFilePaths.size() == 1 || GetGlobalFlag(GlobalFlags::debugParsing))
+        int numThreads = std::min(static_cast<int>(std::thread::hardware_concurrency()), static_cast<int>(sourceFilePaths.size()));
+        if (numThreads <= 1)
+        {
+            numThreads = 1;
+        }
+        if (numThreads == 1 || GetGlobalFlag(GlobalFlags::debugParsing))
         {
             return ParseSourcesInMainThread(module, sourceFilePaths, stop);
         }
         else
         {
-            return ParseSourcesConcurrently(module, sourceFilePaths, numCores, stop);
+            return ParseSourcesConcurrently(module, sourceFilePaths, numThreads, stop);
         }
     }
     catch (soulng::lexer::ParsingException& ex) 
@@ -2556,26 +2560,28 @@ int compileGetTimeoutSecs = 3;
 class CompileQueue
 {
 public:
-    CompileQueue(const std::string& name_, bool& stop_, std::atomic<bool>& ready_, int logStreamId_);
+    CompileQueue(std::mutex* mtx_, const std::string& name_, bool& stop_, bool& ready_, int logStreamId_);
     void Put(int compileUnitIndex);
     int Get();
+    void NotifyAll();
 private:
+    std::mutex* mtx;
     std::string name;
     std::list<int> queue;
-    std::mutex mtx;
     std::condition_variable cond;
     bool& stop;
-    std::atomic<bool>& ready;
+    bool& ready;
     int logStreamId;
 };
 
-CompileQueue::CompileQueue(const std::string& name_, bool& stop_, std::atomic<bool>& ready_, int logStreamId_) : name(name_), stop(stop_), ready(ready_), logStreamId(logStreamId_)
+CompileQueue::CompileQueue(std::mutex* mtx_, const std::string& name_, bool& stop_, bool& ready_, int logStreamId_) :
+    mtx(mtx_), name(name_), stop(stop_), ready(ready_), logStreamId(logStreamId_)
 {
 }
 
 void CompileQueue::Put(int compileUnitIndex)
 {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard<std::mutex> lock(*mtx);
     queue.push_back(compileUnitIndex);
     cond.notify_one();
 }
@@ -2584,27 +2590,26 @@ int CompileQueue::Get()
 {
     while (!stop && !ready)
     {
-        std::unique_lock<std::mutex> lock(mtx);
-        if (cond.wait_for(lock, std::chrono::duration<std::uint64_t>(std::chrono::seconds(compileGetTimeoutSecs)), [this] { return stop || ready || !queue.empty(); }))
-        {
-            if (stop || ready) return -1;
-            int compileUnitIndex = queue.front();
-            queue.pop_front();
-            return compileUnitIndex;
-        }
-        else
-        {
-            return -1;
-        }
+        std::unique_lock<std::mutex> lock(*mtx);
+        cond.wait(lock, [this] { return stop || ready || !queue.empty(); });
+        if (stop || ready) return -1;
+        int compileUnitIndex = queue.front();
+        queue.pop_front();
+        return compileUnitIndex;
     }
     return -1;
 }
 
+void CompileQueue::NotifyAll()
+{
+    cond.notify_all();
+}
+
 struct CompileData
 {
-    CompileData(Module* rootModule_, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits_, std::vector<std::string>& objectFilePaths_, bool& stop_, std::atomic<bool>& ready_,
+    CompileData(std::mutex* mtx_, Module* rootModule_, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits_, std::vector<std::string>& objectFilePaths_, bool& stop_, bool& ready_,
         int numThreads_, CompileQueue& input_, CompileQueue& output_) :
-        rootModule(rootModule_), boundCompileUnits(boundCompileUnits_), objectFilePaths(objectFilePaths_), stop(stop_), ready(ready_), numThreads(numThreads_),
+        mtx(mtx_), rootModule(rootModule_), boundCompileUnits(boundCompileUnits_), objectFilePaths(objectFilePaths_), stop(stop_), ready(ready_), numThreads(numThreads_),
         input(input_), output(output_)
     {
         exceptions.resize(numThreads);
@@ -2614,17 +2619,17 @@ struct CompileData
             sourceFileFilePaths[i] = boundCompileUnits[i]->GetCompileUnitNode()->FilePath();
         }
     }
+    std::mutex* mtx;
     Module* rootModule;
     std::vector<std::string> sourceFileFilePaths;
     std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits;
     std::vector<std::string>& objectFilePaths;
     bool& stop;
-    std::atomic<bool>& ready;
+    bool& ready;
     int numThreads;
     CompileQueue& input;
     CompileQueue& output;
     std::vector<std::exception_ptr> exceptions;
-    std::mutex mtx;
 };
 
 void GenerateCode(CompileData* data, int threadId)
@@ -2648,28 +2653,32 @@ void GenerateCode(CompileData* data, int threadId)
                 {
                     LogMessage(-1, data->sourceFileFilePaths[compileUnitIndex] + " " + std::to_string(compileUnitIndex) + " : PUT OUTPUT " + std::to_string(compileUnitIndex));
                 }
-                std::lock_guard<std::mutex> lock(data->mtx);
-                data->objectFilePaths.push_back(compileUnit->ObjectFilePath());
-                data->boundCompileUnits[compileUnitIndex].reset();
+                {
+                    std::lock_guard<std::mutex> lock(*data->mtx);
+                    data->objectFilePaths.push_back(compileUnit->ObjectFilePath());
+                    data->boundCompileUnits[compileUnitIndex].reset();
+                }
                 data->output.Put(compileUnitIndex);
             }
         }
     }
     catch (...)
     {
+        std::lock_guard<std::mutex> lock(*data->mtx);
         std::exception_ptr exception = std::current_exception();
         if (threadId >= 0 && threadId < data->exceptions.size())
         {
             data->exceptions[threadId] = exception;
         }
         data->stop = true;
+        data->output.NotifyAll();
     }
 }
 
 void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits, std::vector<std::string>& objectFilePaths, 
     bool& stop)
 {
-    int numThreads = std::thread::hardware_concurrency();
+    int numThreads = std::min(static_cast<int>(std::thread::hardware_concurrency()), static_cast<int>(boundCompileUnits.size()));
     if (numThreads <= 0)
     {
         numThreads = 1;
@@ -2680,10 +2689,11 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
     }
     compileDebugStart = CurrentMs();
     rootModule->StartBuild();
-    std::atomic<bool> ready(false);
-    CompileQueue input("input", stop, ready, rootModule->LogStreamId());
-    CompileQueue output("output", stop, ready, rootModule->LogStreamId());
-    CompileData compileData(rootModule, boundCompileUnits, objectFilePaths, stop, ready, numThreads, input, output);
+    bool ready = false;
+    std::mutex mtx;
+    CompileQueue input(&mtx, "input", stop, ready, rootModule->LogStreamId());
+    CompileQueue output(&mtx, "output", stop, ready, rootModule->LogStreamId());
+    CompileData compileData(&mtx, rootModule, boundCompileUnits, objectFilePaths, stop, ready, numThreads, input, output);
     std::vector<std::thread> threads;
     for (int i = 0; i < numThreads; ++i)
     {
@@ -2709,10 +2719,7 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
         catch (...)
         {
             stop = true;
-            for (int i = 0; i < numThreads; ++i)
-            {
-                input.Put(-1);
-            }
+            input.NotifyAll();
             for (int i = 0; i < numThreads; ++i)
             {
                 if (threads[i].joinable())
@@ -2749,16 +2756,13 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
         LogMessage(rootModule->LogStreamId(), ToUtf8(rootModule->Name()) + " > BEGIN READY");
     }
     {
-        std::lock_guard<std::mutex> lock(compileData.mtx);
+        std::lock_guard<std::mutex> lock(mtx);
         ready = true;
+        compileData.input.NotifyAll();
     }
     if (GetGlobalFlag(GlobalFlags::debugCompile))
     {
         LogMessage(rootModule->LogStreamId(), ToUtf8(rootModule->Name()) + " < END READY");
-    }
-    for (int i = 0; i < numThreads; ++i)
-    {
-        input.Put(-1);
     }
     for (int i = 0; i < numThreads; ++i)
     {

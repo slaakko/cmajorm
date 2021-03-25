@@ -4,6 +4,7 @@
 // =================================
 
 #include <soulng/util/FilePtr.hpp>
+#include <soulng/util/FileLocking.hpp>
 #include <stdexcept>
 #include <stdio.h>
 #include <share.h>
@@ -12,6 +13,7 @@ namespace soulng { namespace util {
 
 FILE* OpenRead(const char* fileName)
 {
+    LockFile(fileName, LockKind::read);
 #if defined(_WIN32) && !defined(__MINGW32__)
     FILE* file = _fsopen(fileName, "rb", _SH_DENYWR);
 #else
@@ -26,6 +28,7 @@ FILE* OpenRead(const char* fileName)
 
 FILE* OpenWrite(const char* fileName)
 {
+    LockFile(fileName, LockKind::write);
 #if defined(_WIN32) && !defined(__MINGW32__)
     FILE* file = _fsopen(fileName, "wb", _SH_DENYWR);
 #else

@@ -4,6 +4,7 @@
 // =================================
 
 #include <soulng/util/MappedInputFile.hpp>
+#include <soulng/util/FileLocking.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <stdexcept>
@@ -13,36 +14,38 @@ namespace soulng { namespace util {
 class MappedInputFileImpl
 {
 public:
-    MappedInputFileImpl(const std::string& fileName_);
+    MappedInputFileImpl(const std::string& fileName);
     const char* Data() const { return mappedFile.const_data(); }
     boost::iostreams::mapped_file_source::size_type Size() const { return mappedFile.size(); }
 private:
     boost::iostreams::mapped_file mappedFile;
 };
 
-MappedInputFileImpl::MappedInputFileImpl(const std::string& fileName_) : mappedFile()
+MappedInputFileImpl::MappedInputFileImpl(const std::string& fileName) : mappedFile()
 {
     try
     {
-        mappedFile.open(fileName_, boost::iostreams::mapped_file::mapmode::readonly);
+        LockFile(fileName, LockKind::read);
+        mappedFile.open(fileName, boost::iostreams::mapped_file::mapmode::readonly);
     }
     catch (std::exception& ex)
     {
-        throw std::runtime_error("error opening mapped file '" + fileName_ + "': " + ex.what());
+        throw std::runtime_error("error opening mapped file '" + fileName + "': " + ex.what());
     }
     catch (...)
     {
-        throw std::runtime_error("error opening mapped file '" + fileName_ + "'");
+        throw std::runtime_error("error opening mapped file '" + fileName + "'");
     }
 }
 
-MappedInputFile::MappedInputFile(const std::string& fileName_) : impl(new MappedInputFileImpl(fileName_))
+MappedInputFile::MappedInputFile(const std::string& fileName_) : fileName(fileName_), impl(new MappedInputFileImpl(fileName))
 {
 }
 
 MappedInputFile::~MappedInputFile()
 {
     delete impl;
+    UnlockFile(fileName, LockKind::read);
 }
 
 const char* MappedInputFile::Begin() const

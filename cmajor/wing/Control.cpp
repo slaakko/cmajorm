@@ -1559,6 +1559,7 @@ void Control::DoKeyPress(KeyPressEventArgs& args)
         args.handled = KeyDownHandled();
         return;
     }
+    Application::SetKeyboardModifiers(Keys());
     DispatchKeyPress(args);
 }
 

@@ -1602,6 +1602,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                 columnNumber = 1 + LineNumberFieldLength();
                 InvalidateLineCol(CaretLine(), columnNumber);
                 args.handled = true;
+                break;
             }
             case Keys::end:
             {

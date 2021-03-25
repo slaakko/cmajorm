@@ -97,6 +97,8 @@ protected:
     virtual SourceCodeTokenKind GetTokenKind(const Token& token) const;
     virtual void DrawHilites(Graphics& graphics, int lineIndex, const PointF& origin);
     void DrawLine(Graphics& graphics, int lineIndex, const PointF& origin) override;
+    int RemoveIndent(int lineIndex) const override;
+    int GetIndent(const std::u32string& line, int lineIndex) override;
     void OnLinesChanged() override;
     void OnLineChanged(LineEventArgs& args) override;
     void OnLineDeleted(LineEventArgs& args) override;
@@ -108,6 +110,8 @@ protected:
     SourceCodeTextStyle& GetOrInsertTextStyle(SourceCodeTokenKind tokenKind);
     std::u32string GetText(const SourceSpan& sourceSpan) const;
 private:
+    bool IsBeginBlockLine(int lineIndex) const;
+    bool IsEndBlockLine(int lineIndex) const;
     std::vector<TokenLine> tokenLines;
     int numLineNumberDigits;
     std::map<SourceCodeTokenKind, TokenStyle> tokenStyleMap;

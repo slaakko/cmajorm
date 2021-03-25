@@ -25,7 +25,6 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Trace.hpp>
 #include <soulng/util/Unicode.hpp>
-#include <iostream>
 
 namespace cmajor { namespace binder {
 

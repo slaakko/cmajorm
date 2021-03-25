@@ -16,7 +16,6 @@
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <soulng/util/Unicode.hpp>
-#include <iostream>
 
 namespace cmajor { namespace symbols {
 

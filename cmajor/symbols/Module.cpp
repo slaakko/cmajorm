@@ -29,8 +29,8 @@
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/functional/hash.hpp>
-#include <iostream>
 #include <mutex>
+#include <iostream>
 
 namespace cmajor { namespace symbols {
 

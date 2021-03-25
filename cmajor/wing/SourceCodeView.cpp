@@ -193,6 +193,69 @@ void SourceCodeView::DrawLine(Graphics& graphics, int lineIndex, const PointF& o
     DrawHilites(graphics, lineIndex, hiliteOrigin);
 }
 
+bool SourceCodeView::IsBeginBlockLine(int lineIndex) const
+{
+    if (lineIndex >= 0 && lineIndex < tokenLines.size())
+    {
+        const TokenLine& tokenLine = tokenLines[lineIndex];
+        for (const Token& token : tokenLine.tokens)
+        {
+            if (GetTokenKind(token) == SourceCodeTokenKind::beginBlock)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool SourceCodeView::IsEndBlockLine(int lineIndex) const
+{
+    if (lineIndex >= 0 && lineIndex < tokenLines.size())
+    {
+        const TokenLine& tokenLine = tokenLines[lineIndex];
+        for (const Token& token : tokenLine.tokens)
+        {
+            if (GetTokenKind(token) == SourceCodeTokenKind::endBlock)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int SourceCodeView::RemoveIndent(int lineIndex) const 
+{
+    if (IsEndBlockLine(lineIndex))
+    {
+        return IndentSize();
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int SourceCodeView::GetIndent(const std::u32string& line, int lineIndex)
+{
+    for (int i = 0; i < line.length(); ++i)
+    {
+        if (line[i] != ' ')
+        {
+            if (IsBeginBlockLine(lineIndex))
+            {
+                return i + IndentSize();
+            }
+            else
+            {
+                return i;
+            }
+        }
+    }
+    return 0;
+}
+
 void SourceCodeView::OnLinesChanged()
 {
     TextView::OnLinesChanged();
