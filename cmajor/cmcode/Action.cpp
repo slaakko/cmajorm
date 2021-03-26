@@ -70,6 +70,16 @@ void CleanProjectAction::Execute()
     mainWindow->CleanProject(project);
 }
 
+AddNewProjectAction::AddNewProjectAction(MenuItem* menuItem, MainWindow* mainWindow_) : ClickAction(menuItem), mainWindow(mainWindow_)
+{
+}
+
+void AddNewProjectAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->AddNewProject();
+}
+
 SetActiveProjectAction::SetActiveProjectAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* newActiveProjectNode_) :
     ClickAction(menuItem), mainWindow(mainWindow_), project(project_), newActiveProjectNode(newActiveProjectNode_)
 {

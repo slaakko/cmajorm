@@ -30,6 +30,7 @@ struct WING_API ControlEventArgs
 using ClickEvent = Event;
 using CreatedEvent = Event;
 using DestroyedEvent = Event;
+using ClipboardUpdateEvent = Event;
 using ShownEvent = Event;
 using GotFocusEvent = Event;
 using ChildGotFocusEvent = EventWithArgs<ControlEventArgs>;
@@ -204,10 +205,8 @@ using TimerEvent = EventWithArgs<TimerEventArgs>;
 
 struct WING_API KeyEventArgs
 {
-    KeyEventArgs(Keys keyCode_, Keys modifiers_) : keyCode(keyCode_), modifiers(modifiers_), keyData(keyCode | modifiers), handled(false), suppressKeyPress(false) {}
-    Keys keyCode;
-    Keys modifiers;
-    Keys keyData;
+    KeyEventArgs(Keys key_) : key(key_), handled(false), suppressKeyPress(false) {}
+    Keys key;
     bool handled;
     bool suppressKeyPress;
 };
@@ -484,6 +483,7 @@ protected:
     virtual void OnClick();
     virtual void OnCreated();
     virtual void OnDestroyed();
+    virtual void OnClipboardUpdate();
     virtual void OnShown();
     virtual void OnGotFocus();
     virtual void OnChildGotFocus(ControlEventArgs& args);
@@ -530,6 +530,7 @@ private:
     void DoLostFocus();
     void DoTimer(int timerId);
     void DoDestroy();
+    void DoClipboardUpdate();
     void DoMouseDown(MouseEventArgs& args);
     void DoMouseUp(MouseEventArgs& args);
     void DoMouseDoubleClick(MouseEventArgs& args);
@@ -571,6 +572,7 @@ private:
     ClickEvent click;
     CreatedEvent created;
     DestroyedEvent destroyed;
+    ClipboardUpdateEvent clipboardUpdate;
     ShownEvent shown;
     GotFocusEvent gotFocus;
     ChildGotFocusEvent childGotFocus;

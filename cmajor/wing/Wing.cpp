@@ -64,7 +64,25 @@ WNDPROC GetWndProc()
 
 bool KeyPressed(int virtualKeyCode)
 {
-    return (GetKeyState(virtualKeyCode) & 0x8000) != 0;
+    return (::GetKeyState(virtualKeyCode) & 0x8000) != 0;
+}
+
+KeyState GetKeyState()
+{
+    KeyState keyState = KeyState::none;
+    if (KeyPressed(VK_CONTROL))
+    {
+        keyState = keyState | KeyState::control;
+    }
+    if (KeyPressed(VK_SHIFT))
+    {
+        keyState = keyState | KeyState::shift;
+    }
+    if (KeyPressed(VK_MENU))
+    {
+        keyState = keyState | KeyState::alt;
+    }
+    return keyState;
 }
 
 KeyPreviewFunction keyPreview;
@@ -74,6 +92,25 @@ void SetKeyPreviewFunction(KeyPreviewFunction keyPreviewFun)
     keyPreview = keyPreviewFun;
 }
 
+Keys MakeKeyWithState(Keys key)
+{
+    Keys keys = key;
+    KeyState keyState = GetKeyState();
+    if ((keyState & KeyState::control) != KeyState::none)
+    {
+        keys = keys | Keys::controlModifier;
+    }
+    if ((keyState & KeyState::shift) != KeyState::none)
+    {
+        keys = keys | Keys::shiftModifier;;
+    }
+    if ((keyState & KeyState::alt) != KeyState::none)
+    {
+        keys = keys | Keys::altModifier;
+    }
+    return keys;
+}
+
 int Run()
 {
     MSG msg;
@@ -81,35 +118,14 @@ int Run()
     {
         TranslateMessage(&msg);
         bool handled = false;
-        if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+        if (msg.message == WM_KEYDOWN)
         {
             WPARAM keyCode = msg.wParam;
             if (keyPreview)
             {
-                KeyState keyState = KeyState::none;
-                if (msg.message == WM_KEYDOWN)
-                {
-                    keyState = keyState | KeyState::down;
-                }
-                short shiftState = GetKeyState(VK_SHIFT);
-                bool shift = (shiftState & (1 << 16)) != 0;
-                if (shift)
-                {
-                    keyState = keyState | KeyState::shift;
-                }
-                short controlState = GetKeyState(VK_CONTROL);
-                bool control = (controlState & (1 << 16)) != 0;
-                if (control)
-                {
-                    keyState = keyState | KeyState::control;
-                }
-                short altState = GetKeyState(VK_MENU);
-                bool alt = (altState & (1 << 16)) != 0;
-                if (alt)
-                {
-                    keyState = keyState | KeyState::alt;
-                }
-                keyPreview(keyCode, keyState, handled);
+                Keys key = static_cast<Keys>(keyCode);
+                Keys keys = MakeKeyWithState(key);
+                keyPreview(keys, handled);
             }
         }
         if (!handled)
@@ -131,38 +147,13 @@ int MessageLoop()
         {
             TranslateMessage(&msg);
             bool handled = false;
-            if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+            if (msg.message == WM_KEYDOWN)
             {
                 if (keyPreview)
                 {
-                    uint32_t keyCode = msg.wParam;
-                    if (keyPreview)
-                    {
-                        KeyState keyState = KeyState::none;
-                        if (msg.message == WM_KEYDOWN)
-                        {
-                            keyState = keyState | KeyState::down;
-                        }
-                        short shiftState = GetKeyState(VK_SHIFT);
-                        bool shift = (shiftState & (1 << 16)) != 0;
-                        if (shift)
-                        {
-                            keyState = keyState | KeyState::shift;
-                        }
-                        short controlState = GetKeyState(VK_CONTROL);
-                        bool control = (controlState & (1 << 16)) != 0;
-                        if (control)
-                        {
-                            keyState = keyState | KeyState::control;
-                        }
-                        short altState = GetKeyState(VK_MENU);
-                        bool alt = (altState & (1 << 16)) != 0;
-                        if (alt)
-                        {
-                            keyState = keyState | KeyState::alt;
-                        }
-                        keyPreview(keyCode, keyState, handled);
-                    }
+                    Keys key = static_cast<Keys>(msg.wParam);
+                    Keys keys = MakeKeyWithState(key);
+                    keyPreview(keys, handled);
                 }
             }
             if (!handled)
@@ -190,35 +181,13 @@ int DialogMessageLoop(HWND handle, HWND parentHandle, DialogResultFunction dialo
         {
             TranslateMessage(&msg);
             bool handled = false;
-            if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+            if (msg.message == WM_KEYDOWN)
             {
                 if (dialogWindowKeyPreviewFn)
                 {
                     Keys key = static_cast<Keys>(msg.wParam);
-                    KeyState keyState = KeyState::none;
-                    if (msg.message == WM_KEYDOWN)
-                    {
-                        keyState = keyState | KeyState::down;
-                    }
-                    short shiftState = GetKeyState(VK_SHIFT);
-                    bool shift = (shiftState & (1 << 16)) != 0;
-                    if (shift)
-                    {
-                        keyState = keyState | KeyState::shift;
-                    }
-                    short controlState = GetKeyState(VK_CONTROL);
-                    bool control = (controlState & (1 << 16)) != 0;
-                    if (control)
-                    {
-                        keyState = keyState | KeyState::control;
-                    }
-                    short altState = GetKeyState(VK_MENU);
-                    bool alt = (altState & (1 << 16)) != 0;
-                    if (alt)
-                    {
-                        keyState = keyState | KeyState::alt;
-                    }
-                    dialogWindowKeyPreviewFn(dialogWindowPtr, key, keyState, handled);
+                    Keys keys = MakeKeyWithState(key);
+                    dialogWindowKeyPreviewFn(dialogWindowPtr, keys, handled);
                 }
             }
             if (!handled)

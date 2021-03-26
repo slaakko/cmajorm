@@ -72,7 +72,7 @@ WING_API inline bool operator!=(const Padding& left, const Padding& right)
 
 enum class KeyState : int
 {
-    none = 0, down = 1 << 0, shift = 1 << 1, control = 1 << 2, alt = 1 << 3
+    none = 0, shift = 1 << 0, control = 1 << 1, alt = 1 << 2
 };
 
 WING_API inline KeyState operator|(KeyState left, KeyState right)
@@ -92,9 +92,12 @@ WING_API inline KeyState operator~(KeyState state)
 
 WING_API bool KeyPressed(int virtualKeyCode);
 
-using KeyPreviewFunction = void (*)(WPARAM keyCode, KeyState keyState, bool& handled);
+WING_API KeyState GetKeyState();
+
+using KeyPreviewFunction = void (*)(Keys key, bool& handled);
 
 WING_API void SetKeyPreviewFunction(KeyPreviewFunction keyPreviewFun);
+WING_API Keys MakeKeyWithState(Keys key);
 
 WING_API HINSTANCE Instance();
 WING_API WNDPROC GetWndProc();
@@ -103,7 +106,8 @@ WING_API int Run();
 WING_API int MessageLoop();
 
 using DialogResultFunction = int (*)(void* dialogWindowPtr);
-using DialogWindowKeyPreviewFunction = void (*)(void* dialogWindowPtr, Keys key, KeyState keyState, bool& handled);
+using DialogWindowKeyPreviewFunction = void (*)(void* dialogWindowPtr, Keys key, bool& handled);
+
 
 WING_API int DialogMessageLoop(HWND handle, HWND parentHandle, DialogResultFunction dialogResultFn, DialogWindowKeyPreviewFunction dialogWindowKeyPreviewFn, void* dialogWindowPtr);
 

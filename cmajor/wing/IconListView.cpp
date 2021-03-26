@@ -289,7 +289,7 @@ void IconListView::OnKeyDown(KeyEventArgs& args)
     Control::OnKeyDown(args);
     if (!args.handled)
     {
-        switch (args.keyData)
+        switch (args.key)
         {
             case Keys::home:
             {

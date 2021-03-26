@@ -15,7 +15,7 @@ namespace cmajor { namespace wing {
 
 class Window;
 
-using KeyPreviewFn = std::function<void(Keys, KeyState, bool&)>;
+using KeyPreviewFn = std::function<void(Keys, bool&)>;
 
 class KeyPreviewMethod
 {
@@ -24,13 +24,13 @@ public:
     {
     }
     template<class T>
-    void SetHandlerFunction(T* t, void (T::* pm)(Keys, KeyState, bool&))
+    void SetHandlerFunction(T* t, void (T::* pm)(Keys, bool&))
     {
-        fn = std::bind(pm, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        fn = std::bind(pm, t, std::placeholders::_1, std::placeholders::_2);
     }
-    void operator()(Keys key, KeyState keyState, bool& handled)
+    void operator()(Keys key, bool& handled)
     {
-        fn(key, keyState, handled);
+        fn(key, handled);
     }
 private:
     KeyPreviewFn fn;
@@ -48,19 +48,16 @@ public:
     static Window* MainWindow() { return mainWindow; }
     static void SetActiveWindow(Window* activeWindow_) { activeWindow = activeWindow_; }
     static Window* ActiveWindow() { return activeWindow; }
-    static Keys GetKeyboardModifiers() { return keyboardModifiers; }
-    static void SetKeyboardModifiers(Keys keyboardModifiers_) { keyboardModifiers = keyboardModifiers_; }
     static void ProcessMessages();
 private:
     static bool ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result, void*& originalWndProc);
-    static void ModelessWindowKeyPreview(WPARAM keyCode, KeyState keyState, bool& handled);
+    static void ModelessWindowKeyPreview(Keys key, bool& handled);
     friend WING_API void ApplicationInit();
     static void Init();
     static WindowManager windowManager;
     static ResourceManager resourceManager;
     static Window* mainWindow;
     static Window* activeWindow;
-    static Keys keyboardModifiers;
 };
 
 WING_API void ApplicationInit();

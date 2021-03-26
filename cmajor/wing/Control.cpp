@@ -917,6 +917,12 @@ bool Control::ProcessMessage(Message& msg)
             msg.result = 0;
             return true;
         }
+        case WM_CLIPBOARDUPDATE:
+        {
+            DoClipboardUpdate();
+            msg.result = 0;
+            return true;
+        }
         case WM_SHOWWINDOW:
         {
             if (msg.wParam == 1)
@@ -1233,6 +1239,11 @@ void Control::DoDestroy()
     }
 }
 
+void Control::DoClipboardUpdate()
+{
+    OnClipboardUpdate();
+}
+
 void Control::DoMouseDown(MouseEventArgs& args)
 {
     if (!IsDecoratorControl())
@@ -1432,28 +1443,16 @@ bool Control::DoSysCommand(WPARAM wParam, LPARAM lParam)
             }
             else
             {
-                Keys modifiers = Application::GetKeyboardModifiers();
-                modifiers = modifiers | Keys::altModifier;
-                Application::SetKeyboardModifiers(modifiers);
                 if (DoKeyDown(static_cast<int>(accessKey)))
                 {
-                    Keys modifiers = Application::GetKeyboardModifiers();
-                    modifiers = modifiers & ~Keys::altModifier;
-                    Application::SetKeyboardModifiers(modifiers);
                     return true;
-                }
-                else
-                {
-                    Keys modifiers = Application::GetKeyboardModifiers();
-                    modifiers = modifiers & ~Keys::altModifier;
-                    Application::SetKeyboardModifiers(modifiers);
                 }
             }
             break;
         }
         case SC_CLOSE:
         {
-            KeyEventArgs args(Keys::f4, Keys::altModifier);
+            KeyEventArgs args(Keys::f4 | Keys::altModifier);
             DoMenu(args);
             if (args.handled)
             {
@@ -1519,7 +1518,8 @@ bool Control::DoKeyDown(int virtualKeyCode)
             return true;
         }
     }
-    KeyEventArgs args(keyCode, Application::GetKeyboardModifiers());
+    Keys keys = MakeKeyWithState(keyCode);
+    KeyEventArgs args(keys);
     DoMenu(args);
     if (args.handled)
     {
@@ -1537,19 +1537,15 @@ bool Control::DoKeyDown(int virtualKeyCode)
 
 bool Control::DoKeyUp(int virtualKeyCode)
 {
-    Keys keyCode = static_cast<Keys>(virtualKeyCode);
+    Keys key = static_cast<Keys>(virtualKeyCode);
     if (KeyDownHandled() || MenuWantsKeys())
     {
         return KeyDownHandled();
     }
-    Keys modifiers = Application::GetKeyboardModifiers();
-    KeyEventArgs args(keyCode, modifiers);
+    Keys keys = MakeKeyWithState(key);
+    KeyEventArgs args(keys);
     DispatchKeyUp(args);
-    if (args.handled)
-    {
-        return true;
-    }
-    return false;
+    return true;
 }
 
 void Control::DoKeyPress(KeyPressEventArgs& args)
@@ -1559,7 +1555,6 @@ void Control::DoKeyPress(KeyPressEventArgs& args)
         args.handled = KeyDownHandled();
         return;
     }
-    Application::SetKeyboardModifiers(Keys());
     DispatchKeyPress(args);
 }
 
@@ -1620,6 +1615,11 @@ void Control::OnCreated()
 void Control::OnDestroyed()
 {
     destroyed.Fire();
+}
+
+void Control::OnClipboardUpdate()
+{
+    clipboardUpdate.Fire();
 }
 
 void Control::OnShown()

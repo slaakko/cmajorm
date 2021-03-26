@@ -790,7 +790,7 @@ void TextView::InsertChar(int lineIndex, int columnIndex, char32_t c)
     LineEventArgs args(lineIndex, -1);
     OnLineChanged(args);
     SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength());
-    KeyEventArgs rightArgs(Keys::right, Keys::none);
+    KeyEventArgs rightArgs(Keys::right);
     OnKeyDown(rightArgs);
     SetCCText(line, columnIndex);
     SetDirty();
@@ -1028,9 +1028,9 @@ void TextView::Backspace(int lineIndex, int columnIndex)
 {
     if (lineIndex != 0 || columnIndex != 0)
     {
-        KeyEventArgs leftArgs(Keys::left, Keys::none);
+        KeyEventArgs leftArgs(Keys::left);
         OnKeyDown(leftArgs);
-        KeyEventArgs deleteArgs(Keys::delete_, Keys::none);
+        KeyEventArgs deleteArgs(Keys::delete_);
         OnKeyDown(deleteArgs);
     }
 }
@@ -1579,7 +1579,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
         bool scrolled = false;
         int lineNumber = caretLine;
         int columnNumber = caretColumn;
-        switch (args.keyData)
+        switch (args.key)
         {
             case Keys::escape:
             {
@@ -1992,7 +1992,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                 ResetSelection();
                 FireGotoCaretLine();
                 args.handled = true;
-                break;
+                return;
             }
             case Keys::delete_:
             {
@@ -2105,7 +2105,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
             {
                 FirePaste();
                 args.handled = true;
-                break;
+                return;
             }
             case Keys::shiftModifier | Keys::delete_:
             {
@@ -2114,7 +2114,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                     FireCut();
                 }
                 args.handled = true;
-                break;
+                return;
             }
             case Keys::altModifier | Keys::back:
             {

@@ -8,7 +8,6 @@
 
 namespace cmajor { namespace wing {
 
-Keys Application::keyboardModifiers;
 ResourceManager Application::resourceManager;
 WindowManager Application::windowManager;
 Window* Application::mainWindow = nullptr;
@@ -64,75 +63,6 @@ void Application::ProcessMessages()
 
 bool Application::ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result, void*& originalWndProc)
 {
-    switch (message)
-    {
-        case WM_KEYDOWN:
-        {
-            int virtualKeyCode = static_cast<int>(wParam);
-            Keys keyCode = static_cast<Keys>(virtualKeyCode);
-            switch (keyCode)
-            {
-                case Keys::controlKey:
-                {
-                    Keys modifiers = GetKeyboardModifiers();
-                    modifiers = modifiers | Keys::controlModifier;
-                    SetKeyboardModifiers(modifiers);
-                    result = 0;
-                    return true;
-                }
-                case Keys::shiftKey:
-                {
-                    Keys modifiers = GetKeyboardModifiers();
-                    modifiers = modifiers | Keys::shiftModifier;
-                    SetKeyboardModifiers(modifiers);
-                    result = 0;
-                    return true;
-                }
-                case Keys::menu:
-                {
-                    Keys modifiers = GetKeyboardModifiers();
-                    modifiers = modifiers | Keys::altModifier;
-                    SetKeyboardModifiers(modifiers);
-                    result = 0;
-                    return true;
-                }
-            }
-            break;
-        }
-        case WM_KEYUP:
-        {
-            int virtualKeyCode = static_cast<int>(wParam);
-            Keys keyCode = static_cast<Keys>(virtualKeyCode);
-            switch (keyCode)
-            {
-                case Keys::controlKey:
-                {
-                    Keys modifiers = GetKeyboardModifiers();
-                    modifiers = modifiers & ~Keys::controlModifier;
-                    SetKeyboardModifiers(modifiers);
-                    result = 0;
-                    return true;
-                }
-                case Keys::shiftKey:
-                {
-                    Keys modifiers = GetKeyboardModifiers();
-                    modifiers = modifiers & ~Keys::shiftModifier;
-                    SetKeyboardModifiers(modifiers);
-                    result = 0;
-                    return true;
-                }
-                case Keys::menu:
-                {
-                    Keys modifiers = GetKeyboardModifiers();
-                    modifiers = modifiers & ~Keys::altModifier;
-                    SetKeyboardModifiers(modifiers);
-                    result = 0;
-                    return true;
-                }
-            }
-            break;
-        }
-    }
     Control* window = windowManager.GetWindow(handle);
     if (window)
     {
@@ -151,14 +81,13 @@ bool Application::ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARA
     return false;
 }
 
-void Application::ModelessWindowKeyPreview(WPARAM keyCode, KeyState keyState, bool& handled)
+void Application::ModelessWindowKeyPreview(Keys key, bool& handled)
 {
     Window* activeWindow = ActiveWindow();
     if (activeWindow)
     {
-        Keys key = static_cast<Keys>(static_cast<int>(keyCode));
         KeyPreviewMethod keyPreviewMethod = activeWindow->GetKeyPreviewMethod();
-        keyPreviewMethod(key, keyState, handled);
+        keyPreviewMethod(key, handled);
     }
 }
 

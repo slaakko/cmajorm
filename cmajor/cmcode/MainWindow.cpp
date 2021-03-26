@@ -8,6 +8,7 @@
 #include <cmajor/cmcode/Action.hpp>
 #include <cmajor/cmcode/Build.hpp>
 #include <cmajor/cmcode/ToolBar.hpp>
+#include <cmajor/cmcode/AddNewProjectDialog.hpp>
 #include <cmajor/cmcode/NewProjectDialog.hpp>
 #include <cmajor/cmcode/SelectProjectTypeDialog.hpp>
 #include <cmajor/wing/Dialog.hpp>
@@ -35,6 +36,19 @@ using namespace cmajor::service;
 using namespace sngcm::ast;
 using namespace soulng::unicode;
 using namespace soulng::util;
+
+struct ShowDialogGuard
+{
+    ShowDialogGuard(bool& showingDialog_) : showingDialog(showingDialog_)
+    {
+        showingDialog = true;
+    }
+    ~ShowDialogGuard()
+    {
+        showingDialog = false;
+    }
+    bool& showingDialog;
+};
 
 MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams().Text("Cmajor Code")),
     newProjectMenuItem(nullptr),
@@ -116,9 +130,11 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     sizeChanged(false),
     verticalSplitContainerFactor(0),
     horizontalSplitContainerFactor(0),
+    showingDialog(false),
     state(MainWindowState::idle),
     backend("cpp"),
-    config("debug")
+    config("debug"),
+    cmajorCodeFormat("cmajor.code")
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -547,18 +563,13 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     SetState(MainWindowState::idle);
     LoadConfigurationSettings();
 
+    AddClipboardListener();
+
     SetTimer(configurationSaveTimerId, configurationSavePeriod);
 }
 
 MainWindow::~MainWindow()
 {
-    try
-    {
-        SaveConfiguration();
-    }
-    catch (...)
-    {
-    }
     SetServiceMessageHandlerView(nullptr);
     StopRequestDispatcher();
 }
@@ -571,6 +582,11 @@ void MainWindow::OnWindowClosing(CancelArgs& args)
         if (!CloseSolution())
         {
             args.cancelClose = true;
+        }
+        else
+        {
+            SaveConfigurationSettings();
+            this->RemoveClipboardListener();
         }
     }
     catch (const std::exception& ex)
@@ -586,7 +602,7 @@ void MainWindow::OnKeyDown(KeyEventArgs& args)
         Window::OnKeyDown(args);
         if (!args.handled)
         {
-            switch (args.keyData)
+            switch (args.key)
             {
                 case Keys::escape:
                 {
@@ -609,7 +625,10 @@ void MainWindow::MouseUpNotification(MouseEventArgs& args)
     {
         if (args.buttons == MouseButtons::lbutton)
         {
-            RemoveContextMenu();
+            if (!showingDialog)
+            {
+                RemoveContextMenu();
+            }
         }
     }
     catch (const std::exception& ex)
@@ -642,6 +661,42 @@ void MainWindow::OnGotFocus()
 {
     Window::OnGotFocus();
     SetFocusToEditor();
+}
+
+void MainWindow::OnClipboardUpdate()
+{
+    try
+    {
+        Window::OnClipboardUpdate();
+        Clipboard clipboard(Handle());
+        if (clipboard.IsClipboardFormatAvailable(cmajorCodeFormat))
+        {
+            clipboardData = clipboard.GetStringData(cmajorCodeFormat);
+            pasteMenuItem->Enable();
+        }
+        else
+        {
+            ClipboardFormat unicodeText(unicodeTextClipboardFormat);
+            if (clipboard.IsClipboardFormatAvailable(unicodeText))
+            {
+                clipboardData = clipboard.GetStringData(unicodeText);
+                pasteMenuItem->Enable();
+            }
+            else
+            {
+                ClipboardFormat ansiText(textClipboardFormat);
+                if (clipboard.IsClipboardFormatAvailable(ansiText))
+                {
+                    clipboardData = clipboard.GetStringData(ansiText);
+                    pasteMenuItem->Enable();
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), "Could not open clipboard, another application window may have clipboard open: " + std::string(ex.what()));
+    }
 }
 
 bool MainWindow::ProcessMessage(Message& msg)
@@ -751,6 +806,23 @@ void MainWindow::SaveConfigurationSettings()
         windowSettings.maximizedVerticalSplitterDistance = verticalSplitContainer->SplitterDistance();
     }
     cmcode::SaveConfiguration();
+}
+
+void MainWindow::AddClipboardListener()
+{
+    try
+    {
+        clipboardListener.reset(new ClipboardListener(Handle()));
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::RemoveClipboardListener()
+{
+    clipboardListener.reset();
 }
 
 void MainWindow::StartBuilding()
@@ -906,7 +978,7 @@ void MainWindow::OpenProject(const std::string& filePath)
     }
 }
 
-void MainWindow::HandleBuildReply(const BuildReply& buildReply)
+void MainWindow::HandleBuildReply(BuildReply& buildReply)
 {
     StopBuilding();
     if (buildReply.requestValid)
@@ -1325,6 +1397,35 @@ void MainWindow::EditorCaretPosChanged()
     }
 }
 
+void MainWindow::EditorSelectionChanged()
+{
+    try
+    {
+        Editor* editor = CurrentEditor();
+        if (editor)
+        {
+            TextView* textView = editor->GetTextView();
+            if (textView)
+            {
+                if (!textView->IsSelectionEmpty())
+                {
+                    copyMenuItem->Enable();
+                    cutMenuItem->Enable();
+                }
+                else
+                {
+                    copyMenuItem->Disable();
+                    cutMenuItem->Disable();
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
 void MainWindow::BreakpointAdded(AddBreakpointEventArgs& args)
 {
     ShowInfoMessageBox(Handle(), "breakpoint added");
@@ -1357,6 +1458,7 @@ void MainWindow::NewProjectClick()
     {
         NewProjectDialog dialog;
         dialog.SetProjectLocation(CmajorProjectsDir());
+        ShowDialogGuard guard(showingDialog);
         if (dialog.ShowDialog(*this) == DialogResult::ok)
         {
             bool sameDir = dialog.PlaceSolutionInSameDirectory();
@@ -1377,6 +1479,22 @@ void MainWindow::NewProjectClick()
                 solutionFilePath = Path::ChangeExtension(projectFilePath, ".cms");
                 std::string projectDir = Path::GetDirectoryName(projectFilePath);
                 boost::filesystem::create_directories(projectDir);
+            }
+            if (boost::filesystem::exists(solutionFilePath))
+            {
+                MessageBoxResult result = MessageBox::Show("Solution file '" + solutionFilePath + "' already exists. Do you want to overwrite it?", "Question", this, MB_YESNO);
+                if (result == MessageBoxResult::no)
+                {
+                    return;
+                }
+            }
+            if (boost::filesystem::exists(projectFilePath))
+            {
+                MessageBoxResult result = MessageBox::Show("Project file '" + projectFilePath + "' already exists. Do you want to overwrite it?", "Question", this, MB_YESNO);
+                if (result == MessageBoxResult::no)
+                {
+                    return;
+                }
             }
             std::unique_ptr<sngcm::ast::Solution> solution(new sngcm::ast::Solution(ToUtf32(dialog.GetSolutionName()), solutionFilePath));
             std::unique_ptr<sngcm::ast::Project> project(new sngcm::ast::Project(ToUtf32(dialog.GetProjectName()), projectFilePath, "debug", sngcm::ast::BackEnd::llvm, "gcc", sngcm::ast::SystemDirKind::regular));
@@ -1530,17 +1648,126 @@ void MainWindow::ExitClick()
 
 void MainWindow::CopyClick()
 {
-    ShowInfoMessageBox(Handle(), "Copy");
+    try
+    {
+        Editor* editor = CurrentEditor();
+        if (editor)
+        {
+            TextView* textView = editor->GetTextView();
+            if (textView)
+            {
+                if (!textView->IsSelectionEmpty())
+                {
+                    SelectionData selection = textView->GetSelection();
+                    if (!selection.selectedText.empty())
+                    {
+                        try
+                        {
+                            Clipboard clipboard(Handle());
+                            clipboard.SetEmpty();
+                            clipboard.SetStringData(cmajorCodeFormat, selection.selectedText);
+                            std::u32string crlfText = selection.selectedText;
+                            std::u32string::size_type lfPos = crlfText.find('\n');
+                            while (lfPos != std::u32string::npos)
+                            {
+                                crlfText.replace(lfPos, 1, U"\r\n");
+                                lfPos = crlfText.find('\n', lfPos + 2);
+                            }
+                            ClipboardFormat unicodeText(unicodeTextClipboardFormat);
+                            clipboard.SetStringData(unicodeText, crlfText);
+                        }
+                        catch (const std::exception& ex)
+                        {
+                            ShowErrorMessageBox(Handle(), ex.what());
+                            clipboardData = selection.selectedText;
+                            pasteMenuItem->Enable();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::CutClick()
 {
-    ShowInfoMessageBox(Handle(), "Cut");
+    try
+    {
+        Editor* editor = CurrentEditor();
+        if (editor)
+        {
+            TextView* textView = editor->GetTextView();
+            if (textView)
+            {
+                if (!textView->IsSelectionEmpty())
+                {
+                    SelectionData selection = textView->GetSelection();
+                    if (!selection.selectedText.empty())
+                    {
+                        try
+                        {
+                            Clipboard clipboard(Handle());
+                            clipboard.SetEmpty();
+                            clipboard.SetStringData(cmajorCodeFormat, selection.selectedText);
+                            std::u32string crlfText = selection.selectedText;
+                            std::u32string::size_type lfPos = crlfText.find('\n');
+                            while (lfPos != std::u32string::npos)
+                            {
+                                crlfText.replace(lfPos, 1, U"\r\n");
+                                lfPos = crlfText.find('\n', lfPos + 2);
+                            }
+                            ClipboardFormat unicodeText(unicodeTextClipboardFormat);
+                            clipboard.SetStringData(unicodeText, crlfText);
+                            textView->AddRemoveSelectionCommand();
+                            textView->RemoveSelection();
+                        }
+                        catch (const std::exception& ex)
+                        {
+                            ShowErrorMessageBox(Handle(), ex.what());
+                            textView->AddRemoveSelectionCommand();
+                            textView->RemoveSelection();
+                            clipboardData = selection.selectedText;
+                            pasteMenuItem->Enable();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::PasteClick()
 {
-    ShowInfoMessageBox(Handle(), "Paste");
+    try
+    {
+        if (!clipboardData.empty())
+        {
+            Editor* editor = CurrentEditor();
+            if (editor)
+            {
+                TextView* textView = editor->GetTextView();
+                if (textView)
+                {
+                    int lineIndex = textView->CaretLine() - 1;
+                    int columnIndex = textView->CaretColumn() - 1;
+                    textView->SetFocus();
+                    textView->InsertText(lineIndex, columnIndex, clipboardData);
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::UndoClick()
@@ -1712,6 +1939,56 @@ void MainWindow::CleanProject(sngcm::ast::Project* project)
         }
         StartBuilding();
         StartBuild(backend, config, project->FilePath(), BuildRequestKind::clean | BuildRequestKind::buildDependencies);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::AddNewProject()
+{
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        AddNewProjectDialog dialog; 
+        sngcm::ast::Solution* solution = solutionData->GetSolution();
+        std::string solutionDir = Path::GetDirectoryName(solution->FilePath());
+        dialog.SetProjectLocation(solutionDir);
+        ShowDialogGuard guard(showingDialog);
+        if (dialog.ShowDialog(*this) == DialogResult::ok)
+        {
+            std::string projectFilePath = Path::Combine(dialog.GetProjectLocation(), Path::Combine(dialog.GetProjectName(), dialog.GetProjectName() + ".cmp"));
+            std::string projectDir = Path::GetDirectoryName(projectFilePath);
+            boost::filesystem::create_directories(projectDir);
+            if (boost::filesystem::exists(projectFilePath))
+            {
+                MessageBoxResult result = MessageBox::Show("Project file '" + projectFilePath + "' already exists. Do you want to overwrite it?", "Question", this, MB_YESNO);
+                if (result == MessageBoxResult::no)
+                {
+                    return;
+                }
+            }
+            std::unique_ptr<sngcm::ast::Project> project(new sngcm::ast::Project(ToUtf32(dialog.GetProjectName()), projectFilePath, "debug", sngcm::ast::BackEnd::llvm, "gcc", 
+                sngcm::ast::SystemDirKind::regular));
+            project->SetTarget(dialog.GetProjectType());
+            solution->AddProject(std::move(project));
+            solution->SortByProjectName();
+            solution->Save();
+            std::string solutionFilePath = solution->FilePath();
+            if (!CloseSolution())
+            {
+                return;
+            }
+            OpenProject(solutionFilePath);
+        }
     }
     catch (const std::exception& ex)
     {
@@ -2068,6 +2345,9 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
                     std::unique_ptr<MenuItem> cleanMenuItem(new MenuItem("Clean"));
                     clickActions.push_back(std::unique_ptr<ClickAction>(new CleanSolutionAction(cleanMenuItem.get(), this)));
                     contextMenu->AddMenuItem(cleanMenuItem.release());
+                    std::unique_ptr<MenuItem> addNewProjectMenuItem(new MenuItem("Add New Project..."));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new AddNewProjectAction(addNewProjectMenuItem.get(), this)));
+                    contextMenu->AddMenuItem(addNewProjectMenuItem.release());
                     // todo: project items
                     std::unique_ptr<MenuItem> openFileLocationMenuItem(new MenuItem("Open File Location"));
                     clickActions.push_back(std::unique_ptr<ClickAction>(new OpenFileLocationAction(openFileLocationMenuItem.get(), this, data->solution->FilePath())));
@@ -2193,6 +2473,10 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
         sourceCodeView->CCDirtyChanged().AddHandler(this, &MainWindow::EditorCCDirtyChanged);
         sourceCodeView->ReadOnlyChanged().AddHandler(this, &MainWindow::EditorReadOnlyChanged);
         sourceCodeView->CaretPosChanged().AddHandler(this, &MainWindow::EditorCaretPosChanged);
+        sourceCodeView->SelectionChanged().AddHandler(this, &MainWindow::EditorSelectionChanged);
+        sourceCodeView->Copy().AddHandler(this, &MainWindow::CopyClick);
+        sourceCodeView->Cut().AddHandler(this, &MainWindow::CutClick);
+        sourceCodeView->Paste().AddHandler(this, &MainWindow::PasteClick);
         if (state != MainWindowState::idle)
         {
             sourceCodeView->SetReadOnly();

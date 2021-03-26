@@ -242,88 +242,71 @@ void Window::SetDialogKeyPreviewMethod(KeyPreviewMethod& dialogKeyPreviewMethod_
     dialogKeyPreviewMethod = dialogKeyPreviewMethod_;
 }
 
-void Window::DefaultKeyPreview(Keys key, KeyState keyState, bool& handled)
+void Window::DefaultKeyPreview(Keys key, bool& handled)
 {
-    if ((keyState & KeyState::down) != KeyState::none)
+    switch (key)
     {
-        Keys modifiers = Keys::none;
-        if ((keyState & KeyState::shift) != KeyState::none)
+        case Keys::enter:
         {
-            modifiers = modifiers | Keys::shiftModifier;
-        }
-        if ((keyState & KeyState::control) != KeyState::none)
-        {
-            modifiers = modifiers | Keys::controlModifier;
-        }
-        if ((keyState & KeyState::alt) != KeyState::none)
-        {
-            modifiers = modifiers | Keys::altModifier;
-        }
-        key = key | modifiers;
-        switch (key)
-        {
-            case Keys::enter:
+            if (ShowingDialog())
             {
-                if (ShowingDialog())
+                if (focusedControl)
                 {
-                    if (focusedControl)
+                    if (focusedControl->IsTextBox())
                     {
-                        if (focusedControl->IsTextBox())
+                        TextBox* textBox = static_cast<TextBox*>(focusedControl);
+                        if (textBox->IsMultiline()) 
                         {
-                            TextBox* textBox = static_cast<TextBox*>(focusedControl);
-                            if (textBox->IsMultiline()) 
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    if (focusedControl)
-                    {
-                        if (focusedControl->IsButton())
-                        {
-                            Button* button = static_cast<Button*>(focusedControl);
-                            button->DoClick();
-                            handled = true;
-                        }
-                    }
-                    if (!handled)
-                    {
-                        if (defaultButton)
-                        {
-                            if (defaultButton->IsEnabled())
-                            {
-                                defaultButton->DoClick();
-                                handled = true;
-                            }
+                            break;
                         }
                     }
                 }
-                break;
-            }
-            case Keys::escape:
-            {
-                if (ShowingDialog())
+                if (focusedControl)
                 {
-                    if (cancelButton)
+                    if (focusedControl->IsButton())
                     {
-                        cancelButton->DoClick();
+                        Button* button = static_cast<Button*>(focusedControl);
+                        button->DoClick();
                         handled = true;
                     }
                 }
-                break;
+                if (!handled)
+                {
+                    if (defaultButton)
+                    {
+                        if (defaultButton->IsEnabled())
+                        {
+                            defaultButton->DoClick();
+                            handled = true;
+                        }
+                    }
+                }
             }
-            case Keys::tab:
+            break;
+        }
+        case Keys::escape:
+        {
+            if (ShowingDialog())
             {
-                FocusNext();
-                handled = true;
-                break;
+                if (cancelButton)
+                {
+                    cancelButton->DoClick();
+                    handled = true;
+                }
             }
-            case Keys::shiftModifier | Keys::tab:
-            {
-                FocusPrev();
-                handled = true;
-                break;
-            }
+            break;
+        }
+        case Keys::tab:
+        {
+            FocusNext();
+            handled = true;
+            break;
+        }
+        case Keys::shiftModifier | Keys::tab:
+        {
+            FocusPrev();
+            handled = true;
+            break;
         }
     }
 }
@@ -575,7 +558,7 @@ void Window::OnKeyDown(KeyEventArgs& args)
     ContainerControl::OnKeyDown(args);
     if (!args.handled)
     {
-        switch (args.keyData)
+        switch (args.key)
         {
             case Keys::enter:
             {
@@ -723,7 +706,6 @@ void Window::OnGotFocus()
 {
     ContainerControl::OnGotFocus();
     Application::SetActiveWindow(this);
-    FocusNext();
 }
 
 void Window::OnLostFocus()
@@ -791,13 +773,13 @@ int GetDialogResult(void* dialogWindowPtr)
     return 0;
 }
 
-void DialogWindowKeyPreview(void* dialogWindowPtr, Keys key, KeyState keyState, bool& handled)
+void DialogWindowKeyPreview(void* dialogWindowPtr, Keys key, bool& handled)
 {
     if (dialogWindowPtr)
     {
         Window* dialogWindow = static_cast<Window*>(dialogWindowPtr);
         KeyPreviewMethod dialogKeyPreviewMethod = dialogWindow->GetDialogKeyPreviewMethod();
-        dialogKeyPreviewMethod(key, keyState, handled);
+        dialogKeyPreviewMethod(key, handled);
     }
 }
 

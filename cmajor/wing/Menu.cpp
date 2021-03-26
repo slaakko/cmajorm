@@ -474,7 +474,7 @@ void MenuBar::OnKeyDown(KeyEventArgs& args)
     MenuControl::OnKeyDown(args);
     if (!args.handled)
     {
-        auto it = shortcuts.find(int(args.keyData));
+        auto it = shortcuts.find(int(args.key));
         if (it != shortcuts.cend())
         {
             MenuItem* menuItem = it->second;
@@ -784,6 +784,11 @@ void MenuBox::OnMouseMove(MouseEventArgs& args)
 ContextMenu::ContextMenu() : MenuBox(nullptr, new MenuItem("root")), menuItems(this), latestOpenedMenuItem(nullptr), selectedMenuItem(nullptr), latestMouseDownMenuItem(nullptr)
 {
     menuItems.AddChild(RootItem());
+}
+
+ContextMenu::~ContextMenu()
+{
+    int x = 0;
 }
 
 void ContextMenu::AddMenuItem(MenuItemBase* menuItem)

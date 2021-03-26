@@ -72,6 +72,15 @@ private:
     sngcm::ast::Project* project;
 };
 
+class AddNewProjectAction : public ClickAction
+{
+public:
+    AddNewProjectAction(MenuItem* menuItem, MainWindow* mainWindow_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+};
+
 class SetActiveProjectAction : public ClickAction
 {
 public:

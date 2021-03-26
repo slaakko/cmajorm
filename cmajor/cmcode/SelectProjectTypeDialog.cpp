@@ -63,6 +63,7 @@ SelectProjectTypeDialog::SelectProjectTypeDialog() :
     AddChild(cancelButtonPtr.release());
     SetDefaultButton(selectButton);
     SetCancelButton(cancelButton);
+    iconListView->SetFocus();
 }
 
 sngcm::ast::Target SelectProjectTypeDialog::GetTarget() 

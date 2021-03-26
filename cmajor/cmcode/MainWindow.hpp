@@ -10,6 +10,7 @@
 #include <cmajor/cmmsg/BuildServerMessage.hpp>
 #include <cmajor/cmview/CmajorEditor.hpp>
 #include <cmajor/cmview/ErrorView.hpp>
+#include <cmajor/wing/Clipboard.hpp>
 #include <cmajor/wing/Window.hpp>
 #include <cmajor/wing/Wing.hpp>
 #include <cmajor/wing/Application.hpp>
@@ -45,6 +46,7 @@ public:
     void BuildProject(sngcm::ast::Project* project);
     void RebuildProject(sngcm::ast::Project* project);
     void CleanProject(sngcm::ast::Project* project);
+    void AddNewProject();
     void SetActiveProject(sngcm::ast::Project* project, TreeViewNode* newActiveProjectNode);
     void RemoveProject(sngcm::ast::Project* project);
     void OpenFileLocation(const std::string& filePath);
@@ -57,9 +59,12 @@ protected:
     void MouseUpNotification(MouseEventArgs& args) override;
     void OnTimer(TimerEventArgs& args) override;
     void OnGotFocus() override;
+    void OnClipboardUpdate() override;
 private:
     void SaveConfigurationSettings();
     void LoadConfigurationSettings();
+    void AddClipboardListener();
+    void RemoveClipboardListener();
     void StartBuilding();
     void StopBuilding();
     void ShowBuildProgress();
@@ -67,7 +72,7 @@ private:
     void ClearOutput();
     void WriteOutput(const std::string& text);
     void OpenProject(const std::string& filePath);
-    void HandleBuildReply(const BuildReply& buildReply);
+    void HandleBuildReply(BuildReply& buildReply);
     void HandleBuildError(const std::string& buildError);
     void HandleStopBuild();
     void SetState(MainWindowState state_);
@@ -79,6 +84,7 @@ private:
     void EditorDirtyChanged();
     void EditorCCDirtyChanged();
     void EditorCaretPosChanged();
+    void EditorSelectionChanged();
     void BreakpointAdded(AddBreakpointEventArgs& args);
     void BreakpointRemoved(RemoveBreakpointEventArgs& args);
     void VerticalSplitContainerSplitterDistanceChanged();
@@ -219,11 +225,15 @@ private:
     bool sizeChanged;
     float verticalSplitContainerFactor;
     float horizontalSplitContainerFactor;
+    bool showingDialog;
     std::unique_ptr<SolutionData> solutionData;
     std::unordered_map<TabPage*, Editor*> tabPageEditorMap;
     MainWindowState state;
     std::string backend;
     std::string config;
+    std::unique_ptr<ClipboardListener> clipboardListener;
+    ClipboardFormat cmajorCodeFormat;
+    std::u32string clipboardData;
     std::vector<std::unique_ptr<ClickAction>> clickActions;
 };
 

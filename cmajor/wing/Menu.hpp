@@ -182,6 +182,7 @@ class WING_API ContextMenu : public MenuBox
 {
 public:
     ContextMenu();
+    ~ContextMenu();
     void AddMenuItem(MenuItemBase* menuItem);
     void CalculateSize();
     bool HasMenuItems() const;

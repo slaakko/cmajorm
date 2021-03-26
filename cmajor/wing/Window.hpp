@@ -16,7 +16,7 @@ enum class WindowState : int
 };
 
 WING_API int GetDialogResult(void* dialogWindowPtr);
-WING_API void DialogWindowKeyPreview(void* dialogWindowPtr, Keys key, KeyState keyState, bool& handled);
+WING_API void DialogWindowKeyPreview(void* dialogWindowPtr, Keys key, bool& handled);
 
 enum class DialogResult : int
 {
@@ -110,7 +110,7 @@ public:
     void SetKeyPreviewMethod(KeyPreviewMethod& keyPreviewMethod_);
     KeyPreviewMethod GetDialogKeyPreviewMethod() const;
     void SetDialogKeyPreviewMethod(KeyPreviewMethod& dialogKeyPreviewMethod_);
-    void DefaultKeyPreview(Keys key, KeyState keyState, bool& handled);
+    void DefaultKeyPreview(Keys key, bool& handled);
     WindowState GetWindowState() const { return windowState; }
     void SetWindowState(WindowState newWindowState);
     WindowStateChangedEvent& WindowStateChanged() { return windowStateChanged; }

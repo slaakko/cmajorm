@@ -47,7 +47,7 @@ class CMSVC_API BuildReplyServiceMessage : public ServiceMessage
 {
 public:
     BuildReplyServiceMessage(const BuildReply& buildReply_);
-    const BuildReply& GetBuildReply() const { return buildReply; }
+    BuildReply& GetBuildReply() { return buildReply; }
 private:
     BuildReply buildReply;
 };

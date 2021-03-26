@@ -246,6 +246,7 @@ public:
     void FireCopy();
     void FireCut();
     void FirePaste();
+    void AddRemoveSelectionCommand();
     SelectionChangedEvent& SelectionChanged() { return selectionChanged; }
     DirtyChangedEvent& DirtyChanged() { return dirtyChanged; }
     ReadOnlyChangedEvent& ReadOnlyChanged() { return readOnlyChanged; }
@@ -317,7 +318,6 @@ private:
     void AddBacktabCommand(int lineIndex, int columnIndex);
     void AddTabCommand(int lineIndex, int columnIndex);
     void AddDeleteCharCommand(int lineIndex, int columnIndex);
-    void AddRemoveSelectionCommand();
     void AddIndentSelectionCommand();
     void AddUnindentSelectionCommand();
     void FixColumn(int& column, int line);
