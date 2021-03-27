@@ -65,6 +65,7 @@ public:
     const std::vector<std::string>& RelativeProjectFilePaths() const { return relativeProjectFilePaths; }
     const std::u32string& ActiveProjectName() const { return activeProjectName; }
     void AddProject(std::unique_ptr<Project>&& project);
+    bool HasProject(const std::u32string& projectName) const;
     std::vector<Project*> CreateBuildOrder();
     void AddDeclaration(SolutionDeclaration* declaration);
     void ResolveDeclarations();

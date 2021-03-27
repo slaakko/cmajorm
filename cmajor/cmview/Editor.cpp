@@ -11,4 +11,13 @@ Editor::Editor(ControlCreateParams& createParams) : ContainerControl(createParam
 {
 }
 
+bool Editor::IsCCDirty() const
+{
+    return false;
+}
+
+void Editor::ResetCCDirty()
+{
+}
+
 } } // namespace cmajor::view

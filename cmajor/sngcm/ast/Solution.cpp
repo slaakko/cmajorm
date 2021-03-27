@@ -153,6 +153,18 @@ void Solution::AddProject(std::unique_ptr<Project>&& project)
     projects.push_back(std::move(project));
 }
 
+bool Solution::HasProject(const std::u32string& projectName) const
+{
+    for (const auto& project : projects)
+    {
+        if (project->Name() == projectName)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Visit(std::vector<std::u32string>& order, const std::u32string& projectName, std::unordered_set<std::u32string>& visited, std::unordered_set<std::u32string>& tempVisit,
     const std::unordered_map<std::u32string, ProjectDependencyDeclaration*>& dependencyMap, Solution* solution)
 {

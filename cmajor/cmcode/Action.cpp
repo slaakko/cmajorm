@@ -80,6 +80,16 @@ void AddNewProjectAction::Execute()
     mainWindow->AddNewProject();
 }
 
+AddExistingProjectAction::AddExistingProjectAction(MenuItem* menuItem, MainWindow* mainWindow_) : ClickAction(menuItem), mainWindow(mainWindow_)
+{
+}
+
+void AddExistingProjectAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->AddExistingProject();
+}
+
 SetActiveProjectAction::SetActiveProjectAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* newActiveProjectNode_) :
     ClickAction(menuItem), mainWindow(mainWindow_), project(project_), newActiveProjectNode(newActiveProjectNode_)
 {
@@ -109,6 +119,83 @@ void RemoveProjectAction::Execute()
 {
     mainWindow->HideContextMenu();
     mainWindow->RemoveProject(project);
+}
+
+AddNewSourceFileAction::AddNewSourceFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_) : 
+    ClickAction(menuItem), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+{
+}
+
+void AddNewSourceFileAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->AddNewSourceFile(project, projectNode);
+}
+
+AddExistingSourceFileAction::AddExistingSourceFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_) : 
+    ClickAction(menuItem), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+{
+}
+
+void AddExistingSourceFileAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->AddExistingSourceFile(project, projectNode);
+}
+
+AddNewResourceFileAction::AddNewResourceFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_) : 
+    ClickAction(menuItem), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+{
+}
+
+void AddNewResourceFileAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->AddNewResourceFile(project, projectNode);
+}
+
+AddExistingResourceFileAction::AddExistingResourceFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_) :
+    ClickAction(menuItem), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+{
+}
+
+void AddExistingResourceFileAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->AddExistingResourceFile(project, projectNode);
+}
+
+AddNewTextFileAction::AddNewTextFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_) :
+    ClickAction(menuItem), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+{
+}
+
+void AddNewTextFileAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->AddNewTextFile(project, projectNode);
+}
+
+AddExistingTextFileAction::AddExistingTextFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_) : 
+    ClickAction(menuItem), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+{
+}
+
+void AddExistingTextFileAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->AddExistingTextFile(project, projectNode);
+}
+
+RemoveFileAction::RemoveFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, const std::string& filePath_, const std::string& fileName_, TreeViewNode* fileNode_) :
+    ClickAction(menuItem), mainWindow(mainWindow_), project(project_), filePath(filePath_), fileName(fileName_), fileNode(fileNode_)
+{
+}
+
+void RemoveFileAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->RemoveFile(project, filePath, fileName, fileNode);
 }
 
 } // namespace cmcode

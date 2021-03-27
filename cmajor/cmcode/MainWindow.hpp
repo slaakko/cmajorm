@@ -9,6 +9,8 @@
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmmsg/BuildServerMessage.hpp>
 #include <cmajor/cmview/CmajorEditor.hpp>
+#include <cmajor/cmview/ResourceFileEditor.hpp>
+#include <cmajor/cmview/TextFileEditor.hpp>
 #include <cmajor/cmview/ErrorView.hpp>
 #include <cmajor/wing/Clipboard.hpp>
 #include <cmajor/wing/Window.hpp>
@@ -47,9 +49,17 @@ public:
     void RebuildProject(sngcm::ast::Project* project);
     void CleanProject(sngcm::ast::Project* project);
     void AddNewProject();
+    void AddExistingProject();
     void SetActiveProject(sngcm::ast::Project* project, TreeViewNode* newActiveProjectNode);
     void RemoveProject(sngcm::ast::Project* project);
     void OpenFileLocation(const std::string& filePath);
+    void AddNewSourceFile(sngcm::ast::Project* project, TreeViewNode* projectNode);
+    void AddExistingSourceFile(sngcm::ast::Project* project, TreeViewNode* projectNode);
+    void AddNewResourceFile(sngcm::ast::Project* project, TreeViewNode* projectNode);
+    void AddExistingResourceFile(sngcm::ast::Project* project, TreeViewNode* projectNode);
+    void AddNewTextFile(sngcm::ast::Project* project, TreeViewNode* projectNode);
+    void AddExistingTextFile(sngcm::ast::Project* project, TreeViewNode* projectNode);
+    void RemoveFile(sngcm::ast::Project* project, const std::string& filePath, const std::string& fileName, TreeViewNode* fileNode);
 protected:
     bool ProcessMessage(Message& msg) override;
     void OnWindowStateChanged() override;
@@ -138,6 +148,9 @@ private:
     void TreeViewNodeClick(TreeViewNodeClickEventArgs& args);
     Editor* GetEditorByTabPage(TabPage* tabPage) const;
     CmajorEditor* AddCmajorEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project);
+    ResourceFileEditor* AddResourceFileEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project);
+    TextFileEditor* AddTextFileEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project);
+    void AddFilePathsToProject(const std::string& newSourceFilePath, const std::string& newResourceFilePath, const std::string& newTextFilePath, sngcm::ast::Project* project, TreeViewNode* projectNode);
     void CodeTabPageSelected();
     void CodeTabPageRemoved(ControlEventArgs& args);
     void OutputTabControlTabPageRemoved(ControlEventArgs& args);

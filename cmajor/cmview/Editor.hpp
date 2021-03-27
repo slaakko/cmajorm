@@ -20,8 +20,8 @@ public:
     virtual const std::string& FilePath() const = 0;
     virtual bool IsDirty() const = 0;
     virtual void ResetDirty() = 0;
-    virtual bool IsCCDirty() const = 0;
-    virtual void ResetCCDirty() = 0;
+    virtual bool IsCCDirty() const;
+    virtual void ResetCCDirty();
     virtual void Save() = 0;
     virtual void Select() = 0;
     virtual void Undo() = 0;

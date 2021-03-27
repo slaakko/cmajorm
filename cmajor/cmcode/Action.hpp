@@ -81,6 +81,15 @@ private:
     MainWindow* mainWindow;
 };
 
+class AddExistingProjectAction : public ClickAction
+{
+public:
+    AddExistingProjectAction(MenuItem* menuItem, MainWindow* mainWindow_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+};
+
 class SetActiveProjectAction : public ClickAction
 {
 public:
@@ -110,6 +119,85 @@ public:
 private:
     MainWindow* mainWindow;
     std::string filePath;
+};
+
+class AddNewSourceFileAction : public ClickAction
+{
+public:
+    AddNewSourceFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    sngcm::ast::Project* project;
+    TreeViewNode* projectNode;
+};
+
+class AddExistingSourceFileAction : public ClickAction
+{
+public:
+    AddExistingSourceFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    sngcm::ast::Project* project;
+    TreeViewNode* projectNode;
+};
+
+class AddNewResourceFileAction : public ClickAction
+{
+public:
+    AddNewResourceFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    sngcm::ast::Project* project;
+    TreeViewNode* projectNode;
+};
+
+class AddExistingResourceFileAction : public ClickAction
+{
+public:
+    AddExistingResourceFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    sngcm::ast::Project* project;
+    TreeViewNode* projectNode;
+};
+
+class AddNewTextFileAction : public ClickAction
+{
+public:
+    AddNewTextFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    sngcm::ast::Project* project;
+    TreeViewNode* projectNode;
+};
+
+class AddExistingTextFileAction : public ClickAction
+{
+public:
+    AddExistingTextFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, TreeViewNode* projectNode_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    sngcm::ast::Project* project;
+    TreeViewNode* projectNode;
+};
+
+class RemoveFileAction : public ClickAction
+{
+public:
+    RemoveFileAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, const std::string& filePath_, const std::string& fileName_, TreeViewNode* fileNode_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    sngcm::ast::Project* project;
+    std::string filePath;
+    std::string fileName;
+    TreeViewNode* fileNode;
 };
 
 } // namespace cmcode

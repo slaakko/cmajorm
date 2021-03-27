@@ -178,6 +178,13 @@ public:
     std::string Id() const;
     void AddDependsOnId(const std::string& dependsOnId);
     const std::vector<std::string>& DependsOnIds() const { return dependsOnIds; }
+    bool HasSourceFile(const std::string& sourceFilePath) const;
+    bool HasResourceFile(const std::string& resourceFilePath) const;
+    bool HasTextFile(const std::string& textFilePath) const;
+    void AddSourceFileName(const std::string& sourceFileName, const std::string& sourceFilePath);
+    void AddResourceFileName(const std::string& resourceFileName, const std::string& resourceFilePath);
+    void AddTextFileName(const std::string& textFileName, const std::string& textFilePath);
+    void RemoveFile(const std::string& filePath, const std::string& fileName);
     void Save();
 private:
     BackEnd backend;

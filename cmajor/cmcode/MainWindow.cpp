@@ -10,6 +10,9 @@
 #include <cmajor/cmcode/ToolBar.hpp>
 #include <cmajor/cmcode/AddNewProjectDialog.hpp>
 #include <cmajor/cmcode/NewProjectDialog.hpp>
+#include <cmajor/cmcode/AddNewSourceFileDialog.hpp>
+#include <cmajor/cmcode/AddNewResourceFileDialog.hpp>
+#include <cmajor/cmcode/AddNewTextFileDialog.hpp>
 #include <cmajor/cmcode/SelectProjectTypeDialog.hpp>
 #include <cmajor/wing/Dialog.hpp>
 #include <cmajor/wing/BorderedControl.hpp>
@@ -1524,9 +1527,9 @@ void MainWindow::OpenProjectClick()
         descriptionFilterPairs.push_back(std::make_pair("Cmajor Project Files (*.cmp)", "*.cmp"));
         std::string initialDirectory = CmajorProjectsDir();
         std::string filePath;
-        std::string currentDiretory;
+        std::string currentDirectory;
         std::vector<std::string> fileNames;
-        bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "cms", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDiretory, fileNames);
+        bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "cms", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDirectory, fileNames);
         if (selected)
         {
             if (CloseSolution())
@@ -1996,6 +1999,52 @@ void MainWindow::AddNewProject()
     }
 }
 
+void MainWindow::AddExistingProject()
+{
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        std::vector<std::pair<std::string, std::string>> descriptionFilterPairs;
+        descriptionFilterPairs.push_back(std::pair<std::string, std::string>("Cmajor Project Files (*.cmp)", "*.cmp"));
+        std::string initialDirectory = CmajorProjectsDir();
+        std::string filePath;
+        std::string currentDirectory;
+        std::vector<std::string> fileNames;
+        std::string defaultFilePath;
+        bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "cmp", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDirectory, fileNames);
+        if (selected)
+        {
+            std::vector<std::unique_ptr<std::u32string>> contents;
+            std::unique_ptr<sngcm::ast::Project> project = ReadProject(GetFullPath(filePath), contents);
+            sngcm::ast::Solution* solution = solutionData->GetSolution();
+            if (solution->HasProject(project->Name()))
+            {
+                throw std::runtime_error("solution already has a project with name '" + ToUtf8(project->Name()) + "'");
+            }
+            solution->AddProject(std::move(project));
+            solution->SortByProjectName();
+            solution->Save();
+            std::string solutionFilePath = solution->FilePath();
+            if (!CloseSolution())
+            {
+                return;
+            }
+            OpenProject(solutionFilePath);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
 void MainWindow::SetActiveProject(sngcm::ast::Project* project, TreeViewNode* newActiveProjectNode)
 {
     try
@@ -2062,6 +2111,217 @@ void MainWindow::OpenFileLocation(const std::string& filePath)
         }
 #pragma warning(default:4311)
 #pragma warning(default:4302)
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::AddNewSourceFile(sngcm::ast::Project* project, TreeViewNode* projectNode)
+{
+    try
+    {
+        AddNewSourceFileDialog dialog;
+        ShowDialogGuard guard(showingDialog);
+        DialogResult result = dialog.ShowDialog(*this);
+        if (result == DialogResult::ok)
+        {
+            std::string sourceFileName = dialog.SourceFileName();
+            if (!EndsWith(sourceFileName, ".cm"))
+            {
+                sourceFileName.append(".cm");
+            }
+            std::string newSourceFilePath = GetFullPath(Path::Combine(project->SourceBasePath().generic_string(), sourceFileName));
+            if (project->HasSourceFile(newSourceFilePath))
+            {
+                throw std::runtime_error("source file '" + newSourceFilePath + "' already exists in project '" + ToUtf8(project->Name()) + "'");
+            }
+            project->AddSourceFileName(sourceFileName, newSourceFilePath);
+            project->Save();
+            // todo load edit module
+            AddFilePathsToProject(newSourceFilePath, "", "", project, projectNode);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::AddExistingSourceFile(sngcm::ast::Project* project, TreeViewNode* projectNode)
+{
+    try
+    {
+        std::vector<std::pair<std::string, std::string>> descriptionFilterPairs;
+        descriptionFilterPairs.push_back(std::make_pair("Cmajor Source Files (*.cm)", "*.cm"));
+        std::string initialDirectory = Path::GetDirectoryName(project->FilePath());
+        std::string currentDirectory;
+        std::vector<std::string> fileNames;
+        std::string filePath;
+        bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "cm", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDirectory, fileNames);
+        if (selected)
+        {
+            filePath = GetFullPath(filePath);
+            if (project->HasSourceFile(filePath))
+            {
+                throw std::runtime_error("project '" + ToUtf8(project->Name()) + "' already has source file '" + filePath + "'");
+            }
+            std::string fileName = Path::GetFileName(filePath);
+            project->AddSourceFileName(fileName, filePath);
+            project->Save();
+            // todo: load edit module
+            AddFilePathsToProject("", "", "", project, projectNode);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::AddNewResourceFile(sngcm::ast::Project* project, TreeViewNode* projectNode)
+{
+    try
+    {
+        AddNewResourceFileDialog dialog;
+        ShowDialogGuard guard(showingDialog);
+        DialogResult result = dialog.ShowDialog(*this);
+        if (result == DialogResult::ok)
+        {
+            std::string resourceFileName = dialog.ResourceFileName();
+            if (!EndsWith(resourceFileName, ".xml"))
+            {
+                resourceFileName.append(".xml");
+            }
+            std::string newResourceFilePath = GetFullPath(Path::Combine(project->SourceBasePath().generic_string(), resourceFileName));
+            if (project->HasResourceFile(newResourceFilePath))
+            {
+                throw std::runtime_error("resource file '" + newResourceFilePath + "' already exists in project '" + ToUtf8(project->Name()) + "'");
+            }
+            project->AddResourceFileName(resourceFileName, newResourceFilePath);
+            project->Save();
+            AddFilePathsToProject("", newResourceFilePath, "", project, projectNode);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::AddExistingResourceFile(sngcm::ast::Project* project, TreeViewNode* projectNode)
+{
+    try
+    {
+        std::vector<std::pair<std::string, std::string>> descriptionFilterPairs;
+        descriptionFilterPairs.push_back(std::make_pair("Cmajor Resource Files (*.xml)", "*.xml"));
+        std::string initialDirectory = Path::GetDirectoryName(project->FilePath());
+        std::string currentDirectory;
+        std::vector<std::string> fileNames;
+        std::string filePath;
+        bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "xml", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDirectory, fileNames);
+        if (selected)
+        {
+            filePath = GetFullPath(filePath);
+            if (project->HasResourceFile(filePath))
+            {
+                throw std::runtime_error("project '" + ToUtf8(project->Name()) + "' already has resource file '" + filePath + "'");
+            }
+            std::string fileName = Path::GetFileName(filePath);
+            project->AddResourceFileName(fileName, filePath);
+            project->Save();
+            AddFilePathsToProject("", "", "", project, projectNode);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::AddNewTextFile(sngcm::ast::Project* project, TreeViewNode* projectNode)
+{
+    try
+    {
+        AddNewTextFileDialog dialog;
+        ShowDialogGuard guard(showingDialog);
+        DialogResult result = dialog.ShowDialog(*this);
+        if (result == DialogResult::ok)
+        {
+            std::string fileName = dialog.FileName();
+            std::string filePath = GetFullPath(Path::Combine(project->SourceBasePath().generic_string(), fileName));
+            if (project->HasTextFile(filePath))
+            {
+                throw std::runtime_error("text file '" + filePath + "' already exists in project '" + ToUtf8(project->Name()) + "'");
+            }
+            project->AddTextFileName(fileName, filePath);
+            project->Save();
+            AddFilePathsToProject("", "", filePath, project, projectNode);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::AddExistingTextFile(sngcm::ast::Project* project, TreeViewNode* projectNode)
+{
+    try
+    {
+        std::vector<std::pair<std::string, std::string>> descriptionFilterPairs;
+        descriptionFilterPairs.push_back(std::make_pair("Text Files (*.*)", "*.*"));
+        std::string initialDirectory = Path::GetDirectoryName(project->FilePath());
+        std::string currentDirectory;
+        std::vector<std::string> fileNames;
+        std::string filePath;
+        bool selected = OpenFileName(Handle(), descriptionFilterPairs, initialDirectory, std::string(), "txt", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, filePath, currentDirectory, fileNames);
+        if (selected)
+        {
+            filePath = GetFullPath(filePath);
+            if (project->HasTextFile(filePath))
+            {
+                throw std::runtime_error("project '" + ToUtf8(project->Name()) + "' already has text file '" + filePath + "'");
+            }
+            std::string fileName = Path::GetFileName(filePath);
+            project->AddTextFileName(fileName, filePath);
+            project->Save();
+            AddFilePathsToProject("", "", "", project, projectNode);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::RemoveFile(sngcm::ast::Project* project, const std::string& filePath, const std::string& fileName, TreeViewNode* fileNode)
+{
+    try
+    {
+        TabPage* tabPage = codeTabControl->GetTabPageByKey(filePath);
+        if (tabPage)
+        {
+            Editor* editor = GetEditorByTabPage(tabPage);
+            if (editor)
+            {
+                if (editor->IsDirty())
+                {
+                    editor->Save();
+                }
+            }
+            tabPage->Close();
+        }
+        TreeViewNode* projectNode = fileNode->Parent();
+        project->RemoveFile(filePath, fileName);
+        project->Save();
+        if (EndsWith(filePath, ".cm"))
+        {
+            // todo: load edit module
+        }
+        projectNode->RemoveChild(fileNode);
+        Invalidate();
     }
     catch (const std::exception& ex)
     {
@@ -2199,12 +2459,49 @@ void MainWindow::ProgramArgumentsClick()
 
 void MainWindow::CloseAllTabsClick()
 {
-    ShowInfoMessageBox(Handle(), "Close All Tabs");
+    try
+    {
+        codeTabControl->CloseAllTabPages();
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::CloseExternalTabsClick()
 {
-    ShowInfoMessageBox(Handle(), "Close External Tabs");
+    try
+    {
+        std::vector<TabPage*> tabgPagesToClose;
+        Component* child = codeTabControl->TabPages().FirstChild();
+        while (child)
+        {
+            if (child->IsTabPage())
+            {
+                TabPage* tabPage = static_cast<TabPage*>(child);
+                Editor* editor = GetEditorByTabPage(tabPage);
+                if (editor)
+                {
+                    SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(editor->FilePath());
+                    if (!data || !data->project)
+                    {
+                        tabgPagesToClose.push_back(tabPage);
+                    }
+                }
+            }
+            child = child->NextSibling();
+        }
+        for (TabPage* tabPage : tabgPagesToClose)
+        {
+            tabPage->Hide();
+            tabPage->Close();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::HomepageClick()
@@ -2303,11 +2600,27 @@ void MainWindow::TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args)
                 }
                 else if (ext == ".xml")
                 {
-
+                    TabPage* prevTabPage = codeTabControl->GetTabPageByKey(data->key);
+                    if (prevTabPage)
+                    {
+                        codeTabControl->SetSelectedTabPage(prevTabPage);
+                    }
+                    else
+                    {
+                        AddResourceFileEditor(data->fileName, data->key, data->filePath, data->project);
+                    }
                 }
                 else 
                 {
-
+                    TabPage* prevTabPage = codeTabControl->GetTabPageByKey(data->key);
+                    if (prevTabPage)
+                    {
+                        codeTabControl->SetSelectedTabPage(prevTabPage);
+                    }
+                    else
+                    {
+                        AddTextFileEditor(data->fileName, data->key, data->filePath, data->project);
+                    }
                 }
             }
         }
@@ -2348,7 +2661,9 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
                     std::unique_ptr<MenuItem> addNewProjectMenuItem(new MenuItem("Add New Project..."));
                     clickActions.push_back(std::unique_ptr<ClickAction>(new AddNewProjectAction(addNewProjectMenuItem.get(), this)));
                     contextMenu->AddMenuItem(addNewProjectMenuItem.release());
-                    // todo: project items
+                    std::unique_ptr<MenuItem> addExistingProjectMenuItem(new MenuItem("Add Existing Project..."));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new AddExistingProjectAction(addExistingProjectMenuItem.get(), this)));
+                    contextMenu->AddMenuItem(addExistingProjectMenuItem.release());
                     std::unique_ptr<MenuItem> openFileLocationMenuItem(new MenuItem("Open File Location"));
                     clickActions.push_back(std::unique_ptr<ClickAction>(new OpenFileLocationAction(openFileLocationMenuItem.get(), this, data->solution->FilePath())));
                     contextMenu->AddMenuItem(openFileLocationMenuItem.release());
@@ -2379,7 +2694,24 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
                     std::unique_ptr<MenuItem> cleanMenuItem(new MenuItem("Clean"));
                     clickActions.push_back(std::unique_ptr<ClickAction>(new CleanProjectAction(cleanMenuItem.get(), this, project)));
                     contextMenu->AddMenuItem(cleanMenuItem.release());
-                    // todo: file items
+                    std::unique_ptr<MenuItem> addNewSourceFileMenuItem(new MenuItem("Add New Source File..."));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new AddNewSourceFileAction(addNewSourceFileMenuItem.get(), this, project, node)));
+                    contextMenu->AddMenuItem(addNewSourceFileMenuItem.release());
+                    std::unique_ptr<MenuItem> addExistingSourceFileMenuItem(new MenuItem("Add Existing Source File..."));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new AddExistingSourceFileAction(addExistingSourceFileMenuItem.get(), this, project, node)));
+                    contextMenu->AddMenuItem(addExistingSourceFileMenuItem.release());
+                    std::unique_ptr<MenuItem> addNewResourceFileMenuItem(new MenuItem("Add New Resource File..."));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new AddNewResourceFileAction(addNewResourceFileMenuItem.get(), this, project, node)));
+                    contextMenu->AddMenuItem(addNewResourceFileMenuItem.release());
+                    std::unique_ptr<MenuItem> addExistingResouceFileMenuItem(new MenuItem("Add Existing Resource File..."));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new AddExistingResourceFileAction(addExistingResouceFileMenuItem.get(), this, project, node)));
+                    contextMenu->AddMenuItem(addExistingResouceFileMenuItem.release());
+                    std::unique_ptr<MenuItem> addNewTextFileMenuItem(new MenuItem("Add New Text File..."));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new AddNewTextFileAction(addNewTextFileMenuItem.get(), this, project, node)));
+                    contextMenu->AddMenuItem(addNewTextFileMenuItem.release());
+                    std::unique_ptr<MenuItem> addExistingTextFileMenuItem(new MenuItem("Add Existing Text File..."));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new AddExistingTextFileAction(addExistingTextFileMenuItem.get(), this, project, node)));
+                    contextMenu->AddMenuItem(addExistingTextFileMenuItem.release());
                     if (solutionData->GetSolution()->ActiveProject() != project)
                     {
                         std::unique_ptr<MenuItem> setActiveMenuItem(new MenuItem("Set Active"));
@@ -2408,10 +2740,14 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
                 }
                 case SolutionTreeViewNodeDataKind::file:
                 {
+                    sngcm::ast::Project* project = data->project;
                     std::unique_ptr<ContextMenu> contextMenu(new ContextMenu());
                     std::unique_ptr<MenuItem> openFileLocationMenuItem(new MenuItem("Open File Location"));
                     clickActions.push_back(std::unique_ptr<ClickAction>(new OpenFileLocationAction(openFileLocationMenuItem.get(), this, data->filePath)));
                     contextMenu->AddMenuItem(openFileLocationMenuItem.release());
+                    std::unique_ptr<MenuItem> removeMenuItem(new MenuItem("Remove"));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new RemoveFileAction(removeMenuItem.get(), this, data->project, data->filePath, data->fileName, node)));
+                    contextMenu->AddMenuItem(removeMenuItem.release());
                     if (contextMenu->HasMenuItems())
                     {
                         Point contentLoc = args.location;
@@ -2494,6 +2830,143 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
     SetEditorState();
     SetFocusToEditor();
     return editor;
+}
+
+ResourceFileEditor* MainWindow::AddResourceFileEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project)
+{
+    std::unique_ptr<TabPage> tabPage(new TabPage(fileName, key));
+    std::unique_ptr<ResourceFileEditor> editorPtr(new ResourceFileEditor(ResourceFileEditorCreateParams(filePath).Defaults()));
+    ResourceFileEditor* editor = editorPtr.get();
+    TextView* textView = editor->GetTextView();
+    if (textView)
+    {
+        textView->DirtyChanged().AddHandler(this, &MainWindow::EditorDirtyChanged);
+        textView->ReadOnlyChanged().AddHandler(this, &MainWindow::EditorReadOnlyChanged);
+        textView->CaretPosChanged().AddHandler(this, &MainWindow::EditorCaretPosChanged);
+        textView->SelectionChanged().AddHandler(this, &MainWindow::EditorSelectionChanged);
+        textView->Copy().AddHandler(this, &MainWindow::CopyClick);
+        textView->Cut().AddHandler(this, &MainWindow::CutClick);
+        textView->Paste().AddHandler(this, &MainWindow::PasteClick);
+        if (state != MainWindowState::idle)
+        {
+            textView->SetReadOnly();
+        }
+    }
+    tabPage->AddChild(editorPtr.release());
+    tabPageEditorMap[tabPage.get()] = editor;
+    codeTabControl->AddTabPage(tabPage.release());
+    SetEditorState();
+    SetFocusToEditor();
+    return editor;
+}
+
+TextFileEditor* MainWindow::AddTextFileEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project)
+{
+    std::unique_ptr<TabPage> tabPage(new TabPage(fileName, key));
+    std::unique_ptr<TextFileEditor> editorPtr(new TextFileEditor(TextFileEditorCreateParams(filePath).Defaults()));
+    TextFileEditor* editor = editorPtr.get();
+    TextView* textView = editor->GetTextView();
+    if (textView)
+    {
+        textView->DirtyChanged().AddHandler(this, &MainWindow::EditorDirtyChanged);
+        textView->ReadOnlyChanged().AddHandler(this, &MainWindow::EditorReadOnlyChanged);
+        textView->CaretPosChanged().AddHandler(this, &MainWindow::EditorCaretPosChanged);
+        textView->SelectionChanged().AddHandler(this, &MainWindow::EditorSelectionChanged);
+        textView->Copy().AddHandler(this, &MainWindow::CopyClick);
+        textView->Cut().AddHandler(this, &MainWindow::CutClick);
+        textView->Paste().AddHandler(this, &MainWindow::PasteClick);
+        if (state != MainWindowState::idle)
+        {
+            textView->SetReadOnly();
+        }
+    }
+    tabPage->AddChild(editorPtr.release());
+    tabPageEditorMap[tabPage.get()] = editor;
+    codeTabControl->AddTabPage(tabPage.release());
+    SetEditorState();
+    SetFocusToEditor();
+    return editor;
+}
+
+void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, const std::string& newResourceFilePath, const std::string& newTextFilePath, sngcm::ast::Project* project, TreeViewNode* projectNode)
+{
+    projectNode->RemoveChildren();
+    sngcm::ast::Solution* solution = solutionData->GetSolution();
+    for (const std::string& sourceFilePath : project->SourceFilePaths())
+    {
+        SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(sourceFilePath);
+        if (data)
+        {
+            std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
+            fileNode->SetData(data);
+            projectNode->AddChild(fileNode.release());
+        }
+        else
+        {
+            std::unique_ptr<SolutionTreeViewNodeData> newData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::file, solution, project, sourceFilePath, Path::GetFileName(sourceFilePath)));
+            data = newData.get();
+            std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
+            fileNode->SetData(newData.get());
+            projectNode->AddChild(fileNode.release());
+            solutionData->AddTreeViewNodeData(newData.release());
+        }
+        if (sourceFilePath == newSourceFilePath)
+        {
+            std::ofstream file(sourceFilePath);
+            AddCmajorEditor(data->fileName, data->key, data->filePath, project);
+        }
+    }
+    for (const std::string& resourceFilePath : project->ResourceFilePaths())
+    {
+        SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(resourceFilePath);
+        if (data)
+        {
+            std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
+            fileNode->SetData(data);
+            projectNode->AddChild(fileNode.release());
+        }
+        else
+        {
+            std::unique_ptr<SolutionTreeViewNodeData> newData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::file, solution, project, resourceFilePath, Path::GetFileName(resourceFilePath)));
+            data = newData.get();
+            std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
+            fileNode->SetData(newData.get());
+            projectNode->AddChild(fileNode.release());
+            solutionData->AddTreeViewNodeData(newData.release());
+        }
+        if (resourceFilePath == newResourceFilePath)
+        {
+            std::ofstream file(resourceFilePath);
+            AddResourceFileEditor(data->fileName, data->key, data->filePath, project);
+        }
+    }
+    for (const std::string& textFilePath : project->TextFilePaths())
+    {
+        SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(textFilePath);
+        if (data)
+        {
+            std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
+            fileNode->SetData(data);
+            projectNode->AddChild(fileNode.release());
+        }
+        else
+        {
+            std::unique_ptr<SolutionTreeViewNodeData> newData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::file, solution, project, textFilePath, Path::GetFileName(textFilePath)));
+            data = newData.get();
+            std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
+            fileNode->SetData(data);
+            projectNode->AddChild(fileNode.release());
+            solutionData->AddTreeViewNodeData(newData.release());
+        }
+        if (textFilePath == newTextFilePath)
+        {
+            std::ofstream textFile(textFilePath);
+            AddTextFileEditor(data->fileName, data->key, data->filePath, project);
+        }
+    }
+    projectNode->Expand();
+    solutionTreeView->SetChanged();
+    solutionTreeView->Invalidate();
 }
 
 void MainWindow::CodeTabPageSelected()

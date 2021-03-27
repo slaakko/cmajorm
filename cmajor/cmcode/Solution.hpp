@@ -45,6 +45,7 @@ public:
     SolutionTreeViewNodeData* GetSolutionTreeViewNodeDataByKey(const std::string& key) const;
     ProjectData* GetProjectDataByProject(sngcm::ast::Project* project) const;
     BreakpointCollection& GetSolutionBreakpointCollection() { return solutionBreakpointCollection; }
+    void AddTreeViewNodeData(SolutionTreeViewNodeData* data);
 private:
     void SetActiveProject();
     TreeView* solutionTreeView;

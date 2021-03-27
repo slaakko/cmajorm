@@ -194,4 +194,10 @@ ProjectData* SolutionData::GetProjectDataByProject(sngcm::ast::Project* project)
     }
 }
 
+void SolutionData::AddTreeViewNodeData(SolutionTreeViewNodeData* data)
+{
+    treeViewDataMap[data->key] = data;
+    treeViewData.push_back(std::unique_ptr<SolutionTreeViewNodeData>(data));
+}
+
 } // namespace cmcode

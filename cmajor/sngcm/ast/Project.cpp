@@ -601,6 +601,76 @@ void Project::AddDependsOnId(const std::string& dependsOnId)
     dependsOnIds.push_back(dependsOnId);
 }
 
+bool Project::HasSourceFile(const std::string& sourceFilePath) const
+{
+    for (const auto& filePath : sourceFilePaths)
+    {
+        if (filePath == sourceFilePath)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Project::HasResourceFile(const std::string& resourceFilePath) const
+{
+    for (const auto& filePath : resourceFilePaths)
+    {
+        if (filePath == resourceFilePath)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Project::HasTextFile(const std::string& textFilePath) const
+{
+    for (const auto& filePath : textFilePaths)
+    {
+        if (filePath == textFilePath)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Project::AddSourceFileName(const std::string& sourceFileName, const std::string& sourceFilePath)
+{
+    relativeSourceFilePaths.push_back(sourceFileName);
+    std::sort(relativeSourceFilePaths.begin(), relativeSourceFilePaths.end());
+    sourceFilePaths.push_back(sourceFilePath);
+    std::sort(sourceFilePaths.begin(), sourceFilePaths.end());
+}
+
+void Project::AddResourceFileName(const std::string& resourceFileName, const std::string& resourceFilePath)
+{
+    relativeResourceFilePaths.push_back(resourceFileName);
+    std::sort(relativeResourceFilePaths.begin(), relativeResourceFilePaths.end());
+    resourceFilePaths.push_back(resourceFilePath);
+    std::sort(resourceFilePaths.begin(), resourceFilePaths.end());
+}
+
+void Project::AddTextFileName(const std::string& textFileName, const std::string& textFilePath)
+{
+    relativeTextFilePaths.push_back(textFileName);
+    std::sort(relativeTextFilePaths.begin(), relativeTextFilePaths.end());
+    textFilePaths.push_back(textFilePath);
+    std::sort(textFilePaths.begin(), textFilePaths.end());
+}
+
+void Project::RemoveFile(const std::string& filePath, const std::string& fileName)
+{
+    relativeSourceFilePaths.erase(std::remove(relativeSourceFilePaths.begin(), relativeSourceFilePaths.end(), fileName), relativeSourceFilePaths.end());
+    sourceFilePaths.erase(std::remove(sourceFilePaths.begin(), sourceFilePaths.end(), filePath), sourceFilePaths.end());
+    relativeResourceFilePaths.erase(std::remove(relativeResourceFilePaths.begin(), relativeResourceFilePaths.end(), fileName), relativeResourceFilePaths.end());
+    resourceFilePaths.erase(std::remove(resourceFilePaths.begin(), resourceFilePaths.end(), filePath), resourceFilePaths.end());
+    relativeTextFilePaths.erase(std::remove(relativeTextFilePaths.begin(), relativeTextFilePaths.end(), fileName), relativeTextFilePaths.end());
+    textFilePaths.erase(std::remove(textFilePaths.begin(), textFilePaths.end(), filePath), textFilePaths.end());
+}
+
 void Project::Save()
 {
     std::ofstream file(filePath);
