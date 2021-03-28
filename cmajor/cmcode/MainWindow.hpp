@@ -7,12 +7,14 @@
 #define CMCODE_MAIN_WINDOW_INCLUDED
 #include <cmajor/cmcode/Solution.hpp>
 #include <cmajor/cmcode/LocationList.hpp>
+#include <cmajor/cmcode/SearchDialog.hpp>
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmmsg/BuildServerMessage.hpp>
 #include <cmajor/cmview/CmajorEditor.hpp>
 #include <cmajor/cmview/ResourceFileEditor.hpp>
 #include <cmajor/cmview/TextFileEditor.hpp>
 #include <cmajor/cmview/ErrorView.hpp>
+#include <cmajor/cmview/SearchResultsView.hpp>
 #include <cmajor/wing/Clipboard.hpp>
 #include <cmajor/wing/Window.hpp>
 #include <cmajor/wing/Wing.hpp>
@@ -24,6 +26,7 @@
 #include <cmajor/wing/ToolBar.hpp>
 #include <cmajor/wing/StatusBar.hpp>
 #include <cmajor/wing/LogView.hpp>
+#include <soulng/rex/Nfa.hpp>
 
 namespace cmcode {
 
@@ -32,6 +35,7 @@ const int buildProgressTimerPeriod = 100;
 
 using namespace cmajor::view;
 using namespace cmajor::wing;
+using namespace soulng::rex;
 
 enum class MainWindowState : int
 {
@@ -122,6 +126,10 @@ private:
     void RedoClick();
     void GotoClick();
     void SearchClick();
+    void Search(SearchExtent extent, const std::vector<std::string>& files, const std::vector<std::u32string>& lines, const std::string& searchText, 
+        bool wholeWords, bool caseInsensitive, bool regularExpression);
+    bool Search(const std::u32string& line, const std::u32string& text, bool wholeWords, Nfa* re);
+    void ViewSearchResult(ViewSearchResultEventArgs& args);
     void OptionsClick();
     void CallStackClick();
     void LocalsClick();
@@ -168,6 +176,7 @@ private:
     ErrorView* GetErrorView();
     void ViewError(ViewErrorArgs& args);
     Editor* CurrentEditor() const;
+    SearchResultsView* GetSearchResultsView();
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -234,7 +243,11 @@ private:
     LogView* outputLogView;
     TabPage* errorTabPage;
     ErrorView* errorView;
+    TabPage* logTabPage;
+    LogView* log;
     StatusBar* statusBar;
+    TabPage* searchResultsTabPage;
+    SearchResultsView* searchResultsView;
     StatusBarTextItem* buildIndicatorStatuBarItem;
     StatusBarTextItem* editorReadWriteIndicatorStatusBarItem;
     StatusBarTextItem* editorDirtyIndicatorStatusBarItem;

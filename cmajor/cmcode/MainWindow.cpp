@@ -27,6 +27,8 @@
 #include <cmajor/cmsvc/BuildService.hpp>
 #include <cmajor/cmsvc/BuildServiceRequest.hpp>
 #include <sngcm/ast/Project.hpp>
+#include <soulng/rex/Context.hpp>
+#include <soulng/rex/Match.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
 
@@ -120,7 +122,11 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     outputLogView(nullptr),
     errorTabPage(nullptr),
     errorView(nullptr),
+    logTabPage(nullptr),
+    log(nullptr),
     statusBar(nullptr),
+    searchResultsTabPage(nullptr),
+    searchResultsView(nullptr),
     buildIndicatorStatuBarItem(nullptr), 
     editorReadWriteIndicatorStatusBarItem(nullptr),
     editorDirtyIndicatorStatusBarItem(nullptr),
@@ -1138,12 +1144,6 @@ void MainWindow::SetState(MainWindowState state_)
     bool solutionOpen = solutionData.get() != nullptr;
 
     // todo:
-    // saveMenuItem
-    // copyMenuItem
-    // cutMenuItem
-    // pasteMenuItem
-    // undoMenuItem
-    // redoMenuItem
     // gotoMenuItem
     // callStackMenuItem
     // localsMenuItem
@@ -2019,7 +2019,206 @@ void MainWindow::GotoClick()
 
 void MainWindow::SearchClick()
 {
-    ShowInfoMessageBox(Handle(), "Search");
+    try
+    {
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        sngcm::ast::Solution* solution = solutionData->GetSolution();
+        if (searchResultsTabPage)
+        {
+            searchResultsTabPage->Close();
+            searchResultsTabPage = nullptr;
+        }
+        bool hasCurrentFile = false;
+        Editor* editor = CurrentEditor();
+        if (editor)
+        {
+            hasCurrentFile = true;
+        }
+        ShowDialogGuard dialogGuard(showingDialog);
+        SearchDialog dialog(hasCurrentFile);
+        DialogResult result = dialog.ShowDialog(*this);
+        if (result == DialogResult::ok)
+        {
+            std::vector<std::string> files;
+            switch (dialog.GetSearchExtent())
+            {
+                case SearchExtent::currentFile:
+                {
+                    files.push_back(editor->FilePath());
+                    std::vector<std::u32string> lines;
+                    for (const auto& line : editor->GetTextView()->Lines())
+                    {
+                        lines.push_back(*line);
+                    }
+                    Search(SearchExtent::currentFile, files, lines, dialog.SearchText(), dialog.WholeWords(), dialog.CaseInsensitive(), dialog.RegularExpression());
+                    break;
+                }
+                case SearchExtent::activeProject:
+                {
+                    sngcm::ast::Project* activeProject = solution->ActiveProject();
+                    files = activeProject->SourceFilePaths();
+                    Search(SearchExtent::activeProject, files, std::vector<std::u32string>(), dialog.SearchText(), dialog.WholeWords(), dialog.CaseInsensitive(), dialog.RegularExpression());
+                    break;
+                }
+                case SearchExtent::entireSolution:
+                {
+                    for (const auto& project : solution->Projects())
+                    {
+                        for (const auto& sourceFilePath : project->SourceFilePaths())
+                        {
+                            files.push_back(sourceFilePath);
+                        }
+                    }
+                    Search(SearchExtent::entireSolution, files, std::vector<std::u32string>(), dialog.SearchText(), dialog.WholeWords(), dialog.CaseInsensitive(), dialog.RegularExpression());
+                    break;
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::Search(SearchExtent extent, const std::vector<std::string>& files, const std::vector<std::u32string>& lines, const std::string& searchText, 
+    bool wholeWords, bool caseInsensitive, bool regularExpression)
+{
+    SearchResultsView* searchResults = GetSearchResultsView();
+    searchResults->Clear();
+    std::u32string text = ToUtf32(searchText);
+    if (caseInsensitive)
+    {
+        text = ToLower(text);
+    }
+    Nfa* re = nullptr;
+    Context context;
+    Nfa nfa;
+    if (regularExpression)
+    {
+        nfa = CompileRegularExpressionPattern(context, U".*(" + text + U").*");
+        re = &nfa;
+    }
+    for (const std::string& fileName : files)
+    {
+        std::vector<std::u32string> readLines;
+        const std::vector<std::u32string>* lns = &readLines;
+        if (extent == SearchExtent::currentFile)
+        {
+            lns = &lines;
+        }
+        else
+        {
+            std::string content = ReadFile(fileName);
+            readLines = SplitTextIntoLines(ToUtf32(content));
+        }
+        int n = lns->size();
+        for (int i = 0; i < n; ++i)
+        {
+            const std::u32string* line = &(*lns)[i];
+            std::u32string lowerLine;
+            if (caseInsensitive)
+            {
+                lowerLine = ToLower(*line);
+                line = &lowerLine;
+            }
+            if (Search(*line, text, wholeWords, re))
+            {
+                searchResults->Add(new SearchResult(fileName, i + 1, ToUtf8((*lns)[i])));
+            }
+        }
+    }
+    searchResults->Invalidate();
+}
+
+bool MainWindow::Search(const std::u32string& line, const std::u32string& text, bool wholeWords, Nfa* re)
+{
+    if (re)
+    {
+        return PatternMatch(line, *re);
+    }
+    else
+    {
+        std::u32string::size_type pos = line.find(text, 0);
+        while (pos != std::u32string::npos)
+        {
+            bool match = true;
+            if (wholeWords)
+            {
+                if (pos > 0)
+                {
+                    char32_t prev = line[pos - 1];
+                    if (IsAlphabetic(prev) || IsNumber(prev))
+                    {
+                        match = false;
+                    }
+                }
+                if (pos + text.length() < line.length())
+                {
+                    char32_t next = line[pos + text.length()];
+                    if (IsAlphabetic(next) || IsNumber(next))
+                    {
+                        match = false;
+                    }
+                }
+            }
+            if (match)
+            {
+                return true;
+            }
+            pos = line.find(text, pos + 1);
+        }
+    }
+    return false;
+}
+
+void MainWindow::ViewSearchResult(ViewSearchResultEventArgs& args)
+{
+    try
+    {
+        SearchResult* searchResult = args.searchResult;
+        if (searchResult)
+        {
+            TabPage* tabPage = codeTabControl->GetTabPageByKey(searchResult->fileName);
+            Editor* editor = nullptr;
+            if (tabPage)
+            {
+                editor = GetEditorByTabPage(tabPage);
+                tabPage->Select();
+            }
+            if (!editor)
+            {
+                SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(searchResult->fileName);
+                if (data)
+                {
+                    editor = AddCmajorEditor(data->fileName, data->key, data->filePath, data->project);
+                }
+                else
+                {
+                    editor = AddCmajorEditor(Path::GetFileName(searchResult->fileName), searchResult->fileName, searchResult->fileName, nullptr);
+                }
+            }
+            if (editor)
+            {
+                TextView* textView = editor->GetTextView();
+                if (textView)
+                {
+                    textView->EnsureLineVisible(searchResult->lineNumber);
+                    textView->SetCaretLineCol(std::min(searchResult->lineNumber, static_cast<int>(textView->Lines().size())), 1 + textView->LineNumberFieldLength());
+                    textView->ScrollToCaret();
+                    textView->SetFocus();
+                    textView->Invalidate();
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::OptionsClick()
@@ -2044,7 +2243,19 @@ void MainWindow::ErrorsClick()
 
 void MainWindow::SearchResultsClick()
 {
-    ShowInfoMessageBox(Handle(), "Search Results");
+    try
+    {
+        searchResultsView = GetSearchResultsView();
+        if (searchResultsView)
+        {
+            searchResultsView->Invalidate();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+
 }
 
 void MainWindow::PortMapClick()
@@ -3271,7 +3482,16 @@ void MainWindow::OutputTabControlTabPageRemoved(ControlEventArgs& args)
         errorTabPage = nullptr;
         errorView = nullptr;
     }
-    // todo
+    else if (args.control == searchResultsTabPage)
+    {
+        searchResultsTabPage = nullptr;
+        searchResultsView = nullptr;
+    }
+    else if (args.control == logTabPage)
+    {
+        logTabPage = nullptr;
+        log = nullptr;
+    }
 }
 
 void MainWindow::OutputTabControlTabPageSelected()
@@ -3380,5 +3600,18 @@ Editor* MainWindow::CurrentEditor() const
     return nullptr;
 }
 
+SearchResultsView* MainWindow::GetSearchResultsView()
+{
+    if (!searchResultsView)
+    {
+        searchResultsView = new SearchResultsView();
+        searchResultsView->ViewSearchResult().AddHandler(this, &MainWindow::ViewSearchResult);
+        searchResultsTabPage = new TabPage("Search Results", "searchResults");
+        searchResultsTabPage->AddChild(searchResultsView);
+        outputTabControl->AddTabPage(searchResultsTabPage);
+    }
+    searchResultsTabPage->Select();
+    return searchResultsView;
+}
 
 } // namespace cmcode
