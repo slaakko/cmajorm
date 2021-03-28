@@ -73,6 +73,7 @@ public:
     void ProcessRequests();
     void ExecuteRequest(BuildServiceRequest* request);
     void ProcessBuildRequest(BuildRequest& buildRequest);
+    void ProcessGetDefinitionRequest(GetDefinitionRequest& getDefinitionRequest);
     ~BuildService();
 private:
     BuildService();
@@ -386,6 +387,31 @@ void BuildService::ProcessBuildRequest(BuildRequest& buildRequest)
     }
 }
 
+void BuildService::ProcessGetDefinitionRequest(GetDefinitionRequest& getDefinitionRequest)
+{
+    std::unique_ptr<sngxml::dom::Element> requestElement = getDefinitionRequest.ToXml("getDefinitionRequest");
+    sngxml::dom::Document requestDoc;
+    requestDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(requestElement.release()));
+    std::stringstream strStream;
+    CodeFormatter formatter(strStream);
+    requestDoc.Write(formatter);
+    std::string requestStr = strStream.str();
+    TcpSocket socket("localhost", std::to_string(serverPort));
+    Write(socket, requestStr);
+    std::string messageStr = ReadStr(socket);
+    std::unique_ptr<sngxml::dom::Document> messageDoc = sngxml::dom::ParseDocument(ToUtf32(messageStr), "socket");
+    std::string message = ToUtf8(messageDoc->DocumentElement()->Name());
+    if (message == "getDefinitionReply")
+    {
+        GetDefinitionReply reply(messageDoc->DocumentElement());
+        PutServiceMessage(new GetDefinitionReplyServiceMessage(reply));
+    }
+    else
+    {
+        throw std::runtime_error("unknown message '" + message + "' received");
+    }
+}
+
 void BuildService::Run()
 {
     try
@@ -542,11 +568,34 @@ void RunBuildRequest::Failed(const std::string& error)
     PutServiceMessage(new BuildErrorServiceMessage(error));
 }
 
+RunGetDefinitionRequest::RunGetDefinitionRequest(const GetDefinitionRequest& getDefinitionRequest_) : getDefinitionRequest(getDefinitionRequest_)
+{
+}
+
+void RunGetDefinitionRequest::Execute()
+{
+    BuildService::Instance().ProcessGetDefinitionRequest(getDefinitionRequest);
+}
+
+void RunGetDefinitionRequest::Failed(const std::string& error)
+{
+    PutServiceMessage(new GetDefinitionErrorServiceMessage(error));
+}
+
 BuildReplyServiceMessage::BuildReplyServiceMessage(const BuildReply& buildReply_) : ServiceMessage(ServiceMessageKind::buildReply), buildReply(buildReply_)
 {
 }
 
 BuildErrorServiceMessage::BuildErrorServiceMessage(const std::string& error_) : ServiceMessage(ServiceMessageKind::buildError), error(error_)
+{
+}
+
+GetDefinitionReplyServiceMessage::GetDefinitionReplyServiceMessage(const GetDefinitionReply& getDefinitionReply_) : 
+    ServiceMessage(ServiceMessageKind::getDefinitionReply), getDefinitionReply(getDefinitionReply_)
+{
+}
+
+GetDefinitionErrorServiceMessage::GetDefinitionErrorServiceMessage(const std::string& error_) : ServiceMessage(ServiceMessageKind::getDefinitionError), error(error_)
 {
 }
 

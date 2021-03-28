@@ -1065,6 +1065,7 @@ void TextView::DeleteLines(int lineIndex, int columnIndex, const std::vector<std
 void TextView::SetSelection(const Selection& selection_)
 {
     selection = selection_;
+    Invalidate();
 }
 
 void TextView::ResetSelection()

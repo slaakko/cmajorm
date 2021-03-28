@@ -25,6 +25,7 @@ class CMVIEW_API CmajorEditor : public Editor
 {
 public:
     CmajorEditor(CmajorEditorCreateParams& createParams);
+    bool IsCmajorEditor() const override { return true; }
     const std::string& FilePath() const override;
     bool IsDirty() const override;
     void ResetDirty() override;

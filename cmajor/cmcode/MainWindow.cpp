@@ -137,7 +137,8 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     state(MainWindowState::idle),
     backend("cpp"),
     config("debug"),
-    cmajorCodeFormat("cmajor.code")
+    cmajorCodeFormat("cmajor.code"),
+    locations(this)
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -552,8 +553,9 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     std::unique_ptr<StatusBarTextItem> columnStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(5).BorderStyle(StatusBarItemBorderStyle::sunken)));
     columnStatusBarItem = columnStatusBarItemPtr.get();
     statusBar->AddItem(columnStatusBarItemPtr.release());
-
     AddChild(statusBarPtr.release());
+
+    locations.SetToolButtons(prevToolButton, nextToolButton);
 
     SetServiceMessageHandlerView(this);
     StartRequestDispatcher();
@@ -914,6 +916,17 @@ void MainWindow::HandleServiceMessage()
                 HandleBuildError(message->Error());
                 break;
             }
+            case ServiceMessageKind::getDefinitionReply:
+            {
+                GetDefinitionReplyServiceMessage* message = static_cast<GetDefinitionReplyServiceMessage*>(serviceMessage.get());
+                HandleGetDefinitionReply(message->GetGetDefinitionReply());
+                break;
+            }
+            case ServiceMessageKind::getDefinitionError:
+            {
+                GetDefinitionErrorServiceMessage* message = static_cast<GetDefinitionErrorServiceMessage*>(serviceMessage.get());
+                HandleGetDefinitionError(message->Error());
+            }
             case ServiceMessageKind::stopBuild:
             {
                 HandleStopBuild();
@@ -1016,6 +1029,28 @@ void MainWindow::HandleBuildError(const std::string& buildError)
 void MainWindow::HandleStopBuild()
 {
     StopBuilding();
+}
+
+void MainWindow::HandleGetDefinitionReply(GetDefinitionReply& getDefinitionReply)
+{
+    StopBuilding();
+    if (getDefinitionReply.ok)
+    {
+        DefinitionSourceLocation currentLocation = CurrentLocation();
+        locations.AddLocation(currentLocation);
+        locations.AddLocation(getDefinitionReply.definitionLocation);
+        locations.GotoPreviousLocation(currentLocation);
+    }
+    else
+    {
+        PutOutputServiceMessage("goto definition command unsuccessful: " + getDefinitionReply.error);
+    }
+}
+
+void MainWindow::HandleGetDefinitionError(const std::string& getDefinitionError)
+{
+    StopBuilding();
+    PutOutputServiceMessage("goto definition command unsuccessful");
 }
 
 void MainWindow::SetState(MainWindowState state_)
@@ -1427,6 +1462,200 @@ void MainWindow::EditorSelectionChanged()
     {
         ShowErrorMessageBox(Handle(), ex.what());
     }
+}
+
+void MainWindow::EditorRightClick(RightClickEventArgs& args)
+{
+    try
+    {
+        Control* control = args.control;
+        if (control->IsTextView())
+        {
+            TextView* textView = static_cast<TextView*>(control);
+            std::unique_ptr<ContextMenu> contextMenu(new ContextMenu());
+            std::string identifier;
+            DefinitionSourceLocation sourceLocation;
+            if (GetDefinitionSourceLocationAt(args.location, textView, identifier, sourceLocation))
+            {
+                std::unique_ptr<MenuItem> gotoDefinitionMenuItem(new MenuItem("Go To Definition"));
+                sngcm::ast::Project* project = CurrentProject();
+                if (!project)
+                {
+                    throw std::runtime_error("current project not deduced");
+                }
+                clickActions.clear();
+                clickActions.push_back(std::unique_ptr<ClickAction>(new GotoDefinitionAction(gotoDefinitionMenuItem.get(), this, project, identifier, sourceLocation)));
+                contextMenu->AddMenuItem(gotoDefinitionMenuItem.release());
+            }
+            if (state == MainWindowState::debugging)
+            {
+                // todo: run to cursor
+            }
+            if (contextMenu->HasMenuItems())
+            {
+                Point loc = args.location;
+                textView->TranslateContentLocationInternal(loc);
+                Point screenLoc = textView->ClientToScreen(loc);
+                ShowContextMenu(contextMenu.release(), screenLoc);
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+bool MainWindow::GetDefinitionSourceLocationAt(const Point& loc, TextView* textView, std::string& identifier, DefinitionSourceLocation& sourceLocation)
+{
+    int line = 0;
+    int column = 0;
+    textView->GetLineColumn(loc, line, column);
+    if (line >= 1 && line <= textView->Lines().size())
+    {
+        if (column >= 1 && column <= textView->GetLineLength(line))
+        {
+            char32_t c = textView->GetCharAt(line, column);
+            if (IsIdStart(c) || IsIdCont(c))
+            {
+                while (column > 1 && (IsIdStart(c) || IsIdCont(c)))
+                {
+                    --column;
+                    c = textView->GetCharAt(line, column);
+                }
+                if (IsWhiteSpace(c) || IsWordSeparator(c))
+                {
+                    ++column;
+                }
+                c = textView->GetCharAt(line, column);
+                std::u32string id;
+                int scol = column;
+                while (column <= textView->GetLineLength(line) && (IsIdStart(c) || IsIdCont(c)))
+                {
+                    id.append(1, c);
+                    ++column;
+                    if (column <= textView->GetLineLength(line))
+                    {
+                        c = textView->GetCharAt(line, column);
+                    }
+                }
+                int ecol = column;
+                identifier = ToUtf8(id);
+                sourceLocation.file = textView->FilePath();
+                sourceLocation.line = line;
+                sourceLocation.scol = scol;
+                sourceLocation.ecol = ecol;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+sngcm::ast::Project* MainWindow::CurrentProject()
+{
+    if (!solutionData) return nullptr;
+    sngcm::ast::Project* project = nullptr;
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(editor->FilePath());
+        if (data)
+        {
+            project = data->project;
+        }
+    }
+    if (!project)
+    {
+        project = solutionData->GetSolution()->ActiveProject();
+    }
+    return project;
+}
+
+void MainWindow::GotoDefinition(sngcm::ast::Project* project, const std::string& identifier, const DefinitionSourceLocation& sourceLocation)
+{
+    try
+    {
+        GetDefinitionRequest request;
+        request.backend = backend;
+        request.config = config;
+        request.projectName = ToUtf8(project->Name());
+        request.projectFilePath = project->FilePath();
+        request.identifier = identifier;
+        request.identifierLocation = sourceLocation;
+        StartBuilding();
+        StartGetDefinitionRequest(request);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::GotoLocation(const DefinitionSourceLocation& location)
+{
+    TabPage* tabPage = codeTabControl->GetTabPageByKey(location.file);
+    CmajorEditor* cmajorEditor = nullptr;
+    if (tabPage)
+    {
+        Editor* editor = GetEditorByTabPage(tabPage);
+        if (editor->IsCmajorEditor())
+        {
+            cmajorEditor = static_cast<CmajorEditor*>(editor);
+        }
+        tabPage->Select();
+    }
+    if (!cmajorEditor)
+    {
+        SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(location.file);
+        if (data)
+        {
+            cmajorEditor = AddCmajorEditor(data->fileName, data->filePath, data->filePath, data->project);
+        }
+        else
+        {
+            cmajorEditor = AddCmajorEditor(Path::GetFileName(location.file), location.file, location.file, nullptr);
+        }
+    }
+    if (cmajorEditor)
+    {
+        TextView* textView = cmajorEditor->GetTextView();
+        if (textView)
+        {
+            int line = location.line;
+            int scol = location.scol;
+            int ecol = location.ecol;
+            Selection selection;
+            selection.start.line = line;
+            selection.start.column = scol;
+            selection.end.line = line;
+            selection.end.column = ecol;
+            textView->EnsureLineVisible(line);
+            textView->SetSelection(selection);
+            textView->SetCaretLineCol(line, scol);
+        }
+    }
+}
+
+DefinitionSourceLocation MainWindow::CurrentLocation() const
+{
+    DefinitionSourceLocation currentLocation;
+    if (!solutionData) return currentLocation;
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            currentLocation.file = textView->FilePath();
+            int line = textView->CaretLine();
+            int column = textView->CaretColumn();
+            currentLocation.line = line;
+            currentLocation.scol = column;
+            currentLocation.ecol = column;
+        }
+    }
+    return currentLocation;
 }
 
 void MainWindow::BreakpointAdded(AddBreakpointEventArgs& args)
@@ -2521,12 +2750,26 @@ void MainWindow::AboutClick()
 
 void MainWindow::GotoPreviousLocationClick()
 {
-    ShowInfoMessageBox(Handle(), "Go To Previous Location");
+    try
+    {
+        locations.GotoPreviousLocation(CurrentLocation());
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::GotoNextLocationClick()
 {
-    ShowInfoMessageBox(Handle(), "Go To Next Location");
+    try
+    {
+        locations.GotoNextLocation(CurrentLocation());
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::CppButtonClick()
@@ -2810,6 +3053,7 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
         sourceCodeView->ReadOnlyChanged().AddHandler(this, &MainWindow::EditorReadOnlyChanged);
         sourceCodeView->CaretPosChanged().AddHandler(this, &MainWindow::EditorCaretPosChanged);
         sourceCodeView->SelectionChanged().AddHandler(this, &MainWindow::EditorSelectionChanged);
+        sourceCodeView->RightClick().AddHandler(this, &MainWindow::EditorRightClick);
         sourceCodeView->Copy().AddHandler(this, &MainWindow::CopyClick);
         sourceCodeView->Cut().AddHandler(this, &MainWindow::CutClick);
         sourceCodeView->Paste().AddHandler(this, &MainWindow::PasteClick);
@@ -3121,7 +3365,7 @@ void MainWindow::ViewError(ViewErrorArgs& args)
     }
 }
 
-Editor* MainWindow::CurrentEditor()
+Editor* MainWindow::CurrentEditor() const
 {
     if (codeTabControl->TabPages().IsEmpty()) return nullptr;
     TabPage* selectedTabPage = codeTabControl->SelectedTabPage();

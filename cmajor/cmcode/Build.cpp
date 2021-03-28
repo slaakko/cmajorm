@@ -52,4 +52,10 @@ void StopBuild()
     PutRequest(stopBuildRequest.release());
 }
 
+void StartGetDefinitionRequest(const GetDefinitionRequest& getDefinitionRequest)
+{
+    BuildServiceStartParams serviceStartParams = BuildServiceStartParams().ProcessName("cmcode").DebugServer(UseDebugServers()).Log(ServerLogging()).Wait(DebugWait());
+    PutRequest(new GotoDefinitionRequest(serviceStartParams, getDefinitionRequest));
+}
+
 } // namespace cmcode

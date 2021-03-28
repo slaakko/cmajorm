@@ -27,4 +27,15 @@ public:
     void Execute() override;
 };
 
+class CMSVC_API GotoDefinitionRequest : public Request
+{
+public:
+    GotoDefinitionRequest(const BuildServiceStartParams& serviceStartParams_, const GetDefinitionRequest& getDefinitionRequest_);
+    std::string Name() const override { return "gotoDefinitionRequest"; }
+    void Execute() override;
+private:
+    BuildServiceStartParams serviceStartParams;
+    GetDefinitionRequest getDefinitionRequest;
+};
+
 } } // namespace cmajor::service

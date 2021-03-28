@@ -318,6 +318,7 @@ public:
     virtual bool IsRadioButton() const { return false; }
     virtual bool IsTextBox() const { return false; }
     virtual bool IsListBox() const { return false; }
+    virtual bool IsTextView() const { return false; }
     virtual ContainerControl* GetContainerControl() const;
     Window* GetWindow() const;
     void AddChildVisual(Control* child);

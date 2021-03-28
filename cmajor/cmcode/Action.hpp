@@ -8,6 +8,7 @@
 #include <cmajor/wing/Menu.hpp>
 #include <cmajor/wing/TreeView.hpp>
 #include <sngcm/ast/Project.hpp>
+#include <cmajor/cmmsg/BuildServerMessage.hpp>
 
 namespace cmcode {
 
@@ -198,6 +199,18 @@ private:
     std::string filePath;
     std::string fileName;
     TreeViewNode* fileNode;
+};
+
+class GotoDefinitionAction : public ClickAction
+{
+public:
+    GotoDefinitionAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, const std::string& identifier_, const DefinitionSourceLocation& sourceLocation_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    sngcm::ast::Project* project;
+    std::string identifier;
+    DefinitionSourceLocation sourceLocation;
 };
 
 } // namespace cmcode

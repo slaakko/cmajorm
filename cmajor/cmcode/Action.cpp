@@ -198,4 +198,15 @@ void RemoveFileAction::Execute()
     mainWindow->RemoveFile(project, filePath, fileName, fileNode);
 }
 
+GotoDefinitionAction::GotoDefinitionAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_, const std::string& identifier_, const DefinitionSourceLocation& sourceLocation_) : 
+    ClickAction(menuItem), mainWindow(mainWindow_), project(project_), identifier(identifier_), sourceLocation(sourceLocation_)
+{
+}
+
+void GotoDefinitionAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->GotoDefinition(project, identifier, sourceLocation);
+}
+
 } // namespace cmcode

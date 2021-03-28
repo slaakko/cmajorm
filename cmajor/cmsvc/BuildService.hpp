@@ -61,6 +61,35 @@ private:
     std::string error;
 };
 
+class CMSVC_API RunGetDefinitionRequest : public BuildServiceRequest
+{
+public:
+    RunGetDefinitionRequest(const GetDefinitionRequest& getDefinitionRequest_);
+    std::string Name() const override { return "runGetDefinitionRequest"; }
+    void Execute() override;
+    void Failed(const std::string& error) override;
+private:
+    GetDefinitionRequest getDefinitionRequest;
+};
+
+class GetDefinitionReplyServiceMessage : public ServiceMessage
+{
+public:
+    GetDefinitionReplyServiceMessage(const GetDefinitionReply& getDefinitionReply_);
+    GetDefinitionReply& GetGetDefinitionReply() { return getDefinitionReply; }
+private:
+    GetDefinitionReply getDefinitionReply;
+};
+
+class GetDefinitionErrorServiceMessage : public ServiceMessage
+{
+public:
+    GetDefinitionErrorServiceMessage(const std::string& error_);
+    const std::string& Error() const { return error; }
+private:
+    std::string error;
+};
+
 class CMSVC_API StopBuildServiceMessage : public ServiceMessage
 {
 public:

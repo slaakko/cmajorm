@@ -30,4 +30,18 @@ void StopBuildRequest::Execute()
     PutServiceMessage(new StopBuildServiceMessage());
 }
 
+GotoDefinitionRequest::GotoDefinitionRequest(const BuildServiceStartParams& serviceStartParams_, const GetDefinitionRequest& getDefinitionRequest_) :
+    serviceStartParams(serviceStartParams_), getDefinitionRequest(getDefinitionRequest_)
+{
+}
+
+void GotoDefinitionRequest::Execute()
+{
+    if (!BuildServiceRunning())
+    {
+        StartBuildService(serviceStartParams);
+    }
+    EnqueueBuildServiceRequest(new RunGetDefinitionRequest(getDefinitionRequest));
+}
+
 } } // namespace cmajor::service

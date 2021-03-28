@@ -6,6 +6,7 @@
 #ifndef CMCODE_MAIN_WINDOW_INCLUDED
 #define CMCODE_MAIN_WINDOW_INCLUDED
 #include <cmajor/cmcode/Solution.hpp>
+#include <cmajor/cmcode/LocationList.hpp>
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmmsg/BuildServerMessage.hpp>
 #include <cmajor/cmview/CmajorEditor.hpp>
@@ -60,6 +61,8 @@ public:
     void AddNewTextFile(sngcm::ast::Project* project, TreeViewNode* projectNode);
     void AddExistingTextFile(sngcm::ast::Project* project, TreeViewNode* projectNode);
     void RemoveFile(sngcm::ast::Project* project, const std::string& filePath, const std::string& fileName, TreeViewNode* fileNode);
+    void GotoDefinition(sngcm::ast::Project* project, const std::string& identifier, const DefinitionSourceLocation& sourceLocation);
+    void GotoLocation(const DefinitionSourceLocation& location);
 protected:
     bool ProcessMessage(Message& msg) override;
     void OnWindowStateChanged() override;
@@ -84,6 +87,8 @@ private:
     void OpenProject(const std::string& filePath);
     void HandleBuildReply(BuildReply& buildReply);
     void HandleBuildError(const std::string& buildError);
+    void HandleGetDefinitionReply(GetDefinitionReply& getDefinitionReply);
+    void HandleGetDefinitionError(const std::string& getDefinitionError);
     void HandleStopBuild();
     void SetState(MainWindowState state_);
     void SetEditorState();
@@ -95,6 +100,10 @@ private:
     void EditorCCDirtyChanged();
     void EditorCaretPosChanged();
     void EditorSelectionChanged();
+    void EditorRightClick(RightClickEventArgs& args);
+    bool GetDefinitionSourceLocationAt(const Point& loc, TextView* textView, std::string& identifier, DefinitionSourceLocation& sourceLocation);
+    sngcm::ast::Project* CurrentProject();
+    DefinitionSourceLocation CurrentLocation() const;
     void BreakpointAdded(AddBreakpointEventArgs& args);
     void BreakpointRemoved(RemoveBreakpointEventArgs& args);
     void VerticalSplitContainerSplitterDistanceChanged();
@@ -158,7 +167,7 @@ private:
     LogView* GetOutputLogView();
     ErrorView* GetErrorView();
     void ViewError(ViewErrorArgs& args);
-    Editor* CurrentEditor();
+    Editor* CurrentEditor() const;
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -248,6 +257,7 @@ private:
     ClipboardFormat cmajorCodeFormat;
     std::u32string clipboardData;
     std::vector<std::unique_ptr<ClickAction>> clickActions;
+    LocationList locations;
 };
 
 } // namespace cmcode

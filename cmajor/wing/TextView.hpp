@@ -112,6 +112,8 @@ struct WING_API LineEventArgs
     int indentLineIndex;
 };
 
+WING_API bool IsWordSeparator(char32_t c);
+
 using LineInsertedEvent = EventWithArgs<LineEventArgs>;
 using LineChangedEvent = EventWithArgs<LineEventArgs>;
 using LineDeletedEvent = EventWithArgs<LineEventArgs>;
@@ -145,6 +147,7 @@ class WING_API TextView : public Control
 {
 public:
     TextView(TextViewCreateParams& createParams);
+    bool IsTextView() const override { return true; }
     bool Changed() const { return (flags & TextViewFlags::changed) != TextViewFlags::none; }
     void SetChanged() { flags = flags | TextViewFlags::changed; }
     void ResetChanged() { flags = flags & ~TextViewFlags::changed; }

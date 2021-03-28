@@ -5,7 +5,7 @@
 
 #ifndef CMCODE_BUILD_INCLUDED
 #define CMCODE_BUILD_INCLUDED
-#include <string>
+#include <cmajor/cmmsg/BuildServerMessage.hpp>
 
 namespace cmcode {
 
@@ -31,6 +31,7 @@ inline BuildRequestKind operator~(BuildRequestKind flags)
 
 void StartBuild(const std::string& backend, const std::string& config, const std::string& filePath, BuildRequestKind requestKind);
 void StopBuild();
+void StartGetDefinitionRequest(const GetDefinitionRequest& getDefinitionRequest);
 
 } // namespace cmcode
 

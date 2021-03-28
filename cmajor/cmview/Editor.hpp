@@ -17,6 +17,7 @@ class CMVIEW_API Editor : public ContainerControl
 {
 public:
     Editor(ControlCreateParams& createParams);
+    virtual bool IsCmajorEditor() const { return false; }
     virtual const std::string& FilePath() const = 0;
     virtual bool IsDirty() const = 0;
     virtual void ResetDirty() = 0;
