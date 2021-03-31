@@ -32,6 +32,11 @@ bool DebugWait()
     //return true;
 }
 
+bool ServerVerbose()
+{
+    return true;
+}
+
 class Config
 {
 public:

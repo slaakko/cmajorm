@@ -7,6 +7,7 @@
 #include <cmajor/cmcode/Config.hpp>
 #include <cmajor/cmcode/Action.hpp>
 #include <cmajor/cmcode/Build.hpp>
+#include <cmajor/cmcode/Debug.hpp>
 #include <cmajor/cmcode/ToolBar.hpp>
 #include <cmajor/cmcode/AddNewProjectDialog.hpp>
 #include <cmajor/cmcode/NewProjectDialog.hpp>
@@ -14,6 +15,7 @@
 #include <cmajor/cmcode/AddNewResourceFileDialog.hpp>
 #include <cmajor/cmcode/AddNewTextFileDialog.hpp>
 #include <cmajor/cmcode/SelectProjectTypeDialog.hpp>
+#include <cmajor/wing/Ansi.hpp>
 #include <cmajor/wing/Dialog.hpp>
 #include <cmajor/wing/BorderedControl.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
@@ -30,6 +32,7 @@
 #include <soulng/rex/Context.hpp>
 #include <soulng/rex/Match.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/Process.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef min
@@ -55,7 +58,7 @@ struct ShowDialogGuard
     bool& showingDialog;
 };
 
-MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams().Text("Cmajor Code")),
+MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams().Text("Cmajor Code").WindowClassName("cmajor.code." + std::to_string(GetPid()))),
     newProjectMenuItem(nullptr),
     openProjectMenuItem(nullptr),
     closeSolutionMenuItem(nullptr),
@@ -124,6 +127,9 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     errorView(nullptr),
     logTabPage(nullptr),
     log(nullptr),
+    consoleTabPage(nullptr),
+    console(nullptr),
+    debugTabPage(nullptr),
     statusBar(nullptr),
     searchResultsTabPage(nullptr),
     searchResultsView(nullptr),
@@ -141,9 +147,12 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     horizontalSplitContainerFactor(0),
     showingDialog(false),
     state(MainWindowState::idle),
+    programRunning(false),
+    startDebugging(false),
     backend("cpp"),
     config("debug"),
-    cmajorCodeFormat("cmajor.code"),
+    pid(GetPid()),
+    cmajorCodeFormat("cmajor.code." + std::to_string(pid)),
     locations(this)
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
@@ -582,6 +591,10 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
 MainWindow::~MainWindow()
 {
     SetServiceMessageHandlerView(nullptr);
+    if (state == MainWindowState::debugging)
+    {
+        StopDebugService();
+    }
     StopRequestDispatcher();
 }
 
@@ -841,6 +854,8 @@ void MainWindow::StartBuilding()
     SaveAllClick();
     SetEditorsReadOnly();
     SetState(MainWindowState::building);
+    ErrorView* errorView = GetErrorView();
+    errorView->Clear();
     ClearOutput();
     buildProgressCounter = 0;
     buildProgressTimerRunning = true;
@@ -857,6 +872,30 @@ void MainWindow::StopBuilding()
     buildIndicatorStatuBarItem->SetText(std::string());
     SetState(MainWindowState::idle);
     SetEditorsReadWrite();
+}
+
+void MainWindow::StartDebugging()
+{
+    if (state == MainWindowState::debugging) return;
+    savedLocation = ::Location();
+    SetEditorsReadOnly();
+    startDebugging = true;
+    SetState(MainWindowState::debugging);
+    ClearOutput();
+    GetConsole()->Clear();
+    sngcm::ast::Solution* solution = solutionData->GetSolution();
+    StartDebugService(pid, backend, config, solution->ActiveProject(), programArguments, breakpoints);
+}
+
+void MainWindow::StopDebugging()
+{
+    savedLocation = ::Location();
+    ResetDebugLocations();
+    startDebuggingMenuItem->SetText("Start Debugging");
+    startDebuggingToolButton->SetToolTip("Start Debugging (F5)");
+    SetState(MainWindowState::idle);
+    SetEditorsReadWrite();
+    PutOutputServiceMessage("debugging stopped");
 }
 
 void MainWindow::ShowBuildProgress()
@@ -932,10 +971,71 @@ void MainWindow::HandleServiceMessage()
             {
                 GetDefinitionErrorServiceMessage* message = static_cast<GetDefinitionErrorServiceMessage*>(serviceMessage.get());
                 HandleGetDefinitionError(message->Error());
+                break;
             }
             case ServiceMessageKind::stopBuild:
             {
                 HandleStopBuild();
+                break;
+            }
+            case ServiceMessageKind::startDebugReply:
+            {
+                StartReplyServiceMessage* message = static_cast<StartReplyServiceMessage*>(serviceMessage.get());
+                HandleStartDebugReply(message->GetStartDebugReply());
+                break;
+            }
+            case ServiceMessageKind::startError:
+            {
+                StartErrorServiceMessage* message = static_cast<StartErrorServiceMessage*>(serviceMessage.get());
+                HandleStartDebugError(message->Error());
+                break;
+            }
+            case ServiceMessageKind::continueReply:
+            {
+                ContinueReplyServiceMessage* message = static_cast<ContinueReplyServiceMessage*>(serviceMessage.get());
+                HandleContinueReply(message->GetContinueReply());
+                break;
+            }
+            case ServiceMessageKind::nextReply:
+            {
+                NextReplyServiceMessage* message = static_cast<NextReplyServiceMessage*>(serviceMessage.get());
+                HandleNextReply(message->GetNextReply());
+                break;
+            }
+            case ServiceMessageKind::stepReply:
+            {
+                StepReplyServiceMessage* message = static_cast<StepReplyServiceMessage*>(serviceMessage.get());
+                HandleStepReply(message->GetStepReply());
+                break;
+            }
+            case ServiceMessageKind::finishReply:
+            {
+                FinishReplyServiceMessage* message = static_cast<FinishReplyServiceMessage*>(serviceMessage.get());
+                HandleFinishReply(message->GetFinishReply());
+                break;
+            }
+            case ServiceMessageKind::untilReply:
+            {
+                UntilReplyServiceMessage* message = static_cast<UntilReplyServiceMessage*>(serviceMessage.get());
+                HandleUntilReply(message->GetUntilReply());
+                break;
+            }
+            case ServiceMessageKind::targetRunning:
+            {
+                TargetRunningServiceMessage* message = static_cast<TargetRunningServiceMessage*>(serviceMessage.get());
+                HandleTargetRunning();
+                break;
+            }
+            case ServiceMessageKind::targetOutput:
+            {
+                TargetOutputServiceMessage* message = static_cast<TargetOutputServiceMessage*>(serviceMessage.get());
+                HandleTargetOutputRequest(message->GetTargetOutputRequest());
+                break;
+            }
+            case ServiceMessageKind::debugServiceStopped:
+            {
+                DebugServiceStoppedServiceMessage* message = static_cast<DebugServiceStoppedServiceMessage*>(serviceMessage.get()); 
+                HandleDebugServiceStopped();
                 break;
             }
         }
@@ -1008,9 +1108,15 @@ void MainWindow::HandleBuildReply(BuildReply& buildReply)
         if (buildReply.success)
         {
             PutOutputServiceMessage("build successful, time=" + buildReply.time);
+            if (debugRequest)
+            {
+                StartDebugging();
+                PutRequest(debugRequest.release());
+            }
         }
         else
         {
+            debugRequest.reset();
             PutOutputServiceMessage("build unsuccessful");
             if (!buildReply.errors.empty())
             {
@@ -1022,12 +1128,14 @@ void MainWindow::HandleBuildReply(BuildReply& buildReply)
     }
     else
     {
+        debugRequest.reset();
         PutOutputServiceMessage("invalid build request: " + buildReply.requestErrorMessage);
     }
 }
 
 void MainWindow::HandleBuildError(const std::string& buildError)
 {
+    debugRequest.reset();
     StopBuilding();
     PutOutputServiceMessage("build unsuccessful");
 }
@@ -1035,6 +1143,195 @@ void MainWindow::HandleBuildError(const std::string& buildError)
 void MainWindow::HandleStopBuild()
 {
     StopBuilding();
+}
+
+void MainWindow::HandleStartDebugReply(const StartDebugReply& startDebugReply)
+{
+    startDebugging = false;
+    if (startDebugReply.success)
+    {
+        HandleTargetState(startDebugReply.state);
+        HandleLocation(startDebugReply.location, true);
+        startDebuggingMenuItem->SetText("Continue");
+        startDebuggingToolButton->SetToolTip("Continue (F5)");
+        PutOutputServiceMessage("debugging started");
+    }
+    else
+    {
+        PutOutputServiceMessage("start debugging request failed: " + startDebugReply.error);
+    }
+}
+
+void MainWindow::HandleStartDebugError(const std::string& error)
+{
+    startDebugging = false;
+    PutRequest(new StopDebugServiceRequest());
+}
+
+void MainWindow::HandleContinueReply(const ContinueReply& continueReply)
+{
+    if (continueReply.success)
+    {
+        HandleTargetState(continueReply.state);
+        HandleLocation(continueReply.location, true);
+    }
+    else
+    {
+        PutOutputServiceMessage("continue request failed: " + continueReply.error);
+    }
+}
+
+void MainWindow::HandleNextReply(const NextReply& nextReply)
+{
+    if (nextReply.success)
+    {
+        HandleTargetState(nextReply.state);
+        HandleLocation(nextReply.location, true);
+    }
+    else
+    {
+        PutOutputServiceMessage("next request failed: " + nextReply.error);
+    }
+}
+
+void MainWindow::HandleStepReply(const StepReply& stepReply)
+{
+    if (stepReply.success)
+    {
+        HandleTargetState(stepReply.state);
+        HandleLocation(stepReply.location, true);
+    }
+    else
+    {
+        PutOutputServiceMessage("step request failed: " + stepReply.error);
+    }
+}
+
+void MainWindow::HandleFinishReply(const FinishReply& finishReply)
+{
+    if (finishReply.success)
+    {
+        HandleTargetState(finishReply.state);
+        HandleLocation(finishReply.location, true);
+    }
+    else
+    {
+        PutOutputServiceMessage("finish request failed: " + finishReply.error);
+    }
+}
+
+void MainWindow::HandleUntilReply(const UntilReply& untilReply)
+{
+    if (untilReply.success)
+    {
+        HandleTargetState(untilReply.state);
+        HandleLocation(untilReply.location, true);
+    }
+    else
+    {
+        PutOutputServiceMessage("until request failed: " + untilReply.error);
+    }
+}
+
+void MainWindow::HandleLocation(const ::Location& location, bool saveLocation)
+{
+    try
+    {
+        if (saveLocation)
+        {
+            savedLocation = location;
+        }
+        if (location.file.empty()) return;
+        Editor* editor = nullptr;
+        const std::string& filePath = location.file;
+        TabPage* tabPage = codeTabControl->GetTabPageByKey(filePath);
+        if (tabPage)
+        {
+            tabPage->Select();
+            editor = GetEditorByTabPage(tabPage);
+        }
+        else
+        {
+            SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(filePath);
+            if (data)
+            {
+                editor = AddCmajorEditor(data->fileName, data->key, data->filePath, data->project);
+            }
+        }
+        if (!editor)
+        {
+            editor = AddCmajorEditor(Path::GetFileName(filePath), filePath, filePath, nullptr);
+        }
+        if (editor->IsCmajorEditor())
+        {
+            CmajorEditor* cmajorEditor = static_cast<CmajorEditor*>(editor);
+            DebugStrip* debugStrip = cmajorEditor->GetDebugStrip();
+            SourceSpan debugLocation;
+            debugLocation.line = location.line;
+            debugLocation.scol = location.scol;
+            debugLocation.ecol = location.ecol;
+            debugStrip->SetDebugLocation(debugLocation);
+        }
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            textView->EnsureLineVisible(location.line);
+            textView->SetCaretLineCol(location.line, location.scol);
+            // todo: generate expression hover events
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::HandleTargetState(TargetState state)
+{
+    programRunning = false;
+    ResetDebugLocations();
+    SetState(MainWindowState::debugging);
+    if (state.stopReason == "exited-normally")
+    {
+        PutRequest(new StopDebugServiceRequest());
+        PutOutputServiceMessage("program exited normally");
+    }
+    else if (state.stopReason == "exited")
+    {
+        std::string message = "program exited";
+        message.append(", exit code=" + state.exitCode);
+        PutRequest(new StopDebugServiceRequest());
+        PutOutputServiceMessage(message);
+    }
+    else if (state.stopReason == "signal-received")
+    {
+        std::string message = "program received signal";
+        message.append(", signal=" + state.signalName + ", meaning=" + state.signalMeaning);
+        PutRequest(new StopDebugServiceRequest());
+        PutOutputServiceMessage(message);
+    }
+    else if (state.stopReason == "breakpoint-hit" && !state.breakpointId.empty())
+    {
+        std::string message = "breakpoint hit";
+        message.append(", breakpoint=" + state.breakpointId);
+        PutOutputServiceMessage(message);
+    }
+}
+
+void MainWindow::HandleTargetRunning()
+{
+    programRunning = true;
+    SetState(MainWindowState::debugging);
+}
+
+void MainWindow::HandleTargetOutputRequest(const TargetOutputRequest& targetOutputRequest)
+{
+    GetConsole()->Write(targetOutputRequest.handle, targetOutputRequest.output);
+}
+
+void MainWindow::HandleDebugServiceStopped()
+{
+    StopDebugging();
 }
 
 void MainWindow::HandleGetDefinitionReply(GetDefinitionReply& getDefinitionReply)
@@ -1208,7 +1505,15 @@ void MainWindow::SetState(MainWindowState state_)
                 releaseToolButton->Enable();
                 buildSolutionToolButton->Enable();
                 buildActiveProjectToolButton->Enable();
-                startDebuggingToolButton->Enable();
+                if (backend == "cpp" && config == "debug")
+                {
+                    startDebuggingMenuItem->Enable();
+                    startDebuggingToolButton->Enable();
+                    stepOverMenuItem->Enable();
+                    stepOverToolButton->Enable();
+                    stepIntoMenuItem->Enable();
+                    stepIntoToolButton->Enable();
+                }
                 if (buildServiceRunning)
                 {
                     stopBuildServerToolButton->Enable();
@@ -1219,6 +1524,44 @@ void MainWindow::SetState(MainWindowState state_)
         case MainWindowState::building:
         {
             stopBuildServerToolButton->Enable();
+            break;
+        }
+        case MainWindowState::debugging:
+        {
+            stopDebuggingMenuItem->Enable();
+            stopDebuggingToolButton->Enable();
+            if (programRunning || startDebugging)
+            {
+                startDebuggingMenuItem->Disable();
+                startDebuggingToolButton->Disable();
+                stepOverMenuItem->Disable();
+                stepOverToolButton->Disable();
+                stepIntoMenuItem->Disable();
+                stepIntoToolButton->Disable();
+                stepOutMenuItem->Disable();
+                stepOutToolButton->Disable();
+            }
+            else
+            {
+                startDebuggingMenuItem->Enable();
+                startDebuggingToolButton->Enable();
+                stepOverMenuItem->Enable();
+                stepOverToolButton->Enable();
+                stepIntoMenuItem->Enable();
+                stepIntoToolButton->Enable();
+                stepOutMenuItem->Enable();
+                stepOutToolButton->Enable();
+            }
+            if (!savedLocation.file.empty())
+            {
+                showNextStatementMenuItem->Enable();
+                showNextStatementToolButton->Enable();
+            }
+            else
+            {
+                showNextStatementMenuItem->Disable();
+                showNextStatementToolButton->Disable();
+            }
             break;
         }
     }
@@ -1312,6 +1655,29 @@ void MainWindow::SetEditorsReadOnly()
                 if (textView)
                 {
                     textView->SetReadOnly();
+                }
+            }
+        }
+        child = child->NextSibling();
+    }
+}
+
+void MainWindow::ResetDebugLocations()
+{
+    Component* child = codeTabControl->TabPages().FirstChild();
+    while (child)
+    {
+        if (child->IsTabPage())
+        {
+            TabPage* tabPage = static_cast<TabPage*>(child);
+            Editor* editor = GetEditorByTabPage(tabPage);
+            if (editor->IsCmajorEditor())
+            {
+                CmajorEditor* cmajorEditor = static_cast<CmajorEditor*>(editor);
+                DebugStrip* debugStrip = cmajorEditor->GetDebugStrip();
+                if (debugStrip)
+                {
+                    debugStrip->ResetDebugLocation();
                 }
             }
         }
@@ -1468,28 +1834,36 @@ void MainWindow::EditorRightClick(RightClickEventArgs& args)
 {
     try
     {
+        clickActions.clear();
         Control* control = args.control;
         if (control->IsTextView())
         {
             TextView* textView = static_cast<TextView*>(control);
             std::unique_ptr<ContextMenu> contextMenu(new ContextMenu());
-            std::string identifier;
-            DefinitionSourceLocation sourceLocation;
-            if (GetDefinitionSourceLocationAt(args.location, textView, identifier, sourceLocation))
+            if (state == MainWindowState::idle)
             {
-                std::unique_ptr<MenuItem> gotoDefinitionMenuItem(new MenuItem("Go To Definition"));
-                sngcm::ast::Project* project = CurrentProject();
-                if (!project)
+                std::string identifier;
+                DefinitionSourceLocation sourceLocation;
+                if (GetDefinitionSourceLocationAt(args.location, textView, identifier, sourceLocation))
                 {
-                    throw std::runtime_error("current project not deduced");
+                    std::unique_ptr<MenuItem> gotoDefinitionMenuItem(new MenuItem("Go To Definition"));
+                    sngcm::ast::Project* project = CurrentProject();
+                    if (!project)
+                    {
+                        throw std::runtime_error("current project not deduced");
+                    }
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new GotoDefinitionAction(gotoDefinitionMenuItem.get(), this, project, identifier, sourceLocation)));
+                    contextMenu->AddMenuItem(gotoDefinitionMenuItem.release());
                 }
-                clickActions.clear();
-                clickActions.push_back(std::unique_ptr<ClickAction>(new GotoDefinitionAction(gotoDefinitionMenuItem.get(), this, project, identifier, sourceLocation)));
-                contextMenu->AddMenuItem(gotoDefinitionMenuItem.release());
             }
-            if (state == MainWindowState::debugging)
+            else if (state == MainWindowState::debugging)
             {
-                // todo: run to cursor
+                SourceLoc sourceLocation;
+                sourceLocation.path = textView->FilePath();
+                sourceLocation.line = textView->CaretLine();
+                std::unique_ptr<MenuItem> gotoCursorMenuItem(new MenuItem("Go To Cursor"));
+                clickActions.push_back(std::unique_ptr<ClickAction>(new GotoCursorAction(gotoCursorMenuItem.get(), this, sourceLocation)));
+                contextMenu->AddMenuItem(gotoCursorMenuItem.release());
             }
             if (contextMenu->HasMenuItems())
             {
@@ -1590,6 +1964,11 @@ void MainWindow::GotoDefinition(sngcm::ast::Project* project, const std::string&
     {
         ShowErrorMessageBox(Handle(), ex.what());
     }
+}
+
+void MainWindow::GotoCursor(const SourceLoc& sourceLocation)
+{
+    PutRequest(new UntilDebugServiceRequest(sourceLocation));
 }
 
 void MainWindow::GotoLocation(const DefinitionSourceLocation& location)
@@ -2500,7 +2879,9 @@ void MainWindow::SetActiveProject(sngcm::ast::Project* project, TreeViewNode* ne
         solutionData->ActiveProjectNode()->ResetActive();
         newActiveProjectNode->SetActive();
         solutionData->SetActiveProjectNode(newActiveProjectNode);
-        solutionData->GetSolution()->SetActiveProject(project);
+        sngcm::ast::Solution* solution = solutionData->GetSolution();
+        solution->SetActiveProject(project);
+        solution->Save();
         // todo: load project settings
         solutionTreeView->Invalidate();
     }
@@ -2795,6 +3176,38 @@ void MainWindow::BuildActiveProjectClick()
     }
 }
 
+bool MainWindow::BuildActiveProject()
+{
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        sngcm::ast::Project* activeProject = solutionData->GetSolution()->ActiveProject();
+        if (!activeProject)
+        {
+            throw std::runtime_error("no active project set for the solution");
+        }
+        if (activeProject->GetTarget() != sngcm::ast::Target::program && activeProject->GetTarget() != sngcm::ast::Target::winapp && activeProject->GetTarget() != sngcm::ast::Target::winguiapp)
+        {
+            throw std::runtime_error("active project is a library project");
+        }
+        StartBuilding();
+        StartBuild(backend, config, activeProject->FilePath(), BuildRequestKind::build | BuildRequestKind::buildDependencies);
+        return true;
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+    return false;
+}
+
 void MainWindow::RebuildActiveProjectClick()
 {
     try
@@ -2849,7 +3262,25 @@ void MainWindow::CleanActiveProjectClick()
 
 void MainWindow::StartDebuggingClick()
 {
-    ShowInfoMessageBox(Handle(), "Start Debugging");
+    try
+    {
+        if (state == MainWindowState::debugging)
+        {
+            PutRequest(new ContinueDebugServiceRequest());
+        }
+        else
+        {
+            debugRequest.reset(new ContinueDebugServiceRequest());
+            if (!BuildActiveProject())
+            {
+                debugRequest.reset();
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::StartWithoutDebuggingClick()
@@ -2864,27 +3295,78 @@ void MainWindow::TerminateProcessClick()
 
 void MainWindow::StopDebuggingClick()
 {
-    ShowInfoMessageBox(Handle(), "Stop Debugging");
+    if (state != MainWindowState::debugging) return;
+    PutRequest(new StopDebugServiceRequest());
 }
 
 void MainWindow::ShowNextStatementClick()
 {
-    ShowInfoMessageBox(Handle(), "Show Next Statement");
+    try
+    {
+        HandleLocation(savedLocation, false);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::StepOverClick()
 {
-    ShowInfoMessageBox(Handle(), "Step Over");
+    try
+    {
+        if (state == MainWindowState::debugging)
+        {
+            PutRequest(new NextDebugServiceRequest());
+        }
+        else
+        {
+            debugRequest.reset(new NextDebugServiceRequest());
+            if (!BuildActiveProject())
+            {
+                debugRequest.reset();
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::StepIntoClick()
 {
-    ShowInfoMessageBox(Handle(), "Step Into");
+    try
+    {
+        if (state == MainWindowState::debugging)
+        {
+            PutRequest(new StepDebugServiceRequest());
+        }
+        else
+        {
+            debugRequest.reset(new StepDebugServiceRequest());
+            if (!BuildActiveProject())
+            {
+                debugRequest.reset();
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::StepOutClick()
 {
-    ShowInfoMessageBox(Handle(), "Step Out");
+    try
+    {
+        PutRequest(new FinishDebugServiceRequest());
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::ToggleBreakpointClick()
@@ -2987,24 +3469,28 @@ void MainWindow::CppButtonClick()
 {
     backend = "cpp";
     llvmToolButton->SetState(ToolButtonState::normal);
+    SetState(state);
 }
 
 void MainWindow::LlvmButtonClick()
 {
     backend = "llvm";
     cppToolButton->SetState(ToolButtonState::normal);
+    SetState(state);
 }
 
 void MainWindow::DebugButtonClick()
 {
     config = "debug";
     releaseToolButton->SetState(ToolButtonState::normal);
+    SetState(state);
 }
 
 void MainWindow::ReleaseButtonClick()
 {
     config = "release";
     debugToolButton->SetState(ToolButtonState::normal);
+    SetState(state);
 }
 
 void MainWindow::StopBuildServerClick()
@@ -3438,28 +3924,27 @@ void MainWindow::CodeTabPageSelected()
 void MainWindow::CodeTabPageRemoved(ControlEventArgs& args)
 {
     SetEditorState();
-/*  TODO:
-    HideCodeCompletionList();
+    // todo: HideCodeCompletionList();
     Control* removedControl = args.control;
-    if (removedControl is TabPage*)
+    if (removedControl->IsTabPage())
     {
-        TabPage* removedTabPage = cast<TabPage*>(removedControl);
-        Cm.Views.Editor* editor = GetEditorByTabPage(removedTabPage);
-        if (editor != null)
+        TabPage* removedTabPage = static_cast<TabPage*>(removedControl);
+        Editor* editor = GetEditorByTabPage(removedTabPage);
+        if (editor)
         {
             if (editor->IsDirty())
             {
-                MessageBoxResult result = MessageBox.Show(editor->FilePath() + " is modified. Save changes?", "Question", this, MessageBoxType.MB_YESNO);
-                if (result == MessageBoxResult.yes)
+                MessageBoxResult result = MessageBox::Show(editor->FilePath() + " is modified. Save changes?", "Question", this, MB_YESNO);
+                if (result == MessageBoxResult::yes)
                 {
                     editor->Save();
                 }
             }
         }
-        editorByTabPageMap.Remove(removedTabPage);
+        tabPageEditorMap.erase(removedTabPage);
         if (removedTabPage == debugTabPage)
         {
-            debugTabPage = null;
+            debugTabPage = nullptr;
         }
     }
     if (codeTabControl->TabPages().IsEmpty())
@@ -3467,7 +3952,6 @@ void MainWindow::CodeTabPageRemoved(ControlEventArgs& args)
         sourceFilePathStatusBarItem->SetText("");
         ResetFocusedControl();
     }
-*/
 }
 
 void MainWindow::OutputTabControlTabPageRemoved(ControlEventArgs& args)
@@ -3491,6 +3975,11 @@ void MainWindow::OutputTabControlTabPageRemoved(ControlEventArgs& args)
     {
         logTabPage = nullptr;
         log = nullptr;
+    }
+    else if (args.control == consoleTabPage)
+    {
+        consoleTabPage = nullptr;
+        console = nullptr;
     }
 }
 
@@ -3612,6 +4101,20 @@ SearchResultsView* MainWindow::GetSearchResultsView()
     }
     searchResultsTabPage->Select();
     return searchResultsView;
+}
+
+Console* MainWindow::GetConsole()
+{
+    if (!console)
+    {
+        console = new Console(ConsoleCreateParams().SetDock(Dock::fill));
+        console->SetDoubleBuffered();
+        consoleTabPage = new TabPage("Console", "console");
+        consoleTabPage->AddChild(console);
+        outputTabControl->AddTabPage(consoleTabPage);
+    }
+    consoleTabPage->Select();
+    return console;
 }
 
 } // namespace cmcode

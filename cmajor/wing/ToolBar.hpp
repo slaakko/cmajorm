@@ -279,6 +279,7 @@ public:
     void Disable();
     bool IsEnabled() const { return !IsDisabled(); }
     bool IsDisabled() const { return (flags & ToolButtonFlags::disabled) != ToolButtonFlags::none; }
+    void SetToolTip(const std::string& toolTip_);
     ToolButtonStyle Style() const { return style; }
     void SetBitmaps(Bitmap* normalBitmap_, Bitmap* disabledBitmap_);
     const Padding& GetPadding() const { return padding; }

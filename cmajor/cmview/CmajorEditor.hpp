@@ -37,6 +37,7 @@ public:
     void Redo() override;
     TextView* GetTextView() const override;
     CmajorSourceCodeView* SourceCodeView() { return sourceCodeView; }
+    DebugStrip* GetDebugStrip() const { return debugStrip; }
 private:
     CmajorSourceCodeView* sourceCodeView;
     DebugStrip* debugStrip;

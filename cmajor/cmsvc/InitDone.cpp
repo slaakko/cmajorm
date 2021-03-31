@@ -8,6 +8,7 @@
 #include <cmajor/cmsvc/Request.hpp>
 #include <cmajor/cmsvc/RequestDispatcher.hpp>
 #include <cmajor/cmsvc/BuildService.hpp>
+#include <cmajor/cmsvc/DebugService.hpp>
 
 namespace cmajor { namespace service {
 
@@ -17,10 +18,12 @@ void Init()
     InitRequest();
     InitRequestDispatcher();
     InitBuildService();
+    InitDebugService();
 }
 
 void Done()
 {
+    DoneDebugService();
     DoneBuildService();
     DoneRequestDispatcher();
     DoneRequest();

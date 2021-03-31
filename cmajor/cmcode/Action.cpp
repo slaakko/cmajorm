@@ -209,4 +209,14 @@ void GotoDefinitionAction::Execute()
     mainWindow->GotoDefinition(project, identifier, sourceLocation);
 }
 
+GotoCursorAction::GotoCursorAction(MenuItem* menuItem, MainWindow* mainWindow_, const SourceLoc& sourceLocation_) : ClickAction(menuItem), mainWindow(mainWindow_), sourceLocation(sourceLocation_)
+{
+}
+
+void GotoCursorAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->GotoCursor(sourceLocation);
+}
+
 } // namespace cmcode

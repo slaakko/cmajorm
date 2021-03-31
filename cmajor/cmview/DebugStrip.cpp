@@ -216,12 +216,20 @@ void DebugStrip::RemoveBreakpoint(Breakpoint* breakpoint)
 
 void DebugStrip::SetDebugLocation(const SourceSpan& debugLocation_)
 {
-    debugLocation = debugLocation_;
+    if (debugLocation != debugLocation_)
+    {
+        debugLocation = debugLocation_;
+        if (view)
+        {
+            view->Invalidate();
+        }
+        Invalidate();
+    }
 }
 
 void DebugStrip::ResetDebugLocation()
 {
-    debugLocation = SourceSpan();
+    SetDebugLocation(SourceSpan());
 }
 
 void DebugStrip::OnPaint(PaintEventArgs& args)

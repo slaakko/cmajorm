@@ -201,7 +201,7 @@ public:
     bool IsLineVisible(int line) const;
     void GetLineColumn(const Point& contentLocation, int& line, int& column) const;
     void EnsureLineVisible(int line);
-    void Clear();
+    virtual void Clear();
     void SetTextContent(const std::u32string& textContent);
     char32_t GetCharAt(int line, int col) const;
     bool Prev(int& line, int& col);

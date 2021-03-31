@@ -9,6 +9,8 @@
 #include <cmajor/cmcode/LocationList.hpp>
 #include <cmajor/cmcode/SearchDialog.hpp>
 #include <cmajor/cmsvc/Message.hpp>
+#include <cmajor/cmsvc/DebugService.hpp>
+#include <cmajor/cmsvc/DebugServiceRequest.hpp>
 #include <cmajor/cmmsg/BuildServerMessage.hpp>
 #include <cmajor/cmview/CmajorEditor.hpp>
 #include <cmajor/cmview/ResourceFileEditor.hpp>
@@ -16,6 +18,7 @@
 #include <cmajor/cmview/ErrorView.hpp>
 #include <cmajor/cmview/SearchResultsView.hpp>
 #include <cmajor/wing/Clipboard.hpp>
+#include <cmajor/wing/Console.hpp>
 #include <cmajor/wing/Window.hpp>
 #include <cmajor/wing/Wing.hpp>
 #include <cmajor/wing/Application.hpp>
@@ -66,6 +69,7 @@ public:
     void AddExistingTextFile(sngcm::ast::Project* project, TreeViewNode* projectNode);
     void RemoveFile(sngcm::ast::Project* project, const std::string& filePath, const std::string& fileName, TreeViewNode* fileNode);
     void GotoDefinition(sngcm::ast::Project* project, const std::string& identifier, const DefinitionSourceLocation& sourceLocation);
+    void GotoCursor(const SourceLoc& sourceLocation);
     void GotoLocation(const DefinitionSourceLocation& location);
 protected:
     bool ProcessMessage(Message& msg) override;
@@ -85,6 +89,8 @@ private:
     void StartBuilding();
     void StopBuilding();
     void ShowBuildProgress();
+    void StartDebugging();
+    void StopDebugging();
     void HandleServiceMessage();
     void ClearOutput();
     void WriteOutput(const std::string& text);
@@ -94,8 +100,21 @@ private:
     void HandleGetDefinitionReply(GetDefinitionReply& getDefinitionReply);
     void HandleGetDefinitionError(const std::string& getDefinitionError);
     void HandleStopBuild();
+    void HandleStartDebugReply(const StartDebugReply& startDebugReply);
+    void HandleStartDebugError(const std::string& error);
+    void HandleContinueReply(const ContinueReply& continueReply);
+    void HandleNextReply(const NextReply& nextReply);
+    void HandleStepReply(const StepReply& stepReply);
+    void HandleFinishReply(const FinishReply& finishReply);
+    void HandleUntilReply(const UntilReply& untilReply);
+    void HandleLocation(const ::Location& location, bool saveLocation);
+    void HandleTargetState(TargetState state);
+    void HandleTargetRunning();
+    void HandleTargetOutputRequest(const TargetOutputRequest& targetOutputRequest);
+    void HandleDebugServiceStopped();
     void SetState(MainWindowState state_);
     void SetEditorState();
+    void ResetDebugLocations();
     void SetEditorsReadOnly();
     void SetEditorsReadWrite();
     void SetFocusToEditor();
@@ -137,6 +156,7 @@ private:
     void SearchResultsClick();
     void PortMapClick();
     void BuildActiveProjectClick();
+    bool BuildActiveProject();
     void RebuildActiveProjectClick();
     void CleanActiveProjectClick();
     void StartDebuggingClick();
@@ -177,6 +197,7 @@ private:
     void ViewError(ViewErrorArgs& args);
     Editor* CurrentEditor() const;
     SearchResultsView* GetSearchResultsView();
+    Console* GetConsole();
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -245,6 +266,9 @@ private:
     ErrorView* errorView;
     TabPage* logTabPage;
     LogView* log;
+    TabPage* consoleTabPage;
+    Console* console;
+    TabPage* debugTabPage;
     StatusBar* statusBar;
     TabPage* searchResultsTabPage;
     SearchResultsView* searchResultsView;
@@ -264,13 +288,20 @@ private:
     std::unique_ptr<SolutionData> solutionData;
     std::unordered_map<TabPage*, Editor*> tabPageEditorMap;
     MainWindowState state;
+    bool programRunning;
+    bool startDebugging;
     std::string backend;
     std::string config;
     std::unique_ptr<ClipboardListener> clipboardListener;
+    int pid;
     ClipboardFormat cmajorCodeFormat;
     std::u32string clipboardData;
     std::vector<std::unique_ptr<ClickAction>> clickActions;
     LocationList locations;
+    std::string programArguments;
+    std::vector<SourceLoc> breakpoints;
+    std::unique_ptr<Request> debugRequest;
+    ::Location savedLocation;
 };
 
 } // namespace cmcode

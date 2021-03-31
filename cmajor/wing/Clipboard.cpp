@@ -5,6 +5,8 @@
 
 #include <cmajor/wing/Clipboard.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/Random.hpp>
+#include <thread>
 
 namespace cmajor { namespace wing {
 
@@ -93,11 +95,19 @@ ClipboardListener::~ClipboardListener()
 
 Clipboard::Clipboard(HWND handle_) : handle(handle_)
 {
-    bool result = OpenClipboard(handle);
-    if (!result)
+    for (int i = 0; i < 5; ++i)
     {
-        throw WindowsException(GetLastError());
+        bool succeeded = OpenClipboard(handle);
+        if (succeeded)
+        {
+            return;
+        }
+        else if (i < 4)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(Random() % 1000));
+        }
     }
+    throw WindowsException(GetLastError());
 }
 
 Clipboard::~Clipboard()

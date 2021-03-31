@@ -1059,6 +1059,15 @@ void ToolButton::Disable()
     }
 }
 
+void ToolButton::SetToolTip(const std::string& toolTip_)
+{
+    if (toolTip != toolTip_)
+    {
+        toolTip = toolTip_;
+        Invalidate();
+    }
+}
+
 void ToolButton::SetState(ToolButtonState state_)
 {
     if (state != state_)

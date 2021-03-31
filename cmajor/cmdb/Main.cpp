@@ -87,6 +87,7 @@ int main(int argc, const char** argv)
         bool log = false;
         int port = 54326;
         int sessionPort = 54322;
+        bool wait = false;
         std::vector<int> portNumbers;
         for (int i = 1; i < argc; ++i)
         {
@@ -98,6 +99,10 @@ int main(int argc, const char** argv)
                     if (arg == "--verbose")
                     {
                         verbose = true;
+                    }
+                    else if (arg == "--wait")
+                    {
+                        wait = true;
                     }
                     else if (arg == "--debug")
                     {
@@ -225,6 +230,11 @@ int main(int argc, const char** argv)
                                     log = true;
                                     break;
                                 }
+                                case 'w':
+                                {
+                                    wait = true;
+                                    break;
+                                }
                                 default:
                                 {
                                     throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
@@ -247,6 +257,10 @@ int main(int argc, const char** argv)
         if (executable.empty())
         {
             throw std::runtime_error("no executable specified");
+        }
+        if (wait)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds{ 45 });
         }
         if (server)
         {

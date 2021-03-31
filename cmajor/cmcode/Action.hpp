@@ -9,6 +9,7 @@
 #include <cmajor/wing/TreeView.hpp>
 #include <sngcm/ast/Project.hpp>
 #include <cmajor/cmmsg/BuildServerMessage.hpp>
+#include <cmajor/cmmsg/CmdbMessage.hpp>
 
 namespace cmcode {
 
@@ -211,6 +212,16 @@ private:
     sngcm::ast::Project* project;
     std::string identifier;
     DefinitionSourceLocation sourceLocation;
+};
+
+class GotoCursorAction : public ClickAction
+{
+public:
+    GotoCursorAction(MenuItem* menuItem, MainWindow* mainWindow_, const SourceLoc& sourceLocation_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    SourceLoc sourceLocation;
 };
 
 } // namespace cmcode
