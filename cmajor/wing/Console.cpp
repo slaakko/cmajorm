@@ -134,9 +134,12 @@ Console::Console(ConsoleCreateParams& createParams) :
     errorEngine(2), 
     padding(createParams.padding), 
     defaultBackColor(createParams.defaultBackColor), 
-    defaultTextColor(createParams.defaultTextColor)
+    defaultTextColor(createParams.defaultTextColor),
+    eof(false),
+    startInputCol(1)
 {
     SetReadOnly();
+    SetPadding(padding);
     ColorCharOutputMethod outputMethod;
     outputMethod.Set(this, &Console::OutputChar);
     outEngine.SetColorCharOutputMethod(outputMethod);
@@ -175,6 +178,14 @@ void Console::Write(int handle, const std::string& text)
     }
 }
 
+void Console::StartReadLine()
+{
+    inputLine.clear();
+    eof = false;
+    startInputCol = CaretColumn();
+    SetFocus();
+}
+
 void Console::Clear()
 {
     TextView::Clear();
@@ -208,6 +219,108 @@ void Console::PaintContent(Graphics& graphics, const Rect& clipRect)
         origin.Y = origin.Y + CharHeight();
     }
     graphics.SetTextRenderingHint(prevTextRenderingHint);
+}
+
+void Console::OnKeyDown(KeyEventArgs& args)
+{
+    int caretCol = CaretColumn();
+    int caretLine = CaretLine();
+    switch (args.key)
+    {
+        case Keys::controlModifier | Keys::z:
+        {
+            eof = true;
+            Write(1, "^Z\n");
+            OnConsoleInputReady();
+            args.handled = true;
+            break;
+        }
+        case Keys::enter:
+        {
+            eof = false;
+            Write(1, "\n");
+            OnConsoleInputReady();
+            args.handled = true;
+            break;
+        }
+        case Keys::delete_:
+        {
+            int index = caretCol - startInputCol;
+            if (index < inputLine.length())
+            {
+                DeleteChar();
+            }
+            args.handled = true;
+            break;
+        }
+        case Keys::back:
+        {
+            if (caretCol > startInputCol)
+            {
+                --caretCol;
+                SetCaretLineCol(caretLine, caretCol);
+                DeleteChar();
+            }
+            args.handled = true;
+            break;
+        }
+        case Keys::left:
+        {
+            if (caretCol > startInputCol)
+            {
+                --caretCol;
+                SetCaretLineCol(caretLine, caretCol);
+                Invalidate();
+            }
+            args.handled = true;
+            break;
+        }
+        case Keys::right:
+        {
+            int index = caretCol - startInputCol;
+            if (index < inputLine.length())
+            {
+                ++caretCol;
+                SetCaretLineCol(caretLine, caretCol);
+                Invalidate();
+            }
+            args.handled = true;
+            break;
+        }
+        case Keys::home:
+        {
+            caretCol = startInputCol;
+            SetCaretLineCol(caretLine, caretCol);
+            Invalidate();
+            args.handled = true;
+            break;
+        }
+        case Keys::end:
+        {
+            caretCol = startInputCol + inputLine.length();
+            SetCaretLineCol(caretLine, caretCol);
+            Invalidate();
+            args.handled = true;
+            break;
+        }
+    }
+}
+
+void Console::OnKeyPress(KeyPressEventArgs& args)
+{
+    if (eof) return;
+    TextView::OnKeyPress(args);
+    if (!args.handled)
+    {
+        char32_t ch = args.keyChar;
+        InsertChar(ch);
+        args.handled = true;
+    }
+}
+
+void Console::OnConsoleInputReady()
+{
+    consoleInputReady.Fire();
 }
 
 void Console::OutputChar(ConsoleColor textColor, ConsoleColor backColor, int handle, char32_t c)
@@ -279,6 +392,111 @@ void Console::DrawLineText(Graphics& graphics, const std::u32string& line, const
         DrawString(graphics, ToUtf8(text), GetFont(), loc, *brush);
         loc.X = loc.X + length * CharWidth();
         start = start + length;
+    }
+}
+
+void Console::InsertChar(char32_t ch)
+{
+    int caretCol = CaretColumn();
+    int caretLine = CaretLine();
+    int index = caretCol - startInputCol;
+    if (index < inputLine.length())
+    {
+        inputLine = inputLine.substr(0, index) + std::u32string(1, ch) + inputLine.substr(index);
+    }
+    else
+    {
+        inputLine.append(1, ch);
+    }
+    std::vector<std::unique_ptr<std::u32string>>& lines = Lines();
+    std::u32string line = *lines[caretLine - 1];
+    if (caretCol < line.length())
+    {
+        line = line.substr(0, caretCol - 1) + std::u32string(1, ch) + line.substr(caretCol - 1);
+    }
+    else
+    {
+        line.append(1, ch);
+    }
+    *lines[caretLine - 1] = line;
+    IncrementCaretColorCount();
+    ++caretCol;
+    SetCaretLineCol(caretLine, caretCol);
+    SetTextExtent();
+    Invalidate();
+}
+
+void Console::DeleteChar()
+{
+    int caretCol = CaretColumn();
+    int caretLine = CaretLine();
+    int index = caretCol - startInputCol;
+    inputLine = inputLine.substr(0, index) + inputLine.substr(index + 1);
+    std::vector<std::unique_ptr<std::u32string>>& lines = Lines();
+    std::u32string line = *lines[caretLine - 1];
+    line = line.substr(0, caretCol - 1) + line.substr(caretCol);
+    *lines[caretLine - 1] = line;
+    DecrementCaretColorCount();
+    Invalidate();
+}
+
+void Console::IncrementCaretColorCount()
+{
+    int caretCol = CaretColumn();
+    int caretLine = CaretLine();
+    std::vector<ColorCount>& textColorLine = textColorLines[caretLine - 1];
+    IncrementColorCount(textColorLine, caretCol);
+    std::vector<ColorCount>& backColorLine = backColorLines[caretLine - 1];
+    IncrementColorCount(backColorLine, caretCol);
+}
+
+void Console::IncrementColorCount(std::vector<ColorCount>& colorLine, int caretCol)
+{
+    int count = 0;
+    bool incremented = false;
+    for (ColorCount& colorCount : colorLine)
+    {
+        if (caretCol >= count && caretCol < count + colorCount.count)
+        {
+            colorCount.IncrementCount();
+            incremented = true;
+            break;
+        }
+        count = count + colorCount.count;
+    }
+    if (!incremented)
+    {
+        colorLine.back().IncrementCount();
+    }
+}
+
+void Console::DecrementCaretColorCount()
+{
+    int caretCol = CaretColumn();
+    int caretLine = CaretLine();
+    std::vector<ColorCount>& textColorLine = textColorLines[caretLine - 1];
+    DecrementColorCount(textColorLine, caretCol);
+    std::vector<ColorCount>& backColorLine = backColorLines[caretLine - 1];
+    DecrementColorCount(backColorLine, caretCol);
+}
+
+void Console::DecrementColorCount(std::vector<ColorCount>& colorLine, int caretCol)
+{
+    int count = 0;
+    bool decremented = false;
+    for (ColorCount& colorCount : colorLine)
+    {
+        if (caretCol >= count && caretCol < count + colorCount.count)
+        {
+            colorCount.DecrementCount();
+            decremented = true;
+            break;
+        }
+        count = count + colorCount.count;
+    }
+    if (!decremented)
+    {
+        colorLine.back().DecrementCount();
     }
 }
 

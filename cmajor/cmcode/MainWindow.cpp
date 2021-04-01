@@ -876,6 +876,7 @@ void MainWindow::StopBuilding()
 
 void MainWindow::StartDebugging()
 {
+    ResetDebugLocations();
     if (state == MainWindowState::debugging) return;
     savedLocation = ::Location();
     SetEditorsReadOnly();
@@ -1026,6 +1027,12 @@ void MainWindow::HandleServiceMessage()
                 HandleTargetRunning();
                 break;
             }
+            case ServiceMessageKind::targetInput:
+            {
+                TargetInputServiceMessage* message = static_cast<TargetInputServiceMessage*>(serviceMessage.get());
+                HandleTargetInput();
+                break;
+            }
             case ServiceMessageKind::targetOutput:
             {
                 TargetOutputServiceMessage* message = static_cast<TargetOutputServiceMessage*>(serviceMessage.get());
@@ -1131,6 +1138,7 @@ void MainWindow::HandleBuildReply(BuildReply& buildReply)
         debugRequest.reset();
         PutOutputServiceMessage("invalid build request: " + buildReply.requestErrorMessage);
     }
+    SetFocusToEditor();
 }
 
 void MainWindow::HandleBuildError(const std::string& buildError)
@@ -1138,11 +1146,13 @@ void MainWindow::HandleBuildError(const std::string& buildError)
     debugRequest.reset();
     StopBuilding();
     PutOutputServiceMessage("build unsuccessful");
+    SetFocusToEditor();
 }
 
 void MainWindow::HandleStopBuild()
 {
     StopBuilding();
+    SetFocusToEditor();
 }
 
 void MainWindow::HandleStartDebugReply(const StartDebugReply& startDebugReply)
@@ -1320,8 +1330,14 @@ void MainWindow::HandleTargetState(TargetState state)
 
 void MainWindow::HandleTargetRunning()
 {
+    ResetDebugLocations();
     programRunning = true;
     SetState(MainWindowState::debugging);
+}
+
+void MainWindow::HandleTargetInput()
+{
+    GetConsole()->StartReadLine();
 }
 
 void MainWindow::HandleTargetOutputRequest(const TargetOutputRequest& targetOutputRequest)
@@ -1329,9 +1345,37 @@ void MainWindow::HandleTargetOutputRequest(const TargetOutputRequest& targetOutp
     GetConsole()->Write(targetOutputRequest.handle, targetOutputRequest.output);
 }
 
+void MainWindow::ConsoleInputReady()
+{
+    Console* console = GetConsole();
+    if (console->Eof())
+    {
+        if (state == MainWindowState::debugging)
+        {
+            PutRequest(new SetTargetInputEofRequest());
+        }
+        else if (state == MainWindowState::running)
+        {
+            // todo
+        }
+    }
+    else
+    {
+        if (state == MainWindowState::debugging)
+        {
+            PutRequest(new PutTargetInputLineRequest(ToUtf8(console->InputLine())));
+        }
+        else if (state == MainWindowState::running)
+        {
+            // todo
+        }
+    }
+}
+
 void MainWindow::HandleDebugServiceStopped()
 {
     StopDebugging();
+    SetFocusToEditor();
 }
 
 void MainWindow::HandleGetDefinitionReply(GetDefinitionReply& getDefinitionReply)
@@ -3266,6 +3310,7 @@ void MainWindow::StartDebuggingClick()
     {
         if (state == MainWindowState::debugging)
         {
+            StartDebugging();
             PutRequest(new ContinueDebugServiceRequest());
         }
         else
@@ -3317,6 +3362,7 @@ void MainWindow::StepOverClick()
     {
         if (state == MainWindowState::debugging)
         {
+            StartDebugging();
             PutRequest(new NextDebugServiceRequest());
         }
         else
@@ -3340,6 +3386,7 @@ void MainWindow::StepIntoClick()
     {
         if (state == MainWindowState::debugging)
         {
+            StartDebugging();
             PutRequest(new StepDebugServiceRequest());
         }
         else
@@ -3361,6 +3408,7 @@ void MainWindow::StepOutClick()
 {
     try
     {
+        StartDebugging();
         PutRequest(new FinishDebugServiceRequest());
     }
     catch (const std::exception& ex)
@@ -4109,6 +4157,7 @@ Console* MainWindow::GetConsole()
     {
         console = new Console(ConsoleCreateParams().SetDock(Dock::fill));
         console->SetDoubleBuffered();
+        console->ConsoleInputReady().AddHandler(this, &MainWindow::ConsoleInputReady);
         consoleTabPage = new TabPage("Console", "console");
         consoleTabPage->AddChild(console);
         outputTabControl->AddTabPage(consoleTabPage);

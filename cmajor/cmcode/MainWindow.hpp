@@ -110,7 +110,9 @@ private:
     void HandleLocation(const ::Location& location, bool saveLocation);
     void HandleTargetState(TargetState state);
     void HandleTargetRunning();
+    void HandleTargetInput();
     void HandleTargetOutputRequest(const TargetOutputRequest& targetOutputRequest);
+    void ConsoleInputReady();
     void HandleDebugServiceStopped();
     void SetState(MainWindowState state_);
     void SetEditorState();

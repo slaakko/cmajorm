@@ -95,6 +95,7 @@ ClipboardListener::~ClipboardListener()
 
 Clipboard::Clipboard(HWND handle_) : handle(handle_)
 {
+    int maxWait = 100;
     for (int i = 0; i < 5; ++i)
     {
         bool succeeded = OpenClipboard(handle);
@@ -104,7 +105,8 @@ Clipboard::Clipboard(HWND handle_) : handle(handle_)
         }
         else if (i < 4)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(Random() % 1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(Random() % maxWait));
+            maxWait *= 2;
         }
     }
     throw WindowsException(GetLastError());

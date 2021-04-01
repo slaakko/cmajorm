@@ -153,9 +153,10 @@ private:
     std::thread serviceThread;
     std::unique_ptr<soulng::util::Process> serverProcess;
     std::condition_variable_any requestAvailableOrStopping;
-    std::condition_variable_any targetInputLineAvailableOrEof;
+    std::condition_variable targetInputLineAvailableOrEof;
     std::condition_variable_any stopped;
     std::recursive_mutex mtx;
+    std::mutex inputMutex;
     std::list<std::unique_ptr<DebugServiceRequest>> requestQueue;
     std::list<std::string> targetInputLines;
     bool waitingForTargetInput;
@@ -273,10 +274,11 @@ void DebugService::ProcessTargetRunningRequest(const TargetRunningRequest& targe
 
 void DebugService::ProcessTargetInputRequest(const TargetInputRequest& targetInputRequest)
 {
-    std::unique_lock<std::recursive_mutex> lock(mtx);
+    std::unique_lock<std::mutex> lock(inputMutex);
     if (!targetInputEof && targetInputLines.empty())
     {
         waitingForTargetInput = true;
+        PutServiceMessage(new TargetInputServiceMessage());
         targetInputLineAvailableOrEof.wait(lock, [this]{ return targetInputEof || !targetInputLines.empty(); });
     }
     waitingForTargetInput = false;
@@ -430,6 +432,7 @@ void RunService(DebugService* service)
 
 void DebugService::Start(const DebugServiceStartParams& startParams, const std::vector<SourceLoc>& breakpoints_)
 {
+    targetInputEof = false;
     running = false;
     stop = false;
     MakeDebugServiceStartCommand(startParams);
@@ -497,7 +500,7 @@ void DebugService::Stop()
         {
             if (waitingForTargetInput)
             {
-                DebugService::PutRequest(new SetTargetInputEofServiceRequest());
+                SetTargetInputEof();
             }
             DebugService::PutRequest(new RunStopDebugServiceRequest());
             DebugService::WaitForStoppedOrKill();
@@ -506,6 +509,7 @@ void DebugService::Stop()
         }
         if (started)
         {
+            started = false;
             serviceThread.join();
         }
         PutServiceMessage(new DebugServiceStoppedServiceMessage());
@@ -541,7 +545,7 @@ void DebugService::RunStopRequest()
 
 void DebugService::SetTargetInputEof()
 {
-    std::unique_lock<std::recursive_mutex> lock(mtx);
+    std::unique_lock<std::mutex> lock(inputMutex);
     targetInputEof = true;
     if (waitingForTargetInput)
     {
@@ -551,7 +555,7 @@ void DebugService::SetTargetInputEof()
 
 void DebugService::PutTargetInputLine(const std::string& targetInputLine)
 {
-    std::unique_lock<std::recursive_mutex> lock(mtx);
+    std::unique_lock<std::mutex> lock(inputMutex);
     targetInputLines.push_back(targetInputLine);
     if (waitingForTargetInput)
     {
@@ -670,43 +674,11 @@ void RunStopDebugServiceRequest::Failed(const std::string& error)
     PutServiceMessage(new DebugServiceStoppedServiceMessage());
 }
 
-SetTargetInputEofServiceRequest::SetTargetInputEofServiceRequest()
-{
-}
-
-void SetTargetInputEofServiceRequest::Execute()
-{
-    DebugService::Instance().SetTargetInputEof();
-}
-
-std::string SetTargetInputEofServiceRequest::Name() const
-{
-    return "setTargetInputEofServiceRequest";
-}
-
-void SetTargetInputEofServiceRequest::Failed(const std::string& error)
-{
-}
-
-PutTargetInputLineRequest::PutTargetInputLineRequest(const std::string& targetInputLine_) : targetInputLine(targetInputLine_)
-{
-}
-
-void PutTargetInputLineRequest::Execute()
-{
-    DebugService::Instance().PutTargetInputLine(targetInputLine);
-}
-
-std::string PutTargetInputLineRequest::Name() const
-{
-    return "putTargetInputLineRequest";
-}
-
-void PutTargetInputLineRequest::Failed(const std::string& error)
-{
-}
-
 TargetRunningServiceMessage::TargetRunningServiceMessage() : ServiceMessage(ServiceMessageKind::targetRunning)
+{
+}
+
+TargetInputServiceMessage::TargetInputServiceMessage() : ServiceMessage(ServiceMessageKind::targetInput)
 {
 }
 
@@ -872,6 +844,16 @@ void Finish()
 void Until(const SourceLoc& sourceLocation)
 {
     DebugService::Instance().PutRequest(new RunUntilDebugServiceRequest(sourceLocation));
+}
+
+void SetTargetInputEof()
+{
+    DebugService::Instance().SetTargetInputEof();
+}
+
+void PutTargetInputLine(const std::string& targetInputLine)
+{
+    DebugService::Instance().PutTargetInputLine(targetInputLine);
 }
 
 } } // namespace cmajor::service

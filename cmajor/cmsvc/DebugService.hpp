@@ -84,30 +84,16 @@ public:
     void Failed(const std::string& error) override;
 };
 
-class CMSVC_API SetTargetInputEofServiceRequest : public DebugServiceRequest
-{
-public:
-    SetTargetInputEofServiceRequest();
-    void Execute() override;
-    std::string Name() const override;
-    void Failed(const std::string& error) override;
-};
-
-class CMSVC_API PutTargetInputLineRequest : public DebugServiceRequest
-{
-public:
-    PutTargetInputLineRequest(const std::string& targetInputLine);
-    void Execute() override;
-    std::string Name() const override;
-    void Failed(const std::string& error) override;
-private:
-    std::string targetInputLine;
-};
-
 class CMSVC_API TargetRunningServiceMessage : public ServiceMessage
 {
 public:
     TargetRunningServiceMessage();
+};
+
+class CMSVC_API TargetInputServiceMessage : public ServiceMessage
+{
+public:
+    TargetInputServiceMessage();
 };
 
 class CMSVC_API TargetOutputServiceMessage : public ServiceMessage
@@ -226,6 +212,8 @@ CMSVC_API void Next();
 CMSVC_API void Step();
 CMSVC_API void Finish();
 CMSVC_API void Until(const SourceLoc& sourceLocation);
+CMSVC_API void SetTargetInputEof();
+CMSVC_API void PutTargetInputLine(const std::string& targetInputLine);
 
 } } // namespace cmajor::service
 

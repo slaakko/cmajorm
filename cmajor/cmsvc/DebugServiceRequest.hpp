@@ -69,5 +69,22 @@ private:
     SourceLoc sourceLocation;
 };
 
-} } // namespace cmajor::service
+class CMSVC_API SetTargetInputEofRequest : public Request
+{
+public:
+    SetTargetInputEofRequest();
+    void Execute() override;
+    std::string Name() const override { return "setTargetInputEofRequest"; }
+};
 
+class CMSVC_API PutTargetInputLineRequest : public Request
+{
+public:
+    PutTargetInputLineRequest(const std::string& targetInputLine_);
+    void Execute() override;
+    std::string Name() const override { return "putTargetInputLineRequest"; }
+private:
+    std::string targetInputLine;
+};
+
+} } // namespace cmajor::service

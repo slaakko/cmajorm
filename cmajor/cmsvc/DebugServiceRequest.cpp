@@ -70,4 +70,22 @@ void UntilDebugServiceRequest::Execute()
     Until(sourceLocation);
 }
 
+SetTargetInputEofRequest::SetTargetInputEofRequest()
+{
+}
+
+void SetTargetInputEofRequest::Execute()
+{
+    SetTargetInputEof();
+}
+
+PutTargetInputLineRequest::PutTargetInputLineRequest(const std::string& targetInputLine_) : targetInputLine(targetInputLine_)
+{
+}
+
+void PutTargetInputLineRequest::Execute()
+{
+    PutTargetInputLine(targetInputLine);
+}
+
 } } // namespace cmajor::service
