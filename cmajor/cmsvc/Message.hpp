@@ -16,8 +16,8 @@ const int SM_SERVICE_MESSAGE_AVAILABLE = WM_USER + 1;
 enum class ServiceMessageKind : int
 {
     clearOutput = 0, outputMessage = 1, buildReply = 2, buildError = 3, stopBuild = 4, getDefinitionReply = 5, getDefinitionError = 6,
-    startDebugReply = 7, startError = 8, continueReply = 9, nextReply = 10, stepReply = 11, finishReply = 12, untilReply = 13, 
-    targetRunning = 14, targetInput = 15, targetOutput = 16, debugServiceStopped = 17
+    startDebugReply = 7, startError = 8, continueReply = 9, nextReply = 10, stepReply = 11, finishReply = 12, untilReply = 13, breakReply = 14, deleteReply = 15,
+    targetRunning = 16, targetInput = 17, targetOutput = 18, debugServiceStopped = 19
 };
 
 class CMSVC_API ServiceMessage

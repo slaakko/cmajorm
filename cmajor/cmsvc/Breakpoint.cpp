@@ -8,19 +8,19 @@
 
 namespace cmajor { namespace service {
 
-Breakpoint::Breakpoint(int line_) : line(line_), condition(), disabled(false), info()
+Breakpoint::Breakpoint(int line_) : line(line_), condition(), disabled(false), info(), list(nullptr)
 {
 }
 
-Breakpoint::Breakpoint(int line_, const std::string& condition_) : line(line_), condition(condition_), disabled(false), info()
+Breakpoint::Breakpoint(int line_, const std::string& condition_) : line(line_), condition(condition_), disabled(false), info(), list(nullptr)
 {
 }
 
-Breakpoint::Breakpoint(int line_, const std::string& condition_, bool disabled_) : line(line_), condition(condition_), disabled(disabled_), info()
+Breakpoint::Breakpoint(int line_, const std::string& condition_, bool disabled_) : line(line_), condition(condition_), disabled(disabled_), info(), list(nullptr)
 {
 }
 
-BreakpointList::BreakpointList() : filePath(), breakpoints()
+BreakpointList::BreakpointList() : breakpointCollection(nullptr), filePath(), breakpoints()
 {
 }
 
@@ -41,12 +41,18 @@ void BreakpointList::Clear()
         delete bp;
     }
     breakpoints.clear();
+    breakpointCollection->SetChanged();
 }
 
 void BreakpointList::RemoveBreakpoint(Breakpoint* breakpoint)
 {
-    breakpoints.erase(std::remove(breakpoints.begin(), breakpoints.end(), breakpoint), breakpoints.end());
-    delete breakpoint;
+    Breakpoint* bp = GetBreakpoint(breakpoint->line);
+    if (bp)
+    {
+        breakpoints.erase(std::remove(breakpoints.begin(), breakpoints.end(), breakpoint), breakpoints.end());
+        delete breakpoint;
+        breakpointCollection->SetChanged();
+    }
 }
 
 struct ByLine
@@ -80,13 +86,20 @@ void BreakpointList::AddBreakpoint(Breakpoint* breakpoint)
     {
         throw std::runtime_error("already has breakpoint on line " + std::to_string(breakpoint->line));
     }
+    breakpoint->list = this;
     breakpoints.push_back(breakpoint);
     std::sort(breakpoints.begin(), breakpoints.end(), ByLine());
+    breakpointCollection->SetChanged();
+}
+
+BreakpointCollection::BreakpointCollection() : changed(false)
+{
 }
 
 BreakpointList& BreakpointCollection::GetBreakpointList(const std::string& filePath)
 {
     BreakpointList& breakpointList = breakpointListMap[filePath];
+    breakpointList.SetBreakpointCollection(this);
     if (breakpointList.FilePath().empty())
     {
         breakpointList.SetFilePath(filePath);
@@ -97,6 +110,7 @@ BreakpointList& BreakpointCollection::GetBreakpointList(const std::string& fileP
 void BreakpointCollection::Clear()
 {
     breakpointListMap.clear();
+    changed = true;
 }
 
 } } // namespace cmajor::service

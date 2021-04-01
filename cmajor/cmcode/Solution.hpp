@@ -38,6 +38,9 @@ class SolutionData
 {
 public:
     SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, TreeView* solutionTreeView_);
+    bool Changed() const { return solutionBreakpointCollection.Changed(); }
+    void Load(const std::string& solutionSettingsFilePath);
+    void Save(const std::string& solutionSettingsFilePath);
     sngcm::ast::Solution* GetSolution() const { return solution.get(); }
     TreeView* SolutionTreeView() const { return solutionTreeView; }
     TreeViewNode* ActiveProjectNode() const { return activeProjectNode; }
@@ -46,6 +49,8 @@ public:
     ProjectData* GetProjectDataByProject(sngcm::ast::Project* project) const;
     BreakpointCollection& GetSolutionBreakpointCollection() { return solutionBreakpointCollection; }
     void AddTreeViewNodeData(SolutionTreeViewNodeData* data);
+    const std::vector<std::unique_ptr<ProjectData>>& Projects() const { return projectDataVec; }
+    std::vector<Breakpoint*> GetBreakpoints();
 private:
     void SetActiveProject();
     TreeView* solutionTreeView;

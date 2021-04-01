@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmsvc/Request.hpp>
+#include <cmajor/cmsvc/Breakpoint.hpp>
 #include <cmajor/cmsvc/DebugService.hpp>
 
 namespace cmajor { namespace service {
@@ -11,12 +12,12 @@ namespace cmajor { namespace service {
 class CMSVC_API StartDebugServiceRequest : public Request
 {
 public:
-    StartDebugServiceRequest(const DebugServiceStartParams& startParams_, const std::vector<SourceLoc>& breakpoints_);
+    StartDebugServiceRequest(const DebugServiceStartParams& startParams_, const std::vector<Breakpoint*>& breakpoints_);
     void Execute() override;
     std::string Name() const override { return "startDebugServiceRequest"; }
 private:
     DebugServiceStartParams startParams;
-    std::vector<SourceLoc> breakpoints;
+    std::vector<Breakpoint*> breakpoints;
 };
 
 class CMSVC_API StopDebugServiceRequest : public Request
@@ -67,6 +68,26 @@ public:
     std::string Name() const override { return "untilDebugServiceRequest"; }
 private:
     SourceLoc sourceLocation;
+};
+
+class CMSVC_API BreakDebugServiceRequest : public Request
+{
+public:
+    BreakDebugServiceRequest(Breakpoint* breakpoint_);
+    void Execute() override;
+    std::string Name() const override { return "breakDebugServiceRequest"; }
+private:
+    Breakpoint* breakpoint;
+};
+
+class CMSVC_API DeleteDebugServiceRequest : public Request
+{
+public:
+    DeleteDebugServiceRequest(const std::string& breakpointId_);
+    void Execute() override;
+    std::string Name() const override { return "deleteDebugServiceRequest"; }
+private:
+    std::string breakpointId;
 };
 
 class CMSVC_API SetTargetInputEofRequest : public Request

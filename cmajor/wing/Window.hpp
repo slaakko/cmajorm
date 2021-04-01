@@ -27,12 +27,6 @@ class Button;
 class MenuBar;
 class ContextMenu;
 
-struct CancelArgs
-{
-    CancelArgs(bool& cancelClose_) : cancelClose(cancelClose_) {}
-    bool& cancelClose;
-};
-
 using WindowStateChangedEvent = Event;
 using WindowClosingEvent = EventWithArgs<CancelArgs>;
 using WindowClosedEvent = Event;

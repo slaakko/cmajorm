@@ -8,7 +8,7 @@
 
 namespace cmajor { namespace view {
 
-AddBreakpointEventArgs::AddBreakpointEventArgs() : filePath(), breakpoint(nullptr)
+AddBreakpointEventArgs::AddBreakpointEventArgs() : breakpoint(nullptr)
 {
 }
 
@@ -203,12 +203,20 @@ Breakpoint* DebugStrip::GetBreakpoint(int line) const
 
 void DebugStrip::AddBreakpoint(Breakpoint* breakpoint)
 {
+    bool cancel = false;
+    CancelArgs cancelArgs(cancel);
+    OnChangeBreakpoints(cancelArgs);
+    if (cancel) return;
     breakpointList->AddBreakpoint(breakpoint);
-    OnBreakpointAdded(breakpointList->FilePath(), breakpoint);
+    OnBreakpointAdded(breakpoint);
 }
 
 void DebugStrip::RemoveBreakpoint(Breakpoint* breakpoint)
 {
+    bool cancel = false;
+    CancelArgs cancelArgs(cancel);
+    OnChangeBreakpoints(cancelArgs);
+    if (cancel) return;
     std::string breakpointId = breakpoint->info.breakpointId;
     breakpointList->RemoveBreakpoint(breakpoint);
     OnBreakpointRemoved(breakpointId);
@@ -230,6 +238,23 @@ void DebugStrip::SetDebugLocation(const SourceSpan& debugLocation_)
 void DebugStrip::ResetDebugLocation()
 {
     SetDebugLocation(SourceSpan());
+}
+
+void DebugStrip::Update()
+{
+    bool changed = false;
+    for (Breakpoint* breakpoint : breakpointList->Breakpoints())
+    {
+        if (breakpoint->disabled != !breakpoint->info.success)
+        {
+            changed = true;
+            breakpoint->disabled = !breakpoint->info.success;
+        }
+    }
+    if (changed)
+    {
+        Invalidate();
+    }
 }
 
 void DebugStrip::OnPaint(PaintEventArgs& args)
@@ -315,13 +340,16 @@ void DebugStrip::OnMouseDown(MouseEventArgs& args)
     }
 }
 
-void DebugStrip::OnBreakpointAdded(const std::string& filePath, Breakpoint* breakpoint)
+void DebugStrip::OnChangeBreakpoints(CancelArgs& args)
+{
+    changeBreakpoints.Fire(args);
+}
+
+void DebugStrip::OnBreakpointAdded(Breakpoint* breakpoint)
 {
     AddBreakpointEventArgs args;
-    args.filePath = filePath;
     args.breakpoint = breakpoint;
     breakpointAdded.Fire(args);
-    breakpoint->disabled = !breakpoint->info.success;
     Invalidate();
 }
 

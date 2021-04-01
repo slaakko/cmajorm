@@ -12,7 +12,6 @@
 namespace cmcode {
 
 using namespace soulng::unicode;
-using namespace cmajor::service;
 
 DebugServiceStartParams MakeDebugServiceStartParams(int pid, const std::string& backend, const std::string& config, sngcm::ast::Project* project, const std::string& programArguments)
 {
@@ -21,7 +20,7 @@ DebugServiceStartParams MakeDebugServiceStartParams(int pid, const std::string& 
         DebugServer(UseDebugServers()).Log(ServerLogging()).Wait(DebugWait()).Verbose(ServerVerbose());
 }
 
-void StartDebugService(int pid, const std::string& backend, const std::string& config, sngcm::ast::Project* project, const std::string& programArguments, const std::vector<SourceLoc>& breakpoints)
+void StartDebugService(int pid, const std::string& backend, const std::string& config, sngcm::ast::Project* project, const std::string& programArguments, const std::vector<Breakpoint*>& breakpoints)
 {
     DebugServiceStartParams startParams = MakeDebugServiceStartParams(pid, backend, config, project, programArguments);
     PutRequest(new StartDebugServiceRequest(startParams, breakpoints));

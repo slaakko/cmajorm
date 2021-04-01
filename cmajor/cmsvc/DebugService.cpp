@@ -19,6 +19,9 @@
 #include <mutex>
 #include <sstream>
 
+#undef min
+#undef max
+
 namespace cmajor { namespace service {
 
 using namespace sngxml::dom;
@@ -118,7 +121,7 @@ public:
     static void Init();
     static void Done();
     static DebugService& Instance() { return *instance; }
-    void Start(const DebugServiceStartParams& startParams, const std::vector<SourceLoc>& breakpoints_);
+    void Start(const DebugServiceStartParams& startParams, const std::vector<Breakpoint*>& breakpoints_);
     void Run();
     void Stop();
     void PutRequest(DebugServiceRequest* request);
@@ -134,6 +137,11 @@ public:
     void RunNextRequest();
     void RunFinishRequest();
     void RunUntilRequest(const SourceLoc& sourceLocation);
+    void RunBreakRequest(Breakpoint* breakpoint);
+    void RunDeleteRequest(const std::string& breakpointId);
+    void SetRequestInProgress(const std::string& requestName);
+    void ResetRequestInProgress();
+    bool RequestInProgress(std::string& requestName);
 private:
     DebugService();
     DebugMessageKind GetDebugMessageKind(const std::u32string& messageName) const;
@@ -149,7 +157,7 @@ private:
     static std::unique_ptr<DebugService> instance;
     std::string startCommand;
     std::string startStatus;
-    std::vector<SourceLoc> breakpoints;
+    std::vector<Breakpoint*> breakpoints;
     std::thread serviceThread;
     std::unique_ptr<soulng::util::Process> serverProcess;
     std::condition_variable_any requestAvailableOrStopping;
@@ -166,12 +174,14 @@ private:
     bool started;
     bool running;
     bool stop;
+    bool requestInProgress;
+    std::string runningRequestName;
     std::map<std::u32string, DebugMessageKind> messageKindMap;
 };
 
 std::unique_ptr<DebugService> DebugService::instance;
 
-DebugService::DebugService() : serverPort(0), waitingForTargetInput(false), targetInputEof(false), started(false), running(false), stop(false)
+DebugService::DebugService() : serverPort(0), waitingForTargetInput(false), targetInputEof(false), started(false), running(false), stop(false), requestInProgress(false)
 {
     messageKindMap[U"startDebugRequest"] = DebugMessageKind::startDebugRequest;
     messageKindMap[U"startDebugReply"] = DebugMessageKind::startDebugReply;
@@ -422,6 +432,10 @@ void DebugService::MakeDebugServiceStartCommand(const DebugServiceStartParams& s
         startCommand.append(" --verbose");
     }
     startCommand.append(" \"").append(MakeExecutablePath(startParams)).append("\"");
+    if (!startParams.programArguments.empty())
+    {
+        startCommand.append(" ").append(startParams.programArguments);
+    }
     startStatus.append("...");
 }
 
@@ -430,7 +444,7 @@ void RunService(DebugService* service)
     service->Run();
 }
 
-void DebugService::Start(const DebugServiceStartParams& startParams, const std::vector<SourceLoc>& breakpoints_)
+void DebugService::Start(const DebugServiceStartParams& startParams, const std::vector<Breakpoint*>& breakpoints_)
 {
     targetInputEof = false;
     running = false;
@@ -479,10 +493,19 @@ void DebugService::Run()
     }
 }
 
+struct RequestGuard
+{
+    RequestGuard(DebugService* service_, DebugServiceRequest* request_) : service(service_), request(request_) { service->SetRequestInProgress(request->Name());  }
+    ~RequestGuard() { service->ResetRequestInProgress(); }
+    DebugService* service;
+    DebugServiceRequest* request;
+};
+
 void DebugService::ExecuteRequest(DebugServiceRequest* request)
 {
     try
     {
+        RequestGuard requestGuard(this, request);
         request->Execute();
     }
     catch (const std::exception& ex)
@@ -523,11 +546,27 @@ void DebugService::Stop()
 void DebugService::RunStartRequest()
 {
     StartDebugRequest request;
-    request.breakpointLocations = breakpoints;
+    for (Breakpoint* breakpoint : breakpoints)
+    {
+        SourceLoc breakpointLocation;
+        if (!breakpoint->list)
+        {
+            throw std::runtime_error("source file path for the breakpoint not set");
+        }
+        breakpointLocation.path = breakpoint->list->FilePath();
+        breakpointLocation.line = breakpoint->line;
+        request.breakpointLocations.push_back(breakpointLocation);
+    }
     std::unique_ptr<Element> requestElement = request.ToXml("startDebugRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::startDebugReply);
     StartDebugReply reply(replyDoc->DocumentElement());
+    int n = std::min(reply.breakpointInfos.size(), breakpoints.size());
+    for (int i = 0; i < n; ++i)
+    {
+        Breakpoint* breakpoint = breakpoints[i];
+        breakpoint->info = reply.breakpointInfos[i];
+    }
     PutServiceMessage(new StartReplyServiceMessage(reply));
 }
 
@@ -575,6 +614,7 @@ void DebugService::WaitForStoppedOrKill()
 
 void DebugService::RunContinueRequest()
 {
+    PutServiceMessage(new TargetRunningServiceMessage());
     ContinueRequest request;
     std::unique_ptr<Element> requestElement = request.ToXml("continueRequest");
     WriteMessage(requestElement.release());
@@ -585,6 +625,7 @@ void DebugService::RunContinueRequest()
 
 void DebugService::RunStepRequest()
 {
+    PutServiceMessage(new TargetRunningServiceMessage());
     StepRequest request;
     std::unique_ptr<Element> requestElement = request.ToXml("stepRequest");
     WriteMessage(requestElement.release());
@@ -595,6 +636,7 @@ void DebugService::RunStepRequest()
 
 void DebugService::RunNextRequest()
 {
+    PutServiceMessage(new TargetRunningServiceMessage());
     NextRequest request;
     std::unique_ptr<Element> requestElement = request.ToXml("nextRequest");
     WriteMessage(requestElement.release());
@@ -605,6 +647,7 @@ void DebugService::RunNextRequest()
 
 void DebugService::RunFinishRequest()
 {
+    PutServiceMessage(new TargetRunningServiceMessage());
     FinishRequest request;
     std::unique_ptr<Element> requestElement = request.ToXml("finishRequest");
     WriteMessage(requestElement.release());
@@ -615,6 +658,7 @@ void DebugService::RunFinishRequest()
 
 void DebugService::RunUntilRequest(const SourceLoc& sourceLocation)
 {
+    PutServiceMessage(new TargetRunningServiceMessage());
     UntilRequest request;
     request.sourceLoc = sourceLocation;
     std::unique_ptr<Element> requestElement = request.ToXml("untilRequest");
@@ -622,6 +666,58 @@ void DebugService::RunUntilRequest(const SourceLoc& sourceLocation)
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::untilReply);
     UntilReply reply(replyDoc->DocumentElement());
     PutServiceMessage(new UntilReplyServiceMessage(reply));
+}
+
+void DebugService::RunBreakRequest(Breakpoint* breakpoint)
+{
+    BreakRequest request;
+    if (!breakpoint->list)
+    {
+        throw std::runtime_error("source file path for the breakpoint not set");
+    }
+    request.breakpointLocation.path = breakpoint->list->FilePath();
+    request.breakpointLocation.line = breakpoint->line;
+    std::unique_ptr<Element> requestElement = request.ToXml("breakRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::breakReply);
+    BreakReply reply(replyDoc->DocumentElement());
+    breakpoint->info = reply.breakpointInfo;
+    PutServiceMessage(new BreakReplyServiceMessage(reply));
+}
+
+void DebugService::RunDeleteRequest(const std::string& breakpointId)
+{
+    DeleteRequest request;
+    request.breakpointId = breakpointId;
+    std::unique_ptr<Element> requestElement = request.ToXml("deleteRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::deleteReply);
+    DeleteReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new DeleteReplyServiceMessage(reply));
+}
+
+void DebugService::SetRequestInProgress(const std::string& requestName)
+{
+    requestInProgress = true;
+    runningRequestName = requestName;
+}
+
+void DebugService::ResetRequestInProgress()
+{
+    requestInProgress = false;
+}
+
+bool DebugService::RequestInProgress(std::string& requestName)
+{
+    if (requestInProgress)
+    {
+        requestName = runningRequestName;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 DebugServiceRequest::~DebugServiceRequest()
@@ -800,6 +896,50 @@ UntilReplyServiceMessage::UntilReplyServiceMessage(const UntilReply& untilReply_
 {
 }
 
+RunBreakDebugServiceRequest::RunBreakDebugServiceRequest(Breakpoint* breakpoint_) : breakpoint(breakpoint_)
+{
+}
+
+void RunBreakDebugServiceRequest::Execute()
+{
+    DebugService::Instance().RunBreakRequest(breakpoint);
+}
+
+std::string RunBreakDebugServiceRequest::Name() const
+{
+    return "runBreakDebugServiceRequest";
+}
+
+void RunBreakDebugServiceRequest::Failed(const std::string& error)
+{
+}
+
+BreakReplyServiceMessage::BreakReplyServiceMessage(const BreakReply& breakReply_) : ServiceMessage(ServiceMessageKind::breakReply), breakReply(breakReply_)
+{
+}
+
+RunDeleteDebugServiceRequest::RunDeleteDebugServiceRequest(const std::string& breakpointId_) : breakpointId(breakpointId_)
+{
+}
+
+void RunDeleteDebugServiceRequest::Execute()
+{
+    DebugService::Instance().RunDeleteRequest(breakpointId);
+}
+
+std::string RunDeleteDebugServiceRequest::Name() const
+{
+    return "runDeleteDebugServiceRequest";
+}
+
+void RunDeleteDebugServiceRequest::Failed(const std::string& error)
+{
+}
+
+DeleteReplyServiceMessage::DeleteReplyServiceMessage(const DeleteReply& deleteReply_) : ServiceMessage(ServiceMessageKind::deleteReply), deleteReply(deleteReply_)
+{
+}
+
 void InitDebugService()
 {
     DebugService::Init();
@@ -810,7 +950,7 @@ void DoneDebugService()
     DebugService::Done();
 }
 
-void StartDebugService(DebugServiceStartParams& startParams, const std::vector<SourceLoc>& breakpoints)
+void StartDebugService(DebugServiceStartParams& startParams, const std::vector<Breakpoint*>& breakpoints)
 {
     DebugService::Instance().Start(startParams, breakpoints);
     DebugService::Instance().PutRequest(new RunStartDebugServiceRequest());
@@ -846,6 +986,16 @@ void Until(const SourceLoc& sourceLocation)
     DebugService::Instance().PutRequest(new RunUntilDebugServiceRequest(sourceLocation));
 }
 
+void Break(Breakpoint* breakpoint)
+{
+    DebugService::Instance().PutRequest(new RunBreakDebugServiceRequest(breakpoint));
+}
+
+void Delete(const std::string& breakpointId)
+{
+    DebugService::Instance().PutRequest(new RunDeleteDebugServiceRequest(breakpointId));
+}
+
 void SetTargetInputEof()
 {
     DebugService::Instance().SetTargetInputEof();
@@ -854,6 +1004,11 @@ void SetTargetInputEof()
 void PutTargetInputLine(const std::string& targetInputLine)
 {
     DebugService::Instance().PutTargetInputLine(targetInputLine);
+}
+
+bool DebugRequestInProgress(std::string& requestName)
+{
+    return DebugService::Instance().RequestInProgress(requestName);
 }
 
 } } // namespace cmajor::service

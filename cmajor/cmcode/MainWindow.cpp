@@ -14,6 +14,7 @@
 #include <cmajor/cmcode/AddNewSourceFileDialog.hpp>
 #include <cmajor/cmcode/AddNewResourceFileDialog.hpp>
 #include <cmajor/cmcode/AddNewTextFileDialog.hpp>
+#include <cmajor/cmcode/ProgramArgumentsDialog.hpp>
 #include <cmajor/cmcode/SelectProjectTypeDialog.hpp>
 #include <cmajor/wing/Ansi.hpp>
 #include <cmajor/wing/Dialog.hpp>
@@ -57,6 +58,11 @@ struct ShowDialogGuard
     }
     bool& showingDialog;
 };
+
+bool IsProgramTarget(Target target)
+{
+    return target == Target::program || target == Target::winapp || target == Target::winguiapp;
+}
 
 MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams().Text("Cmajor Code").WindowClassName("cmajor.code." + std::to_string(GetPid()))),
     newProjectMenuItem(nullptr),
@@ -605,11 +611,13 @@ void MainWindow::OnWindowClosing(CancelArgs& args)
         Window::OnWindowClosing(args);
         if (!CloseSolution())
         {
-            args.cancelClose = true;
+            args.cancel = true;
         }
         else
         {
             SaveConfigurationSettings();
+            SaveProjectData();
+            SaveSolutionData();
             this->RemoveClipboardListener();
         }
     }
@@ -673,6 +681,8 @@ void MainWindow::OnTimer(TimerEventArgs& args)
         else if (args.timerId == configurationSaveTimerId)
         {
             SaveConfigurationSettings();
+            SaveProjectData();
+            SaveSolutionData();
         }
     }
     catch (const std::exception& ex)
@@ -832,6 +842,31 @@ void MainWindow::SaveConfigurationSettings()
     cmcode::SaveConfiguration();
 }
 
+void MainWindow::SaveProjectData()
+{
+    if (!solutionData) return;
+    for (const auto& projectData : solutionData->Projects())
+    {
+        if (projectData->Changed())
+        {
+            std::string projectSettingsFilePath = projectData->GetProject()->FilePath();
+            projectSettingsFilePath.append(".settings.xml");
+            projectData->Save(projectSettingsFilePath);
+        }
+    }
+}
+
+void MainWindow::SaveSolutionData()
+{
+    if (!solutionData) return;
+    if (solutionData->Changed())
+    {
+        std::string solutionSettingsFilePath = solutionData->GetSolution()->FilePath();
+        solutionSettingsFilePath.append(".settings.xml");
+        solutionData->Save(solutionSettingsFilePath);
+    }
+}
+
 void MainWindow::AddClipboardListener()
 {
     try
@@ -885,13 +920,21 @@ void MainWindow::StartDebugging()
     ClearOutput();
     GetConsole()->Clear();
     sngcm::ast::Solution* solution = solutionData->GetSolution();
-    StartDebugService(pid, backend, config, solution->ActiveProject(), programArguments, breakpoints);
+    sngcm::ast::Project* activeProject = solution->ActiveProject();
+    ProjectData* projectData = solutionData->GetProjectDataByProject(activeProject);
+    if (!projectData)
+    {
+        throw std::runtime_error("active project has no data");
+    }
+    const std::string& programArguments = projectData->ProgramArguments();
+    std::vector<Breakpoint*> breakpoints = solutionData->GetBreakpoints();
+    StartDebugService(pid, backend, config, activeProject, programArguments, breakpoints);
 }
 
 void MainWindow::StopDebugging()
 {
-    savedLocation = ::Location();
     ResetDebugLocations();
+    savedLocation = ::Location();
     startDebuggingMenuItem->SetText("Start Debugging");
     startDebuggingToolButton->SetToolTip("Start Debugging (F5)");
     SetState(MainWindowState::idle);
@@ -1019,6 +1062,18 @@ void MainWindow::HandleServiceMessage()
             {
                 UntilReplyServiceMessage* message = static_cast<UntilReplyServiceMessage*>(serviceMessage.get());
                 HandleUntilReply(message->GetUntilReply());
+                break;
+            }
+            case ServiceMessageKind::breakReply:
+            {
+                BreakReplyServiceMessage* message = static_cast<BreakReplyServiceMessage*>(serviceMessage.get());
+                HandleBreakReply(message->GetBreakReply());
+                break;
+            }
+            case ServiceMessageKind::deleteReply:
+            {
+                DeleteReplyServiceMessage* message = static_cast<DeleteReplyServiceMessage*>(serviceMessage.get());
+                HandleDeleteReply(message->GetDeleteReply());
                 break;
             }
             case ServiceMessageKind::targetRunning:
@@ -1157,6 +1212,7 @@ void MainWindow::HandleStopBuild()
 
 void MainWindow::HandleStartDebugReply(const StartDebugReply& startDebugReply)
 {
+    UpdateCurrentDebugStrip();
     startDebugging = false;
     if (startDebugReply.success)
     {
@@ -1174,6 +1230,7 @@ void MainWindow::HandleStartDebugReply(const StartDebugReply& startDebugReply)
 
 void MainWindow::HandleStartDebugError(const std::string& error)
 {
+    UpdateCurrentDebugStrip();
     startDebugging = false;
     PutRequest(new StopDebugServiceRequest());
 }
@@ -1243,6 +1300,32 @@ void MainWindow::HandleUntilReply(const UntilReply& untilReply)
     }
 }
 
+void MainWindow::HandleBreakReply(const BreakReply& breakReply)
+{
+    UpdateCurrentDebugStrip();
+    if (breakReply.breakpointInfo.success)
+    {
+        PutOutputServiceMessage("breakpoint added");
+    }
+    else
+    {
+        PutOutputServiceMessage("break request failed: " + breakReply.breakpointInfo.error);
+    }
+}
+
+void MainWindow::HandleDeleteReply(const DeleteReply& deleteReply)
+{
+    UpdateCurrentDebugStrip();
+    if (deleteReply.success)
+    {
+        PutOutputServiceMessage("breakpoint removed");
+    }
+    else
+    {
+        PutOutputServiceMessage("delete request failed: " + deleteReply.error);
+    }
+}
+
 void MainWindow::HandleLocation(const ::Location& location, bool saveLocation)
 {
     try
@@ -1299,7 +1382,6 @@ void MainWindow::HandleLocation(const ::Location& location, bool saveLocation)
 void MainWindow::HandleTargetState(TargetState state)
 {
     programRunning = false;
-    ResetDebugLocations();
     SetState(MainWindowState::debugging);
     if (state.stopReason == "exited-normally")
     {
@@ -1483,6 +1565,11 @@ void MainWindow::SetState(MainWindowState state_)
     }
 
     bool solutionOpen = solutionData.get() != nullptr;
+    sngcm::ast::Project* activeProject = nullptr;
+    if (solutionOpen)
+    {
+        activeProject = solutionData->GetSolution()->ActiveProject();
+    }
 
     // todo:
     // gotoMenuItem
@@ -1541,7 +1628,10 @@ void MainWindow::SetState(MainWindowState state_)
                 cleanActiveProjectMenuItem->Enable();
                 startDebuggingMenuItem->Enable();
                 startWithoutDebuggingMenuItem->Enable();
-                programArgumentsMenuItem->Enable();
+                if (activeProject && IsProgramTarget(activeProject->GetTarget()))
+                {
+                    programArgumentsMenuItem->Enable();
+                }
                 saveAllToolButton->Enable();
                 cppToolButton->Enable();
                 llvmToolButton->Enable();
@@ -2081,14 +2171,53 @@ DefinitionSourceLocation MainWindow::CurrentLocation() const
     return currentLocation;
 }
 
+void MainWindow::ChangeBreakpoints(CancelArgs& args)
+{
+    try
+    {
+        std::string requestName;
+        if (DebugRequestInProgress(requestName))
+        {
+            throw std::runtime_error("cannot change breakpoints while debug request is running (request=" + requestName + ")");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
 void MainWindow::BreakpointAdded(AddBreakpointEventArgs& args)
 {
-    ShowInfoMessageBox(Handle(), "breakpoint added");
+    try
+    {
+        if (state != MainWindowState::debugging)
+        {
+            args.breakpoint->info.success = true;
+            return;
+        }
+        PutRequest(new BreakDebugServiceRequest(args.breakpoint));
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::BreakpointRemoved(RemoveBreakpointEventArgs& args)
 {
-    ShowInfoMessageBox(Handle(), "breakpoint removed");
+    try
+    {
+        if (state != MainWindowState::debugging)
+        {
+            return;
+        }
+        PutRequest(new DeleteDebugServiceRequest(args.breakpointId));
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::VerticalSplitContainerSplitterDistanceChanged()
@@ -3237,7 +3366,7 @@ bool MainWindow::BuildActiveProject()
         {
             throw std::runtime_error("no active project set for the solution");
         }
-        if (activeProject->GetTarget() != sngcm::ast::Target::program && activeProject->GetTarget() != sngcm::ast::Target::winapp && activeProject->GetTarget() != sngcm::ast::Target::winguiapp)
+        if (!IsProgramTarget(activeProject->GetTarget()))
         {
             throw std::runtime_error("active project is a library project");
         }
@@ -3424,7 +3553,41 @@ void MainWindow::ToggleBreakpointClick()
 
 void MainWindow::ProgramArgumentsClick()
 {
-    ShowInfoMessageBox(Handle(), "Program Arguments");
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        if (!solutionData)
+        {
+            throw std::runtime_error("no solution open");
+        }
+        sngcm::ast::Project* activeProject = solutionData->GetSolution()->ActiveProject();
+        if (!activeProject)
+        {
+            throw std::runtime_error("no active project set for the solution");
+        }
+        if (!IsProgramTarget(activeProject->GetTarget()))
+        {
+            throw std::runtime_error("active project is a library project");
+        }
+        ProjectData* projectData = solutionData->GetProjectDataByProject(activeProject);
+        if (!projectData)
+        { 
+            throw std::runtime_error("active project has no data");
+        }
+        ProgramArgumentsDialog dialog;
+        dialog.SetProgramArguments(projectData->ProgramArguments());
+        if (dialog.ShowDialog(*this) == DialogResult::ok)
+        {
+            projectData->SetProgramArguments(dialog.ProgramArguments());
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::CloseAllTabsClick()
@@ -3809,6 +3972,7 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
         DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
         if (debugStrip)
         {
+            debugStrip->ChangeBreakpoints().AddHandler(this, &MainWindow::ChangeBreakpoints);
             debugStrip->BreakpointAdded().AddHandler(this, &MainWindow::BreakpointAdded);
             debugStrip->BreakpointRemoved().AddHandler(this, &MainWindow::BreakpointRemoved);
         }
@@ -4164,6 +4328,23 @@ Console* MainWindow::GetConsole()
     }
     consoleTabPage->Select();
     return console;
+}
+
+void MainWindow::UpdateCurrentDebugStrip()
+{
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        if (editor->IsCmajorEditor())
+        {
+            CmajorEditor* cmajorEditor = static_cast<CmajorEditor*>(editor);
+            DebugStrip* debugStrip = cmajorEditor->GetDebugStrip();
+            if (debugStrip)
+            {
+                debugStrip->Update();
+            }
+        }
+    }
 }
 
 } // namespace cmcode

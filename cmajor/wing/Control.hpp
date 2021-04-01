@@ -27,6 +27,12 @@ struct WING_API ControlEventArgs
     Control* control;
 };
 
+struct WING_API CancelArgs
+{
+    CancelArgs(bool& cancel_) : cancel(cancel_) {}
+    bool& cancel;
+};
+
 using ClickEvent = Event;
 using CreatedEvent = Event;
 using DestroyedEvent = Event;

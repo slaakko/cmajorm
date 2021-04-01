@@ -6,6 +6,7 @@
 #ifndef CMAJOR_SERVICE_DEBUG_SERVICE_INCLUDED
 #define CMAJOR_SERVICE_DEBUG_SERVICE_INCLUDED
 #include <cmajor/cmsvc/Message.hpp>
+#include <cmajor/cmsvc/Breakpoint.hpp>
 #include <cmajor/cmmsg/CmdbMessage.hpp>
 
 namespace cmajor { namespace service {
@@ -197,6 +198,46 @@ private:
     UntilReply untilReply;
 };
 
+class CMSVC_API RunBreakDebugServiceRequest : public DebugServiceRequest
+{
+public:
+    RunBreakDebugServiceRequest(Breakpoint* breakpoint_);
+    void Execute() override;
+    std::string Name() const override;
+    void Failed(const std::string& error) override;
+private:
+    Breakpoint* breakpoint;
+};
+
+class CMSVC_API BreakReplyServiceMessage : public ServiceMessage
+{
+public:
+    BreakReplyServiceMessage(const BreakReply& breakReply_);
+    const BreakReply& GetBreakReply() const { return breakReply; }
+private:
+    BreakReply breakReply;
+};
+
+class CMSVC_API RunDeleteDebugServiceRequest : public DebugServiceRequest
+{
+public:
+    RunDeleteDebugServiceRequest(const std::string& breakpointId_);
+    void Execute() override;
+    std::string Name() const override;
+    void Failed(const std::string& error) override;
+private:
+    std::string breakpointId;
+};
+
+class CMSVC_API DeleteReplyServiceMessage : public ServiceMessage
+{
+public:
+    DeleteReplyServiceMessage(const DeleteReply& deleteReply_);
+    const DeleteReply& GetDeleteReply() const { return deleteReply; }
+private:
+    DeleteReply deleteReply;
+};
+
 class CMSVC_API DebugServiceStoppedServiceMessage : public ServiceMessage
 {
 public:
@@ -205,7 +246,7 @@ public:
 
 CMSVC_API void InitDebugService();
 CMSVC_API void DoneDebugService();
-CMSVC_API void StartDebugService(DebugServiceStartParams& startParams, const std::vector<SourceLoc>& breakpoints);
+CMSVC_API void StartDebugService(DebugServiceStartParams& startParams, const std::vector<Breakpoint*>& breakpoints);
 CMSVC_API void StopDebugService();
 CMSVC_API void Continue();
 CMSVC_API void Next();
@@ -214,6 +255,9 @@ CMSVC_API void Finish();
 CMSVC_API void Until(const SourceLoc& sourceLocation);
 CMSVC_API void SetTargetInputEof();
 CMSVC_API void PutTargetInputLine(const std::string& targetInputLine);
+CMSVC_API bool DebugRequestInProgress(std::string& requestName);
+CMSVC_API void Break(Breakpoint* breakpoint);
+CMSVC_API void Delete(const std::string& breakpointId);
 
 } } // namespace cmajor::service
 

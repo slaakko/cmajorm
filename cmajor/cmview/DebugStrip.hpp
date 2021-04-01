@@ -18,7 +18,6 @@ using namespace cmajor::wing;
 struct CMVIEW_API AddBreakpointEventArgs
 {
     AddBreakpointEventArgs();
-    std::string filePath;
     Breakpoint* breakpoint;
 };
 
@@ -27,6 +26,7 @@ struct CMVIEW_API RemoveBreakpointEventArgs
     std::string breakpointId;
 };
 
+using ChangeBreakpointsEvent = EventWithArgs<CancelArgs>;
 using AddBreakpointEvent = EventWithArgs<AddBreakpointEventArgs>;
 using RemoveBreakpointEvent = EventWithArgs<RemoveBreakpointEventArgs>;
 
@@ -81,12 +81,15 @@ public:
     const SourceSpan& DebugLocation() const { return debugLocation; }
     void SetDebugLocation(const SourceSpan& debugLocation_);
     void ResetDebugLocation();
+    void Update();
+    ChangeBreakpointsEvent& ChangeBreakpoints() { return changeBreakpoints; }
     AddBreakpointEvent& BreakpointAdded() { return breakpointAdded; }
     RemoveBreakpointEvent& BreakpointRemoved() { return breakpointRemoved; }
 protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnMouseDown(MouseEventArgs& args) override;
-    virtual void OnBreakpointAdded(const std::string& filePath, Breakpoint* breakpoint);
+    virtual void OnChangeBreakpoints(CancelArgs& args);
+    virtual void OnBreakpointAdded(Breakpoint* breakpoint);
     virtual void OnBreakpointRemoved(const std::string& breakpointId);
 private:
     void DrawArrow(Graphics& graphics, const PointF& location);
@@ -107,6 +110,7 @@ private:
     SolidBrush backgroundBrush;
     SolidBrush breakpointBrush;
     Pen breakpointPen;
+    ChangeBreakpointsEvent changeBreakpoints;
     AddBreakpointEvent breakpointAdded;
     RemoveBreakpointEvent breakpointRemoved;
 };

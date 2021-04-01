@@ -669,6 +669,8 @@ void TreeViewNode::RemoveChild(TreeViewNode* child)
     if (view)
     {
         view->SetTreeViewNodeChanged();
+        view->SetChanged();
+        view->Invalidate();
     }
 }
 

@@ -520,7 +520,7 @@ bool Window::ProcessMessage(Message& msg)
             bool cancelClose = false;
             CancelArgs args(cancelClose);
             OnWindowClosing(args);
-            if (args.cancelClose) 
+            if (args.cancel) 
             {
                 msg.result = 0;
                 return true;

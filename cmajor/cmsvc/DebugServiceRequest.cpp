@@ -7,7 +7,7 @@
 
 namespace cmajor { namespace service {
 
-StartDebugServiceRequest::StartDebugServiceRequest(const DebugServiceStartParams& startParams_, const std::vector<SourceLoc>& breakpoints_) : startParams(startParams_), breakpoints(breakpoints_)
+StartDebugServiceRequest::StartDebugServiceRequest(const DebugServiceStartParams& startParams_, const std::vector<Breakpoint*>& breakpoints_) : startParams(startParams_), breakpoints(breakpoints_)
 {
 }
 
@@ -68,6 +68,24 @@ UntilDebugServiceRequest::UntilDebugServiceRequest(const SourceLoc& sourceLocati
 void UntilDebugServiceRequest::Execute() 
 {
     Until(sourceLocation);
+}
+
+BreakDebugServiceRequest::BreakDebugServiceRequest(Breakpoint* breakpoint_) : breakpoint(breakpoint_)
+{
+}
+
+void BreakDebugServiceRequest::Execute()
+{
+    Break(breakpoint);
+}
+
+DeleteDebugServiceRequest::DeleteDebugServiceRequest(const std::string& breakpointId_) : breakpointId(breakpointId_)
+{
+}
+
+void DeleteDebugServiceRequest::Execute()
+{
+    Delete(breakpointId);
 }
 
 SetTargetInputEofRequest::SetTargetInputEofRequest()

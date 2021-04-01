@@ -4,6 +4,10 @@
 // =================================
 
 #include <cmajor/cmcode/Solution.hpp>
+#include <cmajor/cmcode/SolutionSettings.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/Parser.hpp>
 #include <sngcm/cmlexer/ContainerFileLexer.hpp>
 #include <sngcm/cmparser/ProjectFile.hpp>
 #include <sngcm/cmparser/SolutionFile.hpp>
@@ -84,10 +88,16 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, Tr
     std::unique_ptr<SolutionTreeViewNodeData> solutionData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::solution, solution.get(), nullptr, std::string(), std::string()));
     solutionNode->SetData(solutionData.get());
     treeViewData.push_back(std::move(solutionData));
+    std::string solutionSettingsFilePath = solution->FilePath();
+    solutionSettingsFilePath.append(".settings.xml");
+    Load(solutionSettingsFilePath);
     for (const auto& project : solution->Projects())
     {
         std::string projectName = ToUtf8(project->Name());
         std::unique_ptr<ProjectData> projectData(new ProjectData(project.get()));
+        std::string projectSettingsFilePath = project->FilePath();
+        projectSettingsFilePath.append(".settings.xml");
+        projectData->Load(projectSettingsFilePath);
         projectDataMap[project.get()] = projectData.get();
         projectDataVec.push_back(std::move(projectData));
         std::unique_ptr<TreeViewNode> projectNode(new TreeViewNode(projectName));
@@ -198,6 +208,73 @@ void SolutionData::AddTreeViewNodeData(SolutionTreeViewNodeData* data)
 {
     treeViewDataMap[data->key] = data;
     treeViewData.push_back(std::unique_ptr<SolutionTreeViewNodeData>(data));
+}
+
+std::vector<Breakpoint*> SolutionData::GetBreakpoints() 
+{
+    std::vector<Breakpoint*> breakpoints;
+    for (auto& bm : solutionBreakpointCollection.BreakpointListMap())
+    {
+        BreakpointList& list = bm.second;
+        for (Breakpoint* breakpoint : list.Breakpoints())
+        {
+            breakpoints.push_back(breakpoint);
+        }
+    }
+    for (auto& project : projectDataVec)
+    {
+        BreakpointCollection& breakpointCollection = project->GetBreakpointCollection();
+        for (auto& bm : breakpointCollection.BreakpointListMap())
+        {
+            BreakpointList& list = bm.second;
+            for (Breakpoint* breakpoint : list.Breakpoints())
+            {
+                breakpoints.push_back(breakpoint);
+            }
+        }
+    }
+    return breakpoints;
+}
+
+void SolutionData::Load(const std::string& solutionSettingsFilePath)
+{
+    if (boost::filesystem::exists(solutionSettingsFilePath))
+    {
+        std::unique_ptr<sngxml::dom::Document> solutionSettingsDoc = sngxml::dom::ReadDocument(solutionSettingsFilePath); 
+        SolutionSettings solutionSettings(solutionSettingsDoc->DocumentElement());
+        for (const SolutionBreakpoint& breakpoint : solutionSettings.breakpoints)
+        {
+            BreakpointList& breakpointList = solutionBreakpointCollection.GetBreakpointList(breakpoint.file);
+            breakpointList.AddBreakpoint(new Breakpoint(breakpoint.line, breakpoint.condition, breakpoint.disabled));
+        }
+        solutionBreakpointCollection.ResetChanged();
+    }
+}
+
+void SolutionData::Save(const std::string& solutionSettingsFilePath)
+{
+    if (!Changed()) return;
+    SolutionSettings solutionSettings;
+    for (auto& bm : solutionBreakpointCollection.BreakpointListMap())
+    {
+        BreakpointList& breakpointList = bm.second;
+        for (Breakpoint* breakpoint : breakpointList.Breakpoints())
+        {
+            SolutionBreakpoint solutionBreakpoint;
+            solutionBreakpoint.file = breakpointList.FilePath();
+            solutionBreakpoint.line = breakpoint->line;
+            solutionBreakpoint.condition = breakpoint->condition;
+            solutionBreakpoint.disabled = breakpoint->disabled;
+            solutionSettings.breakpoints.push_back(solutionBreakpoint);
+        }
+    }
+    sngxml::dom::Document solutionSettingsDoc;
+    std::unique_ptr<sngxml::dom::Element> solutionSettingsElement = solutionSettings.ToXml("solutionSettings");
+    solutionSettingsDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(solutionSettingsElement.release()));
+    std::ofstream solutionSettingsFile(solutionSettingsFilePath);
+    CodeFormatter formatter(solutionSettingsFile);
+    solutionSettingsDoc.Write(formatter);
+    solutionBreakpointCollection.ResetChanged();
 }
 
 } // namespace cmcode

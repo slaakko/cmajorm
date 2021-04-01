@@ -84,6 +84,8 @@ protected:
 private:
     void SaveConfigurationSettings();
     void LoadConfigurationSettings();
+    void SaveProjectData();
+    void SaveSolutionData();
     void AddClipboardListener();
     void RemoveClipboardListener();
     void StartBuilding();
@@ -107,6 +109,8 @@ private:
     void HandleStepReply(const StepReply& stepReply);
     void HandleFinishReply(const FinishReply& finishReply);
     void HandleUntilReply(const UntilReply& untilReply);
+    void HandleBreakReply(const BreakReply& breakReply);
+    void HandleDeleteReply(const DeleteReply& deleteReply);
     void HandleLocation(const ::Location& location, bool saveLocation);
     void HandleTargetState(TargetState state);
     void HandleTargetRunning();
@@ -129,6 +133,7 @@ private:
     bool GetDefinitionSourceLocationAt(const Point& loc, TextView* textView, std::string& identifier, DefinitionSourceLocation& sourceLocation);
     sngcm::ast::Project* CurrentProject();
     DefinitionSourceLocation CurrentLocation() const;
+    void ChangeBreakpoints(CancelArgs& args);
     void BreakpointAdded(AddBreakpointEventArgs& args);
     void BreakpointRemoved(RemoveBreakpointEventArgs& args);
     void VerticalSplitContainerSplitterDistanceChanged();
@@ -200,6 +205,7 @@ private:
     Editor* CurrentEditor() const;
     SearchResultsView* GetSearchResultsView();
     Console* GetConsole();
+    void UpdateCurrentDebugStrip();
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -300,8 +306,6 @@ private:
     std::u32string clipboardData;
     std::vector<std::unique_ptr<ClickAction>> clickActions;
     LocationList locations;
-    std::string programArguments;
-    std::vector<SourceLoc> breakpoints;
     std::unique_ptr<Request> debugRequest;
     ::Location savedLocation;
 };
