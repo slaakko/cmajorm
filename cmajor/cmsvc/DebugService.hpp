@@ -238,6 +238,45 @@ private:
     DeleteReply deleteReply;
 };
 
+class CMSVC_API RunDepthDebugServiceRequest : public DebugServiceRequest
+{
+public:
+    RunDepthDebugServiceRequest();
+    void Execute() override;
+    std::string Name() const override;
+    void Failed(const std::string& error) override;
+};
+
+class CMSVC_API DepthReplyServiceMessage : public ServiceMessage
+{
+public:
+    DepthReplyServiceMessage(const DepthReply& depthReply_);
+    const DepthReply& GetDepthReply() const { return depthReply; }
+private:
+    DepthReply depthReply;
+};
+
+class CMSVC_API RunFramesDebugServiceRequest : public DebugServiceRequest
+{
+public:
+    RunFramesDebugServiceRequest(int lowFrame_, int highFrame_);
+    void Execute() override;
+    std::string Name() const override;
+    void Failed(const std::string& error) override;
+private:
+    int lowFrame;
+    int highFrame;
+};
+
+class CMSVC_API FramesReplyServiceMessage : public ServiceMessage
+{
+public:
+    FramesReplyServiceMessage(const FramesReply& framesReply_);
+    const FramesReply& GetFramesReply() const { return framesReply; }
+private:
+    FramesReply framesReply;
+};
+
 class CMSVC_API DebugServiceStoppedServiceMessage : public ServiceMessage
 {
 public:
@@ -258,6 +297,8 @@ CMSVC_API void PutTargetInputLine(const std::string& targetInputLine);
 CMSVC_API bool DebugRequestInProgress(std::string& requestName);
 CMSVC_API void Break(Breakpoint* breakpoint);
 CMSVC_API void Delete(const std::string& breakpointId);
+CMSVC_API void Depth();
+CMSVC_API void Frames(int lowFrame, int highFrame);
 
 } } // namespace cmajor::service
 

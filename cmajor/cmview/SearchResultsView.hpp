@@ -6,7 +6,6 @@
 #ifndef CMAJOR_VIEW_SEARCH_RESULTS_VIEW_INCLUDED
 #define CMAJOR_VIEW_SEARCH_RESULTS_VIEW_INCLUDED
 #include <cmajor/cmview/ViewApi.hpp>
-#include <cmajor/wing/Control.hpp>
 #include <cmajor/wing/Container.hpp>
 #include <cmajor/wing/TreeView.hpp>
 

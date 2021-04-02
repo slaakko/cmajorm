@@ -15,6 +15,7 @@
 #include <cmajor/cmview/CmajorEditor.hpp>
 #include <cmajor/cmview/ResourceFileEditor.hpp>
 #include <cmajor/cmview/TextFileEditor.hpp>
+#include <cmajor/cmview/CallStackView.hpp>
 #include <cmajor/cmview/ErrorView.hpp>
 #include <cmajor/cmview/SearchResultsView.hpp>
 #include <cmajor/wing/Clipboard.hpp>
@@ -111,7 +112,9 @@ private:
     void HandleUntilReply(const UntilReply& untilReply);
     void HandleBreakReply(const BreakReply& breakReply);
     void HandleDeleteReply(const DeleteReply& deleteReply);
-    void HandleLocation(const ::Location& location, bool saveLocation);
+    void HandleDepthReply(const DepthReply& depthReply);
+    void HandleFramesReply(const FramesReply& framesReply);
+    void HandleLocation(const ::Location& location, bool saveLocation, bool setSelection);
     void HandleTargetState(TargetState state);
     void HandleTargetRunning();
     void HandleTargetInput();
@@ -204,8 +207,13 @@ private:
     void ViewError(ViewErrorArgs& args);
     Editor* CurrentEditor() const;
     SearchResultsView* GetSearchResultsView();
+    CallStackView* GetCallStackView();
+    void ClearCallStack();
+    void UpdateCallStack();
+    void CallStackFrameSelected(FrameSelectedEventArgs& args);
     Console* GetConsole();
     void UpdateCurrentDebugStrip();
+    void ResetSelections();
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -280,6 +288,8 @@ private:
     StatusBar* statusBar;
     TabPage* searchResultsTabPage;
     SearchResultsView* searchResultsView;
+    TabPage* callStackTabPage;
+    CallStackView* callStackView;
     StatusBarTextItem* buildIndicatorStatuBarItem;
     StatusBarTextItem* editorReadWriteIndicatorStatusBarItem;
     StatusBarTextItem* editorDirtyIndicatorStatusBarItem;
@@ -298,6 +308,8 @@ private:
     MainWindowState state;
     bool programRunning;
     bool startDebugging;
+    bool signalReceived;
+    int callStackDepth;
     std::string backend;
     std::string config;
     std::unique_ptr<ClipboardListener> clipboardListener;

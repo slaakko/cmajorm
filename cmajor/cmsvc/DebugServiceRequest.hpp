@@ -90,6 +90,25 @@ private:
     std::string breakpointId;
 };
 
+class CMSVC_API DepthDebugServiceRequest : public Request
+{
+public:
+    DepthDebugServiceRequest();
+    void Execute() override;
+    std::string Name() const override { return "depthDebugServiceRequest"; }
+};
+
+class CMSVC_API FramesDebugServiceRequest : public Request
+{
+public:
+    FramesDebugServiceRequest(int lowFrame_, int highFrame_);
+    void Execute() override;
+    std::string Name() const override { return "framesDebugServiceRequest"; }
+private:
+    int lowFrame;
+    int highFrame;
+};
+
 class CMSVC_API SetTargetInputEofRequest : public Request
 {
 public:

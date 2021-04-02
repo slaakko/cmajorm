@@ -88,6 +88,24 @@ void DeleteDebugServiceRequest::Execute()
     Delete(breakpointId);
 }
 
+DepthDebugServiceRequest::DepthDebugServiceRequest()
+{
+}
+
+void DepthDebugServiceRequest::Execute()
+{
+    Depth();
+}
+
+FramesDebugServiceRequest::FramesDebugServiceRequest(int lowFrame_, int highFrame_) : lowFrame(lowFrame_), highFrame(highFrame_)
+{
+}
+
+void FramesDebugServiceRequest::Execute()
+{
+    Frames(lowFrame, highFrame);
+}
+
 SetTargetInputEofRequest::SetTargetInputEofRequest()
 {
 }

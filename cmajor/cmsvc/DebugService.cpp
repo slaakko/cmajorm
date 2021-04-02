@@ -139,6 +139,8 @@ public:
     void RunUntilRequest(const SourceLoc& sourceLocation);
     void RunBreakRequest(Breakpoint* breakpoint);
     void RunDeleteRequest(const std::string& breakpointId);
+    void RunDepthRequest();
+    void RunFramesRequest(int lowFrame, int highFrame);
     void SetRequestInProgress(const std::string& requestName);
     void ResetRequestInProgress();
     bool RequestInProgress(std::string& requestName);
@@ -446,6 +448,7 @@ void RunService(DebugService* service)
 
 void DebugService::Start(const DebugServiceStartParams& startParams, const std::vector<Breakpoint*>& breakpoints_)
 {
+    requestQueue.clear();
     targetInputEof = false;
     running = false;
     stop = false;
@@ -696,6 +699,28 @@ void DebugService::RunDeleteRequest(const std::string& breakpointId)
     PutServiceMessage(new DeleteReplyServiceMessage(reply));
 }
 
+void DebugService::RunDepthRequest()
+{
+    DepthRequest request;
+    std::unique_ptr<Element> requestElement = request.ToXml("depthRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::depthReply);
+    DepthReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new DepthReplyServiceMessage(reply));
+}
+
+void DebugService::RunFramesRequest(int lowFrame, int highFrame)
+{
+    FramesRequest request;
+    request.lowFrame = lowFrame;
+    request.highFrame = highFrame;
+    std::unique_ptr<Element> requestElement = request.ToXml("framesRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::framesReply);
+    FramesReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new FramesReplyServiceMessage(reply));
+}
+
 void DebugService::SetRequestInProgress(const std::string& requestName)
 {
     requestInProgress = true;
@@ -940,6 +965,50 @@ DeleteReplyServiceMessage::DeleteReplyServiceMessage(const DeleteReply& deleteRe
 {
 }
 
+RunDepthDebugServiceRequest::RunDepthDebugServiceRequest()
+{
+}
+
+void RunDepthDebugServiceRequest::Execute()
+{
+    DebugService::Instance().RunDepthRequest();
+}
+
+std::string RunDepthDebugServiceRequest::Name() const
+{
+    return "runDepthDebugServiceRequest";
+}
+
+void RunDepthDebugServiceRequest::Failed(const std::string& error)
+{
+}
+
+DepthReplyServiceMessage::DepthReplyServiceMessage(const DepthReply& depthReply_) : ServiceMessage(ServiceMessageKind::depthReply), depthReply(depthReply_)
+{
+}
+
+RunFramesDebugServiceRequest::RunFramesDebugServiceRequest(int lowFrame_, int highFrame_) : lowFrame(lowFrame_), highFrame(highFrame_)
+{
+}
+
+void RunFramesDebugServiceRequest::Execute()
+{
+    DebugService::Instance().RunFramesRequest(lowFrame, highFrame);
+}
+
+std::string RunFramesDebugServiceRequest::Name() const
+{
+    return "runFrameDebugServiceRequest";
+}
+
+void RunFramesDebugServiceRequest::Failed(const std::string& error)
+{
+}
+
+FramesReplyServiceMessage::FramesReplyServiceMessage(const FramesReply& framesReply_) : ServiceMessage(ServiceMessageKind::framesReply), framesReply(framesReply_)
+{
+}
+
 void InitDebugService()
 {
     DebugService::Init();
@@ -994,6 +1063,16 @@ void Break(Breakpoint* breakpoint)
 void Delete(const std::string& breakpointId)
 {
     DebugService::Instance().PutRequest(new RunDeleteDebugServiceRequest(breakpointId));
+}
+
+void Depth()
+{
+    DebugService::Instance().PutRequest(new RunDepthDebugServiceRequest());
+}
+
+void Frames(int lowFrame, int highFrame)
+{
+    DebugService::Instance().PutRequest(new RunFramesDebugServiceRequest(lowFrame, highFrame));
 }
 
 void SetTargetInputEof()

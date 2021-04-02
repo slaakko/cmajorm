@@ -139,6 +139,8 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     statusBar(nullptr),
     searchResultsTabPage(nullptr),
     searchResultsView(nullptr),
+    callStackTabPage(nullptr),
+    callStackView(nullptr),
     buildIndicatorStatuBarItem(nullptr), 
     editorReadWriteIndicatorStatusBarItem(nullptr),
     editorDirtyIndicatorStatusBarItem(nullptr),
@@ -155,10 +157,12 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     state(MainWindowState::idle),
     programRunning(false),
     startDebugging(false),
+    signalReceived(false),
+    callStackDepth(-1),
     backend("cpp"),
     config("debug"),
     pid(GetPid()),
-    cmajorCodeFormat("cmajor.code." + std::to_string(pid)),
+    cmajorCodeFormat("cmajor.code"),
     locations(this)
 {
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
@@ -916,9 +920,11 @@ void MainWindow::StartDebugging()
     savedLocation = ::Location();
     SetEditorsReadOnly();
     startDebugging = true;
+    signalReceived = false;
     SetState(MainWindowState::debugging);
     ClearOutput();
     GetConsole()->Clear();
+    ClearCallStack();
     sngcm::ast::Solution* solution = solutionData->GetSolution();
     sngcm::ast::Project* activeProject = solution->ActiveProject();
     ProjectData* projectData = solutionData->GetProjectDataByProject(activeProject);
@@ -961,7 +967,7 @@ void MainWindow::ShowBuildProgress()
             }
             case 2:
             {
-                buildIndicatorText = "-";
+                buildIndicatorText = ToUtf8(std::u32string(1, char32_t(0x2015)));
                 break;
             }
             case 3:
@@ -1074,6 +1080,18 @@ void MainWindow::HandleServiceMessage()
             {
                 DeleteReplyServiceMessage* message = static_cast<DeleteReplyServiceMessage*>(serviceMessage.get());
                 HandleDeleteReply(message->GetDeleteReply());
+                break;
+            }
+            case ServiceMessageKind::depthReply:
+            {
+                DepthReplyServiceMessage* message = static_cast<DepthReplyServiceMessage*>(serviceMessage.get());
+                HandleDepthReply(message->GetDepthReply());
+                break;
+            }
+            case ServiceMessageKind::framesReply:
+            {
+                FramesReplyServiceMessage* message = static_cast<FramesReplyServiceMessage*>(serviceMessage.get());
+                HandleFramesReply(message->GetFramesReply());
                 break;
             }
             case ServiceMessageKind::targetRunning:
@@ -1217,7 +1235,7 @@ void MainWindow::HandleStartDebugReply(const StartDebugReply& startDebugReply)
     if (startDebugReply.success)
     {
         HandleTargetState(startDebugReply.state);
-        HandleLocation(startDebugReply.location, true);
+        HandleLocation(startDebugReply.location, true, false);
         startDebuggingMenuItem->SetText("Continue");
         startDebuggingToolButton->SetToolTip("Continue (F5)");
         PutOutputServiceMessage("debugging started");
@@ -1240,7 +1258,7 @@ void MainWindow::HandleContinueReply(const ContinueReply& continueReply)
     if (continueReply.success)
     {
         HandleTargetState(continueReply.state);
-        HandleLocation(continueReply.location, true);
+        HandleLocation(continueReply.location, true, false);
     }
     else
     {
@@ -1253,7 +1271,7 @@ void MainWindow::HandleNextReply(const NextReply& nextReply)
     if (nextReply.success)
     {
         HandleTargetState(nextReply.state);
-        HandleLocation(nextReply.location, true);
+        HandleLocation(nextReply.location, true, false);
     }
     else
     {
@@ -1266,7 +1284,7 @@ void MainWindow::HandleStepReply(const StepReply& stepReply)
     if (stepReply.success)
     {
         HandleTargetState(stepReply.state);
-        HandleLocation(stepReply.location, true);
+        HandleLocation(stepReply.location, true, false);
     }
     else
     {
@@ -1279,7 +1297,7 @@ void MainWindow::HandleFinishReply(const FinishReply& finishReply)
     if (finishReply.success)
     {
         HandleTargetState(finishReply.state);
-        HandleLocation(finishReply.location, true);
+        HandleLocation(finishReply.location, true, false);
     }
     else
     {
@@ -1292,7 +1310,7 @@ void MainWindow::HandleUntilReply(const UntilReply& untilReply)
     if (untilReply.success)
     {
         HandleTargetState(untilReply.state);
-        HandleLocation(untilReply.location, true);
+        HandleLocation(untilReply.location, true, false);
     }
     else
     {
@@ -1326,7 +1344,36 @@ void MainWindow::HandleDeleteReply(const DeleteReply& deleteReply)
     }
 }
 
-void MainWindow::HandleLocation(const ::Location& location, bool saveLocation)
+void MainWindow::HandleDepthReply(const DepthReply& depthReply)
+{
+    if (depthReply.success)
+    {
+        callStackDepth = depthReply.depth;
+        UpdateCallStack();
+    }
+    else
+    {
+        PutOutputServiceMessage("depth request failed: " + depthReply.error);
+    }
+}
+
+void MainWindow::HandleFramesReply(const FramesReply& framesReply)
+{
+    if (framesReply.success)
+    {
+        GetCallStackView()->SetFrameRange(framesReply.frames);
+    }
+    else
+    {
+        PutOutputServiceMessage("frames request failed: " + framesReply.error);
+    }
+    if (signalReceived)
+    {
+        GetOutputLogView()->Select();
+    }
+}
+
+void MainWindow::HandleLocation(const ::Location& location, bool saveLocation, bool setSelection)
 {
     try
     {
@@ -1363,13 +1410,26 @@ void MainWindow::HandleLocation(const ::Location& location, bool saveLocation)
             debugLocation.line = location.line;
             debugLocation.scol = location.scol;
             debugLocation.ecol = location.ecol;
-            debugStrip->SetDebugLocation(debugLocation);
+            if (!setSelection)
+            {
+                debugStrip->SetDebugLocation(debugLocation);
+            }
         }
         TextView* textView = editor->GetTextView();
         if (textView)
         {
             textView->EnsureLineVisible(location.line);
             textView->SetCaretLineCol(location.line, location.scol);
+            if (setSelection)
+            {
+                ResetSelections();
+                SourcePos start(location.line, location.scol);
+                SourcePos end(location.line, location.ecol);
+                Selection selection;
+                selection.start = start;
+                selection.end = end;
+                textView->SetSelection(selection);
+            }
             // todo: generate expression hover events
         }
     }
@@ -1399,14 +1459,25 @@ void MainWindow::HandleTargetState(TargetState state)
     {
         std::string message = "program received signal";
         message.append(", signal=" + state.signalName + ", meaning=" + state.signalMeaning);
-        PutRequest(new StopDebugServiceRequest());
+        signalReceived = true;
         PutOutputServiceMessage(message);
+        callStackDepth = -1;
+        GetCallStackView();
+        UpdateCallStack();
     }
-    else if (state.stopReason == "breakpoint-hit" && !state.breakpointId.empty())
+    else if (state.stopReason == "breakpoint-hit")
     {
-        std::string message = "breakpoint hit";
-        message.append(", breakpoint=" + state.breakpointId);
-        PutOutputServiceMessage(message);
+        UpdateCallStack();
+        if (!state.breakpointId.empty())
+        {
+            std::string message = "breakpoint hit";
+            message.append(", breakpoint=" + state.breakpointId);
+            PutOutputServiceMessage(message);
+        }
+    }
+    else if (state.stopReason == "end-stepping-range")
+    {
+        UpdateCallStack();
     }
 }
 
@@ -1598,6 +1669,7 @@ void MainWindow::SetState(MainWindowState state_)
     exitMenuItem->Enable();
     optionsMenuItem->Enable();
     searchResultsMenuItem->Enable();
+    callStackMenuItem->Enable();
     portMapMenuItem->Enable();
     closeAllTabsMenuItem->Enable();
     closeExternalTabsMenuItem->Enable();
@@ -2780,7 +2852,15 @@ void MainWindow::OptionsClick()
 
 void MainWindow::CallStackClick()
 {
-    ShowInfoMessageBox(Handle(), "Call Stack");
+    try
+    {
+        ClearCallStack();
+        GetCallStackView()->Invalidate();
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::LocalsClick()
@@ -3437,6 +3517,8 @@ void MainWindow::StartDebuggingClick()
 {
     try
     {
+        ClearCallStack();
+        ResetSelections();
         if (state == MainWindowState::debugging)
         {
             StartDebugging();
@@ -3477,7 +3559,7 @@ void MainWindow::ShowNextStatementClick()
 {
     try
     {
-        HandleLocation(savedLocation, false);
+        HandleLocation(savedLocation, false, false);
     }
     catch (const std::exception& ex)
     {
@@ -3489,6 +3571,8 @@ void MainWindow::StepOverClick()
 {
     try
     {
+        ClearCallStack();
+        ResetSelections();
         if (state == MainWindowState::debugging)
         {
             StartDebugging();
@@ -3513,6 +3597,8 @@ void MainWindow::StepIntoClick()
 {
     try
     {
+        ClearCallStack();
+        ResetSelections();
         if (state == MainWindowState::debugging)
         {
             StartDebugging();
@@ -3537,6 +3623,8 @@ void MainWindow::StepOutClick()
 {
     try
     {
+        ClearCallStack();
+        ResetSelections();
         StartDebugging();
         PutRequest(new FinishDebugServiceRequest());
     }
@@ -4183,6 +4271,11 @@ void MainWindow::OutputTabControlTabPageRemoved(ControlEventArgs& args)
         searchResultsTabPage = nullptr;
         searchResultsView = nullptr;
     }
+    else if (args.control == callStackTabPage)
+    {
+        callStackTabPage = nullptr;
+        callStackView = nullptr;
+    }
     else if (args.control == logTabPage)
     {
         logTabPage = nullptr;
@@ -4197,7 +4290,7 @@ void MainWindow::OutputTabControlTabPageRemoved(ControlEventArgs& args)
 
 void MainWindow::OutputTabControlTabPageSelected()
 {
-    // todo
+    // todo?
 }
 
 LogView* MainWindow::GetOutputLogView()
@@ -4315,15 +4408,74 @@ SearchResultsView* MainWindow::GetSearchResultsView()
     return searchResultsView;
 }
 
+CallStackView* MainWindow::GetCallStackView()
+{
+    if (!callStackView)
+    {
+        callStackView = new CallStackView();
+        callStackView->FrameSelected().AddHandler(this, &MainWindow::CallStackFrameSelected);
+        if (state == MainWindowState::debugging)
+        {
+            UpdateCallStack();
+        }
+        callStackTabPage = new TabPage("Call Stack", "callStack");
+        callStackTabPage->AddChild(callStackView);
+        outputTabControl->AddTabPage(callStackTabPage);
+    }
+    callStackTabPage->Select();
+    return callStackView;
+}
+
+void MainWindow::ClearCallStack()
+{
+    if (signalReceived) return;
+    callStackDepth = -1;
+    if (callStackView)
+    {
+        callStackView->Clear();
+    }
+}
+
+void MainWindow::UpdateCallStack()
+{
+    if (!callStackView) return;
+    if (callStackDepth == -1)
+    {
+        PutRequest(new DepthDebugServiceRequest());
+    }
+    else if (callStackDepth >= 0)
+    {
+        callStackView->SetDepth(callStackDepth);
+        std::pair<int, int> frameRange = callStackView->GetFrameRange();
+        if (frameRange.first != -1 && frameRange.second != -1)
+        {
+            PutRequest(new FramesDebugServiceRequest(frameRange.first, frameRange.second));
+        }
+    }
+}
+
+void MainWindow::CallStackFrameSelected(FrameSelectedEventArgs& args)
+{
+    try
+    {
+        HandleLocation(*args.frame, false, true);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
 Console* MainWindow::GetConsole()
 {
     if (!console)
     {
-        console = new Console(ConsoleCreateParams().SetDock(Dock::fill));
+        console = new Console(ConsoleCreateParams().Defaults());
         console->SetDoubleBuffered();
         console->ConsoleInputReady().AddHandler(this, &MainWindow::ConsoleInputReady);
+        ScrollableControl* scrollableConsole = new ScrollableControl(ScrollableControlCreateParams(console).SetDock(Dock::fill));
         consoleTabPage = new TabPage("Console", "console");
-        consoleTabPage->AddChild(console);
+        consoleTabPage->AddChild(scrollableConsole);
         outputTabControl->AddTabPage(consoleTabPage);
     }
     consoleTabPage->Select();
@@ -4344,6 +4496,28 @@ void MainWindow::UpdateCurrentDebugStrip()
                 debugStrip->Update();
             }
         }
+    }
+}
+
+void MainWindow::ResetSelections()
+{
+    Component* child = codeTabControl->TabPages().FirstChild();
+    while (child)
+    {
+        if (child->IsTabPage())
+        {
+            TabPage* tabPage = static_cast<TabPage*>(child);
+            Editor* editor = GetEditorByTabPage(tabPage);
+            if (editor)
+            {
+                TextView* textView = editor->GetTextView();
+                if (textView)
+                {
+                    textView->ResetSelection();
+                }
+            }
+        }
+        child = child->NextSibling();
     }
 }
 
