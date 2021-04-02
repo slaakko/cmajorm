@@ -141,6 +141,7 @@ public:
     void RunDeleteRequest(const std::string& breakpointId);
     void RunDepthRequest();
     void RunFramesRequest(int lowFrame, int highFrame);
+    void RunEvaluateRequest(const std::string& expression, int requestId);
     void SetRequestInProgress(const std::string& requestName);
     void ResetRequestInProgress();
     bool RequestInProgress(std::string& requestName);
@@ -721,6 +722,17 @@ void DebugService::RunFramesRequest(int lowFrame, int highFrame)
     PutServiceMessage(new FramesReplyServiceMessage(reply));
 }
 
+void DebugService::RunEvaluateRequest(const std::string& expression, int requestId)
+{
+    EvaluateRequest request;
+    request.expression = expression;
+    std::unique_ptr<Element> requestElement = request.ToXml("evaluateRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::evaluateReply);
+    EvaluateReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new EvaluateReplyServiceMessage(reply, requestId));
+}
+
 void DebugService::SetRequestInProgress(const std::string& requestName)
 {
     requestInProgress = true;
@@ -1009,6 +1021,29 @@ FramesReplyServiceMessage::FramesReplyServiceMessage(const FramesReply& framesRe
 {
 }
 
+RunEvaluateDebugServiceRequest::RunEvaluateDebugServiceRequest(const std::string& expression_, int requestId_) : expression(expression_), requestId(requestId_)
+{
+}
+
+void RunEvaluateDebugServiceRequest::Execute()
+{
+    DebugService::Instance().RunEvaluateRequest(expression, requestId);
+}
+
+std::string RunEvaluateDebugServiceRequest::Name() const
+{
+    return "runEvaluateDebugServiceRequest";
+}
+
+void RunEvaluateDebugServiceRequest::Failed(const std::string& error)
+{
+}
+
+EvaluateReplyServiceMessage::EvaluateReplyServiceMessage(const EvaluateReply& evaluateReply_, int requestId_) : 
+    ServiceMessage(ServiceMessageKind::evaluateReply), evaluateReply(evaluateReply_), requestId(requestId_)
+{
+}
+
 void InitDebugService()
 {
     DebugService::Init();
@@ -1073,6 +1108,11 @@ void Depth()
 void Frames(int lowFrame, int highFrame)
 {
     DebugService::Instance().PutRequest(new RunFramesDebugServiceRequest(lowFrame, highFrame));
+}
+
+void Evaluate(const std::string& expression, int requestId)
+{
+    DebugService::Instance().PutRequest(new RunEvaluateDebugServiceRequest(expression, requestId));
 }
 
 void SetTargetInputEof()

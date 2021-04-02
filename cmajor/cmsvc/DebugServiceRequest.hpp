@@ -109,6 +109,17 @@ private:
     int highFrame;
 };
 
+class CMSVC_API EvaluateDebugServiceRequest : public Request
+{
+public:
+    EvaluateDebugServiceRequest(const std::string& expression_, int requestId_);
+    void Execute() override;
+    std::string Name() const override { return "evaluateDebugServiceRequest"; }
+private:
+    std::string expression;
+    int requestId;
+};
+
 class CMSVC_API SetTargetInputEofRequest : public Request
 {
 public:

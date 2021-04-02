@@ -18,4 +18,21 @@ std::string GetEndTokenInfo()
     return "end of file";
 }
 
+int TokenLine::TokenIndex(int columnNumber) const
+{
+    int col = 1;
+    int index = 0;
+    for (const Token& token : tokens)
+    {
+        int len = token.match.end - token.match.begin;
+        if (columnNumber >= col && columnNumber < col + len)
+        {
+            return index;
+        }
+        col += len;
+        ++index;
+    }
+    return -1;
+}
+
 } } // namespace soulng::lexer

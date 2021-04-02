@@ -23,6 +23,15 @@ namespace cmajor { namespace view {
 
 using namespace cmajor::wing;
 
+struct CMVIEW_API ExpressionHoverEventArgs
+{
+    std::string expression;
+    Point screenLoc;
+};
+
+using ExpressionHoverEvent = EventWithArgs<ExpressionHoverEventArgs>;
+using ExitExpressionHoverEvent = Event;
+
 class DebugStrip;
 class CmajorEditor;
 
@@ -63,10 +72,13 @@ public:
     CmajorEditor* Editor() const { return editor; }
     void SetEditor(CmajorEditor* editor_) { editor = editor_; }
     void ToggleBreakpoint();
+    ExpressionHoverEvent& ExpressionHover() { return expressionHover; }
 protected:
     TokenLine TokenizeLine(const std::u32string& line, int lineNumber, int startState) override;
     SourceCodeTokenKind GetTokenKind(const Token& token) const override;
     void DrawHilites(Graphics& graphics, int lineIndex, const PointF& origin) override;
+    void OnMouseHover(MouseEventArgs& args) override;
+    virtual void OnExpressionHover(ExpressionHoverEventArgs& args);
 private:
     void DrawDebugLocationHilite(Graphics& graphics, const SourceSpan& debugLocation, const PointF& origin);
     CmajorLexer lexer;
@@ -75,6 +87,7 @@ private:
     Padding debugLocationPadding;
     DebugStrip* debugStrip;
     CmajorEditor* editor;
+    ExpressionHoverEvent expressionHover;
 };
 
 } } // namespace cmajor::view

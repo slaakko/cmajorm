@@ -277,6 +277,29 @@ private:
     FramesReply framesReply;
 };
 
+class CMSVC_API RunEvaluateDebugServiceRequest : public DebugServiceRequest
+{
+public:
+    RunEvaluateDebugServiceRequest(const std::string& expression_, int requestId_);
+    void Execute() override;
+    std::string Name() const override;
+    void Failed(const std::string& error) override;
+private:
+    std::string expression;
+    int requestId;
+};
+
+class CMSVC_API EvaluateReplyServiceMessage : public ServiceMessage
+{
+public:
+    EvaluateReplyServiceMessage(const EvaluateReply& evaluateReply_, int requestId_);
+    const EvaluateReply& GetEvaluateReply() const { return evaluateReply; }
+    int RequestId() const { return requestId; }
+private:
+    EvaluateReply evaluateReply;
+    int requestId;
+};
+
 class CMSVC_API DebugServiceStoppedServiceMessage : public ServiceMessage
 {
 public:
@@ -299,6 +322,7 @@ CMSVC_API void Break(Breakpoint* breakpoint);
 CMSVC_API void Delete(const std::string& breakpointId);
 CMSVC_API void Depth();
 CMSVC_API void Frames(int lowFrame, int highFrame);
+CMSVC_API void Evaluate(const std::string& expression, int requestId);
 
 } } // namespace cmajor::service
 

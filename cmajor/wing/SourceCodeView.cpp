@@ -376,4 +376,22 @@ std::u32string SourceCodeView::GetText(const SourceSpan& sourceSpan) const
     return std::u32string();
 }
 
+std::u32string SourceCodeView::GetTokenText(int lineNumber, int columnNumber) const
+{
+    if (lineNumber >= 1 && lineNumber <= tokenLines.size())
+    {
+        const TokenLine& tokenLine = tokenLines[lineNumber - 1];
+        int tokenIndex = tokenLine.TokenIndex(columnNumber);
+        if (tokenIndex != -1)
+        {
+            const Token& token = tokenLine.tokens[tokenIndex];
+            if (GetTokenKind(token) == SourceCodeTokenKind::identifier)
+            {
+                return token.match.ToString();
+            }
+        }
+    }
+    return std::u32string();
+}
+
 } } // cmajor::wing

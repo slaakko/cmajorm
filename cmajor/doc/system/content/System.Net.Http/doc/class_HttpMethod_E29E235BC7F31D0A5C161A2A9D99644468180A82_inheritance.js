@@ -270,11 +270,11 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Net.Http.HttpMethod", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Net.Http/doc/class_HttpMethod_E29E235BC7F31D0A5C161A2A9D99644468180A82.html" },
         { name: "System.Net.Http.HttpConnectMethod", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpConnectMethod_25C15D8ACDAE62FC789FD8C79ADD10953059CB14.html" },
-        { name: "System.Net.Http.HttpDeleteMethod", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpDeleteMethod_3ED86F0AB454611362489BD9160F405836EB9FE6.html" },
+        { name: "System.Net.Http.HttpDeleteMethod", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpDeleteMethod_3ED86F0AB454611362489BD9160F405836EB9FE6.html" },
         { name: "System.Net.Http.HttpGetMethod", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpGetMethod_8669593E077ED7A334D7BED3738564194C93B8B1.html" },
-        { name: "System.Net.Http.HttpHeadMethod", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpHeadMethod_05552D440A3E98E152393E5332C9D3632B383DB8.html" },
-        { name: "System.Net.Http.HttpOptionsMethod", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpOptionsMethod_FEC4542645F4D303EB5688D8698049F3355614B0.html" },
-        { name: "System.Net.Http.HttpPostMethod", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpPostMethod_C06B5756900A892E9F18198124B4299C349DD660.html" },
+        { name: "System.Net.Http.HttpHeadMethod", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpHeadMethod_05552D440A3E98E152393E5332C9D3632B383DB8.html" },
+        { name: "System.Net.Http.HttpOptionsMethod", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpOptionsMethod_FEC4542645F4D303EB5688D8698049F3355614B0.html" },
+        { name: "System.Net.Http.HttpPostMethod", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpPostMethod_C06B5756900A892E9F18198124B4299C349DD660.html" },
         { name: "System.Net.Http.HttpPutMethod", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpPutMethod_6105E626BBDEF3A8F3C53B86AFDE88BF5F9F92E4.html" },
         { name: "System.Net.Http.HttpTraceMethod", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpTraceMethod_A59F39939A477689D10F8A4D0EBF90A9F126E687.html" }];
     drawDiagram(diagramNodes);

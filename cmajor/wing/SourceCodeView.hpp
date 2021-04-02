@@ -109,6 +109,7 @@ protected:
     Font* GetOrInsertFont(const std::string& fontFamilyName, float fontSize, FontStyle fontStyle);
     SourceCodeTextStyle& GetOrInsertTextStyle(SourceCodeTokenKind tokenKind);
     std::u32string GetText(const SourceSpan& sourceSpan) const;
+    std::u32string GetTokenText(int lineNumber, int columnNumber) const;
 private:
     bool IsBeginBlockLine(int lineIndex) const;
     bool IsEndBlockLine(int lineIndex) const;

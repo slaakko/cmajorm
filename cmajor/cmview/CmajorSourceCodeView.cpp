@@ -155,6 +155,7 @@ CmajorSourceCodeView::CmajorSourceCodeView(CmajorSourceCodeViewCreateParams& cre
     lexer.SetBlockCommentStates(blockCommentStates);
     SetFixed();
     SetIndentSize(4);
+    SetMouseHoverMs(DefaultMouseHoverMs());
 }
 
 void CmajorSourceCodeView::ToggleBreakpoint()
@@ -307,6 +308,33 @@ void CmajorSourceCodeView::DrawHilites(Graphics& graphics, int lineIndex, const 
     {
         DrawDebugLocationHilite(graphics, debugLocation, origin);
     }
+}
+
+void CmajorSourceCodeView::OnMouseHover(MouseEventArgs& args)
+{
+    SourceCodeView::OnMouseHover(args);
+    int lineNumber = 0;
+    int columnNumber = 0;
+    GetLineColumn(args.location, lineNumber, columnNumber);
+    if (lineNumber >= 1 && lineNumber <= Lines().size() && columnNumber >= 1 && columnNumber <= GetLineLength(lineNumber))
+    {
+        std::u32string tokenText = GetTokenText(lineNumber, columnNumber);
+        if (!tokenText.empty())
+        {
+            ExpressionHoverEventArgs expressionHoverArgs;
+            expressionHoverArgs.expression = ToUtf8(tokenText);
+            Point loc = args.location;
+            TranslateContentLocation(loc);
+            loc = ClientToScreen(loc);
+            expressionHoverArgs.screenLoc = loc;
+            OnExpressionHover(expressionHoverArgs);
+        }
+    }
+}
+
+void CmajorSourceCodeView::OnExpressionHover(ExpressionHoverEventArgs& args)
+{
+    expressionHover.Fire(args);
 }
 
 void CmajorSourceCodeView::DrawDebugLocationHilite(Graphics& graphics, const SourceSpan& debugLocation, const PointF& origin)

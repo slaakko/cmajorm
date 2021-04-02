@@ -106,6 +106,15 @@ void FramesDebugServiceRequest::Execute()
     Frames(lowFrame, highFrame);
 }
 
+EvaluateDebugServiceRequest::EvaluateDebugServiceRequest(const std::string& expression_, int requestId_) : expression(expression_), requestId(requestId_)
+{
+}
+
+void EvaluateDebugServiceRequest::Execute()
+{
+    Evaluate(expression, requestId);
+}
+
 SetTargetInputEofRequest::SetTargetInputEofRequest()
 {
 }

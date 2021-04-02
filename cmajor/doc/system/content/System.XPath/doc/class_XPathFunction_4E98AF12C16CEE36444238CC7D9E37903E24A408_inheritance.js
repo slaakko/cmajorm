@@ -270,11 +270,11 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.XPath.XPathFunction", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.XPath/doc/class_XPathFunction_4E98AF12C16CEE36444238CC7D9E37903E24A408.html" },
         { name: "System.XPath.XPathBooleanFunction", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathBooleanFunction_436037BD58AFA8408E3A2FB305BBBE107362B516.html" },
-        { name: "System.XPath.XPathCountFunction", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathCountFunction_2296BBD53FA4F0D57A2C327CD82EB2E7B5FE38CF.html" },
-        { name: "System.XPath.XPathLastFunction", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathLastFunction_470D2B0434975293AB9C5EEA6266A1B38E7C6E95.html" },
+        { name: "System.XPath.XPathCountFunction", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathCountFunction_2296BBD53FA4F0D57A2C327CD82EB2E7B5FE38CF.html" },
+        { name: "System.XPath.XPathLastFunction", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathLastFunction_470D2B0434975293AB9C5EEA6266A1B38E7C6E95.html" },
         { name: "System.XPath.XPathNumberFunction", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNumberFunction_3CD349E443E9F9856C593054B85BA4FEFECC42C7.html" },
-        { name: "System.XPath.XPathPositionFunction", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathPositionFunction_CD239B9D33A34AB01D2239F7A7FF3B1F0646ED05.html" },
-        { name: "System.XPath.XPathStringFunction", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathStringFunction_7B03242259C3ABC0C5FDCBC3F3A3791DAB1E9862.html" }];
+        { name: "System.XPath.XPathPositionFunction", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathPositionFunction_CD239B9D33A34AB01D2239F7A7FF3B1F0646ED05.html" },
+        { name: "System.XPath.XPathStringFunction", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathStringFunction_7B03242259C3ABC0C5FDCBC3F3A3791DAB1E9862.html" }];
     drawDiagram(diagramNodes);
 }
 

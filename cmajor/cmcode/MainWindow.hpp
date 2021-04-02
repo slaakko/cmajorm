@@ -36,6 +36,8 @@ namespace cmcode {
 
 const int buildProgressTimerId = 10;
 const int buildProgressTimerPeriod = 100;
+const int toolTipTimerId = 12;
+const int toolTipShowPeriod = 3000;
 
 using namespace cmajor::view;
 using namespace cmajor::wing;
@@ -44,6 +46,13 @@ using namespace soulng::rex;
 enum class MainWindowState : int
 {
     idle, building, debugging, running
+};
+
+struct ExpressionEvaluateRequest
+{
+    ExpressionEvaluateRequest(const std::string& expression_, const Point& screenLoc_);
+    std::string expression;
+    Point screenLoc;
 };
 
 class MainWindow : public Window
@@ -114,6 +123,7 @@ private:
     void HandleDeleteReply(const DeleteReply& deleteReply);
     void HandleDepthReply(const DepthReply& depthReply);
     void HandleFramesReply(const FramesReply& framesReply);
+    void HandleEvaluateReply(const EvaluateReply& evaluateReply, int requestId);
     void HandleLocation(const ::Location& location, bool saveLocation, bool setSelection);
     void HandleTargetState(TargetState state);
     void HandleTargetRunning();
@@ -214,6 +224,7 @@ private:
     Console* GetConsole();
     void UpdateCurrentDebugStrip();
     void ResetSelections();
+    void ExpressionHover(ExpressionHoverEventArgs& args);
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -320,6 +331,9 @@ private:
     LocationList locations;
     std::unique_ptr<Request> debugRequest;
     ::Location savedLocation;
+    std::vector<std::string> buildIndicatorTexts;
+    std::vector<ExpressionEvaluateRequest> expressionEvaluateRequests;
+    ToolTip* toolTipWindow;
 };
 
 } // namespace cmcode

@@ -270,10 +270,10 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Net.Http.HttpHeader", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Net.Http/doc/class_HttpHeader_579B164F08791FA07CEFA19A0E2858BEAEA4F4B6.html" },
         { name: "System.Net.Http.HttpAcceptEncodingHeader", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpAcceptEncodingHeader_E66F194A1531ECCE2064B9268706E0D6EC8180AC.html" },
-        { name: "System.Net.Http.HttpAcceptHeader", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpAcceptHeader_8EAB00C53E35B6A3BDEE78ABADE8D17CF00451D6.html" },
+        { name: "System.Net.Http.HttpAcceptHeader", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpAcceptHeader_8EAB00C53E35B6A3BDEE78ABADE8D17CF00451D6.html" },
         { name: "System.Net.Http.HttpContentLengthHeader", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpContentLengthHeader_DF7C0C33F804DB663277B5F2CE334BB658C4792E.html" },
         { name: "System.Net.Http.HttpHostHeader", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpHostHeader_658B15ACB06C359E5135106F4D6E69C5D48AF230.html" },
-        { name: "System.Net.Http.HttpTEHeader", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpTEHeader_C3CB2E2A71A4025B323FEA4823D5FD897864F7A9.html" },
+        { name: "System.Net.Http.HttpTEHeader", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpTEHeader_C3CB2E2A71A4025B323FEA4823D5FD897864F7A9.html" },
         { name: "System.Net.Http.HttpUserAgentHeader", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpUserAgentHeader_7D766F4E13EABAB7C6C2436B95AFEFE01796A470.html" }];
     drawDiagram(diagramNodes);
 }

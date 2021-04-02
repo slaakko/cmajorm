@@ -64,6 +64,10 @@ bool IsProgramTarget(Target target)
     return target == Target::program || target == Target::winapp || target == Target::winguiapp;
 }
 
+ExpressionEvaluateRequest::ExpressionEvaluateRequest(const std::string& expression_, const Point& screenLoc_) : expression(expression_), screenLoc(screenLoc_)
+{
+}
+
 MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams().Text("Cmajor Code").WindowClassName("cmajor.code." + std::to_string(GetPid()))),
     newProjectMenuItem(nullptr),
     openProjectMenuItem(nullptr),
@@ -163,8 +167,13 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     config("debug"),
     pid(GetPid()),
     cmajorCodeFormat("cmajor.code"),
-    locations(this)
+    locations(this),
+    toolTipWindow(new ToolTip(ToolTipCreateParams().Defaults()))
 {
+    buildIndicatorTexts.push_back("|");
+    buildIndicatorTexts.push_back("/");
+    buildIndicatorTexts.push_back(ToUtf8(std::u32string(1, char32_t(0x2015))));
+    buildIndicatorTexts.push_back("\\");
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
     std::unique_ptr<MenuItem> newProjectMenuItemPtr(new MenuItem("&New Project.."));
@@ -580,6 +589,8 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     statusBar->AddItem(columnStatusBarItemPtr.release());
     AddChild(statusBarPtr.release());
 
+    AddChild(toolTipWindow);
+
     locations.SetToolButtons(prevToolButton, nextToolButton);
 
     SetServiceMessageHandlerView(this);
@@ -687,6 +698,11 @@ void MainWindow::OnTimer(TimerEventArgs& args)
             SaveConfigurationSettings();
             SaveProjectData();
             SaveSolutionData();
+        }
+        else if (args.timerId == toolTipTimerId)
+        {
+            KillTimer(toolTipTimerId);
+            toolTipWindow->Hide();
         }
     }
     catch (const std::exception& ex)
@@ -917,6 +933,7 @@ void MainWindow::StartDebugging()
 {
     ResetDebugLocations();
     if (state == MainWindowState::debugging) return;
+    expressionEvaluateRequests.clear();
     savedLocation = ::Location();
     SetEditorsReadOnly();
     startDebugging = true;
@@ -952,31 +969,7 @@ void MainWindow::ShowBuildProgress()
 {
     if (state == MainWindowState::building)
     {
-        std::string buildIndicatorText;
-        switch (buildProgressCounter % 4)
-        {
-            case 0:
-            {
-                buildIndicatorText = "|";
-                break;
-            }
-            case 1:
-            {
-                buildIndicatorText = "/";
-                break;
-            }
-            case 2:
-            {
-                buildIndicatorText = ToUtf8(std::u32string(1, char32_t(0x2015)));
-                break;
-            }
-            case 3:
-            {
-                buildIndicatorText = "\\";
-                break;
-            }
-        }
-        buildIndicatorStatuBarItem->SetText(buildIndicatorText);
+        buildIndicatorStatuBarItem->SetText(buildIndicatorTexts[buildProgressCounter % 4]);
         ++buildProgressCounter;
     }
 }
@@ -1092,6 +1085,12 @@ void MainWindow::HandleServiceMessage()
             {
                 FramesReplyServiceMessage* message = static_cast<FramesReplyServiceMessage*>(serviceMessage.get());
                 HandleFramesReply(message->GetFramesReply());
+                break;
+            }
+            case ServiceMessageKind::evaluateReply:
+            {
+                EvaluateReplyServiceMessage* message = static_cast<EvaluateReplyServiceMessage*>(serviceMessage.get());
+                HandleEvaluateReply(message->GetEvaluateReply(), message->RequestId());
                 break;
             }
             case ServiceMessageKind::targetRunning:
@@ -1370,6 +1369,37 @@ void MainWindow::HandleFramesReply(const FramesReply& framesReply)
     if (signalReceived)
     {
         GetOutputLogView()->Select();
+    }
+}
+
+void MainWindow::HandleEvaluateReply(const EvaluateReply& evaluateReply, int requestId)
+{
+    if (evaluateReply.success)
+    {
+        if (requestId >= 0 && requestId < expressionEvaluateRequests.size())
+        {
+            const ExpressionEvaluateRequest& evaluateRequest = expressionEvaluateRequests[requestId];
+            toolTipWindow->Hide();
+            toolTipWindow->SetText(evaluateRequest.expression + " = " + evaluateReply.result.value);
+            toolTipWindow->MeasureExtent();
+            Point loc = evaluateRequest.screenLoc;
+            loc = ScreenToClient(loc);
+            loc.Y = loc.Y + toolTipWindow->GetSize().Height;
+            toolTipWindow->SetLocation(loc);
+            toolTipWindow->BringToFront();
+            toolTipWindow->Show();
+            toolTipWindow->Invalidate();
+            toolTipWindow->Update();
+            SetTimer(toolTipTimerId, toolTipShowPeriod);
+        }
+        else
+        {
+            PutOutputServiceMessage("invalid evaluate request id");
+        }
+    }
+    else
+    {
+        PutOutputServiceMessage("evaluate request failed: " + evaluateReply.error);
     }
 }
 
@@ -4053,6 +4083,7 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
         sourceCodeView->Copy().AddHandler(this, &MainWindow::CopyClick);
         sourceCodeView->Cut().AddHandler(this, &MainWindow::CutClick);
         sourceCodeView->Paste().AddHandler(this, &MainWindow::PasteClick);
+        sourceCodeView->ExpressionHover().AddHandler(this, &MainWindow::ExpressionHover);
         if (state != MainWindowState::idle)
         {
             sourceCodeView->SetReadOnly();
@@ -4519,6 +4550,15 @@ void MainWindow::ResetSelections()
         }
         child = child->NextSibling();
     }
+}
+
+void MainWindow::ExpressionHover(ExpressionHoverEventArgs& args)
+{
+    if (state != MainWindowState::debugging) return;
+    int requestId = expressionEvaluateRequests.size();
+    ExpressionEvaluateRequest request(args.expression, args.screenLoc);
+    expressionEvaluateRequests.push_back(request);
+    PutRequest(new EvaluateDebugServiceRequest(args.expression, requestId));
 }
 
 } // namespace cmcode
