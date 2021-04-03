@@ -460,7 +460,7 @@ void Emitter::EmitObjectCodeFile(const std::string& objectFilePath)
     objectFile.flush();
     if (objectFile.has_error())
     {
-        throw std::runtime_error("Emitter: could not emit object code file '" + objectFilePath + "': " + errorCode.message());
+        throw std::runtime_error("Emitter: could not emit object code file '" + objectFilePath + "': " + PlatformStringToUtf8(errorCode.message()));
     }
 }
 
