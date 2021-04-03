@@ -606,12 +606,12 @@ std::string PlatformStringToUtf8(const std::string& platformString)
     int result = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, platformString.c_str(), -1, (LPWSTR)wbuf.get(), bufSize);
     if (result == 0)
     {
-        return "<error converting platform string to UTF-16>";
+        return platformString; // conversion failed, maybe it's UTF-8 already
     }
     return ToUtf8(wbuf.get());
 }
 
-#else
+#else // on Linux it will probably be UTF-8 already...
 
 std::string PlatformStringToUtf8(const std::string& platformString)
 {
