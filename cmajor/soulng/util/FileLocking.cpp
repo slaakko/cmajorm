@@ -14,7 +14,7 @@
 
 namespace soulng { namespace util {
 
-bool debugFileLocking = true;
+bool debugFileLocking = false;
 
 class FileLockTable
 {

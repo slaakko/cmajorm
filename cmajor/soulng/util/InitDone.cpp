@@ -15,8 +15,8 @@ namespace soulng { namespace util {
 
 void Init()
 {
-    soulng::util::InitFileLocking();
     soulng::unicode::UnicodeInit();
+    soulng::util::InitFileLocking();
     soulng::util::InitSocket();
     soulng::util::AnsiInit();
     soulng::util::InitTrace();
@@ -29,8 +29,8 @@ void Done()
     soulng::util::DoneTrace();
     soulng::util::AnsiDone();
     soulng::util::DoneSocket();
-    soulng::unicode::UnicodeDone();
     soulng::util::DoneFileLocking();
+    soulng::unicode::UnicodeDone();
 }
 
 } } // namespace soulng::util

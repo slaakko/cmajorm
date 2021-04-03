@@ -596,7 +596,7 @@ std::string Format(const std::string& s, int width, FormatWidth fw, FormatJustif
     return result;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
 
 std::string PlatformStringToUtf8(const std::string& platformString)
 {

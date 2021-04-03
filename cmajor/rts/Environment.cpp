@@ -6,6 +6,7 @@
 #include <cmajor/rts/Environment.hpp>
 #include <cmajor/rts/Error.hpp>
 #include <cmajor/rts/String.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <soulng/util/System.hpp>
 #include <memory>
 #include <vector>
@@ -14,7 +15,7 @@
 #include <mutex>
 #include <cstdlib>
 #include <cerrno>
-#include <string.h>
+#include <cstring>
 #ifdef _WIN32
 #include <direct.h>
 #include <io.h>
@@ -239,7 +240,7 @@ extern "C" RT_API int32_t RtGetCurrentWorkingDirectoryHandle()
     }
     else
     {
-        return cmajor::rt::InstallError(std::string("could not get current working directory: ") + strerror(errno));
+        return cmajor::rt::InstallError(std::string("could not get current working directory: ") + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
     }
 }
 

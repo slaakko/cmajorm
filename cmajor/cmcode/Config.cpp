@@ -17,8 +17,8 @@ using namespace soulng::util;
 
 bool UseDebugServers()
 {
-    //return true;
-    return false;
+    return true;
+    //return false;
 }
 
 bool ServerLogging()

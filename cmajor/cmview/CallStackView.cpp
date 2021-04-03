@@ -107,6 +107,7 @@ void CallStackView::SetFrameRange(const std::vector<::Location>& frames_)
 void CallStackView::UpdateNodes()
 {
     std::vector<TreeViewNode*> visibleNodes = treeView->GetVisibleNodes(1);
+    if (visibleNodes.empty()) return;
     TreeViewNode* first = visibleNodes.front();
     TreeViewNode* last = visibleNodes.back();
     int firstIndex = first->Index();

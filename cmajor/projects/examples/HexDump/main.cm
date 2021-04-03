@@ -53,7 +53,7 @@ string HexDumpLine(uint addr, byte* bytes, uint numBytes)
 
 void HexDump(const string& fileName)
 {
-    Console.WriteLine(GetFullPath(fileName) + ":");
+    Console.WriteLine(fileName + ":");
     long fileSize = File.Size(fileName);
     BinaryReader reader = File.OpenBinary(fileName);
     byte[bytesInLine] bytes;
@@ -103,7 +103,7 @@ int main(int argc, const char** argv)
             }
             else
             {
-                fileNames.Add(arg);
+                fileNames.Add(GetFullPath(arg));
             }
         }
         if (fileNames.IsEmpty())

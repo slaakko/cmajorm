@@ -109,6 +109,8 @@ void PrintHelp()
         "   clean given solutions and projects\n" <<
         "--debug-parse (-p)\n" <<
         "   debug parsing to stdout\n" <<
+        "--link-with-debug-runtime (-d)\n" <<
+        "   link with the debug version of the runtime library cmrt3100(d).dll\n" <<
         "--define SYMBOL (-D SYMBOL)\n" <<
         "   define a conditional compilation symbol SYMBOL.\n" <<
         "--gen-debug-info (-g)\n" <<
@@ -197,6 +199,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--strict-nothrow" || arg == "-s")
                     {
                         SetGlobalFlag(GlobalFlags::strictNothrow);
+                    }
+                    else if (arg == "--link-with-debug-runtime" || arg == "-d")
+                    {
+                        SetGlobalFlag(GlobalFlags::linkWithDebugRuntime);
                     }
                     else if (arg == "--time" || arg == "-t")
                     {

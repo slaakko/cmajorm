@@ -8,7 +8,7 @@
 #include <soulng/util/TextUtils.hpp>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <string.h>
+#include <cstring>
 #include <memory>
 #ifdef _WIN32
 #include <process.h>
@@ -307,7 +307,7 @@ unsigned long long Spawn(const std::string& filename, const std::vector<std::str
     intptr_t handle = _spawnvp(_P_NOWAIT, filename.c_str(), argList);
     if (handle == -1)
     {
-        std::string error = strerror(errno);
+        std::string error = soulng::util::PlatformStringToUtf8(std::strerror(errno));
         throw std::runtime_error("spawn: " + error);
     }
     return handle;
@@ -319,7 +319,7 @@ int Wait(unsigned long long processHandle)
     intptr_t result = _cwait(&exitCode, processHandle, 0);
     if (result == -1)
     {
-        std::string error = strerror(errno);
+        std::string error = soulng::util::PlatformStringToUtf8(std::strerror(errno));
         throw std::runtime_error("wait: " + error);
     }
     return exitCode;

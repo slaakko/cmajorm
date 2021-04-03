@@ -4,6 +4,7 @@
 // =================================
 
 #include <soulng/util/FilePtr.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <soulng/util/FileLocking.hpp>
 #include <stdexcept>
 #include <stdio.h>
@@ -21,7 +22,7 @@ FILE* OpenRead(const char* fileName)
 #endif
     if (!file)
     {
-        throw std::runtime_error("could not open '" + std::string(fileName) + "' for reading: " + std::strerror(errno));
+        throw std::runtime_error("could not open '" + std::string(fileName) + "' for reading: " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
     }
     return file;
 }
@@ -36,7 +37,7 @@ FILE* OpenWrite(const char* fileName)
 #endif
     if (!file)
     {
-        throw std::runtime_error("could not open '" + std::string(fileName) + "' for writing: " + std::strerror(errno));
+        throw std::runtime_error("could not open '" + std::string(fileName) + "' for writing: " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
     }
     return file;
 }

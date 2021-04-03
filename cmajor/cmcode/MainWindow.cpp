@@ -145,6 +145,8 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     searchResultsView(nullptr),
     callStackTabPage(nullptr),
     callStackView(nullptr),
+    localsTabPage(nullptr),
+    localsView(nullptr),
     buildIndicatorStatuBarItem(nullptr), 
     editorReadWriteIndicatorStatusBarItem(nullptr),
     editorDirtyIndicatorStatusBarItem(nullptr),
@@ -909,8 +911,7 @@ void MainWindow::StartBuilding()
     SaveAllClick();
     SetEditorsReadOnly();
     SetState(MainWindowState::building);
-    ErrorView* errorView = GetErrorView();
-    errorView->Clear();
+    GetErrorView()->Clear();
     ClearOutput();
     buildProgressCounter = 0;
     buildProgressTimerRunning = true;
@@ -1199,9 +1200,9 @@ void MainWindow::HandleBuildReply(BuildReply& buildReply)
             PutOutputServiceMessage("build unsuccessful");
             if (!buildReply.errors.empty())
             {
-                ErrorView* errorView = GetErrorView();
-                errorView->Clear();
-                errorView->SetErrors(std::move(buildReply.errors));
+                ErrorView* view = GetErrorView();
+                view->Clear();
+                view->SetErrors(std::move(buildReply.errors));
             }
         }
     }
@@ -1460,7 +1461,6 @@ void MainWindow::HandleLocation(const ::Location& location, bool saveLocation, b
                 selection.end = end;
                 textView->SetSelection(selection);
             }
-            // todo: generate expression hover events
         }
     }
     catch (const std::exception& ex)
@@ -1674,25 +1674,7 @@ void MainWindow::SetState(MainWindowState state_)
 
     // todo:
     // gotoMenuItem
-    // callStackMenuItem
-    // localsMenuItem
-    // errorsMenuItem
     // terminateProcessMenuItem
-    // stopDebuggingMenuItem
-    // showNextStatementMenuItem
-    // stepOverMenuItem
-    // stepIntoMenuItem
-    // stepOutMenuItem
-    // toggleBreakpointMenuItem
-    // prevToolButton
-    // nextToolButton
-    // saveToolButton
-    // stopBuildServerToolButton
-    // stopDebuggingToolButton
-    // showNextStatementToolButton
-    // stepOverToolButton
-    // stepIntoToolButton
-    // stepOutToolButton
 
     // always on:
 
@@ -1700,6 +1682,7 @@ void MainWindow::SetState(MainWindowState state_)
     optionsMenuItem->Enable();
     searchResultsMenuItem->Enable();
     callStackMenuItem->Enable();
+    localsMenuItem->Enable();
     portMapMenuItem->Enable();
     closeAllTabsMenuItem->Enable();
     closeExternalTabsMenuItem->Enable();
@@ -1741,6 +1724,7 @@ void MainWindow::SetState(MainWindowState state_)
                 releaseToolButton->Enable();
                 buildSolutionToolButton->Enable();
                 buildActiveProjectToolButton->Enable();
+                toggleBreakpointMenuItem->Enable();
                 if (backend == "cpp" && config == "debug")
                 {
                     startDebuggingMenuItem->Enable();
@@ -1776,6 +1760,7 @@ void MainWindow::SetState(MainWindowState state_)
                 stepIntoToolButton->Disable();
                 stepOutMenuItem->Disable();
                 stepOutToolButton->Disable();
+                toggleBreakpointMenuItem->Disable();
             }
             else
             {
@@ -1787,6 +1772,7 @@ void MainWindow::SetState(MainWindowState state_)
                 stepIntoToolButton->Enable();
                 stepOutMenuItem->Enable();
                 stepOutToolButton->Enable();
+                toggleBreakpointMenuItem->Enable();
             }
             if (!savedLocation.file.empty())
             {
@@ -2895,29 +2881,46 @@ void MainWindow::CallStackClick()
 
 void MainWindow::LocalsClick()
 {
-    ShowInfoMessageBox(Handle(), "Locals");
+    try
+    {
+        GetLocalsView()->Invalidate();
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::ErrorsClick()
 {
-    ShowInfoMessageBox(Handle(), "Errors");
-}
-
-void MainWindow::SearchResultsClick()
-{
     try
     {
-        searchResultsView = GetSearchResultsView();
-        if (searchResultsView)
+        ErrorView* view = GetErrorView();
+        if (view)
         {
-            searchResultsView->Invalidate();
+            view->Invalidate();
         }
     }
     catch (const std::exception& ex)
     {
         ShowErrorMessageBox(Handle(), ex.what());
     }
+}
 
+void MainWindow::SearchResultsClick()
+{
+    try
+    {
+        SearchResultsView* view = GetSearchResultsView();
+        if (view)
+        {
+            view->Invalidate();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::PortMapClick()
@@ -3165,7 +3168,6 @@ void MainWindow::SetActiveProject(sngcm::ast::Project* project, TreeViewNode* ne
         sngcm::ast::Solution* solution = solutionData->GetSolution();
         solution->SetActiveProject(project);
         solution->Save();
-        // todo: load project settings
         solutionTreeView->Invalidate();
     }
     catch (const std::exception& ex)
@@ -3666,7 +3668,26 @@ void MainWindow::StepOutClick()
 
 void MainWindow::ToggleBreakpointClick()
 {
-    ShowInfoMessageBox(Handle(), "Toggle Breakpoint");
+    try
+    {
+        Editor* editor = CurrentEditor();
+        if (editor)
+        {
+            if (editor->IsCmajorEditor())
+            {
+                CmajorEditor* cmajorEditor = static_cast<CmajorEditor*>(editor);
+                CmajorSourceCodeView* cmajorSourceCodeView = cmajorEditor->SourceCodeView();
+                if (cmajorSourceCodeView)
+                {
+                    cmajorSourceCodeView->ToggleBreakpoint();
+                }
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::ProgramArgumentsClick()
@@ -4307,6 +4328,11 @@ void MainWindow::OutputTabControlTabPageRemoved(ControlEventArgs& args)
         callStackTabPage = nullptr;
         callStackView = nullptr;
     }
+    else if (args.control == localsTabPage)
+    {
+        localsTabPage = nullptr;
+        localsView = nullptr;
+    }
     else if (args.control == logTabPage)
     {
         logTabPage = nullptr;
@@ -4495,6 +4521,29 @@ void MainWindow::CallStackFrameSelected(FrameSelectedEventArgs& args)
     {
         ShowErrorMessageBox(Handle(), ex.what());
     }
+}
+
+LocalsView* MainWindow::GetLocalsView()
+{
+    if (!localsView)
+    {
+        localsView = new LocalsView();
+        if (state == MainWindowState::debugging)
+        {
+            UpdateLocals();
+        }
+        localsTabPage = new TabPage("Locals", "locals");
+        localsTabPage->AddChild(localsView);
+        outputTabControl->AddTabPage(localsTabPage);
+    }
+    localsTabPage->Select();
+    return localsView;
+}
+
+void MainWindow::UpdateLocals()
+{
+    if (!localsView) return;
+    // todo
 }
 
 Console* MainWindow::GetConsole()

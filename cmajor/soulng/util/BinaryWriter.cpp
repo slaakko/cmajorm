@@ -4,6 +4,7 @@
 // =================================
 
 #include <soulng/util/BinaryWriter.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
  
 namespace soulng { namespace util {
@@ -14,7 +15,7 @@ BinaryWriter::BinaryWriter(const std::string& fileName_) : fileName(fileName_), 
 {
     if (!file)
     {
-        throw std::runtime_error("could not open '" + fileName + "' for writing: " + strerror(errno));
+        throw std::runtime_error("could not open '" + fileName + "' for writing: " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
     }
 }
 
@@ -248,7 +249,7 @@ void BinaryWriter::Seek(uint32_t pos_)
     int result = fseek(file, pos, SEEK_SET);
     if (result != 0)
     {
-        throw std::runtime_error("seek failed: " + std::string(strerror(errno)));
+        throw std::runtime_error("seek failed: " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
     }
 }
 
@@ -260,7 +261,7 @@ void BinaryWriter::FlushBuffer()
         size_t numWritten = fwrite(buffer, 1, n, file);
         if (numWritten != n)
         {
-            throw std::runtime_error("could not write to '" + fileName + "': " + strerror(errno));
+            throw std::runtime_error("could not write to '" + fileName + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         }
         BufferReset();
     }

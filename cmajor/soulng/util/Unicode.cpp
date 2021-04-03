@@ -2283,11 +2283,11 @@ bool IsAsciiDigit(char32_t c)
 
 void UnicodeInit()
 {
+    CharacterTable::Init();
     BinaryPropertyTable::Init();
     GeneralCategoryTable::Init();
     AgeTable::Init();
     ScriptTable::Init();
-    CharacterTable::Init();
     BlockTable::Init();
     BidiClassTable::Init();
     BidiPairedBracketTypeTable::Init();
@@ -2302,11 +2302,11 @@ void UnicodeDone()
     BidiPairedBracketTypeTable::Done();
     BidiClassTable::Done();
     BlockTable::Done();
-    CharacterTable::Done();
     ScriptTable::Done();
     AgeTable::Done();
     GeneralCategoryTable::Done();
     BinaryPropertyTable::Done();
+    CharacterTable::Done();
 }
 
 } } // namespace soulng::util

@@ -7,8 +7,10 @@
 #include <cmajor/rt/Debug.hpp>
 #include <cmajor/rt/Error.hpp>
 #include <soulng/util/Error.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
+#include <cstring>
 #ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
@@ -121,7 +123,7 @@ int64_t StdInputFile::Read(uint8_t* buffer, int64_t count, int32_t& errorStringH
     int64_t result = std::fread(buffer, 1, count, stdin);
     if (ferror(stdin))
     {
-        errorStringHandle = InstallError("could not read from STDIN: " + std::string(strerror(errno)));
+        errorStringHandle = InstallError("could not read from STDIN: " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return -1;
     }
     return result;
@@ -159,7 +161,7 @@ bool StdInputFile::GetError(int32_t& errorStringHandle) const
 {
     if (std::ferror(stdin))
     {
-        errorStringHandle = InstallError("STDIN: " + std::string(std::strerror(errno)));
+        errorStringHandle = InstallError("STDIN: " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return true;
     }
     return false;
@@ -225,7 +227,7 @@ int64_t StdOutputFile::Write(const uint8_t* buffer, int64_t count, int32_t& erro
     int64_t result = std::fwrite(buffer, 1, count, file);
     if (result != count)
     {
-        errorStringHandle = InstallError("could not write to : " + name + ": " + strerror(errno));
+        errorStringHandle = InstallError("could not write to : " + name + ": " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return -1;
     }
     return result;
@@ -243,7 +245,7 @@ bool StdOutputFile::WriteByte(uint8_t x, int32_t& errorStringHandle)
     int result = std::fputc(x, file);
     if (result == EOF)
     {
-        errorStringHandle = InstallError("could not write to '" + name + "': " + strerror(errno));
+        errorStringHandle = InstallError("could not write to '" + name + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return false;
     }
     return true;
@@ -269,7 +271,7 @@ bool StdOutputFile::GetError(int32_t& errorStringHandle) const
 {
     if (std::ferror(file))
     {
-        errorStringHandle = InstallError(name + ": " + std::string(std::strerror(errno)));
+        errorStringHandle = InstallError(name + ": " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return true;
     }
     return false;
@@ -292,7 +294,7 @@ bool StdOutputFile::Flush(int32_t& errorStringHandle)
     int result = fflush(file);
     if (result != 0)
     {
-        errorStringHandle = InstallError("could not flush " + name + ": " + strerror(errno));
+        errorStringHandle = InstallError("could not flush " + name + ": " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return false;
     }
     return true;
@@ -385,7 +387,7 @@ int64_t StdUnicodeInputFile::Read(uint8_t* buffer, int64_t count, int32_t& error
     {
         if (ferror(stdin))
         {
-            errorStringHandle = InstallError("could not read from STDIN: " + std::string(strerror(errno)));
+            errorStringHandle = InstallError("could not read from STDIN: " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
             return -1;
         }
     }
@@ -440,7 +442,7 @@ bool StdUnicodeInputFile::GetError(int32_t& errorStringHandle) const
 {
     if (std::ferror(stdin))
     {
-        errorStringHandle = InstallError("STDIN: " + std::string(std::strerror(errno)));
+        errorStringHandle = InstallError("STDIN: " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return true;
     }
     return false;
@@ -520,7 +522,7 @@ int64_t StdUnicodeOutputFile::Write(const uint8_t* buffer, int64_t count, int32_
         int64_t utf16result = std::fwrite(utf16Chars.c_str(), sizeof(char16_t), utf16Chars.length(), file);
         if (utf16result != utf16Chars.length())
         {
-            errorStringHandle = InstallError("could not write to : " + name + ": " + strerror(errno));
+            errorStringHandle = InstallError("could not write to : " + name + ": " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
             return -1;
         }
     }
@@ -559,7 +561,7 @@ bool StdUnicodeOutputFile::GetError(int32_t& errorStringHandle) const
 {
     if (std::ferror(file))
     {
-        errorStringHandle = InstallError(name + ": " + std::strerror(errno));
+        errorStringHandle = InstallError(name + ": " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return true;
     }
     return false;
@@ -582,7 +584,7 @@ bool StdUnicodeOutputFile::Flush(int32_t& errorStringHandle)
     int result = fflush(file);
     if (result != 0)
     {
-        errorStringHandle = InstallError("could not flush " + name + ": " + strerror(errno));
+        errorStringHandle = InstallError("could not flush " + name + ": " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return false;
     }
     return true;
@@ -733,7 +735,7 @@ bool RegularFile::Close(int32_t& errorStringHandle)
     file = nullptr;
     if (result != 0)
     {
-        errorStringHandle = InstallError("could not close file '" + std::string(filePath) + "': " + strerror(errno));
+        errorStringHandle = InstallError("could not close file '" + std::string(filePath) + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return false;
     }
     return true;
@@ -745,7 +747,7 @@ int64_t RegularFile::Write(const uint8_t* buffer, int64_t count, int32_t& errorS
     int64_t result = std::fwrite(buffer, 1, count, file);
     if (result != count)
     {
-        errorStringHandle = InstallError("could not write to file '" + filePath + "': " + strerror(errno));
+        errorStringHandle = InstallError("could not write to file '" + filePath + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return -1;
     }
     return result;
@@ -757,7 +759,7 @@ bool RegularFile::WriteByte(uint8_t x, int32_t& errorStringHandle)
     int result = std::fputc(x, file);
     if (result == EOF)
     {
-        errorStringHandle = InstallError("could not write to file '" + filePath + "': " + strerror(errno));
+        errorStringHandle = InstallError("could not write to file '" + filePath + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return false;
     }
     return true;
@@ -769,7 +771,7 @@ int64_t RegularFile::Read(uint8_t* buffer, int64_t count, int32_t& errorStringHa
     int64_t result = std::fread(buffer, 1, count, file);
     if (ferror(file))
     {
-        errorStringHandle = InstallError("could not read from file '" + filePath + "': " + strerror(errno));
+        errorStringHandle = InstallError("could not read from file '" + filePath + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return -1;
     }
     return result;
@@ -794,7 +796,7 @@ bool RegularFile::GetError(int32_t& errorStringHandle) const
 {
     if (std::ferror(file))
     {
-        errorStringHandle = InstallError(filePath + ": " + std::strerror(errno));
+        errorStringHandle = InstallError(filePath + ": " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return true;
     }
     return false;
@@ -825,7 +827,7 @@ bool RegularFile::Seek(int64_t pos, Origin origin, int32_t& errorStringHandle)
     int result = fseek(file, pos, seekOrigin);
     if (result != 0)
     {
-        errorStringHandle = InstallError("could not seek file '" + filePath + "': " + strerror(errno));
+        errorStringHandle = InstallError("could not seek file '" + filePath + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return false;
     }
     return true;
@@ -836,7 +838,7 @@ int64_t RegularFile::Tell(int32_t& errorStringHandle)
     int64_t result = ftell(file);
     if (result == -1)
     {
-        errorStringHandle = InstallError("could not tell file '" + filePath + "': " + strerror(errno));
+        errorStringHandle = InstallError("could not tell file '" + filePath + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return -1;
     }
     return result;
@@ -847,7 +849,7 @@ bool RegularFile::Flush(int32_t& errorStringHandle)
     int result = fflush(file);
     if (result != 0)
     {
-        errorStringHandle = InstallError("could not flush file '" + filePath + "': " + strerror(errno));
+        errorStringHandle = InstallError("could not flush file '" + filePath + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return false;
     }
     return true;
@@ -888,7 +890,7 @@ void* OpenFile(const char* filePath, OpenMode openMode, int32_t& errorStringHand
     FILE* file = std::fopen(filePath, mode.c_str());
     if (!file)
     {
-        errorStringHandle = InstallError("could not open file '" + std::string(filePath) + "': " + strerror(errno));
+        errorStringHandle = InstallError("could not open file '" + std::string(filePath) + "': " + soulng::util::PlatformStringToUtf8(std::strerror(errno)));
         return nullptr;
     }
     return new RegularFile(file, filePath);
@@ -1130,7 +1132,7 @@ int64_t RtGetFileSize(const char* filePath, int32_t& errorStringHandle)
     int64_t fileSize = boost::filesystem::file_size(filePath, ec);
     if (ec)
     {
-        errorStringHandle = cmajor::rt::InstallError("could not get size of file '" + std::string(filePath) + "': " + ec.message());
+        errorStringHandle = cmajor::rt::InstallError("could not get size of file '" + std::string(filePath) + "': " + soulng::util::PlatformStringToUtf8(ec.message()));
         return -1;
     }
     return fileSize;
@@ -1143,7 +1145,7 @@ bool RtRemoveFile(const char* filePath, int32_t& errorStringHandle)
     boost::filesystem::remove(filePath, ec);
     if (ec)
     {
-        errorStringHandle = cmajor::rt::InstallError("could not remove file '" + std::string(filePath) + "': " + ec.message());
+        errorStringHandle = cmajor::rt::InstallError("could not remove file '" + std::string(filePath) + "': " + soulng::util::PlatformStringToUtf8(ec.message()));
         return false;
     }
     return true;
@@ -1156,7 +1158,7 @@ bool RtCopyFile(const char* sourceFilePath, const char* targetFilePath, int32_t&
     boost::filesystem::copy(sourceFilePath, targetFilePath, ec);
     if (ec)
     {
-        errorStringHandle = cmajor::rt::InstallError("could not copy file '" + std::string(sourceFilePath) + "': " + ec.message());
+        errorStringHandle = cmajor::rt::InstallError("could not copy file '" + std::string(sourceFilePath) + "': " + soulng::util::PlatformStringToUtf8(ec.message()));
         return false;
     }
     return true;
@@ -1169,7 +1171,7 @@ bool RtMoveFile(const char* sourceFilePath, const char* targetFilePath, int32_t&
     boost::filesystem::rename(sourceFilePath, targetFilePath, ec);
     if (ec)
     {
-        errorStringHandle = cmajor::rt::InstallError("could not move file '" + std::string(sourceFilePath) + "': " + ec.message());
+        errorStringHandle = cmajor::rt::InstallError("could not move file '" + std::string(sourceFilePath) + "': " + soulng::util::PlatformStringToUtf8(ec.message()));
         return false;
     }
     return true;

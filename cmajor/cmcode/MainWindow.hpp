@@ -16,6 +16,7 @@
 #include <cmajor/cmview/ResourceFileEditor.hpp>
 #include <cmajor/cmview/TextFileEditor.hpp>
 #include <cmajor/cmview/CallStackView.hpp>
+#include <cmajor/cmview/LocalsView.hpp>
 #include <cmajor/cmview/ErrorView.hpp>
 #include <cmajor/cmview/SearchResultsView.hpp>
 #include <cmajor/wing/Clipboard.hpp>
@@ -221,6 +222,8 @@ private:
     void ClearCallStack();
     void UpdateCallStack();
     void CallStackFrameSelected(FrameSelectedEventArgs& args);
+    LocalsView* GetLocalsView();
+    void UpdateLocals();
     Console* GetConsole();
     void UpdateCurrentDebugStrip();
     void ResetSelections();
@@ -301,6 +304,8 @@ private:
     SearchResultsView* searchResultsView;
     TabPage* callStackTabPage;
     CallStackView* callStackView;
+    TabPage* localsTabPage;
+    LocalsView* localsView;
     StatusBarTextItem* buildIndicatorStatuBarItem;
     StatusBarTextItem* editorReadWriteIndicatorStatusBarItem;
     StatusBarTextItem* editorDirtyIndicatorStatusBarItem;
