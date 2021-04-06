@@ -1277,6 +1277,7 @@ void MainWindow::HandleContinueReply(const ContinueReply& continueReply)
     {
         HandleTargetState(continueReply.state);
         HandleLocation(continueReply.location, true, false);
+        UpdateLocals();
     }
     else
     {
@@ -1290,6 +1291,7 @@ void MainWindow::HandleNextReply(const NextReply& nextReply)
     {
         HandleTargetState(nextReply.state);
         HandleLocation(nextReply.location, true, false);
+        UpdateLocals();
     }
     else
     {
@@ -1303,6 +1305,7 @@ void MainWindow::HandleStepReply(const StepReply& stepReply)
     {
         HandleTargetState(stepReply.state);
         HandleLocation(stepReply.location, true, false);
+        UpdateLocals();
     }
     else
     {
@@ -1316,6 +1319,7 @@ void MainWindow::HandleFinishReply(const FinishReply& finishReply)
     {
         HandleTargetState(finishReply.state);
         HandleLocation(finishReply.location, true, false);
+        UpdateLocals();
     }
     else
     {
@@ -1329,6 +1333,7 @@ void MainWindow::HandleUntilReply(const UntilReply& untilReply)
     {
         HandleTargetState(untilReply.state);
         HandleLocation(untilReply.location, true, false);
+        UpdateLocals();
     }
     else
     {
