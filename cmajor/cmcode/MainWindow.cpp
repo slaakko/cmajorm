@@ -15,6 +15,7 @@
 #include <cmajor/cmcode/AddNewSourceFileDialog.hpp>
 #include <cmajor/cmcode/AddNewResourceFileDialog.hpp>
 #include <cmajor/cmcode/AddNewTextFileDialog.hpp>
+#include <cmajor/cmcode/GotoLineDialog.hpp>
 #include <cmajor/cmcode/ProgramArgumentsDialog.hpp>
 #include <cmajor/cmcode/SelectProjectTypeDialog.hpp>
 #include <cmajor/wing/Ansi.hpp>
@@ -2757,41 +2758,69 @@ void MainWindow::PasteClick()
 
 void MainWindow::UndoClick()
 {
-    Editor* editor = CurrentEditor();
-    if (editor)
+    try
     {
-        TextView* textView = editor->GetTextView();
-        if (textView)
+        Editor* editor = CurrentEditor();
+        if (editor)
         {
-            textView->Undo();
+            TextView* textView = editor->GetTextView();
+            if (textView)
+            {
+                textView->Undo();
+            }
         }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
     }
 }
 
 void MainWindow::RedoClick()
 {
-    Editor* editor = CurrentEditor();
-    if (editor)
+    try
     {
-        TextView* textView = editor->GetTextView();
-        if (textView)
+        Editor* editor = CurrentEditor();
+        if (editor)
         {
-            textView->Redo();
+            TextView* textView = editor->GetTextView();
+            if (textView)
+            {
+                textView->Redo();
+            }
         }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
     }
 }
 
 void MainWindow::GotoClick()
 {
-    // todo
-    Editor* editor = CurrentEditor();
-    if (editor)
+    try
     {
-        TextView* textView = editor->GetTextView();
-        if (textView)
+        GotoLineDialog dialog;
+        if (dialog.ShowDialog(*this) == DialogResult::ok)
         {
-
+            Editor* editor = CurrentEditor();
+            if (editor)
+            {
+                TextView* textView = editor->GetTextView();
+                if (textView)
+                {
+                    int lineNumber = dialog.LineNumber();
+                    textView->SetCaretLineCol(std::min(lineNumber, static_cast<int>(textView->Lines().size())), 1 + textView->LineNumberFieldLength());
+                    textView->ScrollToCaret();
+                    textView->SetFocus();
+                    textView->Invalidate();
+                }
+            }
         }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
     }
 }
 
