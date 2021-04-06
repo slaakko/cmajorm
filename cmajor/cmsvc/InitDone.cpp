@@ -9,6 +9,8 @@
 #include <cmajor/cmsvc/RequestDispatcher.hpp>
 #include <cmajor/cmsvc/BuildService.hpp>
 #include <cmajor/cmsvc/DebugService.hpp>
+#include <cmajor/cmsvc/RunService.hpp>
+#include <cmajor/cmdebug/CmdbSession.hpp>
 
 namespace cmajor { namespace service {
 
@@ -19,10 +21,14 @@ void Init()
     InitRequestDispatcher();
     InitBuildService();
     InitDebugService();
+    InitRunService();
+    cmajor::debug::CmdbSessionInit();
 }
 
 void Done()
 {
+    cmajor::debug::CmdbSessionDone();
+    DoneRunService();
     DoneDebugService();
     DoneBuildService();
     DoneRequestDispatcher();

@@ -107,22 +107,29 @@ void CmdbSession::Run()
 {
     try
     {
+        listenSocket = TcpSocket();
         listenSocket.Bind(port);
         listenSocket.Listen(10);
         started.notify_one();
         while (!exiting)
         {
             TcpSocket socket = listenSocket.Accept();
-            if (exiting) return;
+            if (exiting)
+            {
+                listenSocket.Close();
+                return;
+            }
             sessionClosed = false;
             while (!sessionClosed)
             {
                 Transact(socket);
             }
         }
+        listenSocket.Close();
     }
     catch (const std::exception& ex)
     {
+        listenSocket.Close();
         if (!exiting)
         {
             std::cerr << "error from CMDB session run: " << ex.what() << std::endl;
@@ -143,6 +150,7 @@ void RunSession()
 
 void CmdbSession::Start(CmdbSessionClient* client_)
 {
+    exiting = false;
     client = client_;
     thread = std::thread{ RunSession };
 }

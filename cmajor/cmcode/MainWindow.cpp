@@ -8,6 +8,7 @@
 #include <cmajor/cmcode/Action.hpp>
 #include <cmajor/cmcode/Build.hpp>
 #include <cmajor/cmcode/Debug.hpp>
+#include <cmajor/cmcode/Run.hpp>
 #include <cmajor/cmcode/ToolBar.hpp>
 #include <cmajor/cmcode/AddNewProjectDialog.hpp>
 #include <cmajor/cmcode/NewProjectDialog.hpp>
@@ -29,6 +30,8 @@
 #include <cmajor/cmsvc/PortMapService.hpp>
 #include <cmajor/cmsvc/BuildService.hpp>
 #include <cmajor/cmsvc/BuildServiceRequest.hpp>
+#include <cmajor/cmsvc/RunService.hpp>
+#include <cmajor/cmsvc/RunServiceRequest.hpp>
 #include <sngcm/ast/Project.hpp>
 #include <soulng/rex/Context.hpp>
 #include <soulng/rex/Match.hpp>
@@ -618,6 +621,10 @@ MainWindow::~MainWindow()
     {
         StopDebugService();
     }
+    else if (state == MainWindowState::running)
+    {
+        StopRunService();
+    }
     StopRequestDispatcher();
 }
 
@@ -967,6 +974,30 @@ void MainWindow::StopDebugging()
     PutOutputServiceMessage("debugging stopped");
 }
 
+void MainWindow::StartRunning()
+{
+    SetEditorsReadOnly();
+    SetState(MainWindowState::running);
+    ClearOutput();
+    GetConsole()->Clear();
+    sngcm::ast::Solution* solution = solutionData->GetSolution();
+    sngcm::ast::Project* activeProject = solution->ActiveProject();
+    ProjectData* projectData = solutionData->GetProjectDataByProject(activeProject);
+    if (!projectData)
+    {
+        throw std::runtime_error("active project has no data");
+    }
+    const std::string& programArguments = projectData->ProgramArguments();
+    RunProgram(backend, config, activeProject, programArguments);
+}
+
+void MainWindow::StopRunning()
+{
+    SetState(MainWindowState::idle);
+    SetEditorsReadWrite();
+    PutOutputServiceMessage("run service stopped");
+}
+
 void MainWindow::ShowBuildProgress()
 {
     if (state == MainWindowState::building)
@@ -1129,6 +1160,16 @@ void MainWindow::HandleServiceMessage()
             {
                 DebugServiceStoppedServiceMessage* message = static_cast<DebugServiceStoppedServiceMessage*>(serviceMessage.get()); 
                 HandleDebugServiceStopped();
+                break;
+            }
+            case ServiceMessageKind::processTerminated:
+            {
+                HandleProcessTerminated();
+                break;
+            }
+            case ServiceMessageKind::runServiceStopped:
+            {
+                HandleRunServiceStopped();
                 break;
             }
         }
@@ -1596,7 +1637,7 @@ void MainWindow::ConsoleInputReady()
         }
         else if (state == MainWindowState::running)
         {
-            // todo
+            PutRequest(new SetProgramEofRequest());
         }
     }
     else
@@ -1607,7 +1648,7 @@ void MainWindow::ConsoleInputReady()
         }
         else if (state == MainWindowState::running)
         {
-            // todo
+            PutRequest(new PutProgramInputLineRequest(ToUtf8(console->InputLine())));
         }
     }
 }
@@ -1615,6 +1656,17 @@ void MainWindow::ConsoleInputReady()
 void MainWindow::HandleDebugServiceStopped()
 {
     StopDebugging();
+    SetFocusToEditor();
+}
+
+void MainWindow::HandleProcessTerminated()
+{
+    PutRequest(new StopRunServiceRequest());
+}
+
+void MainWindow::HandleRunServiceStopped()
+{
+    StopRunning();
     SetFocusToEditor();
 }
 
@@ -1731,7 +1783,6 @@ void MainWindow::SetState(MainWindowState state_)
 
     // todo:
     // gotoMenuItem
-    // terminateProcessMenuItem
 
     // always on:
 
@@ -1841,6 +1892,11 @@ void MainWindow::SetState(MainWindowState state_)
                 showNextStatementMenuItem->Disable();
                 showNextStatementToolButton->Disable();
             }
+            break;
+        }
+        case MainWindowState::running:
+        {
+            terminateProcessMenuItem->Enable();
             break;
         }
     }
@@ -2701,17 +2757,42 @@ void MainWindow::PasteClick()
 
 void MainWindow::UndoClick()
 {
-    ShowInfoMessageBox(Handle(), "Undo");
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            textView->Undo();
+        }
+    }
 }
 
 void MainWindow::RedoClick()
 {
-    ShowInfoMessageBox(Handle(), "Redo");
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            textView->Redo();
+        }
+    }
 }
 
 void MainWindow::GotoClick()
 {
-    ShowInfoMessageBox(Handle(), "Goto");
+    // todo
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+
+        }
+    }
 }
 
 void MainWindow::SearchClick()
@@ -3632,12 +3713,26 @@ void MainWindow::StartDebuggingClick()
 
 void MainWindow::StartWithoutDebuggingClick()
 {
-    ShowInfoMessageBox(Handle(), "Start Without Debugging");
+    try
+    {
+        StartRunning();
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::TerminateProcessClick()
 {
-    ShowInfoMessageBox(Handle(), "Terminate Process");
+    try
+    {
+        PutRequest(new TerminateProcessRequest());
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::StopDebuggingClick()

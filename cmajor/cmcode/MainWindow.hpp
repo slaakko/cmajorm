@@ -104,6 +104,8 @@ private:
     void ShowBuildProgress();
     void StartDebugging();
     void StopDebugging();
+    void StartRunning();
+    void StopRunning();
     void HandleServiceMessage();
     void ClearOutput();
     void WriteOutput(const std::string& text);
@@ -134,6 +136,8 @@ private:
     void HandleTargetOutputRequest(const TargetOutputRequest& targetOutputRequest);
     void ConsoleInputReady();
     void HandleDebugServiceStopped();
+    void HandleProcessTerminated();
+    void HandleRunServiceStopped();
     void SetState(MainWindowState state_);
     void SetEditorState();
     void ResetDebugLocations();
