@@ -300,6 +300,48 @@ private:
     int requestId;
 };
 
+class CMSVC_API RunCountDebugServiceRequest : public DebugServiceRequest
+{
+public:
+    RunCountDebugServiceRequest(const std::string& expression_);
+    void Execute() override;
+    std::string Name() const override;
+    void Failed(const std::string& error) override;
+private:
+    std::string expression;
+};
+
+class CMSVC_API CountReplyServiceMessage : public ServiceMessage
+{
+public:
+    CountReplyServiceMessage(const CountReply& countReply_);
+    const CountReply& GetCountReply() const { return countReply; }
+private:
+    CountReply countReply;
+};
+
+class CMSVC_API RunEvaluateChildRequest : public DebugServiceRequest
+{
+public:
+    RunEvaluateChildRequest(const std::string& expression_, int start_, int count_);
+    void Execute() override;
+    std::string Name() const override;
+    void Failed(const std::string& error) override;
+private:
+    std::string expression;
+    int start;
+    int count;
+};
+
+class CMSVC_API EvaluateChildReplyServiceMessage : public ServiceMessage
+{
+public:
+    EvaluateChildReplyServiceMessage(const EvaluateChildReply& evaluateChildReply_);
+    const EvaluateChildReply& GetEvaluateChildReply() const { return evaluateChildReply; }
+private:
+    EvaluateChildReply evaluateChildReply;
+};
+
 class CMSVC_API DebugServiceStoppedServiceMessage : public ServiceMessage
 {
 public:
@@ -323,6 +365,8 @@ CMSVC_API void Delete(const std::string& breakpointId);
 CMSVC_API void Depth();
 CMSVC_API void Frames(int lowFrame, int highFrame);
 CMSVC_API void Evaluate(const std::string& expression, int requestId);
+CMSVC_API void Count(const std::string& expression);
+CMSVC_API void EvaluateChild(const std::string& expression, int start, int count);
 
 } } // namespace cmajor::service
 

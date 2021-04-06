@@ -120,6 +120,28 @@ private:
     int requestId;
 };
 
+class CMSVC_API CountDebugServiceRequest : public Request
+{
+public:
+    CountDebugServiceRequest(const std::string& expression_);
+    void Execute() override;
+    std::string Name() const override { return "countDebugServiceRequest"; }
+private:
+    std::string expression;
+};
+
+class CMSVC_API EvaluateChildDebugServiceRequest : public Request
+{
+public:
+    EvaluateChildDebugServiceRequest(const std::string& expression_, int start_, int count_);
+    void Execute() override;
+    std::string Name() const override { return "evaluateChildDebugServiceRequest"; }
+private:
+    std::string expression;
+    int start;
+    int count;
+};
+
 class CMSVC_API SetTargetInputEofRequest : public Request
 {
 public:

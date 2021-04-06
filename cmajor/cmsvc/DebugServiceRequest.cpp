@@ -115,6 +115,24 @@ void EvaluateDebugServiceRequest::Execute()
     Evaluate(expression, requestId);
 }
 
+CountDebugServiceRequest::CountDebugServiceRequest(const std::string& expression_) : expression(expression_)
+{
+}
+
+void CountDebugServiceRequest::Execute()
+{
+    Count(expression);
+}
+
+EvaluateChildDebugServiceRequest::EvaluateChildDebugServiceRequest(const std::string& expression_, int start_, int count_) : expression(expression_), start(start_), count(count_)
+{
+}
+
+void EvaluateChildDebugServiceRequest::Execute() 
+{
+    EvaluateChild(expression, start, count);
+}
+
 SetTargetInputEofRequest::SetTargetInputEofRequest()
 {
 }

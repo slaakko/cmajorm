@@ -943,6 +943,7 @@ void MainWindow::StartDebugging()
     ClearOutput();
     GetConsole()->Clear();
     ClearCallStack();
+    ClearLocals();
     sngcm::ast::Solution* solution = solutionData->GetSolution();
     sngcm::ast::Project* activeProject = solution->ActiveProject();
     ProjectData* projectData = solutionData->GetProjectDataByProject(activeProject);
@@ -1094,6 +1095,18 @@ void MainWindow::HandleServiceMessage()
                 HandleEvaluateReply(message->GetEvaluateReply(), message->RequestId());
                 break;
             }
+            case ServiceMessageKind::countReply:
+            {
+                CountReplyServiceMessage* message = static_cast<CountReplyServiceMessage*>(serviceMessage.get());
+                HandleCountReply(message->GetCountReply());
+                break;
+            }
+            case ServiceMessageKind::evaluateChildReply:
+            {
+                EvaluateChildReplyServiceMessage* message = static_cast<EvaluateChildReplyServiceMessage*>(serviceMessage.get());
+                HandleEvaluateChildReply(message->GetEvaluateChildReply());
+                break;
+            }
             case ServiceMessageKind::targetRunning:
             {
                 TargetRunningServiceMessage* message = static_cast<TargetRunningServiceMessage*>(serviceMessage.get());
@@ -1239,6 +1252,11 @@ void MainWindow::HandleStartDebugReply(const StartDebugReply& startDebugReply)
         startDebuggingMenuItem->SetText("Continue");
         startDebuggingToolButton->SetToolTip("Continue (F5)");
         PutOutputServiceMessage("debugging started");
+        if (localsView)
+        {
+            ClearLocals();
+            UpdateLocals();
+        }
     }
     else
     {
@@ -1401,6 +1419,40 @@ void MainWindow::HandleEvaluateReply(const EvaluateReply& evaluateReply, int req
     else
     {
         PutOutputServiceMessage("evaluate request failed: " + evaluateReply.error);
+    }
+}
+
+void MainWindow::HandleCountReply(const CountReply& countReply)
+{
+    if (countReply.success)
+    {
+        LocalsView* view = GetLocalsView();
+        if (view)
+        {
+            view->SetLocalCount(countReply.count);
+            UpdateLocals();
+        }
+    }
+    else
+    {
+        PutOutputServiceMessage("count request failed: " + countReply.error);
+    }
+}
+
+void MainWindow::HandleEvaluateChildReply(const EvaluateChildReply& evaluateChildReply)
+{
+    if (evaluateChildReply.success)
+    {
+        LocalsView* view = GetLocalsView();
+        if (view)
+        {
+            view->SetChildResults(evaluateChildReply.results);
+            UpdateLocals();
+        }
+    }
+    else
+    {
+        PutOutputServiceMessage("evaluate child request failed: " + evaluateChildReply.error);
     }
 }
 
@@ -2883,7 +2935,8 @@ void MainWindow::LocalsClick()
 {
     try
     {
-        GetLocalsView()->Invalidate();
+        GetLocalsView();
+        UpdateLocals();
     }
     catch (const std::exception& ex)
     {
@@ -3550,6 +3603,7 @@ void MainWindow::StartDebuggingClick()
     try
     {
         ClearCallStack();
+        ClearLocals();
         ResetSelections();
         if (state == MainWindowState::debugging)
         {
@@ -3604,6 +3658,7 @@ void MainWindow::StepOverClick()
     try
     {
         ClearCallStack();
+        ClearLocals();
         ResetSelections();
         if (state == MainWindowState::debugging)
         {
@@ -3630,6 +3685,7 @@ void MainWindow::StepIntoClick()
     try
     {
         ClearCallStack();
+        ClearLocals();
         ResetSelections();
         if (state == MainWindowState::debugging)
         {
@@ -3656,6 +3712,7 @@ void MainWindow::StepOutClick()
     try
     {
         ClearCallStack();
+        ClearLocals();
         ResetSelections();
         StartDebugging();
         PutRequest(new FinishDebugServiceRequest());
@@ -4528,10 +4585,8 @@ LocalsView* MainWindow::GetLocalsView()
     if (!localsView)
     {
         localsView = new LocalsView();
-        if (state == MainWindowState::debugging)
-        {
-            UpdateLocals();
-        }
+        localsView->LocalNodeExpanded().AddHandler(this, &MainWindow::LocalsViewNodeExpanded);
+        localsView->UpdateNeeded().AddHandler(this, &MainWindow::LocalsViewUpdateNeeded);
         localsTabPage = new TabPage("Locals", "locals");
         localsTabPage->AddChild(localsView);
         outputTabControl->AddTabPage(localsTabPage);
@@ -4540,10 +4595,91 @@ LocalsView* MainWindow::GetLocalsView()
     return localsView;
 }
 
+void MainWindow::ClearLocals()
+{
+    if (localsView)
+    {
+        localsView->Clear();
+    }
+}
+
 void MainWindow::UpdateLocals()
 {
     if (!localsView) return;
-    // todo
+    int localCount = localsView->LocalCount();
+    if (localCount == -1)
+    {
+        if (!localsView->LocalCountRequested())
+        {
+            localsView->SetLocalCountRequested();
+            PutRequest(new CountDebugServiceRequest("@locals"));
+        }
+    }
+    else 
+    {
+        if (!localsView->ChildExtentRequested())
+        {
+            ChildExtent childExtent = localsView->GetChildExtent();
+            if (!childExtent.IsEmpty())
+            {
+                localsView->SetChildExtentRequested();
+                PutRequest(new EvaluateChildDebugServiceRequest(localsView->FetchExpression(), childExtent.start, childExtent.count));
+            }
+        }
+        else
+        {
+            localsView->ResetChildExtentRequested();
+            if (!localsView->IsFetchSetEmpty())
+            {
+                localsView->Fetch();
+                ChildExtent childExtent = localsView->GetChildExtent();
+                if (!childExtent.IsEmpty())
+                {
+                    localsView->SetChildExtentRequested();
+                    PutRequest(new EvaluateChildDebugServiceRequest(localsView->FetchExpression(), childExtent.start, childExtent.count));
+                }
+            }
+        }
+        localsView->Update();
+    }
+}
+
+void MainWindow::LocalsViewNodeExpanded(TreeViewNodeEventArgs& args)
+{
+    try
+    {
+        if (!localsView) return;
+        UpdateLocals();
+        localsView->UpdateFetchSet();
+        if (!localsView->IsFetchSetEmpty())
+        {
+            localsView->Fetch();
+        }
+        UpdateLocals();
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::LocalsViewUpdateNeeded()
+{
+    try
+    {
+        if (!localsView) return;
+        UpdateLocals();
+        localsView->UpdateFetchSet();
+        if (!localsView->IsFetchSetEmpty())
+        {
+            localsView->Fetch();
+        }
+        UpdateLocals();
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 Console* MainWindow::GetConsole()

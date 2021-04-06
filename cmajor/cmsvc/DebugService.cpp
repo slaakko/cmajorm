@@ -142,9 +142,12 @@ public:
     void RunDepthRequest();
     void RunFramesRequest(int lowFrame, int highFrame);
     void RunEvaluateRequest(const std::string& expression, int requestId);
+    void RunCountRequest(const std::string& expression);
+    void RunEvaluateChildRequest(const std::string& expression, int start, int count);
     void SetRequestInProgress(const std::string& requestName);
     void ResetRequestInProgress();
     bool RequestInProgress(std::string& requestName);
+    void ClearRequestQueue();
 private:
     DebugService();
     DebugMessageKind GetDebugMessageKind(const std::u32string& messageName) const;
@@ -449,7 +452,6 @@ void RunService(DebugService* service)
 
 void DebugService::Start(const DebugServiceStartParams& startParams, const std::vector<Breakpoint*>& breakpoints_)
 {
-    requestQueue.clear();
     targetInputEof = false;
     running = false;
     stop = false;
@@ -539,6 +541,7 @@ void DebugService::Stop()
             started = false;
             serviceThread.join();
         }
+        ClearRequestQueue();
         PutServiceMessage(new DebugServiceStoppedServiceMessage());
     }
     catch (const std::exception& ex)
@@ -733,6 +736,30 @@ void DebugService::RunEvaluateRequest(const std::string& expression, int request
     PutServiceMessage(new EvaluateReplyServiceMessage(reply, requestId));
 }
 
+void DebugService::RunCountRequest(const std::string& expression)
+{
+    CountRequest request;
+    request.expression = expression;
+    std::unique_ptr<Element> requestElement = request.ToXml("countRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::countReply);
+    CountReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new CountReplyServiceMessage(reply));
+}
+
+void DebugService::RunEvaluateChildRequest(const std::string& expression, int start, int count)
+{
+    EvaluateChildRequest request;
+    request.expression = expression;
+    request.start = start;
+    request.count = count;
+    std::unique_ptr<Element> requestElement = request.ToXml("evaluateChildRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::evaluateChildReply);
+    EvaluateChildReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new EvaluateChildReplyServiceMessage(reply));
+}
+
 void DebugService::SetRequestInProgress(const std::string& requestName)
 {
     requestInProgress = true;
@@ -755,6 +782,11 @@ bool DebugService::RequestInProgress(std::string& requestName)
     {
         return false;
     }
+}
+
+void DebugService::ClearRequestQueue()
+{
+    requestQueue.clear();
 }
 
 DebugServiceRequest::~DebugServiceRequest()
@@ -804,6 +836,7 @@ std::string RunStopDebugServiceRequest::Name() const
 
 void RunStopDebugServiceRequest::Failed(const std::string& error)
 {
+    DebugService::Instance().ClearRequestQueue();
     PutServiceMessage(new DebugServiceStoppedServiceMessage());
 }
 
@@ -1044,6 +1077,51 @@ EvaluateReplyServiceMessage::EvaluateReplyServiceMessage(const EvaluateReply& ev
 {
 }
 
+RunCountDebugServiceRequest::RunCountDebugServiceRequest(const std::string& expression_) : expression(expression_)
+{
+}
+
+void RunCountDebugServiceRequest::Execute()
+{
+    DebugService::Instance().RunCountRequest(expression);
+}
+
+std::string RunCountDebugServiceRequest::Name() const
+{
+    return "runCountDebugServiceRequest";
+}
+
+void RunCountDebugServiceRequest::Failed(const std::string& error) 
+{
+}
+
+CountReplyServiceMessage::CountReplyServiceMessage(const CountReply& countReply_) : ServiceMessage(ServiceMessageKind::countReply), countReply(countReply_)
+{
+}
+
+RunEvaluateChildRequest::RunEvaluateChildRequest(const std::string& expression_, int start_, int count_) : expression(expression_), start(start_), count(count_)
+{
+}
+
+void RunEvaluateChildRequest::Execute()
+{
+    DebugService::Instance().RunEvaluateChildRequest(expression, start, count);
+}
+
+std::string RunEvaluateChildRequest::Name() const
+{
+    return "runEvaluateChildRequest";
+}
+
+void RunEvaluateChildRequest::Failed(const std::string& error)
+{
+}
+
+EvaluateChildReplyServiceMessage::EvaluateChildReplyServiceMessage(const EvaluateChildReply& evaluateChildReply_) : 
+    ServiceMessage(ServiceMessageKind::evaluateChildReply), evaluateChildReply(evaluateChildReply_)
+{
+}
+
 void InitDebugService()
 {
     DebugService::Init();
@@ -1113,6 +1191,16 @@ void Frames(int lowFrame, int highFrame)
 void Evaluate(const std::string& expression, int requestId)
 {
     DebugService::Instance().PutRequest(new RunEvaluateDebugServiceRequest(expression, requestId));
+}
+
+void Count(const std::string& expression)
+{
+    DebugService::Instance().PutRequest(new RunCountDebugServiceRequest(expression));
+}
+
+void EvaluateChild(const std::string& expression, int start, int count)
+{
+    DebugService::Instance().PutRequest(new RunEvaluateChildRequest(expression, start, count));
 }
 
 void SetTargetInputEof()

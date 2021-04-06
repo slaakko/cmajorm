@@ -526,10 +526,7 @@ void BuildService::Stop(bool log)
                 {
                     StopKeepAliveThread();
                 }
-                if (requestInProgress)
-                {
-                    Quit();
-                }
+                Quit();
                 requestAvailableOrExiting.notify_one();
                 running = false;
             }

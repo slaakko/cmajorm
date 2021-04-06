@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_TREE_VIEW_INCLUDED
 #define CMAJOR_WING_TREE_VIEW_INCLUDED
-#include <cmajor/wing/Control.hpp>
+#include <cmajor/wing/ToolTip.hpp>
 #include <cmajor/wing/Container.hpp>
 
 namespace cmajor { namespace wing {
@@ -38,7 +38,7 @@ using NodeHoveredEvent = EventWithArgs<TreeViewNodeEventArgs>;
 
 enum class TreeViewFlags : int
 {
-    none = 0, changed = 1 << 0, treeViewNodeChanged = 1 << 1, treeViewNodeStateChanged = 1 << 2, toolTipWindowAdded = 1 << 3
+    none = 0, changed = 1 << 0, treeViewNodeChanged = 1 << 1, treeViewNodeStateChanged = 1 << 2, toolTipWindowAdded = 1 << 3, toolTipWindowShown = 1 << 4
 };
 
 WING_API inline TreeViewFlags operator&(TreeViewFlags left, TreeViewFlags right)
@@ -118,6 +118,8 @@ public:
     const Color& StateIndicatorColor() const { return stateIndicatorColor; }
     const Color& SelectedNodeColor() const { return selectedNodeColor; }
     const Color& TextColor() const { return textColor; }
+    void ShowToolTipWindow(TreeViewNode* node);
+    void HideToolTipWindow();
     bool Changed() const { return (flags & TreeViewFlags::changed) != TreeViewFlags::none; }
     void SetChanged() { flags = flags | TreeViewFlags::changed; }
     void ResetChanged() { flags = flags & ~TreeViewFlags::changed; }
@@ -130,6 +132,9 @@ public:
     bool ToolTipWindowAdded() const { return (flags & TreeViewFlags::toolTipWindowAdded) != TreeViewFlags::none; }
     void SetToolTipWindowAdded() { flags = flags | TreeViewFlags::toolTipWindowAdded; }
     void ResetToolTipWindowAdded() { flags = flags & ~TreeViewFlags::toolTipWindowAdded; }
+    bool ToolTipWindowShown() const { return (flags & TreeViewFlags::toolTipWindowShown) != TreeViewFlags::none; }
+    void SetToolTipWindowShown() { flags = flags | TreeViewFlags::toolTipWindowShown; }
+    void ResetToolTipWindowShown() { flags = flags & ~TreeViewFlags::toolTipWindowShown; }
     float TextHeight() const { return textHeight; }
     NodeClickEvent& NodeClick() { return nodeClick; }
     NodeDoubleClickEvent& NodeDoubleClick() { return nodeDoubleClick; }
@@ -192,6 +197,7 @@ private:
     std::unique_ptr<Bitmap> nodeCollapsedBitmap;
     std::unique_ptr<Bitmap> nodeExpandedBitmap;
     StringFormat stringFormat;
+    ToolTip* toolTipWindow;
     NodeClickEvent nodeClick;
     NodeDoubleClickEvent nodeDoubleClick;
     NodeEnterEvent nodeEnter;
@@ -279,6 +285,8 @@ public:
     void MeasureSize(Graphics& graphics);
     void Measure(Graphics& graphics, const Point& loc, int level, int& idx, Rect& parentRect);
     void Draw(Graphics& graphics, SolidBrush& selectedBrush, SolidBrush& textBrush);
+    const std::string& ToolTip() const { return toolTip; }
+    void SetToolTip(const std::string& toolTip_);
 protected:
     virtual void OnMouseDown(MouseEventArgs& args);
     virtual void OnMouseUp(MouseEventArgs& args);
@@ -288,6 +296,7 @@ protected:
     virtual void OnMouseHover();
 private:
     std::string text;
+    std::string toolTip;
     TreeView* treeView;
     Container children;
     TreeViewNodeState state;

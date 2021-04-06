@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/wing/TreeView.hpp>
+#include <cmajor/wing/Window.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef min
@@ -187,7 +188,8 @@ TreeView::TreeView(TreeViewCreateParams& createParams) :
     textHeight(0),
     stateIndicatorHeight(0),
     stateIndicatorPercentage(createParams.stateIndicatorPercentage),
-    stringFormat()
+    stringFormat(),
+    toolTipWindow(new ToolTip(ToolTipCreateParams().Defaults()))
 {
     stringFormat.SetAlignment(StringAlignment::StringAlignmentNear);
     stringFormat.SetLineAlignment(StringAlignment::StringAlignmentNear);
@@ -199,7 +201,16 @@ TreeView::TreeView(TreeViewCreateParams& createParams) :
 
 TreeView::~TreeView()
 {
-    // todo remove tool tip window
+    if (toolTipWindow && ToolTipWindowAdded())
+    {
+        ResetToolTipWindowAdded();
+        Window* window = GetWindow();
+        if (window)
+        {
+            window->RemoveChild(toolTipWindow); 
+            toolTipWindow = nullptr;
+        }
+    }
 }
 
 void TreeView::SetRoot(TreeViewNode* root_)
@@ -355,6 +366,15 @@ void TreeView::OnPaint(PaintEventArgs& args)
 {
     try
     {
+        if (toolTipWindow && !ToolTipWindowAdded())
+        {
+            SetToolTipWindowAdded();
+            Window* window = GetWindow();
+            if (window)
+            {
+                window->AddChild(toolTipWindow);
+            }
+        }
         if (Changed())
         {
             ResetChanged();
@@ -603,6 +623,49 @@ void TreeView::SetActiveNodeFont(const std::string& activeNodeFontFamilyName_, f
         std::u16string fontFamilyName = ToUtf16(activeNodeFontFamilyName);
         activeNodeFont = Font(FontFamily((const WCHAR*)fontFamilyName.c_str()), activeNodeFontSize, activeNodeFontStyle, Unit::UnitPoint);
         SetChanged();
+    }
+}
+
+void TreeView::ShowToolTipWindow(TreeViewNode* node)
+{
+    if (!toolTipWindow || !ToolTipWindowAdded()) return;
+    if (ToolTipWindowShown()) toolTipWindow->Hide();
+    ResetToolTipWindowShown();
+    Point loc = node->Location();
+    Size size = node->GetSize();
+    toolTipWindow->SetText(node->ToolTip());
+    toolTipWindow->MeasureExtent();
+    Point pt(loc.X, loc.Y + size.Height + 8);
+    pt = ClientToScreen(pt);
+    Window* window = GetWindow();
+    if (window)
+    {
+        pt = window->ScreenToClient(pt);
+        Size sz = toolTipWindow->GetSize();
+        Point wloc = window->Location();
+        Size wsz = window->GetSize();
+        if (pt.Y + sz.Height > wloc.Y + wsz.Height)
+        {
+            pt.Y = wloc.Y + wsz.Height - sz.Height;
+        }
+        if (pt.X + sz.Width > wloc.X + wsz.Width)
+        {
+            pt.X = wloc.X + wsz.Width - sz.Width;
+        }
+        toolTipWindow->SetLocation(pt);
+        toolTipWindow->BringToFront();
+        toolTipWindow->Show();
+        toolTipWindow->Invalidate();
+        SetToolTipWindowShown();
+    }
+}
+
+void TreeView::HideToolTipWindow()
+{
+    if (ToolTipWindowShown())
+    {
+        ResetToolTipWindowShown();
+        toolTipWindow->Hide();
     }
 }
 
@@ -1156,6 +1219,11 @@ void TreeViewNode::Draw(Graphics& graphics, SolidBrush& selectedBrush, SolidBrus
             }
         }
     }
+}
+
+void TreeViewNode::SetToolTip(const std::string& toolTip_)
+{
+    toolTip = toolTip_;
 }
 
 void TreeViewNode::OnMouseDown(MouseEventArgs& args)

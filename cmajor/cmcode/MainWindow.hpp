@@ -125,6 +125,8 @@ private:
     void HandleDepthReply(const DepthReply& depthReply);
     void HandleFramesReply(const FramesReply& framesReply);
     void HandleEvaluateReply(const EvaluateReply& evaluateReply, int requestId);
+    void HandleCountReply(const CountReply& countReply);
+    void HandleEvaluateChildReply(const EvaluateChildReply& evaluateChildReply);
     void HandleLocation(const ::Location& location, bool saveLocation, bool setSelection);
     void HandleTargetState(TargetState state);
     void HandleTargetRunning();
@@ -223,7 +225,11 @@ private:
     void UpdateCallStack();
     void CallStackFrameSelected(FrameSelectedEventArgs& args);
     LocalsView* GetLocalsView();
+    void ClearLocals();
     void UpdateLocals();
+    void LocalsViewNodeExpanded(TreeViewNodeEventArgs& args);
+    void LocalsViewNodeHovered(TreeViewNodeEventArgs& args);
+    void LocalsViewUpdateNeeded();
     Console* GetConsole();
     void UpdateCurrentDebugStrip();
     void ResetSelections();
