@@ -35,6 +35,8 @@
 
 namespace cmcode {
 
+extern const char* cmajorCodeVersion;
+
 const int buildProgressTimerId = 10;
 const int buildProgressTimerPeriod = 100;
 const int toolTipTimerId = 12;
@@ -82,6 +84,7 @@ public:
     void GotoDefinition(sngcm::ast::Project* project, const std::string& identifier, const DefinitionSourceLocation& sourceLocation);
     void GotoCursor(const SourceLoc& sourceLocation);
     void GotoLocation(const DefinitionSourceLocation& location);
+    void SetProjectReferences(sngcm::ast::Project* project);
 protected:
     bool ProcessMessage(Message& msg) override;
     void OnWindowStateChanged() override;

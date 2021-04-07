@@ -4,6 +4,8 @@
 // =================================
 
 #include <cmajor/cmcode/MainWindow.hpp>
+#include <cmajor/cmcode/AboutDialog.hpp>
+#include <cmajor/cmcode/ProjectReferencesDialog.hpp>
 #include <cmajor/cmcode/Config.hpp>
 #include <cmajor/cmcode/Action.hpp>
 #include <cmajor/cmcode/Build.hpp>
@@ -44,6 +46,8 @@
 #undef max
 
 namespace cmcode {
+
+const char* cmajorCodeVersion = "3.10.0";
 
 using namespace cmajor::service;
 using namespace sngcm::ast;
@@ -250,10 +254,10 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     searchMenuItem->SetShortcut(Keys::controlModifier | Keys::f);
     searchMenuItem->Click().AddHandler(this, &MainWindow::SearchClick);
     editMenuItem->AddMenuItem(searchMenuItemPtr.release());
-    std::unique_ptr<MenuItem> optionsMenuItemPtr(new MenuItem("&Options..."));
-    optionsMenuItem = optionsMenuItemPtr.get();
-    optionsMenuItem->Click().AddHandler(this, &MainWindow::OptionsClick);
-    editMenuItem->AddMenuItem(optionsMenuItemPtr.release());
+//    std::unique_ptr<MenuItem> optionsMenuItemPtr(new MenuItem("&Options..."));
+//    optionsMenuItem = optionsMenuItemPtr.get();
+//    optionsMenuItem->Click().AddHandler(this, &MainWindow::OptionsClick);
+//    editMenuItem->AddMenuItem(optionsMenuItemPtr.release());
     menuBar->AddMenuItem(editMenuItem.release());
     std::unique_ptr<MenuItem> viewMenuItem(new MenuItem("&View"));
     std::unique_ptr<MenuItem> debugWindowsMenuItem(new MenuItem("&Debug Windows"));
@@ -1709,7 +1713,7 @@ void MainWindow::SetState(MainWindowState state_)
     redoMenuItem->Disable();
     gotoMenuItem->Disable();
     searchMenuItem->Disable();
-    optionsMenuItem->Disable();
+    //optionsMenuItem->Disable();
     callStackMenuItem->Disable();
     localsMenuItem->Disable();
     errorsMenuItem->Disable();
@@ -1782,13 +1786,10 @@ void MainWindow::SetState(MainWindowState state_)
         activeProject = solutionData->GetSolution()->ActiveProject();
     }
 
-    // todo:
-    // gotoMenuItem
-
     // always on:
 
     exitMenuItem->Enable();
-    optionsMenuItem->Enable();
+    //optionsMenuItem->Enable();
     searchResultsMenuItem->Enable();
     callStackMenuItem->Enable();
     localsMenuItem->Enable();
@@ -2352,6 +2353,27 @@ void MainWindow::GotoLocation(const DefinitionSourceLocation& location)
     }
 }
 
+void MainWindow::SetProjectReferences(sngcm::ast::Project* project)
+{
+    try
+    {
+        if (!solutionData) return;
+        Solution* solution = solutionData->GetSolution();
+        ProjectReferencesDialog dialog(project, solution);
+        if (dialog.ShowDialog(*this) == DialogResult::ok)
+        {
+            std::vector<Project*> referencedProjects = dialog.ReferencedProjects();
+            project->SetReferencedProjects(referencedProjects);
+            project->Save();
+            // todo: load edit module
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
 DefinitionSourceLocation MainWindow::CurrentLocation() const
 {
     DefinitionSourceLocation currentLocation;
@@ -2598,11 +2620,8 @@ void MainWindow::SaveAllClick()
         if (!solutionData) return;
         sngcm::ast::Solution* solution = solutionData->GetSolution();
         solution->Save();
-        sngcm::ast::Project* activeProject = solution->ActiveProject();
-        if (activeProject)
-        {
-            // todo: save project settings
-        }
+        SaveSolutionData();
+        SaveProjectData();
         Component* child = codeTabControl->TabPages().FirstChild();
         while (child)
         {
@@ -3030,6 +3049,7 @@ void MainWindow::ViewSearchResult(ViewSearchResultEventArgs& args)
 
 void MainWindow::OptionsClick()
 {
+    // todo
     ShowInfoMessageBox(Handle(), "Options");
 }
 
@@ -3093,6 +3113,7 @@ void MainWindow::SearchResultsClick()
 
 void MainWindow::PortMapClick()
 {
+    // todo
     ShowInfoMessageBox(Handle(), "Port Map");
 }
 
@@ -3964,17 +3985,41 @@ void MainWindow::CloseExternalTabsClick()
 
 void MainWindow::HomepageClick()
 {
-    ShowInfoMessageBox(Handle(), "Homepage");
+    try
+    {
+        std::string homePage = "http://slaakko.github.io/cmajor/";
+        ShellExecuteA(Handle(), "open", homePage.c_str(), nullptr, nullptr, SW_SHOW);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::LocalDocumentationClick()
 {
-    ShowInfoMessageBox(Handle(), "Local Documentation");
+    try
+    {
+        std::string indexFilePath = Path::Combine(sngcm::ast::CmajorRootDir(), "doc/index.html");
+        ShellExecuteA(Handle(), "open", indexFilePath.c_str(), nullptr, nullptr, SW_SHOW);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::AboutClick()
 {
-    ShowInfoMessageBox(Handle(), "About");
+    try
+    {
+        AboutDialog dialog;
+        dialog.ShowDialog(*this);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::GotoPreviousLocationClick()
@@ -4188,6 +4233,9 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
                     std::unique_ptr<MenuItem> addExistingTextFileMenuItem(new MenuItem("Add Existing Text File..."));
                     clickActions.push_back(std::unique_ptr<ClickAction>(new AddExistingTextFileAction(addExistingTextFileMenuItem.get(), this, project, node)));
                     contextMenu->AddMenuItem(addExistingTextFileMenuItem.release());
+                    std::unique_ptr<MenuItem> referencesMenuItem(new MenuItem("Rererences..."));
+                    clickActions.push_back(std::unique_ptr<ClickAction>(new ProjectReferencesAction(referencesMenuItem.get(), this, project)));
+                    contextMenu->AddMenuItem(referencesMenuItem.release());
                     if (solutionData->GetSolution()->ActiveProject() != project)
                     {
                         std::unique_ptr<MenuItem> setActiveMenuItem(new MenuItem("Set Active"));

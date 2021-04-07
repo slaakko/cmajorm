@@ -224,6 +224,16 @@ private:
     SourceLoc sourceLocation;
 };
 
+class ProjectReferencesAction : public ClickAction
+{
+public:
+    ProjectReferencesAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_);
+    void Execute() override;
+private:
+    MainWindow* mainWindow;
+    sngcm::ast::Project* project;
+};
+
 } // namespace cmcode
 
 #endif // CMCODE_ACTION_INCLUDED

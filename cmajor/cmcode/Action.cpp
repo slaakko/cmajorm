@@ -219,4 +219,15 @@ void GotoCursorAction::Execute()
     mainWindow->GotoCursor(sourceLocation);
 }
 
+ProjectReferencesAction::ProjectReferencesAction(MenuItem* menuItem, MainWindow* mainWindow_, sngcm::ast::Project* project_) : 
+    ClickAction(menuItem), mainWindow(mainWindow_), project(project_)
+{
+}
+
+void ProjectReferencesAction::Execute()
+{
+    mainWindow->HideContextMenu();
+    mainWindow->SetProjectReferences(project);
+}
+
 } // namespace cmcode

@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <set>
 
 namespace sngcm { namespace ast {
 
@@ -39,6 +40,9 @@ enum class SystemDirKind : int
     regular = 0, repository = 1
 };
 
+class Project;
+class Solution;
+
 SNGCM_AST_API std::string CmajorRootDir();
 SNGCM_AST_API std::string CmajorSystemLibDir(const std::string& config, BackEnd backend, const std::string& toolChain, SystemDirKind systemDirKind);
 SNGCM_AST_API std::string CmajorResourceDir();
@@ -47,6 +51,9 @@ SNGCM_AST_API std::string CmajorSystemModuleFilePath(const std::string& config, 
 SNGCM_AST_API std::string CmajorSystemWindowsModuleFilePath(const std::string& config, const std::string& toolChanin, SystemDirKind systemDirKind);
 SNGCM_AST_API std::string MakeCmajorRootRelativeFilePath(const std::string& filePath);
 SNGCM_AST_API std::string ExpandCmajorRootRelativeFilePath(const std::string& filePath);
+SNGCM_AST_API std::vector<Project*> GetReferencedProjects(Project* project, Solution* solution);
+SNGCM_AST_API std::set<Project*> GetAllReferencedProjects(Project* project, Solution* solution);
+SNGCM_AST_API void AddReferencedProjects(std::set<Project*>& allReferencedProjects, Project* project, Solution* solution);
 SNGCM_AST_API void SetOutDir(const std::string& outDir_);
 SNGCM_AST_API const std::string& OutDir();
 
@@ -163,6 +170,7 @@ public:
     const std::string& RelativeFilePath() const { return relativeFilePath; }
     void SetModuleFilePath(const std::string& moduleFilePath_);
     void SetLibraryFilePath(const std::string& libraryFilePath_);
+    void SetReferencedProjects(const std::vector<Project*>& referencedProjects);
     bool IsUpToDate(const std::string& systemModuleFilePath) const;
     int LogStreamId() const { return logStreamId; }
     void SetLogStreamId(int logStreamId_) { logStreamId = logStreamId_; }

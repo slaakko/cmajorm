@@ -4,6 +4,7 @@
 // =================================
 
 #include <sngcm/ast/Project.hpp>
+#include <sngcm/ast/Solution.hpp>
 #include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -187,6 +188,50 @@ std::string ExpandCmajorRootRelativeFilePath(const std::string& filePath)
     else
     {
         return GetFullPath(filePath);
+    }
+}
+
+std::vector<Project*> GetReferencedProjects(Project* project, Solution* solution)
+{
+    std::vector<Project*> referencedProjects;
+    for (const std::string& referencedProjectFilePath : project->ReferencedProjectFilePaths())
+    {
+        std::string rpfp = GetFullPath(referencedProjectFilePath);
+        int n = solution->Projects().size();
+        bool found = false;
+        int i = 0;
+        while (i < n && !found)
+        {
+            Project* solutionProject = solution->Projects()[i].get();
+            std::string fp = GetFullPath(solutionProject->FilePath());
+            if (fp == rpfp)
+            {
+                referencedProjects.push_back(solutionProject);
+                found = true;
+            }
+            ++i;
+        }
+    }
+    return referencedProjects;
+}
+
+std::set<Project*> GetAllReferencedProjects(Project* project, Solution* solution)
+{
+    std::set<Project*> allReferencedProjects;
+    AddReferencedProjects(allReferencedProjects, project, solution);
+    return allReferencedProjects;
+}
+
+void AddReferencedProjects(std::set<Project*>& allReferencedProjects, Project* project, Solution* solution)
+{
+    std::vector<Project*> referencedProjects = GetReferencedProjects(project, solution);
+    for (Project* referencedProject : referencedProjects)
+    {
+        if (allReferencedProjects.find(referencedProject) == allReferencedProjects.cend())
+        {
+            allReferencedProjects.insert(referencedProject);
+            AddReferencedProjects(allReferencedProjects, referencedProject, solution);
+        }
     }
 }
 
@@ -523,6 +568,20 @@ void Project::SetModuleFilePath(const std::string& moduleFilePath_)
 void Project::SetLibraryFilePath(const std::string& libraryFilePath_)
 {
     libraryFilePath = libraryFilePath_;
+}
+
+void Project::SetReferencedProjects(const std::vector<Project*>& referencedProjects)
+{
+    referencedProjectFilePaths.clear();
+    relativeReferencedProjectFilePaths.clear();
+    std::string absoluteProjectDirPath = GetFullPath(sourceBasePath.generic_string());
+    for (Project* referencedProject : referencedProjects)
+    {
+        referencedProjectFilePaths.push_back(referencedProject->FilePath());
+        std::string absoluteReferenceDirPath = GetFullPath(Path::GetDirectoryName(referencedProject->FilePath()));
+        std::string referenceProjectDir = MakeRelativeDirPath(absoluteReferenceDirPath, absoluteProjectDirPath);
+        relativeReferencedProjectFilePaths.push_back(Path::Combine(referenceProjectDir, Path::GetFileName(referencedProject->FilePath())));
+    }
 }
 
 bool Project::IsUpToDate(const std::string& systemModuleFilePath) const
