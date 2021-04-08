@@ -277,6 +277,7 @@ protected:
     void OnMouseUp(MouseEventArgs& args) override;
     void OnKeyDown(KeyEventArgs& args) override;
     void OnKeyPress(KeyPressEventArgs& args) override;
+    void OnContentLocationChanged() override;
     virtual void OnEscape();
     virtual void OnCC();
     virtual void OnCCNext();

@@ -2168,6 +2168,12 @@ void TextView::OnKeyPress(KeyPressEventArgs& args)
     }
 }
 
+void TextView::OnContentLocationChanged()
+{
+    Control::OnContentLocationChanged();
+    SetCaretLocation();
+}
+
 void TextView::OnEscape()
 {
     escape.Fire();
