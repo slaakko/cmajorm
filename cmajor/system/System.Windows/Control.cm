@@ -1146,7 +1146,7 @@ namespace System.Windows
                 }
                 case SC_CLOSE:
                 {
-                    KeyEventArgs args(Keys.f4, Keys.altModifier);
+                    KeyEventArgs args(cast<Keys>(Keys.f4 | Keys.altModifier));
                     DoMenu(args);
                     if (args.handled)
                     {
@@ -1178,26 +1178,20 @@ namespace System.Windows
                     return true;
                 }
             }
-            Keys keyCode = cast<Keys>(virtualKeyCode);
-            switch (keyCode)
+            Keys key = cast<Keys>(virtualKeyCode);
+            if (WinKeyPressed(VK_SHIFT))
             {
-                case Keys.controlKey:
-                {
-                    currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.controlModifier);
-                    break;
-                }
-                case Keys.shiftKey:
-                {
-                    currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.shiftModifier);
-                    break;
-                }
-                case Keys.menu:
-                {
-                    currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.altModifier);
-                    break;
-                }
+                key = cast<Keys>(key | Keys.shiftModifier);
             }
-            KeyEventArgs args(keyCode, currentModifierKeys);
+            if (WinKeyPressed(VK_CONTROL))
+            {
+                key = cast<Keys>(key | Keys.controlModifier);
+            }
+            if (WinKeyPressed(VK_MENU))
+            {
+                key = cast<Keys>(key | Keys.altModifier);
+            }
+            KeyEventArgs args(key);
             DoMenu(args);
             if (args.handled)
             {
@@ -1223,49 +1217,12 @@ namespace System.Windows
                 string s = "DoKeyUp: " + ToString(cast<Keys>(virtualKeyCode)) + " " + ToHexString(cast<uint>(virtualKeyCode));
                 logView->WriteLine(s);
             }
-            Keys keyCode = cast<Keys>(virtualKeyCode);
-            switch (keyCode)
-            {
-                case Keys.controlKey:
-                {
-                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.controlModifier);
-                    break;
-                }
-                case Keys.shiftKey:
-                {
-                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.shiftModifier);
-                    break;
-                }
-                case Keys.menu:
-                {
-                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.altModifier);
-                    break;
-                }
-            }
+            Keys key = cast<Keys>(virtualKeyCode);
             if (KeyDownHandled() || MenuWantsKeys())
             {
                 return KeyDownHandled();
             }
-            Keys modifierKeys;
-            switch (keyCode)
-            {
-                case Keys.controlKey:
-                {
-                    modifierKeys = cast<Keys>(modifierKeys | Keys.controlModifier);
-                    break;
-                }
-                case Keys.shiftKey:
-                {
-                    modifierKeys = cast<Keys>(modifierKeys | Keys.shiftModifier);
-                    break;
-                }
-                case Keys.menu:
-                {
-                    modifierKeys = cast<Keys>(modifierKeys | Keys.altModifier);
-                    break;
-                }
-            }
-            KeyEventArgs args(keyCode, modifierKeys);
+            KeyEventArgs args(key);
             DispatchKeyUp(args);
             if (args.handled)
             {

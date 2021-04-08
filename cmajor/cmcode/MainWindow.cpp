@@ -981,17 +981,21 @@ void MainWindow::StopDebugging()
 
 void MainWindow::StartRunning()
 {
-    SetEditorsReadOnly();
-    SetState(MainWindowState::running);
-    ClearOutput();
-    GetConsole()->Clear();
     sngcm::ast::Solution* solution = solutionData->GetSolution();
     sngcm::ast::Project* activeProject = solution->ActiveProject();
+    if (activeProject->GetTarget() != sngcm::ast::Target::program && activeProject->GetTarget() != sngcm::ast::Target::winapp && activeProject->GetTarget() != sngcm::ast::Target::winguiapp)
+    {
+        throw std::runtime_error("project '" + ToUtf8(activeProject->Name()) + "' is a library project");
+    }
     ProjectData* projectData = solutionData->GetProjectDataByProject(activeProject);
     if (!projectData)
     {
         throw std::runtime_error("active project has no data");
     }
+    SetEditorsReadOnly();
+    SetState(MainWindowState::running);
+    ClearOutput();
+    GetConsole()->Clear();
     const std::string& programArguments = projectData->ProgramArguments();
     RunProgram(backend, config, activeProject, programArguments);
 }

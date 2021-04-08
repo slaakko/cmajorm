@@ -1720,6 +1720,11 @@ int Module::GetBuildTimeMs()
 
 void Module::AddCompileUnitId(const std::string& compileUnitId)
 {
+    std::lock_guard<std::recursive_mutex> lck(lock);
+    if (compileUnitId.empty())
+    {
+        throw std::runtime_error("module '" + ToUtf8(Name()) + "': compile unit id is empty");
+    }
     compileUnitIds.insert(compileUnitId);
     allCompileUnitIds.insert(compileUnitId);
 }

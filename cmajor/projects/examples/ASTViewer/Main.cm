@@ -85,7 +85,7 @@ class MainWindow : Window
     protected override void OnKeyDown(KeyEventArgs& args)
     {
         base->OnKeyDown(args);
-        if (!args.handled && args.keyData == cast<Keys>(Keys.altModifier | Keys.c))
+        if (!args.handled && args.key == cast<Keys>(Keys.altModifier | Keys.c))
         {
             LogView* logView = Application.GetLogView();
             if (logView != null)

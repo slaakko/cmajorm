@@ -406,6 +406,9 @@ TokenLine Lexer::TokenizeLine(const std::u32string& line, int lineNumber, int st
     token.id = INVALID_TOKEN;
     token.line = lineNumber;
     int state = startState;
+    int prevState = 0;
+    int prevPrevState = 0;
+    bool cont = false;
     while (pos != end)
     {
         char32_t c = *pos;
@@ -416,7 +419,8 @@ TokenLine Lexer::TokenizeLine(const std::u32string& line, int lineNumber, int st
             token.line = lineNumber;
         }
         lexeme.end = pos + 1;
-        int prevState = state;
+        prevPrevState = prevState;
+        prevState = state;
         state = NextState(state, c);
         if (state == -1)
         {
@@ -427,6 +431,14 @@ TokenLine Lexer::TokenizeLine(const std::u32string& line, int lineNumber, int st
             state = 0;
             pos = token.match.end;
             tokenLine.tokens.push_back(token);
+            if (pos + 1 < end && *pos == '\"' && *(pos + 1) == '\\' && prevPrevState == 13 && prevState == 71)
+            {
+                Token tok;
+                tok.match.begin = pos;
+                tok.match.end = pos + 2;
+                tokenLine.tokens.push_back(tok);
+                pos += 2;
+            }
             lexeme.begin = lexeme.end;
         }
         else

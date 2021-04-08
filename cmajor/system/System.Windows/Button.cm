@@ -35,11 +35,11 @@ namespace System.Windows
         BS_TYPEMASK = 0xF,
         BS_VCENTER = 0xC00
     }
-    
+
     public abstract class ButtonBase : Control
     {
-        public ButtonBase(const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle, 
-            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
+        public ButtonBase(const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle,
+            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base(windowClassName, windowClassStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors)
         {
         }
@@ -52,7 +52,7 @@ namespace System.Windows
             OnClick();
         }
     }
-    
+
     public class Button : ButtonBase
     {
         private enum Flags : sbyte
@@ -60,7 +60,7 @@ namespace System.Windows
             none = 0, defaultButton = 1 << 0
         }
         public Button(ButtonStyle buttonStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle), DefaultExtendedWindowStyle(), 
+            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle), DefaultExtendedWindowStyle(),
             backgroundColor, text, location, size, dock, anchors), flags(Flags.none), dialogResult(DialogResult.none)
         {
             SetFlagsFromButtonStyle(buttonStyle);
@@ -73,7 +73,7 @@ namespace System.Windows
             this(buttonStyle, GetSystemColor(SystemColor.COLOR_BTNFACE), text, location, size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left))
         {
         }
-        public Button(const string& text, const Point& location, const Size& size) : 
+        public Button(const string& text, const Point& location, const Size& size) :
             this(cast<ButtonStyle>(ButtonStyle.BS_PUSHBUTTON | ButtonStyle.BS_NOTIFY), text, location, size)
         {
         }
@@ -138,7 +138,7 @@ namespace System.Windows
             base->OnKeyDown(args);
             if (!args.handled)
             {
-                switch (args.keyData)
+                switch (args.key)
                 {
                     case Keys.enter:
                     {

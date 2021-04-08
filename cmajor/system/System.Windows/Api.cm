@@ -1126,11 +1126,21 @@ namespace System.Windows.API
 
     public void OpenClipboard(void* windowHandle)
     {
-        bool succeeded = WinOpenClipboard(windowHandle);
-        if (!succeeded)
+        int maxWait = 100;
+        for (int i = 0; i < 5; ++i)
         {
-            throw WindowsAPIException(WinGetLastError());
+            bool succeeded = WinOpenClipboard(windowHandle);
+            if (succeeded)
+            {
+                return;
+            }
+            else if (i < 4)
+            {
+                Sleep(Duration.FromMilliseconds(Random() % maxWait));
+                maxWait = maxWait * 2;
+            }
         }
+        throw WindowsAPIException(WinGetLastError());
     }
 
     public void CloseClipboard()

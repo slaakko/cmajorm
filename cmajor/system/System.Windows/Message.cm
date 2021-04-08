@@ -147,17 +147,10 @@ namespace System.Windows
 
     public class KeyEventArgs
     {
-        public nothrow KeyEventArgs(Keys keyCode_, Keys modifiers_) :
-            keyCode(keyCode_), modifiers(modifiers_), keyData(cast<Keys>(keyCode | modifiers)),
-            alt((modifiers & Keys.altModifier) != 0), control((modifiers & Keys.controlModifier) != 0), shift((modifiers & Keys.shiftModifier) != 0), handled(false), suppressKeyPress(false)
+        public nothrow KeyEventArgs(Keys key_) : key(key_)
         {
         }
-        public Keys keyCode;
-        public Keys modifiers;
-        public Keys keyData;
-        public bool alt;
-        public bool control;
-        public bool shift;
+        public Keys key;
         public bool handled;
         public bool suppressKeyPress;
     }
@@ -214,7 +207,7 @@ namespace System.Windows
         }
         public uint timerId;
     }
-    
+
     public class Message
     {
         public nothrow Message(void* windowHandle_, uint msg_, uint wparam_, long lparam_, long result_) : windowHandle(windowHandle_), msg(msg_), wparam(wparam_), lparam(lparam_), result(result_)

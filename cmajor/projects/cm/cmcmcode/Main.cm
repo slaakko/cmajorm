@@ -761,7 +761,7 @@ namespace cmcode
                 base->OnKeyDown(args);
                 if (!args.handled)
                 {
-                    switch (args.keyData)
+                    switch (args.key)
                     {
                         case Keys.escape:
                         {
@@ -3741,7 +3741,7 @@ namespace cmcode
         }
         private void HelpAboutClick()
         {
-            MessageBox.Show("Cmajor Code version " + Version(), "Info", null, MessageBoxType.MB_OK);
+            MessageBox.Show("Cmajor Code version " + Version() + "\n(written in Cmajor)", "Info", null, MessageBoxType.MB_OK);
         }
         private bool tracing;
         private void StartStopTraceClick()

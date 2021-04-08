@@ -344,7 +344,7 @@ namespace System.Windows
             base->OnKeyDown(args);
             if (!args.handled)
             {
-                HashMap<Keys, MenuItem*>.ConstIterator it = shortcuts.CFind(args.keyData);
+                HashMap<Keys, MenuItem*>.ConstIterator it = shortcuts.CFind(args.key);
                 if (it != shortcuts.CEnd())
                 {
                     MenuItem* menuItem = it->second;
