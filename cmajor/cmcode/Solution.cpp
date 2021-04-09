@@ -80,7 +80,8 @@ struct ByFileName
 };
 
 SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, TreeView* solutionTreeView_) : 
-    solution(std::move(solution_)), solutionTreeView(solutionTreeView_), treeViewData(), treeViewDataMap(), activeProjectNode(nullptr)
+    solution(std::move(solution_)), solutionTreeView(solutionTreeView_), treeViewData(), treeViewDataMap(), activeProjectNode(nullptr), 
+    callStackOpen(false), localsViewOpen(false), currentCursorLine(0)
 {
     solution->SortByProjectName();
     SetActiveProject();
@@ -149,6 +150,15 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, Tr
     solutionTreeView->SetRoot(solutionNode.release());
 }
 
+bool SolutionData::Changed()
+{
+    if (solutionBreakpointCollection.Changed())
+    {
+        changed = true;
+    }
+    return changed;
+}
+
 void SolutionData::SetActiveProject()
 {
     if (solution->ActiveProjectName().empty())
@@ -204,6 +214,60 @@ ProjectData* SolutionData::GetProjectDataByProject(sngcm::ast::Project* project)
     }
 }
 
+void SolutionData::SetCallStackOpen(bool callStackOpen_)
+{
+    if (callStackOpen != callStackOpen_)
+    {
+        callStackOpen = callStackOpen_;
+        changed = true;
+    }
+}
+
+void SolutionData::SetLocalsViewOpen(bool localsViewOpen_)
+{
+    if (localsViewOpen != localsViewOpen_)
+    {
+        localsViewOpen = localsViewOpen_;
+        changed = true;
+    }
+}
+
+void SolutionData::AddOpenFile(const std::string& filePath)
+{
+    if (openFiles.find(filePath) == openFiles.cend())
+    {
+        openFiles.insert(filePath);
+        changed = true;
+    }
+}
+
+void SolutionData::RemoveOpenFile(const std::string& filePath)
+{
+    if (openFiles.find(filePath) != openFiles.cend())
+    {
+        openFiles.erase(filePath);
+        changed = true;
+    }
+}
+
+void SolutionData::SetCurrentOpenFile(const std::string& openFile)
+{
+    if (currentOpenFile != openFile)
+    {
+        currentOpenFile = openFile;
+        changed = true;
+    }
+}
+
+void SolutionData::SetCurrentCursorLine(int line)
+{
+    if (currentCursorLine != line)
+    {
+        currentCursorLine = line;
+        changed = true;
+    }
+}
+
 void SolutionData::AddTreeViewNodeData(SolutionTreeViewNodeData* data)
 {
     treeViewDataMap[data->key] = data;
@@ -242,6 +306,14 @@ void SolutionData::Load(const std::string& solutionSettingsFilePath)
     {
         std::unique_ptr<sngxml::dom::Document> solutionSettingsDoc = sngxml::dom::ReadDocument(solutionSettingsFilePath); 
         SolutionSettings solutionSettings(solutionSettingsDoc->DocumentElement());
+        callStackOpen = solutionSettings.callStackOpen;
+        localsViewOpen = solutionSettings.localsViewOpen;
+        for (const std::string& openFile : solutionSettings.openFiles)
+        {
+            openFiles.insert(openFile);
+        }
+        currentOpenFile = solutionSettings.currentOpenFile;
+        currentCursorLine = solutionSettings.currentCursorLine;
         for (const SolutionBreakpoint& breakpoint : solutionSettings.breakpoints)
         {
             BreakpointList& breakpointList = solutionBreakpointCollection.GetBreakpointList(breakpoint.file);
@@ -255,6 +327,14 @@ void SolutionData::Save(const std::string& solutionSettingsFilePath)
 {
     if (!Changed()) return;
     SolutionSettings solutionSettings;
+    solutionSettings.callStackOpen = callStackOpen;
+    solutionSettings.localsViewOpen = localsViewOpen;
+    for (const std::string& openFile : openFiles)
+    {
+        solutionSettings.openFiles.push_back(openFile);
+    }
+    solutionSettings.currentOpenFile = currentOpenFile;
+    solutionSettings.currentCursorLine = currentCursorLine;
     for (auto& bm : solutionBreakpointCollection.BreakpointListMap())
     {
         BreakpointList& breakpointList = bm.second;
@@ -275,6 +355,7 @@ void SolutionData::Save(const std::string& solutionSettingsFilePath)
     CodeFormatter formatter(solutionSettingsFile);
     solutionSettingsDoc.Write(formatter);
     solutionBreakpointCollection.ResetChanged();
+    changed = false;
 }
 
 } // namespace cmcode

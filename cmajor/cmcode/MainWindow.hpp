@@ -113,6 +113,8 @@ private:
     void ClearOutput();
     void WriteOutput(const std::string& text);
     void OpenProject(const std::string& filePath);
+    void SetIDEState();
+    void AddEditor(const std::string& filePath);
     void HandleBuildReply(BuildReply& buildReply);
     void HandleBuildError(const std::string& buildError);
     void HandleGetDefinitionReply(GetDefinitionReply& getDefinitionReply);
@@ -339,6 +341,8 @@ private:
     bool startDebugging;
     bool signalReceived;
     int callStackDepth;
+    bool callStackOpen;
+    bool localsViewOpen;
     std::string backend;
     std::string config;
     std::unique_ptr<ClipboardListener> clipboardListener;

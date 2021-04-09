@@ -179,6 +179,8 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     startDebugging(false),
     signalReceived(false),
     callStackDepth(-1),
+    callStackOpen(false),
+    localsViewOpen(false),
     backend("cpp"),
     config("debug"),
     pid(GetPid()),
@@ -911,6 +913,18 @@ void MainWindow::SaveProjectData()
 void MainWindow::SaveSolutionData()
 {
     if (!solutionData) return;
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        solutionData->SetCurrentOpenFile(editor->FilePath());
+        TextView* textView = editor->GetTextView();
+        if (textView)
+        {
+            solutionData->SetCurrentCursorLine(textView->CaretLine());
+        }
+    }
+    solutionData->SetCallStackOpen(callStackOpen);
+    solutionData->SetLocalsViewOpen(localsViewOpen);
     if (solutionData->Changed())
     {
         std::string solutionSettingsFilePath = solutionData->GetSolution()->FilePath();
@@ -1253,11 +1267,106 @@ void MainWindow::OpenProject(const std::string& filePath)
         }
         codeTabControl->CloseAllTabPages();
         solutionData.reset(new SolutionData(std::move(solution), solutionTreeView));
+        SetIDEState();
         SetState(MainWindowState::idle);
     }
     catch (const std::exception& ex)
     {
         ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::SetIDEState()
+{
+    try
+    {
+        for (const std::string& openFile : solutionData->OpenFiles())
+        {
+            AddEditor(openFile);
+        }
+        if (!solutionData->CurrentOpenFile().empty())
+        {
+            TabPage* tabPage = codeTabControl->GetTabPageByKey(solutionData->CurrentOpenFile());
+            if (tabPage)
+            {
+                tabPage->Select();
+            }
+            else
+            {
+                AddEditor(solutionData->CurrentOpenFile());
+            }
+        }
+        if (solutionData->CurrentCursorLine() > 0)
+        {
+            TabPage* tabPage = codeTabControl->GetTabPageByKey(solutionData->CurrentOpenFile());
+            if (tabPage)
+            {
+                Editor* editor = GetEditorByTabPage(tabPage);
+                if (editor)
+                {
+                    TextView* textView = editor->GetTextView();
+                    if (textView)
+                    {
+                        textView->SetCaretLineCol(solutionData->CurrentCursorLine(), 1 + textView->LineNumberFieldLength());
+                        textView->ScrollToCaret();
+                        textView->EnsureLineVisible(solutionData->CurrentCursorLine());
+                    }
+                }
+            }
+        }
+        callStackOpen = solutionData->CallStackOpen();
+        if (callStackOpen)
+        {
+            GetCallStackView();
+        }
+        localsViewOpen = solutionData->LocalsViewOpen();
+        if (localsViewOpen)
+        {
+            GetLocalsView();
+        }
+        outputTabPage->Select();
+        SetFocusToEditor();
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::AddEditor(const std::string& filePath)
+{
+    SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(filePath);
+    if (data)
+    {
+        std::string ext = Path::GetExtension(data->fileName);
+        if (ext == ".cm")
+        {
+            AddCmajorEditor(data->fileName, data->key, data->filePath, data->project);
+        }
+        else if (ext == ".xml")
+        {
+            AddResourceFileEditor(data->fileName, data->key, data->filePath, data->project);
+        }
+        else
+        {
+            AddTextFileEditor(data->fileName, data->key, data->filePath, data->project);
+        }
+    }
+    else
+    {
+        std::string ext = Path::GetExtension(filePath);
+        if (ext == ".cm")
+        {
+            AddCmajorEditor(Path::GetFileName(filePath), filePath, filePath, nullptr);
+        }
+        else if (ext == ".xml")
+        {
+            AddResourceFileEditor(Path::GetFileName(filePath), filePath, filePath, nullptr);
+        }
+        else
+        {
+            AddTextFileEditor(Path::GetFileName(filePath), filePath, filePath, nullptr);
+        }
     }
 }
 
@@ -2585,6 +2694,9 @@ bool MainWindow::CloseSolution()
     try
     {
         if (!solutionData) return true;
+        callStackOpen = callStackView != nullptr;
+        localsViewOpen = localsView != nullptr;
+        SaveSolutionData();
         Component* child = codeTabControl->TabPages().FirstChild();
         while (child)
         {
@@ -2611,6 +2723,14 @@ bool MainWindow::CloseSolution()
         solutionData.reset();
         ResetFocusedControl();
         SetEditorState();
+        if (callStackTabPage)
+        {
+            callStackTabPage->Close();
+        }
+        if (localsTabPage)
+        {
+            localsTabPage->Close();
+        }
         return true;
     }
     catch (const std::exception& ex)
@@ -4392,6 +4512,7 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
     codeTabControl->AddTabPage(tabPage.release());
     SetEditorState();
     SetFocusToEditor();
+    solutionData->AddOpenFile(filePath);
     return editor;
 }
 
@@ -4420,6 +4541,7 @@ ResourceFileEditor* MainWindow::AddResourceFileEditor(const std::string& fileNam
     codeTabControl->AddTabPage(tabPage.release());
     SetEditorState();
     SetFocusToEditor();
+    solutionData->AddOpenFile(filePath);
     return editor;
 }
 
@@ -4448,6 +4570,7 @@ TextFileEditor* MainWindow::AddTextFileEditor(const std::string& fileName, const
     codeTabControl->AddTabPage(tabPage.release());
     SetEditorState();
     SetFocusToEditor();
+    solutionData->AddOpenFile(filePath);
     return editor;
 }
 
@@ -4561,6 +4684,11 @@ void MainWindow::CodeTabPageRemoved(ControlEventArgs& args)
                 {
                     editor->Save();
                 }
+            }
+            solutionData->RemoveOpenFile(editor->FilePath());
+            if (editor->FilePath() == solutionData->CurrentOpenFile())
+            {
+                solutionData->SetCurrentOpenFile(std::string());
             }
         }
         tabPageEditorMap.erase(removedTabPage);
@@ -4750,6 +4878,7 @@ CallStackView* MainWindow::GetCallStackView()
         outputTabControl->AddTabPage(callStackTabPage);
     }
     callStackTabPage->Select();
+    callStackOpen = true;
     return callStackView;
 }
 
@@ -4805,6 +4934,7 @@ LocalsView* MainWindow::GetLocalsView()
         outputTabControl->AddTabPage(localsTabPage);
     }
     localsTabPage->Select();
+    localsViewOpen = true;
     return localsView;
 }
 

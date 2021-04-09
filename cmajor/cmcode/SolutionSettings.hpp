@@ -36,6 +36,11 @@ public:
     SolutionSettings(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
+    bool callStackOpen;
+    bool localsViewOpen;
+    std::vector<std::string> openFiles;
+    std::string currentOpenFile;
+    int32_t currentCursorLine;
     std::vector<SolutionBreakpoint> breakpoints;
 };
 

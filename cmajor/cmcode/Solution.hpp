@@ -38,7 +38,7 @@ class SolutionData
 {
 public:
     SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, TreeView* solutionTreeView_);
-    bool Changed() const { return solutionBreakpointCollection.Changed(); }
+    bool Changed();
     void Load(const std::string& solutionSettingsFilePath);
     void Save(const std::string& solutionSettingsFilePath);
     sngcm::ast::Solution* GetSolution() const { return solution.get(); }
@@ -47,6 +47,17 @@ public:
     void SetActiveProjectNode(TreeViewNode* activeProjectNode_) { activeProjectNode = activeProjectNode_; }
     SolutionTreeViewNodeData* GetSolutionTreeViewNodeDataByKey(const std::string& key) const;
     ProjectData* GetProjectDataByProject(sngcm::ast::Project* project) const;
+    void SetCallStackOpen(bool callStackOpen_);
+    bool CallStackOpen() const { return callStackOpen; }
+    void SetLocalsViewOpen(bool localsViewOpen_);
+    bool LocalsViewOpen() const { return localsViewOpen; }
+    void AddOpenFile(const std::string& filePath);
+    void RemoveOpenFile(const std::string& filePath);
+    const std::set<std::string>& OpenFiles() const { return openFiles; }
+    const std::string& CurrentOpenFile() const { return currentOpenFile; }
+    void SetCurrentOpenFile(const std::string& openFile);
+    int CurrentCursorLine() const { return currentCursorLine;  }
+    void SetCurrentCursorLine(int line);
     BreakpointCollection& GetSolutionBreakpointCollection() { return solutionBreakpointCollection; }
     void AddTreeViewNodeData(SolutionTreeViewNodeData* data);
     const std::vector<std::unique_ptr<ProjectData>>& Projects() const { return projectDataVec; }
@@ -60,7 +71,13 @@ private:
     TreeViewNode* activeProjectNode;
     std::vector<std::unique_ptr<ProjectData>> projectDataVec;
     std::unordered_map<sngcm::ast::Project*, ProjectData*> projectDataMap;
+    bool changed;
     BreakpointCollection solutionBreakpointCollection;
+    bool callStackOpen;
+    bool localsViewOpen;
+    std::set<std::string> openFiles;
+    std::string currentOpenFile;
+    int currentCursorLine;
 };
 
 } // namespace cmcode
