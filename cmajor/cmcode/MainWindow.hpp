@@ -191,6 +191,7 @@ private:
     bool BuildActiveProject();
     void RebuildActiveProjectClick();
     void CleanActiveProjectClick();
+    void BuildSettingsClick();
     void StartDebuggingClick();
     void StartWithoutDebuggingClick();
     void TerminateProcessClick();
@@ -215,6 +216,8 @@ private:
     void StopBuildServerClick();
     void TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args);
     void TreeViewNodeClick(TreeViewNodeClickEventArgs& args);
+    void TreeViewNodeExpanded(TreeViewNodeEventArgs& args);
+    void TreeViewNodeCollapsed(TreeViewNodeEventArgs& args);
     Editor* GetEditorByTabPage(TabPage* tabPage) const;
     CmajorEditor* AddCmajorEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project);
     ResourceFileEditor* AddResourceFileEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project);
@@ -268,6 +271,7 @@ private:
     MenuItem* buildActiveProjectMenuItem;
     MenuItem* rebuildActiveProjectMenuItem;
     MenuItem* cleanActiveProjectMenuItem;
+    MenuItem* buildSettingsMenuItem;
     MenuItem* startDebuggingMenuItem;
     MenuItem* startWithoutDebuggingMenuItem;
     MenuItem* terminateProcessMenuItem;

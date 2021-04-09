@@ -102,6 +102,7 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, Tr
         projectDataMap[project.get()] = projectData.get();
         projectDataVec.push_back(std::move(projectData));
         std::unique_ptr<TreeViewNode> projectNode(new TreeViewNode(projectName));
+        projectNodeMap[projectName] = projectNode.get();
         std::unique_ptr<SolutionTreeViewNodeData> projectTreeViewData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::project, nullptr, project.get(), std::string(), std::string()));
         projectNode->SetData(projectTreeViewData.get());
         if (project.get() == solution->ActiveProject())
@@ -268,6 +269,24 @@ void SolutionData::SetCurrentCursorLine(int line)
     }
 }
 
+void SolutionData::AddExpandedProject(const std::string& expandedProject)
+{
+    if (expandedProjects.find(expandedProject) == expandedProjects.cend())
+    {
+        expandedProjects.insert(expandedProject);
+        changed = true;
+    }
+}
+
+void SolutionData::RemoveExpandedProject(const std::string& project)
+{
+    if (expandedProjects.find(project) != expandedProjects.cend())
+    {
+        expandedProjects.erase(project);
+        changed = true;
+    }
+}
+
 void SolutionData::AddTreeViewNodeData(SolutionTreeViewNodeData* data)
 {
     treeViewDataMap[data->key] = data;
@@ -300,6 +319,24 @@ std::vector<Breakpoint*> SolutionData::GetBreakpoints()
     return breakpoints;
 }
 
+TreeViewNode* SolutionData::GetProjectNodeByName(const std::string& projectName) const
+{
+    auto it = projectNodeMap.find(projectName);
+    if (it != projectNodeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void SolutionData::RemoveProjectNode(const std::string& projectName)
+{
+    projectNodeMap.erase(projectName);
+}
+
 void SolutionData::Load(const std::string& solutionSettingsFilePath)
 {
     if (boost::filesystem::exists(solutionSettingsFilePath))
@@ -308,12 +345,18 @@ void SolutionData::Load(const std::string& solutionSettingsFilePath)
         SolutionSettings solutionSettings(solutionSettingsDoc->DocumentElement());
         callStackOpen = solutionSettings.callStackOpen;
         localsViewOpen = solutionSettings.localsViewOpen;
+        openFiles.clear();
         for (const std::string& openFile : solutionSettings.openFiles)
         {
             openFiles.insert(openFile);
         }
         currentOpenFile = solutionSettings.currentOpenFile;
         currentCursorLine = solutionSettings.currentCursorLine;
+        expandedProjects.clear();
+        for (const std::string& expandedProject : solutionSettings.expandedProjects)
+        {
+            expandedProjects.insert(expandedProject);
+        }
         for (const SolutionBreakpoint& breakpoint : solutionSettings.breakpoints)
         {
             BreakpointList& breakpointList = solutionBreakpointCollection.GetBreakpointList(breakpoint.file);
@@ -335,6 +378,10 @@ void SolutionData::Save(const std::string& solutionSettingsFilePath)
     }
     solutionSettings.currentOpenFile = currentOpenFile;
     solutionSettings.currentCursorLine = currentCursorLine;
+    for (const std::string& expandedProject : expandedProjects)
+    {
+        solutionSettings.expandedProjects.push_back(expandedProject);
+    }
     for (auto& bm : solutionBreakpointCollection.BreakpointListMap())
     {
         BreakpointList& breakpointList = bm.second;

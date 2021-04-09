@@ -19,6 +19,7 @@ bool ServerVerbose();
 void LoadConfiguration();
 void SaveConfiguration();
 const BuildSettings& GetBuildSettings();
+void SetBuildSettings(const BuildSettings& buildSettings);
 WindowSettings& GetWindowSettings();
 void ConfigInit();
 void ConfigDone();

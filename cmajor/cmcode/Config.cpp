@@ -99,6 +99,11 @@ const BuildSettings& GetBuildSettings()
     return Config::Instance().GetConfiguration().buildSettings;
 }
 
+void SetBuildSettings(const BuildSettings& buildSettings)
+{
+    Config::Instance().GetConfiguration().buildSettings = buildSettings;
+}
+
 void ConfigInit()
 {
     Config::Init();

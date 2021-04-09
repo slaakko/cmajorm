@@ -42,6 +42,7 @@ public:
     std::string currentOpenFile;
     int32_t currentCursorLine;
     std::vector<SolutionBreakpoint> breakpoints;
+    std::vector<std::string> expandedProjects;
 };
 
 #endif // SOLUTIONSETTINGS_HPP_CBFFFB300F3FB8B5357239390EFF01476489416B

@@ -1038,6 +1038,7 @@ void TreeViewNode::Expand()
     TreeView* view = GetTreeView();
     if (view)
     {
+        view->Invalidate();
         view->FireNodeExpanded(this);
     }
 }
@@ -1049,6 +1050,7 @@ void TreeViewNode::ExpandAll()
     TreeView* view = GetTreeView();
     if (view)
     {
+        view->Invalidate();
         view->FireNodeExpanded(this);
     }
 }
@@ -1079,6 +1081,7 @@ void TreeViewNode::Collapse()
     TreeView* view = GetTreeView();
     if (view)
     {
+        view->Invalidate();
         view->FireNodeCollapsed(this);
     }
 }
@@ -1090,6 +1093,7 @@ void TreeViewNode::CollapseAll()
     TreeView* view = GetTreeView();
     if (view)
     {
+        view->Invalidate();
         view->FireNodeCollapsed(this);
     }
 }

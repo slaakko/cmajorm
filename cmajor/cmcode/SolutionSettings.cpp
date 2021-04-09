@@ -30,12 +30,12 @@ std::unique_ptr<sngxml::dom::Element> SolutionBreakpoint::ToXml(const std::strin
 }
 
 SolutionSettings::SolutionSettings()
-    : callStackOpen(), localsViewOpen(), openFiles(), currentOpenFile(), currentCursorLine(), breakpoints()
+    : callStackOpen(), localsViewOpen(), openFiles(), currentOpenFile(), currentCursorLine(), breakpoints(), expandedProjects()
 {
 }
 
 SolutionSettings::SolutionSettings(sngxml::dom::Element* element)
-    : callStackOpen(), localsViewOpen(), openFiles(), currentOpenFile(), currentCursorLine(), breakpoints()
+    : callStackOpen(), localsViewOpen(), openFiles(), currentOpenFile(), currentCursorLine(), breakpoints(), expandedProjects()
 {
     sngxml::xmlser::FromXml(element, "callStackOpen", callStackOpen);
     sngxml::xmlser::FromXml(element, "localsViewOpen", localsViewOpen);
@@ -43,6 +43,7 @@ SolutionSettings::SolutionSettings(sngxml::dom::Element* element)
     sngxml::xmlser::FromXml(element, "currentOpenFile", currentOpenFile);
     sngxml::xmlser::FromXml(element, "currentCursorLine", currentCursorLine);
     sngxml::xmlser::FromXml(element, "breakpoints", breakpoints);
+    sngxml::xmlser::FromXml(element, "expandedProjects", expandedProjects);
 }
 
 std::unique_ptr<sngxml::dom::Element> SolutionSettings::ToXml(const std::string& fieldName) const
@@ -54,6 +55,7 @@ std::unique_ptr<sngxml::dom::Element> SolutionSettings::ToXml(const std::string&
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(currentOpenFile, "currentOpenFile").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(currentCursorLine, "currentCursorLine").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(breakpoints, "breakpoints").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(expandedProjects, "expandedProjects").release()));
     return element;
 }
 

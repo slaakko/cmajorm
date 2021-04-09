@@ -5,6 +5,7 @@
 
 #include <cmajor/cmcode/MainWindow.hpp>
 #include <cmajor/cmcode/AboutDialog.hpp>
+#include <cmajor/cmcode/BuildSettingsDialog.hpp>
 #include <cmajor/cmcode/ProjectReferencesDialog.hpp>
 #include <cmajor/cmcode/Config.hpp>
 #include <cmajor/cmcode/Action.hpp>
@@ -108,6 +109,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     buildActiveProjectMenuItem(nullptr),
     rebuildActiveProjectMenuItem(nullptr),
     cleanActiveProjectMenuItem(nullptr),
+    buildSettingsMenuItem(nullptr),
     startDebuggingMenuItem(nullptr),
     startWithoutDebuggingMenuItem(nullptr),
     terminateProcessMenuItem(nullptr),
@@ -320,6 +322,11 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     cleanActiveProjectMenuItem = cleanActiveProjectMenuItemPtr.get();
     cleanActiveProjectMenuItem->Click().AddHandler(this, &MainWindow::CleanActiveProjectClick);
     buildMenuItem->AddMenuItem(cleanActiveProjectMenuItemPtr.release());
+    buildMenuItem->AddMenuItem(new MenuItemSeparator());
+    std::unique_ptr<MenuItem> buildSettingsMenuItemPtr(new MenuItem("&Settings..."));
+    buildSettingsMenuItem = buildSettingsMenuItemPtr.get();
+    buildSettingsMenuItem->Click().AddHandler(this, &MainWindow::BuildSettingsClick);
+    buildMenuItem->AddMenuItem(buildSettingsMenuItemPtr.release());
     menuBar->AddMenuItem(buildMenuItem.release());
     std::unique_ptr<MenuItem> debugMenuItem(new MenuItem("&Debug"));
     std::unique_ptr<MenuItem> startDebuggingMenuItemPtr(new MenuItem("&Start Debugging"));
@@ -556,6 +563,8 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     solutionTreeView = solutionTreeViewPtr.get();
     solutionTreeView->NodeDoubleClick().AddHandler(this, &MainWindow::TreeViewNodeDoubleClick);
     solutionTreeView->NodeClick().AddHandler(this, &MainWindow::TreeViewNodeClick);
+    solutionTreeView->NodeExpanded().AddHandler(this, &MainWindow::TreeViewNodeExpanded);
+    solutionTreeView->NodeCollapsed().AddHandler(this, &MainWindow::TreeViewNodeCollapsed);
     solutionTreeView->SetDoubleBuffered();
     std::unique_ptr<PaddedControl> paddedTreeViewPtr(new PaddedControl(PaddedControlCreateParams(solutionTreeViewPtr.release()).Defaults()));
     std::unique_ptr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(ScrollableControlCreateParams(paddedTreeViewPtr.release()).SetDock(Dock::fill)));
@@ -1312,6 +1321,14 @@ void MainWindow::SetIDEState()
                         textView->EnsureLineVisible(solutionData->CurrentCursorLine());
                     }
                 }
+            }
+        }
+        for (const std::string& expandedProject : solutionData->ExpandedProjects())
+        {
+            TreeViewNode* projectNode = solutionData->GetProjectNodeByName(expandedProject);
+            if (projectNode)
+            {
+                projectNode->Expand();
             }
         }
         callStackOpen = solutionData->CallStackOpen();
@@ -3533,6 +3550,9 @@ void MainWindow::RemoveProject(sngcm::ast::Project* project)
         {
             throw std::runtime_error("no solution open");
         }
+        std::string projectName = ToUtf8(project->Name());
+        solutionData->RemoveProjectNode(projectName);
+        solutionData->RemoveExpandedProject(projectName);
         sngcm::ast::Solution* solution = solutionData->GetSolution();
         solution->RemoveProject(project);
         solution->Save();
@@ -3883,6 +3903,28 @@ void MainWindow::CleanActiveProjectClick()
         }
         StartBuilding();
         StartBuild(backend, config, activeProject->FilePath(), BuildRequestKind::clean | BuildRequestKind::buildDependencies);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
+}
+
+void MainWindow::BuildSettingsClick()
+{
+    try
+    {
+        if (state != MainWindowState::idle)
+        {
+            throw std::runtime_error("wrong state");
+        }
+        BuildSettingsDialog dialog;
+        dialog.SetValuesFrom(GetBuildSettings());
+        if (dialog.ShowDialog(*this) == DialogResult::ok)
+        {
+            SetBuildSettings(dialog.GetValues());
+            SaveConfiguration();
+        }
     }
     catch (const std::exception& ex)
     {
@@ -4443,6 +4485,40 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
                     break;
                 }
             }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::TreeViewNodeExpanded(TreeViewNodeEventArgs& args)
+{
+    try
+    {
+        TreeViewNode* node = args.node;
+        SolutionTreeViewNodeData* data = static_cast<SolutionTreeViewNodeData*>(node->Data());
+        if (data->kind == SolutionTreeViewNodeDataKind::project)
+        {
+            solutionData->AddExpandedProject(ToUtf8(data->project->Name()));
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::TreeViewNodeCollapsed(TreeViewNodeEventArgs& args)
+{
+    try
+    {
+        TreeViewNode* node = args.node;
+        SolutionTreeViewNodeData* data = static_cast<SolutionTreeViewNodeData*>(node->Data());
+        if (data->kind == SolutionTreeViewNodeDataKind::project)
+        {
+            solutionData->RemoveExpandedProject(ToUtf8(data->project->Name()));
         }
     }
     catch (const std::exception& ex)

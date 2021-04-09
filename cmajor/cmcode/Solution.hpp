@@ -58,10 +58,15 @@ public:
     void SetCurrentOpenFile(const std::string& openFile);
     int CurrentCursorLine() const { return currentCursorLine;  }
     void SetCurrentCursorLine(int line);
+    void AddExpandedProject(const std::string& expandedProject);
+    void RemoveExpandedProject(const std::string& project);
+    const std::set<std::string>& ExpandedProjects() const { return expandedProjects; }
     BreakpointCollection& GetSolutionBreakpointCollection() { return solutionBreakpointCollection; }
     void AddTreeViewNodeData(SolutionTreeViewNodeData* data);
     const std::vector<std::unique_ptr<ProjectData>>& Projects() const { return projectDataVec; }
     std::vector<Breakpoint*> GetBreakpoints();
+    TreeViewNode* GetProjectNodeByName(const std::string& projectName) const;
+    void RemoveProjectNode(const std::string& projectName);
 private:
     void SetActiveProject();
     TreeView* solutionTreeView;
@@ -71,6 +76,7 @@ private:
     TreeViewNode* activeProjectNode;
     std::vector<std::unique_ptr<ProjectData>> projectDataVec;
     std::unordered_map<sngcm::ast::Project*, ProjectData*> projectDataMap;
+    std::map<std::string, TreeViewNode*> projectNodeMap;
     bool changed;
     BreakpointCollection solutionBreakpointCollection;
     bool callStackOpen;
@@ -78,6 +84,7 @@ private:
     std::set<std::string> openFiles;
     std::string currentOpenFile;
     int currentCursorLine;
+    std::set<std::string> expandedProjects;
 };
 
 } // namespace cmcode

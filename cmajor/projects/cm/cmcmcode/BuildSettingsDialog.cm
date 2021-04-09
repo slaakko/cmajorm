@@ -39,12 +39,12 @@ namespace cmcode
             Size defaultCheckBoxSize = ScreenMetrics.Get().DefaultCheckBoxSize();
 
             int borderWidth = DefaultSingleBorderWidth();
- 
+
             Point projectBuildThreadsLabelLocation(16, 16);
             UniquePtr<Label> projectBuildThreadsLabelPtr(new Label("Number of project build threads (0=use default number of threads, 1=build projects sequentially):",
                 projectBuildThreadsLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
             AddChild(projectBuildThreadsLabelPtr.Release());
- 
+
             UniquePtr<TextBox> projectBuildThreadsTextBoxPtr(new TextBox("0"));
             projectBuildThreadsTextBox = projectBuildThreadsTextBoxPtr.Get();
             projectBuildThreadsTextBox->TextChangedEvent().AddHandler(ProjectBuildThreadsTextBoxTextChanged);
