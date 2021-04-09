@@ -153,7 +153,7 @@ void LocalsView::SetChildResults(const std::vector<ChildResult>& childResults)
                 std::string text = std::to_string(index);
                 if (childResult)
                 {
-                    text.append(" ").append(childResult->name);
+                    text = childResult->name;
                     if (!childResult->value.empty())
                     {
                         text.append(" = ").append(childResult->value);

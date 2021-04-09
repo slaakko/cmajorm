@@ -2149,7 +2149,7 @@ void MainWindow::EditorCaretPosChanged()
         TextView* textView = editor->GetTextView();
         if (textView)
         {
-            if (textView->CaretLine() != 0)
+            if (textView->CaretLine() > 0)
             {
                 lineStatusBarItem->SetText(std::to_string(textView->CaretLine()));
             }
@@ -2157,7 +2157,7 @@ void MainWindow::EditorCaretPosChanged()
             {
                 lineStatusBarItem->SetText(std::string());
             }
-            if (textView->CaretColumn() != 0)
+            if (textView->CaretColumn() > 0)
             {
                 columnStatusBarItem->SetText(std::to_string(textView->CaretColumn()));
             }
