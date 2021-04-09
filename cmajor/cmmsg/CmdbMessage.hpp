@@ -503,4 +503,22 @@ public:
 public:
 };
 
+class MSG_API KillRequest
+{
+public:
+    KillRequest();
+    KillRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+};
+
+class MSG_API KillReply
+{
+public:
+    KillReply();
+    KillReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+};
+
 #endif // CMDBMESSAGE_HPP_9A6DA1BD20F12675B0E78EEAF8B950F3D0DDB92E

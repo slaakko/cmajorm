@@ -12,6 +12,7 @@ ResourceManager Application::resourceManager;
 WindowManager Application::windowManager;
 Window* Application::mainWindow = nullptr;
 Window* Application::activeWindow = nullptr;
+LogView* Application::logView = nullptr;
 
 void Application::Init()
 {

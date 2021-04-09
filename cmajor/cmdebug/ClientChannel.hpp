@@ -24,6 +24,7 @@ class ClientChannelUser
 public:
     virtual ~ClientChannelUser();
     virtual std::unique_ptr<Element> GetIdleClientChannelMessage() = 0;
+    virtual bool SendIdleChannelMessages() const = 0;
     virtual bool IsIdleChannelMessage(Element* message) const = 0;
     virtual void ClientChannelError(const std::string& error) = 0;
     virtual void ProcessReceivedClientChannelMessage(Element* message) = 0;

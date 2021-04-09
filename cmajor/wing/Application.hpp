@@ -36,6 +36,8 @@ private:
     KeyPreviewFn fn;
 };
 
+class LogView;
+
 class WING_API Application
 {
 public:
@@ -49,6 +51,8 @@ public:
     static void SetActiveWindow(Window* activeWindow_) { activeWindow = activeWindow_; }
     static Window* ActiveWindow() { return activeWindow; }
     static void ProcessMessages();
+    static void SetLogView(LogView* logView_) { logView = logView_; }
+    static LogView* GetLogView() { return logView; }
 private:
     static bool ProcessMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam, LRESULT& result, void*& originalWndProc);
     static void ModelessWindowKeyPreview(Keys key, bool& handled);
@@ -58,6 +62,7 @@ private:
     static ResourceManager resourceManager;
     static Window* mainWindow;
     static Window* activeWindow;
+    static LogView* logView;
 };
 
 WING_API void ApplicationInit();

@@ -4,6 +4,8 @@
 // =================================
 
 #include <cmajor/cmview/LocalsView.hpp>
+#include <cmajor/wing/Application.hpp>
+#include <cmajor/wing/LogView.hpp>
 #include <cmajor/wing/PaddedControl.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
 
@@ -13,7 +15,7 @@
 namespace cmajor { namespace view {
 
 LocalsView::LocalsView() : Control(ControlCreateParams().WindowClassName("cmajor.view.LocalsView").WindowClassBackgroundColor(COLOR_WINDOW).BackgroundColor(Color::White).SetDock(Dock::fill)),
-    localCount(-1), localCountRequested(false), childExtentRequested(false), childResultsSet(false), fetchNode(nullptr), container(this), treeView(nullptr), child(nullptr)
+    localCount(-1), localCountRequested(false), childExtentRequested(false), fetchNode(nullptr), container(this), treeView(nullptr), child(nullptr)
 {
     std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
     treeView = treeViewPtr.get();
@@ -32,7 +34,6 @@ void LocalsView::Clear()
 {
     localCount = -1;
     localCountRequested = false;
-    childResultsSet = false;
     childExtentRequested = false;
     fetchNode = nullptr;
     treeView->SetRoot(new TreeViewNode("Locals"));
@@ -41,11 +42,15 @@ void LocalsView::Clear()
 
 void LocalsView::SetLocalCount(int localCount_)
 {
+    LogView* logView = Application::GetLogView();
     if (localCount != localCount_)
     {
         localCount = localCount_;
+        if (logView)
+        {
+            logView->WriteLine("setLocalCount=" + std::to_string(localCount));
+        }
         childExtentRequested = false;
-        childResultsSet = false;
         fetchNode = nullptr;
         PopulateTreeViewNode(treeView->Root(), localCount);
     }
@@ -53,13 +58,18 @@ void LocalsView::SetLocalCount(int localCount_)
 
 void LocalsView::SetFetchNode(TreeViewNode* fetchNode_)
 {
+    LogView* logView = Application::GetLogView();
     childExtentRequested = false;
-    childResultsSet = false;
     fetchNode = fetchNode_;
+    if (logView)
+    {
+        logView->WriteLine("setFetchNode=" + std::to_string(fetchNode->Index()));
+    }
 }
 
 const ChildExtent& LocalsView::GetChildExtent()
 {
+    LogView* logView = Application::GetLogView();
     childExtentRequested = false;
     childExtent = ChildExtent();
     TreeViewNode* parentNode = fetchNode;
@@ -89,6 +99,11 @@ const ChildExtent& LocalsView::GetChildExtent()
         return childExtent;
     }
     childExtent = ChildExtent(start, count, dataStart);
+    if (logView)
+    {
+        logView->WriteLine("getChildExtent=" + 
+            std::to_string(parentNode->Index()) + ": [" + std::to_string(start) + ":" + std::to_string(first->Index()) + ", " + std::to_string(count) + ":" + std::to_string(last->Index()) + "]");
+    }
     return childExtent;
 }
 
@@ -107,6 +122,7 @@ std::string LocalsView::FetchExpression() const
 
 void LocalsView::SetChildResults(const std::vector<ChildResult>& childResults)
 {
+    LogView* logView = Application::GetLogView();
     if (!childExtent.IsEmpty())
     {
         childResultVec.resize(childExtent.dataStart + std::max(childExtent.count, static_cast<int>(childResults.size())));
@@ -122,6 +138,10 @@ void LocalsView::SetChildResults(const std::vector<ChildResult>& childResults)
         }
         std::vector<TreeViewNode*> visibleNodes;
         parentNode->GetVisibleNodes(visibleNodes, parentNode->Level() + 1);
+        if (logView && !visibleNodes.empty())
+        {
+            logView->WriteLine("setChildResults=" + std::to_string(visibleNodes.front()->Index()) + "-" + std::to_string(visibleNodes.back()->Index()));
+        }
         for (int i = 0; i < visibleNodes.size(); ++i)
         {
             TreeViewNode* node = visibleNodes[i];
@@ -133,7 +153,7 @@ void LocalsView::SetChildResults(const std::vector<ChildResult>& childResults)
                 std::string text = std::to_string(index);
                 if (childResult)
                 {
-                    text = childResult->name;
+                    text.append(" ").append(childResult->name);
                     if (!childResult->value.empty())
                     {
                         text.append(" = ").append(childResult->value);
@@ -148,7 +168,6 @@ void LocalsView::SetChildResults(const std::vector<ChildResult>& childResults)
             }
         }
     }
-    childResultsSet = true;
 }
 
 void LocalsView::UpdateFetchSet()

@@ -71,7 +71,6 @@ private:
     bool localCountRequested;
     ChildExtent childExtent;
     bool childExtentRequested;
-    bool childResultsSet;
     TreeViewNode* fetchNode;
     std::set<TreeViewNode*> fetchSet;
     std::vector<std::unique_ptr<ChildResult>> childResultVec;

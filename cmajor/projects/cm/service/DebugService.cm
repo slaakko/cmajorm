@@ -24,7 +24,7 @@ namespace Cm.Service.Debug
     public class DebugServiceArgs
     {
         public nothrow DebugServiceArgs() :
-            port(defaultPort), sessionPort(defaultSessionPort), log(false), wait(false), verbose(false), debugServer(false), serverStartWaitSeconds(1),
+            port(defaultPort), sessionPort(defaultSessionPort), log(false), idle(false), wait(false), verbose(false), debugServer(false), serverStartWaitSeconds(1),
             backend("cpp"), toolChain("gcc"), config("debug")
         {
         }
@@ -51,6 +51,11 @@ namespace Cm.Service.Debug
         public nothrow DebugServiceArgs& Log(bool log_)
         {
             log = log_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& Idle(bool idle_)
+        {
+            idle = idle_;
             return *this;
         }
         public nothrow DebugServiceArgs& Wait(bool wait_)
@@ -114,6 +119,7 @@ namespace Cm.Service.Debug
         public int port;
         public int sessionPort;
         public bool log;
+        public bool idle;
         public bool wait;
         public bool verbose;
         public bool debugServer;
@@ -244,6 +250,10 @@ namespace Cm.Service.Debug
             {
                 serverStartCommand.Append(" --log");
             }
+            if (args.idle)
+            {
+                 serverStartCommand.Append(" --idle");   
+            }   
             if (args.wait)
             {
                 serverStartCommand.Append(" --wait");

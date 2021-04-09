@@ -800,6 +800,7 @@ void TextView::InsertChar(int lineIndex, int columnIndex, char32_t c)
 void TextView::InsertText(int lineIndex, int columnIndex, const std::u32string& text)
 {
     if (text.empty()) return;
+    if (IsReadOnly()) return;
     editCommandList.BeginGroup();
     if (!selection.IsEmpty())
     {

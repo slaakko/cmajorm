@@ -95,12 +95,19 @@ void ClientChannel::Run()
 std::unique_ptr<Document> ClientChannel::GetMessage()
 {
     std::unique_lock<std::mutex> lock(messageQueueMtx);
-    if (!messageEnqueued.wait_for(lock, std::chrono::milliseconds{ timeoutMs }, [this] { return !messageQueue.empty(); }))
+    if (user->SendIdleChannelMessages())
     {
-        std::unique_ptr<Element> idleChannelMessage = user->GetIdleClientChannelMessage();
-        std::unique_ptr<Document> message(new Document());
-        message->AppendChild(std::unique_ptr<Node>(idleChannelMessage.release()));
-        return message;
+        if (!messageEnqueued.wait_for(lock, std::chrono::milliseconds{ timeoutMs }, [this] { return !messageQueue.empty(); }))
+        {
+            std::unique_ptr<Element> idleChannelMessage = user->GetIdleClientChannelMessage();
+            std::unique_ptr<Document> message(new Document());
+            message->AppendChild(std::unique_ptr<Node>(idleChannelMessage.release()));
+            return message;
+        }
+    }
+    else
+    {
+        messageEnqueued.wait(lock, [this] { return !messageQueue.empty(); });
     }
     std::unique_ptr<Document> message(std::move(messageQueue.front()));
     messageQueue.pop_front();

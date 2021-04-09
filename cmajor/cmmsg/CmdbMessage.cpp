@@ -865,3 +865,31 @@ std::unique_ptr<sngxml::dom::Element> LogDebugMessageReply::ToXml(const std::str
     return element;
 }
 
+KillRequest::KillRequest()
+{
+}
+
+KillRequest::KillRequest(sngxml::dom::Element* element)
+{
+}
+
+std::unique_ptr<sngxml::dom::Element> KillRequest::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
+}
+
+KillReply::KillReply()
+{
+}
+
+KillReply::KillReply(sngxml::dom::Element* element)
+{
+}
+
+std::unique_ptr<sngxml::dom::Element> KillReply::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    return element;
+}
+

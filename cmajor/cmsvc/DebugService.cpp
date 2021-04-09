@@ -131,7 +131,7 @@ public:
     void RunStopRequest();
     void SetTargetInputEof();
     void PutTargetInputLine(const std::string& targetInputLine);
-    void WaitForStoppedOrKill();
+    void Terminate();
     void RunContinueRequest();
     void RunStepRequest();
     void RunNextRequest();
@@ -148,6 +148,7 @@ public:
     void ResetRequestInProgress();
     bool RequestInProgress(std::string& requestName);
     void ClearRequestQueue();
+    void SendKillRequest();
 private:
     DebugService();
     DebugMessageKind GetDebugMessageKind(const std::u32string& messageName) const;
@@ -166,28 +167,30 @@ private:
     std::vector<Breakpoint*> breakpoints;
     std::thread serviceThread;
     std::unique_ptr<soulng::util::Process> serverProcess;
-    std::condition_variable_any requestAvailableOrStopping;
+    std::condition_variable requestAvailableOrStopping;
     std::condition_variable targetInputLineAvailableOrEof;
-    std::condition_variable_any stopped;
-    std::recursive_mutex mtx;
+    std::condition_variable stopped;
+    std::mutex queueMutex;
     std::mutex inputMutex;
     std::list<std::unique_ptr<DebugServiceRequest>> requestQueue;
     std::list<std::string> targetInputLines;
     bool waitingForTargetInput;
     bool targetInputEof;
     int serverPort;
+    int killPort;
     TcpSocket socket;
     bool started;
     bool running;
     bool stop;
     bool requestInProgress;
+    bool terminated;
     std::string runningRequestName;
     std::map<std::u32string, DebugMessageKind> messageKindMap;
 };
 
 std::unique_ptr<DebugService> DebugService::instance;
 
-DebugService::DebugService() : serverPort(0), waitingForTargetInput(false), targetInputEof(false), started(false), running(false), stop(false), requestInProgress(false)
+DebugService::DebugService() : serverPort(0), killPort(0), waitingForTargetInput(false), targetInputEof(false), started(false), running(false), stop(false), terminated(false), requestInProgress(false)
 {
     messageKindMap[U"startDebugRequest"] = DebugMessageKind::startDebugRequest;
     messageKindMap[U"startDebugReply"] = DebugMessageKind::startDebugReply;
@@ -355,7 +358,7 @@ void DebugService::Done()
 
 void DebugService::PutRequest(DebugServiceRequest* request)
 {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
+    std::lock_guard<std::mutex> lock(queueMutex);
     requestQueue.push_back(std::unique_ptr<DebugServiceRequest>(request));
     requestAvailableOrStopping.notify_one();
 }
@@ -397,6 +400,7 @@ void DebugService::MakeDebugServiceStartCommand(const DebugServiceStartParams& s
     startCommand.clear();
     startStatus.clear();
     serverPort = 0;
+    killPort = 0;
     if (startParams.debugServer)
     {
         startCommand.append("cmdbd");
@@ -420,6 +424,11 @@ void DebugService::MakeDebugServiceStartCommand(const DebugServiceStartParams& s
         sessionPort = defaultSessionPort;
     }
     startCommand.append(" --sessionPort=").append(std::to_string(sessionPort));
+    killPort = GetFreePortNumber(startParams.processName);
+    if (killPort != -1)
+    {
+        startCommand.append(" --killPort=").append(std::to_string(killPort));
+    }
     int portMapServicePort = GetPortMapServicePortNumberFromConfig();
     if (portMapServicePort != -1)
     {
@@ -452,6 +461,8 @@ void RunService(DebugService* service)
 
 void DebugService::Start(const DebugServiceStartParams& startParams, const std::vector<Breakpoint*>& breakpoints_)
 {
+    terminated = false;
+    requestInProgress = false;
     targetInputEof = false;
     running = false;
     stop = false;
@@ -477,13 +488,21 @@ void DebugService::Run()
             socket.Connect("localhost", std::to_string(serverPort));
             while (!stop)
             {
-                std::unique_lock<std::recursive_mutex> lock(mtx);
-                requestAvailableOrStopping.wait(lock, [this]{ return stop || !requestQueue.empty(); });
-                if (stop) return;
-                std::unique_ptr<DebugServiceRequest> request = std::move(requestQueue.front());
-                requestQueue.pop_front();
+                std::unique_ptr<DebugServiceRequest> request;
+                {
+                    std::unique_lock<std::mutex> lock(queueMutex);
+                    requestAvailableOrStopping.wait(lock, [this] { return stop || !requestQueue.empty(); });
+                    if (stop)
+                    {
+                        break;
+                    }
+                    request = std::move(requestQueue.front());
+                    requestQueue.pop_front();
+                }
                 ExecuteRequest(request.get());
             }
+            terminated = true;
+            stopped.notify_all();
         }
         else
         {
@@ -531,10 +550,38 @@ void DebugService::Stop()
             {
                 SetTargetInputEof();
             }
-            DebugService::PutRequest(new RunStopDebugServiceRequest());
-            DebugService::WaitForStoppedOrKill();
+            if (!requestInProgress)
+            {
+                PutRequest(new RunStopDebugServiceRequest());
+                std::cv_status status = std::cv_status::no_timeout;
+                {
+                    std::unique_lock<std::mutex> lock(queueMutex);
+                    status = stopped.wait_for(lock, std::chrono::seconds(3));
+                }
+                if (status == std::cv_status::timeout)
+                {
+                    SendKillRequest();
+                }
+                requestInProgress = false;
+            }
             stop = true;
             requestAvailableOrStopping.notify_one();
+            if (requestInProgress)
+            {
+                std::cv_status status = std::cv_status::no_timeout;
+                {
+                    std::unique_lock<std::mutex> lock(queueMutex);
+                    status = stopped.wait_for(lock, std::chrono::seconds(3));
+                }
+                if (status == std::cv_status::timeout)
+                {
+                    if (requestInProgress)
+                    {
+                        SendKillRequest();
+                    }
+                }
+            }
+            DebugService::Terminate();
         }
         if (started)
         {
@@ -585,7 +632,7 @@ void DebugService::RunStopRequest()
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::stopDebugReply);
     StopDebugReply reply(replyDoc->DocumentElement());
     serverProcess->WaitForExit();
-    stopped.notify_one();
+    stopped.notify_all();
     stop = true;
 }
 
@@ -609,11 +656,9 @@ void DebugService::PutTargetInputLine(const std::string& targetInputLine)
     }
 }
 
-void DebugService::WaitForStoppedOrKill()
+void DebugService::Terminate()
 {
-    std::unique_lock<std::recursive_mutex> lock(mtx);
-    std::cv_status status = stopped.wait_for(lock, std::chrono::seconds(3));
-    if (status == std::cv_status::timeout)
+    if (!terminated)
     {
         serverProcess->Terminate();
     }
@@ -787,6 +832,42 @@ bool DebugService::RequestInProgress(std::string& requestName)
 void DebugService::ClearRequestQueue()
 {
     requestQueue.clear();
+}
+
+void DebugService::SendKillRequest()
+{
+    try
+    {
+        if (killPort == -1)
+        {
+            PutOutputServiceMessage("debug service: error: no kill port set, use Task Manager to terminate GDB.");
+        }
+        KillRequest killRequest;
+        std::unique_ptr<sngxml::dom::Element> requestElement = killRequest.ToXml("killRequest");
+        sngxml::dom::Document requestDoc;
+        requestDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(requestElement.release()));
+        std::stringstream strStream;
+        CodeFormatter formatter(strStream);
+        requestDoc.Write(formatter);
+        std::string requestStr = strStream.str();
+        TcpSocket socket("localhost", std::to_string(killPort));
+        Write(socket, requestStr);
+        std::string replyStr = ReadStr(socket);
+        std::unique_ptr<sngxml::dom::Document> replyDoc = sngxml::dom::ParseDocument(ToUtf32(replyStr), "socket");
+        if (replyDoc->DocumentElement()->Name() == U"killReply")
+        {
+            KillReply killReply(replyDoc->DocumentElement());
+            PutOutputServiceMessage("debug service: kill request sent to cmdb");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        PutOutputServiceMessage("debug service: could not send kill request to cmdb: " + std::string(ex.what()));
+    }
+    catch (...)
+    {
+        PutOutputServiceMessage("debug service: could not send kill request to cmdb: unknown exception occurred");
+    }
 }
 
 DebugServiceRequest::~DebugServiceRequest()

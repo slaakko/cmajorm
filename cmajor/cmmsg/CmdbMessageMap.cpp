@@ -46,6 +46,8 @@ MessageMap::MessageMap()
     map["targetOutputReply"] = MessageKind::targetOutputReply;
     map["logDebugMessageRequest"] = MessageKind::logMessageRequest;
     map["logDebugMessageReply"] = MessageKind::logMessageReply;
+    map["killRequest"] = MessageKind::killRequest;
+    map["killReply"] = MessageKind::killReply;
 }
 
 MessageKind MessageMap::GetMessageKind(const std::string& messageKindStr)

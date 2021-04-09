@@ -17,7 +17,8 @@ enum class MessageKind
     finishRequest, finishReply, untilRequest, untilReply,
     breakRequest, breakReply, deleteRequest, deleteReply, depthRequest, depthReply, framesRequest, framesReply, 
     countRequest, countReply, evaluateChildRequest, evaluateChildReply, evaluateRequest, evaluateReply,
-    targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply, logMessageRequest, logMessageReply
+    targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply, logMessageRequest, logMessageReply,
+    killRequest, killReply
 };
 
 class MSG_API MessageMap

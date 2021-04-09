@@ -111,13 +111,14 @@ class ServerDebugger : public Debugger, public ClientChannelUser
 {
 public:
     const int maxPointerLevel = 3;
-    ServerDebugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, bool breakOnThrow_, const std::string& version_, int port_, bool log_);
+    ServerDebugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, bool breakOnThrow_, const std::string& version_, int port_, bool log_, bool idle_);
     ~ServerDebugger();
     void StartServer();
     void StopServer();
     void RunServer();
     void LogRequest(const std::unique_ptr<Document>& requestDoc);
     void LogReply(Document& replyDoc);
+    bool SendIdleChannelMessages() const override { return idle; }
     std::unique_ptr<Element> ProcessRequest(Element* requestElement);
     std::unique_ptr<Element> GetIdleClientChannelMessage() override;
     bool IsIdleChannelMessage(Element* message) const override;
@@ -188,6 +189,7 @@ private:
     bool log;
     bool exiting;
     bool listening;
+    bool idle;
     TcpSocket listenSocket;
     TcpSocket socket;
     std::string logFilePath;
@@ -231,9 +233,10 @@ struct ClientChannelGuard
 };
 
 ServerDebugger::ServerDebugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, bool breakOnThrow_, const std::string& version_,
-    int port_, bool log_) :
+    int port_, bool log_, bool idle_) :
     Debugger(verbose_, breakOnThrow_, new ServerDebuggerOutputWriter(this, log_), executable, args), version(version_), port(port_), log(log_), exiting(false),
-    listening(false), logFilePath(CmdbLogFilePath()), clientChannel(nullptr), targetInputReplyReceived(false), targetOutputReplyReceived(false), targetRunningIntervalMs(250)
+    listening(false), logFilePath(CmdbLogFilePath()), clientChannel(nullptr), targetInputReplyReceived(false), targetOutputReplyReceived(false), targetRunningIntervalMs(250),
+    idle(idle_)
 {
 }
 
@@ -1842,11 +1845,11 @@ void ServerDebugger::WriteTargetOuput(int handle, const std::string& s)
 ServerDebugger* serverDebugger = nullptr;
 
 void StartDebuggerServer(const std::string& executable, const std::vector<std::string>& args, bool verbose, bool breakOnThrow, const std::string& version,
-    int port, bool log)
+    int port, bool log, bool idle)
 {
     if (!serverDebugger)
     {
-        serverDebugger = new ServerDebugger(executable, args, verbose, breakOnThrow, version, port, log);
+        serverDebugger = new ServerDebugger(executable, args, verbose, breakOnThrow, version, port, log, idle);
     }
     serverDebugger->StartServer();
 }
@@ -1858,11 +1861,11 @@ void StopDebuggerServer()
 }
 
 void RunDebuggerServer(const std::string& executable, const std::vector<std::string>& args, bool verbose, bool breakOnThrow, const std::string& version, int port,
-    bool log)
+    bool log, bool idle)
 {
     if (!serverDebugger)
     {
-        serverDebugger = new ServerDebugger(executable, args, verbose, breakOnThrow, version, port, log);
+        serverDebugger = new ServerDebugger(executable, args, verbose, breakOnThrow, version, port, log, idle);
     }
     serverDebugger->RunServer();
     delete serverDebugger;

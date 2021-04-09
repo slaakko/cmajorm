@@ -2800,10 +2800,10 @@ namespace cmcode
         private DebugServiceArgs MakeDebugServiceArgs(const string& backend, const string& config, Cm.Ast.Project* project, const string& programArguments)
         {
         #if (DEBUG)
-            DebugServiceArgs args = DebugServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).DebugServer(true).Verbose(true).Backend(backend).Config(config).
+            DebugServiceArgs args = DebugServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).Idle(true).DebugServer(true).Verbose(true).Backend(backend).Config(config).
                 ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments);
         #else
-            DebugServiceArgs args = DebugServiceArgs().ProgramName("cmcode").Pid(pid).Log(false).DebugServer(false).Verbose(true).Backend(backend).Config(config).
+            DebugServiceArgs args = DebugServiceArgs().ProgramName("cmcode").Pid(pid).Log(false).Idle(true).DebugServer(false).Verbose(true).Backend(backend).Config(config).
                 ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments);
         #endif
             return args;

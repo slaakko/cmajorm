@@ -49,6 +49,12 @@ namespace cmcode {
 
 const char* cmajorCodeVersion = "3.10.0";
 
+bool CmCodeLogFlagExists()
+{
+    std::string cmcodeLogFlagFilePath = Path::Combine(cmajor::service::CmajorConfigDir(), "cmcode.log.flag");
+    return boost::filesystem::exists(cmcodeLogFlagFilePath);
+}
+
 using namespace cmajor::service;
 using namespace sngcm::ast;
 using namespace soulng::unicode;
@@ -569,6 +575,18 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     std::unique_ptr<Control> scrollableOutputLogView(new ScrollableControl(ScrollableControlCreateParams(outputLogViewPtr.release()).SetDock(Dock::fill)));
     outputTabPage->AddChild(scrollableOutputLogView.release());
     outputTabControl->AddTabPage(outputTabPagePtr.release());
+    if (CmCodeLogFlagExists())
+    {
+        std::unique_ptr<TabPage> logTabPagePtr(new TabPage("Log", "log"));
+        logTabPage = logTabPagePtr.get();
+        std::unique_ptr<LogView> logViewPtr(new LogView(TextViewCreateParams().Defaults()));
+        log = logViewPtr.get();
+        log->SetDoubleBuffered();
+        std::unique_ptr<Control> scrollableLogView(new ScrollableControl(ScrollableControlCreateParams(logViewPtr.release()).SetDock(Dock::fill)));
+        logTabPage->AddChild(scrollableLogView.release());
+        Application::SetLogView(log);
+        outputTabControl->AddTabPage(logTabPagePtr.release());
+    }
     verticalSplitContainer->Pane2Container()->AddChild(borderedOutptTabControl.release());
     AddChild(verticalSplitContainerPtr.release());
 
@@ -2665,6 +2683,7 @@ void MainWindow::CopyClick()
             TextView* textView = editor->GetTextView();
             if (textView)
             {
+                if (textView->IsReadOnly()) return;
                 if (!textView->IsSelectionEmpty())
                 {
                     SelectionData selection = textView->GetSelection();
@@ -2712,6 +2731,7 @@ void MainWindow::CutClick()
             TextView* textView = editor->GetTextView();
             if (textView)
             {
+                if (textView->IsReadOnly()) return;
                 if (!textView->IsSelectionEmpty())
                 {
                     SelectionData selection = textView->GetSelection();
@@ -2765,6 +2785,7 @@ void MainWindow::PasteClick()
                 TextView* textView = editor->GetTextView();
                 if (textView)
                 {
+                    if (textView->IsReadOnly()) return;
                     int lineIndex = textView->CaretLine() - 1;
                     int columnIndex = textView->CaretColumn() - 1;
                     textView->SetFocus();
@@ -2789,6 +2810,7 @@ void MainWindow::UndoClick()
             TextView* textView = editor->GetTextView();
             if (textView)
             {
+                if (textView->IsReadOnly()) return;
                 textView->Undo();
             }
         }
@@ -2809,6 +2831,7 @@ void MainWindow::RedoClick()
             TextView* textView = editor->GetTextView();
             if (textView)
             {
+                if (textView->IsReadOnly()) return;
                 textView->Redo();
             }
         }

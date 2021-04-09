@@ -4,6 +4,7 @@
 #include <cmajor/cmdebug/ServerDebugger.hpp>
 #include <cmajor/cmdebug/DebuggerClient.hpp>
 #include <cmajor/cmdebug/CmdbSession.hpp>
+#include <cmajor/cmdebug/KillChannel.hpp>
 #ifdef _WIN32
 #include <cmajor/cmpm/PortMapClient.hpp>
 #endif
@@ -62,6 +63,8 @@ void PrintHelp()
     std::cout << "  Used in combination with --server. Starts test client along with server." << std::endl;
     std::cout << "--port=PORT_NUMBER | -p=PORT_NUMBER" << std::endl;
     std::cout << "  Set debug server port number. Default port is 54326." << std::endl;
+    std::cout << "--idle | -i" << std::endl;
+    std::cout << "  Send idle messages." << std::endl;
     std::cout << "--log | -l" << std::endl;
     std::cout << "  Write log to %CMAJOR_ROOT%/log/cmdb.log (by default C:\\cmajor\\log\\cmdb.log)." << std::endl;
     std::cout << "--sessionPort=PORT_NUMBER | -s=PORT_NUMBER" << std::endl;
@@ -69,6 +72,8 @@ void PrintHelp()
     std::cout << "--portMapServicePort=PORT_NUMBER | -m=PORT_NUMBER" << std::endl;
     std::cout << "  Set port map service port number to PORT_NUMBER." << std::endl;
     std::cout << "  Optional. When set revises main port number and session port number using port map service every minute." << std::endl;
+    std::cout << "--killPort=PORT_NUMBER | -k=PORT_NUMBER" << std::endl;
+    std::cout << "  Optional. Set kill channel port number to PORT_NUMBER." << std::endl;
 }
 
 int main(int argc, const char** argv)
@@ -85,8 +90,10 @@ int main(int argc, const char** argv)
         bool executableSeen = false;
         bool breakOnThrow = true;
         bool log = false;
+        bool idle = false;
         int port = 54326;
         int sessionPort = 54322;
+        int killPort = -1;
         bool wait = false;
         std::vector<int> portNumbers;
         for (int i = 1; i < argc; ++i)
@@ -129,6 +136,10 @@ int main(int argc, const char** argv)
                     {
                         log = true;
                     }
+                    else if (arg == "--idle")
+                    {
+                        idle = true;
+                    }
                     else if (arg.find('=') != std::string::npos)
                     {
                         std::vector<std::string> components = Split(arg, '=');
@@ -146,6 +157,10 @@ int main(int argc, const char** argv)
                             else if (components[0] == "--portMapServicePort")
                             {
                                 portMapServicePort = boost::lexical_cast<int>(components[1]);
+                            }
+                            else if (components[0] == "--killPort")
+                            {
+                                killPort = boost::lexical_cast<int>(components[1]);
                             }
                             else
                             {
@@ -182,6 +197,10 @@ int main(int argc, const char** argv)
                             else if (components[0] == "m")
                             {
                                 portMapServicePort = boost::lexical_cast<int>(components[1]);
+                            }
+                            else if (components[0] == "k")
+                            {
+                                killPort = boost::lexical_cast<int>(components[1]);
                             }
                         }
                         else
@@ -230,6 +249,11 @@ int main(int argc, const char** argv)
                                     log = true;
                                     break;
                                 }
+                                case 'i':
+                                {
+                                    idle = true;
+                                    break;
+                                }
                                 case 'w':
                                 {
                                     wait = true;
@@ -264,6 +288,10 @@ int main(int argc, const char** argv)
         }
         if (server)
         {
+            if (killPort != -1)
+            {
+                cmajor::debug::StartKillChannel(killPort);
+            }
 #ifdef _WIN32
             if (portMapServicePort != -1)
             {
@@ -275,13 +303,13 @@ int main(int argc, const char** argv)
 #endif
             if (client)
             {
-                cmajor::debug::StartDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log);
+                cmajor::debug::StartDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log, idle);
                 cmajor::debug::RunClient(port);
                 cmajor::debug::StopDebuggerServer();
             }
             else
             {
-                cmajor::debug::RunDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log);
+                cmajor::debug::RunDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log, idle);
             }
 #ifdef _WIN32
             if (portMapServicePort != -1)
@@ -290,6 +318,10 @@ int main(int argc, const char** argv)
                 portMapServicePort = -1;
             }
 #endif
+            if (killPort != -1)
+            {
+                cmajor::debug::StopKillChannel();
+            }
         }
         else
         {
