@@ -1533,6 +1533,15 @@ void MainWindow::HandleLocation(const ::Location& location, bool saveLocation, b
 {
     try
     {
+        if (location.line > 0)
+        {
+            lineStatusBarItem->SetText(std::to_string(location.line));
+        }
+        else
+        {
+            lineStatusBarItem->SetText(std::string());
+        }
+        columnStatusBarItem->SetText(std::string());
         if (saveLocation)
         {
             savedLocation = location;
@@ -1970,7 +1979,7 @@ void MainWindow::SetEditorState()
                     copyMenuItem->Disable();
                     cutMenuItem->Disable();
                 }
-                if (textView->CaretLine() != 0)
+                if (textView->CaretLine() > 0)
                 {
                     lineStatusBarItem->SetText(std::to_string(textView->CaretLine()));
                 }
@@ -1978,7 +1987,7 @@ void MainWindow::SetEditorState()
                 {
                     lineStatusBarItem->SetText(std::string());
                 }
-                if (textView->CaretColumn() != 0)
+                if (textView->CaretColumn() > 0)
                 {
                     columnStatusBarItem->SetText(std::to_string(textView->CaretColumn()));
                 }
