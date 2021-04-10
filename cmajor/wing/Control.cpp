@@ -1452,6 +1452,12 @@ bool Control::DoSysCommand(WPARAM wParam, LPARAM lParam)
         }
         case SC_CLOSE:
         {
+            if (IsWindow())
+            {
+                Window* window = static_cast<Window*>(this);
+                window->SetDialogResult(DialogResult::cancel);
+                return false;
+            }
             KeyEventArgs args(Keys::f4 | Keys::altModifier);
             DoMenu(args);
             if (args.handled)

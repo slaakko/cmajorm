@@ -39,6 +39,8 @@ extern const char* cmajorCodeVersion;
 
 const int buildProgressTimerId = 10;
 const int buildProgressTimerPeriod = 100;
+const int startupDialogTimer = 15;
+const int startupDialogTimerDelay = 10;
 const int toolTipTimerId = 12;
 const int toolTipShowPeriod = 3000;
 
@@ -98,6 +100,7 @@ protected:
 private:
     void SaveConfigurationSettings();
     void LoadConfigurationSettings();
+    void ShowStartupDialog();
     void SaveProjectData();
     void SaveSolutionData();
     void AddClipboardListener();

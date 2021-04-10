@@ -70,12 +70,19 @@ void Config::Load()
     {
         std::unique_ptr<sngxml::dom::Document> configDoc = sngxml::dom::ReadDocument(configXmlFilePath);
         configuration = Configuration(configDoc->DocumentElement());
+        if (!configuration.options.defined)
+        {
+            configuration.options.defined = true;
+            configuration.options.showStartupDialog = true;
+            configuration.options.numberOfRecentSolutions = 5;
+        }
     }
 }
 
 void Config::Save()
 {
     std::string configXmlFilePath = Path::Combine(CmajorConfigDir(), "cmcode.config.xml");
+    configuration.options.defined = true;
     std::unique_ptr<sngxml::dom::Element> configurationElement = configuration.ToXml("configuration");
     sngxml::dom::Document configDoc;
     configDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(configurationElement.release()));
@@ -92,6 +99,22 @@ void LoadConfiguration()
 void SaveConfiguration()
 {
     Config::Instance().Save();
+}
+
+const Options& GetOptions()
+{
+    if (!Config::Instance().GetConfiguration().options.defined)
+    {
+        Config::Instance().GetConfiguration().options.defined = true;
+        Config::Instance().GetConfiguration().options.showStartupDialog = true;
+        Config::Instance().GetConfiguration().options.numberOfRecentSolutions = 5;
+    }
+    return Config::Instance().GetConfiguration().options;
+}
+
+void SetOptions(const Options& options)
+{
+    Config::Instance().GetConfiguration().options = options;
 }
 
 const BuildSettings& GetBuildSettings()
@@ -117,6 +140,47 @@ void ConfigDone()
 WindowSettings& GetWindowSettings()
 {
     return Config::Instance().GetConfiguration().windowSettings;
+}
+
+const std::vector<RecentSolution>& GetRecentSolutions() 
+{
+    std::vector<std::string> removeFilePaths;
+    const std::vector<RecentSolution>& recentSolutions = Config::Instance().GetConfiguration().recentSolutions;
+    for (const RecentSolution& recentSolution : recentSolutions)
+    {
+        if (!boost::filesystem::exists(recentSolution.filePath))
+        {
+            removeFilePaths.push_back(recentSolution.filePath);
+        }
+    }
+    for (const std::string& removeFilePath : removeFilePaths)
+    {
+        RemoveRecentSolution(removeFilePath);
+    }
+    return Config::Instance().GetConfiguration().recentSolutions;
+}
+
+void AddRecentSolution(const std::string& solutionName, const std::string& solutionFilePath)
+{
+    std::string filePath = GetFullPath(solutionFilePath);
+    RemoveRecentSolution(filePath);
+    const Options& options = GetOptions();
+    std::vector<RecentSolution>& recentSolutions = Config::Instance().GetConfiguration().recentSolutions;
+    while (recentSolutions.size() >= options.numberOfRecentSolutions)
+    {
+        recentSolutions.pop_back();
+    }
+    RecentSolution recentSolution;
+    recentSolution.name = solutionName;
+    recentSolution.filePath = filePath;
+    recentSolutions.insert(recentSolutions.begin(), recentSolution);
+}
+
+void RemoveRecentSolution(const std::string& solutionFilePath)
+{
+    std::vector<RecentSolution>& recentSolutions = Config::Instance().GetConfiguration().recentSolutions;
+    std::string filePath = GetFullPath(solutionFilePath);
+    recentSolutions.erase(std::remove_if(recentSolutions.begin(), recentSolutions.end(), [&](const RecentSolution& solution) { return solution.filePath == filePath; }), recentSolutions.end());
 }
 
 } // namespace cmcode

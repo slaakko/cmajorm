@@ -3,12 +3,25 @@
 // Distributed under the MIT license
 // =================================
 
+class RecentSolution
+{
+    string name;
+    string filePath;
+}
+
 class BuildSettings
 {
     int numberOfProjectBuildThreads;
     bool singleThreadedCompile;
     bool generateIntermediateCodeFiles;
     bool generateOptimizedIntermediateCodeFiles;
+}
+
+class Options
+{
+    bool defined;
+    bool showStartupDialog;
+    int numberOfRecentSolutions;
 }
 
 class WindowLocation
@@ -36,6 +49,8 @@ class WindowSettings
 
 class Configuration
 {
+    RecentSolution[] recentSolutions;
+    Options options;
     BuildSettings buildSettings;
     WindowSettings windowSettings;
 }

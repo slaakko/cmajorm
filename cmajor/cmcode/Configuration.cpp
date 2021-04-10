@@ -5,6 +5,26 @@
 
 using namespace soulng::unicode;
 
+RecentSolution::RecentSolution()
+    : name(), filePath()
+{
+}
+
+RecentSolution::RecentSolution(sngxml::dom::Element* element)
+    : name(), filePath()
+{
+    sngxml::xmlser::FromXml(element, "name", name);
+    sngxml::xmlser::FromXml(element, "filePath", filePath);
+}
+
+std::unique_ptr<sngxml::dom::Element> RecentSolution::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(name, "name").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(filePath, "filePath").release()));
+    return element;
+}
+
 BuildSettings::BuildSettings()
     : numberOfProjectBuildThreads(), singleThreadedCompile(), generateIntermediateCodeFiles(), generateOptimizedIntermediateCodeFiles()
 {
@@ -26,6 +46,28 @@ std::unique_ptr<sngxml::dom::Element> BuildSettings::ToXml(const std::string& fi
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(singleThreadedCompile, "singleThreadedCompile").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(generateIntermediateCodeFiles, "generateIntermediateCodeFiles").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(generateOptimizedIntermediateCodeFiles, "generateOptimizedIntermediateCodeFiles").release()));
+    return element;
+}
+
+Options::Options()
+    : defined(), showStartupDialog(), numberOfRecentSolutions()
+{
+}
+
+Options::Options(sngxml::dom::Element* element)
+    : defined(), showStartupDialog(), numberOfRecentSolutions()
+{
+    sngxml::xmlser::FromXml(element, "defined", defined);
+    sngxml::xmlser::FromXml(element, "showStartupDialog", showStartupDialog);
+    sngxml::xmlser::FromXml(element, "numberOfRecentSolutions", numberOfRecentSolutions);
+}
+
+std::unique_ptr<sngxml::dom::Element> Options::ToXml(const std::string& fieldName) const
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(defined, "defined").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(showStartupDialog, "showStartupDialog").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(numberOfRecentSolutions, "numberOfRecentSolutions").release()));
     return element;
 }
 
@@ -100,13 +142,15 @@ std::unique_ptr<sngxml::dom::Element> WindowSettings::ToXml(const std::string& f
 }
 
 Configuration::Configuration()
-    : buildSettings(), windowSettings()
+    : recentSolutions(), options(), buildSettings(), windowSettings()
 {
 }
 
 Configuration::Configuration(sngxml::dom::Element* element)
-    : buildSettings(), windowSettings()
+    : recentSolutions(), options(), buildSettings(), windowSettings()
 {
+    sngxml::xmlser::FromXml(element, "recentSolutions", recentSolutions);
+    sngxml::xmlser::FromXml(element, "options", options);
     sngxml::xmlser::FromXml(element, "buildSettings", buildSettings);
     sngxml::xmlser::FromXml(element, "windowSettings", windowSettings);
 }
@@ -114,6 +158,8 @@ Configuration::Configuration(sngxml::dom::Element* element)
 std::unique_ptr<sngxml::dom::Element> Configuration::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(recentSolutions, "recentSolutions").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(options, "options").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(buildSettings, "buildSettings").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(windowSettings, "windowSettings").release()));
     return element;

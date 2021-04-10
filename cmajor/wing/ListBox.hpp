@@ -32,6 +32,7 @@ class WING_API ListBox : public Control
 {
 public:
     ListBox(ListBoxCreateParams& createParams);
+    bool IsListBox() const override { return true; }
     void SetSelectedIndex(int selectedIndex);
     int GetSelectedIndex() const;
     void SetTopIndex(int topIndex);

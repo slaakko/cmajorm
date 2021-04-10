@@ -27,9 +27,8 @@ AddNewProjectDialog::AddNewProjectDialog() : Window(WindowCreateParams().WindowC
     Size defaultButtonSize = ScreenMetrics::Get().DefaultButtonSize();
     Size defaultTextBoxSize = ScreenMetrics::Get().DefaultTextBoxSize();
     Size defaultLabelSize = ScreenMetrics::Get().DefaultLabelSize();
-    Size defaultCheckBoxSize = ScreenMetrics::Get().DefaultCheckBoxSize();
-
-   Point projectNameLabelLocation(16, 16);
+    
+    Point projectNameLabelLocation(16, 16);
     std::unique_ptr<Label> projectNameLabelPtr(new Label(LabelCreateParams().Text("Project name:").Location(projectNameLabelLocation).SetSize(defaultLabelSize).
         SetAnchors(Anchors::left | Anchors::top)));
     AddChild(projectNameLabelPtr.release());

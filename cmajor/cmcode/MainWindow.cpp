@@ -6,6 +6,8 @@
 #include <cmajor/cmcode/MainWindow.hpp>
 #include <cmajor/cmcode/AboutDialog.hpp>
 #include <cmajor/cmcode/BuildSettingsDialog.hpp>
+#include <cmajor/cmcode/OptionsDialog.hpp>
+#include <cmajor/cmcode/StartupDialog.hpp>
 #include <cmajor/cmcode/ProjectReferencesDialog.hpp>
 #include <cmajor/cmcode/Config.hpp>
 #include <cmajor/cmcode/Action.hpp>
@@ -264,10 +266,11 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     searchMenuItem->SetShortcut(Keys::controlModifier | Keys::f);
     searchMenuItem->Click().AddHandler(this, &MainWindow::SearchClick);
     editMenuItem->AddMenuItem(searchMenuItemPtr.release());
-//    std::unique_ptr<MenuItem> optionsMenuItemPtr(new MenuItem("&Options..."));
-//    optionsMenuItem = optionsMenuItemPtr.get();
-//    optionsMenuItem->Click().AddHandler(this, &MainWindow::OptionsClick);
-//    editMenuItem->AddMenuItem(optionsMenuItemPtr.release());
+    editMenuItem->AddMenuItem(new MenuItemSeparator());
+    std::unique_ptr<MenuItem> optionsMenuItemPtr(new MenuItem("&Options..."));
+    optionsMenuItem = optionsMenuItemPtr.get();
+    optionsMenuItem->Click().AddHandler(this, &MainWindow::OptionsClick);
+    editMenuItem->AddMenuItem(optionsMenuItemPtr.release());
     menuBar->AddMenuItem(editMenuItem.release());
     std::unique_ptr<MenuItem> viewMenuItem(new MenuItem("&View"));
     std::unique_ptr<MenuItem> debugWindowsMenuItem(new MenuItem("&Debug Windows"));
@@ -645,7 +648,27 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
 
     AddClipboardListener();
 
+    const Options& options = GetOptions();
+    if (options.showStartupDialog)
+    {
+        const std::vector<RecentSolution>& recentSolutions = GetRecentSolutions();
+        if (!recentSolutions.empty())
+        {
+            SetTimer(startupDialogTimer, startupDialogTimerDelay);
+        }
+    }
+
     SetTimer(configurationSaveTimerId, configurationSavePeriod);
+}
+
+void MainWindow::ShowStartupDialog()
+{
+    StartupDialog dialog;
+    if (dialog.ShowDialog(*this) == DialogResult::ok)
+    {
+        const RecentSolution& selectedSolution = dialog.GetSelectedSolution();
+        OpenProject(selectedSolution.filePath);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -732,7 +755,12 @@ void MainWindow::OnTimer(TimerEventArgs& args)
     try
     {
         Window::OnTimer(args);
-        if (args.timerId == buildProgressTimerId)
+        if (args.timerId == startupDialogTimer)
+        {
+            KillTimer(startupDialogTimer);
+            ShowStartupDialog();
+        }
+        else if (args.timerId == buildProgressTimerId)
         {
             ShowBuildProgress();
         }
@@ -1277,10 +1305,17 @@ void MainWindow::OpenProject(const std::string& filePath)
         codeTabControl->CloseAllTabPages();
         solutionData.reset(new SolutionData(std::move(solution), solutionTreeView));
         SetIDEState();
+        sngcm::ast::Solution* sln = solutionData->GetSolution();
+        if (sln)
+        { 
+            AddRecentSolution(ToUtf8(sln->Name()), sln->FilePath());
+            SaveConfiguration();
+        }
         SetState(MainWindowState::idle);
     }
     catch (const std::exception& ex)
     {
+        SetState(MainWindowState::idle);
         ShowErrorMessageBox(Handle(), ex.what());
     }
 }
@@ -1875,7 +1910,7 @@ void MainWindow::SetState(MainWindowState state_)
     redoMenuItem->Disable();
     gotoMenuItem->Disable();
     searchMenuItem->Disable();
-    //optionsMenuItem->Disable();
+    optionsMenuItem->Disable();
     callStackMenuItem->Disable();
     localsMenuItem->Disable();
     errorsMenuItem->Disable();
@@ -1951,7 +1986,7 @@ void MainWindow::SetState(MainWindowState state_)
     // always on:
 
     exitMenuItem->Enable();
-    //optionsMenuItem->Enable();
+    optionsMenuItem->Enable();
     searchResultsMenuItem->Enable();
     callStackMenuItem->Enable();
     localsMenuItem->Enable();
@@ -2676,6 +2711,7 @@ void MainWindow::NewProjectClick()
             { 
                 return;
             }
+            solutionTreeView->SetRoot(nullptr);
             OpenProject(solutionFilePath);
         }
     }
@@ -2701,6 +2737,7 @@ void MainWindow::OpenProjectClick()
         {
             if (CloseSolution())
             {
+                solutionTreeView->SetRoot(nullptr);
                 OpenProject(GetFullPath(filePath));
             }
         }
@@ -3227,8 +3264,20 @@ void MainWindow::ViewSearchResult(ViewSearchResultEventArgs& args)
 
 void MainWindow::OptionsClick()
 {
-    // todo
-    ShowInfoMessageBox(Handle(), "Options");
+    try
+    {
+        OptionsDialog dialog; 
+        dialog.SetOptionsFrom(GetOptions());
+        if (dialog.ShowDialog(*this) == DialogResult::ok)
+        {
+            SetOptions(dialog.GetOptions());
+            SaveConfiguration();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::CallStackClick()
@@ -3462,6 +3511,7 @@ void MainWindow::AddNewProject()
             {
                 return;
             }
+            solutionTreeView->SetRoot(nullptr);
             OpenProject(solutionFilePath);
         }
     }
@@ -3508,6 +3558,7 @@ void MainWindow::AddExistingProject()
             {
                 return;
             }
+            solutionTreeView->SetRoot(nullptr);
             OpenProject(solutionFilePath);
         }
     }
@@ -3566,6 +3617,7 @@ void MainWindow::RemoveProject(sngcm::ast::Project* project)
         {
             return;
         }
+        solutionTreeView->SetRoot(nullptr);
         OpenProject(solutionFilePath);
     }
     catch (const std::exception& ex)

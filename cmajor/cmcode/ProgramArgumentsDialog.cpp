@@ -17,6 +17,7 @@ ProgramArgumentsDialog::ProgramArgumentsDialog() :
     cancelButton(nullptr),
     programArgumentsTextBox(nullptr)
 {
+    SetSmallIcon(Application::GetResourceManager().GetIcon("cmcode.small.icon"));
     Size s = GetSize();
     Size defaultButtonSize = ScreenMetrics::Get().DefaultButtonSize();
     Size defaultControlSpacing = ScreenMetrics::Get().DefaultControlSpacing();

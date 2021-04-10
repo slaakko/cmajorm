@@ -16,6 +16,17 @@ using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
 
+class RecentSolution
+{
+public:
+    RecentSolution();
+    RecentSolution(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    std::string name;
+    std::string filePath;
+};
+
 class BuildSettings
 {
 public:
@@ -27,6 +38,18 @@ public:
     bool singleThreadedCompile;
     bool generateIntermediateCodeFiles;
     bool generateOptimizedIntermediateCodeFiles;
+};
+
+class Options
+{
+public:
+    Options();
+    Options(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    bool defined;
+    bool showStartupDialog;
+    int32_t numberOfRecentSolutions;
 };
 
 class WindowLocation
@@ -74,6 +97,8 @@ public:
     Configuration(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
+    std::vector<RecentSolution> recentSolutions;
+    Options options;
     BuildSettings buildSettings;
     WindowSettings windowSettings;
 };
