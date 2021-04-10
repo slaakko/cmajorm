@@ -348,10 +348,18 @@ void SolutionData::Load(const std::string& solutionSettingsFilePath)
         openFiles.clear();
         for (const std::string& openFile : solutionSettings.openFiles)
         {
-            openFiles.insert(openFile);
+            if (boost::filesystem::exists(openFile))
+            {
+                openFiles.insert(openFile);
+            }
         }
-        currentOpenFile = solutionSettings.currentOpenFile;
-        currentCursorLine = solutionSettings.currentCursorLine;
+        currentOpenFile = std::string();
+        currentCursorLine = 0;
+        if (boost::filesystem::exists(solutionSettings.currentOpenFile))
+        {
+            currentOpenFile = solutionSettings.currentOpenFile;
+            currentCursorLine = solutionSettings.currentCursorLine;
+        }
         expandedProjects.clear();
         for (const std::string& expandedProject : solutionSettings.expandedProjects)
         {

@@ -1316,9 +1316,13 @@ void MainWindow::SetIDEState()
                     TextView* textView = editor->GetTextView();
                     if (textView)
                     {
-                        textView->SetCaretLineCol(solutionData->CurrentCursorLine(), 1 + textView->LineNumberFieldLength());
-                        textView->ScrollToCaret();
-                        textView->EnsureLineVisible(solutionData->CurrentCursorLine());
+                        int line = solutionData->CurrentCursorLine();
+                        if (line > 0 && line <= textView->Lines().size())
+                        {
+                            textView->SetCaretLineCol(line, 1 + textView->LineNumberFieldLength());
+                            textView->ScrollToCaret();
+                            textView->EnsureLineVisible(line);
+                        }
                     }
                 }
             }
@@ -1352,6 +1356,7 @@ void MainWindow::SetIDEState()
 
 void MainWindow::AddEditor(const std::string& filePath)
 {
+    if (!boost::filesystem::exists(filePath)) return;
     SolutionTreeViewNodeData* data = solutionData->GetSolutionTreeViewNodeDataByKey(filePath);
     if (data)
     {
@@ -3785,6 +3790,11 @@ void MainWindow::RemoveFile(sngcm::ast::Project* project, const std::string& fil
             tabPage->Close();
         }
         TreeViewNode* projectNode = fileNode->Parent();
+        solutionData->RemoveOpenFile(filePath);
+        if (solutionData->CurrentOpenFile() == filePath)
+        {
+            solutionData->SetCurrentOpenFile(std::string());
+        }
         project->RemoveFile(filePath, fileName);
         project->Save();
         if (EndsWith(filePath, ".cm"))
@@ -4571,6 +4581,7 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
         sourceCodeView->Cut().AddHandler(this, &MainWindow::CutClick);
         sourceCodeView->Paste().AddHandler(this, &MainWindow::PasteClick);
         sourceCodeView->ExpressionHover().AddHandler(this, &MainWindow::ExpressionHover);
+        sourceCodeView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
         if (state != MainWindowState::idle)
         {
             sourceCodeView->SetReadOnly();
@@ -4607,6 +4618,7 @@ ResourceFileEditor* MainWindow::AddResourceFileEditor(const std::string& fileNam
         textView->Copy().AddHandler(this, &MainWindow::CopyClick);
         textView->Cut().AddHandler(this, &MainWindow::CutClick);
         textView->Paste().AddHandler(this, &MainWindow::PasteClick);
+        textView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
         if (state != MainWindowState::idle)
         {
             textView->SetReadOnly();
@@ -4636,6 +4648,7 @@ TextFileEditor* MainWindow::AddTextFileEditor(const std::string& fileName, const
         textView->Copy().AddHandler(this, &MainWindow::CopyClick);
         textView->Cut().AddHandler(this, &MainWindow::CutClick);
         textView->Paste().AddHandler(this, &MainWindow::PasteClick);
+        textView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
         if (state != MainWindowState::idle)
         {
             textView->SetReadOnly();
