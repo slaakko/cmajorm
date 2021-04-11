@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#15">15</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#15">15</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#constructor_DelegateTypeSymbol_D089CE4A341A83F4A68E39B95DB75E7F50ED61DC">DelegateTypeSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#constructor_DelegateTypeSymbol_1BEA8120CCEB325C0D6B5A24593D2E27720AA1FC">DelegateTypeSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -62,7 +62,19 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GenerateCall_6E11A5E4F5156C02B10B72A3318EA77C9F315D12">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GenerateCall_1921CE6F5525A50BF6527A50326AEA61DC8DF253">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GetSymbolCategoryDescription_9BEFBDAFF8E1DB03EA069F34C38797A8C2E0E34E">GetSymbolCategoryDescription</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GetSymbolCategoryStr_CC85B6640F58965E830E5052DA474903CC00220C">GetSymbolCategoryStr</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GetSymbolHelp_7D79AFB84F3BBCE97084B819105DF457AD812864">GetSymbolHelp</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
@@ -142,28 +154,31 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_DelegateTypeSymbol_D089CE4A341A83F4A68E39B95DB75E7F50ED61DC">DelegateTypeSymbol Constructor</h3>
+        <h3 id="constructor_DelegateTypeSymbol_1BEA8120CCEB325C0D6B5A24593D2E27720AA1FC">DelegateTypeSymbol Constructor</h3>
         <h4>
             cmajor::symbols::DelegateTypeSymbol::DelegateTypeSymbol(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#22">22</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#22">22</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;22</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_delegateTypeSymbol_F5126A256F2711C78BECDACD7B15BC194AE49031">delegateTypeSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_parameters_57C60157A3C2476484DCF9F656CC266219C5C32B">parameters</a><span class="other">(</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;22</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;23</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;23</span>&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_delegateTypeSymbol_F5126A256F2711C78BECDACD7B15BC194AE49031">delegateTypeSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_parameters_57C60157A3C2476484DCF9F656CC266219C5C32B">parameters</a><span class="other">(</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;24</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;24</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;25</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#18">18</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#18">18</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -176,28 +191,28 @@
             * collector) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#103">103</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#104">104</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;104</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;105</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddDelegate</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddDelegate</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;109</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;110</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#27">27</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#27">27</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -222,30 +237,30 @@
             * member) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#58">58</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#59">59</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;59</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;60</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">AddMember</span><span class="other">(</span><span class="identifier">member</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">AddMember</span><span class="other">(</span><span class="identifier">member</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">member</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_parameterSymbol_8A8B5AC965EF0DB162723E5C13D09035A75168FB">parameterSymbol</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">member</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_parameterSymbol_8A8B5AC965EF0DB162723E5C13D09035A75168FB">parameterSymbol</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_parameters_57C60157A3C2476484DCF9F656CC266219C5C32B">parameters</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="./class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html">ParameterSymbol</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">member</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_parameters_57C60157A3C2476484DCF9F656CC266219C5C32B">parameters</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="./class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html">ParameterSymbol</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">member</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;65</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;66</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#22">22</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#22">22</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -267,8 +282,8 @@
              cmajor::symbols::DelegateTypeSymbol::Arity() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#33">33</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#33">33</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_parameters_57C60157A3C2476484DCF9F656CC266219C5C32B">parameters</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -283,21 +298,21 @@
              cmajor::symbols::DelegateTypeSymbol::Check() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#362">362</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#363">363</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;363</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;364</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;364</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;365</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;365</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;366</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;366</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;367</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;367</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"delegate&nbsp;type&nbsp;symbol&nbsp;has&nbsp;no&nbsp;return&nbsp;type"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;368</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="string">"delegate&nbsp;type&nbsp;symbol&nbsp;has&nbsp;no&nbsp;return&nbsp;type"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;368</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;369</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;370</span>&nbsp;<span class="other">}</span></span>
             </span>
@@ -305,8 +320,8 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#43">43</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#43">43</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -319,6 +334,7 @@
         <br/>
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Check_6BA282B657A3D6754158A9D616ECD581E50A6A2E">cmajor::symbols::TypeSymbol::Check</a>
         </span>
         <br/>
@@ -331,8 +347,8 @@
             * cmajor::symbols::DelegateTypeSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#42">42</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#42">42</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"DelegateTypeSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -354,22 +370,22 @@
             * cmajor::symbols::DelegateTypeSymbol::CreateDefaultIrValue(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#145">145</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#146">146</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;146</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;147</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateDefaultIrValueForDelegateType</span><span class="other">(</span><span class="identifier">IrType</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateDefaultIrValueForDelegateType</span><span class="other">(</span><span class="identifier">IrType</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;148</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;149</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#30">30</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#30">30</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -379,9 +395,9 @@
         <br/>
         <br/>
         <span>
-            Called by: <a href="./class_ClassDelegateTypeDefaultConstructor_F7754688B06C08FE1C39588318337CECA7C900EA.html#function_GenerateCall_C407497DB250A511BDBA0958416086ECAD68F033">cmajor::symbols::ClassDelegateTypeDefaultConstructor::GenerateCall</a>
+            Called by: <a href="./class_ClassDelegateTypeDefaultConstructor_F7754688B06C08FE1C39588318337CECA7C900EA.html#function_GenerateCall_2909361D9B0BE0EEFF7A527B89880643D48C75A3">cmajor::symbols::ClassDelegateTypeDefaultConstructor::GenerateCall</a>
             , <a href="./class_ClassDelegateTypeSymbol_128306583C73553FFFA4F5C051CE181C3EC4D435.html#function_CreateDefaultIrValue_0679716E07759C5869B6642EA7FC77B66B177FB2">cmajor::symbols::ClassDelegateTypeSymbol::CreateDefaultIrValue</a>
-            , <a href="./class_DelegateTypeDefaultConstructor_67AC30667126234A4FE4638DE9DF9725247B4B3E.html#function_GenerateCall_A77855D33BD087A4983CEAEC7FA7B4FF9F0F83D7">cmajor::symbols::DelegateTypeDefaultConstructor::GenerateCall</a>
+            , <a href="./class_DelegateTypeDefaultConstructor_67AC30667126234A4FE4638DE9DF9725247B4B3E.html#function_GenerateCall_603C742AD54620A0E659989025331F74F484B225">cmajor::symbols::DelegateTypeDefaultConstructor::GenerateCall</a>
         </span>
         <br/>
         <br/>
@@ -392,26 +408,26 @@
              cmajor::symbols::DelegateTypeSymbol::Dump(CodeFormatter&amp; formatter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#111">111</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#112">112</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;112</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;113</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"full&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullNameWithSpecifiers</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"full&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullNameWithSpecifiers</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"typeid:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"typeid:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;116</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;117</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#28">28</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#28">28</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -437,24 +453,24 @@
              index) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#52">52</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#53">53</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;53</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;54</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;56</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;57</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#21">21</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#21">21</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -464,19 +480,20 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_GenerateCall_6E11A5E4F5156C02B10B72A3318EA77C9F315D12">GenerateCall Member Function</h3>
+        <h3 id="function_GenerateCall_1921CE6F5525A50BF6527A50326AEA61DC8DF253">GenerateCall Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::symbols::DelegateTypeSymbol::GenerateCall(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>
-            Span&amp; span)</h4>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId)</h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#233">233</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#234">234</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#40">40</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#40">40</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -488,7 +505,82 @@
         <br/>
         <br/>
         <span>
-            Called by: <a href="./class_ClassDelegateTypeSymbol_128306583C73553FFFA4F5C051CE181C3EC4D435.html#function_GenerateCall_69853D606C63FF6B9EA1C6216A654F0FF414047D">cmajor::symbols::ClassDelegateTypeSymbol::GenerateCall</a>
+            Called by: <a href="./class_ClassDelegateTypeSymbol_128306583C73553FFFA4F5C051CE181C3EC4D435.html#function_GenerateCall_C3FF1B5D14A7D2A5458F05D98CDA8A95EFF88E3E">cmajor::symbols::ClassDelegateTypeSymbol::GenerateCall</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryDescription_9BEFBDAFF8E1DB03EA069F34C38797A8C2E0E34E">GetSymbolCategoryDescription Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::DelegateTypeSymbol::GetSymbolCategoryDescription() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#45">45</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"delegate"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryDescription_34BE1EAEAA69A7557F968BD6B843A5DC2295736E">cmajor::symbols::Symbol::GetSymbolCategoryDescription</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GetSymbolHelp_7D79AFB84F3BBCE97084B819105DF457AD812864">cmajor::symbols::DelegateTypeSymbol::GetSymbolHelp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryStr_CC85B6640F58965E830E5052DA474903CC00220C">GetSymbolCategoryStr Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::DelegateTypeSymbol::GetSymbolCategoryStr() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#44">44</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"DG"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryStr_DE4CB4E167EA03932F01A5903D1CC2B8A2E473DF">cmajor::symbols::Symbol::GetSymbolCategoryStr</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolHelp_7D79AFB84F3BBCE97084B819105DF457AD812864">GetSymbolHelp Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::DelegateTypeSymbol::GetSymbolHelp() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#372">372</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#46">46</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolHelp_2BB9A1DE713846C4F3CD35BEEC4F2A2A1EE881CB">cmajor::symbols::Symbol::GetSymbolHelp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GetSymbolCategoryDescription_9BEFBDAFF8E1DB03EA069F34C38797A8C2E0E34E">cmajor::symbols::DelegateTypeSymbol::GetSymbolCategoryDescription</a>
+            , <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_ReturnType_0F61C4A422AEB1C8157EE4BCD2A4C30FBE973647">cmajor::symbols::DelegateTypeSymbol::ReturnType</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
+            , <a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#function_GetType_14C05D793AECFE077753292B1354FD70428B9196">cmajor::symbols::VariableSymbol::GetType</a>
         </span>
         <br/>
         <br/>
@@ -498,22 +590,22 @@
             std::u32string cmajor::symbols::DelegateTypeSymbol::Id() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#98">98</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#99">99</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;99</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;100</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;101</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;102</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#25">25</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#25">25</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -534,8 +626,8 @@
             std::u32string cmajor::symbols::DelegateTypeSymbol::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#41">41</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#41">41</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -560,13 +652,13 @@
             * cmajor::symbols::DelegateTypeSymbol::IrType(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#118">118</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#119">119</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#29">29</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#29">29</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -584,7 +676,7 @@
             Called by: <a href="./class_ClassDelegateTypeSymbol_128306583C73553FFFA4F5C051CE181C3EC4D435.html#function_IrType_13BB82806E332247E6BB25125312648E0DA0B0EC">cmajor::symbols::ClassDelegateTypeSymbol::IrType</a>
             , <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_CreateDefaultIrValue_009E33B690F263C8798A96B17ADBB2385C5F32C6">cmajor::symbols::DelegateTypeSymbol::CreateDefaultIrValue</a>
             , <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_IrType_D4CCAD2A6C6EDBFCA9B35B811CDA5DB1E7DA33DF">cmajor::symbols::DelegateTypeSymbol::IrType</a>
-            , <a href="./class_MemberFunctionToClassDelegateConversion_6CA93A3F92B3723079C3A15901A0CBFFB0D119BC.html#function_GenerateCall_B2BBE696B989B2E0CEE8E9EBAED8AA947E058D64">cmajor::symbols::MemberFunctionToClassDelegateConversion::GenerateCall</a>
+            , <a href="./class_MemberFunctionToClassDelegateConversion_6CA93A3F92B3723079C3A15901A0CBFFB0D119BC.html#function_GenerateCall_8C35E146CD0FC5E82C5EFE3268FF38CF6026B273">cmajor::symbols::MemberFunctionToClassDelegateConversion::GenerateCall</a>
         </span>
         <br/>
         <br/>
@@ -595,8 +687,8 @@
              cmajor::symbols::DelegateTypeSymbol::IsDelegateType() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#26">26</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#26">26</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -617,8 +709,8 @@
             *>&amp; cmajor::symbols::DelegateTypeSymbol::Parameters() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#34">34</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#34">34</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_parameters_57C60157A3C2476484DCF9F656CC266219C5C32B">parameters</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -634,13 +726,13 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#39">39</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#40">40</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#20">20</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#20">20</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -668,8 +760,8 @@
             * cmajor::symbols::DelegateTypeSymbol::ReturnType() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#35">35</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#35">35</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -683,8 +775,8 @@
             <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * cmajor::symbols::DelegateTypeSymbol::ReturnType()</h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#36">36</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#36">36</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -693,7 +785,8 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_Syntax_5523B5DB348025D5311DF3613768A277C99149DE">cmajor::symbols::DelegateTypeSymbol::Syntax</a>
+            Called by: <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GetSymbolHelp_7D79AFB84F3BBCE97084B819105DF457AD812864">cmajor::symbols::DelegateTypeSymbol::GetSymbolHelp</a>
+            , <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_Syntax_5523B5DB348025D5311DF3613768A277C99149DE">cmajor::symbols::DelegateTypeSymbol::Syntax</a>
         </span>
         <br/>
         <br/>
@@ -704,22 +797,22 @@
              cmajor::symbols::DelegateTypeSymbol::ReturnsClassInterfaceOrClassDelegateByValue() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#223">223</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#224">224</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;224</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;225</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">-></span><span class="identifier">IsClassTypeSymbol</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;||&nbsp;</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_classDelegateTypeSymbol_EC07DD89649C0E6F64C8C57D0B5F406F70D5B343">classDelegateTypeSymbol</a><span class="other">&nbsp;||&nbsp;</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_interfaceTypeSymbol_52159F86CE270EDFF00F0A1476435C0580678F93">interfaceTypeSymbol</a><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">-></span><span class="identifier">IsClassTypeSymbol</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;||&nbsp;</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_classDelegateTypeSymbol_EC07DD89649C0E6F64C8C57D0B5F406F70D5B343">classDelegateTypeSymbol</a><span class="other">&nbsp;||&nbsp;</span><a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_interfaceTypeSymbol_52159F86CE270EDFF00F0A1476435C0580678F93">interfaceTypeSymbol</a><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;226</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;227</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#38">38</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#38">38</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -730,7 +823,7 @@
         <br/>
         <br/>
         <span>
-            Called by: <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GenerateCall_6E11A5E4F5156C02B10B72A3318EA77C9F315D12">cmajor::symbols::DelegateTypeSymbol::GenerateCall</a>
+            Called by: <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_GenerateCall_1921CE6F5525A50BF6527A50326AEA61DC8DF253">cmajor::symbols::DelegateTypeSymbol::GenerateCall</a>
             , <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_IrType_D4CCAD2A6C6EDBFCA9B35B811CDA5DB1E7DA33DF">cmajor::symbols::DelegateTypeSymbol::IrType</a>
         </span>
         <br/>
@@ -742,22 +835,22 @@
              cmajor::symbols::DelegateTypeSymbol::SetReturnParam(<a href="./class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html">ParameterSymbol</a>
             * returnParam_)</h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#228">228</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#229">229</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;229</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;230</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnParam_7E8B987432FED7EB2D9BAED300D6C81FF6EA5869">returnParam</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">returnParam_</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnParam_7E8B987432FED7EB2D9BAED300D6C81FF6EA5869">returnParam</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">returnParam_</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;231</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;232</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#39">39</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#39">39</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -768,8 +861,8 @@
              cmajor::symbols::DelegateTypeSymbol::SetReturnType(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * returnType_)</h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#37">37</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#37">37</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#variable_returnType_B7AE9B7A8F3DC171C32AF6EC0F0CEF62CAB7EC9B">returnType</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">returnType_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -783,13 +876,13 @@
             <span class="kw">void</span>
              cmajor::symbols::DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)</h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#150">150</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#151">151</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#32">32</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#32">32</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -798,6 +891,7 @@
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsNothrow_B962D2B86095953B70717644027E06A0437C8D26">cmajor::symbols::Symbol::IsNothrow</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetAccess_121F064F7F499D20D45D6E7192296F2A23583BE1">cmajor::symbols::Symbol::SetAccess</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetNothrow_8D503112A0A9A48A67B717431EF83FA24EC2D8A5">cmajor::symbols::Symbol::SetNothrow</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -807,13 +901,13 @@
             std::string cmajor::symbols::DelegateTypeSymbol::Syntax() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#67">67</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#68">68</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#24">24</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#24">24</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -836,8 +930,8 @@
             std::string cmajor::symbols::DelegateTypeSymbol::TypeString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#23">23</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#23">23</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"delegate"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -860,13 +954,13 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#26">26</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#27">27</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#19">19</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#19">19</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>

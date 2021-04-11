@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#13">13</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#13">13</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#constructor_ConstantSymbol_A93555699121C0C4FEB9AE977605EF6276A5E610">ConstantSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#constructor_ConstantSymbol_97A42C6140118E625A20DD8476DED33E7E08A89B">ConstantSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -59,6 +59,18 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Evaluating_354D17BBB4BBB4F57C9CB4A4C46C500992544D76">Evaluating</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_GetSymbolCategoryDescription_8A36D4A387377F10A6179561163C19A158BD9147">GetSymbolCategoryDescription</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_GetSymbolCategoryStr_A092ED7EF41DB7355AF3A15F8CEE7AE4AEC3E1BA">GetSymbolCategoryStr</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_GetSymbolHelp_80C2FEF6254DBD1D4854DE5DC2546287E3481C67">GetSymbolHelp</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*</td>
@@ -158,28 +170,31 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_ConstantSymbol_A93555699121C0C4FEB9AE977605EF6276A5E610">ConstantSymbol Constructor</h3>
+        <h3 id="constructor_ConstantSymbol_97A42C6140118E625A20DD8476DED33E7E08A89B">ConstantSymbol Constructor</h3>
         <h4>
             cmajor::symbols::ConstantSymbol::ConstantSymbol(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#21">21</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#21">21</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_constantSymbol_94534789B353FA6DD07F800C9C7CCFCAAE68AB93">constantSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_evaluating_7094660FB77BB4F0942B36AAD29681171E1445B6">evaluating</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_sizeOfValue_1C02E952C540A6F33401C59CCD7016E63FAE8BE9">sizeOfValue</a><span class="other">(</span><span class="other">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_valuePos_E8649CA4DEF4910B324B4EC5D9224B053679A473">valuePos</a><span class="other">(</span><span class="other">0</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_constantSymbol_94534789B353FA6DD07F800C9C7CCFCAAE68AB93">constantSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_evaluating_7094660FB77BB4F0942B36AAD29681171E1445B6">evaluating</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_sizeOfValue_1C02E952C540A6F33401C59CCD7016E63FAE8BE9">sizeOfValue</a><span class="other">(</span><span class="other">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_valuePos_E8649CA4DEF4910B324B4EC5D9224B053679A473">valuePos</a><span class="other">(</span><span class="other">0</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#16">16</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#16">16</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -192,28 +207,28 @@
             * collector) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#98">98</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#99">99</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddConstant</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddConstant</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#20">20</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#20">20</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -236,13 +251,13 @@
             * cmajor::symbols::ConstantSymbol::ArrayIrObject(Emitter&amp; emitter, <span class="kw">bool</span>
              create)</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#221">221</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#222">222</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#34">34</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#34">34</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -250,6 +265,7 @@
             Calls: <a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#function_IrValue_12BED98117A2A28B0B3E011C9D1BD8DB3925AE36">cmajor::symbols::ArrayValue::IrValue</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_MangledName_6F4B3C08E6832F2EF32DD516A461D594D5C9AC64">cmajor::symbols::Symbol::MangledName</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IrType_CF492E4F6EE5C2476955057615923BBB6B3B1F13">cmajor::symbols::TypeSymbol::IrType</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsArrayType_E014C44D0F7E3B84C24BB37A4A119D8740F82262">cmajor::symbols::TypeSymbol::IsArrayType</a>
         </span>
@@ -262,30 +278,30 @@
              cmajor::symbols::ConstantSymbol::Check() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#271">271</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#272">272</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">272</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"constant&nbsp;symbol&nbsp;has&nbsp;no&nbsp;type"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="string">"constant&nbsp;symbol&nbsp;has&nbsp;no&nbsp;type"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#40">40</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#40">40</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -297,6 +313,7 @@
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Check_2EEB2CB990DAA0E8825B075E9CD48522F6925234">cmajor::symbols::Symbol::Check</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -308,8 +325,8 @@
             * cmajor::symbols::ConstantSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#37">37</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#37">37</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ConstantSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -329,22 +346,22 @@
              cmajor::symbols::ConstantSymbol::ComputeMangledName() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#185">185</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#186">186</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">ComputeMangledName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">ComputeMangledName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#25">25</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#25">25</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -365,30 +382,30 @@
              cmajor::symbols::ConstantSymbol::Dump(CodeFormatter&amp; formatter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#106">106</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#107">107</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"full&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullNameWithSpecifiers</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"full&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullNameWithSpecifiers</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"mangled&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"mangled&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"type:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"type:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"value:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"value:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#21">21</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#21">21</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -415,24 +432,24 @@
              index) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#92">92</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#93">93</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#19">19</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#19">19</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -448,14 +465,102 @@
              cmajor::symbols::ConstantSymbol::Evaluating() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#26">26</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#26">26</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_evaluating_7094660FB77BB4F0942B36AAD29681171E1445B6">evaluating</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryDescription_8A36D4A387377F10A6179561163C19A158BD9147">GetSymbolCategoryDescription Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::ConstantSymbol::GetSymbolCategoryDescription() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#42">42</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"constant"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryDescription_34BE1EAEAA69A7557F968BD6B843A5DC2295736E">cmajor::symbols::Symbol::GetSymbolCategoryDescription</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_GetSymbolHelp_80C2FEF6254DBD1D4854DE5DC2546287E3481C67">cmajor::symbols::ConstantSymbol::GetSymbolHelp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryStr_A092ED7EF41DB7355AF3A15F8CEE7AE4AEC3E1BA">GetSymbolCategoryStr Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::ConstantSymbol::GetSymbolCategoryStr() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#41">41</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"CN"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryStr_DE4CB4E167EA03932F01A5903D1CC2B8A2E473DF">cmajor::symbols::Symbol::GetSymbolCategoryStr</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolHelp_80C2FEF6254DBD1D4854DE5DC2546287E3481C67">GetSymbolHelp Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::ConstantSymbol::GetSymbolHelp() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#281">281</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">help</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"("</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">help</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">GetSymbolCategoryDescription</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">")&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">help</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"&nbsp;"</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">help</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#43">43</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolHelp_2BB9A1DE713846C4F3CD35BEEC4F2A2A1EE881CB">cmajor::symbols::Symbol::GetSymbolHelp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_GetSymbolCategoryDescription_8A36D4A387377F10A6179561163C19A158BD9147">cmajor::symbols::ConstantSymbol::GetSymbolCategoryDescription</a>
+            , <a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_GetType_F4A400E91A0BCB77480CA32E2F517799EEDDECE8">cmajor::symbols::ConstantSymbol::GetType</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_GetType_5004799F645F6B212906B185197D9AF1B4184E36">GetType Member Function</h3>
@@ -465,8 +570,8 @@
             * cmajor::symbols::ConstantSymbol::GetType() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#29">29</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#29">29</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -480,8 +585,8 @@
             <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * cmajor::symbols::ConstantSymbol::GetType()</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#30">30</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#30">30</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -490,7 +595,8 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Syntax_97148CE3B4F60C96BBCCC6F4DF21F9554D16F774">cmajor::symbols::ConstantSymbol::Syntax</a>
+            Called by: <a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_GetSymbolHelp_80C2FEF6254DBD1D4854DE5DC2546287E3481C67">cmajor::symbols::ConstantSymbol::GetSymbolHelp</a>
+            , <a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Syntax_97148CE3B4F60C96BBCCC6F4DF21F9554D16F774">cmajor::symbols::ConstantSymbol::Syntax</a>
         </span>
         <br/>
         <br/>
@@ -500,13 +606,13 @@
             <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             * cmajor::symbols::ConstantSymbol::GetValue()</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#72">72</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#73">73</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#33">33</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#33">33</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -514,6 +620,7 @@
             Calls: <a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Read_973EF09BD270279C749D0174569D0A0059F8A0F4">cmajor::symbols::ConstantSymbol::Read</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_MakeValue_10E8163A213C4E23DCB8A86FB91FD9F7E393693D">cmajor::symbols::TypeSymbol::MakeValue</a>
         </span>
         <br/>
@@ -524,8 +631,8 @@
             std::u32string cmajor::symbols::ConstantSymbol::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#36">36</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#36">36</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -551,13 +658,13 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#51">51</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#52">52</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#18">18</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#18">18</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -569,6 +676,7 @@
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Read_7EF7A4F3D39DBFEEE2CE7A15AB41BC00023EE07C">cmajor::symbols::Symbol::Read</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_GetBinaryReader_09806EC47DD0DB222D693F04AF043F0FEBBC6EB0">cmajor::symbols::SymbolReader::GetBinaryReader</a>
             , <a href="./class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_GetSymbolTable_9F15647C7315A170EE5EC9CB1CF0E291A136240F">cmajor::symbols::SymbolReader::GetSymbolTable</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_EmplaceTypeRequest_87233DE76E2EF6F632B4D8E09A363E1A2AD962D6">cmajor::symbols::SymbolTable::EmplaceTypeRequest</a>
@@ -586,8 +694,8 @@
             <span class="kw">void</span>
              cmajor::symbols::ConstantSymbol::ResetEvaluating()</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#28">28</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#28">28</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_evaluating_7094660FB77BB4F0942B36AAD29681171E1445B6">evaluating</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -601,8 +709,8 @@
             <span class="kw">void</span>
              cmajor::symbols::ConstantSymbol::SetEvaluating()</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#27">27</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#27">27</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_evaluating_7094660FB77BB4F0942B36AAD29681171E1445B6">evaluating</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -616,19 +724,20 @@
             <span class="kw">void</span>
              cmajor::symbols::ConstantSymbol::SetSpecifiers(Specifiers specifiers)</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#115">115</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#116">116</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#24">24</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#24">24</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetAccess_121F064F7F499D20D45D6E7192296F2A23583BE1">cmajor::symbols::Symbol::SetAccess</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -639,8 +748,8 @@
              cmajor::symbols::ConstantSymbol::SetStrValue(<span class="kw">const </span>
             std::u32string&amp; strValue_)</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#38">38</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#38">38</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_strValue_A71257062CFEE10A0874BAB5939BB5CC1E6A7DFB">strValue</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">strValue_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -660,8 +769,8 @@
              cmajor::symbols::ConstantSymbol::SetType(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * typeSymbol)</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#31">31</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#31">31</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -676,22 +785,22 @@
              cmajor::symbols::ConstantSymbol::SetValue(<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             * value_)</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#216">216</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#217">217</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#32">32</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#32">32</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -702,8 +811,8 @@
             std::u32string&amp; cmajor::symbols::ConstantSymbol::StrValue() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#39">39</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#39">39</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_strValue_A71257062CFEE10A0874BAB5939BB5CC1E6A7DFB">strValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -718,13 +827,13 @@
             * cmajor::symbols::ConstantSymbol::StructureIrObject(Emitter&amp; emitter, <span class="kw">bool</span>
              create)</h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#246">246</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#247">247</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#35">35</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#35">35</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -733,6 +842,7 @@
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsClassTypeSymbol_E494E01E2C84FEF70392BD65D94ACA6124099EDA">cmajor::symbols::Symbol::IsClassTypeSymbol</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_MangledName_6F4B3C08E6832F2EF32DD516A461D594D5C9AC64">cmajor::symbols::Symbol::MangledName</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IrType_CF492E4F6EE5C2476955057615923BBB6B3B1F13">cmajor::symbols::TypeSymbol::IrType</a>
         </span>
         <br/>
@@ -743,13 +853,13 @@
             std::string cmajor::symbols::ConstantSymbol::Syntax() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#191">191</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#192">192</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#23">23</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#23">23</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -772,8 +882,8 @@
             std::string cmajor::symbols::ConstantSymbol::TypeString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#22">22</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Definition at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#22">22</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"constant"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -794,13 +904,13 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html#25">25</a>
-             of <a href="file/ConstantSymbol.cpp_543383261D98714121593929BC1E863E03AB91D6.html">ConstantSymbol.cpp</a>
+            Definition at line <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html#26">26</a>
+             of <a href="file/ConstantSymbol.cpp_38F0ABEE15675F5BB107D15C5A0714247CF11D1B.html">ConstantSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html#17">17</a>
-             of <a href="file/ConstantSymbol.hpp_FABDF3652B5A073F2259C644B04FBA9BB900AE57.html">ConstantSymbol.hpp</a>
+            Declaration at line <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html#17">17</a>
+             of <a href="file/ConstantSymbol.hpp_156A665E8A8BE3B93708BC501D16E28606C9B854.html">ConstantSymbol.hpp</a>
         </span>
         <br/>
         <br/>

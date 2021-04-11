@@ -1,0 +1,1072 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmsxi/Context.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmsxi/Instruction.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmsxi/BasicBlock.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmsxi</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#constructor_Context_652CBC2A75FF68F9B77EC768F2CA21403BFCE7F5">Context</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentFunction_B6DF76F47FB2697C262A5FD25EE785A8562EEE85">currentFunction</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_metadata_347DCB5BDB0E70FD1A7C08759790CCDBC749D548">metadata</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentLineNumber_9F4F2D57653C16E9A1FE9AD47D3EDC95738762CF">currentLineNumber</a><span class="other">(</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_AddValue_FA7599EB37008293E847B894CC74357452DD0C6B">AddValue</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_values_7058531BB31EDD14F8580070D4A29EE2CA42DDBE">values</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">></span><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetBoolValue_BD700278F6B3CB37944E0B95EC0090C44027F55F">GetBoolValue</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">boolValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_BoolValue_D833400FD32A0A68EB5CF3F15C0B14F3653B0887.html">BoolValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">boolValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">boolValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetSByteValue_8B28AF6AD7E752B7453E21F67670D34FB0DAA811">GetSByteValue</a><span class="other">(</span><span class="identifier">int8_t</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">sbyteValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_SByteValue_0CE40530780B931EB1DA326D1EC53010E098CCD4.html">SByteValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">sbyteValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sbyteValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetByteValue_99A6A6E38C136B59A0510A1B61A206DC9010FCF3">GetByteValue</a><span class="other">(</span><span class="identifier">uint8_t</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">byteValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ByteValue_65290C422DB37037035C4CD7611852F7AA1EFD4C.html">ByteValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">byteValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">byteValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetShortValue_4876C513B57E367B38F21E084159443E684B02F1">GetShortValue</a><span class="other">(</span><span class="identifier">int16_t</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">shortValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ShortValue_FF9BB36D87A7465A6654CC69FE8D67A81E596675.html">ShortValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">shortValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">shortValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetUShortValue_B1B043EA60387C83BB8BE92BBEED41F2474C2EB8">GetUShortValue</a><span class="other">(</span><span class="identifier">uint16_t</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">ushortValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_UShortValue_0C3EB8F8BC8CA6688A1803D1B1858A8C3DA07A2A.html">UShortValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">ushortValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ushortValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetIntValue_00405D48835D935C90C1321A801AE2C5BFAB249A">GetIntValue</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">intValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_IntValue_CDC6340847451BFE44FD828DCED29C7E75510E78.html">IntValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">intValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">intValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetUIntValue_91D35B194A1B229D6535FC3E48CFA1C7B5043CCE">GetUIntValue</a><span class="other">(</span><span class="identifier">uint32_t</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">uintValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_UIntValue_CF55EB640CAB88D798AB35D9880CDACD952AA96C.html">UIntValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">uintValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">uintValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetLongValue_6317E418B78432CE33DD2EE7E88C270A266255AB">GetLongValue</a><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">longValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html">LongValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">longValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">longValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetULongValue_2D05C32BAC6CE339169ACC83552D8E3918060694">GetULongValue</a><span class="other">(</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">ulongValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ULongValue_C37BD23DF4D13F13466B9B24A1A7691D6D7B3A6C.html">ULongValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">ulongValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ulongValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetFloatValue_1FFCB423C9C5C980ADBFBA35C1CC98105087FF98">GetFloatValue</a><span class="other">(</span><span class="kw">float</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">floatValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_FloatValue_DA0A7851285EC32E60E9000B8F42A76B3239DBAD.html">FloatValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">floatValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">floatValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetDoubleValue_F9A6BA1CA501D9F78593214A4F32399395209F07">GetDoubleValue</a><span class="other">(</span><span class="kw">double</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">doubleValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_DoubleValue_F1C37903C87086A03F09B5C4796DC234DE1C6DEF.html">DoubleValue</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">doubleValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">doubleValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html">ArrayValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetArrayValue_19D4DD61CBA96B2898E35FEDBC5B2D8FB5AAEA0F">GetArrayValue</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">arrayType</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">elements</span><span class="other">,&nbsp;</span><span class="kw">const</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span><span class="identifier">prefix</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html">ArrayValue</a><span class="other">*</span>&nbsp;<span class="identifier">arrayValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html">ArrayValue</a><span class="other">(</span><span class="identifier">arrayType</span><span class="other">,&nbsp;</span><span class="identifier">elements</span><span class="other">,&nbsp;</span><span class="identifier">prefix</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">arrayValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">arrayValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html">StructureValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetStructureValue_D0BE2F54EF1EC1F1200941508C51273B42AD1FE7">GetStructureValue</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">structureType</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">members</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html">StructureValue</a><span class="other">*</span>&nbsp;<span class="identifier">structureValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html">StructureValue</a><span class="other">(</span><span class="identifier">structureType</span><span class="other">,&nbsp;</span><span class="identifier">members</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">structureValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">structureValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html">StringValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetStringValue_56A0E046BA0D81060591E608EC29E7E6F84CFECE">GetStringValue</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">stringType</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html">StringValue</a><span class="other">*</span>&nbsp;<span class="identifier">stringValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html">StringValue</a><span class="other">(</span><span class="identifier">stringType</span><span class="other">,&nbsp;</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">stringValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">stringValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;<a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html">ConversionValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetConversionValue_E1241010A8AA56BDD805BB571D00A441BACBA10F">GetConversionValue</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">type</span><span class="other">,&nbsp;</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">from</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html">ConversionValue</a><span class="other">*</span>&nbsp;<span class="identifier">conversionValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html">ConversionValue</a><span class="other">(</span><span class="identifier">type</span><span class="other">,&nbsp;</span><span class="identifier">from</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">conversionValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">conversionValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;<a href="../class_ClsIdValue_9C62FA55D46519183CA969A5AD43C4BB8AF855F8.html">ClsIdValue</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetClsIdValue_8921ABDDB2C74F9E06A6C8BC1B2F754E36EBB22F">GetClsIdValue</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">typeId</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ClsIdValue_9C62FA55D46519183CA969A5AD43C4BB8AF855F8.html">ClsIdValue</a><span class="other">*</span>&nbsp;<span class="identifier">clsIdValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ClsIdValue_9C62FA55D46519183CA969A5AD43C4BB8AF855F8.html">ClsIdValue</a><span class="other">(</span><span class="identifier">typeId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddValue</span><span class="other">(</span><span class="identifier">clsIdValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clsIdValue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateNot_479361AA1EE6E7B371357AE828B7FDCF9E4DFD12">CreateNot</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_NotInstruction_0C45E55D84C3B52B41F739A9A934C8FA39AD2791.html">NotInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateNeg_79EF9B8105C73F0A5B1AF7308B180A9453E946E3">CreateNeg</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_NegInstruction_CD8138DAC68A35B2449F509B956911B72F03EF5C.html">NegInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateAdd_7F8CDA84532CB725CC3442C710364B770B483411">CreateAdd</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_AddInstruction_B896CB26B54498FD3CD2F6627159707513C3BA9B.html">AddInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateSub_101DAD30F6A534AEF70126F01A66A8C963E3B115">CreateSub</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_SubInstruction_80215F458791800ACC8DB084A5425D9D25BA9C95.html">SubInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateMul_B4F29DD9BCAB11CFD9FECB17190782BF583DACD5">CreateMul</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_MulInstruction_385E64231399E604A0A022C94F432917FAABE8B6.html">MulInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateDiv_E9B5D1EBB4498A18917C8EBE253B4229C554611A">CreateDiv</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_DivInstruction_22E1351DA58FB72F8B12304C98DACAABA09520C7.html">DivInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateMod_C98D376A56E8ECA1A442666DFA0644A3D3136DDE">CreateMod</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ModInstruction_264D2AE4501840CF6733DF09B693A11F7B21DD4A.html">ModInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateAnd_0396D90333C5B03FABFBE45EB9D3B87A08328048">CreateAnd</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_AndInstruction_D34ECB42D844C8ED06F2CC9D57F5F3EB2CFD37A3.html">AndInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateOr_5C5D2A90DE7E7C365A7816B32B3691B875E22134">CreateOr</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_OrInstruction_BB219CFA53B0D93A2C8528B6D0E2C015CC1B5934.html">OrInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateXor_ADB712994DEF0CF61EE924E1FDE2D4942683812B">CreateXor</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_XorInstruction_9B79D9ACAF78F8CBDCA4F8CFCA4818429240DB67.html">XorInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateShl_FE6BDA2F29891A031F95583B9EB8CC995A9444E3">CreateShl</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ShlInstruction_C46F4161C45F56669BAB1C3EFB5A72EDA00C44F4.html">ShlInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateShr_EFA9FEA9C7E8FEA1007C32B7F657FBAD7AD615A6">CreateShr</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ShrInstruction_51B325FFB073708379210810E29E6F04C7E5A2E6.html">ShrInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateEqual_6AB4BC3A53A39ADD7B64E94227EAFDA202DB0453">CreateEqual</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_EqualInstruction_F4CB170B0E92114F895D883DC5C7E8464D15F60E.html">EqualInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateLess_5A4E55B8B1AB4FB977C16FEBAAF863F430951359">CreateLess</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_LessInstruction_E9BBA995B695D426653690D20680B475FECDA696.html">LessInstruction</a><span class="other">(</span><span class="identifier">left</span><span class="other">,&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateSignExtend_B2F5C091FC32627E765E987ECACA21FBAFDF9CBA">CreateSignExtend</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">destType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_SignExtendInstruction_6FD2175E4A13BD9E53D29861F716A0E6A9C935DB.html">SignExtendInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="identifier">destType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateZeroExtend_0BACA953FAC9BCCDCB3CFCDEB33D786BE62AAEEB">CreateZeroExtend</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">destType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ZeroExtendInstruction_7DEF2EC4307FB862162484B59B57236F9B59BD3C.html">ZeroExtendInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="identifier">destType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateTruncate_AEC8AD09D01633D89C53DC6A5B9EAE90C90CE948">CreateTruncate</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">destType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_TruncateInstruction_40D88B28279B6C2C2D50EF565154142D56FCAF8F.html">TruncateInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="identifier">destType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateBitCast_60A0A7ECC47A69131E81710D70BD02AB9D1B9A79">CreateBitCast</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">destType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="270" xml:space="preserve"><span class="lineNumber">270</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="271" xml:space="preserve"><span class="lineNumber">271</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_BitCastInstruction_0DFF6E0A81A1210923AAD95DB99FD7FAF7D470B1.html">BitCastInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="identifier">destType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="272" xml:space="preserve"><span class="lineNumber">272</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="273" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="274" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="275" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="276" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="277" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateIntToFloat_123B5C1B59125D0E77D8D820C4F9E01380CB9A5F">CreateIntToFloat</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">destType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="278" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="279" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_IntToFloatInstruction_15FB89429A8CA130590F02004C1155D65973B11D.html">IntToFloatInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="identifier">destType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="280" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="281" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="282" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="283" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="284" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="285" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateFloatToInt_F99DFD6C9B4ADA7FAEDA9D5B0A2E0DD5C1AAE55E">CreateFloatToInt</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">destType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="286" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="287" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_FloatToIntInstruction_607FC33B0E11A5968B3F5A1A7F082ADFA7EEAA35.html">FloatToIntInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="identifier">destType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="288" xml:space="preserve"><span class="lineNumber">288</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="289" xml:space="preserve"><span class="lineNumber">289</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="290" xml:space="preserve"><span class="lineNumber">290</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="291" xml:space="preserve"><span class="lineNumber">291</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="292" xml:space="preserve"><span class="lineNumber">292</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="293" xml:space="preserve"><span class="lineNumber">293</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateIntToPtr_742E0744F8F55DDEDF7122E4DEBE927678CC4689">CreateIntToPtr</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">destType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="294" xml:space="preserve"><span class="lineNumber">294</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="295" xml:space="preserve"><span class="lineNumber">295</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_IntToPtrInstruction_8EF26A3BD257052B1A7D9FED9B22F1E73E9ACBD6.html">IntToPtrInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="identifier">destType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="296" xml:space="preserve"><span class="lineNumber">296</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="297" xml:space="preserve"><span class="lineNumber">297</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="298" xml:space="preserve"><span class="lineNumber">298</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="299" xml:space="preserve"><span class="lineNumber">299</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="300" xml:space="preserve"><span class="lineNumber">300</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="301" xml:space="preserve"><span class="lineNumber">301</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreatePtrToInt_62F09038837AFE2C4CD469FCE01F1CA09D2A94FF">CreatePtrToInt</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">destType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="302" xml:space="preserve"><span class="lineNumber">302</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="303" xml:space="preserve"><span class="lineNumber">303</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_PtrToIntInstruction_BC96B81C243A09AD179E917B548D59E3FE952719.html">PtrToIntInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="identifier">destType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="304" xml:space="preserve"><span class="lineNumber">304</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="305" xml:space="preserve"><span class="lineNumber">305</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="306" xml:space="preserve"><span class="lineNumber">306</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="307" xml:space="preserve"><span class="lineNumber">307</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="308" xml:space="preserve"><span class="lineNumber">308</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="309" xml:space="preserve"><span class="lineNumber">309</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateParam_9AEA483322E2E27A1BCDD6A23A04DD6D0E5B3C1C">CreateParam</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">type</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="310" xml:space="preserve"><span class="lineNumber">310</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="311" xml:space="preserve"><span class="lineNumber">311</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ParamInstruction_4282832B48B8DA9D0154354509D63C3D92EB42BC.html">ParamInstruction</a><span class="other">(</span><span class="identifier">type</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="312" xml:space="preserve"><span class="lineNumber">312</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="313" xml:space="preserve"><span class="lineNumber">313</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="314" xml:space="preserve"><span class="lineNumber">314</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="315" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="316" xml:space="preserve"><span class="lineNumber">316</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="317" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateLocal_06EC46727CE14E75A24F28F38F0235F245437377">CreateLocal</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">type</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="318" xml:space="preserve"><span class="lineNumber">318</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="319" xml:space="preserve"><span class="lineNumber">319</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_LocalInstruction_5D18BB3698529E817D936094058F8926A87925C5.html">LocalInstruction</a><span class="other">(</span><span class="identifier">type</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="320" xml:space="preserve"><span class="lineNumber">320</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="321" xml:space="preserve"><span class="lineNumber">321</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="322" xml:space="preserve"><span class="lineNumber">322</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="323" xml:space="preserve"><span class="lineNumber">323</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="324" xml:space="preserve"><span class="lineNumber">324</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="325" xml:space="preserve"><span class="lineNumber">325</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateLoad_B2B4CD7BB3A64A898E57BA2F090FD558C16357E8">CreateLoad</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">ptr</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="326" xml:space="preserve"><span class="lineNumber">326</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="327" xml:space="preserve"><span class="lineNumber">327</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_LoadInstruction_92C4FAADE3952CB8C614B351684AB1EEF7781BB0.html">LoadInstruction</a><span class="other">(</span><span class="identifier">ptr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="328" xml:space="preserve"><span class="lineNumber">328</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="329" xml:space="preserve"><span class="lineNumber">329</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="330" xml:space="preserve"><span class="lineNumber">330</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="331" xml:space="preserve"><span class="lineNumber">331</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="332" xml:space="preserve"><span class="lineNumber">332</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="333" xml:space="preserve"><span class="lineNumber">333</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateStore_C21575B6C9B384720D039AEF0EFFA4C72848C93F">CreateStore</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">value</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">ptr</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="334" xml:space="preserve"><span class="lineNumber">334</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="335" xml:space="preserve"><span class="lineNumber">335</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_StoreInstruction_C8901B05E1AB70FF53FF3EA5295EF93CDA7F5BF4.html">StoreInstruction</a><span class="other">(</span><span class="identifier">value</span><span class="other">,&nbsp;</span><span class="identifier">ptr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="336" xml:space="preserve"><span class="lineNumber">336</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="337" xml:space="preserve"><span class="lineNumber">337</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="338" xml:space="preserve"><span class="lineNumber">338</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="339" xml:space="preserve"><span class="lineNumber">339</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="340" xml:space="preserve"><span class="lineNumber">340</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="341" xml:space="preserve"><span class="lineNumber">341</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateArg_945FB5BA3C2A85864F152C3E828F2E4B47DA0DF4">CreateArg</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="342" xml:space="preserve"><span class="lineNumber">342</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="343" xml:space="preserve"><span class="lineNumber">343</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ArgInstruction_8D66ACB96862655F3B1B9EECCF791EFF8DB03611.html">ArgInstruction</a><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="344" xml:space="preserve"><span class="lineNumber">344</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="345" xml:space="preserve"><span class="lineNumber">345</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="346" xml:space="preserve"><span class="lineNumber">346</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="347" xml:space="preserve"><span class="lineNumber">347</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="348" xml:space="preserve"><span class="lineNumber">348</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="349" xml:space="preserve"><span class="lineNumber">349</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateElemAddr_559D36EEE9210DE1095020B43A978F92C8C5E35D">CreateElemAddr</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">ptr</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">index</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="350" xml:space="preserve"><span class="lineNumber">350</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="351" xml:space="preserve"><span class="lineNumber">351</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_ElemAddrInstruction_12C03BAC34905F7F2D1686EB29A8C3F2D283E8D8.html">ElemAddrInstruction</a><span class="other">(</span><span class="identifier">ptr</span><span class="other">,&nbsp;</span><span class="identifier">index</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="352" xml:space="preserve"><span class="lineNumber">352</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="353" xml:space="preserve"><span class="lineNumber">353</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="354" xml:space="preserve"><span class="lineNumber">354</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="355" xml:space="preserve"><span class="lineNumber">355</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="356" xml:space="preserve"><span class="lineNumber">356</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="357" xml:space="preserve"><span class="lineNumber">357</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreatePtrOffset_A3BB8E48B9FFE6098941952D6446633ED361544A">CreatePtrOffset</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">ptr</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">offset</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="358" xml:space="preserve"><span class="lineNumber">358</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="359" xml:space="preserve"><span class="lineNumber">359</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_PtrOffsetInstruction_06F2F62C386F4DB6160B84EB633AF91689EEBACD.html">PtrOffsetInstruction</a><span class="other">(</span><span class="identifier">ptr</span><span class="other">,&nbsp;</span><span class="identifier">offset</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="360" xml:space="preserve"><span class="lineNumber">360</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="361" xml:space="preserve"><span class="lineNumber">361</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="362" xml:space="preserve"><span class="lineNumber">362</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="363" xml:space="preserve"><span class="lineNumber">363</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="364" xml:space="preserve"><span class="lineNumber">364</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="365" xml:space="preserve"><span class="lineNumber">365</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreatePtrDiff_9EB7A5DD5394421F28928BC2DB57A3E5DFC6F966">CreatePtrDiff</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">leftPtr</span><span class="other">,&nbsp;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">rightPtr</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="366" xml:space="preserve"><span class="lineNumber">366</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="367" xml:space="preserve"><span class="lineNumber">367</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_PtrDiffInstruction_01C088D2F10791C957F474E99A41DD30333C150D.html">PtrDiffInstruction</a><span class="other">(</span><span class="identifier">leftPtr</span><span class="other">,&nbsp;</span><span class="identifier">rightPtr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="368" xml:space="preserve"><span class="lineNumber">368</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="369" xml:space="preserve"><span class="lineNumber">369</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="370" xml:space="preserve"><span class="lineNumber">370</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="371" xml:space="preserve"><span class="lineNumber">371</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="372" xml:space="preserve"><span class="lineNumber">372</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="373" xml:space="preserve"><span class="lineNumber">373</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateCall_DEE75F4B8FFA33DAECD6C6AECFA74140E3BA0475">CreateCall</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">function</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="374" xml:space="preserve"><span class="lineNumber">374</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="375" xml:space="preserve"><span class="lineNumber">375</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_CallInstruction_05DFC938BEF33F80DF5A0D72730A2DB3E32255F6.html">CallInstruction</a><span class="other">(</span><span class="identifier">function</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="376" xml:space="preserve"><span class="lineNumber">376</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="377" xml:space="preserve"><span class="lineNumber">377</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="378" xml:space="preserve"><span class="lineNumber">378</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="379" xml:space="preserve"><span class="lineNumber">379</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="380" xml:space="preserve"><span class="lineNumber">380</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="381" xml:space="preserve"><span class="lineNumber">381</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateRet_1A1ED3E4588021A222F451F2AF28B6CD88FA109C">CreateRet</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">value</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="382" xml:space="preserve"><span class="lineNumber">382</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="383" xml:space="preserve"><span class="lineNumber">383</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_RetInstruction_907676D77B1D303008E2E04269D51BBD130E5320.html">RetInstruction</a><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="384" xml:space="preserve"><span class="lineNumber">384</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="385" xml:space="preserve"><span class="lineNumber">385</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="386" xml:space="preserve"><span class="lineNumber">386</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="387" xml:space="preserve"><span class="lineNumber">387</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="388" xml:space="preserve"><span class="lineNumber">388</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="389" xml:space="preserve"><span class="lineNumber">389</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateJump_CA7103E08D6F4A7455844487F08C482FD6CAC1F0">CreateJump</a><span class="other">(</span><a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a><span class="other">*</span>&nbsp;<span class="identifier">dest</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="390" xml:space="preserve"><span class="lineNumber">390</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="391" xml:space="preserve"><span class="lineNumber">391</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_JumpInstruction_D0A54FDDD4BC94FA672FC2FB90139D5EF87ED221.html">JumpInstruction</a><span class="other">(</span><span class="identifier">dest</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="392" xml:space="preserve"><span class="lineNumber">392</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="393" xml:space="preserve"><span class="lineNumber">393</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="394" xml:space="preserve"><span class="lineNumber">394</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="395" xml:space="preserve"><span class="lineNumber">395</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="396" xml:space="preserve"><span class="lineNumber">396</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="397" xml:space="preserve"><span class="lineNumber">397</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateBranch_51C021AB78BACDDE11CE22CF9909CB35EC3D4526">CreateBranch</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">cond</span><span class="other">,&nbsp;</span><a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a><span class="other">*</span>&nbsp;<span class="identifier">trueDest</span><span class="other">,&nbsp;</span><a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a><span class="other">*</span>&nbsp;<span class="identifier">falseDest</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="398" xml:space="preserve"><span class="lineNumber">398</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="399" xml:space="preserve"><span class="lineNumber">399</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_BranchInstruction_C1DBE5056C86FDF5C9771681638477E6D4E7FBAF.html">BranchInstruction</a><span class="other">(</span><span class="identifier">cond</span><span class="other">,&nbsp;</span><span class="identifier">trueDest</span><span class="other">,&nbsp;</span><span class="identifier">falseDest</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="400" xml:space="preserve"><span class="lineNumber">400</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="401" xml:space="preserve"><span class="lineNumber">401</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="402" xml:space="preserve"><span class="lineNumber">402</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="403" xml:space="preserve"><span class="lineNumber">403</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="404" xml:space="preserve"><span class="lineNumber">404</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="405" xml:space="preserve"><span class="lineNumber">405</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateSwitch_A1E8680345E2E78AEE4B270AA2BC7F893E66B279">CreateSwitch</a><span class="other">(</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">cond</span><span class="other">,&nbsp;</span><a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a><span class="other">*</span>&nbsp;<span class="identifier">defaultDest</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="406" xml:space="preserve"><span class="lineNumber">406</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="407" xml:space="preserve"><span class="lineNumber">407</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_SwitchInstruction_27C982C8E1C1C0C0C83DEED9837D03868AD69521.html">SwitchInstruction</a><span class="other">(</span><span class="identifier">cond</span><span class="other">,&nbsp;</span><span class="identifier">defaultDest</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="408" xml:space="preserve"><span class="lineNumber">408</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="409" xml:space="preserve"><span class="lineNumber">409</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="410" xml:space="preserve"><span class="lineNumber">410</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="411" xml:space="preserve"><span class="lineNumber">411</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="412" xml:space="preserve"><span class="lineNumber">412</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="413" xml:space="preserve"><span class="lineNumber">413</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateTrap_640C4961887FD0E54B90AE577E81A136E8062F39">CreateTrap</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">args</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="414" xml:space="preserve"><span class="lineNumber">414</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="415" xml:space="preserve"><span class="lineNumber">415</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">b0</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="416" xml:space="preserve"><span class="lineNumber">416</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">b1</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="417" xml:space="preserve"><span class="lineNumber">417</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">b2</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="418" xml:space="preserve"><span class="lineNumber">418</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">args</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="419" xml:space="preserve"><span class="lineNumber">419</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="420" xml:space="preserve"><span class="lineNumber">420</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="421" xml:space="preserve"><span class="lineNumber">421</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">arg</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">args</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="422" xml:space="preserve"><span class="lineNumber">422</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">i</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="423" xml:space="preserve"><span class="lineNumber">423</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="424" xml:space="preserve"><span class="lineNumber">424</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">b0</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">arg</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="425" xml:space="preserve"><span class="lineNumber">425</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="426" xml:space="preserve"><span class="lineNumber">426</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">i</span><span class="other">&nbsp;==&nbsp;</span><span class="other">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="427" xml:space="preserve"><span class="lineNumber">427</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="428" xml:space="preserve"><span class="lineNumber">428</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">b1</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">arg</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="429" xml:space="preserve"><span class="lineNumber">429</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="430" xml:space="preserve"><span class="lineNumber">430</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">i</span><span class="other">&nbsp;==&nbsp;</span><span class="other">2</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="431" xml:space="preserve"><span class="lineNumber">431</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="432" xml:space="preserve"><span class="lineNumber">432</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">b2</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">arg</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="433" xml:space="preserve"><span class="lineNumber">433</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="434" xml:space="preserve"><span class="lineNumber">434</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="435" xml:space="preserve"><span class="lineNumber">435</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="436" xml:space="preserve"><span class="lineNumber">436</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">CreateArg</span><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="437" xml:space="preserve"><span class="lineNumber">437</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="438" xml:space="preserve"><span class="lineNumber">438</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="439" xml:space="preserve"><span class="lineNumber">439</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_TrapInstruction_3A0E48743A9F441758862E3B3946E735F4C55E96.html">TrapInstruction</a><span class="other">(</span><span class="identifier">b0</span><span class="other">,&nbsp;</span><span class="identifier">b1</span><span class="other">,&nbsp;</span><span class="identifier">b2</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="440" xml:space="preserve"><span class="lineNumber">440</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLineInfo</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="441" xml:space="preserve"><span class="lineNumber">441</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="442" xml:space="preserve"><span class="lineNumber">442</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="443" xml:space="preserve"><span class="lineNumber">443</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="444" xml:space="preserve"><span class="lineNumber">444</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="445" xml:space="preserve"><span class="lineNumber">445</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateNop_C3ED51F8FF1123F71975DCB63600DD5F7E1B59C5">CreateNop</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="446" xml:space="preserve"><span class="lineNumber">446</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="447" xml:space="preserve"><span class="lineNumber">447</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_NoOperationInstruction_1F8F70B464E38FBD7D78AE78D9D58D2D38A9FC36.html">NoOperationInstruction</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="448" xml:space="preserve"><span class="lineNumber">448</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="449" xml:space="preserve"><span class="lineNumber">449</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="450" xml:space="preserve"><span class="lineNumber">450</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="451" xml:space="preserve"><span class="lineNumber">451</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="452" xml:space="preserve"><span class="lineNumber">452</span>&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateSave_37713696911BF6B5787F37C038249DFEE56965F2">CreateSave</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="453" xml:space="preserve"><span class="lineNumber">453</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="454" xml:space="preserve"><span class="lineNumber">454</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_SaveInstruction_6C0969CFECC6DE912D13756776CE818A7A347EBA.html">SaveInstruction</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="455" xml:space="preserve"><span class="lineNumber">455</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentBasicBlock_A7B8E1DD3190DDE39AE3F4616D66DDFDEBFCB3D6">currentBasicBlock</a><span class="other">-></span><span class="identifier">AddInstruction</span><span class="other">(</span><span class="identifier">inst</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="456" xml:space="preserve"><span class="lineNumber">456</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">inst</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="457" xml:space="preserve"><span class="lineNumber">457</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="458" xml:space="preserve"><span class="lineNumber">458</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="459" xml:space="preserve"><span class="lineNumber">459</span>&nbsp;<a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetOrInsertGlobal_9626D090999AC8A4E23321D104038E19D3D35572">GetOrInsertGlobal</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">type</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="460" xml:space="preserve"><span class="lineNumber">460</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="461" xml:space="preserve"><span class="lineNumber">461</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_dataRepository_3E8E35CCE88552D5B96A0D9F15CACF11E8BBBC13">dataRepository</a><span class="other">.</span><span class="identifier">GetOrInsertGlobal</span><span class="other">(</span><span class="identifier">name</span><span class="other">,&nbsp;</span><span class="identifier">type</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="462" xml:space="preserve"><span class="lineNumber">462</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="463" xml:space="preserve"><span class="lineNumber">463</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="464" xml:space="preserve"><span class="lineNumber">464</span>&nbsp;<a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_CreateGlobalStringPtr_211082A4E02EE80F3B08C6AB351EC562A846D0AD">CreateGlobalStringPtr</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">stringValue</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="465" xml:space="preserve"><span class="lineNumber">465</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="466" xml:space="preserve"><span class="lineNumber">466</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_dataRepository_3E8E35CCE88552D5B96A0D9F15CACF11E8BBBC13">dataRepository</a><span class="other">.</span><span class="identifier">CreateGlobalStringPtr</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">stringValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="467" xml:space="preserve"><span class="lineNumber">467</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="468" xml:space="preserve"><span class="lineNumber">468</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="469" xml:space="preserve"><span class="lineNumber">469</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_SetCompileUnitId_8811C8D20434413304BBF32A66937424776448FE">SetCompileUnitId</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">compileUnitId_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="470" xml:space="preserve"><span class="lineNumber">470</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="471" xml:space="preserve"><span class="lineNumber">471</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_dataRepository_3E8E35CCE88552D5B96A0D9F15CACF11E8BBBC13">dataRepository</a><span class="other">.</span><span class="identifier">SetCompileUnitId</span><span class="other">(</span><span class="identifier">compileUnitId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="472" xml:space="preserve"><span class="lineNumber">472</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="473" xml:space="preserve"><span class="lineNumber">473</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="474" xml:space="preserve"><span class="lineNumber">474</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_AddMDStructItem_56BF64FC8C60BA7A9B47EF8E3477AA120BC13F19">AddMDStructItem</a><span class="other">(</span><a href="../class_MDStruct_8EED091A860B3940E2E7CB4657699F015B9E2D64.html">MDStruct</a><span class="other">*</span>&nbsp;<span class="identifier">mdStruct</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fieldName</span><span class="other">,&nbsp;</span><a href="../class_MDItem_84AD4A7CE74DC3168FBADCDE7F559311ACD18525.html">MDItem</a><span class="other">*</span>&nbsp;<span class="identifier">item</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="475" xml:space="preserve"><span class="lineNumber">475</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="476" xml:space="preserve"><span class="lineNumber">476</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mdStruct</span><span class="other">-></span><span class="identifier">AddItem</span><span class="other">(</span><span class="identifier">fieldName</span><span class="other">,&nbsp;</span><span class="identifier">item</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="477" xml:space="preserve"><span class="lineNumber">477</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="478" xml:space="preserve"><span class="lineNumber">478</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="479" xml:space="preserve"><span class="lineNumber">479</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_SetCurrentLineNumber_7808355109CC879381D9BEE6BBB28A1E309D3152">SetCurrentLineNumber</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">lineNumber</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="480" xml:space="preserve"><span class="lineNumber">480</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="481" xml:space="preserve"><span class="lineNumber">481</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">lineNumber</span><span class="other">&nbsp;!=&nbsp;</span><span class="other">-</span><span class="other">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="482" xml:space="preserve"><span class="lineNumber">482</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="483" xml:space="preserve"><span class="lineNumber">483</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentLineNumber_9F4F2D57653C16E9A1FE9AD47D3EDC95738762CF">currentLineNumber</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">lineNumber</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="484" xml:space="preserve"><span class="lineNumber">484</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="485" xml:space="preserve"><span class="lineNumber">485</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="486" xml:space="preserve"><span class="lineNumber">486</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="487" xml:space="preserve"><span class="lineNumber">487</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_AddLineInfo_B07B1E3E825620125D49D31C1F16E9864A0DA757">AddLineInfo</a><span class="other">(</span><a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="488" xml:space="preserve"><span class="lineNumber">488</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="489" xml:space="preserve"><span class="lineNumber">489</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentLineNumber_9F4F2D57653C16E9A1FE9AD47D3EDC95738762CF">currentLineNumber</a><span class="other">&nbsp;!=&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">!</span><span class="identifier">inst</span><span class="other">-></span><span class="identifier">IsNoOperation</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="490" xml:space="preserve"><span class="lineNumber">490</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="491" xml:space="preserve"><span class="lineNumber">491</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_MDStructRef_6ABF2EF4441645DF1A5593AF1714A8305E564F34.html">MDStructRef</a><span class="other">*</span>&nbsp;<span class="identifier">lineNumberInfo</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="492" xml:space="preserve"><span class="lineNumber">492</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_lineNumberInfoMap_25026502397A53C917779F4572CC68DF41216B54">lineNumberInfoMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentLineNumber_9F4F2D57653C16E9A1FE9AD47D3EDC95738762CF">currentLineNumber</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="493" xml:space="preserve"><span class="lineNumber">493</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_lineNumberInfoMap_25026502397A53C917779F4572CC68DF41216B54">lineNumberInfoMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="494" xml:space="preserve"><span class="lineNumber">494</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="495" xml:space="preserve"><span class="lineNumber">495</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">lineNumberInfo</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="496" xml:space="preserve"><span class="lineNumber">496</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="497" xml:space="preserve"><span class="lineNumber">497</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="498" xml:space="preserve"><span class="lineNumber">498</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="499" xml:space="preserve"><span class="lineNumber">499</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_MDStruct_8EED091A860B3940E2E7CB4657699F015B9E2D64.html">MDStruct</a><span class="other">*</span>&nbsp;<span class="identifier">lineNumberStruct</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_metadata_347DCB5BDB0E70FD1A7C08759790CCDBC749D548">metadata</a><span class="other">.</span><span class="identifier">CreateMDStruct</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="500" xml:space="preserve"><span class="lineNumber">500</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">lineNumberStruct</span><span class="other">-></span><span class="identifier">AddItem</span><span class="other">(</span><span class="string">"nodeType"</span><span class="other">,&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_metadata_347DCB5BDB0E70FD1A7C08759790CCDBC749D548">metadata</a><span class="other">.</span><span class="identifier">CreateMDLong</span><span class="other">(</span><a href="../namespace_cmsxi_9FF0912E7694F9E263911E9FA89E89C681FEBDFA.html#variable_lineInfoNodeType_C3B5CDC3E2142A89D9BD7E8F6B6B99555A80C8FD">lineInfoNodeType</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="501" xml:space="preserve"><span class="lineNumber">501</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">lineNumberStruct</span><span class="other">-></span><span class="identifier">AddItem</span><span class="other">(</span><span class="string">"line"</span><span class="other">,&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_metadata_347DCB5BDB0E70FD1A7C08759790CCDBC749D548">metadata</a><span class="other">.</span><span class="identifier">CreateMDLong</span><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentLineNumber_9F4F2D57653C16E9A1FE9AD47D3EDC95738762CF">currentLineNumber</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="502" xml:space="preserve"><span class="lineNumber">502</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">lineNumberInfo</span><span class="other">&nbsp;=&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_metadata_347DCB5BDB0E70FD1A7C08759790CCDBC749D548">metadata</a><span class="other">.</span><span class="identifier">CreateMDStructRef</span><span class="other">(</span><span class="identifier">lineNumberStruct</span><span class="other">-></span><span class="identifier">Id</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="503" xml:space="preserve"><span class="lineNumber">503</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_lineNumberInfoMap_25026502397A53C917779F4572CC68DF41216B54">lineNumberInfoMap</a><span class="other">[</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_currentLineNumber_9F4F2D57653C16E9A1FE9AD47D3EDC95738762CF">currentLineNumber</a><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">lineNumberInfo</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="504" xml:space="preserve"><span class="lineNumber">504</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="505" xml:space="preserve"><span class="lineNumber">505</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">inst</span><span class="other">-></span><span class="identifier">SetMetadataRef</span><span class="other">(</span><span class="identifier">lineNumberInfo</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="506" xml:space="preserve"><span class="lineNumber">506</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="507" xml:space="preserve"><span class="lineNumber">507</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="508" xml:space="preserve"><span class="lineNumber">508</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="509" xml:space="preserve"><span class="lineNumber">509</span>&nbsp;<a href="../class_MDStructRef_6ABF2EF4441645DF1A5593AF1714A8305E564F34.html">MDStructRef</a><span class="other">*</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_GetMDStructRefForSourceFile_AF48EC3668F8C0E5B2FB4EEBF1F765568C6E7D44">GetMDStructRefForSourceFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">sourceFileName</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="510" xml:space="preserve"><span class="lineNumber">510</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="511" xml:space="preserve"><span class="lineNumber">511</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_sourceFileMap_D442CF661C8F51B95BBA7A3477B34E6D95ED2F2A">sourceFileMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">sourceFileName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="512" xml:space="preserve"><span class="lineNumber">512</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_sourceFileMap_D442CF661C8F51B95BBA7A3477B34E6D95ED2F2A">sourceFileMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="513" xml:space="preserve"><span class="lineNumber">513</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="514" xml:space="preserve"><span class="lineNumber">514</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="515" xml:space="preserve"><span class="lineNumber">515</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="516" xml:space="preserve"><span class="lineNumber">516</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="517" xml:space="preserve"><span class="lineNumber">517</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="518" xml:space="preserve"><span class="lineNumber">518</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_MDStruct_8EED091A860B3940E2E7CB4657699F015B9E2D64.html">MDStruct</a><span class="other">*</span>&nbsp;<span class="identifier">sourceFileStruct</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_metadata_347DCB5BDB0E70FD1A7C08759790CCDBC749D548">metadata</a><span class="other">.</span><span class="identifier">CreateMDStruct</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="519" xml:space="preserve"><span class="lineNumber">519</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">sourceFileStruct</span><span class="other">-></span><span class="identifier">AddItem</span><span class="other">(</span><span class="string">"nodeType"</span><span class="other">,&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_metadata_347DCB5BDB0E70FD1A7C08759790CCDBC749D548">metadata</a><span class="other">.</span><span class="identifier">CreateMDLong</span><span class="other">(</span><a href="../namespace_cmsxi_9FF0912E7694F9E263911E9FA89E89C681FEBDFA.html#variable_fileInfoNodeType_7F6970F59A480B56B5A58F30F0041206B9435191">fileInfoNodeType</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="520" xml:space="preserve"><span class="lineNumber">520</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">sourceFileStruct</span><span class="other">-></span><span class="identifier">AddItem</span><span class="other">(</span><span class="string">"sourceFileName"</span><span class="other">,&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_metadata_347DCB5BDB0E70FD1A7C08759790CCDBC749D548">metadata</a><span class="other">.</span><span class="identifier">CreateMDString</span><span class="other">(</span><span class="identifier">sourceFileName</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="521" xml:space="preserve"><span class="lineNumber">521</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_MDStructRef_6ABF2EF4441645DF1A5593AF1714A8305E564F34.html">MDStructRef</a><span class="other">*</span>&nbsp;<span class="identifier">sourceFileNameRef</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_metadata_347DCB5BDB0E70FD1A7C08759790CCDBC749D548">metadata</a><span class="other">.</span><span class="identifier">CreateMDStructRef</span><span class="other">(</span><span class="identifier">sourceFileStruct</span><span class="other">-></span><span class="identifier">Id</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="522" xml:space="preserve"><span class="lineNumber">522</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#variable_sourceFileMap_D442CF661C8F51B95BBA7A3477B34E6D95ED2F2A">sourceFileMap</a><span class="other">[</span><span class="identifier">sourceFileName</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">sourceFileNameRef</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="523" xml:space="preserve"><span class="lineNumber">523</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sourceFileNameRef</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="524" xml:space="preserve"><span class="lineNumber">524</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="525" xml:space="preserve"><span class="lineNumber">525</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="526" xml:space="preserve"><span class="lineNumber">526</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="527" xml:space="preserve"><span class="lineNumber">527</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">::</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html#function_SetMetadataRef_83D334EF438999E9883230B160BB0CE607D8FAC3">SetMetadataRef</a><span class="other">(</span><a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">inst</span><span class="other">,&nbsp;</span><a href="../class_MDStructRef_6ABF2EF4441645DF1A5593AF1714A8305E564F34.html">MDStructRef</a><span class="other">*</span>&nbsp;<span class="identifier">metadataRef</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="528" xml:space="preserve"><span class="lineNumber">528</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="529" xml:space="preserve"><span class="lineNumber">529</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">inst</span><span class="other">-></span><span class="identifier">SetMetadataRef</span><span class="other">(</span><span class="identifier">metadataRef</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="530" xml:space="preserve"><span class="lineNumber">530</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="531" xml:space="preserve"><span class="lineNumber">531</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="532" xml:space="preserve"><span class="lineNumber">532</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmsxi</span></span>
+  <br/>
+ </body>
+</html>

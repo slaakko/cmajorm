@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#132">132</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#136">136</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ArrayTypeCopyConstructor_5D0F119C84F5958468B16224E4D7C719735610A6.html#constructor_ArrayTypeCopyConstructor_9A38DE1783A20786BDA843B99A46A10F4F021C0E">ArrayTypeCopyConstructor</a>(<a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a>* arrayType_, <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>* elementTypeCopyConstructor_, <span class="kw">const </span>Span&amp; span_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ArrayTypeCopyConstructor_5D0F119C84F5958468B16224E4D7C719735610A6.html#constructor_ArrayTypeCopyConstructor_88674D76425A6CE9E7523FDCEF266E005747DCF8">ArrayTypeCopyConstructor</a>(<a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a>* arrayType_, <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>* elementTypeCopyConstructor_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -42,11 +42,15 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayTypeCopyConstructor_5D0F119C84F5958468B16224E4D7C719735610A6.html#function_GenerateCall_24DB6FCC19F151028570163E9EF55B1CC6076326">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayTypeCopyConstructor_5D0F119C84F5958468B16224E4D7C719735610A6.html#function_GenerateCall_955BA770679939E6F2A5D340824752F769E95492">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayTypeCopyConstructor_5D0F119C84F5958468B16224E4D7C719735610A6.html#function_IsBasicTypeOperation_3FD785488C55EB1E52EB69D1622930F9B77610C3">IsBasicTypeOperation</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayTypeCopyConstructor_5D0F119C84F5958468B16224E4D7C719735610A6.html#function_SetTemporariesForElementTypeCopyCtor_9DE5100C0A407B3711040C502953DB1B879AA315">SetTemporariesForElementTypeCopyCtor</a>(std::vector&lt;std::unique_ptr&lt;GenObject>>&amp;&amp; temporaries)</td>
             </tr>
         </table>
         <h2>Member Variables</h2>
@@ -59,23 +63,26 @@
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve">elementTypeCopyConstructor</td>
             </tr>
+            <tr id="variable_temporariesForElementTypeCopyConstructor_FB3FAC18D84D4EC873A320DB7DD4BB21E5D35DD4">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;GenObject>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">temporariesForElementTypeCopyConstructor</td>
+            </tr>
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_ArrayTypeCopyConstructor_9A38DE1783A20786BDA843B99A46A10F4F021C0E">ArrayTypeCopyConstructor Constructor</h3>
+        <h3 id="constructor_ArrayTypeCopyConstructor_88674D76425A6CE9E7523FDCEF266E005747DCF8">ArrayTypeCopyConstructor Constructor</h3>
         <h4>
             cmajor::symbols::ArrayTypeCopyConstructor::ArrayTypeCopyConstructor(<a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a>
             * arrayType_, <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
-            * elementTypeCopyConstructor_, <span class="kw">const </span>
-            Span&amp; span_)</h4>
+            * elementTypeCopyConstructor_)</h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#490">490</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#510">510</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#135">135</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#139">139</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -87,13 +94,13 @@
              cmajor::symbols::ArrayTypeCopyConstructor::Check() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#555">555</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#584">584</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#140">140</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#145">145</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -107,6 +114,7 @@
         <span>
             Calls: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Check_4AF89A439E7139CEB263EA663840E4BB618B1B3E">cmajor::symbols::FunctionSymbol::Check</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -118,11 +126,11 @@
             * cmajor::symbols::ArrayTypeCopyConstructor::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#139">139</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#144">144</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ArrayTypeCopyConstructor"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ArrayTypeCopyConstructor"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -142,26 +150,26 @@
             * currentFunction) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#504">504</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#524">524</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">505</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">525</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">506</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="./class_LocalVariableSymbol_F5A9F74EEFC0001129616C5EEBCFE3B2DFC74FCF.html">LocalVariableSymbol</a><span class="other">*</span><span class="other">></span>&nbsp;<span class="identifier">temporaries</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">526</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="./class_LocalVariableSymbol_F5A9F74EEFC0001129616C5EEBCFE3B2DFC74FCF.html">LocalVariableSymbol</a><span class="other">*</span><span class="other">></span>&nbsp;<span class="identifier">temporaries</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">507</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">temporaries</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">currentFunction</span><span class="other">-></span><span class="identifier">CreateTemporary</span><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">GetTypeByName</span><span class="other">(</span><span class="string">U"long"</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">Span</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">527</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">temporaries</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">currentFunction</span><span class="other">-></span><span class="identifier">CreateTemporary</span><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">GetTypeByName</span><span class="other">(</span><span class="string">U"long"</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">508</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">temporaries</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">528</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">temporaries</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">509</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">529</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#136">136</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#140">140</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -171,35 +179,38 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_CreateTemporary_AD1A7877BBA122E1FCEF55A87386F5A8A1327EF1">cmajor::symbols::FunctionSymbol::CreateTemporary</a>
+            Calls: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_CreateTemporary_557F859D53780F8AAAC592B91C7DE04690853E16">cmajor::symbols::FunctionSymbol::CreateTemporary</a>
             , <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_GetSymbolTable_96EFF75157C1B663A7B64E9E04562FBD0F0AE426">cmajor::symbols::Module::GetSymbolTable</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetModule_F839F8ADED6E5D493AD001DA7010BF226E046AC3">cmajor::symbols::Symbol::GetModule</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetTypeByName_D72879D27A1343FF7933ACCD7526D826F50F36E1">cmajor::symbols::SymbolTable::GetTypeByName</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_GenerateCall_24DB6FCC19F151028570163E9EF55B1CC6076326">GenerateCall Member Function</h3>
+        <h3 id="function_GenerateCall_955BA770679939E6F2A5D340824752F769E95492">GenerateCall Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::symbols::ArrayTypeCopyConstructor::GenerateCall(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>
-            Span&amp; span) <span class="kw">override</span>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#511">511</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#536">536</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#137">137</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#142">142</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Calls: <a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html#function_ElementType_28D483F3DB54FD0A255A6DE0C1E54FA55A076EE4">cmajor::symbols::ArrayTypeSymbol::ElementType</a>
             , <a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html#function_Size_71E749FE72124FCE62571B1D44FFB9FB7D2E0D3D">cmajor::symbols::ArrayTypeSymbol::Size</a>
-            , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_GenerateCall_BA1484A8F28A9836376321BD1FD5CEF278FF1CB2">cmajor::symbols::FunctionSymbol::GenerateCall</a>
+            , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_GenerateCall_AD170E1177BF8FCC25F2C81075801425DBBF20F2">cmajor::symbols::FunctionSymbol::GenerateCall</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsBasicTypeSymbol_195B59240ECED9EBE9CF27A31BC23131E1F538EF">cmajor::symbols::TypeSymbol::IsBasicTypeSymbol</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsPointerType_995223D2DCAD91066E9AE79576ED4BDC1DFF00CB">cmajor::symbols::TypeSymbol::IsPointerType</a>
@@ -213,17 +224,42 @@
              cmajor::symbols::ArrayTypeCopyConstructor::IsBasicTypeOperation() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#138">138</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#143">143</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_IsBasicTypeOperation_370ECFE6425F9F520B8008A31FBA47E39FEBC4BF">cmajor::symbols::FunctionSymbol::IsBasicTypeOperation</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetTemporariesForElementTypeCopyCtor_9DE5100C0A407B3711040C502953DB1B879AA315">SetTemporariesForElementTypeCopyCtor Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ArrayTypeCopyConstructor::SetTemporariesForElementTypeCopyCtor(std::vector&lt;std::unique_ptr&lt;GenObject>>&amp;&amp; temporaries)</h4>
+        <span>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#531">531</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">532</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">533</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ArrayTypeCopyConstructor_5D0F119C84F5958468B16224E4D7C719735610A6.html#variable_temporariesForElementTypeCopyConstructor_FB3FAC18D84D4EC873A320DB7DD4BB21E5D35DD4">temporariesForElementTypeCopyConstructor</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">temporaries</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">534</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#141">141</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>

@@ -1,0 +1,116 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/binder/BoundClass.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/binder/BoundNodeVisitor.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/binder/BoundFunction.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/Exception.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">binder</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html">BoundClass</a><span class="other">::</span><a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#constructor_BoundClass_5D915600A3C33EA712A7011ABAA8C407438EBE33">BoundClass</a><span class="other">(</span><span class="identifier">ClassTypeSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">classTypeSymbol_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html">BoundNode</a><span class="other">(</span><span class="identifier">classTypeSymbol_</span><span class="other">-></span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">classTypeSymbol_</span><span class="other">-></span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="../enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundClass_CDB5A2ADA668D64EB90E74DED2D65306386C64A0">boundClass</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#variable_classTypeSymbol_852CEFD013A45E10A0DCED8575E40D12F061FCBC">classTypeSymbol</a><span class="other">(</span><span class="identifier">classTypeSymbol_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#variable_inlineFunctionContainer_99C8059C48653C2AD66E15D7B794A5429AE343AC">inlineFunctionContainer</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html">BoundClass</a><span class="other">::</span><a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#function_Accept_4706C58BF5D54A051FC8076135E4C66E487BECB5">Accept</a><span class="other">(</span><a href="../class_BoundNodeVisitor_CE5CFDED99644DA4EABDD18A7FDFBE5548A49675.html">BoundNodeVisitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html">BoundClass</a><span class="other">::</span><a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#function_Load_5CABC0C40C21280BA43DB0B1A3E0242C2EBABD78">Load</a><span class="other">(</span><a href="../../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">emitter</span><span class="other">,&nbsp;</span><a href="../../../../ir/html/content/enum_OperationFlags_759E65CBD07EA7837676833D7E212AEDFEBEC62C.html">OperationFlags</a>&nbsp;<span class="identifier">flags</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="string">"cannot&nbsp;load&nbsp;from&nbsp;class"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html">BoundClass</a><span class="other">::</span><a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#function_Store_071A3CFB59E40A9C441BB31E1A5F657A02756778">Store</a><span class="other">(</span><a href="../../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">emitter</span><span class="other">,&nbsp;</span><a href="../../../../ir/html/content/enum_OperationFlags_759E65CBD07EA7837676833D7E212AEDFEBEC62C.html">OperationFlags</a>&nbsp;<span class="identifier">flags</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="string">"cannot&nbsp;store&nbsp;to&nbsp;class"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html">BoundClass</a><span class="other">::</span><a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#function_AddMember_A46627102DDAC7580595AC171C04AF8DC8F0A0F3">AddMember</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html">BoundNode</a><span class="other">></span><span class="other">&amp;&amp;</span><span class="identifier">member</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#variable_members_5DAF80958AE1F328480D3600D763A51F3D5339F1">members</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">member</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html">BoundClass</a><span class="other">::</span><a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#function_ContainsSourceFunctions_611135F97488856A51FA0709618880EC5FE85844">ContainsSourceFunctions</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">member</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#variable_members_5DAF80958AE1F328480D3600D763A51F3D5339F1">members</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">member</span><span class="other">-></span><span class="identifier">GetBoundNodeType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="../enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundFunction_0DBA914AAAF202C18A218A90CA84ADFAE852E34D">boundFunction</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a><span class="other">*</span>&nbsp;<span class="identifier">boundFunction</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">member</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">boundFunction</span><span class="other">-></span><span class="identifier">GetFunctionSymbol</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">HasSource</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::binder</span></span>
+  <br/>
+ </body>
+</html>

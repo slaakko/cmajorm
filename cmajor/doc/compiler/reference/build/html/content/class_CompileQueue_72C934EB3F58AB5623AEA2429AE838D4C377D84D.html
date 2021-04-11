@@ -12,14 +12,14 @@
         <hr/>
         <h1>CompileQueue Class</h1>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#2367">2367</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2562">2562</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#constructor_CompileQueue_878FCDE14E62D263F94D001211B107F777C5A1EE">CompileQueue</a>(<span class="kw">const </span>std::string&amp; name_, <span class="kw">bool</span>&amp; stop_, std::atomic&lt;<span class="kw">bool</span>>&amp; ready_, <span class="kw">int</span> logStreamId_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#constructor_CompileQueue_172C14E2921210229B9ACAA682F8B77AFC0AA725">CompileQueue</a>(std::mutex* mtx_, <span class="kw">const </span>std::string&amp; name_, <span class="kw">bool</span>&amp; stop_, <span class="kw">bool</span>&amp; ready_, <span class="kw">int</span> logStreamId_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -27,6 +27,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#function_Get_0C5D493EA2EB5DA7BDD9DE4BF93911D190AA23A3">Get</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#function_NotifyAll_B5E46F69884CAB2DAB492EAEBA0708CE3BD62484">NotifyAll</a>()</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -44,7 +48,7 @@
                 <td class="functionTableSecondCol" xml:space="preserve">logStreamId</td>
             </tr>
             <tr id="variable_mtx_F92F154D4741B88B666ECE0129E456E21849A614">
-                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex*</td>
                 <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
             </tr>
             <tr id="variable_name_260D06D50AA9403DE072075F7532DDBEF5DB17F7">
@@ -56,7 +60,7 @@
                 <td class="functionTableSecondCol" xml:space="preserve">queue</td>
             </tr>
             <tr id="variable_ready_FE00ADCC3262EC0694EBDED48E0B81F5AE53B014">
-                <td class="functionTableFirstCol" xml:space="preserve">std::atomic&lt;<span class="kw">bool</span>>&amp;</td>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span>&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve">ready</td>
             </tr>
             <tr id="variable_stop_47CB83BF0C0BD9B136263C87A04A48B6A1DDBA61">
@@ -66,30 +70,32 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_CompileQueue_878FCDE14E62D263F94D001211B107F777C5A1EE">CompileQueue Constructor</h3>
+        <h3 id="constructor_CompileQueue_172C14E2921210229B9ACAA682F8B77AFC0AA725">CompileQueue Constructor</h3>
         <h4>
-            cmajor::build::CompileQueue::CompileQueue(<span class="kw">const </span>
+            cmajor::build::CompileQueue::CompileQueue(std::mutex* mtx_, <span class="kw">const </span>
             std::string&amp; name_, <span class="kw">bool</span>
-            &amp; stop_, std::atomic&lt;<span class="kw">bool</span>
-            >&amp; ready_, <span class="kw">int</span>
+            &amp; stop_, <span class="kw">bool</span>
+            &amp; ready_, <span class="kw">int</span>
              logStreamId_)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#2383">2383</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2579">2579</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">2383</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_name_260D06D50AA9403DE072075F7532DDBEF5DB17F7">name</a><span class="other">(</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_stop_47CB83BF0C0BD9B136263C87A04A48B6A1DDBA61">stop</a><span class="other">(</span><span class="identifier">stop_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_ready_FE00ADCC3262EC0694EBDED48E0B81F5AE53B014">ready</a><span class="other">(</span><span class="identifier">ready_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_logStreamId_5A73933BBF17CD5EDEAF3ACC1EA3A883D3B61A97">logStreamId</a><span class="other">(</span><span class="identifier">logStreamId_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2579</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2384</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2580</span>&nbsp;<a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_mtx_F92F154D4741B88B666ECE0129E456E21849A614">mtx</a><span class="other">(</span><span class="identifier">mtx_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_name_260D06D50AA9403DE072075F7532DDBEF5DB17F7">name</a><span class="other">(</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_stop_47CB83BF0C0BD9B136263C87A04A48B6A1DDBA61">stop</a><span class="other">(</span><span class="identifier">stop_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_ready_FE00ADCC3262EC0694EBDED48E0B81F5AE53B014">ready</a><span class="other">(</span><span class="identifier">ready_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_logStreamId_5A73933BBF17CD5EDEAF3ACC1EA3A883D3B61A97">logStreamId</a><span class="other">(</span><span class="identifier">logStreamId_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2385</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2581</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2582</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#2370">2370</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Declaration at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2565">2565</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <br/>
@@ -100,13 +106,38 @@
             <span class="kw">int</span>
              cmajor::build::CompileQueue::Get()</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#2394">2394</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2591">2591</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#2372">2372</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Declaration at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2567">2567</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_NotifyAll_B5E46F69884CAB2DAB492EAEBA0708CE3BD62484">NotifyAll Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::build::CompileQueue::NotifyAll()</h4>
+        <span>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2605">2605</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">2606</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2607</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_cond_C90EE9FC2B8A3DC5DE16CEE9AC08D640039835C4">cond</a><span class="other">.</span><span class="identifier">notify_all</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2608</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2568">2568</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <br/>
@@ -117,26 +148,26 @@
              cmajor::build::CompileQueue::Put(<span class="kw">int</span>
              compileUnitIndex)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#2387">2387</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2584">2584</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">2388</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2585</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2389</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_mtx_F92F154D4741B88B666ECE0129E456E21849A614">mtx</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2586</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><span class="other">*</span><a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_mtx_F92F154D4741B88B666ECE0129E456E21849A614">mtx</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2390</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_queue_D8887A3CB6587532A2C336316526707283F4ADDE">queue</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">compileUnitIndex</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2587</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_queue_D8887A3CB6587532A2C336316526707283F4ADDE">queue</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">compileUnitIndex</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2391</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_cond_C90EE9FC2B8A3DC5DE16CEE9AC08D640039835C4">cond</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2588</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#variable_cond_C90EE9FC2B8A3DC5DE16CEE9AC08D640039835C4">cond</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2392</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2589</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#2371">2371</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Declaration at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2566">2566</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <br/>

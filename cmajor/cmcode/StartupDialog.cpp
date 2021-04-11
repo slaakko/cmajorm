@@ -12,7 +12,7 @@ namespace cmcode {
 StartupDialog::StartupDialog() : Window(WindowCreateParams().WindowClassName("cmcode.StartupDialog").Text("Cmajor Code Startup").
     WindowClassBackgroundColor(DefaultControlWindowClassBackgroundColor()).BackgroundColor(DefaultControlBackgroundColor()).
     SetSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(150), ScreenMetrics::Get().MMToVerticalPixels(60)))),
-    recentSolutions(GetRecentSolutions()), startButton(nullptr), removeButton(nullptr), startWithNoSolutionButton(nullptr), listBox(nullptr), solutionFilePathLabel(nullptr)
+    recentSolutions(GetRecentSolutions()), startButton(nullptr), removeButton(nullptr), startWithoutSolutionButton(nullptr), listBox(nullptr), solutionFilePathLabel(nullptr)
 {
     SetSmallIcon(Application::GetResourceManager().GetIcon("cmcode.small.icon"));
     Size s = GetSize();
@@ -49,13 +49,13 @@ StartupDialog::StartupDialog() : Window(WindowCreateParams().WindowClassName("cm
     removeButton->Click().AddHandler(this, &StartupDialog::RemoveClick);
     AddChild(removeButtonPtr.release());
     Point startWithNoSolutionButtonLocation(borderedListBox->GetSize().Width + 3 * defaultControlSpacing.Width, 16 + 2 * buttonSize.Height + 16);
-    std::unique_ptr<Button> startWithNoSolutionButtonPtr(new Button(ControlCreateParams().Text("Start with no solution").Location(startWithNoSolutionButtonLocation).SetSize(buttonSize).SetAnchors(Anchors::top | Anchors::left)));
-    startWithNoSolutionButton = startWithNoSolutionButtonPtr.get();
-    startWithNoSolutionButton->SetDialogResult(DialogResult::cancel);
+    std::unique_ptr<Button> startWithoutSolutionButtonPtr(new Button(ControlCreateParams().Text("Start without solution").Location(startWithNoSolutionButtonLocation).SetSize(buttonSize).SetAnchors(Anchors::top | Anchors::left)));
+    startWithoutSolutionButton = startWithoutSolutionButtonPtr.get();
+    startWithoutSolutionButton->SetDialogResult(DialogResult::cancel);
     AddChild(startButtonPtr.release());
-    AddChild(startWithNoSolutionButtonPtr.release());
+    AddChild(startWithoutSolutionButtonPtr.release());
     SetDefaultButton(startButton);
-    SetCancelButton(startWithNoSolutionButton);
+    SetCancelButton(startWithoutSolutionButton);
     listBox->SetFocus();
 }
 

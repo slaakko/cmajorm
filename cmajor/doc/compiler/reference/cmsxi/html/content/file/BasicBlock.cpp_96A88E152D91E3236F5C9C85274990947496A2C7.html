@@ -1,0 +1,100 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmsxi/BasicBlock.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/TextUtils.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmsxi</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a><span class="other">::</span><a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html#constructor_BasicBlock_6DA281662F064421D9D2BA46434A7455E01856BF">BasicBlock</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">id_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html#variable_id_0485A6FBF523B7CC527D8D9DCC49DA7D503F00BB">id</a><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a><span class="other">::</span><a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html#function_AddInstruction_DA31D5F958B2838FB9F4248BFA01D6EF3B6B0492">AddInstruction</a><span class="other">(</span><a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">*</span>&nbsp;<span class="identifier">instruction</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html#variable_instructions_D8DBF5FC99E69ECB210260D56E1348C6DFE4BBF8">instructions</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">></span><span class="other">(</span><span class="identifier">instruction</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a><span class="other">::</span><a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html#function_Write_E0C96EA5C364F95DEE773A652F2192D0819C4682">Write</a><span class="other">(</span><span class="identifier">CodeFormatter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">,&nbsp;</span><a href="../class_Function_98A91CF98A94177A3A63B253F29B179264F9D8CE.html">Function</a><span class="other">&amp;</span>&nbsp;<span class="identifier">function</span><span class="other">,&nbsp;</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">indent</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">IndentSize</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">indentDecremented</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">.</span><span class="identifier">CurrentIndent</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">DecIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">indentDecremented</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">Format</span><span class="other">(</span><span class="string">"@"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html#variable_id_0485A6FBF523B7CC527D8D9DCC49DA7D503F00BB">id</a><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">indent</span><span class="other">,&nbsp;</span><span class="identifier">FormatWidth</span><span class="other">::</span><span class="identifier">min</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">first</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">inst</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html#variable_instructions_D8DBF5FC99E69ECB210260D56E1348C6DFE4BBF8">instructions</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">inst</span><span class="other">-></span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">,&nbsp;</span><span class="identifier">function</span><span class="other">,&nbsp;</span><span class="identifier">context</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">first</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">indentDecremented</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">IncIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">first</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmsxi</span></span>
+  <br/>
+ </body>
+</html>

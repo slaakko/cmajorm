@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#16">16</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Definition at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#16">16</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#constructor_ConceptGroupSymbol_003AC9CD53DDA8FDA147C8B80496DED61974C332">ConceptGroupSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#constructor_ConceptGroupSymbol_054A562DFA71BD0DCFEE2AF8BE71D9EB5D61ABAB">ConceptGroupSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -53,6 +53,18 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_GetConcept_2E2EE5C56A4C46CB4BCB2FDFE1175AD392CD8B60">GetConcept</a>(<span class="kw">int</span> arity)</td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_GetSymbolCategoryDescription_773E0B66EEF9FCE13D4173ECC831D6E651C4EBA9">GetSymbolCategoryDescription</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_GetSymbolCategoryStr_615785CA6C0CB258F43EE45A8EB6D241BF8294D6">GetSymbolCategoryStr</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_GetSymbolHelp_836FE7AF7C4D57D0CEF4F0D8BDAA3EC7029FA51C">GetSymbolHelp</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_HasProjectMembers_824C8074EFDB6737027A9FBB8B17E6367D6082C6">HasProjectMembers</a>() <span class="kw">const override</span></td>
             </tr>
@@ -62,7 +74,15 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_IsEmpty_334DBAC1D7E4A1F199443A9253F86C4FE83B9CA6">IsEmpty</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_IsExportSymbol_4003F5F64782CA78C5AE55487AA92B93464D5A58">IsExportSymbol</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_RemoveConcept_9193BC04CF6BD683B276C2161BF87A3EC937B3A0">RemoveConcept</a>(<a href="./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html">ConceptSymbol</a>* conceptSymbol)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
@@ -78,28 +98,29 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_ConceptGroupSymbol_003AC9CD53DDA8FDA147C8B80496DED61974C332">ConceptGroupSymbol Constructor</h3>
+        <h3 id="constructor_ConceptGroupSymbol_054A562DFA71BD0DCFEE2AF8BE71D9EB5D61ABAB">ConceptGroupSymbol Constructor</h3>
         <h4>
             cmajor::symbols::ConceptGroupSymbol::ConceptGroupSymbol(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html#21">21</a>
-             of <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html">ConceptSymbol.cpp</a>
+            Definition at line <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html#22">22</a>
+             of <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html">ConceptSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_conceptGroupSymbol_EFB827E3642013426FC07E2C52C5B7ADD14E4E90">conceptGroupSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_conceptGroupSymbol_EFB827E3642013426FC07E2C52C5B7ADD14E4E90">conceptGroupSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#19">19</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Declaration at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#19">19</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -111,45 +132,24 @@
              cmajor::symbols::ConceptGroupSymbol::AddConcept(<a href="./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html">ConceptSymbol</a>
             * conceptSymbol)</h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html#25">25</a>
-             of <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html">ConceptSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">conceptSymbol</span><span class="other">-></span><span class="identifier">GroupName</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"wrong&nbsp;concept&nbsp;group"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">arity</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">conceptSymbol</span><span class="other">-></span><span class="identifier">Arity</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#variable_arityConceptMap_DB0BC0D05E0B0DAA83EE9BFE1D6A3C1492724DBD">arityConceptMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">arity</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="./class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#variable_arityConceptMap_DB0BC0D05E0B0DAA83EE9BFE1D6A3C1492724DBD">arityConceptMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"concept&nbsp;group&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;already&nbsp;has&nbsp;concept&nbsp;with&nbsp;arity&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">arity</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#variable_arityConceptMap_DB0BC0D05E0B0DAA83EE9BFE1D6A3C1492724DBD">arityConceptMap</a><span class="other">[</span><span class="identifier">arity</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">conceptSymbol</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html#26">26</a>
+             of <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html">ConceptSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#23">23</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Declaration at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#23">23</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Calls: <a href="./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html#function_Arity_0E0F6995ED916370270467CF090866646E688B90">cmajor::symbols::ConceptSymbol::Arity</a>
             , <a href="./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html#function_GroupName_547A8EAAF0D9812E75D1558CD78C3AAA651CC97E">cmajor::symbols::ConceptSymbol::GroupName</a>
+            , <a href="./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html#function_SetConceptGroup_D1D1CE70CC1D0FD77501749F65F1C94AB4E14F13">cmajor::symbols::ConceptSymbol::SetConceptGroup</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -168,13 +168,13 @@
             &amp; typeMap) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html#63">63</a>
-             of <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html">ConceptSymbol.cpp</a>
+            Definition at line <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html#76">76</a>
+             of <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html">ConceptSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#26">26</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Declaration at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#28">28</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -197,36 +197,36 @@
              cmajor::symbols::ConceptGroupSymbol::Check() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html#76">76</a>
-             of <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html">ConceptSymbol.cpp</a>
+            Definition at line <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html#89">89</a>
+             of <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html">ConceptSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#variable_arityConceptMap_DB0BC0D05E0B0DAA83EE9BFE1D6A3C1492724DBD">arityConceptMap</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#variable_arityConceptMap_DB0BC0D05E0B0DAA83EE9BFE1D6A3C1492724DBD">arityConceptMap</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"concept&nbsp;group&nbsp;symbol&nbsp;has&nbsp;no&nbsp;concept&nbsp;symbol"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="string">"concept&nbsp;group&nbsp;symbol&nbsp;has&nbsp;no&nbsp;concept&nbsp;symbol"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#29">29</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Declaration at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#31">31</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -238,6 +238,7 @@
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Check_2EEB2CB990DAA0E8825B075E9CD48522F6925234">cmajor::symbols::Symbol::Check</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -249,11 +250,11 @@
             * cmajor::symbols::ConceptGroupSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#28">28</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Definition at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#30">30</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ConceptGroupSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ConceptGroupSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -270,8 +271,8 @@
              cmajor::symbols::ConceptGroupSymbol::DeclaredAccess() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#22">22</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Definition at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#22">22</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -291,19 +292,93 @@
             * cmajor::symbols::ConceptGroupSymbol::GetConcept(<span class="kw">int</span>
              arity)</h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html#37">37</a>
-             of <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html">ConceptSymbol.cpp</a>
+            Definition at line <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html#50">50</a>
+             of <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html">ConceptSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#24">24</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Declaration at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#26">26</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryDescription_773E0B66EEF9FCE13D4173ECC831D6E651C4EBA9">GetSymbolCategoryDescription Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::ConceptGroupSymbol::GetSymbolCategoryDescription() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#33">33</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"concept"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryDescription_34BE1EAEAA69A7557F968BD6B843A5DC2295736E">cmajor::symbols::Symbol::GetSymbolCategoryDescription</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_GetSymbolHelp_836FE7AF7C4D57D0CEF4F0D8BDAA3EC7029FA51C">cmajor::symbols::ConceptGroupSymbol::GetSymbolHelp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryStr_615785CA6C0CB258F43EE45A8EB6D241BF8294D6">GetSymbolCategoryStr Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::ConceptGroupSymbol::GetSymbolCategoryStr() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#32">32</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"CO"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryStr_DE4CB4E167EA03932F01A5903D1CC2B8A2E473DF">cmajor::symbols::Symbol::GetSymbolCategoryStr</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolHelp_836FE7AF7C4D57D0CEF4F0D8BDAA3EC7029FA51C">GetSymbolHelp Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::ConceptGroupSymbol::GetSymbolHelp() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html#101">101</a>
+             of <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html">ConceptSymbol.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#34">34</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolHelp_2BB9A1DE713846C4F3CD35BEEC4F2A2A1EE881CB">cmajor::symbols::Symbol::GetSymbolHelp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#function_GetSymbolCategoryDescription_773E0B66EEF9FCE13D4173ECC831D6E651C4EBA9">cmajor::symbols::ConceptGroupSymbol::GetSymbolCategoryDescription</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolHelp_2BB9A1DE713846C4F3CD35BEEC4F2A2A1EE881CB">cmajor::symbols::Symbol::GetSymbolHelp</a>
         </span>
         <br/>
         <br/>
@@ -314,13 +389,13 @@
              cmajor::symbols::ConceptGroupSymbol::HasProjectMembers() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html#50">50</a>
-             of <a href="file/ConceptSymbol.cpp_8F613F4601B377C59D82B5E46D12F92489C71374.html">ConceptSymbol.cpp</a>
+            Definition at line <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html#63">63</a>
+             of <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html">ConceptSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#25">25</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Declaration at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#27">27</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -340,11 +415,11 @@
             std::u32string cmajor::symbols::ConceptGroupSymbol::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#27">27</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Definition at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#29">29</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -360,14 +435,45 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_IsEmpty_334DBAC1D7E4A1F199443A9253F86C4FE83B9CA6">IsEmpty Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::symbols::ConceptGroupSymbol::IsEmpty() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html#45">45</a>
+             of <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html">ConceptSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#variable_arityConceptMap_DB0BC0D05E0B0DAA83EE9BFE1D6A3C1492724DBD">arityConceptMap</a><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#25">25</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html#function_RemoveFromParent_C3C9DC52487769EC2C52570B638E216EEC88B115">cmajor::symbols::ConceptSymbol::RemoveFromParent</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_IsExportSymbol_4003F5F64782CA78C5AE55487AA92B93464D5A58">IsExportSymbol Member Function</h3>
         <h4>
             <span class="kw">bool</span>
              cmajor::symbols::ConceptGroupSymbol::IsExportSymbol() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#21">21</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Definition at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#21">21</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -381,13 +487,51 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_RemoveConcept_9193BC04CF6BD683B276C2161BF87A3EC937B3A0">RemoveConcept Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ConceptGroupSymbol::RemoveConcept(<a href="./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html">ConceptSymbol</a>
+            * conceptSymbol)</h4>
+        <span>
+            Definition at line <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html#39">39</a>
+             of <a href="file/ConceptSymbol.cpp_5343B48B24AA14DCC6DC084EF2A6E340ED302C9F.html">ConceptSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">arity</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">conceptSymbol</span><span class="other">-></span><span class="identifier">Arity</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ConceptGroupSymbol_4F31355C6A0CED9D324FA100B698ECC4A926CE90.html#variable_arityConceptMap_DB0BC0D05E0B0DAA83EE9BFE1D6A3C1492724DBD">arityConceptMap</a><span class="other">.</span><span class="identifier">erase</span><span class="other">(</span><span class="identifier">arity</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#24">24</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html#function_Arity_0E0F6995ED916370270467CF090866646E688B90">cmajor::symbols::ConceptSymbol::Arity</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html#function_RemoveFromParent_C3C9DC52487769EC2C52570B638E216EEC88B115">cmajor::symbols::ConceptSymbol::RemoveFromParent</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_TypeString_841F2895576A9B07DA28DA946DF5DD74F48FE6E4">TypeString Member Function</h3>
         <h4>
             std::string cmajor::symbols::ConceptGroupSymbol::TypeString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html#20">20</a>
-             of <a href="file/ConceptSymbol.hpp_420927F50131F7C5E8E836CA643B9E832C5E0745.html">ConceptSymbol.hpp</a>
+            Definition at line <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html#20">20</a>
+             of <a href="file/ConceptSymbol.hpp_707001E3509C3EEC7E6414E2A739DBAF53600F2B.html">ConceptSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"concept_group"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>

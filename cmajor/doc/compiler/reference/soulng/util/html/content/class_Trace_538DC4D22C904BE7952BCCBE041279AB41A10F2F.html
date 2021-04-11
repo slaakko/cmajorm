@@ -1,0 +1,184 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Trace Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html">prev</a>
+         | <a href="struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html">next</a>
+        <hr/>
+        <h1>Trace Class</h1>
+        <span>
+            Definition at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#216">216</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#function_AddEntry_97695B7FFDB8104AF5704FA8C9AAF885F370B815">AddEntry</a>(<span class="kw">const </span><a href="./struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html">TraceEntry</a>&amp; entry)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#function_Done_498926900FD168330143CF5486DA71240FB0D95B">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#function_Init_0C4C8732A5597E6702D8CB668974D2A1972FEE39">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html">Trace</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#function_Instance_731D100516EAD5FA762E9F8543816B7B76FD7B57">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#function_Write_FD564B66923B0AB2E2BABED6BA55C3E987868391">Write</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_entries_272F860AD4B0F7EC70BC26595D237A5F9BCF848C">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;<a href="./struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html">TraceEntry</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">entries</td>
+            </tr>
+            <tr id="variable_instance_6FD1FA38434D66A1FD40C6F1A2FD21F067015FF7">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html">Trace</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_mtx_9770B2F76AF72024B3E3539042F50BC6B0941661">
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddEntry_97695B7FFDB8104AF5704FA8C9AAF885F370B815">AddEntry Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::Trace::AddEntry(<span class="kw">const </span>
+            <a href="./struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html">TraceEntry</a>
+            &amp; entry)</h4>
+        <span>
+            Definition at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#242">242</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="./class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#variable_mtx_9770B2F76AF72024B3E3539042F50BC6B0941661">mtx</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#variable_entries_272F860AD4B0F7EC70BC26595D237A5F9BCF848C">entries</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">entry</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#222">222</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Done_498926900FD168330143CF5486DA71240FB0D95B">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::Trace::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#237">237</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#variable_instance_6FD1FA38434D66A1FD40C6F1A2FD21F067015FF7">instance</a><span class="other">.</span><a href="./namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#220">220</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_0C4C8732A5597E6702D8CB668974D2A1972FEE39">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::Trace::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#232">232</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#variable_instance_6FD1FA38434D66A1FD40C6F1A2FD21F067015FF7">instance</a><span class="other">.</span><a href="./namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html">Trace</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#219">219</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_731D100516EAD5FA762E9F8543816B7B76FD7B57">Instance Member Function</h3>
+        <h4>
+            <a href="./class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html">Trace</a>
+            &amp; soulng::util::Trace::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#221">221</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="./class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html#variable_instance_6FD1FA38434D66A1FD40C6F1A2FD21F067015FF7">instance</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_FD564B66923B0AB2E2BABED6BA55C3E987868391">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::Trace::Write()</h4>
+        <span>
+            Definition at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#248">248</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html#223">223</a>
+             of <a href="file/Trace.cpp_2407921370B5E7CFD0DE4231D287EB70812D65A7.html">Trace.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_E96BAC0CD88C5070475A962EAF127C97CC88B97D">soulng::util::BinaryWriter::Write</a>
+            , <a href="./class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_49E900F8FCBEE026FB051B768287EF8640B06FED">soulng::util::BinaryWriter::Write</a>
+            , <a href="./class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_CD46C207F55CB3B98D0B446C1CF03E0F9A87D8E0">soulng::util::BinaryWriter::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html">prev</a>
+         | <a href="struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html">next</a>
+    </body>
+</html>

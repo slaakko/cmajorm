@@ -1,0 +1,90 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SOULNG_UTIL_SYSTEM_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SOULNG_UTIL_SYSTEM_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/UtilApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;vector></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;map></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdexcept></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ProcessFailure_5FF25A0149D846D562E8727928A3743AA159D038.html">ProcessFailure</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">runtime_error</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ProcessFailure_5FF25A0149D846D562E8727928A3743AA159D038.html#constructor_ProcessFailure_4C15D8729001F8C06788798B1C640A664815CF31">ProcessFailure</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">errorMessage_</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">exitCode_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<a href="../class_ProcessFailure_5FF25A0149D846D562E8727928A3743AA159D038.html#function_ExitCode_BDBC52B3A33760C03E52BD04CD05024CD653A72D">ExitCode</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_ProcessFailure_5FF25A0149D846D562E8727928A3743AA159D038.html#variable_exitCode_ED224131246AAB1209D4F3BF6FDF2B0361B0F647">exitCode</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<a href="../class_ProcessFailure_5FF25A0149D846D562E8727928A3743AA159D038.html#variable_exitCode_ED224131246AAB1209D4F3BF6FDF2B0361B0F647">exitCode</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_DisableConsoleWindow_CA2A7595D4121934F481EF42D394AC2C48424E14">DisableConsoleWindow</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_System_8559577F0FD00F039563FBE0F9B0E030D9DE225A">System</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">command</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_System_781B59C23B38BCBF2A2B8FA12FF6CE8CADE4F7FD">System</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">command</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">ignoreReturnValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_System_B2F053B821CF6FE166D66EB60366C13EA251EDDC">System</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">command</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">redirectFd</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">toFile</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_System_C17966D8A5F016F0795650250FF67692441EBDB3">System</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">command</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">redirectFd</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">toFile</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">ignoreReturnValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_System_854C659CEAEF31B066A8717DB115F992B2CBFE39">System</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">command</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">pair</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span><span class="other">></span><span class="other">&amp;</span><span class="identifier">redirections</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="kw">unsigned</span>&nbsp;<span class="kw">long</span>&nbsp;<span class="kw">long</span>&nbsp;<span class="identifier">Spawn</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filename</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">Wait</span><span class="other">(</span><span class="kw">unsigned</span>&nbsp;<span class="kw">long</span>&nbsp;<span class="kw">long</span>&nbsp;<span class="identifier">processHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_ReadFromPipe_58F03B2759C06F64FCF6A256CB1062910B051621">ReadFromPipe</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">pipeHandle</span><span class="other">,&nbsp;</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">buffer</span><span class="other">,&nbsp;</span><span class="kw">unsigned</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">count</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_WriteToPipe_59407C4AF9F4DA13AA1A97C50FE2F3DE18ECE954">WriteToPipe</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">pipeHandle</span><span class="other">,&nbsp;</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">buffer</span><span class="other">,&nbsp;</span><span class="kw">unsigned</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">count</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_RedirectStdHandlesToPipes_392E71433D67D2679BFC6C524A540C52B9851E9B">RedirectStdHandlesToPipes</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">oldHandles</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">pipeHandles</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_RestoreStdHandles_1198F3F70DA7F2F8D8C3BF1316292370CDA036FC">RestoreStdHandles</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">oldHandles</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_GetPathToExecutable_8726124A4314FA1369262864B9CB95086BEEA44E">GetPathToExecutable</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SOULNG_UTIL_SYSTEM_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

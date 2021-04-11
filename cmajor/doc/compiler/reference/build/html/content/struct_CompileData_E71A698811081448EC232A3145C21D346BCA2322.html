@@ -12,14 +12,14 @@
         <hr/>
         <h1>CompileData Struct</h1>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#2414">2414</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2610">2610</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="struct_CompileData_E71A698811081448EC232A3145C21D346BCA2322.html#constructor_CompileData_3FC4AB170B1CB44887F426ECEFAA950BE1FAF4C2">CompileData</a>(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* rootModule_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../binder/html/content/class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>>>&amp; boundCompileUnits_, std::vector&lt;std::string>&amp; objectFilePaths_, <span class="kw">bool</span>&amp; stop_, std::atomic&lt;<span class="kw">bool</span>>&amp; ready_, <span class="kw">int</span> numThreads_, <a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html">CompileQueue</a>&amp; input_, <a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html">CompileQueue</a>&amp; output_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="struct_CompileData_E71A698811081448EC232A3145C21D346BCA2322.html#constructor_CompileData_123686173E73EB131B92CB6AD9B6C3A56F6D7B4D">CompileData</a>(std::mutex* mtx_, <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* rootModule_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../binder/html/content/class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>>>&amp; boundCompileUnits_, std::vector&lt;std::string>&amp; objectFilePaths_, <span class="kw">bool</span>&amp; stop_, <span class="kw">bool</span>&amp; ready_, <span class="kw">int</span> numThreads_, <a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html">CompileQueue</a>&amp; input_, <a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html">CompileQueue</a>&amp; output_)</td>
             </tr>
         </table>
         <h2>Member Variables</h2>
@@ -37,7 +37,7 @@
                 <td class="functionTableSecondCol" xml:space="preserve">input</td>
             </tr>
             <tr id="variable_mtx_CE61A124972AF59B53A72F7F9F4CB0D689C3B353">
-                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex*</td>
                 <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
             </tr>
             <tr id="variable_numThreads_9F83D21DC6F511E4FD7389993F57AB8E96557DED">
@@ -53,7 +53,7 @@
                 <td class="functionTableSecondCol" xml:space="preserve">output</td>
             </tr>
             <tr id="variable_ready_5FE6DE79BFBF638262AB41C7BD8A06D496B13F7B">
-                <td class="functionTableFirstCol" xml:space="preserve">std::atomic&lt;<span class="kw">bool</span>>&amp;</td>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span>&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve">ready</td>
             </tr>
             <tr id="variable_rootModule_721BD3E7F8FA53E862FD6CE56DB991058EF3967C">
@@ -71,19 +71,19 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_CompileData_3FC4AB170B1CB44887F426ECEFAA950BE1FAF4C2">CompileData Constructor</h3>
+        <h3 id="constructor_CompileData_123686173E73EB131B92CB6AD9B6C3A56F6D7B4D">CompileData Constructor</h3>
         <h4>
-            cmajor::build::CompileData::CompileData(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            cmajor::build::CompileData::CompileData(std::mutex* mtx_, <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             * rootModule_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../binder/html/content/class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>
             >>&amp; boundCompileUnits_, std::vector&lt;std::string>&amp; objectFilePaths_, <span class="kw">bool</span>
-            &amp; stop_, std::atomic&lt;<span class="kw">bool</span>
-            >&amp; ready_, <span class="kw">int</span>
+            &amp; stop_, <span class="kw">bool</span>
+            &amp; ready_, <span class="kw">int</span>
              numThreads_, <a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html">CompileQueue</a>
             &amp; input_, <a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html">CompileQueue</a>
             &amp; output_)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#2416">2416</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#2612">2612</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <br/>

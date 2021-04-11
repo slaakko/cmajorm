@@ -16,8 +16,8 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#695">695</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Definition at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#695">695</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
@@ -26,7 +26,7 @@
                 <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BasicTypeMoveCtor_238784583C9AA743DC72C1383D8312F01001226C.html#constructor_BasicTypeMoveCtor_9160F0ADCCEBEF44F78076734F66784CE5285713">BasicTypeMoveCtor</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* type)</td>
             </tr>
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BasicTypeMoveCtor_238784583C9AA743DC72C1383D8312F01001226C.html#constructor_BasicTypeMoveCtor_91EF3499D582E95E062FB3D6AD3606633D265FAE">BasicTypeMoveCtor</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BasicTypeMoveCtor_238784583C9AA743DC72C1383D8312F01001226C.html#constructor_BasicTypeMoveCtor_48CE3E17C2C1621EE394E6EA6B02044D35A1FE8A">BasicTypeMoveCtor</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -37,7 +37,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BasicTypeMoveCtor_238784583C9AA743DC72C1383D8312F01001226C.html#function_ConstructValue_DBA04B3D90796EDBC0FE0EA9069A54CCC04A1641">ConstructValue</a>(<span class="kw">const </span>std::vector&lt;std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>>>&amp; argumentValues, <span class="kw">const </span>Span&amp; span, <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>* receiver) <span class="kw">const override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BasicTypeMoveCtor_238784583C9AA743DC72C1383D8312F01001226C.html#function_ConstructValue_AC28CCAC953BCED0473447AD842AAD5D161ADCCA">ConstructValue</a>(<span class="kw">const </span>std::vector&lt;std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>>>&amp; argumentValues, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId, <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>* receiver) <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a></td>
@@ -45,7 +45,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BasicTypeMoveCtor_238784583C9AA743DC72C1383D8312F01001226C.html#function_GenerateCall_A68F862C35E7F02D8978AAB0275D09596D9E3C17">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BasicTypeMoveCtor_238784583C9AA743DC72C1383D8312F01001226C.html#function_GenerateCall_9082702790FCB1262E1820A8752BABFE8E3432D4">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
@@ -67,39 +67,42 @@
             cmajor::symbols::BasicTypeMoveCtor::BasicTypeMoveCtor(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * type)</h4>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html#189">189</a>
-             of <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html">BasicTypeOperation.cpp</a>
+            Definition at line <a href="file/BasicTypeOperation.cpp_24868F851228F28B2794B9BCF134A46209C262A7.html#226">226</a>
+             of <a href="file/BasicTypeOperation.cpp_24868F851228F28B2794B9BCF134A46209C262A7.html">BasicTypeOperation.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#698">698</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Declaration at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#698">698</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="constructor_BasicTypeMoveCtor_91EF3499D582E95E062FB3D6AD3606633D265FAE">BasicTypeMoveCtor Constructor</h3>
+        <h3 id="constructor_BasicTypeMoveCtor_48CE3E17C2C1621EE394E6EA6B02044D35A1FE8A">BasicTypeMoveCtor Constructor</h3>
         <h4>
             cmajor::symbols::BasicTypeMoveCtor::BasicTypeMoveCtor(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html#207">207</a>
-             of <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html">BasicTypeOperation.cpp</a>
+            Definition at line <a href="file/BasicTypeOperation.cpp_24868F851228F28B2794B9BCF134A46209C262A7.html#244">244</a>
+             of <a href="file/BasicTypeOperation.cpp_24868F851228F28B2794B9BCF134A46209C262A7.html">BasicTypeOperation.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_basicTypeMoveCtor_F293B8C44867811D3D312EA29A152125410E506D">basicTypeMoveCtor</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_basicTypeMoveCtor_F293B8C44867811D3D312EA29A152125410E506D">basicTypeMoveCtor</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#699">699</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Declaration at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#699">699</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
         </span>
         <br/>
         <br/>
@@ -112,8 +115,8 @@
             * cmajor::symbols::BasicTypeMoveCtor::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#705">705</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Definition at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#705">705</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;705</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"BasicTypeMoveCtor"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -129,39 +132,40 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_ConstructValue_DBA04B3D90796EDBC0FE0EA9069A54CCC04A1641">ConstructValue Member Function</h3>
+        <h3 id="function_ConstructValue_AC28CCAC953BCED0473447AD842AAD5D161ADCCA">ConstructValue Member Function</h3>
         <h4>
             std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             > cmajor::symbols::BasicTypeMoveCtor::ConstructValue(<span class="kw">const </span>
             std::vector&lt;std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             >>&amp; argumentValues, <span class="kw">const </span>
-            Span&amp; span, <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId, <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             * receiver) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html#220">220</a>
-             of <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html">BasicTypeOperation.cpp</a>
+            Definition at line <a href="file/BasicTypeOperation.cpp_24868F851228F28B2794B9BCF134A46209C262A7.html#258">258</a>
+             of <a href="file/BasicTypeOperation.cpp_24868F851228F28B2794B9BCF134A46209C262A7.html">BasicTypeOperation.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">argumentValues</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"one&nbsp;source&nbsp;value&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">argumentValues</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"one&nbsp;source&nbsp;value&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">(</span><span class="identifier">argumentValues</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">(</span><span class="identifier">argumentValues</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#702">702</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Declaration at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#702">702</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ConstructValue_71E99BB10B4189CC2799E38F7219618A792EF463">cmajor::symbols::FunctionSymbol::ConstructValue</a>
+            Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ConstructValue_8F99C46540C64E4145DAED16A3802211AEBBEDF5">cmajor::symbols::FunctionSymbol::ConstructValue</a>
         </span>
         <br/>
         <br/>
@@ -172,8 +176,8 @@
              cmajor::symbols::BasicTypeMoveCtor::DeclaredAccess() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#700">700</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Definition at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#700">700</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;700</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -187,37 +191,38 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_GenerateCall_A68F862C35E7F02D8978AAB0275D09596D9E3C17">GenerateCall Member Function</h3>
+        <h3 id="function_GenerateCall_9082702790FCB1262E1820A8752BABFE8E3432D4">GenerateCall Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::symbols::BasicTypeMoveCtor::GenerateCall(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>
-            Span&amp; span) <span class="kw">override</span>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html#211">211</a>
-             of <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html">BasicTypeOperation.cpp</a>
+            Definition at line <a href="file/BasicTypeOperation.cpp_24868F851228F28B2794B9BCF134A46209C262A7.html#249">249</a>
+             of <a href="file/BasicTypeOperation.cpp_24868F851228F28B2794B9BCF134A46209C262A7.html">BasicTypeOperation.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">genObjects</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">2</span><span class="other">,&nbsp;</span><span class="string">"move&nbsp;constructor&nbsp;needs&nbsp;two&nbsp;objects"</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">genObjects</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">2</span><span class="other">,&nbsp;</span><span class="string">"move&nbsp;constructor&nbsp;needs&nbsp;two&nbsp;objects"</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">genObjects</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">-></span><span class="identifier">Load</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="identifier">OperationFlags</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">genObjects</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">-></span><span class="identifier">Load</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="identifier">OperationFlags</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">rvalueRefValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">rvalueRefValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateLoad</span><span class="other">(</span><span class="identifier">rvalueRefValue</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateLoad</span><span class="other">(</span><span class="identifier">rvalueRefValue</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">genObjects</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">-></span><span class="identifier">Store</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="identifier">flags</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">OperationFlags</span><span class="other">::</span><span class="identifier">functionCallFlags</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">genObjects</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">-></span><span class="identifier">Store</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="identifier">flags</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">OperationFlags</span><span class="other">::</span><span class="identifier">functionCallFlags</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#701">701</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Declaration at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#701">701</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
         </span>
         <br/>
         <br/>
@@ -227,8 +232,8 @@
             std::u32string cmajor::symbols::BasicTypeMoveCtor::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#706">706</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Definition at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#706">706</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;706</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -249,8 +254,8 @@
              cmajor::symbols::BasicTypeMoveCtor::IsBasicTypeOperation() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#703">703</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Definition at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#703">703</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;703</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -270,8 +275,8 @@
              cmajor::symbols::BasicTypeMoveCtor::IsCompileTimePrimitiveFunction() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#704">704</a>
-             of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            Definition at line <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html#704">704</a>
+             of <a href="file/BasicTypeOperation.hpp_990AB7921C0383694B99BBB454E36F2E596A5E0F.html">BasicTypeOperation.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;704</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>

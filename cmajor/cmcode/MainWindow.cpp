@@ -638,18 +638,13 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     SetServiceMessageHandlerView(this);
     StartRequestDispatcher();
 
-    if (!filePath.empty())
-    {
-        OpenProject(filePath);
-    }
-
     SetState(MainWindowState::idle);
     LoadConfigurationSettings();
 
     AddClipboardListener();
 
     const Options& options = GetOptions();
-    if (options.showStartupDialog)
+    if (filePath.empty() && options.showStartupDialog)
     {
         const std::vector<RecentSolution>& recentSolutions = GetRecentSolutions();
         if (!recentSolutions.empty())
@@ -659,6 +654,11 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     }
 
     SetTimer(configurationSaveTimerId, configurationSavePeriod);
+
+    if (!filePath.empty())
+    {
+        OpenProject(filePath);
+    }
 }
 
 void MainWindow::ShowStartupDialog()
@@ -845,16 +845,19 @@ void MainWindow::OnWindowStateChanged()
 {
     Window::OnWindowStateChanged();
     const WindowSettings& windowSettings = GetWindowSettings();
-    if (GetWindowState() == WindowState::normal)
+    if (windowSettings.defined)
     {
-        SetLocation(Point(windowSettings.location.x, windowSettings.location.y));
-        SetSize(Size(windowSettings.size.width, windowSettings.size.height));
-        horizontalSplitContainer->SetSplitterDistance(windowSettings.normalHorizontalSplitterDistance);
-        verticalSplitContainer->SetSplitterDistance(windowSettings.normalVerticalSplitterDistance);
-    }
-    else if (GetWindowState() == WindowState::maximized)
-    {
-        setMaximizedSplitterDistance = true;
+        if (GetWindowState() == WindowState::normal)
+        {
+            SetLocation(Point(windowSettings.location.x, windowSettings.location.y));
+            SetSize(Size(windowSettings.size.width, windowSettings.size.height));
+            horizontalSplitContainer->SetSplitterDistance(windowSettings.normalHorizontalSplitterDistance);
+            verticalSplitContainer->SetSplitterDistance(windowSettings.normalVerticalSplitterDistance);
+        }
+        else if (GetWindowState() == WindowState::maximized)
+        {
+            setMaximizedSplitterDistance = true;
+        }
     }
 }
 
@@ -865,8 +868,11 @@ void MainWindow::OnSizeChanged()
     {
         setMaximizedSplitterDistance = false;
         const WindowSettings& windowSettings = GetWindowSettings();
-        horizontalSplitContainer->SetSplitterDistance(windowSettings.maximizedHorizontalSplitterDistance);
-        verticalSplitContainer->SetSplitterDistance(windowSettings.maximizedVerticalSplitterDistance);
+        if (windowSettings.defined)
+        {
+            horizontalSplitContainer->SetSplitterDistance(windowSettings.maximizedHorizontalSplitterDistance);
+            verticalSplitContainer->SetSplitterDistance(windowSettings.maximizedVerticalSplitterDistance);
+        }
     }
     statusBar->SetChanged();
     statusBar->Invalidate();
@@ -891,17 +897,20 @@ void MainWindow::LoadConfigurationSettings()
 {
     LoadConfiguration();
     const WindowSettings& windowSettings = GetWindowSettings();
-    SetWindowState(WindowState(windowSettings.windowState));
-    if (GetWindowState() == WindowState::normal)
+    if (windowSettings.defined)
     {
-        SetLocation(Point(windowSettings.location.x, windowSettings.location.y));
-        SetSize(Size(windowSettings.size.width, windowSettings.size.height));
-        horizontalSplitContainer->SetSplitterDistance(windowSettings.normalHorizontalSplitterDistance);
-        verticalSplitContainer->SetSplitterDistance(windowSettings.normalVerticalSplitterDistance);
-    }
-    else if (GetWindowState() == WindowState::maximized)
-    {
-        setMaximizedSplitterDistance = true;
+        SetWindowState(WindowState(windowSettings.windowState));
+        if (GetWindowState() == WindowState::normal)
+        {
+            SetLocation(Point(windowSettings.location.x, windowSettings.location.y));
+            SetSize(Size(windowSettings.size.width, windowSettings.size.height));
+            horizontalSplitContainer->SetSplitterDistance(windowSettings.normalHorizontalSplitterDistance);
+            verticalSplitContainer->SetSplitterDistance(windowSettings.normalVerticalSplitterDistance);
+        }
+        else if (GetWindowState() == WindowState::maximized)
+        {
+            setMaximizedSplitterDistance = true;
+        }
     }
 }
 
@@ -909,6 +918,7 @@ void MainWindow::SaveConfigurationSettings()
 {
     WindowState windowState = GetWindowState();
     WindowSettings& windowSettings = GetWindowSettings();
+    windowSettings.defined = true;
     windowSettings.windowState = static_cast<int>(windowState);
     if (windowState == WindowState::normal)
     {

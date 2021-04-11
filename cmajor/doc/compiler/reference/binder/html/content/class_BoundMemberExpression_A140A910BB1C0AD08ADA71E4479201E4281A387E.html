@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#608">608</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Definition at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#609">609</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#constructor_BoundMemberExpression_3219251CF71FF7C6ADF457F7369299958C343420">BoundMemberExpression</a>(Module* module_, <span class="kw">const </span>Span&amp; span_, std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>>&amp;&amp; classPtr_, std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>>&amp;&amp; member_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#constructor_BoundMemberExpression_24DD63B25BF2BE1BFFA974E289470BA0D4BE8D6B">BoundMemberExpression</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId_, std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>>&amp;&amp; classPtr_, std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>>&amp;&amp; member_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -86,31 +86,38 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_BoundMemberExpression_3219251CF71FF7C6ADF457F7369299958C343420">BoundMemberExpression Constructor</h3>
+        <h3 id="constructor_BoundMemberExpression_24DD63B25BF2BE1BFFA974E289470BA0D4BE8D6B">BoundMemberExpression Constructor</h3>
         <h4>
-            cmajor::binder::BoundMemberExpression::BoundMemberExpression(Module* module_, <span class="kw">const </span>
-            Span&amp; span_, std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
+            cmajor::binder::BoundMemberExpression::BoundMemberExpression(<span class="kw">const </span>
+            Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId_, std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
             >&amp;&amp; classPtr_, std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
             >&amp;&amp; member_)</h4>
         <span>
-            Definition at line <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html#2124">2124</a>
-             of <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html">BoundExpression.cpp</a>
+            Definition at line <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html#2136">2136</a>
+             of <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html">BoundExpression.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">2124</span>&nbsp;<span class="other">:</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2136</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2125</span>&nbsp;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a><span class="other">(</span><span class="identifier">module_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundMemberExpression_2CC99DFD5B91052184B3307FB1CDC6CC2CF348CC">boundMemberExpression</a><span class="other">,&nbsp;</span><span class="identifier">CreateMemberExpressionTypeSymbol</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">member_</span><span class="other">-></span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">module_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">classPtr_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_member_1C038C46A5BFC0CC5BB78F44C2910BB37A376D6A">member</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">member_</span><span class="other">)</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2137</span>&nbsp;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">moduleId_</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundMemberExpression_2CC99DFD5B91052184B3307FB1CDC6CC2CF348CC">boundMemberExpression</a><span class="other">,&nbsp;</span><span class="identifier">CreateMemberExpressionTypeSymbol</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">member_</span><span class="other">-></span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">member_</span><span class="other">-></span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">classPtr_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_member_1C038C46A5BFC0CC5BB78F44C2910BB37A376D6A">member</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">member_</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2126</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2138</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_memberExpressionType_0F01AFE416DEC628770750D156183712C0E77085">memberExpressionType</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_memberExpressionType_0F01AFE416DEC628770750D156183712C0E77085">memberExpressionType</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">-></span><span class="identifier">MoveTemporaryDestructorCallsTo</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">-></span><span class="identifier">MoveTemporaryDestructorCallsTo</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2129</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2141</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#612">612</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -121,22 +128,22 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html#2153">2153</a>
-             of <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html">BoundExpression.cpp</a>
+            Definition at line <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html#2165">2165</a>
+             of <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html">BoundExpression.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">2154</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2166</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"cannot&nbsp;visit&nbsp;a&nbsp;member&nbsp;expression"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="string">"cannot&nbsp;visit&nbsp;a&nbsp;member&nbsp;expression"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2156</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2168</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#616">616</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Declaration at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#617">617</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
         </span>
         <br/>
         <br/>
@@ -146,8 +153,8 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetModule_DB6EB51F57737BE38E6D13F24AE4EC5AF448C43D">cmajor::binder::BoundNode::GetModule</a>
-            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
+            Calls: <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
+            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_ModuleId_D9B7DAF4B86F57300AF9C490E3FC47DB994C66C2">cmajor::binder::BoundNode::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -157,11 +164,11 @@
             <a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
             * cmajor::binder::BoundMemberExpression::ClassPtr()</h4>
         <span>
-            Definition at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#618">618</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Definition at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#619">619</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">618</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">619</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -178,22 +185,22 @@
             * cmajor::binder::BoundMemberExpression::Clone() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html#2131">2131</a>
-             of <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html">BoundExpression.cpp</a>
+            Definition at line <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html#2143">2143</a>
+             of <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html">BoundExpression.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">2132</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2144</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html">BoundMemberExpression</a><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a><span class="other">></span><span class="other">(</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a><span class="other">></span><span class="other">(</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_member_1C038C46A5BFC0CC5BB78F44C2910BB37A376D6A">member</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html">BoundMemberExpression</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a><span class="other">></span><span class="other">(</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a><span class="other">></span><span class="other">(</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_member_1C038C46A5BFC0CC5BB78F44C2910BB37A376D6A">member</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2134</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2146</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#612">612</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Declaration at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#613">613</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
         </span>
         <br/>
         <br/>
@@ -204,8 +211,8 @@
         <br/>
         <span>
             Calls: <a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#function_Clone_ACFF9767E74F71E7F78FE54CC330D77609841F5D">cmajor::binder::BoundMemberExpression::Clone</a>
-            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetModule_DB6EB51F57737BE38E6D13F24AE4EC5AF448C43D">cmajor::binder::BoundNode::GetModule</a>
             , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
+            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_ModuleId_D9B7DAF4B86F57300AF9C490E3FC47DB994C66C2">cmajor::binder::BoundNode::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -221,11 +228,11 @@
              cmajor::binder::BoundMemberExpression::IsComplete() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#613">613</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Definition at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#614">614</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">613</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">614</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -244,36 +251,36 @@
              flags) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html#2136">2136</a>
-             of <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html">BoundExpression.cpp</a>
+            Definition at line <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html#2148">2148</a>
+             of <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html">BoundExpression.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">2137</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2149</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">-></span><span class="identifier">Load</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><a href="./../../../ir/html/content/enum_OperationFlags_759E65CBD07EA7837676833D7E212AEDFEBEC62C.html">OperationFlags</a><span class="other">::</span><a href="./../../../ir/html/content/enum_OperationFlags_759E65CBD07EA7837676833D7E212AEDFEBEC62C.html#enumerator_none_B0E31C514C0E96B027D04BCECCEBC15366CBF135">none</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">-></span><span class="identifier">Load</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><a href="./../../../ir/html/content/enum_OperationFlags_759E65CBD07EA7837676833D7E212AEDFEBEC62C.html">OperationFlags</a><span class="other">::</span><a href="./../../../ir/html/content/enum_OperationFlags_759E65CBD07EA7837676833D7E212AEDFEBEC62C.html#enumerator_none_B0E31C514C0E96B027D04BCECCEBC15366CBF135">none</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2146</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2158</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#614">614</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Declaration at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#615">615</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
         </span>
         <br/>
         <br/>
@@ -300,19 +307,19 @@
             <a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
             * cmajor::binder::BoundMemberExpression::Member()</h4>
         <span>
-            Definition at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#621">621</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Definition at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#622">622</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">621</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_member_1C038C46A5BFC0CC5BB78F44C2910BB37A376D6A">member</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">622</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_member_1C038C46A5BFC0CC5BB78F44C2910BB37A376D6A">member</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetConversion_6B074B7199E6617424F3C39F70ABB5A5C3A89C68">cmajor::binder::BoundCompileUnit::GetConversion</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_333FCA5FC1817A103EE015FE972C5B7D901E0477">cmajor::binder::ExpressionBinder::Visit</a>
+            Called by: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetConversion_983FEB4A973F3C89E4316FD908E5FC869968F710">cmajor::binder::BoundCompileUnit::GetConversion</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_FF365E6AAF51933B4258A6E09499810F444A705D">cmajor::binder::ExpressionBinder::Visit</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_333FCA5FC1817A103EE015FE972C5B7D901E0477">cmajor::binder::ExpressionBinder::Visit</a>
         </span>
         <br/>
         <br/>
@@ -322,11 +329,11 @@
             <a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
             * cmajor::binder::BoundMemberExpression::ReleaseClassPtr()</h4>
         <span>
-            Definition at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#620">620</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Definition at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#621">621</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">620</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">.</span><span class="identifier">release</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">621</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">.</span><span class="identifier">release</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -342,17 +349,17 @@
             <span class="kw">void</span>
              cmajor::binder::BoundMemberExpression::ResetClassPtr()</h4>
         <span>
-            Definition at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#619">619</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Definition at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#620">620</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">619</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">620</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#variable_classPtr_213F8708FBEF282A01000EF702384006CEEBC0B6">classPtr</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetConversion_6B074B7199E6617424F3C39F70ABB5A5C3A89C68">cmajor::binder::BoundCompileUnit::GetConversion</a>
+            Called by: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetConversion_983FEB4A973F3C89E4316FD908E5FC869968F710">cmajor::binder::BoundCompileUnit::GetConversion</a>
         </span>
         <br/>
         <br/>
@@ -365,22 +372,22 @@
              flags) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html#2148">2148</a>
-             of <a href="file/BoundExpression.cpp_CEC54F7B5A7BE4DF9C8F4E4C6C33069B06270A5A.html">BoundExpression.cpp</a>
+            Definition at line <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html#2160">2160</a>
+             of <a href="file/BoundExpression.cpp_ABAD478BA4973FE23DB5A9692A1D8F1B68AC464A.html">BoundExpression.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">2149</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2161</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"cannot&nbsp;store&nbsp;to&nbsp;a&nbsp;member&nbsp;expression"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="string">"cannot&nbsp;store&nbsp;to&nbsp;a&nbsp;member&nbsp;expression"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">2151</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2163</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#615">615</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Declaration at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#616">616</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
         </span>
         <br/>
         <br/>
@@ -390,8 +397,8 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetModule_DB6EB51F57737BE38E6D13F24AE4EC5AF448C43D">cmajor::binder::BoundNode::GetModule</a>
-            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
+            Calls: <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
+            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_ModuleId_D9B7DAF4B86F57300AF9C490E3FC47DB994C66C2">cmajor::binder::BoundNode::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -401,11 +408,11 @@
             std::string cmajor::binder::BoundMemberExpression::TypeString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html#617">617</a>
-             of <a href="file/BoundExpression.hpp_498AF3D7F37E53EB3AB8F73510E44BF9F3A70809.html">BoundExpression.hpp</a>
+            Definition at line <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html#618">618</a>
+             of <a href="file/BoundExpression.hpp_55A1DEDFD15715619A81E9585B8786AC23A94425.html">BoundExpression.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">617</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"member&nbsp;expression"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">618</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"member&nbsp;expression"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>

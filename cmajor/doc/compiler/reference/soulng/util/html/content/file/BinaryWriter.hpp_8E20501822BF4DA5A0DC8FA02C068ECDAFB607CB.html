@@ -1,0 +1,126 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SOULNG_UTIL_BINARY_WRITER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SOULNG_UTIL_BINARY_WRITER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/FilePtr.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;boost/uuid/uuid.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html">BinaryWriter</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#constructor_BinaryWriter_19233EB57C889466AF97CAEC8AB0511496BACF90">BinaryWriter</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">BinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_A421110005C38E5AC3996B2459870673634605B5">Write</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_CE74CABA0C3FC4DD0B8EB305FFB5E426D31D5E40">Write</a><span class="other">(</span><span class="identifier">uint8_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_8308390EFB4A764BF9949E5E1843AD95A64D23F0">Write</a><span class="other">(</span><span class="identifier">int8_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_267DC9901F08FE366C232CD1305D138C8E90B168">Write</a><span class="other">(</span><span class="identifier">uint16_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_B9570996838EDC301DBA988F4DA333F2F1C6C5C9">Write</a><span class="other">(</span><span class="identifier">int16_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_C04278BCBD92BF580E8101ECF8024313536D5B7F">Write</a><span class="other">(</span><span class="identifier">uint32_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_49E900F8FCBEE026FB051B768287EF8640B06FED">Write</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_46B20BD660CE2FB20A00D98F57775C1A33B1D3F0">Write</a><span class="other">(</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_CD46C207F55CB3B98D0B446C1CF03E0F9A87D8E0">Write</a><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_9F2215F4C32693805B51652EC367F7D0CECB4000">Write</a><span class="other">(</span><span class="kw">float</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_5C03FB4ABCB9507EFDCA39B63CB78AE2D0703299">Write</a><span class="other">(</span><span class="kw">double</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_E96BAC0CD88C5070475A962EAF127C97CC88B97D">Write</a><span class="other">(</span><span class="kw">char</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_AFC59CB85B5DFD2DA030073BACF2F4F213B65775">Write</a><span class="other">(</span><span class="kw">char16_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_95209D5701F64DA7402A3D7B1D2A0F1D3987BECE">Write</a><span class="other">(</span><span class="kw">char32_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_E9D7D6E5673E11EEBF075BA76631A8B9752E5098">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_9E78485FD22AD63F6E568F98E51A5FC1F2C74A1E">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">writeNull</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_7342D94D2133C73F2E08CB37B1A554E531631B9D">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_A7316B717FAE4D7238B2AE6D8EC125765712CDC8">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_WriteULEB128UInt_A283EA8B3EC2F9FA2F257EE15A8A2F3EE7DC1AFF">WriteULEB128UInt</a><span class="other">(</span><span class="identifier">uint32_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_WriteULEB128ULong_3BAD24E03087424AA06C6C08CF62307672A254B8">WriteULEB128ULong</a><span class="other">(</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_WriteSLEB128Int_12D6DC2A2EB27D1808BDE08823029BF150B84588">WriteSLEB128Int</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_WriteSLEB128Long_9F23B5A5651BCFF88DAB5139EC18B6F3B3F70944">WriteSLEB128Long</a><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_3E297EF11047E0C69B1F2573EE01C2915FB992C2">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">uuid</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Pos_ABB0239FC7B1C95688959500A4947455B809D55B">Pos</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_pos_29FD61C2A7B0F6F7D38049A1575FF6C967B9011A">pos</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Seek_577B6163676BF6C7E1679B909B39A6528005A4FB">Seek</a><span class="other">(</span><span class="identifier">uint32_t</span>&nbsp;<span class="identifier">pos_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_N_339CD0A308E6B0D8746B21185FC840747E36E842">N</a>&nbsp;<span class="other">=</span>&nbsp;<span class="other">8192</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_fileName_FB421B1BF3B43F5E9DBCDB6A1AA6E453CEB24896">fileName</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FilePtr_2779FF05E84D4E3A6FC9A7175E8F536679D6BA3D.html">FilePtr</a>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_file_BD2143174A8D30E788B15F38BECB7DBB6DE91CC5">file</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">buffer</span><span class="other">[</span><span class="identifier">N</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span><span class="other">*</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_bufp_E9025815ABBE3B938B0BC2A8F2EB42DE34098F21">bufp</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span><span class="other">*</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_bufend_B2403CC3B50989ADCFF0FFA480EF4C956FA2E63E">bufend</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_pos_29FD61C2A7B0F6F7D38049A1575FF6C967B9011A">pos</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_BufferReset_D45C7EEF60F61543AB0F6665D2778D93B19B69D6">BufferReset</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_bufp_E9025815ABBE3B938B0BC2A8F2EB42DE34098F21">bufp</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">buffer</span><span class="other">;</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_bufend_B2403CC3B50989ADCFF0FFA480EF4C956FA2E63E">bufend</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">buffer</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_N_339CD0A308E6B0D8746B21185FC840747E36E842">N</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_BufferFull_11D59A6B2AE7E45381C22440A9BBC0006737FEAB">BufferFull</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_bufp_E9025815ABBE3B938B0BC2A8F2EB42DE34098F21">bufp</a><span class="other">&nbsp;==&nbsp;</span><a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#variable_bufend_B2403CC3B50989ADCFF0FFA480EF4C956FA2E63E">bufend</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_FlushBuffer_DF69926E3D4E28D5B0741F221B8927332F319A84">FlushBuffer</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SOULNG_UTIL_BINARY_WRITER_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

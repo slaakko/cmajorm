@@ -16,17 +16,17 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#12">12</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#12">12</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#constructor_InterfaceNode_E3A9E9CEC26C8593C6D2C34BDDC48AC14218E6E7">InterfaceNode</a>(<span class="kw">const </span>Span&amp; span_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#constructor_InterfaceNode_7E61D9A19CF0E24F6A19B7DCCFA4F6BB5CD31734">InterfaceNode</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId_)</td>
             </tr>
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#constructor_InterfaceNode_A51C92690A6431E1B05317A45CE91CE5D06B3D38">InterfaceNode</a>(<span class="kw">const </span>Span&amp; span_, <a href="./enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a> specifiers_, <a href="./class_IdentifierNode_4CE99E9F7A7A909CE85CE1E7ED4A63A5060B83E3.html">IdentifierNode</a>* id_, <a href="./class_Attributes_3F5341E96E1F65002591A0DFAF6175C6CAE55CAD.html">Attributes</a>* attributes_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#constructor_InterfaceNode_25BED648DD9A236E9BC5126B5AAF59434937589A">InterfaceNode</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId_, <a href="./enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a> specifiers_, <a href="./class_IdentifierNode_4CE99E9F7A7A909CE85CE1E7ED4A63A5060B83E3.html">IdentifierNode</a>* id_, <a href="./class_AttributesNode_B713EAB5359EE5717474CD4C3FFD1AE0ADE44C08.html">AttributesNode</a>* attributes_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -52,7 +52,7 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_EndBraceSpan_9BF682463D22EDFD0AB7D7F10D613A67AF8BE47C">EndBraceSpan</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
-                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Attributes_3F5341E96E1F65002591A0DFAF6175C6CAE55CAD.html">Attributes</a>*</td>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_AttributesNode_B713EAB5359EE5717474CD4C3FFD1AE0ADE44C08.html">AttributesNode</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_GetAttributes_7D0B9E3464F7DAA77904847113D8A966747D917C">GetAttributes</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
@@ -95,7 +95,7 @@
         <h2>Member Variables</h2>
         <table>
             <tr id="variable_attributes_5D484EBDB6B4E42CF351493546B1762CF4F08DDD">
-                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_Attributes_3F5341E96E1F65002591A0DFAF6175C6CAE55CAD.html">Attributes</a>></td>
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_AttributesNode_B713EAB5359EE5717474CD4C3FFD1AE0ADE44C08.html">AttributesNode</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">attributes</td>
             </tr>
             <tr id="variable_beginBraceSpan_DE32CFEE75E1C105A00D2E1E499DEAB3C5049A54">
@@ -125,59 +125,63 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_InterfaceNode_E3A9E9CEC26C8593C6D2C34BDDC48AC14218E6E7">InterfaceNode Constructor</h3>
+        <h3 id="constructor_InterfaceNode_7E61D9A19CF0E24F6A19B7DCCFA4F6BB5CD31734">InterfaceNode Constructor</h3>
         <h4>
             sngcm::ast::InterfaceNode::InterfaceNode(<span class="kw">const </span>
-            Span&amp; span_)</h4>
+            Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId_)</h4>
         <span>
-            Definition at line <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html#12">12</a>
-             of <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html">Interface.cpp</a>
+            Definition at line <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html#12">12</a>
+             of <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html">Interface.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_interfaceNode_A6B54CDF7C0DBCD5180EEDB0CCF9F26C4730020B">interfaceNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_specifiers_7BB5326C5203E4DAE6AD87BA67A55C9770CF3D70">specifiers</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_id_4527D5ACCAA80818745007DE49AFEB381304ABD2">id</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_members_D033F3ADBCCE21698DE612D69FC05498D0FD7C48">members</a><span class="other">(</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_interfaceNode_A6B54CDF7C0DBCD5180EEDB0CCF9F26C4730020B">interfaceNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">moduleId_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_specifiers_7BB5326C5203E4DAE6AD87BA67A55C9770CF3D70">specifiers</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_id_4527D5ACCAA80818745007DE49AFEB381304ABD2">id</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_members_D033F3ADBCCE21698DE612D69FC05498D0FD7C48">members</a><span class="other">(</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#15">15</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Declaration at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#15">15</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="constructor_InterfaceNode_A51C92690A6431E1B05317A45CE91CE5D06B3D38">InterfaceNode Constructor</h3>
+        <h3 id="constructor_InterfaceNode_25BED648DD9A236E9BC5126B5AAF59434937589A">InterfaceNode Constructor</h3>
         <h4>
             sngcm::ast::InterfaceNode::InterfaceNode(<span class="kw">const </span>
-            Span&amp; span_, <a href="./enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a>
+            Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId_, <a href="./enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a>
              specifiers_, <a href="./class_IdentifierNode_4CE99E9F7A7A909CE85CE1E7ED4A63A5060B83E3.html">IdentifierNode</a>
-            * id_, <a href="./class_Attributes_3F5341E96E1F65002591A0DFAF6175C6CAE55CAD.html">Attributes</a>
+            * id_, <a href="./class_AttributesNode_B713EAB5359EE5717474CD4C3FFD1AE0ADE44C08.html">AttributesNode</a>
             * attributes_)</h4>
         <span>
-            Definition at line <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html#16">16</a>
-             of <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html">Interface.cpp</a>
+            Definition at line <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html#17">17</a>
+             of <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html">Interface.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">:</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_interfaceNode_A6B54CDF7C0DBCD5180EEDB0CCF9F26C4730020B">interfaceNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_specifiers_7BB5326C5203E4DAE6AD87BA67A55C9770CF3D70">specifiers</a><span class="other">(</span><span class="identifier">specifiers_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_id_4527D5ACCAA80818745007DE49AFEB381304ABD2">id</a><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_members_D033F3ADBCCE21698DE612D69FC05498D0FD7C48">members</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_attributes_5D484EBDB6B4E42CF351493546B1762CF4F08DDD">attributes</a><span class="other">(</span><span class="identifier">attributes_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_interfaceNode_A6B54CDF7C0DBCD5180EEDB0CCF9F26C4730020B">interfaceNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">moduleId_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_specifiers_7BB5326C5203E4DAE6AD87BA67A55C9770CF3D70">specifiers</a><span class="other">(</span><span class="identifier">specifiers_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_id_4527D5ACCAA80818745007DE49AFEB381304ABD2">id</a><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_members_D033F3ADBCCE21698DE612D69FC05498D0FD7C48">members</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_attributes_5D484EBDB6B4E42CF351493546B1762CF4F08DDD">attributes</a><span class="other">(</span><span class="identifier">attributes_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_id_4527D5ACCAA80818745007DE49AFEB381304ABD2">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_id_4527D5ACCAA80818745007DE49AFEB381304ABD2">id</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#16">16</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Declaration at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#16">16</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
         </span>
         <br/>
         <br/>
@@ -190,22 +194,22 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html#41">41</a>
-             of <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html">Interface.cpp</a>
+            Definition at line <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html#42">42</a>
+             of <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html">Interface.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#18">18</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Declaration at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#18">18</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
         </span>
         <br/>
         <br/>
@@ -226,24 +230,24 @@
              sngcm::ast::InterfaceNode::AddMember(<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>
             * member)</h4>
         <span>
-            Definition at line <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html#80">80</a>
-             of <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html">Interface.cpp</a>
+            Definition at line <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html#81">81</a>
+             of <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html">Interface.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">member</span><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">member</span><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_members_D033F3ADBCCE21698DE612D69FC05498D0FD7C48">members</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">member</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_members_D033F3ADBCCE21698DE612D69FC05498D0FD7C48">members</a><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><span class="identifier">member</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">85</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#24">24</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Declaration at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#24">24</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
         </span>
         <br/>
         <br/>
@@ -265,8 +269,8 @@
             Span&amp; sngcm::ast::InterfaceNode::BeginBraceSpan() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#29">29</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#29">29</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_beginBraceSpan_DE32CFEE75E1C105A00D2E1E499DEAB3C5049A54">beginBraceSpan</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -282,13 +286,13 @@
             &amp; cloneContext) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html#22">22</a>
-             of <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html">Interface.cpp</a>
+            Definition at line <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html#23">23</a>
+             of <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html">Interface.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#17">17</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Declaration at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#17">17</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
         </span>
         <br/>
         <br/>
@@ -298,14 +302,13 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_MapSpan_4854B818E90C09061F441CEE0410C6DF44D518CF">sngcm::ast::CloneContext::MapSpan</a>
-            , <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_AddMember_FD5F18F7DFE39702AD57A38D64C2F8AB0510329C">sngcm::ast::InterfaceNode::AddMember</a>
+            Calls: <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_AddMember_FD5F18F7DFE39702AD57A38D64C2F8AB0510329C">sngcm::ast::InterfaceNode::AddMember</a>
             , <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_Clone_4A937A8697EE39A5A0DD516F6946D627AF11B0DD">sngcm::ast::InterfaceNode::Clone</a>
             , <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_SetBeginBraceSpan_A78AEEACEA576E62BBA92356D6DEC7BE4670A646">sngcm::ast::InterfaceNode::SetBeginBraceSpan</a>
             , <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_SetEndBraceSpan_7A2F7BE33E3FE0961E2D29C4033C65B52D12653A">sngcm::ast::InterfaceNode::SetEndBraceSpan</a>
             , <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_SetSpecifierSpan_3D8A94F16D66A71AF3D0A3AB4C275D23512320A7">sngcm::ast::InterfaceNode::SetSpecifierSpan</a>
             , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
-            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_RootModuleId_2C637CA63FEB26C6458958EFD55F1248AA470C07">sngcm::ast::Node::RootModuleId</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Count_6085551DEB801D74B35253F865FAD968A24AA564">sngcm::ast::NodeList::Count</a>
         </span>
         <br/>
@@ -322,8 +325,8 @@
             Span&amp; sngcm::ast::InterfaceNode::EndBraceSpan() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#31">31</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#31">31</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_endBraceSpan_D65D9A5F87C9C12C05EBC747DE22C3063C73D7DA">endBraceSpan</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -334,12 +337,12 @@
         <hr/>
         <h3 id="function_GetAttributes_7D0B9E3464F7DAA77904847113D8A966747D917C">GetAttributes Member Function</h3>
         <h4>
-            <a href="./class_Attributes_3F5341E96E1F65002591A0DFAF6175C6CAE55CAD.html">Attributes</a>
+            <a href="./class_AttributesNode_B713EAB5359EE5717474CD4C3FFD1AE0ADE44C08.html">AttributesNode</a>
             * sngcm::ast::InterfaceNode::GetAttributes() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#25">25</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#25">25</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_attributes_5D484EBDB6B4E42CF351493546B1762CF4F08DDD">attributes</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -359,8 +362,8 @@
              sngcm::ast::InterfaceNode::GetSpecifiers() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#21">21</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#21">21</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_specifiers_7BB5326C5203E4DAE6AD87BA67A55C9770CF3D70">specifiers</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -385,8 +388,8 @@
             * sngcm::ast::InterfaceNode::Id() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#22">22</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#22">22</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_id_4527D5ACCAA80818745007DE49AFEB381304ABD2">id</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -408,8 +411,8 @@
             >&amp; sngcm::ast::InterfaceNode::Members() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#23">23</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#23">23</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_members_D033F3ADBCCE21698DE612D69FC05498D0FD7C48">members</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -430,13 +433,13 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html#62">62</a>
-             of <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html">Interface.cpp</a>
+            Definition at line <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html#64">64</a>
+             of <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html">Interface.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#20">20</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Declaration at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#20">20</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
         </span>
         <br/>
         <br/>
@@ -447,19 +450,14 @@
         <br/>
         <span>
             Calls: <a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#function_GetBinaryReader_C4EBE237AB790F3291BA338C15C29EAC4D2B44E3">sngcm::ast::AstReader::GetBinaryReader</a>
+            , <a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#function_ReadAttributesNode_11CB55C675B27C9DDFB4E8D2C63DB8DB89F4DAF4">sngcm::ast::AstReader::ReadAttributesNode</a>
             , <a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#function_ReadIdentifierNode_B0A59E1945200CA27720BBA3F1FD819D872FF645">sngcm::ast::AstReader::ReadIdentifierNode</a>
             , <a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#function_ReadSpan_91D30B41697389B56B5EE1127A7E496C6EB4782E">sngcm::ast::AstReader::ReadSpan</a>
-            , <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_Read_AD203FE118B300CF0239797E2FF31C088D1DFEDC">sngcm::ast::InterfaceNode::Read</a>
             , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Read_752482F1CB1306EFB283CCDCEDEE428813AFB309">sngcm::ast::Node::Read</a>
             , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_SetParent_C9CC10A97DD1BD027D4AA8CC9726919C2E037A27">sngcm::ast::Node::SetParent</a>
             , <a href="./class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Read_5181C634041495B8ACF6AE2E6B02AB1C7B7573D0">sngcm::ast::NodeList::Read</a>
             , <a href="./class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_SetParent_966A06FCF0D7A9E2C222687977FB842D68B15ECC">sngcm::ast::NodeList::SetParent</a>
             , <a href="./../../../../soulng/util/html/content/class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadBool_B7C79A05473F3A9F898406C8ADA32D82A532C530">soulng::util::BinaryReader::ReadBool</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Called by: <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_Read_AD203FE118B300CF0239797E2FF31C088D1DFEDC">sngcm::ast::InterfaceNode::Read</a>
         </span>
         <br/>
         <br/>
@@ -470,8 +468,8 @@
              sngcm::ast::InterfaceNode::SetBeginBraceSpan(<span class="kw">const </span>
             Span&amp; beginBraceSpan_)</h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#28">28</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#28">28</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_beginBraceSpan_DE32CFEE75E1C105A00D2E1E499DEAB3C5049A54">beginBraceSpan</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">beginBraceSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -491,8 +489,8 @@
              sngcm::ast::InterfaceNode::SetEndBraceSpan(<span class="kw">const </span>
             Span&amp; endBraceSpan_)</h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#30">30</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#30">30</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_endBraceSpan_D65D9A5F87C9C12C05EBC747DE22C3063C73D7DA">endBraceSpan</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">endBraceSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -512,8 +510,8 @@
              sngcm::ast::InterfaceNode::SetSpecifierSpan(<span class="kw">const </span>
             Span&amp; specifierSpan_)</h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#26">26</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#26">26</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_specifierSpan_621297EDF446778A70B0C4C5216DE8A5EAEBE3DE">specifierSpan</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">specifierSpan_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -533,8 +531,8 @@
             Span&amp; sngcm::ast::InterfaceNode::SpecifierSpan() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#27">27</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Definition at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#27">27</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#variable_specifierSpan_621297EDF446778A70B0C4C5216DE8A5EAEBE3DE">specifierSpan</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -550,13 +548,13 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html#46">46</a>
-             of <a href="file/Interface.cpp_8FFE4FF06B16816456E38ACFCB32B61131F6CE3A.html">Interface.cpp</a>
+            Definition at line <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html#47">47</a>
+             of <a href="file/Interface.cpp_680EA8922C56AC669187ACF89E4CCAEF0F527628.html">Interface.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html#19">19</a>
-             of <a href="file/Interface.hpp_1AC7AB0E0F69CF90E9CEE0B0009E024A2F75531D.html">Interface.hpp</a>
+            Declaration at line <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html#19">19</a>
+             of <a href="file/Interface.hpp_6283CA1F8D72FC966F6C3CD5C46EF1E9289C3179.html">Interface.hpp</a>
         </span>
         <br/>
         <br/>
@@ -567,16 +565,12 @@
         <br/>
         <span>
             Calls: <a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_GetBinaryWriter_C0553F3868525738920D79B8A4B828CECA64AE9D">sngcm::ast::AstWriter::GetBinaryWriter</a>
-            , <a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_E506CCA80B5693D1234A143199582072DA16E3DC">sngcm::ast::AstWriter::Write</a>
-            , <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_Write_35996F4D8A878753889DD104F4DA8F88504D46F0">sngcm::ast::InterfaceNode::Write</a>
+            , <a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_SpanConversionModuleId_3926AA2B39CD2021B48C8BB0CDAA2A760A816D27">sngcm::ast::AstWriter::SpanConversionModuleId</a>
+            , <a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_D1B5E32970528C824707EF52FDE6E7320E110FFA">sngcm::ast::AstWriter::Write</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Write_67F59ACDC95A0AD11AD691611F8AB8512CF407C5">sngcm::ast::Node::Write</a>
             , <a href="./class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Write_84A1F3B56262D19FEF5ADA99B35BA13EE17E4B21">sngcm::ast::NodeList::Write</a>
             , <a href="./../../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_A421110005C38E5AC3996B2459870673634605B5">soulng::util::BinaryWriter::Write</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Called by: <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_Write_35996F4D8A878753889DD104F4DA8F88504D46F0">sngcm::ast::InterfaceNode::Write</a>
         </span>
         <br/>
         <br/>

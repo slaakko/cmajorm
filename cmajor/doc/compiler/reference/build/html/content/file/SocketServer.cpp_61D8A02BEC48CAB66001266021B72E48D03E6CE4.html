@@ -1,0 +1,252 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/SocketServer.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/ServerConfig.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/GlobalFlags.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Log.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">build</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">symbols</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">util</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a><span class="other">::</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#constructor_SocketServer_34EBADD64005AD9DD2123D8C12C55352491B489A">SocketServer</a><span class="other">(</span><a href="../class_Log_E5FAA7543B7619E2D8F0ECB72340AD71D694329D.html">Log</a><span class="other">*</span>&nbsp;<span class="identifier">log_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">serverName_</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">continuous_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_log_CFF797990ED82A85DEE8FE71DC48F3704366FAEB">log</a><span class="other">(</span><span class="identifier">log_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">(</span><span class="identifier">serverName_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_name_69FC2DD0DEE760F38231EFA7051F64830A5429D5">name</a><span class="other">(</span><span class="string">"socket&nbsp;server:&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_socket_3EBDEDE6D5F216E617B12097733C69614D43A3E8">socket</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_running_0E39A675CAA5F697331D65D36A15BA403A3E7782">running</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_isRunning_C45936B8B1462FEE49C8C127D6AD15C1141E3BB7">isRunning</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_exiting_898D10BB91FC177E615F6D47669F00A5DB2CD925">exiting</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_continuous_C72B2E824ECA12C8368293CCDB95A9824D7213C8">continuous</a><span class="other">(</span><span class="identifier">continuous_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ServerInfo_BBD34CDEA3B847BE9895B9B88676ACFEEE267944.html">ServerInfo</a><span class="other">*</span>&nbsp;<span class="identifier">serverInfo</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_ServerConfig_ECF49A7F78A9298F1377858FE5E0220012466DDF.html">ServerConfig</a><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">GetServerInfo</span><span class="other">(</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">serverInfo</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;binding&nbsp;server&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;to&nbsp;port&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">serverInfo</span><span class="other">-></span><span class="identifier">Port</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"..."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_socket_3EBDEDE6D5F216E617B12097733C69614D43A3E8">socket</a><span class="other">.</span><span class="identifier">Bind</span><span class="other">(</span><span class="identifier">serverInfo</span><span class="other">-></span><span class="identifier">Port</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;server&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;listening..."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_socket_3EBDEDE6D5F216E617B12097733C69614D43A3E8">socket</a><span class="other">.</span><span class="identifier">Listen</span><span class="other">(</span><span class="other">10</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"socket&nbsp;server:&nbsp;server&nbsp;name&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;not&nbsp;found"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a><span class="other">::</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_Name_EFD23D4D2318CCB956978E4DD2C1D2B640BA4069">Name</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_name_69FC2DD0DEE760F38231EFA7051F64830A5429D5">name</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a><span class="other">::</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_WaitForRunning_D4A347708C87BFFB3467E7EC34B8AE1F12891D10">WaitForRunning</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;wait&nbsp;for&nbsp;running..."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_mtx_42A8B59A4B3CCD53D281E4027B3AEF7A82E7D150">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_running_0E39A675CAA5F697331D65D36A15BA403A3E7782">running</a><span class="other">.</span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="other">[</span><span class="kw">this</span><span class="other">]</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_isRunning_C45936B8B1462FEE49C8C127D6AD15C1141E3BB7">isRunning</a><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;running"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a><span class="other">::</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_Run_46AF09F98398376061C4A65904009714C15E5B35">Run</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">prompt</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_exiting_898D10BB91FC177E615F6D47669F00A5DB2CD925">exiting</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">prompt</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">prompt</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_isRunning_C45936B8B1462FEE49C8C127D6AD15C1141E3BB7">isRunning</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_running_0E39A675CAA5F697331D65D36A15BA403A3E7782">running</a><span class="other">.</span><span class="identifier">notify_all</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;waiting&nbsp;for&nbsp;client&nbsp;connection..."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">TcpSocket</span>&nbsp;<span class="identifier">connectedSocket</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_socket_3EBDEDE6D5F216E617B12097733C69614D43A3E8">socket</a><span class="other">.</span><span class="identifier">Accept</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;accepted&nbsp;a&nbsp;client&nbsp;connection..."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_connection_EAF02DE491C36A431890E117F7ABA6B2F04059C1">connection</a><span class="other">.</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_SocketConnection_0530EC03D8565CF4D7DA890C49F360A34B151788.html">SocketConnection</a><span class="other">(</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_log_CFF797990ED82A85DEE8FE71DC48F3704366FAEB">log</a><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">connectedSocket</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_buildServer_7BD8089D8A2F5BE65D815A5837DC98F2AA63495C">buildServer</a><span class="other">.</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="kw">new&nbsp;</span><span class="identifier">BuildServer</span><span class="other">(</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_connection_EAF02DE491C36A431890E117F7ABA6B2F04059C1">connection</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;running&nbsp;build&nbsp;server..."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_buildServer_7BD8089D8A2F5BE65D815A5837DC98F2AA63495C">buildServer</a><span class="other">-></span><span class="identifier">Run</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a><span class="other">::</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_Exit_A1D83AFEED5953A8D7E4E4C9AD99534D36D0953B">Exit</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_continuous_C72B2E824ECA12C8368293CCDB95A9824D7213C8">continuous</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_buildServer_7BD8089D8A2F5BE65D815A5837DC98F2AA63495C">buildServer</a><span class="other">-></span><span class="identifier">Exit</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_buildServer_7BD8089D8A2F5BE65D815A5837DC98F2AA63495C">buildServer</a><span class="other">-></span><span class="identifier">SetConnection</span><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_connection_EAF02DE491C36A431890E117F7ABA6B2F04059C1">connection</a><span class="other">-></span><span class="identifier">SetServer</span><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_exiting_898D10BB91FC177E615F6D47669F00A5DB2CD925">exiting</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;exiting..."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_socket_3EBDEDE6D5F216E617B12097733C69614D43A3E8">socket</a><span class="other">.</span><span class="identifier">Close</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"socket&nbsp;server:&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;exited"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a><span class="other">::</span><a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_ExitContinuous_74932B78480F5186253FC8AD19AB17911C1432A3">ExitContinuous</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_continuous_C72B2E824ECA12C8368293CCDB95A9824D7213C8">continuous</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Exit</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::build</span></span>
+  <br/>
+ </body>
+</html>

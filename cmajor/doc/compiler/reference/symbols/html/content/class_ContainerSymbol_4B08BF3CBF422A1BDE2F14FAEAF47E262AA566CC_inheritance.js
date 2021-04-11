@@ -270,11 +270,12 @@ function drawClassInheritanceDiagram() {
     var classes = [
         { name: "cmajor::symbols::Symbol", id: "class_0", level: 0, subject: false, hasDerivedClasses: true, link: "./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html" },
         { name: "cmajor::symbols::ContainerSymbol", id: "class_1", level: 1, subject: true, hasDerivedClasses: true, link: "./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html" },
-        { name: "cmajor::symbols::ConceptSymbol", id: "class_2", level: 2, subject: false, hasDerivedClasses: false, link: "./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html" },
-        { name: "cmajor::symbols::DeclarationBlock", id: "class_3", level: 2, subject: false, hasDerivedClasses: false, link: "./class_DeclarationBlock_585311538A78AC7083BB3F8BA178ADC04C211148.html" },
-        { name: "cmajor::symbols::FunctionSymbol", id: "class_4", level: 2, subject: false, hasDerivedClasses: true, link: "./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html" },
-        { name: "cmajor::symbols::NamespaceSymbol", id: "class_5", level: 2, subject: false, hasDerivedClasses: false, link: "./class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html" },
-        { name: "cmajor::symbols::TypeSymbol", id: "class_6", level: 2, subject: false, hasDerivedClasses: true, link: "./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html" }];
+        { name: "cmajor::symbols::AxiomSymbol", id: "class_2", level: 2, subject: false, hasDerivedClasses: false, link: "./class_AxiomSymbol_7CFCE765D67BB495D4436F5A32B1CC86B9DCE90A.html" },
+        { name: "cmajor::symbols::ConceptSymbol", id: "class_3", level: 2, subject: false, hasDerivedClasses: false, link: "./class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html" },
+        { name: "cmajor::symbols::DeclarationBlock", id: "class_4", level: 2, subject: false, hasDerivedClasses: false, link: "./class_DeclarationBlock_585311538A78AC7083BB3F8BA178ADC04C211148.html" },
+        { name: "cmajor::symbols::FunctionSymbol", id: "class_5", level: 2, subject: false, hasDerivedClasses: true, link: "./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html" },
+        { name: "cmajor::symbols::NamespaceSymbol", id: "class_6", level: 2, subject: false, hasDerivedClasses: false, link: "./class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html" },
+        { name: "cmajor::symbols::TypeSymbol", id: "class_7", level: 2, subject: false, hasDerivedClasses: true, link: "./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html" }];
     drawDiagram(classes);
 }
 

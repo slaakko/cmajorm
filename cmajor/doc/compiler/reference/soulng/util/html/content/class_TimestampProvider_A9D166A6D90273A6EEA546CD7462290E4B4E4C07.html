@@ -1,0 +1,221 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>TimestampProvider Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">prev</a>
+         | <a href="class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html">next</a>
+        <hr/>
+        <h1>TimestampProvider Class</h1>
+        <span>
+            Definition at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#388">388</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#constructor_TimestampProvider_237591B58F5892AB00E6955AA5D9D31A149A4221">TimestampProvider</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#function_Done_DF3D1B86D41780192607714916FDFA5F2B71E7D9">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#function_GetCurrentTimestamp_2D77423073991061491CA92A6E0A773ED902EF21">GetCurrentTimestamp</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#function_Init_733068284BB4FA27D737AEE9137BB765ACB3EB51">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html">TimestampProvider</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#function_Instance_4D794ADF6F1079C07F2BEE8707FF0319D1ABF4D8">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#function_Reset_6B57CFDAB409C0096C10281AFB7C002DC268333C">Reset</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_instance_2C070AC441FE0840BC37309D65DE95E94E79BC01">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html">TimestampProvider</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_startDateTime_C5645F0A7BAEB1B8FE33BD0197292AACFD01AE48">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">startDateTime</td>
+            </tr>
+            <tr id="variable_startTimePoint_8D0031A90978EA10311D5DE6395264BBB618B3E6">
+                <td class="functionTableFirstCol" xml:space="preserve">std::chrono::steady_clock::time_point</td>
+                <td class="functionTableSecondCol" xml:space="preserve">startTimePoint</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_TimestampProvider_237591B58F5892AB00E6955AA5D9D31A149A4221">TimestampProvider Constructor</h3>
+        <h4>
+            soulng::util::TimestampProvider::TimestampProvider()</h4>
+        <span>
+            Definition at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#421">421</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">421</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#variable_startDateTime_C5645F0A7BAEB1B8FE33BD0197292AACFD01AE48">startDateTime</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#variable_startTimePoint_8D0031A90978EA10311D5DE6395264BBB618B3E6">startTimePoint</a><span class="other">(</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">422</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">423</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">424</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#397">397</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Done_DF3D1B86D41780192607714916FDFA5F2B71E7D9">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::TimestampProvider::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#410">410</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">411</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">412</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#variable_instance_2C070AC441FE0840BC37309D65DE95E94E79BC01">instance</a><span class="other">.</span><a href="./namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">413</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#392">392</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetCurrentTimestamp_2D77423073991061491CA92A6E0A773ED902EF21">GetCurrentTimestamp Member Function</h3>
+        <h4>
+            <a href="./class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a>
+             soulng::util::TimestampProvider::GetCurrentTimestamp()</h4>
+        <span>
+            Definition at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#426">426</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#394">394</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#function_AddDays_60B9B09FE6F3342DC4E78323223017DE4F743B6A">soulng::util::Date::AddDays</a>
+            , <a href="./class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#function_GetDate_55594EFD982305FCD5EECF4892D27716AE98E466">soulng::util::DateTime::GetDate</a>
+            , <a href="./class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#function_Seconds_D660EA05952711D0763E2E1206EF0FF6308BD03D">soulng::util::DateTime::Seconds</a>
+            , <a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#function_Reset_6B57CFDAB409C0096C10281AFB7C002DC268333C">soulng::util::TimestampProvider::Reset</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_733068284BB4FA27D737AEE9137BB765ACB3EB51">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::TimestampProvider::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#405">405</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">406</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">407</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#variable_instance_2C070AC441FE0840BC37309D65DE95E94E79BC01">instance</a><span class="other">.</span><a href="./namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html">TimestampProvider</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">408</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#391">391</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_4D794ADF6F1079C07F2BEE8707FF0319D1ABF4D8">Instance Member Function</h3>
+        <h4>
+            <a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html">TimestampProvider</a>
+            &amp; soulng::util::TimestampProvider::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#393">393</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">393</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#variable_instance_2C070AC441FE0840BC37309D65DE95E94E79BC01">instance</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Reset_6B57CFDAB409C0096C10281AFB7C002DC268333C">Reset Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::TimestampProvider::Reset()</h4>
+        <span>
+            Definition at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#415">415</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">416</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">417</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#variable_startDateTime_C5645F0A7BAEB1B8FE33BD0197292AACFD01AE48">startDateTime</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">GetCurrentDateTime</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">418</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#variable_startTimePoint_8D0031A90978EA10311D5DE6395264BBB618B3E6">startTimePoint</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">419</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html#400">400</a>
+             of <a href="file/Time.cpp_6A86E4B55FD5025F208017385AA5684FDFC46E44.html">Time.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_TimestampProvider_A9D166A6D90273A6EEA546CD7462290E4B4E4C07.html#function_GetCurrentTimestamp_2D77423073991061491CA92A6E0A773ED902EF21">soulng::util::TimestampProvider::GetCurrentTimestamp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">prev</a>
+         | <a href="class_Trace_538DC4D22C904BE7952BCCBE041279AB41A10F2F.html">next</a>
+    </body>
+</html>

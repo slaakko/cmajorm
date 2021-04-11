@@ -1,0 +1,70 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_BUILD_FIBER_EXECUTION_CONTEXT_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_BUILD_FIBER_EXECUTION_CONTEXT_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/ExecutionContext.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">build</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">class</span>&nbsp;<span class="identifier">BuildServer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_FiberConnection_D742502AF943DDAD23C56A8E1EC303DD3FF1291E.html">FiberConnection</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html">Connection</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html">FiberExecutionContext</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html">ExecutionContext</a></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#constructor_FiberExecutionContext_B1C33A777DE2FCC63F05367EAEA700070699E2A1">FiberExecutionContext</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">~</span><span class="identifier">FiberExecutionContext</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BuildClient</span><span class="other">*</span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#function_GetClient_12EE542CFC892CE169BBCD899E6C8B2B3B66F783">GetClient</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_client_20F528FCB29D620BDFA1D7E6859401D279B7BEAF">client</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html">Connection</a><span class="other">*</span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#function_GetConnection_DABD0FB928F035D61E2030D5B54F7A9EAD0FEEA9">GetConnection</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_FiberConnection_D742502AF943DDAD23C56A8E1EC303DD3FF1291E.html">FiberConnection</a><span class="other">></span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">BuildClient</span><span class="other">></span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_client_20F528FCB29D620BDFA1D7E6859401D279B7BEAF">client</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">BuildServer</span><span class="other">></span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_server_F51B659AC6C6CF5847DC1C35D4237A8E16D135C6">server</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::build</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_BUILD_FIBER_EXECUTION_CONTEXT_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

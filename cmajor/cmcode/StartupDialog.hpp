@@ -28,7 +28,7 @@ private:
     std::vector<RecentSolution> recentSolutions;
     Button* startButton;
     Button* removeButton;
-    Button* startWithNoSolutionButton;
+    Button* startWithoutSolutionButton;
     ListBox* listBox;
     Label* solutionFilePathLabel;
 };

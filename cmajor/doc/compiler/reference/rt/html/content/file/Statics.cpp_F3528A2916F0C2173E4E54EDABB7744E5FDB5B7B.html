@@ -1,0 +1,368 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/rt/Statics.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/rt/Error.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/rt/Io.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Error.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;boost/functional/hash.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;memory></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="pp">#include&nbsp;&lt;mutex></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdexcept></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="pp">#include&nbsp;&lt;sstream></span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="pp">#include&nbsp;&lt;unordered_map></span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span><span class="kw">namespace</span>&nbsp;<span class="identifier">rt</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_Init_BDE6CC26A7E324FF8BEDD4B3A72E8689EA576BD7">Init</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_Done_D70EEF539CF8FBD81FF87DD1BE57C16CBCAD7ED5">Done</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">&amp;</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_Instance_8AF5DC772A95A9AC80C400F6092DA6983AF9A020">Instance</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_instance_D71213C8FDD1CB68AB54F52CC367FD8FF1D9F82A">instance</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_AllocateMutexes_263D69DF85E9721637002D603970F25A4CB50FE8">AllocateMutexes</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">staticClassIds</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_BeginCriticalSection_64C919445135D5FD753C674C656B429C480C5216">BeginCriticalSection</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">classId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_EndCriticalSection_D16320D238732A76C277CED7DBB7C6815F3AD085">EndCriticalSection</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">classId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">></span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_instance_D71213C8FDD1CB68AB54F52CC367FD8FF1D9F82A">instance</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">></span><span class="other">></span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexes_DF1229FCCFBBA6775B763F6A633DF9FC3BE40B33">mutexes</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">,&nbsp;</span><span class="kw">int</span><span class="other">,&nbsp;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">boost</span><span class="other">::</span><span class="type">hash</span><span class="other">&lt;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">></span><span class="other">></span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexMap_51AA83ECAE219A5E4397246BC0142DBD38ED305E">mutexMap</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">StaticInitTable</span><span class="other">></span>&nbsp;<span class="identifier">StaticInitTable</span><span class="other">::</span><span class="identifier">instance</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">::</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_Init_BDE6CC26A7E324FF8BEDD4B3A72E8689EA576BD7">Init</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_instance_D71213C8FDD1CB68AB54F52CC367FD8FF1D9F82A">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">::</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_Done_D70EEF539CF8FBD81FF87DD1BE57C16CBCAD7ED5">Done</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_instance_D71213C8FDD1CB68AB54F52CC367FD8FF1D9F82A">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">::</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_AllocateMutexes_263D69DF85E9721637002D603970F25A4CB50FE8">AllocateMutexes</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">staticClassIds</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">staticClassIds</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">classId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">staticClassIds</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexMap_51AA83ECAE219A5E4397246BC0142DBD38ED305E">mutexMap</a><span class="other">[</span><span class="identifier">classId</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexes_DF1229FCCFBBA6775B763F6A633DF9FC3BE40B33">mutexes</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexes_DF1229FCCFBBA6775B763F6A633DF9FC3BE40B33">mutexes</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">::</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_BeginCriticalSection_64C919445135D5FD753C674C656B429C480C5216">BeginCriticalSection</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">classId</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexMap_51AA83ECAE219A5E4397246BC0142DBD38ED305E">mutexMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">classId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexMap_51AA83ECAE219A5E4397246BC0142DBD38ED305E">mutexMap</a><span class="other">.</span><a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_cend_617683F805C954BBF5635F152EF23D739E6AADB9">cend</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">mutexIndex</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">mutexIndex</span><span class="other">&nbsp;>=&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">mutexIndex</span><span class="other">&nbsp;&lt;&nbsp;</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexes_DF1229FCCFBBA6775B763F6A633DF9FC3BE40B33">mutexes</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;mutex&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span>&nbsp;<span class="identifier">mutex</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexes_DF1229FCCFBBA6775B763F6A633DF9FC3BE40B33">mutexes</a><span class="other">[</span><span class="identifier">mutexIndex</span><span class="other">]</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mutex</span><span class="other">-></span><span class="identifier">lock</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;class&nbsp;id"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">::</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_EndCriticalSection_D16320D238732A76C277CED7DBB7C6815F3AD085">EndCriticalSection</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">classId</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexMap_51AA83ECAE219A5E4397246BC0142DBD38ED305E">mutexMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">classId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexMap_51AA83ECAE219A5E4397246BC0142DBD38ED305E">mutexMap</a><span class="other">.</span><a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_cend_617683F805C954BBF5635F152EF23D739E6AADB9">cend</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">mutexIndex</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">mutexIndex</span><span class="other">&nbsp;>=&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">mutexIndex</span><span class="other">&nbsp;&lt;&nbsp;</span><a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexes_DF1229FCCFBBA6775B763F6A633DF9FC3BE40B33">mutexes</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;mutex&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span>&nbsp;<span class="identifier">mutex</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#variable_mutexes_DF1229FCCFBBA6775B763F6A633DF9FC3BE40B33">mutexes</a><span class="other">[</span><span class="identifier">mutexIndex</span><span class="other">]</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mutex</span><span class="other">-></span><span class="identifier">unlock</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;class&nbsp;id"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_AllocateMutexes_896A8233B013D36A66162DD22F8EB52631004579">AllocateMutexes</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">staticClassIds</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">AllocateMutexes</span><span class="other">(</span><span class="identifier">staticClassIds</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<span class="kw">typedef</span>&nbsp;<span class="kw">void</span><span class="other">(</span><span class="other">*</span><span class="identifier">destructor_ptr</span><span class="other">)</span><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html">Destruction</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#constructor_Destruction_D5C1B39CF43F7744C5E4238FEB1B38BC2B7C480D">Destruction</a><span class="other">(</span><span class="identifier">destructor_ptr</span>&nbsp;<span class="identifier">destructor_</span><span class="other">,&nbsp;</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">arg_</span><span class="other">,&nbsp;</span><a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html">Destruction</a><span class="other">*</span>&nbsp;<span class="identifier">next_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#variable_destructor_1F9056F301475D4873A5524BEB37AE1A0AF13FA2">destructor</a><span class="other">(</span><span class="identifier">destructor_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#variable_arg_B9016790618DFE2CA53E8AA0CD0EB95BD055E1C7">arg</a><span class="other">(</span><span class="identifier">arg_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#variable_next_F087834401C03D9437468E24BE114A38DFB93AE9">next</a><span class="other">(</span><span class="identifier">next_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">destructor_ptr</span>&nbsp;<a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#variable_destructor_1F9056F301475D4873A5524BEB37AE1A0AF13FA2">destructor</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#variable_arg_B9016790618DFE2CA53E8AA0CD0EB95BD055E1C7">arg</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html">Destruction</a><span class="other">*</span>&nbsp;<a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#variable_next_F087834401C03D9437468E24BE114A38DFB93AE9">next</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html">Destruction</a><span class="other">*</span>&nbsp;<span class="identifier">destructionList</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_ExecuteDestructors_C0DD38216CA7C813B7DFBC6CCA7524ADE5022001">ExecuteDestructors</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html">Destruction</a><span class="other">*</span>&nbsp;<span class="identifier">destruction</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_destructionList_3067E16D77CC7220D87C4BE2FC969976999309BA">destructionList</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="identifier">destruction</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_destructionList_3067E16D77CC7220D87C4BE2FC969976999309BA">destructionList</a><span class="other">&nbsp;=&nbsp;</span><a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_destructionList_3067E16D77CC7220D87C4BE2FC969976999309BA">destructionList</a><span class="other">-></span><a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#variable_next_F087834401C03D9437468E24BE114A38DFB93AE9">next</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">destruction</span><span class="other">-></span><a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#variable_destructor_1F9056F301475D4873A5524BEB37AE1A0AF13FA2">destructor</a><span class="other">(</span><span class="identifier">destruction</span><span class="other">-></span><a href="../struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html#variable_arg_B9016790618DFE2CA53E8AA0CD0EB95BD055E1C7">arg</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">delete</span>&nbsp;<span class="identifier">destruction</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">destruction</span><span class="other">&nbsp;=&nbsp;</span><a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_destructionList_3067E16D77CC7220D87C4BE2FC969976999309BA">destructionList</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_InitStatics_C84F47B0759CE19DEAD22D4655B4F381CCD43C5D">InitStatics</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_DoneStatics_6549595E063034B12237A08D12B72169F6EE8714">DoneStatics</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ExecuteDestructors</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::rt</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">RtBeginStaticInitCriticalSection</span><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">staticClassId</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">*</span>&nbsp;<span class="identifier">classId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">reinterpret_cast</span><span class="other">&lt;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">staticClassId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">StaticInitTable</span><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">BeginCriticalSection</span><span class="other">(</span><span class="other">*</span><span class="identifier">classId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch</span>&nbsp;<span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">stringstream</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="string">"internal&nbsp;error:&nbsp;"</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="string">"\n"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">str</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">str</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<span class="identifier">errorStringHandle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">stdError</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">RtOpenStdFile</span><span class="other">(</span><span class="other">2</span><span class="other">,</span>&nbsp;<span class="identifier">errorStringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">RtWrite</span><span class="other">(</span><span class="identifier">stdError</span><span class="other">,</span>&nbsp;<span class="kw">reinterpret_cast</span><span class="other">&lt;</span><span class="kw">const</span>&nbsp;<span class="identifier">uint8_t</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">str</span><span class="other">.</span><span class="identifier">c_str</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">length</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="identifier">errorStringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">RtFlush</span><span class="other">(</span><span class="identifier">stdError</span><span class="other">,</span>&nbsp;<span class="identifier">errorStringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">exit</span><span class="other">(</span><span class="identifier">exitCodeInternalError</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">RtEndStaticInitCriticalSection</span><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">staticClassId</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">*</span>&nbsp;<span class="identifier">classId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">reinterpret_cast</span><span class="other">&lt;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">staticClassId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">StaticInitTable</span><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">EndCriticalSection</span><span class="other">(</span><span class="other">*</span><span class="identifier">classId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch</span>&nbsp;<span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">stringstream</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="string">"internal&nbsp;error:&nbsp;"</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="string">"\n"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">str</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">str</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<span class="identifier">errorStringHandle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">stdError</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">RtOpenStdFile</span><span class="other">(</span><span class="other">2</span><span class="other">,</span>&nbsp;<span class="identifier">errorStringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">RtWrite</span><span class="other">(</span><span class="identifier">stdError</span><span class="other">,</span>&nbsp;<span class="kw">reinterpret_cast</span><span class="other">&lt;</span><span class="kw">const</span>&nbsp;<span class="identifier">uint8_t</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">str</span><span class="other">.</span><span class="identifier">c_str</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">length</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="identifier">errorStringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">RtFlush</span><span class="other">(</span><span class="identifier">stdError</span><span class="other">,</span>&nbsp;<span class="identifier">errorStringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">exit</span><span class="other">(</span><span class="identifier">exitCodeInternalError</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_destructionListMutex_C9E1D96B87725A50214B7858E437E50DD5C2E399">destructionListMutex</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">RtEnqueueDestruction</span><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">destructor</span><span class="other">,</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><span class="identifier">destructionListMutex</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">destructionList</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new</span>&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">Destruction</span><span class="other">(</span><span class="kw">reinterpret_cast</span><span class="other">&lt;</span><span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">destructor_ptr</span><span class="other">></span><span class="other">(</span><span class="identifier">destructor</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="identifier">arg</span><span class="other">,</span>&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">destructionList</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;</span>
+  <br/>
+ </body>
+</html>

@@ -1,0 +1,102 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SOULNG_UTIL_PROCESS_IMPL_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SOULNG_UTIL_PROCESS_IMPL_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Process.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#if&nbsp;defined(_WIN32)&nbsp;&amp;&amp;&nbsp;defined(__MINGW32__)</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#ifndef&nbsp;__kernel_entry</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#define&nbsp;__kernel_entry</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="pp">#endif</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="pp">#endif</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="pp">#include&nbsp;&lt;boost/process.hpp></span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html">ProcessImpl</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ProcessImpl</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">command</span><span class="other">,&nbsp;</span><a href="../class_Process_07D18D84208775F0AA402C79110A09992F86E597.html">Process</a><span class="other">::</span><a href="../enum_Redirections_BC0BC55AD2B4EB95A53799D239BDBBA39D5B7B27.html">Redirections</a>&nbsp;<span class="identifier">redirections_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ProcessImpl</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">ProcessImpl</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ProcessImpl</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">ProcessImpl</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ProcessImpl</span><span class="other">(</span><span class="identifier">ProcessImpl</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ProcessImpl</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">ProcessImpl</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">Running</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">WaitForExit</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">ExitCode</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">Terminate</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">Eof</span><span class="other">(</span><a href="../class_Process_07D18D84208775F0AA402C79110A09992F86E597.html">Process</a><span class="other">::</span><a href="../enum_StdHandle_EDDC59515C07E59CAD60D45207F1E9D46B81D386.html">StdHandle</a>&nbsp;<span class="identifier">handle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">ReadLine</span><span class="other">(</span><a href="../class_Process_07D18D84208775F0AA402C79110A09992F86E597.html">Process</a><span class="other">::</span><a href="../enum_StdHandle_EDDC59515C07E59CAD60D45207F1E9D46B81D386.html">StdHandle</a>&nbsp;<span class="identifier">handle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">ReadToEnd</span><span class="other">(</span><a href="../class_Process_07D18D84208775F0AA402C79110A09992F86E597.html">Process</a><span class="other">::</span><a href="../enum_StdHandle_EDDC59515C07E59CAD60D45207F1E9D46B81D386.html">StdHandle</a>&nbsp;<span class="identifier">handle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">WriteLine</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">line</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Process_07D18D84208775F0AA402C79110A09992F86E597.html">Process</a><span class="other">::</span><a href="../enum_Redirections_BC0BC55AD2B4EB95A53799D239BDBBA39D5B7B27.html">Redirections</a>&nbsp;<a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_redirections_037AEF74BC2815CA5C15A1A3027B141F57328F18">redirections</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_process_32FD1EF44A51633DEC67B4381E3D857EA59B800B">process</a><span class="other">::</span><span class="identifier">ipstream</span>&nbsp;<a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_processStdOut_159589BA0757C19036CF32166C4916B8C965D982">processStdOut</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_process_32FD1EF44A51633DEC67B4381E3D857EA59B800B">process</a><span class="other">::</span><span class="identifier">ipstream</span>&nbsp;<a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_processStdErr_CDD1E6A717A24C62F6436265999B522D7FE47E1D">processStdErr</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_process_32FD1EF44A51633DEC67B4381E3D857EA59B800B">process</a><span class="other">::</span><span class="identifier">opstream</span>&nbsp;<a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_processStdIn_E84C1B7C406CE20F6FDC82158A9EF469765F6532">processStdIn</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_process_32FD1EF44A51633DEC67B4381E3D857EA59B800B">process</a><span class="other">::</span><span class="identifier">child</span>&nbsp;<a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_process_32FD1EF44A51633DEC67B4381E3D857EA59B800B">process</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_stdOutEof_D544BD2A8A40F35DC2F0CC57BA18471545A796B0">stdOutEof</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_ProcessImpl_9930493AA23ABEF21ADC89801CBAB5FD15B7C4EC.html#variable_stdErrEof_438A35FEC7DD2FB222B020145885CCE6C05D2A6D">stdErrEof</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SOULNG_UTIL_PROCESS_IMPL_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

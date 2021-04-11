@@ -12,8 +12,8 @@
         <hr/>
         <h1>SymbolWriter Class</h1>
         <span>
-            Definition at line <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html#17">17</a>
-             of <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html">SymbolWriter.hpp</a>
+            Definition at line <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html#17">17</a>
+             of <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html">SymbolWriter.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
@@ -38,6 +38,10 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#function_SetSpanConversionModuleId_FAD6E5FC8B2A40E6D76E74830ECC9354FFB49438">SetSpanConversionModuleId</a>(<span class="kw">const </span>boost::uuids::uuid&amp; spanConversionModuleId_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#function_Write_415650B790120E3B3FB5A26F985776A782676AAD">Write</a>(<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a>* symbol)</td>
             </tr>
         </table>
@@ -51,6 +55,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;<a href="./../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html">Lexer</a>*>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve">lexers</td>
             </tr>
+            <tr id="variable_spanConversionModuleId_356670AE06DC50B3F96287734691319078AD09CF">
+                <td class="functionTableFirstCol" xml:space="preserve">boost::uuids::uuid</td>
+                <td class="functionTableSecondCol" xml:space="preserve">spanConversionModuleId</td>
+            </tr>
         </table>
         <hr/>
         <h2>Constructor Details</h2>
@@ -59,22 +67,22 @@
             cmajor::symbols::SymbolWriter::SymbolWriter(<span class="kw">const </span>
             std::string&amp; fileName_)</h4>
         <span>
-            Definition at line <a href="file/SymbolWriter.cpp_92A6D3BB0CC77CB5F130FBF9E800055AFD5A79A2.html#11">11</a>
-             of <a href="file/SymbolWriter.cpp_92A6D3BB0CC77CB5F130FBF9E800055AFD5A79A2.html">SymbolWriter.cpp</a>
+            Definition at line <a href="file/SymbolWriter.cpp_94986C369A4E981DFB2DC831DF2ABBB38BF40E72.html#12">12</a>
+             of <a href="file/SymbolWriter.cpp_94986C369A4E981DFB2DC831DF2ABBB38BF40E72.html">SymbolWriter.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">(</span><span class="identifier">fileName_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_lexers_5B861E4A8DE2128557AB60CE8570782AE5B751B4">lexers</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">(</span><span class="identifier">fileName_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_spanConversionModuleId_356670AE06DC50B3F96287734691319078AD09CF">spanConversionModuleId</a><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">nil_uuid</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_lexers_5B861E4A8DE2128557AB60CE8570782AE5B751B4">lexers</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html#20">20</a>
-             of <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html">SymbolWriter.hpp</a>
+            Declaration at line <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html#20">20</a>
+             of <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html">SymbolWriter.hpp</a>
         </span>
         <br/>
         <br/>
@@ -85,8 +93,8 @@
             <a href="./../../../sngcm/ast/html/content/class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html">AstWriter</a>
             &amp; cmajor::symbols::SymbolWriter::GetAstWriter()</h4>
         <span>
-            Definition at line <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html#21">21</a>
-             of <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html">SymbolWriter.hpp</a>
+            Definition at line <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html#21">21</a>
+             of <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html">SymbolWriter.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -107,8 +115,8 @@
         <h4>
             BinaryWriter&amp; cmajor::symbols::SymbolWriter::GetBinaryWriter()</h4>
         <span>
-            Definition at line <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html#22">22</a>
-             of <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html">SymbolWriter.hpp</a>
+            Definition at line <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html#22">22</a>
+             of <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html">SymbolWriter.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -160,6 +168,7 @@
             , <a href="./class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html#function_Write_7829ADAA30DE6679FC7491F3622B321D99C30E1F">cmajor::symbols::ParameterSymbol::Write</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Write_CDF1B8A279B9A5BFAA1AABFE9054A6DCCFDB9DD7">cmajor::symbols::Symbol::Write</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_Write_8EA1FA63A832C4C76679E3623D9247580CCFE90A">cmajor::symbols::SymbolTable::Write</a>
+            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_WriteSymbolDefinitionMap_02ABC5B6944957460CACFB97D43347B0C93CF859">cmajor::symbols::SymbolTable::WriteSymbolDefinitionMap</a>
             , <a href="./class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_Write_296619D0FA23D5E1B3A68DDECB323E6BEFA7CADA">cmajor::symbols::TemplateParameterSymbol::Write</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Write_3B9CF1C2068B388E840353BCF6A2DA6AAE37A26F">cmajor::symbols::TypeSymbol::Write</a>
             , <a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#function_Write_47321540B4BF445DB0666A9CC480CA0F4E31A2B0">cmajor::symbols::TypedefSymbol::Write</a>
@@ -175,29 +184,62 @@
              cmajor::symbols::SymbolWriter::SetLexers(std::vector&lt;<a href="./../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html">Lexer</a>
             *>* lexers_)</h4>
         <span>
-            Definition at line <a href="file/SymbolWriter.cpp_92A6D3BB0CC77CB5F130FBF9E800055AFD5A79A2.html#23">23</a>
-             of <a href="file/SymbolWriter.cpp_92A6D3BB0CC77CB5F130FBF9E800055AFD5A79A2.html">SymbolWriter.cpp</a>
+            Definition at line <a href="file/SymbolWriter.cpp_94986C369A4E981DFB2DC831DF2ABBB38BF40E72.html#33">33</a>
+             of <a href="file/SymbolWriter.cpp_94986C369A4E981DFB2DC831DF2ABBB38BF40E72.html">SymbolWriter.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_lexers_5B861E4A8DE2128557AB60CE8570782AE5B751B4">lexers</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">lexers_</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_lexers_5B861E4A8DE2128557AB60CE8570782AE5B751B4">lexers</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">lexers_</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">.</span><span class="identifier">SetLexers</span><span class="other">(</span><a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_lexers_5B861E4A8DE2128557AB60CE8570782AE5B751B4">lexers</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">.</span><span class="identifier">SetLexers</span><span class="other">(</span><a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_lexers_5B861E4A8DE2128557AB60CE8570782AE5B751B4">lexers</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html#24">24</a>
-             of <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html">SymbolWriter.hpp</a>
+            Declaration at line <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html#24">24</a>
+             of <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html">SymbolWriter.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Calls: <a href="./../../../sngcm/ast/html/content/class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_SetLexers_666FDAC4A9787799E31828D12DBDA643DC697A98">sngcm::ast::AstWriter::SetLexers</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetSpanConversionModuleId_FAD6E5FC8B2A40E6D76E74830ECC9354FFB49438">SetSpanConversionModuleId Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::SymbolWriter::SetSpanConversionModuleId(<span class="kw">const </span>
+            boost::uuids::uuid&amp; spanConversionModuleId_)</h4>
+        <span>
+            Definition at line <a href="file/SymbolWriter.cpp_94986C369A4E981DFB2DC831DF2ABBB38BF40E72.html#39">39</a>
+             of <a href="file/SymbolWriter.cpp_94986C369A4E981DFB2DC831DF2ABBB38BF40E72.html">SymbolWriter.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_spanConversionModuleId_356670AE06DC50B3F96287734691319078AD09CF">spanConversionModuleId</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">spanConversionModuleId_</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">.</span><span class="identifier">SetSpanConversionModuleId</span><span class="other">(</span><a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_spanConversionModuleId_356670AE06DC50B3F96287734691319078AD09CF">spanConversionModuleId</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html#25">25</a>
+             of <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html">SymbolWriter.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../sngcm/ast/html/content/class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_SetSpanConversionModuleId_49D67DFF87F6578B446FA03740F12F42D85680FB">sngcm::ast::AstWriter::SetSpanConversionModuleId</a>
         </span>
         <br/>
         <br/>
@@ -208,38 +250,27 @@
              cmajor::symbols::SymbolWriter::Write(<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a>
             * symbol)</h4>
         <span>
-            Definition at line <a href="file/SymbolWriter.cpp_92A6D3BB0CC77CB5F130FBF9E800055AFD5A79A2.html#15">15</a>
-             of <a href="file/SymbolWriter.cpp_92A6D3BB0CC77CB5F130FBF9E800055AFD5A79A2.html">SymbolWriter.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint8_t</span><span class="other">></span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html#variable_astWriter_CD181BF15DE68BC295FF3CA2C99B84B1ED74B280">astWriter</a><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">symbol</span><span class="other">-></span><span class="identifier">Write</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/SymbolWriter.cpp_94986C369A4E981DFB2DC831DF2ABBB38BF40E72.html#16">16</a>
+             of <a href="file/SymbolWriter.cpp_94986C369A4E981DFB2DC831DF2ABBB38BF40E72.html">SymbolWriter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html#23">23</a>
-             of <a href="file/SymbolWriter.hpp_8A83A82C5B6E18EB389BE47E5E64449C601504DB.html">SymbolWriter.hpp</a>
+            Declaration at line <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html#23">23</a>
+             of <a href="file/SymbolWriter.hpp_B626593D150FC9BD1A5F069E98E4353AA18F97C1.html">SymbolWriter.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            Calls: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_GetFlag_1FB712539A758883D3A653885476B11FE2E0E250">cmajor::symbols::Module::GetFlag</a>
+            , <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_Id_3CB6F4D468FB9C7553BDD680991409BCDD607C9A">cmajor::symbols::Module::Id</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Write_CDF1B8A279B9A5BFAA1AABFE9054A6DCCFDB9DD7">cmajor::symbols::Symbol::Write</a>
             , <a href="./../../../sngcm/ast/html/content/class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_GetBinaryWriter_C0553F3868525738920D79B8A4B828CECA64AE9D">sngcm::ast::AstWriter::GetBinaryWriter</a>
-            , <a href="./../../../sngcm/ast/html/content/class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_E506CCA80B5693D1234A143199582072DA16E3DC">sngcm::ast::AstWriter::Write</a>
+            , <a href="./../../../sngcm/ast/html/content/class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_D1B5E32970528C824707EF52FDE6E7320E110FFA">sngcm::ast::AstWriter::Write</a>
+            , <a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_3E297EF11047E0C69B1F2573EE01C2915FB992C2">soulng::util::BinaryWriter::Write</a>
             , <a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_A7316B717FAE4D7238B2AE6D8EC125765712CDC8">soulng::util::BinaryWriter::Write</a>
         </span>
         <br/>

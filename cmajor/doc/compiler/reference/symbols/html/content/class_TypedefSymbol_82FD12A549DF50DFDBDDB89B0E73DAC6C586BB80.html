@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#12">12</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Definition at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#12">12</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#constructor_TypedefSymbol_7981820B048C0C84376C0DBA91760F66E6E14009">TypedefSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#constructor_TypedefSymbol_F1A68CC80E1181791BE56A481BAE7FC1CE741C1E">TypedefSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -51,6 +51,18 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#function_EmplaceType_08C3C0CBA94DD65DF41992696D78BCD4DFBD4ADA">EmplaceType</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* typeSymbol, <span class="kw">int</span> index) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#function_GetSymbolCategoryDescription_9C3C803E724A0C941562485977A0798030B4FCB3">GetSymbolCategoryDescription</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#function_GetSymbolCategoryStr_0FD1827C8A78FCA67B7133553652496126300FAC">GetSymbolCategoryStr</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#function_GetSymbolHelp_26F25D6A85814EC78983C28765D4499E3ACD12B5">GetSymbolHelp</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*</td>
@@ -102,28 +114,31 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_TypedefSymbol_7981820B048C0C84376C0DBA91760F66E6E14009">TypedefSymbol Constructor</h3>
+        <h3 id="constructor_TypedefSymbol_F1A68CC80E1181791BE56A481BAE7FC1CE741C1E">TypedefSymbol Constructor</h3>
         <h4>
             cmajor::symbols::TypedefSymbol::TypedefSymbol(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#20">20</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#20">20</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_typedefSymbol_86BDC4FBA9F1769933614B86EE1C61FE031DB195">typedefSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">(</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_typedefSymbol_86BDC4FBA9F1769933614B86EE1C61FE031DB195">typedefSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">(</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#15">15</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#15">15</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -136,28 +151,28 @@
             * collector) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#49">49</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#50">50</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddTypedef</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddTypedef</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#20">20</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#20">20</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -180,30 +195,30 @@
              cmajor::symbols::TypedefSymbol::Check() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#163">163</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#164">164</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"typedef&nbsp;symbol&nbsp;contains&nbsp;null&nbsp;type&nbsp;pointer"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="string">"typedef&nbsp;symbol&nbsp;contains&nbsp;null&nbsp;type&nbsp;pointer"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#31">31</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#31">31</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -215,6 +230,7 @@
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Check_2EEB2CB990DAA0E8825B075E9CD48522F6925234">cmajor::symbols::Symbol::Check</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -226,8 +242,8 @@
             * cmajor::symbols::TypedefSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#30">30</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Definition at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#30">30</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"TypedefSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -248,13 +264,13 @@
             &amp; typeMap) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#150">150</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#151">151</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#28">28</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#28">28</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -275,28 +291,28 @@
              cmajor::symbols::TypedefSymbol::Dump(CodeFormatter&amp; formatter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#57">57</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#58">58</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"full&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullNameWithSpecifiers</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"full&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullNameWithSpecifiers</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"mangled&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"mangled&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"type:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"type:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#21">21</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#21">21</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -323,29 +339,111 @@
              index) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#38">38</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#39">39</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#18">18</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#18">18</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_EmplaceType_C6FE127C6FA6E48EDDCF22B76E91CC5A4F99958B">cmajor::symbols::Symbol::EmplaceType</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryDescription_9C3C803E724A0C941562485977A0798030B4FCB3">GetSymbolCategoryDescription Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::TypedefSymbol::GetSymbolCategoryDescription() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#33">33</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"typedef"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryDescription_34BE1EAEAA69A7557F968BD6B843A5DC2295736E">cmajor::symbols::Symbol::GetSymbolCategoryDescription</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryStr_0FD1827C8A78FCA67B7133553652496126300FAC">GetSymbolCategoryStr Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::TypedefSymbol::GetSymbolCategoryStr() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#32">32</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"TY"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryStr_DE4CB4E167EA03932F01A5903D1CC2B8A2E473DF">cmajor::symbols::Symbol::GetSymbolCategoryStr</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolHelp_26F25D6A85814EC78983C28765D4499E3ACD12B5">GetSymbolHelp Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::TypedefSymbol::GetSymbolHelp() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#173">173</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">)</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">help</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">GetSymbolHelp</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">help</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"&nbsp;=&nbsp;"</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">help</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#34">34</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolHelp_2BB9A1DE713846C4F3CD35BEEC4F2A2A1EE881CB">cmajor::symbols::Symbol::GetSymbolHelp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolHelp_2BB9A1DE713846C4F3CD35BEEC4F2A2A1EE881CB">cmajor::symbols::Symbol::GetSymbolHelp</a>
         </span>
         <br/>
         <br/>
@@ -357,8 +455,8 @@
             * cmajor::symbols::TypedefSymbol::GetType() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#25">25</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Definition at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#25">25</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -372,8 +470,8 @@
             <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * cmajor::symbols::TypedefSymbol::GetType()</h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#26">26</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Definition at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#26">26</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -382,7 +480,7 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MakeDerivedType_7CF675AABDEA1E42F4006D6418E80BF2908A8BCC">cmajor::symbols::SymbolTable::MakeDerivedType</a>
+            Called by: <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MakeDerivedType_9E88C62C8D1A4F2469FB63B3F7547E18EE3F8EC5">cmajor::symbols::SymbolTable::MakeDerivedType</a>
             , <a href="./class_TypeIndex_FF71288B299D46222D066CBF7B74BCF8724B4F82.html#function_AddType_1A0F9C67160B0E87F7C647636C0A770CD2EEA9C0">cmajor::symbols::TypeIndex::AddType</a>
             , <a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#function_Syntax_0865616EF7BF7314B27B3914C55BB488E369D86C">cmajor::symbols::TypedefSymbol::Syntax</a>
         </span>
@@ -394,8 +492,8 @@
             std::u32string cmajor::symbols::TypedefSymbol::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#29">29</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Definition at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#29">29</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -420,22 +518,22 @@
              cmajor::symbols::TypedefSymbol::IsExportSymbol() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#44">44</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#45">45</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">IsExportSymbol</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">IsExportSymbol</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#19">19</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#19">19</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -457,28 +555,28 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#30">30</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#31">31</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span>&nbsp;<span class="identifier">typeId</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span>&nbsp;<span class="identifier">typeId</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUuid</span><span class="other">(</span><span class="identifier">typeId</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUuid</span><span class="other">(</span><span class="identifier">typeId</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">EmplaceTypeRequest</span><span class="other">(</span><span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">typeId</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">EmplaceTypeRequest</span><span class="other">(</span><span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">typeId</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#17">17</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#17">17</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -501,19 +599,20 @@
             <span class="kw">void</span>
              cmajor::symbols::TypedefSymbol::SetSpecifiers(Specifiers specifiers)</h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#80">80</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#81">81</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#24">24</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#24">24</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetAccess_121F064F7F499D20D45D6E7192296F2A23583BE1">cmajor::symbols::Symbol::SetAccess</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -524,8 +623,8 @@
              cmajor::symbols::TypedefSymbol::SetType(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * typeSymbol)</h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#27">27</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Definition at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#27">27</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -534,8 +633,8 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MakeArrayType_04D141172CC9AE1EDB7C558BC0A1D7A1FA6FF722">cmajor::symbols::SymbolTable::MakeArrayType</a>
-            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MakeDerivedType_7CF675AABDEA1E42F4006D6418E80BF2908A8BCC">cmajor::symbols::SymbolTable::MakeDerivedType</a>
+            Called by: <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MakeArrayType_4616A21DFC73AD4A621D8B8EBD6E4DC9264B9FF6">cmajor::symbols::SymbolTable::MakeArrayType</a>
+            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MakeDerivedType_9E88C62C8D1A4F2469FB63B3F7547E18EE3F8EC5">cmajor::symbols::SymbolTable::MakeDerivedType</a>
         </span>
         <br/>
         <br/>
@@ -545,13 +644,13 @@
             std::string cmajor::symbols::TypedefSymbol::Syntax() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#65">65</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#66">66</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#23">23</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#23">23</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -573,8 +672,8 @@
             std::string cmajor::symbols::TypedefSymbol::TypeString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#22">22</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Definition at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#22">22</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"typedef"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -595,24 +694,24 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html#24">24</a>
-             of <a href="file/TypedefSymbol.cpp_F9F3F49EE85B1281051F29374899ECE26BE78F88.html">TypedefSymbol.cpp</a>
+            Definition at line <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html#25">25</a>
+             of <a href="file/TypedefSymbol.cpp_631CDE256D00206BE66C74B7DB6AAC7A66FA0E72.html">TypedefSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#variable_type_1948B280C25F9EEDB0B8317C678F4CF2BD650592">type</a><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html#16">16</a>
-             of <a href="file/TypedefSymbol.hpp_503A1EFD276FCC878370DCE2DCCAA9C8019E9FB6.html">TypedefSymbol.hpp</a>
+            Declaration at line <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html#16">16</a>
+             of <a href="file/TypedefSymbol.hpp_F42F4BED639CBE83A3340B34AB2212201BF88A71.html">TypedefSymbol.hpp</a>
         </span>
         <br/>
         <br/>

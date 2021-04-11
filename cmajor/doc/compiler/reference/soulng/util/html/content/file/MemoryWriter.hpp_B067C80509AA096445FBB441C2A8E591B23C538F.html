@@ -1,0 +1,78 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SOULNG_UTIL_MEMORY_WRITER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SOULNG_UTIL_MEMORY_WRITER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Time.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/UtilApi.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdint.h></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html">MemoryWriter</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#constructor_MemoryWriter_C9F296314100EA61998984D136DDF80ECE392D6E">MemoryWriter</a><span class="other">(</span><span class="identifier">uint8_t</span><span class="other">*</span>&nbsp;<span class="identifier">ptr_</span><span class="other">,&nbsp;</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">count_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#function_Write_75D79AD14F9A765F721177EE8649DB2A3424F43B">Write</a><span class="other">(</span><span class="identifier">uint8_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#function_Write_CB9AF1574E58E818D08CC80317E7F004B1BB4753">Write</a><span class="other">(</span><span class="identifier">int8_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#function_Write_8CB891F9BD0236E09C7C0EE7DF0A7B18F7672234">Write</a><span class="other">(</span><span class="identifier">uint16_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#function_Write_C6579B29EB036E0A71A7E76295220D60812A21D2">Write</a><span class="other">(</span><span class="identifier">int16_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#function_Write_3B06C5122FBF80144158C48A12B1518D0B71BE8F">Write</a><span class="other">(</span><span class="identifier">uint32_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#function_Write_DDB4D8A2217503891D20F3231B8F9ABF640D0D0B">Write</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#function_Write_B3AEB71FEF3A5881732A08E5FF0075CEF85746EA">Write</a><span class="other">(</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#function_Write_1217F33047FA1E1E143A197274ED7ADA885F7AB9">Write</a><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#function_Write_4771E6639933511BBBB4F9EC45159DE092D4CDC0">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">dt</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span><span class="other">*</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#variable_ptr_9B9FA67F2D04BD6F893FBE3EE08BF0513197191A">ptr</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span><span class="other">*</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#variable_pos_FEDD266BFB6136C804731BCADE93FFA0D34F4B99">pos</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../class_MemoryWriter_BEBD1CF4DC7BA3CD659FE27588AD0C4207C6528D.html#variable_count_83CBF47A432B5E36693DB0C870AF53F40A53D467">count</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SOULNG_UTIL_MEMORY_WRITER_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

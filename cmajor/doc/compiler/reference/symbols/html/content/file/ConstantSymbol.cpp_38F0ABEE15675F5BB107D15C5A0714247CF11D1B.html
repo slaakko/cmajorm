@@ -1,0 +1,586 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/ConstantSymbol.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/TypeSymbol.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/SymbolTable.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/SymbolWriter.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/SymbolReader.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/Exception.hpp></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/SymbolCollector.hpp></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/Module.hpp></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ir/Emitter.hpp></span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">symbols</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#constructor_ConstantSymbol_97A42C6140118E625A20DD8476DED33E7E08A89B">ConstantSymbol</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">(</span><a href="../enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="../enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_constantSymbol_94534789B353FA6DD07F800C9C7CCFCAAE68AB93">constantSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_evaluating_7094660FB77BB4F0942B36AAD29681171E1445B6">evaluating</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_sizeOfValue_1C02E952C540A6F33401C59CCD7016E63FAE8BE9">sizeOfValue</a><span class="other">(</span><span class="other">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_valuePos_E8649CA4DEF4910B324B4EC5D9224B053679A473">valuePos</a><span class="other">(</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Write_32B17DC3706AB65CFE08998255195686309D3531">Write</a><span class="other">(</span><a href="../class_SymbolWriter_D66E3D6D7FC4C00C3A549FA3B321F027EF774457.html">SymbolWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">hasComplexValue</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">-></span><span class="identifier">IsComplexValue</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">hasComplexValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">hasComplexValue</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<span class="identifier">sizePos</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Pos</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<span class="identifier">sizeOfValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">sizeOfValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<span class="identifier">startPos</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Pos</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">-></span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<span class="identifier">endPos</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Pos</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">sizeOfValue</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">endPos</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">startPos</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Seek</span><span class="other">(</span><span class="identifier">sizePos</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">sizeOfValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Seek</span><span class="other">(</span><span class="identifier">endPos</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">WriteValue</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_strValue_A71257062CFEE10A0874BAB5939BB5CC1E6A7DFB">strValue</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Read_973EF09BD270279C749D0174569D0A0059F8A0F4">Read</a><span class="other">(</span><a href="../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html">SymbolReader</a><span class="other">&amp;</span>&nbsp;<span class="identifier">reader</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span>&nbsp;<span class="identifier">typeId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUuid</span><span class="other">(</span><span class="identifier">typeId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">EmplaceTypeRequest</span><span class="other">(</span><span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">typeId</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">hasComplexValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadBool</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">hasComplexValue</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_sizeOfValue_1C02E952C540A6F33401C59CCD7016E63FAE8BE9">sizeOfValue</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_valuePos_E8649CA4DEF4910B324B4EC5D9224B053679A473">valuePos</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Pos</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Skip</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_sizeOfValue_1C02E952C540A6F33401C59CCD7016E63FAE8BE9">sizeOfValue</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_filePathReadFrom_804E41BCE10B1A0A05F2882386A729A384AC59D9">filePathReadFrom</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">FileName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">ReadValue</span><span class="other">(</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_strValue_A71257062CFEE10A0874BAB5939BB5CC1E6A7DFB">strValue</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUtf32String</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;<a href="../class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">*</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_GetValue_B0E25CB905FB393B2C89E36F12411CB1A7012671">GetValue</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_filePathReadFrom_804E41BCE10B1A0A05F2882386A729A384AC59D9">filePathReadFrom</a><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"internal&nbsp;error:&nbsp;could&nbsp;not&nbsp;read&nbsp;value:&nbsp;value&nbsp;file&nbsp;name&nbsp;not&nbsp;set"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BinaryReader</span>&nbsp;<span class="identifier">reader</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_filePathReadFrom_804E41BCE10B1A0A05F2882386A729A384AC59D9">filePathReadFrom</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">Skip</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_valuePos_E8649CA4DEF4910B324B4EC5D9224B053679A473">valuePos</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">MakeValue</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"internal&nbsp;error:&nbsp;could&nbsp;not&nbsp;read&nbsp;value&nbsp;because&nbsp;could&nbsp;not&nbsp;create&nbsp;value&nbsp;of&nbsp;type&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">-></span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_EmplaceType_A7DECFEA2D54D92F15F947B3A61851A3ADD82885">EmplaceType</a><span class="other">(</span><a href="../class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">typeSymbol</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">index</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Accept_EFD51255E85175316E98DA4776FC400147D27E85">Accept</a><span class="other">(</span><a href="../class_SymbolCollector_96279A002006E750FAF6C5C4987EF78C9C152FAF.html">SymbolCollector</a><span class="other">*</span>&nbsp;<span class="identifier">collector</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="../enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddConstant</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Dump_A9056327847D1015D6A788A65F4525A634342DCB">Dump</a><span class="other">(</span><span class="identifier">CodeFormatter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"full&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullNameWithSpecifiers</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"mangled&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"type:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"value:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_SetSpecifiers_DC8E790B3E2B30373A9BFC390E462477ACB3AE50">SetSpecifiers</a><span class="other">(</span><span class="identifier">Specifiers</span>&nbsp;<span class="identifier">specifiers</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Specifiers</span>&nbsp;<span class="identifier">accessSpecifiers</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">access_</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetAccess</span><span class="other">(</span><span class="identifier">accessSpecifiers</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">static_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;static"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">virtual_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;virtual"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">override_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;override"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">abstract_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;abstract"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">inline_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;inline"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">explicit_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;explicit"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">external_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;external"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">suppress_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;suppressed"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">default_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;default"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">constexpr_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;constexpr"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">cdecl_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;cdecl"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">nothrow_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;nothrow"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">throw_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;throw"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">new_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;new"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">const_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;const"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">unit_test_</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"constant&nbsp;cannot&nbsp;be&nbsp;unit_test"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_ComputeMangledName_1FA71B5B184661FAD3358AEBB820110F590678BC">ComputeMangledName</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">ComputeMangledName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Syntax_97148CE3B4F60C96BBCCC6F4DF21F9554D16F774">Syntax</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">syntax</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">GetSpecifierStr</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">syntax</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">syntax</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">'&nbsp;'</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">syntax</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"const&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">syntax</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">DocName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">syntax</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">'&nbsp;'</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">syntax</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">DocName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">syntax</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"&nbsp;=&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">valueStr</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">IsUnsignedType</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">valueStr</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">'u'</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">syntax</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">valueStr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">syntax</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">';'</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">syntax</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_SetValue_3CD6ED10E36896194723AB086A49840BC7D51663">SetValue</a><span class="other">(</span><a href="../class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_ArrayIrObject_F1ECC7D69EAA9A513DBD5188DBFD48A8C70D7E70">ArrayIrObject</a><span class="other">(</span><span class="identifier">Emitter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">create</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">IsArrayType</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"internal&nbsp;error:&nbsp;array&nbsp;object&nbsp;expected"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"internal&nbsp;error:&nbsp;array&nbsp;value&nbsp;missing"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">-></span><span class="identifier">GetValueType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="../enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a><span class="other">::</span><a href="../enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html#enumerator_arrayValue_A9A33258A30A6C40657B80A29B26254E4F54D2C1">arrayValue</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"internal&nbsp;error:&nbsp;array&nbsp;value&nbsp;expected"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html">ArrayValue</a><span class="other">*</span>&nbsp;<span class="identifier">arrayValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html">ArrayValue</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">irArrayType</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">IrType</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">irArrayObject</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">GetOrInsertGlobal</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">irArrayType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">create</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">arrayObjectGlobal</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">irArrayObject</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">SetInitializer</span><span class="other">(</span><span class="identifier">arrayObjectGlobal</span><span class="other">,&nbsp;</span><span class="identifier">arrayValue</span><span class="other">-></span><span class="identifier">IrValue</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">irArrayObject</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_StructureIrObject_4C5328A14424701D7FCEFDA085C9C0E8348AF3AF">StructureIrObject</a><span class="other">(</span><span class="identifier">Emitter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">create</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">IsClassTypeSymbol</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"internal&nbsp;error:&nbsp;class&nbsp;type&nbsp;object&nbsp;expected"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"internal&nbsp;error:&nbsp;structured&nbsp;value&nbsp;missing"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">-></span><span class="identifier">GetValueType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="../enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a><span class="other">::</span><a href="../enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html#enumerator_structuredValue_A0F0EE839E07FCC3B765AAEA07EEC459C2ADEF85">structuredValue</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="string">"internal&nbsp;error:&nbsp;structured&nbsp;value&nbsp;expected"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StructuredValue_B2E6027F8490C6C3257E3986BF5B5EA7B7C7AF58.html">StructuredValue</a><span class="other">*</span>&nbsp;<span class="identifier">structuredValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../class_StructuredValue_B2E6027F8490C6C3257E3986BF5B5EA7B7C7AF58.html">StructuredValue</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_value_660AEF765B29AE53954F785B37061F06978BCFDD">value</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">irStructureType</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">-></span><span class="identifier">IrType</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">irStructureObject</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">GetOrInsertGlobal</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">irStructureType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">create</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">structureObjectGlobal</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">irStructureObject</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">SetInitializer</span><span class="other">(</span><span class="identifier">structureObjectGlobal</span><span class="other">,&nbsp;</span><span class="identifier">structuredValue</span><span class="other">-></span><span class="identifier">IrValue</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">irStructureObject</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="270" xml:space="preserve"><span class="lineNumber">270</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="271" xml:space="preserve"><span class="lineNumber">271</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="272" xml:space="preserve"><span class="lineNumber">272</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_Check_8E9A7A584CD35A4FA468B31BBCB7D7F39917B28A">Check</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="273" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="274" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="275" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#variable_type_10B1548BFE6E987090BEAAA908CBAB7184291F86">type</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="276" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="277" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="../class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="string">"constant&nbsp;symbol&nbsp;has&nbsp;no&nbsp;type"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="278" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="279" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="280" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="281" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">ConstantSymbol</a><span class="other">::</span><a href="../class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html#function_GetSymbolHelp_80C2FEF6254DBD1D4854DE5DC2546287E3481C67">GetSymbolHelp</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="282" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="283" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">help</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"("</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="284" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">help</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">GetSymbolCategoryDescription</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">")&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="285" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">help</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"&nbsp;"</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="286" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">help</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="287" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="288" xml:space="preserve"><span class="lineNumber">288</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="289" xml:space="preserve"><span class="lineNumber">289</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::symbols</span></span>
+  <br/>
+ </body>
+</html>

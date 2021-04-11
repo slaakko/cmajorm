@@ -16,8 +16,8 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#36">36</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#38">38</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
@@ -26,7 +26,7 @@
                 <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#constructor_ArrayLengthFunction_A83E4C4FB00296627082111532502BBE8765AC82">ArrayLengthFunction</a>(<a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a>* arrayType_)</td>
             </tr>
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#constructor_ArrayLengthFunction_7C389A865A06759C87005D777496092ABDA38D15">ArrayLengthFunction</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#constructor_ArrayLengthFunction_67AC215CD3AB41AC723BD093AFFE09E686DAFBBA">ArrayLengthFunction</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -41,7 +41,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#function_ConstructValue_2DDB98E062ED25952DC2676F3F4B660432CDB744">ConstructValue</a>(<span class="kw">const </span>std::vector&lt;std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>>>&amp; argumentValues, <span class="kw">const </span>Span&amp; span, <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>* receiver) <span class="kw">const override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#function_ConstructValue_6AD032989AEE7C6E90FD3A53E9EF663F9B514B00">ConstructValue</a>(<span class="kw">const </span>std::vector&lt;std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>>>&amp; argumentValues, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId, <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>* receiver) <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -49,7 +49,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#function_GenerateCall_FC8AB37203DA5A72A93E8DF409901EE5D23A3746">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#function_GenerateCall_3587AE184889CF9003EBE7B9B00D00BAAE60DC67">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -82,39 +82,42 @@
             cmajor::symbols::ArrayLengthFunction::ArrayLengthFunction(<a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a>
             * arrayType_)</h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#117">117</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#119">119</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#40">40</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#42">42</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="constructor_ArrayLengthFunction_7C389A865A06759C87005D777496092ABDA38D15">ArrayLengthFunction Constructor</h3>
+        <h3 id="constructor_ArrayLengthFunction_67AC215CD3AB41AC723BD093AFFE09E686DAFBBA">ArrayLengthFunction Constructor</h3>
         <h4>
             cmajor::symbols::ArrayLengthFunction::ArrayLengthFunction(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#113">113</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#114">114</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_arrayLengthFunctionSymbol_B1B2EBA00891095ABCA2C38BBE29CDFEE8A5F005">arrayLengthFunctionSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_arrayLengthFunctionSymbol_B1B2EBA00891095ABCA2C38BBE29CDFEE8A5F005">arrayLengthFunctionSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#39">39</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#41">41</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -126,30 +129,30 @@
              cmajor::symbols::ArrayLengthFunction::Check() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#169">169</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#172">172</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"array&nbsp;length&nbsp;function&nbsp;has&nbsp;no&nbsp;array&nbsp;type"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="string">"array&nbsp;length&nbsp;function&nbsp;has&nbsp;no&nbsp;array&nbsp;type"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#49">49</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#51">51</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -163,6 +166,7 @@
         <span>
             Calls: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Check_4AF89A439E7139CEB263EA663840E4BB618B1B3E">cmajor::symbols::FunctionSymbol::Check</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -174,11 +178,11 @@
             * cmajor::symbols::ArrayLengthFunction::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#48">48</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#50">50</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ArrayLengthFunction"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ArrayLengthFunction"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -191,37 +195,38 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_ConstructValue_2DDB98E062ED25952DC2676F3F4B660432CDB744">ConstructValue Member Function</h3>
+        <h3 id="function_ConstructValue_6AD032989AEE7C6E90FD3A53E9EF663F9B514B00">ConstructValue Member Function</h3>
         <h4>
             std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             > cmajor::symbols::ArrayLengthFunction::ConstructValue(<span class="kw">const </span>
             std::vector&lt;std::unique_ptr&lt;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             >>&amp; argumentValues, <span class="kw">const </span>
-            Span&amp; span, <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId, <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             * receiver) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#164">164</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#167">167</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_LongValue_1BD265CB5802007DF44E57306A8CE9482A5A8B33.html">LongValue</a><span class="other">(</span><span class="identifier">span</span><span class="other">,&nbsp;</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">-></span><span class="identifier">Size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_LongValue_1BD265CB5802007DF44E57306A8CE9482A5A8B33.html">LongValue</a><span class="other">(</span><span class="identifier">span</span><span class="other">,&nbsp;</span><span class="identifier">moduleId</span><span class="other">,&nbsp;</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">-></span><span class="identifier">Size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#45">45</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#47">47</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ConstructValue_71E99BB10B4189CC2799E38F7219618A792EF463">cmajor::symbols::FunctionSymbol::ConstructValue</a>
+            Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ConstructValue_8F99C46540C64E4145DAED16A3802211AEBBEDF5">cmajor::symbols::FunctionSymbol::ConstructValue</a>
         </span>
         <br/>
         <br/>
@@ -239,13 +244,13 @@
              index) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#143">143</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#146">146</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#43">43</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#45">45</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -262,35 +267,36 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_GenerateCall_FC8AB37203DA5A72A93E8DF409901EE5D23A3746">GenerateCall Member Function</h3>
+        <h3 id="function_GenerateCall_3587AE184889CF9003EBE7B9B00D00BAAE60DC67">GenerateCall Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::symbols::ArrayLengthFunction::GenerateCall(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>
-            Span&amp; span) <span class="kw">override</span>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#156">156</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#159">159</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">SetCurrentDebugLocation</span><span class="other">(</span><span class="identifier">span</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">SetCurrentDebugLocation</span><span class="other">(</span><span class="identifier">span</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">genObjects</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"array&nbsp;length&nbsp;needs&nbsp;one&nbsp;object"</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">genObjects</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"array&nbsp;length&nbsp;needs&nbsp;one&nbsp;object"</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">size</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateIrValueForULong</span><span class="other">(</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">-></span><span class="identifier">Size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">size</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateIrValueForULong</span><span class="other">(</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">-></span><span class="identifier">Size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><span class="identifier">size</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><span class="identifier">size</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#44">44</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#46">46</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -306,11 +312,11 @@
              cmajor::symbols::ArrayLengthFunction::IsBasicTypeOperation() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#46">46</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#48">48</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -327,11 +333,11 @@
              cmajor::symbols::ArrayLengthFunction::IsCompileTimePrimitiveFunction() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#47">47</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#49">49</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -349,28 +355,28 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#135">135</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#138">138</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span>&nbsp;<span class="identifier">typeId</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span>&nbsp;<span class="identifier">typeId</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUuid</span><span class="other">(</span><span class="identifier">typeId</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUuid</span><span class="other">(</span><span class="identifier">typeId</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">EmplaceTypeRequest</span><span class="other">(</span><span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">typeId</span><span class="other">,&nbsp;</span><span class="other">1</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">EmplaceTypeRequest</span><span class="other">(</span><span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">typeId</span><span class="other">,&nbsp;</span><span class="other">1</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#42">42</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#44">44</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -397,24 +403,24 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#129">129</a>
-             of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            Definition at line <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html#132">132</a>
+             of <a href="file/ArrayTypeSymbol.cpp_D128E85F6A1F5D5E1D5046D70D4528C1D88FAA1E.html">ArrayTypeSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_ArrayLengthFunction_9078AC53FF16E7839CADC1ED62796CAA5861D0FE.html#variable_arrayType_E76D24FF648D49843E3F4A0FA0A87485E94FAA06">arrayType</a><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#41">41</a>
-             of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            Declaration at line <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html#43">43</a>
+             of <a href="file/ArrayTypeSymbol.hpp_FB3638D101ACB688B1151D53C19E3768D2694452.html">ArrayTypeSymbol.hpp</a>
         </span>
         <br/>
         <br/>

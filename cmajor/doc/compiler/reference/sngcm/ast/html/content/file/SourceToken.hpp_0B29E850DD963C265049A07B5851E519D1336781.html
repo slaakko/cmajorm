@@ -1,0 +1,72 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SNGCM_AST_SOURCE_TOKEN_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SNGCM_AST_SOURCE_TOKEN_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngcm/ast/AstApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">sngcm</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">ast</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html">SourceTokenFormatter</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">SourceTokenFormatter</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_BeginFormat_D6C7596F579BBD57D16C1C0C4D8A91F3CCA4701F">BeginFormat</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_EndFormat_E009080B34DDAA7A874B33E0507CD72B8AA05CF9">EndFormat</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_Keyword_E2EB2308FAC986438CBDED2B0CD2FB4D019B7C19">Keyword</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">keyword</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_Identifier_17A708F3E80A54F0BE5282C34AB2B5565B01DD26">Identifier</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">identifier</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_Number_F32B22A076D4DA35720EB5EDC29E044E67E68E76">Number</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">number</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_Char_3CA423D49ACBFD0BE7FF39D0E17A7F0C7964FD43">Char</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">char_</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_String_E4C6E824F6A59A6D5DE74882E2EDB633417715BB">String</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">string</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_Spaces_70C5C47578E4870AA62D30C37032C7BB5F4F7F26">Spaces</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">spaces</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_Comment_7A02F530A3A664BE28760660F29C80153DD60AD0">Comment</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">comment</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_NewLine_33077BD902E11766E3ED58DC9E1FE4FFF976E2FC">NewLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">newline</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SourceTokenFormatter_43A31107110C00D7E0E8F22B350FE1EA41BA4A88.html#function_Other_9B3EDA34F583AEE24EFAD119C44930EFBE37CC67">Other</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">other</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;sngcm::ast</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SNGCM_AST_SOURCE_TOKEN_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

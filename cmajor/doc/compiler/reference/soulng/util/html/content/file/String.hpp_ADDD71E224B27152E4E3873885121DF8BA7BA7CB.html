@@ -1,0 +1,200 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SOULNG_UTIL_STRING_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SOULNG_UTIL_STRING_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Defines.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Error.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="identifier">uint64_t</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_StringLen_1E1373E01A1AF45E706A22BC623EB048376E956C">StringLen</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">char32_t</span><span class="other">*</span>&nbsp;<span class="identifier">s</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint64_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">s</span><span class="other">,&nbsp;</span><span class="string">"null&nbsp;string&nbsp;ptr"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="other">*</span><span class="identifier">s</span><span class="other">++</span><span class="other">)</span>&nbsp;<span class="other">++</span><span class="identifier">n</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">n</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html">StringPtr</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html#constructor_StringPtr_54A594F5F6A2120C17030E5B9324FA5B93C48957">StringPtr</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">char32_t</span><span class="other">*</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html#variable_value_6D917F2889325AF4FA3AD1B1D1D27480A17E4929">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char32_t</span><span class="other">*</span>&nbsp;<a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html#function_Value_5274B905CA72412DCF500F3D46043C49CE04D70B">Value</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html#variable_value_6D917F2889325AF4FA3AD1B1D1D27480A17E4929">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html#function_IsEmpty_CC462F8363EC2890C843BD9C08DD6054438E4851">IsEmpty</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html#variable_value_6D917F2889325AF4FA3AD1B1D1D27480A17E4929">value</a><span class="other">,&nbsp;</span><span class="string">"null&nbsp;string&nbsp;ptr"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">*</span><a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html#variable_value_6D917F2889325AF4FA3AD1B1D1D27480A17E4929">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char32_t</span><span class="other">*</span>&nbsp;<a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html#variable_value_6D917F2889325AF4FA3AD1B1D1D27480A17E4929">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">==</span><span class="other">(</span><a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html">StringPtr</a>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html">StringPtr</a>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char32_t</span><span class="other">*</span>&nbsp;<span class="identifier">p</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">left</span><span class="other">.</span><span class="identifier">Value</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char32_t</span><span class="other">*</span>&nbsp;<span class="identifier">q</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">right</span><span class="other">.</span><span class="identifier">Value</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">p</span><span class="other">,&nbsp;</span><span class="string">"null&nbsp;string&nbsp;ptr"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">q</span><span class="other">,&nbsp;</span><span class="string">"null&nbsp;string&nbsp;ptr"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="other">*</span><span class="identifier">p</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">*</span><span class="identifier">q</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">*</span><span class="identifier">p</span><span class="other">&nbsp;==&nbsp;</span><span class="other">*</span><span class="identifier">q</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">p</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">q</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">*</span><span class="identifier">p</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">!</span><span class="other">*</span><span class="identifier">q</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">!=</span><span class="other">(</span><a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html">StringPtr</a>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html">StringPtr</a>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">left</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;</span><span class="other">(</span><a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html">StringPtr</a>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html">StringPtr</a>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char32_t</span><span class="other">*</span>&nbsp;<span class="identifier">p</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">left</span><span class="other">.</span><span class="identifier">Value</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char32_t</span><span class="other">*</span>&nbsp;<span class="identifier">q</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">right</span><span class="other">.</span><span class="identifier">Value</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">p</span><span class="other">,&nbsp;</span><span class="string">"null&nbsp;string&nbsp;ptr"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">q</span><span class="other">,&nbsp;</span><span class="string">"null&nbsp;string&nbsp;ptr"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="other">*</span><span class="identifier">p</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">*</span><span class="identifier">q</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">*</span><span class="identifier">p</span><span class="other">&nbsp;==&nbsp;</span><span class="other">*</span><span class="identifier">q</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">p</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">q</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><span class="identifier">p</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="other">*</span><span class="identifier">q</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_StringPtrHash_D372607DEB7E1F8251D058C4506CC3C6B838F9EB.html">StringPtrHash</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;<span class="pp">#if&nbsp;defined(BITS_64)</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;<span class="pp">#elif&nbsp;defined(BITS_32)</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;<span class="pp">#else</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;#error&nbsp;either&nbsp;BITS_64&nbsp;or&nbsp;BITS_32&nbsp;must&nbsp;be&nbsp;defined</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;<span class="pp">#endif</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">size_t</span>&nbsp;<span class="kw">operator</span><span class="other">()</span><span class="other">(</span><a href="../class_StringPtr_AD88B7A6F76C2E123CB20D10817599DDC067DFB4.html">StringPtr</a>&nbsp;<span class="identifier">s</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">size_t</span>&nbsp;<span class="identifier">value</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">offset</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char32_t</span><span class="other">*</span>&nbsp;<span class="identifier">p</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">Value</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">p</span><span class="other">,&nbsp;</span><span class="string">"null&nbsp;string&nbsp;ptr"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="other">*</span><span class="identifier">p</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">value</span><span class="other">&nbsp;^=&nbsp;</span><span class="other">(</span><span class="identifier">size_t</span><span class="other">)</span><span class="other">*</span><span class="identifier">p</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">value</span><span class="other">&nbsp;*=&nbsp;</span><span class="identifier">prime</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">p</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">value</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">92</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">93</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">94</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">95</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">96</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SOULNG_UTIL_STRING_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

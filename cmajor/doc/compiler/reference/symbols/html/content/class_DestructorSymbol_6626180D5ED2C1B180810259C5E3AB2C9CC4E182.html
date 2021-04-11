@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#323">323</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#353">353</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#constructor_DestructorSymbol_B63835910FCB4A5612E0727CE7DBC1316663455B">DestructorSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#constructor_DestructorSymbol_58B350BB1C3CD8E796CCDAFAB5FE4A778C427CB8">DestructorSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -39,6 +39,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#function_CodeName_0452A5B03B6C2F3BFE9F6FC85644246AA9F439F6">CodeName</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#function_Copy_E3A5F4F78D76BF035B828B2F6A78AF54C4550CB9">Copy</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -77,6 +81,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#function_SetSpecifiers_6FF353A8C1F7FD6622D154C9630099A93CD1340B">SetSpecifiers</a>(Specifiers specifiers)</td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#function_StartParamIndex_676500400BE6AF9DD7AC3ABFE30CDE5A79178044">StartParamIndex</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#function_TypeString_D344DD38DC32A7325DB096A7FACF169DC1A5704E">TypeString</a>() <span class="kw">const override</span></td>
             </tr>
@@ -94,30 +102,33 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_DestructorSymbol_B63835910FCB4A5612E0727CE7DBC1316663455B">DestructorSymbol Constructor</h3>
+        <h3 id="constructor_DestructorSymbol_58B350BB1C3CD8E796CCDAFAB5FE4A778C427CB8">DestructorSymbol Constructor</h3>
         <h4>
             cmajor::symbols::DestructorSymbol::DestructorSymbol(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html#1641">1641</a>
-             of <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html">FunctionSymbol.cpp</a>
+            Definition at line <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html#1857">1857</a>
+             of <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html">FunctionSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1641</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_destructorSymbol_8C06C0AD3BF51BC66C921CE3CA02B25072099348">destructorSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1857</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1642</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1858</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_destructorSymbol_8C06C0AD3BF51BC66C921CE3CA02B25072099348">destructorSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1643</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGroupName</span><span class="other">(</span><span class="string">U"@destructor"</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1859</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1644</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1860</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGroupName</span><span class="other">(</span><span class="string">U"@destructor"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1861</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#326">326</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Declaration at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#356">356</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -130,11 +141,11 @@
             * collector) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#330">330</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#360">360</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">330</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">360</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -154,11 +165,11 @@
             * cmajor::symbols::DestructorSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#340">340</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#370">370</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">340</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"DestructorSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">370</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"DestructorSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -176,22 +187,22 @@
             std::u32string cmajor::symbols::DestructorSymbol::CodeName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html#1749">1749</a>
-             of <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html">FunctionSymbol.cpp</a>
+            Definition at line <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html#1974">1974</a>
+             of <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html">FunctionSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1750</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1975</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1751</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="string">U"~"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">Parent</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">CodeName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1976</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="string">U"~"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">Parent</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">CodeName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1752</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1977</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#333">333</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Declaration at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#363">363</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -208,36 +219,81 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_Copy_E3A5F4F78D76BF035B828B2F6A78AF54C4550CB9">Copy Member Function</h3>
+        <h4>
+            <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
+            * cmajor::symbols::DestructorSymbol::Copy() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html#1863">1863</a>
+             of <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html">FunctionSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">1864</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1865</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html">DestructorSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">copy</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html">DestructorSymbol</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1866</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">copy</span><span class="other">-></span><span class="identifier">CopyFrom</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1867</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">copy</span><span class="other">-></span><a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">&nbsp;=&nbsp;</span><a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1868</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">copy</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1869</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#372">372</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Copy_2A6E88DD2D0C74350CCC21239986B894D281349D">cmajor::symbols::FunctionSymbol::Copy</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_CopyFrom_6A5B015311EFA76F94F9475FB98E3002CF324B54">cmajor::symbols::FunctionSymbol::CopyFrom</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_DontThrow_9E66D38008BE15BB5CF622880CB355AC3F6DD7A4">DontThrow Member Function</h3>
         <h4>
             <span class="kw">bool</span>
              cmajor::symbols::DestructorSymbol::DontThrow() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html#1754">1754</a>
-             of <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html">FunctionSymbol.cpp</a>
+            Definition at line <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html#1979">1979</a>
+             of <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html">FunctionSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1755</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1980</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1756</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetBackEnd</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html">BackEnd</a><span class="other">::</span><a href="./enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html#enumerator_cmcpp_3AA0702D7F00DC4F5F54852FDD45A7D87201F8CA">cmcpp</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1981</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetBackEnd</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html">BackEnd</a><span class="other">::</span><a href="./enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html#enumerator_cmcpp_3AA0702D7F00DC4F5F54852FDD45A7D87201F8CA">cmcpp</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1757</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1982</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1758</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="identifier">HasCleanup</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1983</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="identifier">HasCleanup</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1759</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1984</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1760</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1985</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1761</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1986</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#336">336</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Declaration at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#366">366</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -258,11 +314,11 @@
             * cmajor::symbols::DestructorSymbol::GetThisParam() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#332">332</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#362">362</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">332</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Parameters</span><span class="other">(</span><span class="other">)</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">362</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Parameters</span><span class="other">(</span><span class="other">)</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -283,11 +339,11 @@
             std::u32string cmajor::symbols::DestructorSymbol::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#339">339</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#369">369</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">339</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">369</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -305,11 +361,11 @@
              cmajor::symbols::DestructorSymbol::IsConstructorDestructorOrNonstaticMemberFunction() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#334">334</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#364">364</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">334</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">364</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -326,13 +382,13 @@
              cmajor::symbols::DestructorSymbol::IsExportSymbol() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html#1646">1646</a>
-             of <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html">FunctionSymbol.cpp</a>
+            Definition at line <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html#1871">1871</a>
+             of <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html">FunctionSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#329">329</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Declaration at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#359">359</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -356,11 +412,11 @@
              cmajor::symbols::DestructorSymbol::IsGeneratedFunction() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#335">335</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#365">365</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">335</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">365</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -378,24 +434,24 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html#1665">1665</a>
-             of <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html">FunctionSymbol.cpp</a>
+            Definition at line <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html#1890">1890</a>
+             of <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html">FunctionSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1666</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1891</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1667</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1892</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1668</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadBool</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1893</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadBool</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1669</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1894</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#328">328</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Declaration at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#358">358</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -418,11 +474,11 @@
             <span class="kw">void</span>
              cmajor::symbols::DestructorSymbol::SetGenerated()</h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#338">338</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#368">368</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">338</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">368</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -438,13 +494,13 @@
             <span class="kw">void</span>
              cmajor::symbols::DestructorSymbol::SetSpecifiers(Specifiers specifiers)</h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html#1671">1671</a>
-             of <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html">FunctionSymbol.cpp</a>
+            Definition at line <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html#1896">1896</a>
+             of <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html">FunctionSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#337">337</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Declaration at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#367">367</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -455,6 +511,28 @@
             , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_SetVirtual_8053F00AE1FFAF0546C302B00017EEA3E15CE8A1">cmajor::symbols::FunctionSymbol::SetVirtual</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetAccess_121F064F7F499D20D45D6E7192296F2A23583BE1">cmajor::symbols::Symbol::SetAccess</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_StartParamIndex_676500400BE6AF9DD7AC3ABFE30CDE5A79178044">StartParamIndex Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             cmajor::symbols::DestructorSymbol::StartParamIndex() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#371">371</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">371</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">1</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_StartParamIndex_010927DCF2AD1083866EB0FDBD1A3AB469B90298">cmajor::symbols::FunctionSymbol::StartParamIndex</a>
         </span>
         <br/>
         <br/>
@@ -464,11 +542,11 @@
             std::string cmajor::symbols::DestructorSymbol::TypeString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#331">331</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Definition at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#361">361</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">331</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"destructor"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">361</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"destructor"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -488,24 +566,24 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html#1659">1659</a>
-             of <a href="file/FunctionSymbol.cpp_2C2562AFEDF5FA7D701E47B7FF956E2E6D6B00BE.html">FunctionSymbol.cpp</a>
+            Definition at line <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html#1884">1884</a>
+             of <a href="file/FunctionSymbol.cpp_C984823D2F5F47785AF8780EAE0CE37EA3AD8595.html">FunctionSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1660</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1885</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1661</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1886</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1662</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1887</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_DestructorSymbol_6626180D5ED2C1B180810259C5E3AB2C9CC4E182.html#variable_generated_E725A113464932D43E14DA58351ACA785244FC79">generated</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1663</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1888</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html#327">327</a>
-             of <a href="file/FunctionSymbol.hpp_B247BEFC4384771A20FAAD218AF8118020786B9E.html">FunctionSymbol.hpp</a>
+            Declaration at line <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html#357">357</a>
+             of <a href="file/FunctionSymbol.hpp_4F6ECBCE4A88BB53DFF0ABF5A7381B79C4B64668.html">FunctionSymbol.hpp</a>
         </span>
         <br/>
         <br/>

@@ -1,0 +1,124 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/rt/Mutex.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Error.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;mutex></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtAllocateMutex_23F9F719684E786B9ED55B3D9281A406A47EE03E">RtAllocateMutex</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtFreeMutex_15413F6ADD3551B166C27384F24FC9493C663D67">RtFreeMutex</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">delete</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtLockMutex_0EF5BB33629E24927EA42587B74B27FB5FC502D5">RtLockMutex</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">*</span>&nbsp;<span class="identifier">mtx</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mtx</span><span class="other">-></span><span class="identifier">lock</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtUnlockMutex_C445C7FB4C45AB69DF26E8AF0588C663EE3300EB">RtUnlockMutex</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">*</span>&nbsp;<span class="identifier">mtx</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mtx</span><span class="other">-></span><span class="identifier">unlock</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtAllocateRecursiveMutex_192BF1DF4E2A70536662E520FFC50BA26B9DE6C3">RtAllocateRecursiveMutex</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtFreeRecursiveMutex_6D056713E94A78D4F7CD17FDEFD158792B355F18">RtFreeRecursiveMutex</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">delete</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtLockRecursiveMutex_DCE5A803FC5EF78E622FF2AA1A9B7717B5D53378">RtLockRecursiveMutex</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span>&nbsp;<span class="identifier">mtx</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mtx</span><span class="other">-></span><span class="identifier">lock</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtUnlockRecursiveMutex_1C49B1BAE36C14DB905E91A1D7A6070308C1073E">RtUnlockRecursiveMutex</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span>&nbsp;<span class="identifier">mtx</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mtx</span><span class="other">-></span><span class="identifier">unlock</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

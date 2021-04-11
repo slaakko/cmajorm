@@ -1,0 +1,58 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngxml/dom/DocumentFragment.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">sngxml</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">dom</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<a href="../class_DocumentFragment_2B141A2BB60C5C12291240BA461876F291E50535.html">DocumentFragment</a><span class="other">::</span><a href="../class_DocumentFragment_2B141A2BB60C5C12291240BA461876F291E50535.html#constructor_DocumentFragment_7FE139C6814AC890E82E0DF4518FC3C427B426C9">DocumentFragment</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_ParentNode_32EEAAD4A81494D922390069F0D2A62E62F636E6.html">ParentNode</a><span class="other">(</span><a href="../enum_NodeType_5368029CED50AA3E105E71B9D211833D74A20068.html">NodeType</a><span class="other">::</span><a href="../enum_NodeType_5368029CED50AA3E105E71B9D211833D74A20068.html#enumerator_documentFragmentNode_82CFDA7302458E30DD05B13C73C80BE4632752BB">documentFragmentNode</a><span class="other">,&nbsp;</span><span class="string">U"document_fragment"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span><a href="../class_DocumentFragment_2B141A2BB60C5C12291240BA461876F291E50535.html">DocumentFragment</a><span class="other">::</span><a href="../class_DocumentFragment_2B141A2BB60C5C12291240BA461876F291E50535.html#function_CloneNode_9359F171CC7E04DA2310CF7EFB64FF650D682877">CloneNode</a><span class="other">(</span><span class="kw">bool</span><span class="identifier">deep</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">clonedDocumentFragment</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_DocumentFragment_2B141A2BB60C5C12291240BA461876F291E50535.html">DocumentFragment</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">deep</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ParentNode_32EEAAD4A81494D922390069F0D2A62E62F636E6.html">ParentNode</a><span class="other">*</span>&nbsp;<span class="identifier">parentNode</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../class_ParentNode_32EEAAD4A81494D922390069F0D2A62E62F636E6.html">ParentNode</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">clonedDocumentFragment</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">CloneChildrenTo</span><span class="other">(</span><span class="identifier">parentNode</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clonedDocumentFragment</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;sngxml::dom</span></span>
+  <br/>
+ </body>
+</html>

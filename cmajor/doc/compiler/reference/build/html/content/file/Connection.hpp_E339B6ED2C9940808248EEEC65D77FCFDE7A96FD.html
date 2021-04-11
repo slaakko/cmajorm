@@ -1,0 +1,90 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_BUILD_CONNECTION_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_BUILD_CONNECTION_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/Log.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">build</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">class</span>&nbsp;<span class="identifier">MessageBase</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">class</span>&nbsp;<span class="identifier">BuildServer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Host_E94AA38A88E5E5A14022F010D55F30332CE31433.html">Host</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html">Connection</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#constructor_Connection_155C977A23981C4BD207968A298C997703C75724">Connection</a><span class="other">(</span><a href="../class_Log_E5FAA7543B7619E2D8F0ECB72340AD71D694329D.html">Log</a><span class="other">*</span>&nbsp;<span class="identifier">log_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">Connection</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">Send</span><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_DoSend_B8CF89EA851AAFE209586D595D368F62025314CE">DoSend</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">MessageBase</span><span class="other">></span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_Receive_E2FF4592D553BE37806CB82AF26F141224F0186C">Receive</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">JsonObject</span><span class="other">></span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_DoReceive_3269EE038BA43E22C4E1E05951F26FA4BD7308B9">DoReceive</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_Close_57632AF0651225DF64E5AD1CE922EA61601A983D">Close</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_DoClose_460E1A660244AF4B025D1A11655F5A148B834337">DoClose</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Log_E5FAA7543B7619E2D8F0ECB72340AD71D694329D.html">Log</a><span class="other">*</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_GetLog_3C50E2898E732C90E515F2D2E91EC79B1D04F5DA">GetLog</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#variable_log_6931CA55AA5BD25C9F01BBD3A9264D731089E146">log</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_GetActor_9C1BFEA05A51B985392EAD95ED5351DE85CD3C79">GetActor</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_ServerAlive_0B71BD9960C20B7319DC14888677C9822307EAB3">ServerAlive</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#variable_serverAlive_6D38CE44EB1DAEFDCE85D16A3627B0B5B5F90E60">serverAlive</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_SetServerAlive_F273FCD06B9CD59C8D858A2E7670A602657871BE">SetServerAlive</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">serverAlive_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_SetServer_D3C3FBA398B25D7952DE90A612CED82E997A8F00">SetServer</a><span class="other">(</span><span class="identifier">BuildServer</span><span class="other">*</span>&nbsp;<span class="identifier">server_</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#variable_server_84877A2AD1AC5377FA1295A3354558193E3759C8">server</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">server_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<a href="../class_Host_E94AA38A88E5E5A14022F010D55F30332CE31433.html">Host</a><span class="other">*</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#function_GetHost_40B1AC9DCBB86744EAC3BE11C01B23B440D305A4">GetHost</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Log_E5FAA7543B7619E2D8F0ECB72340AD71D694329D.html">Log</a><span class="other">*</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#variable_log_6931CA55AA5BD25C9F01BBD3A9264D731089E146">log</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BuildServer</span><span class="other">*</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#variable_server_84877A2AD1AC5377FA1295A3354558193E3759C8">server</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html#variable_serverAlive_6D38CE44EB1DAEFDCE85D16A3627B0B5B5F90E60">serverAlive</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::build</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_BUILD_CONNECTION_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

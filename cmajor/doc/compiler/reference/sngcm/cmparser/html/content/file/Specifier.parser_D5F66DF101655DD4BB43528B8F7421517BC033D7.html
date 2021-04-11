@@ -1,0 +1,104 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">[hpp]</span><span class="pp">#include&nbsp;&lt;sngcm/cmparser/ParserApi.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">[hpp]</span><span class="pp">#include&nbsp;&lt;sngcm/ast/Specifier.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">[cpp]</span><span class="pp">#include&nbsp;&lt;sngcm/cmlexer/CmajorLexer.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">[cpp]</span><span class="pp">#include&nbsp;&lt;sngcm/cmlexer/CmajorTokens.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">CmajorTokens</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">parser</span>&nbsp;<span class="kw">api</span><span class="other">(</span><span class="identifier">SNGCM_PARSER_API</span><span class="other">)</span>&nbsp;<span class="identifier">SpecifierParser</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">uselexer</span>&nbsp;<span class="identifier">CmajorLexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Specifiers</span><span class="other">(</span><span class="kw">var</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span>&nbsp;<span class="identifier">specifiers</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="other">(</span><span class="other">(</span><span class="identifier">Specifier</span><span class="other">:</span><span class="identifier">specifier</span><span class="other">{</span>&nbsp;<span class="identifier">specifiers</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">specifiers</span>&nbsp;<span class="other">|</span>&nbsp;<span class="identifier">specifier</span><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">*</span><span class="other">)</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">specifiers</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Specifier</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="identifier">PUBLIC</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">public_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">PROTECTED</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">protected_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">PRIVATE</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">private_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">INTERNAL</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">internal_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">STATIC</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">static_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">VIRTUAL</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">virtual_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">OVERRIDE</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">override_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">ABSTRACT</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">abstract_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">INLINE</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">inline_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">EXPLICIT</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">explicit_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">EXTERN</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">external_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">SUPPRESS</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">suppress_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">DEFAULT</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">default_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">CONSTEXPR</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">constexpr_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">CDECL</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">cdecl_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">NOTHROW</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">nothrow_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">THROW</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">throw_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">NEW</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">new_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">UNIT_TEST</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">unit_test_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;<span class="identifier">WINAPI</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">Specifiers</span><span class="other">::</span><span class="identifier">winapi</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ruleinfo</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">(</span><span class="identifier">Specifiers</span><span class="other">,</span>&nbsp;<span class="string">"specifiers"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">Specifier</span><span class="other">,</span>&nbsp;<span class="string">"specifier"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

@@ -16,8 +16,8 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#133">133</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#136">136</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
@@ -26,7 +26,7 @@
                 <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#constructor_FunctionToDelegateConversion_B1A3FB3E87E66B9A6336D17441D8056F0EC92F87">FunctionToDelegateConversion</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* sourceType_, <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* targetType_, <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>* function_)</td>
             </tr>
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#constructor_FunctionToDelegateConversion_33DD48E38ABCB489AB660A9E91F269AD569B85C5">FunctionToDelegateConversion</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#constructor_FunctionToDelegateConversion_05F75E484119931C602401D5705B8D62DD82BFFD">FunctionToDelegateConversion</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -44,16 +44,8 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#function_ConversionDistance_71488CD75E11202542F924BAB166AD31E4F47121">ConversionDistance</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
-                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#function_ConversionSourceType_B135C3A4359F2D957A2165E9D9E2B6D10F23672C">ConversionSourceType</a>() <span class="kw">const override</span></td>
-            </tr>
-            <tr>
-                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#function_ConversionTargetType_40B14586A37AEE934C9DFFE76DC2D097EF91562C">ConversionTargetType</a>() <span class="kw">const override</span></td>
-            </tr>
-            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#function_GenerateCall_8C54E30A0DB596F795EF55EB87BEB20563406C91">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#function_GenerateCall_4F8423C98BC52B53112AE30B7875C240C5CD869E">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_ConversionType_CDCA03B61493967E6304CD32ACBE09CFDF355617.html">ConversionType</a></td>
@@ -88,52 +80,59 @@
             * targetType_, <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
             * function_)</h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#584">584</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#619">619</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;584</span>&nbsp;<span class="other">:</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;619</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;585</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_functionToDelegateSymbol_125E7D685081BB673BAD18986D299745636F593C">functionToDelegateSymbol</a><span class="other">,&nbsp;</span><span class="identifier">Span</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">U"@conversion"</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_sourceType_DC8B1945522C0AE54054FE75981B38EA8BC79623">sourceType</a><span class="other">(</span><span class="identifier">sourceType_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_targetType_82ADBE78A988CA01A54DC57FB2F14161CFD3784E">targetType</a><span class="other">(</span><span class="identifier">targetType_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_function_C95D8419752EA5A31A6DC8DB307CE691029D9A11">function</a><span class="other">(</span><span class="identifier">function_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;620</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_functionToDelegateSymbol_125E7D685081BB673BAD18986D299745636F593C">functionToDelegateSymbol</a><span class="other">,&nbsp;</span><span class="identifier">function_</span><span class="other">-></span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">function_</span><span class="other">-></span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">U"@conversion"</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_sourceType_DC8B1945522C0AE54054FE75981B38EA8BC79623">sourceType</a><span class="other">(</span><span class="identifier">sourceType_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_targetType_82ADBE78A988CA01A54DC57FB2F14161CFD3784E">targetType</a><span class="other">(</span><span class="identifier">targetType_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_function_C95D8419752EA5A31A6DC8DB307CE691029D9A11">function</a><span class="other">(</span><span class="identifier">function_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;586</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;621</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;587</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetConversion</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;622</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetConversion</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;588</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;623</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetConversionSourceType</span><span class="other">(</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_sourceType_DC8B1945522C0AE54054FE75981B38EA8BC79623">sourceType</a><span class="other">-></span><span class="identifier">PlainType</span><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;624</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetConversionTargetType</span><span class="other">(</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_targetType_82ADBE78A988CA01A54DC57FB2F14161CFD3784E">targetType</a><span class="other">-></span><span class="identifier">PlainType</span><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;625</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#137">137</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#140">140</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="constructor_FunctionToDelegateConversion_33DD48E38ABCB489AB660A9E91F269AD569B85C5">FunctionToDelegateConversion Constructor</h3>
+        <h3 id="constructor_FunctionToDelegateConversion_05F75E484119931C602401D5705B8D62DD82BFFD">FunctionToDelegateConversion Constructor</h3>
         <h4>
             cmajor::symbols::FunctionToDelegateConversion::FunctionToDelegateConversion(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#580">580</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#614">614</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;580</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_functionToDelegateSymbol_125E7D685081BB673BAD18986D299745636F593C">functionToDelegateSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;614</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;581</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;615</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_functionToDelegateSymbol_125E7D685081BB673BAD18986D299745636F593C">functionToDelegateSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_sourceType_DC8B1945522C0AE54054FE75981B38EA8BC79623">sourceType</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_targetType_82ADBE78A988CA01A54DC57FB2F14161CFD3784E">targetType</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_function_C95D8419752EA5A31A6DC8DB307CE691029D9A11">function</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;582</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;616</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;617</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#136">136</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#139">139</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -145,13 +144,13 @@
              cmajor::symbols::FunctionToDelegateConversion::Check() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#596">596</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#633">633</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#145">145</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#146">146</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -165,6 +164,7 @@
         <span>
             Calls: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Check_4AF89A439E7139CEB263EA663840E4BB618B1B3E">cmajor::symbols::FunctionSymbol::Check</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -176,11 +176,11 @@
             * cmajor::symbols::FunctionToDelegateConversion::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#144">144</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#145">145</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"FunctionToDelegateConversion"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"FunctionToDelegateConversion"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -198,11 +198,11 @@
             uint8_t cmajor::symbols::FunctionToDelegateConversion::ConversionDistance() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#139">139</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#142">142</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">1</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">1</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -213,73 +213,32 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_ConversionSourceType_B135C3A4359F2D957A2165E9D9E2B6D10F23672C">ConversionSourceType Member Function</h3>
-        <h4>
-            <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
-            * cmajor::symbols::FunctionToDelegateConversion::ConversionSourceType() <span class="kw">const override</span>
-        </h4>
-        <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#140">140</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_sourceType_DC8B1945522C0AE54054FE75981B38EA8BC79623">sourceType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
-        </span>
-        <br/>
-        <span>
-            Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ConversionSourceType_DA2FA15ABB0133CA312F20720A02F343589F67F8">cmajor::symbols::FunctionSymbol::ConversionSourceType</a>
-        </span>
-        <br/>
-        <br/>
-        <hr/>
-        <h3 id="function_ConversionTargetType_40B14586A37AEE934C9DFFE76DC2D097EF91562C">ConversionTargetType Member Function</h3>
-        <h4>
-            <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
-            * cmajor::symbols::FunctionToDelegateConversion::ConversionTargetType() <span class="kw">const override</span>
-        </h4>
-        <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#141">141</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_targetType_82ADBE78A988CA01A54DC57FB2F14161CFD3784E">targetType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
-        </span>
-        <br/>
-        <span>
-            Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ConversionTargetType_E3581C99887D52044B1D4F18D182EAC194EFB019">cmajor::symbols::FunctionSymbol::ConversionTargetType</a>
-        </span>
-        <br/>
-        <br/>
-        <hr/>
-        <h3 id="function_GenerateCall_8C54E30A0DB596F795EF55EB87BEB20563406C91">GenerateCall Member Function</h3>
+        <h3 id="function_GenerateCall_4F8423C98BC52B53112AE30B7875C240C5CD869E">GenerateCall Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::symbols::FunctionToDelegateConversion::GenerateCall(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>
-            Span&amp; span) <span class="kw">override</span>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html#590">590</a>
-             of <a href="file/DelegateSymbol.cpp_4BA5ACF16E1228CEFFA9192384A0E9E16A6F8E58.html">DelegateSymbol.cpp</a>
+            Definition at line <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html#627">627</a>
+             of <a href="file/DelegateSymbol.cpp_8082CD847B9B439C26FECD21C64F18BEE6BB1C8F.html">DelegateSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;591</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;628</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;592</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;629</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;593</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">.</span><span class="identifier">GetOrInsertFunction</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_function_C95D8419752EA5A31A6DC8DB307CE691029D9A11">function</a><span class="other">-></span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_function_C95D8419752EA5A31A6DC8DB307CE691029D9A11">function</a><span class="other">-></span><span class="identifier">IrType</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_function_C95D8419752EA5A31A6DC8DB307CE691029D9A11">function</a><span class="other">-></span><span class="identifier">DontThrow</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;630</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">.</span><span class="identifier">GetOrInsertFunction</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_function_C95D8419752EA5A31A6DC8DB307CE691029D9A11">function</a><span class="other">-></span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_function_C95D8419752EA5A31A6DC8DB307CE691029D9A11">function</a><span class="other">-></span><span class="identifier">IrType</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FunctionToDelegateConversion_528ACF569CD05CE5D8431A13AF117DAAFC3FB1FE.html#variable_function_C95D8419752EA5A31A6DC8DB307CE691029D9A11">function</a><span class="other">-></span><span class="identifier">DontThrow</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;594</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;631</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#142">142</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Declaration at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#143">143</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -297,11 +256,11 @@
              cmajor::symbols::FunctionToDelegateConversion::GetConversionType() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#138">138</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#141">141</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_ConversionType_CDCA03B61493967E6304CD32ACBE09CFDF355617.html">ConversionType</a><span class="other">::</span><a href="./enum_ConversionType_CDCA03B61493967E6304CD32ACBE09CFDF355617.html#enumerator_implicit__DB540795F8F19E0BEEF1C61541823315B0814C8E">implicit_</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_ConversionType_CDCA03B61493967E6304CD32ACBE09CFDF355617.html">ConversionType</a><span class="other">::</span><a href="./enum_ConversionType_CDCA03B61493967E6304CD32ACBE09CFDF355617.html#enumerator_implicit__DB540795F8F19E0BEEF1C61541823315B0814C8E">implicit_</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -318,11 +277,11 @@
              cmajor::symbols::FunctionToDelegateConversion::IsBasicTypeOperation() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html#143">143</a>
-             of <a href="file/DelegateSymbol.hpp_ABC28AA9630C8C77C349391239E6E80EC2EB85B4.html">DelegateSymbol.hpp</a>
+            Definition at line <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html#144">144</a>
+             of <a href="file/DelegateSymbol.hpp_45EBA18AE7A05B97B4680EBDAB407F9770986D67.html">DelegateSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>

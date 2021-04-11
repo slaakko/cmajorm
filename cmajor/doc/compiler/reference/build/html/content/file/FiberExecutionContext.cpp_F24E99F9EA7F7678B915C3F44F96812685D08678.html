@@ -1,0 +1,128 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/FiberExecutionContext.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/FiberConnection.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildClient.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildServer.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildServerMessage.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Fiber.hpp></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdexcept></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">build</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="other">(*</span><span class="identifier">runServerFunction</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html">FiberExecutionContext</a><span class="other">::</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#constructor_FiberExecutionContext_B1C33A777DE2FCC63F05367EAEA700070699E2A1">FiberExecutionContext</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">CreateFiberConnection</span><span class="other">(</span><span class="identifier">GetLog</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_client_20F528FCB29D620BDFA1D7E6859401D279B7BEAF">client</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><span class="identifier">BuildClient</span><span class="other">(</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_server_F51B659AC6C6CF5847DC1C35D4237A8E16D135C6">server</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><span class="identifier">BuildServer</span><span class="other">(</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetServer</span><span class="other">(</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_server_F51B659AC6C6CF5847DC1C35D4237A8E16D135C6">server</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">clientFiber</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ConvertThreadToFiber</span><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">runServerFunction</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">RunServer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">startAddress</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">reinterpret_cast</span><span class="other">&lt;</span><span class="kw">void</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">runServerFunction</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">serverFiber</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">CreateFiber</span><span class="other">(</span><span class="other">1024</span><span class="other">&nbsp;*&nbsp;</span><span class="other">1024</span><span class="other">,&nbsp;</span><span class="identifier">startAddress</span><span class="other">,&nbsp;</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">-></span><span class="identifier">SetFibers</span><span class="other">(</span><span class="identifier">serverFiber</span><span class="other">,&nbsp;</span><span class="identifier">clientFiber</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SwitchToFiber</span><span class="other">(</span><span class="identifier">serverFiber</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html">FiberExecutionContext</a><span class="other">::</span><span class="other">~</span><span class="identifier">FiberExecutionContext</span><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">-></span><span class="identifier">ServerAlive</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">-></span><span class="identifier">SetServerAlive</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">-></span><span class="identifier">GetLog</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">-></span><span class="identifier">GetLog</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Write</span><span class="other">(</span><span class="string">"closing&nbsp;connection\n"</span><span class="other">,&nbsp;</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_CloseConnectionRequest_55B5CE3226343CB5C1285AFE383C961D8275902B.html">CloseConnectionRequest</a>&nbsp;<span class="identifier">closeConnectionRequest</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">closeConnectionRequest</span><span class="other">.</span><span class="identifier">SendTo</span><span class="other">(</span><span class="other">*</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html">Connection</a><span class="other">*</span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html">FiberExecutionContext</a><span class="other">::</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#function_GetConnection_DABD0FB928F035D61E2030D5B54F7A9EAD0FEEA9">GetConnection</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html#variable_connection_2F4C48F868EA2997D3BA86730264C80A851628A4">connection</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::build</span></span>
+  <br/>
+ </body>
+</html>

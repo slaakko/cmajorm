@@ -1,0 +1,430 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/ClientCommand.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildLangLexer.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildLangClientParser.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildOption.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildServerMessage.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/Log.hpp></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildClient.hpp></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildServer.hpp></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/ServerConfig.hpp></span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/FiberExecutionContext.hpp></span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/LocalExecutionContext.hpp></span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/ClientExecutionContext.hpp></span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/GlobalFlags.hpp></span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngcm/ast/Project.hpp></span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Fiber.hpp></span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Error.hpp></span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Path.hpp></span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Log.hpp></span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">build</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">symbols</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_GetFilePath_E1173B23B2953B252EBC15FCF334B92D3578490F">GetFilePath</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">path</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">path</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;>=&nbsp;</span><span class="other">2</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;path"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">path</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">'&lt;'</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">path</span><span class="other">[</span><span class="identifier">path</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><span class="other">1</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">'>'</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;path"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">p</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">path</span><span class="other">.</span><span class="identifier">substr</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">path</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><span class="other">2</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">p</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"system"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">Path</span><span class="other">::</span><span class="identifier">Combine</span><span class="other">(</span><span class="identifier">Path</span><span class="other">::</span><span class="identifier">Combine</span><span class="other">(</span><span class="identifier">Path</span><span class="other">::</span><span class="identifier">Combine</span><span class="other">(</span><span class="identifier">CmajorRootDir</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"system"</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"System.Install"</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"System.Install.cmp"</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">p</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html">ExecutionContext</a><span class="other">></span><a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_CreateExecutionContext_A520E06F06E11D67A4F0177DC20A6CC1DE719E23">CreateExecutionContext</a><span class="other">(</span><span class="kw">const</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span><span class="identifier">serverName</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">serverName</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html">ExecutionContext</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_FiberExecutionContext_F2D0D1BE65FA93038C43688004467D24394859A4.html">FiberExecutionContext</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">serverName</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"local"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html">ExecutionContext</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html">LocalExecutionContext</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html">ExecutionContext</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_ClientExecutionContext_02A2CDECAAA97EC14E6547C738178D7A3BF7DDC6.html">ClientExecutionContext</a><span class="other">(</span><span class="identifier">serverName</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;<a href="../class_ClientCommand_30480C5C38CCBC5A6B75CCCA34F3E3787089333A.html">ClientCommand</a><span class="other">::</span><a href="../class_ClientCommand_30480C5C38CCBC5A6B75CCCA34F3E3787089333A.html#constructor_ClientCommand_03F181B7ED7CFD98180E33CFCBE341B69011C8FA">ClientCommand</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<a href="../class_ClientCommand_30480C5C38CCBC5A6B75CCCA34F3E3787089333A.html">ClientCommand</a><span class="other">::</span><span class="other">~</span><span class="identifier">ClientCommand</span><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;<a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html">PushProjectClientCommand</a><span class="other">::</span><a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#constructor_PushProjectClientCommand_9F6BD35F80621C671C934E124733F5F88D8E4CEF">PushProjectClientCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">projectFilePath_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">serverName_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#variable_projectFilePath_8F0791745651A3ACAAB3419F134CFF9F80BD590D">projectFilePath</a><span class="other">(</span><span class="identifier">GetFilePath</span><span class="other">(</span><span class="identifier">projectFilePath_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#variable_serverName_91CD42A0C6FC34B065983B985B422DDEA796CA7B">serverName</a><span class="other">(</span><span class="identifier">serverName_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html">PushProjectClientCommand</a><span class="other">::</span><a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#function_Execute_40AF2250CD7CAA22B06E161DCAB2BAE8BCD5A3E0">Execute</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">set</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<span class="identifier">pushedProjects</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html">ExecutionContext</a><span class="other">></span>&nbsp;<span class="identifier">context</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">CreateExecutionContext</span><span class="other">(</span><a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#variable_serverName_91CD42A0C6FC34B065983B985B422DDEA796CA7B">serverName</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">context</span><span class="other">-></span><span class="identifier">GetClient</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">PushProject</span><span class="other">(</span><a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#variable_projectFilePath_8F0791745651A3ACAAB3419F134CFF9F80BD590D">projectFilePath</a><span class="other">,&nbsp;</span><span class="identifier">pushedProjects</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html">Connection</a><span class="other">*</span>&nbsp;<span class="identifier">connection</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">context</span><span class="other">-></span><span class="identifier">GetConnection</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">connection</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_printDebugMessages_F381FB66D6C79261099E186FF4565D95CC847165">printDebugMessages</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"buildclient:&nbsp;closing&nbsp;connection"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">connection</span><span class="other">-></span><span class="identifier">ServerAlive</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">connection</span><span class="other">-></span><span class="identifier">SetServerAlive</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_CloseConnectionRequest_55B5CE3226343CB5C1285AFE383C961D8275902B.html">CloseConnectionRequest</a>&nbsp;<span class="identifier">closeConnectionRequest</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">closeConnectionRequest</span><span class="other">.</span><span class="identifier">SendTo</span><span class="other">(</span><span class="other">*</span><span class="identifier">connection</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">connection</span><span class="other">-></span><span class="identifier">Close</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#variable_serverName_91CD42A0C6FC34B065983B985B422DDEA796CA7B">serverName</a><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"project&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#variable_projectFilePath_8F0791745651A3ACAAB3419F134CFF9F80BD590D">projectFilePath</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;pushed&nbsp;to&nbsp;local&nbsp;build&nbsp;repository"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"project&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#variable_projectFilePath_8F0791745651A3ACAAB3419F134CFF9F80BD590D">projectFilePath</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;pushed&nbsp;to&nbsp;server&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_PushProjectClientCommand_0BCA6C0EBC07CAF600941B64BC0A80293AFD8E9E.html#variable_serverName_91CD42A0C6FC34B065983B985B422DDEA796CA7B">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<a href="../class_RemoveProjectClientCommand_3E949DF10ECD88946F31F80B35FEDA7B02D0F8FD.html">RemoveProjectClientCommand</a><span class="other">::</span><a href="../class_RemoveProjectClientCommand_3E949DF10ECD88946F31F80B35FEDA7B02D0F8FD.html#constructor_RemoveProjectClientCommand_46029FB633A34C86412BE6333149B4B69BD9A4FD">RemoveProjectClientCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">projectFilePath_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">serverName_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_RemoveProjectClientCommand_3E949DF10ECD88946F31F80B35FEDA7B02D0F8FD.html#variable_projectFilePath_9F04EE6B9002BDFED27EA334186532F175E3ABC8">projectFilePath</a><span class="other">(</span><span class="identifier">GetFilePath</span><span class="other">(</span><span class="identifier">projectFilePath_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_RemoveProjectClientCommand_3E949DF10ECD88946F31F80B35FEDA7B02D0F8FD.html#variable_serverName_7BF73D941DF43D970229CCB54312534F4D14FE81">serverName</a><span class="other">(</span><span class="identifier">serverName_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_RemoveProjectClientCommand_3E949DF10ECD88946F31F80B35FEDA7B02D0F8FD.html">RemoveProjectClientCommand</a><span class="other">::</span><a href="../class_RemoveProjectClientCommand_3E949DF10ECD88946F31F80B35FEDA7B02D0F8FD.html#function_Execute_C17532CB46DFBEACB6447DB90E6DA3689FF741A0">Execute</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<a href="../class_RemoveServerClientCommand_93C047C44CB61D3A7A6032437DFF86D90FC128A2.html">RemoveServerClientCommand</a><span class="other">::</span><a href="../class_RemoveServerClientCommand_93C047C44CB61D3A7A6032437DFF86D90FC128A2.html#constructor_RemoveServerClientCommand_E3E16C9D1FB8002AF7284329CD09668DA064C0A2">RemoveServerClientCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">serverName_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_RemoveServerClientCommand_93C047C44CB61D3A7A6032437DFF86D90FC128A2.html#variable_serverName_3938861380E554CE7296B72A95AA10229F1FCFBD">serverName</a><span class="other">(</span><span class="identifier">serverName_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_RemoveServerClientCommand_93C047C44CB61D3A7A6032437DFF86D90FC128A2.html">RemoveServerClientCommand</a><span class="other">::</span><a href="../class_RemoveServerClientCommand_93C047C44CB61D3A7A6032437DFF86D90FC128A2.html#function_Execute_33B0B7E9B63007B99B71DFA8C868E8237DBD0ECA">Execute</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ServerConfig_ECF49A7F78A9298F1377858FE5E0220012466DDF.html">ServerConfig</a><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Remove</span><span class="other">(</span><a href="../class_RemoveServerClientCommand_93C047C44CB61D3A7A6032437DFF86D90FC128A2.html#variable_serverName_3938861380E554CE7296B72A95AA10229F1FCFBD">serverName</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"server&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_RemoveServerClientCommand_93C047C44CB61D3A7A6032437DFF86D90FC128A2.html#variable_serverName_3938861380E554CE7296B72A95AA10229F1FCFBD">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;removed"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html">AddServerClientCommand</a><span class="other">::</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#constructor_AddServerClientCommand_0EFD56FC9482560B98495D77CD20D2F34C13FD80">AddServerClientCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">serverName_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">host_</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">port_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">defaultToolChain_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#variable_serverName_E7B07A2AFF5E20F5AE008F34D836983B111D711A">serverName</a><span class="other">(</span><span class="identifier">serverName_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#variable_host_AE430066C58EF224C4197CD39F71296C130EAD78">host</a><span class="other">(</span><span class="identifier">host_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#variable_port_4D115F039A3D9A08FA54BC803F1FCE5B93A9C2D5">port</a><span class="other">(</span><span class="identifier">port_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#variable_defaultToolChain_95316F83497E546F9B01A3EFA8EC8C7A6E1065A4">defaultToolChain</a><span class="other">(</span><span class="identifier">defaultToolChain_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html">AddServerClientCommand</a><span class="other">::</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#function_Execute_469E04F3B4ED6D8423A95D09A5305346F943BCE9">Execute</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">force</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetBuildOption</span><span class="other">(</span><span class="identifier">BuildOptions</span><span class="other">::</span><span class="identifier">force</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">force</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ServerConfig_ECF49A7F78A9298F1377858FE5E0220012466DDF.html">ServerConfig</a><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Add</span><span class="other">(</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#variable_serverName_E7B07A2AFF5E20F5AE008F34D836983B111D711A">serverName</a><span class="other">,&nbsp;</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#variable_host_AE430066C58EF224C4197CD39F71296C130EAD78">host</a><span class="other">,&nbsp;</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#variable_port_4D115F039A3D9A08FA54BC803F1FCE5B93A9C2D5">port</a><span class="other">,&nbsp;</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#variable_defaultToolChain_95316F83497E546F9B01A3EFA8EC8C7A6E1065A4">defaultToolChain</a><span class="other">,&nbsp;</span><span class="identifier">force</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"server&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_AddServerClientCommand_035E58E6F316FF7132ECF57D6B5EC1DAC0CEE8E6.html#variable_serverName_E7B07A2AFF5E20F5AE008F34D836983B111D711A">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;added"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html">BuildProjectClientCommand</a><span class="other">::</span><a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#constructor_BuildProjectClientCommand_1632CA380665063960412FF5CA89BF9BDB3255AA">BuildProjectClientCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">projectFilePath_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">serverName_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#variable_projectFilePath_24C676AA9996DCE74685A24E04A6CD91D6FEC484">projectFilePath</a><span class="other">(</span><span class="identifier">GetFilePath</span><span class="other">(</span><span class="identifier">projectFilePath_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#variable_serverName_D598D821552C16FCB5EB5C312BDAC7F63E6D31AD">serverName</a><span class="other">(</span><span class="identifier">serverName_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html">BuildProjectClientCommand</a><span class="other">::</span><a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#function_Execute_E47A0DF14FD109D37E8DDF9BCB7A1A8DB535F11F">Execute</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html">ExecutionContext</a><span class="other">></span>&nbsp;<span class="identifier">context</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">CreateExecutionContext</span><span class="other">(</span><a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#variable_serverName_D598D821552C16FCB5EB5C312BDAC7F63E6D31AD">serverName</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">config</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">buildConfig</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">toolChain</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">buildToolChain</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">printBuildOutput</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">GetBuildOption</span><span class="other">(</span><span class="identifier">BuildOptions</span><span class="other">::</span><span class="identifier">messages</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">rebuild</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">GetBuildOption</span><span class="other">(</span><span class="identifier">BuildOptions</span><span class="other">::</span><span class="identifier">rebuild</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">only</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">GetBuildOption</span><span class="other">(</span><span class="identifier">BuildOptions</span><span class="other">::</span><span class="identifier">only</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">context</span><span class="other">-></span><span class="identifier">GetClient</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">BuildProject</span><span class="other">(</span><a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#variable_projectFilePath_24C676AA9996DCE74685A24E04A6CD91D6FEC484">projectFilePath</a><span class="other">,&nbsp;</span><span class="identifier">config</span><span class="other">,&nbsp;</span><span class="identifier">toolChain</span><span class="other">,&nbsp;</span><span class="identifier">rebuild</span><span class="other">,&nbsp;</span><span class="identifier">only</span><span class="other">,&nbsp;</span><span class="identifier">printBuildOutput</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html">Connection</a><span class="other">*</span>&nbsp;<span class="identifier">connection</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">context</span><span class="other">-></span><span class="identifier">GetConnection</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">connection</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_printDebugMessages_F381FB66D6C79261099E186FF4565D95CC847165">printDebugMessages</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"buildclient:&nbsp;closing&nbsp;connection"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">connection</span><span class="other">-></span><span class="identifier">ServerAlive</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">connection</span><span class="other">-></span><span class="identifier">SetServerAlive</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_CloseConnectionRequest_55B5CE3226343CB5C1285AFE383C961D8275902B.html">CloseConnectionRequest</a>&nbsp;<span class="identifier">closeConnectionRequest</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">closeConnectionRequest</span><span class="other">.</span><span class="identifier">SendTo</span><span class="other">(</span><span class="other">*</span><span class="identifier">connection</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">connection</span><span class="other">-></span><span class="identifier">Close</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#variable_serverName_D598D821552C16FCB5EB5C312BDAC7F63E6D31AD">serverName</a><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"project&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#variable_projectFilePath_24C676AA9996DCE74685A24E04A6CD91D6FEC484">projectFilePath</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;built&nbsp;using&nbsp;local&nbsp;build&nbsp;repository"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"project&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#variable_projectFilePath_24C676AA9996DCE74685A24E04A6CD91D6FEC484">projectFilePath</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;built&nbsp;using&nbsp;server&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html#variable_serverName_D598D821552C16FCB5EB5C312BDAC7F63E6D31AD">serverName</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;<a href="../class_DebugProjectClientCommand_9881A4DABE163AA58F8B9BC5F7E8D6FB32057A91.html">DebugProjectClientCommand</a><span class="other">::</span><a href="../class_DebugProjectClientCommand_9881A4DABE163AA58F8B9BC5F7E8D6FB32057A91.html#constructor_DebugProjectClientCommand_EC4C84F2B92BBD9C89188B39A9EDF572B52B482F">DebugProjectClientCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">projectFilePath_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">serverName_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DebugProjectClientCommand_9881A4DABE163AA58F8B9BC5F7E8D6FB32057A91.html#variable_projectFilePath_BA7031D85C8397B3F3D1CA19330E5F2C2BD9BB91">projectFilePath</a><span class="other">(</span><span class="identifier">GetFilePath</span><span class="other">(</span><span class="identifier">projectFilePath_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_DebugProjectClientCommand_9881A4DABE163AA58F8B9BC5F7E8D6FB32057A91.html#variable_serverName_C287308AF98021C3E917148F782F6A5A5560C46A">serverName</a><span class="other">(</span><span class="identifier">serverName_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugProjectClientCommand_9881A4DABE163AA58F8B9BC5F7E8D6FB32057A91.html">DebugProjectClientCommand</a><span class="other">::</span><a href="../class_DebugProjectClientCommand_9881A4DABE163AA58F8B9BC5F7E8D6FB32057A91.html#function_Execute_58306C47082006A1F3C94E9CDCE81ACC4314A39F">Execute</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;<a href="../class_InstallProjectClientCommand_1637398B174E7EE136CE31F28AEC5936BE1DF80A.html">InstallProjectClientCommand</a><span class="other">::</span><a href="../class_InstallProjectClientCommand_1637398B174E7EE136CE31F28AEC5936BE1DF80A.html#constructor_InstallProjectClientCommand_17A39E00EC3F4FE0DBEA59088E56762E0A3A967B">InstallProjectClientCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">projectFilePath_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">directory_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">serverName_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_InstallProjectClientCommand_1637398B174E7EE136CE31F28AEC5936BE1DF80A.html#variable_projectFilePath_1A915141CF1C121B52CEE5C311346385B9F055D1">projectFilePath</a><span class="other">(</span><span class="identifier">GetFilePath</span><span class="other">(</span><span class="identifier">projectFilePath_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_InstallProjectClientCommand_1637398B174E7EE136CE31F28AEC5936BE1DF80A.html#variable_directory_923C625F2C7FADCAC58DD0FF2AF263E2C18EDF44">directory</a><span class="other">(</span><span class="identifier">GetFilePath</span><span class="other">(</span><span class="identifier">directory_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_InstallProjectClientCommand_1637398B174E7EE136CE31F28AEC5936BE1DF80A.html#variable_serverName_501D92C7401BFF62F0D73BD22137456E58E88D0F">serverName</a><span class="other">(</span><span class="identifier">serverName_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_InstallProjectClientCommand_1637398B174E7EE136CE31F28AEC5936BE1DF80A.html">InstallProjectClientCommand</a><span class="other">::</span><a href="../class_InstallProjectClientCommand_1637398B174E7EE136CE31F28AEC5936BE1DF80A.html#function_Execute_077E87F3FCFDCFE789C7B6FD6ADB6DE2BF6D360B">Execute</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;<a href="../class_ShowConfigurationClientCommand_B8A7CCE25F7CD29CD43ED3A75943AB2836EDA7EE.html">ShowConfigurationClientCommand</a><span class="other">::</span><a href="../class_ShowConfigurationClientCommand_B8A7CCE25F7CD29CD43ED3A75943AB2836EDA7EE.html#constructor_ShowConfigurationClientCommand_491DE8570FA56428919C1B5AD7A4A61A62B051AD">ShowConfigurationClientCommand</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ShowConfigurationClientCommand_B8A7CCE25F7CD29CD43ED3A75943AB2836EDA7EE.html">ShowConfigurationClientCommand</a><span class="other">::</span><a href="../class_ShowConfigurationClientCommand_B8A7CCE25F7CD29CD43ED3A75943AB2836EDA7EE.html#function_Execute_B039E4178D9DE9813E811D22F510A5223D52C9D0">Execute</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ServerConfig_ECF49A7F78A9298F1377858FE5E0220012466DDF.html">ServerConfig</a><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Show</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_ClientCommand_30480C5C38CCBC5A6B75CCCA34F3E3787089333A.html">ClientCommand</a><span class="other">></span><a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_ParseClientCommand_0A33871BED4C9DF5F1C02EDEDF69B052E87A6A9F">ParseClientCommand</a><span class="other">(</span><span class="kw">const</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span><span class="identifier">command</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BuildLangLexer_5B30F4E48EB3173EE96C39D13AC5609DEC1119E1.html">BuildLangLexer</a>&nbsp;<span class="identifier">lexer</span><span class="other">(</span><span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">command</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">""</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BuildOptionSetter</span>&nbsp;<span class="identifier">optionSetter</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../struct_BuildLangClientParser_92B1FC685528F1E07A3BD992155B6A84287D3D9D.html">BuildLangClientParser</a><span class="other">::</span><span class="identifier">Parse</span><span class="other">(</span><span class="identifier">lexer</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">optionSetter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::build;</span></span>
+  <br/>
+ </body>
+</html>

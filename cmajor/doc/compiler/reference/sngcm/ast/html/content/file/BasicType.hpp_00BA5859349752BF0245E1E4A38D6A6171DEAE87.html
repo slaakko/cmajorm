@@ -1,0 +1,316 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SNGCM_AST_BASIC_TYPE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SNGCM_AST_BASIC_TYPE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngcm/ast/Node.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/lexer/Lexer.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">sngcm</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">ast</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_BoolNode_0E6C7C9D8889718865B3C7C62D3DFEFEF8036C2B.html">BoolNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoolNode_0E6C7C9D8889718865B3C7C62D3DFEFEF8036C2B.html#constructor_BoolNode_FEF6109465AC0CA8586BB68E6D06F974278C6973">BoolNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_BoolNode_0E6C7C9D8889718865B3C7C62D3DFEFEF8036C2B.html#function_Clone_C30B32E8A083A1FAEACFEDA61FC275B2C12E1CDC">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BoolNode_0E6C7C9D8889718865B3C7C62D3DFEFEF8036C2B.html#function_Accept_D3CBEBC15CFB3671F5D20F972FD44EC6ACF6E352">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_BoolNode_0E6C7C9D8889718865B3C7C62D3DFEFEF8036C2B.html#function_ToString_CBA17FB0D87FE2DA4A89E9D75EDC0D8ABFF47414">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"bool"</span><span class="other">;</span>&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_SByteNode_27369E01C88219836AB79F205DAA65703E0CB95E.html">SByteNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SByteNode_27369E01C88219836AB79F205DAA65703E0CB95E.html#constructor_SByteNode_99FD491437F7202C849AB62643E29A61F1A9625A">SByteNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_SByteNode_27369E01C88219836AB79F205DAA65703E0CB95E.html#function_Clone_E4F109EB170F503CCF765CA6E08661745F798FB6">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SByteNode_27369E01C88219836AB79F205DAA65703E0CB95E.html#function_Accept_A69EA3BF119096E026024CAEA068A70056D4C6E1">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_SByteNode_27369E01C88219836AB79F205DAA65703E0CB95E.html#function_ToString_BA7EAB3070A5648A99904DCB191D2A76B627FFC9">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"sbyte"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ByteNode_C492431344FCF899D2F17B048418CBC7A3C90B06.html">ByteNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ByteNode_C492431344FCF899D2F17B048418CBC7A3C90B06.html#constructor_ByteNode_06308A9288501615DF6F57C5EBDE72D2767BC5D9">ByteNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_ByteNode_C492431344FCF899D2F17B048418CBC7A3C90B06.html#function_Clone_DE2F54E9256B8775E332FCA2BA46A4E91C04C8BC">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ByteNode_C492431344FCF899D2F17B048418CBC7A3C90B06.html#function_Accept_332C4472B0BDA82661C94B02FBD9FAFE47A1BE56">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_ByteNode_C492431344FCF899D2F17B048418CBC7A3C90B06.html#function_IsUnsignedTypeNode_B58270A614A83D70B1E81CA576504488F8E369A7">IsUnsignedTypeNode</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ByteNode_C492431344FCF899D2F17B048418CBC7A3C90B06.html#function_ToString_9A9777D2800AC79078A34C05F4ABDAF40AAADDE1">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"byte"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ShortNode_DA0D6E3A91BC87ABB38E2A7D6220986402332F49.html">ShortNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ShortNode_DA0D6E3A91BC87ABB38E2A7D6220986402332F49.html#constructor_ShortNode_FFB627C9DA556BE28DCCBD8B39D402C8BA6B31C0">ShortNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_ShortNode_DA0D6E3A91BC87ABB38E2A7D6220986402332F49.html#function_Clone_EC7FD8FF4E58532053175736CBDF85E628928BB3">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ShortNode_DA0D6E3A91BC87ABB38E2A7D6220986402332F49.html#function_Accept_FCA73C7ABF17679A34C37E109E4948F399E00441">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ShortNode_DA0D6E3A91BC87ABB38E2A7D6220986402332F49.html#function_ToString_F9267C328E05CDBC97F7B8E1D3D6D4C8746CAA1F">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"short"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_UShortNode_CA23AAEABBB53A97BA0D2FA83EE144A49AD558AA.html">UShortNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UShortNode_CA23AAEABBB53A97BA0D2FA83EE144A49AD558AA.html#constructor_UShortNode_3B52A37C6D75F63EFD05473F1E46F50A568FBEB5">UShortNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_UShortNode_CA23AAEABBB53A97BA0D2FA83EE144A49AD558AA.html#function_Clone_CBC3570F808435E41DC71F45A56F1A790780A5AF">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_UShortNode_CA23AAEABBB53A97BA0D2FA83EE144A49AD558AA.html#function_Accept_B24C9370D3CBC0909E05B27980FCF07375CC4FB5">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_UShortNode_CA23AAEABBB53A97BA0D2FA83EE144A49AD558AA.html#function_IsUnsignedTypeNode_CC420972C7255196112EFB7E58362462D5643D15">IsUnsignedTypeNode</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_UShortNode_CA23AAEABBB53A97BA0D2FA83EE144A49AD558AA.html#function_ToString_DFA575A9F4FF3555FED149E7785574163D376F98">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ushort"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_IntNode_D24E49996B0668DE797B7DD60AABA409ABE42E4C.html">IntNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_IntNode_D24E49996B0668DE797B7DD60AABA409ABE42E4C.html#constructor_IntNode_74901245E8E50817EF21F16949F69EEE3FE575FE">IntNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_IntNode_D24E49996B0668DE797B7DD60AABA409ABE42E4C.html#function_Clone_4F261859F4CD5AE3263D77588B871B2BD0CB1B93">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_IntNode_D24E49996B0668DE797B7DD60AABA409ABE42E4C.html#function_Accept_7B4B286DAE31FCFF3E582A808B10BE89A6CA5C4B">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_IntNode_D24E49996B0668DE797B7DD60AABA409ABE42E4C.html#function_ToString_29CEBB1BA45F9D7084B132B47DF08D5AA76CA8CA">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"int"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_UIntNode_EB152EAD34C39474D543D4BA369175050C97C1F2.html">UIntNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UIntNode_EB152EAD34C39474D543D4BA369175050C97C1F2.html#constructor_UIntNode_99EDA22FD206289EC50695DBFB407B9CD84E834D">UIntNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_UIntNode_EB152EAD34C39474D543D4BA369175050C97C1F2.html#function_Clone_ABFCEBD65E5BA1FAADD7D584454215FA0621BC75">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_UIntNode_EB152EAD34C39474D543D4BA369175050C97C1F2.html#function_Accept_0181A23FB2AB1031514AFB618A46BADBE7E683BD">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_UIntNode_EB152EAD34C39474D543D4BA369175050C97C1F2.html#function_IsUnsignedTypeNode_F61C1E1ED22D2607819991D0E8B92640ED3C1487">IsUnsignedTypeNode</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_UIntNode_EB152EAD34C39474D543D4BA369175050C97C1F2.html#function_ToString_BAAB57E999C61D8174265EA0EC1900A9A2AB2E89">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"uint"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_LongNode_5579FC2689C50AEC0D7FE1B7A88408DCB86E5621.html">LongNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_LongNode_5579FC2689C50AEC0D7FE1B7A88408DCB86E5621.html#constructor_LongNode_A9EB80B31483F54813DD2B408617EE8C5D819C3F">LongNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_LongNode_5579FC2689C50AEC0D7FE1B7A88408DCB86E5621.html#function_Clone_CAB96BF3BAC45DDDA0337E86A39E77F709A95F86">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_LongNode_5579FC2689C50AEC0D7FE1B7A88408DCB86E5621.html#function_Accept_91F209221B4BFA44F59A4E765E30171A5EB498DD">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_LongNode_5579FC2689C50AEC0D7FE1B7A88408DCB86E5621.html#function_ToString_366E18734442097DA0FB05778097FB8543F65169">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"long"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ULongNode_04CDFFCD3D56E0E680D1318B45A207E5514F0C26.html">ULongNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ULongNode_04CDFFCD3D56E0E680D1318B45A207E5514F0C26.html#constructor_ULongNode_3E4B315861AA8CD3A0FEA8ADE409186D43C33031">ULongNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_ULongNode_04CDFFCD3D56E0E680D1318B45A207E5514F0C26.html#function_Clone_BA1F6AF62C573FCF662B599527FB93F9A7E61763">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ULongNode_04CDFFCD3D56E0E680D1318B45A207E5514F0C26.html#function_Accept_7D5A8AA1578328A8C1AB4DB54D2DE48837FA1681">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_ULongNode_04CDFFCD3D56E0E680D1318B45A207E5514F0C26.html#function_IsUnsignedTypeNode_B8AC8847858474C7FFDAC0409CB8194A90C331CE">IsUnsignedTypeNode</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ULongNode_04CDFFCD3D56E0E680D1318B45A207E5514F0C26.html#function_ToString_FFA82BDD3755E7CD1F24FB84C88A1A9F80F0A580">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ulong"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_FloatNode_1AD177C2BF6126F603E0E42937502FB3859F7074.html">FloatNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FloatNode_1AD177C2BF6126F603E0E42937502FB3859F7074.html#constructor_FloatNode_1FDD417C3D3BAE48135F36B4D873D3E75D802677">FloatNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_FloatNode_1AD177C2BF6126F603E0E42937502FB3859F7074.html#function_Clone_2DCF53D8DC5816E9324E06F28B69BF358BF80C92">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_FloatNode_1AD177C2BF6126F603E0E42937502FB3859F7074.html#function_Accept_ECF66A08C6F457B31C1E5FCE3C7CCB334DDA2DBD">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_FloatNode_1AD177C2BF6126F603E0E42937502FB3859F7074.html#function_ToString_519196C472D0EC6276E16986A8245EC5CD294655">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"float"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DoubleNode_E7B613E244C35F5B6C1FD5106F577A1627A09507.html">DoubleNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DoubleNode_E7B613E244C35F5B6C1FD5106F577A1627A09507.html#constructor_DoubleNode_0C14F989589B13997832963C7FE43C2A437A5A48">DoubleNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_DoubleNode_E7B613E244C35F5B6C1FD5106F577A1627A09507.html#function_Clone_38AE2943B1139AF73022B16E250041FC37302188">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DoubleNode_E7B613E244C35F5B6C1FD5106F577A1627A09507.html#function_Accept_E7495C8182118FB2741AA8E0AF9B0E6B9F3082F2">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_DoubleNode_E7B613E244C35F5B6C1FD5106F577A1627A09507.html#function_ToString_43443A2AD1A26D08683BD714BEFAFD370F7CC7A6">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"double"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_CharNode_D97C752E6DE2F8ED51F0342FF190332274DC276C.html">CharNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_CharNode_D97C752E6DE2F8ED51F0342FF190332274DC276C.html#constructor_CharNode_178CA958A0A68ED0B63F72E1C930B806378FA742">CharNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_CharNode_D97C752E6DE2F8ED51F0342FF190332274DC276C.html#function_Clone_0750B60230E6F351B8D0DF9E6C92DF69AFDA89DD">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_CharNode_D97C752E6DE2F8ED51F0342FF190332274DC276C.html#function_Accept_4988380EAB1D919B80B7BD9E57C2C397EDAC9B8A">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_CharNode_D97C752E6DE2F8ED51F0342FF190332274DC276C.html#function_ToString_39EC53F8B13663043C3BA0FE6504F64BD875349A">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"char"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_WCharNode_3A6052D36C4D98759C119600DD3C0F295A540F02.html">WCharNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_WCharNode_3A6052D36C4D98759C119600DD3C0F295A540F02.html#constructor_WCharNode_83F1D68470ECCCC8CEA4E8E6ED55A1D3F277DE04">WCharNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_WCharNode_3A6052D36C4D98759C119600DD3C0F295A540F02.html#function_Clone_8FF0256EBC68A3115FE21A609FD7D8FF8DC50AB8">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_WCharNode_3A6052D36C4D98759C119600DD3C0F295A540F02.html#function_Accept_7509663C5E65EFC233D7B9F11A4C9BB3561D9B7B">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_WCharNode_3A6052D36C4D98759C119600DD3C0F295A540F02.html#function_ToString_DEFC12FA31D5AFBF3BDEAFDC7CFEABA1AAF37EC7">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"wchar"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_UCharNode_087FCBBFB880603D156FD3093E1E0E28721FA033.html">UCharNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UCharNode_087FCBBFB880603D156FD3093E1E0E28721FA033.html#constructor_UCharNode_E4BEC5AEA5E1E386AEE9FEE9F77851F60F6F26E2">UCharNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_UCharNode_087FCBBFB880603D156FD3093E1E0E28721FA033.html#function_Clone_3D9323A625CBE4CBD8A5A4B79BB69CB0832F2855">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_UCharNode_087FCBBFB880603D156FD3093E1E0E28721FA033.html#function_Accept_5D74E97218B5339EB1F46030C00DC3614C184559">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_UCharNode_087FCBBFB880603D156FD3093E1E0E28721FA033.html#function_ToString_0CFD5F151C2612CA0A02FAC12EA0FE1ACCF5D713">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"uchar"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_VoidNode_0B8E194235D6FDC11EACED7C69334D85F4A90257.html">VoidNode</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_VoidNode_0B8E194235D6FDC11EACED7C69334D85F4A90257.html#constructor_VoidNode_4C9B06C780247C8076A0625253A18077D68C572B">VoidNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<a href="../class_VoidNode_0B8E194235D6FDC11EACED7C69334D85F4A90257.html#function_Clone_8C9C41BD79D287707A623C7B925D3E6935AF445C">Clone</a><span class="other">(</span><a href="../class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_VoidNode_0B8E194235D6FDC11EACED7C69334D85F4A90257.html#function_Accept_6636649BC8FDFC5D923EF42D7D4D4ACF7575DA7B">Accept</a><span class="other">(</span><a href="../class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_VoidNode_0B8E194235D6FDC11EACED7C69334D85F4A90257.html#function_ToString_D63427E19A8AE4C00D731424DB9F899414EF2C22">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"void"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;sngcm::ast</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SNGCM_AST_BASIC_TYPE_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

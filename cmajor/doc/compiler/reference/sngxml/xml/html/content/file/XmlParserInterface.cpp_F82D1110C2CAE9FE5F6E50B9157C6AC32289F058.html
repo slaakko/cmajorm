@@ -1,0 +1,122 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngxml/xml/XmlParserInterface.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngxml/xml/XmlParser.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/lexer/TrivialLexer.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/lexer/XmlParsingLog.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/MappedInputFile.hpp></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="pp">#include&nbsp;&lt;iostream></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">sngxml</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">xml</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">util</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_xml_E70FE776A7D0201102722B6526198D965E74ED7B.html#function_ParseXmlFile_133F79DE9FC838EEC3DCABB74A01091B20D12055">ParseXmlFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlFileName</span><span class="other">,&nbsp;</span><a href="../class_XmlContentHandler_8AE38CE227FB4990F18C13596AC35DB352C3B24D.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ParseXmlFile</span><span class="other">(</span><span class="identifier">xmlFileName</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">,&nbsp;</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a><span class="other">::</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html#enumerator_none_D9090845DC123DAE8EF2F152836B8839B2B2D1CA">none</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_xml_E70FE776A7D0201102722B6526198D965E74ED7B.html#function_ParseXmlFile_EBBE6B337A1A35DA3D3B8F78466ABBD03E7CD07E">ParseXmlFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlFileName</span><span class="other">,&nbsp;</span><a href="../class_XmlContentHandler_8AE38CE227FB4990F18C13596AC35DB352C3B24D.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">,&nbsp;</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a>&nbsp;<span class="identifier">flags</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">xmlContent</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadFile</span><span class="other">(</span><span class="identifier">xmlFileName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ParseXmlContent</span><span class="other">(</span><span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="identifier">xmlFileName</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">,&nbsp;</span><span class="identifier">flags</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_xml_E70FE776A7D0201102722B6526198D965E74ED7B.html#function_ParseXmlContent_4F4715DE9A2431DE27ECD12F19BACFFFAE641A5D">ParseXmlContent</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">systemId</span><span class="other">,&nbsp;</span><a href="../class_XmlContentHandler_8AE38CE227FB4990F18C13596AC35DB352C3B24D.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ParseXmlContent</span><span class="other">(</span><span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">xmlContent</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">,&nbsp;</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a><span class="other">::</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html#enumerator_none_D9090845DC123DAE8EF2F152836B8839B2B2D1CA">none</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_xml_E70FE776A7D0201102722B6526198D965E74ED7B.html#function_ParseXmlContent_DD544C5594EB2C40FAB4A5D0B734C114BFDC88DC">ParseXmlContent</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">systemId</span><span class="other">,&nbsp;</span><a href="../class_XmlContentHandler_8AE38CE227FB4990F18C13596AC35DB352C3B24D.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">,&nbsp;</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a>&nbsp;<span class="identifier">flags</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ParseXmlContent</span><span class="other">(</span><span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">xmlContent</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">,&nbsp;</span><span class="identifier">flags</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_xml_E70FE776A7D0201102722B6526198D965E74ED7B.html#function_ParseXmlContent_48D43CD461A74B03A5CFF6A5771B3259CA715986">ParseXmlContent</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">systemId</span><span class="other">,&nbsp;</span><a href="../class_XmlContentHandler_8AE38CE227FB4990F18C13596AC35DB352C3B24D.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ParseXmlContent</span><span class="other">(</span><span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">,&nbsp;</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a><span class="other">::</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html#enumerator_none_D9090845DC123DAE8EF2F152836B8839B2B2D1CA">none</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_xml_E70FE776A7D0201102722B6526198D965E74ED7B.html#function_ParseXmlContent_EB5960D6158F5A3808A1EE95EBEA240E3E1E5808">ParseXmlContent</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">systemId</span><span class="other">,&nbsp;</span><a href="../class_XmlContentHandler_8AE38CE227FB4990F18C13596AC35DB352C3B24D.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">,&nbsp;</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a>&nbsp;<span class="identifier">flags</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/lexer/html/content/namespace_lexer_B617309FB5F11FACD97A0C90702D495D1129C158.html">lexer</a><span class="other">::</span><a href="../../../../../soulng/lexer/html/content/class_XmlParsingLog_5E0B9202EA88CB2A01B9FB8C47C69E2F9DC726EA.html">XmlParsingLog</a>&nbsp;<span class="identifier">debugLog</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">cerr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/class_TrivialLexer_B17F9A78188DD0AA5ADA45FFAB5AB3826EA2E098.html">TrivialLexer</a>&nbsp;<span class="identifier">xmlLexer</span><span class="other">(</span><span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">flags</span><span class="other">&nbsp;&amp;&nbsp;</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a><span class="other">::</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html#enumerator_debug_F83D0663CD98B42ABE6D0EFBC4A56A6103B08B86">debug</a><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a><span class="other">::</span><a href="../enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html#enumerator_none_D9090845DC123DAE8EF2F152836B8839B2B2D1CA">none</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">xmlLexer</span><span class="other">.</span><span class="identifier">SetLog</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">debugLog</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_XmlProcessor_CBECB6FD47573E860FE6AFEAAE3992C8B53A9D28.html">XmlProcessor</a>&nbsp;<span class="identifier">xmlProcessor</span><span class="other">(</span><span class="identifier">xmlLexer</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_XmlParser_1C89AEAD603FA44D44FBE3D310288725A856C46F.html">XmlParser</a><span class="other">::</span><span class="identifier">Parse</span><span class="other">(</span><span class="identifier">xmlLexer</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">xmlProcessor</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;sngxml::xml</span></span>
+  <br/>
+ </body>
+</html>

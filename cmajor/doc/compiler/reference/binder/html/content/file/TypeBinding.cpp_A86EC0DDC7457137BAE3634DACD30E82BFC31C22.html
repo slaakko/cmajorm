@@ -1,0 +1,94 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/binder/TypeBinding.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/binder/AttributeBinder.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/binder/BoundCompileUnit.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/binder/TypeBinder.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">binder</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span><a href="../namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_BindTypes_E63090B6105D24CBB1B7515AB6EC4E83B27339BE">BindTypes</a><span class="other">(</span><span class="identifier">Module</span><span class="other">*</span><span class="identifier">module</span><span class="other">,&nbsp;</span><span class="identifier">CompileUnitNode</span><span class="other">*</span><span class="identifier">compileUnit</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<span class="identifier">errors</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html">AttributeBinder</a>&nbsp;<span class="identifier">attributeBinder</span><span class="other">(</span><span class="identifier">module</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a><span class="other">></span>&nbsp;<span class="identifier">boundCompileUnit</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a><span class="other">(</span><span class="other">*</span><span class="identifier">module</span><span class="other">,&nbsp;</span><span class="identifier">compileUnit</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">attributeBinder</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boundCompileUnit</span><span class="other">-></span><span class="identifier">PushBindingTypes</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html">TypeBinder</a>&nbsp;<span class="identifier">typeBinder</span><span class="other">(</span><span class="other">*</span><span class="identifier">boundCompileUnit</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">typeBinder</span><span class="other">.</span><span class="identifier">SetEditMode</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">compileUnit</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="identifier">typeBinder</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boundCompileUnit</span><span class="other">-></span><span class="identifier">PopBindingTypes</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<span class="identifier">e</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">typeBinder</span><span class="other">.</span><span class="identifier">Errors</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">errors</span><span class="other">.</span><span class="identifier">insert</span><span class="other">(</span><span class="identifier">errors</span><span class="other">.</span><span class="identifier">end</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">e</span><span class="other">.</span><span class="identifier">cbegin</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">e</span><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../symbols/html/content/namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><a href="../../../../symbols/html/content/class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">errors</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">Message</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">errors</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="other">...</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">errors</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="string">"unknown&nbsp;error&nbsp;occurred"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">errors</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::binder</span></span>
+  <br/>
+ </body>
+</html>

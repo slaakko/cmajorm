@@ -1,0 +1,178 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/MemoryReader.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdexcept></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#constructor_MemoryReader_758DEB1ED2EDB0F50618215F14213A253C1F4CBE">MemoryReader</a><span class="other">(</span><span class="identifier">uint8_t</span><span class="other">*</span>&nbsp;<span class="identifier">ptr_</span><span class="other">,&nbsp;</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">count_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#variable_ptr_9908B27E59CC1DE207263247885E27AA9B00EFDE">ptr</a><span class="other">(</span><span class="identifier">ptr_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#variable_pos_7231558029E5B95C08B8390E9F2EA7B659A90305">pos</a><span class="other">(</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#variable_ptr_9908B27E59CC1DE207263247885E27AA9B00EFDE">ptr</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#variable_count_0BB0287FF0739877F58273D37C617B98723DAE33">count</a><span class="other">(</span><span class="identifier">count_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="identifier">uint8_t</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#function_ReadByte_8AF7C6EEDD796E9D4D7461A2A6E78F8BB95FBEB5">ReadByte</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#variable_pos_7231558029E5B95C08B8390E9F2EA7B659A90305">pos</a><span class="other">&nbsp;-&nbsp;</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#variable_ptr_9908B27E59CC1DE207263247885E27AA9B00EFDE">ptr</a><span class="other">&nbsp;>=&nbsp;</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#variable_count_0BB0287FF0739877F58273D37C617B98723DAE33">count</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"memory&nbsp;reader:&nbsp;unexpected&nbsp;end&nbsp;of&nbsp;data"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#variable_pos_7231558029E5B95C08B8390E9F2EA7B659A90305">pos</a><span class="other">++</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="identifier">int8_t</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#function_ReadSByte_38AE2FA5BEB2C3F6656F47610F45E81046CF2FFA">ReadSByte</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int8_t</span><span class="other">></span><span class="other">(</span><span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="identifier">uint16_t</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#function_ReadUShort_C9043D4D9B55A6FBB202AF4E6E2D3DC1875CE01A">ReadUShort</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b0</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b1</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint16_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b0</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">8u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint16_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b1</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="identifier">int16_t</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#function_ReadShort_E36D9629E7840CBAFF5D03E66F3F282C7B506C79">ReadShort</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int16_t</span><span class="other">></span><span class="other">(</span><span class="identifier">ReadUShort</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="identifier">uint32_t</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#function_ReadUInt_4B753E51F434D799E77A781E98D9FD32BA8EBEF2">ReadUInt</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b0</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b1</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b2</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b3</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b0</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">24u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b1</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">16u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b2</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">8u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b3</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#function_ReadInt_F21FDBA9ECE526742B08D6740A4C9F4D59C08DB6">ReadInt</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">ReadUInt</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="identifier">uint64_t</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#function_ReadULong_8F84D3E943578B0467DB46B1CBE2BF2BB02AC8DF">ReadULong</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b0</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b1</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b2</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b3</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b4</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b5</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b6</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<span class="identifier">b7</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint64_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b0</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">56u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint64_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b1</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">48u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint64_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b2</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">40u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint64_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b3</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">32u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint64_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b4</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">24u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint64_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b5</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">16u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint64_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b6</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">8u</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint64_t</span><span class="other">></span><span class="other">(</span><span class="identifier">b7</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#function_ReadLong_572F3D65CBC5656EC23DCC5488C20B265DF6BBD7">ReadLong</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int64_t</span><span class="other">></span><span class="other">(</span><span class="identifier">ReadULong</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a>&nbsp;<a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html">MemoryReader</a><span class="other">::</span><a href="../class_MemoryReader_19F889C4AB90C122BD696FE39C9749C546C3CEA7.html#function_ReadDateTime_50B316585A8FF353BBDAC6E6AE3E5D8BA39BFB96">ReadDateTime</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int16_t</span>&nbsp;<span class="identifier">year</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadShort</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Month_92FA697A3D21D76968797E2DC720D098051C1EBD.html">Month</a>&nbsp;<span class="identifier">month</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../enum_Month_92FA697A3D21D76968797E2DC720D098051C1EBD.html">Month</a><span class="other">></span><span class="other">(</span><span class="identifier">ReadSByte</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int8_t</span>&nbsp;<span class="identifier">day</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadSByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<span class="identifier">date</span><span class="other">(</span><span class="identifier">year</span><span class="other">,&nbsp;</span><span class="identifier">month</span><span class="other">,&nbsp;</span><span class="identifier">day</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<span class="identifier">secs</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a>&nbsp;<span class="identifier">dt</span><span class="other">(</span><span class="identifier">date</span><span class="other">,&nbsp;</span><span class="identifier">secs</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">dt</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">85</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+ </body>
+</html>

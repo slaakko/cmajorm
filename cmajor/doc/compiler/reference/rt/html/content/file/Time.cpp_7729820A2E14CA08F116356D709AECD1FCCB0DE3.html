@@ -1,0 +1,108 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/rt/Time.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;chrono></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;thread></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;ctime></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtNow_CC949883632768108A4E225A76B0F2E524DCEC52">RtNow</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="type">duration_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">nanoseconds</span><span class="other">></span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">now</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">time_since_epoch</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">.</span><span class="identifier">count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtSleep_6C10C220DB46C3ADCC958DFF5DD30E569F35BFC1">RtSleep</a><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">nanoseconds</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">nanoseconds</span>&nbsp;<span class="identifier">duration</span><span class="other">{</span>&nbsp;<span class="identifier">nanoseconds</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">this_thread</span><span class="other">::</span><span class="identifier">sleep_for</span><span class="other">(</span><span class="identifier">duration</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtGetCurrentDate_8067D9C54C5C78720AFE4ACF249757927C4C7377">RtGetCurrentDate</a><span class="other">(</span><span class="identifier">int16_t</span><span class="other">*</span>&nbsp;<span class="identifier">year</span><span class="other">,&nbsp;</span><span class="identifier">int8_t</span><span class="other">*</span>&nbsp;<span class="identifier">month</span><span class="other">,&nbsp;</span><span class="identifier">int8_t</span><span class="other">*</span>&nbsp;<span class="identifier">day</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">time_t</span>&nbsp;<span class="identifier">currentTime</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">time</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">currentTime</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">struct</span>&nbsp;<span class="identifier">tm</span><span class="other">*</span>&nbsp;<span class="identifier">localTime</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">localTime</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">localtime</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">currentTime</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">year</span><span class="other">&nbsp;=&nbsp;</span><span class="other">1900</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">localTime</span><span class="other">-></span><span class="identifier">tm_year</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">month</span><span class="other">&nbsp;=&nbsp;</span><span class="other">1</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">localTime</span><span class="other">-></span><span class="identifier">tm_mon</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">day</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">localTime</span><span class="other">-></span><span class="identifier">tm_mday</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtGetCurrentDateTime_1AAD6A3B680BB52D84CBB65781718980041DC957">RtGetCurrentDateTime</a><span class="other">(</span><span class="identifier">int16_t</span><span class="other">*</span>&nbsp;<span class="identifier">year</span><span class="other">,&nbsp;</span><span class="identifier">int8_t</span><span class="other">*</span>&nbsp;<span class="identifier">month</span><span class="other">,&nbsp;</span><span class="identifier">int8_t</span><span class="other">*</span>&nbsp;<span class="identifier">day</span><span class="other">,&nbsp;</span><span class="identifier">int32_t</span><span class="other">*</span>&nbsp;<span class="identifier">secs</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">time_t</span>&nbsp;<span class="identifier">currentTime</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">time</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">currentTime</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">struct</span>&nbsp;<span class="identifier">tm</span><span class="other">*</span>&nbsp;<span class="identifier">localTime</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">localTime</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">localtime</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">currentTime</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">year</span><span class="other">&nbsp;=&nbsp;</span><span class="other">1900</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">localTime</span><span class="other">-></span><span class="identifier">tm_year</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">month</span><span class="other">&nbsp;=&nbsp;</span><span class="other">1</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">localTime</span><span class="other">-></span><span class="identifier">tm_mon</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">day</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">localTime</span><span class="other">-></span><span class="identifier">tm_mday</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">secs</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">localTime</span><span class="other">-></span><span class="identifier">tm_hour</span><span class="other">&nbsp;*&nbsp;</span><span class="other">3600</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">localTime</span><span class="other">-></span><span class="identifier">tm_min</span><span class="other">&nbsp;*&nbsp;</span><span class="other">60</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">localTime</span><span class="other">-></span><span class="identifier">tm_sec</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtGetCurrentTime_F60B5025425149F53429A2AC216DF84BC7188CDB">RtGetCurrentTime</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">time_t</span>&nbsp;<span class="identifier">currentTime</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">time</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">currentTime</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">currentTime</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

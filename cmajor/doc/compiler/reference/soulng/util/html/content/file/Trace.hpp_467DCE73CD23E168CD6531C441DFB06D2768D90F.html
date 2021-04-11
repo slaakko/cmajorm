@@ -1,0 +1,114 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SOULNG_UTIL_TRACE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SOULNG_UTIL_TRACE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/UtilApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdint.h></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;vector></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">EntryKind</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">int8_t</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">begin</span><span class="other">=</span>&nbsp;&nbsp;<span class="other">0</span><span class="other">,&nbsp;</span><span class="identifier">end</span><span class="other">=</span>&nbsp;&nbsp;<span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">message</span><span class="other">=</span>&nbsp;&nbsp;<span class="other">2</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html">TraceEntry</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html#constructor_TraceEntry_C4BF7A02E86FDACAE39B472793737D92E6D0B1D7">TraceEntry</a><span class="other">(</span><a href="../enum_EntryKind_1C094C8B95F7A997FD3E1961932B8FE9CF62D154.html">EntryKind</a>&nbsp;<span class="identifier">kind_</span><span class="other">,&nbsp;</span><span class="kw">char</span>&nbsp;<span class="identifier">threadId_</span><span class="other">,&nbsp;</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">id_</span><span class="other">,&nbsp;</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">nanosecs_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_EntryKind_1C094C8B95F7A997FD3E1961932B8FE9CF62D154.html">EntryKind</a>&nbsp;<a href="../struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html#variable_kind_122A8D05C1E6B9B361F61265ED1836497FEEA035">kind</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">char</span>&nbsp;<a href="../struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html#variable_threadId_5999CF30E520626D527072503B6441B881459835">threadId</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html#variable_id_834BC142A85F68E373A6EDFC17B4499159DFD860">id</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../struct_TraceEntry_BA99DE9DA87A75931A493D2D46145A4ED497CCBC.html#variable_nanosecs_5420A9F64C6BEEF555BF466C7F7088B7013229B4">nanosecs</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_BeginTracing_FACAEF2DEE986BBEA0461EF69F45A24F6E24D2FE">BeginTracing</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_EndTracing_E77C59AB4589AF26619C5F861772027F03726641">EndTracing</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_SetThreadId_429BBE3E02F5AAA3DEC53458EF82FB56B1352C14">SetThreadId</a><span class="other">(</span><span class="kw">char</span>&nbsp;<span class="identifier">threadId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_GetTraceFunctionId_CB7C2E52997377CC281B8ED45F1F304106BCDE8B">GetTraceFunctionId</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">functionFullName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_GetTraceFunctionName_B34294EF61096D39987BB30C06681A2809717039">GetTraceFunctionName</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">traceFunctionId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_GetTraceMessageName_D3D2947A06ADCFE0B5192C58A6641BC5C6D5D2C4">GetTraceMessageName</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">traceMessageId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_AddTraceEntry_9137D39E462F08DB48F4889818ACF2F40D72FE9F">AddTraceEntry</a><span class="other">(</span><a href="../enum_EntryKind_1C094C8B95F7A997FD3E1961932B8FE9CF62D154.html">EntryKind</a>&nbsp;<span class="identifier">kind</span><span class="other">,&nbsp;</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">id</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">TraceEntry</span><span class="other">></span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_ReadTrace_2A32696B91442F8CB12B983556F6005D0EE4B28E">ReadTrace</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">traceFilePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_ReadTraceTable_B17A9A6F863ADF19AE4ABD50DA68C6EDD6D511B2">ReadTraceTable</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_WriteTraceTable_A009B816351D4739DB90A6DF340632DC83F8A64E">WriteTraceTable</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_InitTrace_6EAF7DC5FCD85E278C0972733F87420F8F76F251">InitTrace</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_DoneTrace_857E21BD468E42BD563BEC6B26FD7F7699CB3217">DoneTrace</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Tracer_93DCC6D2AB96587CC096365F6006C4419AB42A43.html">Tracer</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Tracer_93DCC6D2AB96587CC096365F6006C4419AB42A43.html#constructor_Tracer_C8FB5C8816EFA239728B3401D8C7478CB301DF97">Tracer</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">traceFunctionId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">~</span><span class="identifier">Tracer</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_Tracer_93DCC6D2AB96587CC096365F6006C4419AB42A43.html#variable_traceFunctionId_AAC9FF908224ADF1447268F33BECD3CA1FA3470C">traceFunctionId</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SOULNG_UTIL_TRACE_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

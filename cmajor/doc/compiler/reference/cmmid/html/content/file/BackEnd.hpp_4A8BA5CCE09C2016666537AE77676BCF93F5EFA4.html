@@ -1,0 +1,84 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_MID_BACK_END_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_MID_BACK_END_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ir/Emitter.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ir/EmittingContext.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">mid</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">BackEndKind</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">int</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">llvmBackEnd</span><span class="other">=</span>&nbsp;&nbsp;<span class="other">0</span><span class="other">,&nbsp;</span><span class="identifier">cmsxBackEnd</span><span class="other">=</span>&nbsp;&nbsp;<span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">cmcppBackEnd</span><span class="other">=</span>&nbsp;&nbsp;<span class="other">2</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html">BackEnd</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">BackEnd</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html#function_Init_131B610ECA24B7D90C450741136362FF5DD8207F">Init</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html#function_Done_60D08B3322D445E27CE120710F0C32E0655BFF89">Done</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../ir/html/content/namespace_ir_CECF80BCF58FD5CC6118CB107FC60F370B770AA3.html">ir</a><span class="other">::</span><a href="../../../../ir/html/content/class_EmittingContext_42D38BA76B81697C1A82775FA1B5E641DC51D0DD.html">EmittingContext</a><span class="other">*</span>&nbsp;<a href="../class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html#function_CreateEmittingContext_13093D10F6D271FE31E7BC520E90C0CB10907985">CreateEmittingContext</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">optimizationLevel</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html#function_DestroyEmittingContext_7852149FCEC86DC68A3853620CBC8FDEA083F408">DestroyEmittingContext</a><span class="other">(</span><a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../ir/html/content/namespace_ir_CECF80BCF58FD5CC6118CB107FC60F370B770AA3.html">ir</a><span class="other">::</span><a href="../../../../ir/html/content/class_EmittingContext_42D38BA76B81697C1A82775FA1B5E641DC51D0DD.html">EmittingContext</a><span class="other">*</span>&nbsp;<span class="identifier">emittingContext</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../ir/html/content/namespace_ir_CECF80BCF58FD5CC6118CB107FC60F370B770AA3.html">ir</a><span class="other">::</span><a href="../../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a><span class="other">*</span>&nbsp;<a href="../class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html#function_CreateEmitter_79C137339CA885B492034B6C08225C8D18046DB1">CreateEmitter</a><span class="other">(</span><a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../ir/html/content/namespace_ir_CECF80BCF58FD5CC6118CB107FC60F370B770AA3.html">ir</a><span class="other">::</span><a href="../../../../ir/html/content/class_EmittingContext_42D38BA76B81697C1A82775FA1B5E641DC51D0DD.html">EmittingContext</a><span class="other">*</span>&nbsp;<span class="identifier">emittingContext</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html#function_DestroyEmitter_0C5F9B77783DEDD7EE057A62B416144A794926E1">DestroyEmitter</a><span class="other">(</span><a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../ir/html/content/namespace_ir_CECF80BCF58FD5CC6118CB107FC60F370B770AA3.html">ir</a><span class="other">::</span><a href="../../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a><span class="other">*</span>&nbsp;<span class="identifier">emitter</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<a href="../enum_BackEndKind_925F708C841BEC68CB24274EA2ABCC111972C37B.html">BackEndKind</a>&nbsp;<a href="../class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html#function_GetBackEndKind_BC0373100AB64DB10FAB26A56780624343803E21">GetBackEndKind</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_mid_3129DC3C46A8448C2BDF46CC752977D37A01E30F.html#function_SetBackEnd_6A19CC92C4734ADBF4A252D9DE5DC880ABBD0C0F">SetBackEnd</a><span class="other">(</span><a href="../enum_BackEndKind_925F708C841BEC68CB24274EA2ABCC111972C37B.html">BackEndKind</a>&nbsp;<span class="identifier">backEndKind</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="identifier">BackEndKind</span>&nbsp;<a href="../namespace_mid_3129DC3C46A8448C2BDF46CC752977D37A01E30F.html#function_GetBackEnd_25EEA46B97011B943AFA283BC02E7A2BE7E8B04C">GetBackEnd</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="kw">extern</span>&nbsp;<a href="../class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html">BackEnd</a><span class="other">*</span>&nbsp;<span class="identifier">backEnd</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::mid</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_MID_BACK_END_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

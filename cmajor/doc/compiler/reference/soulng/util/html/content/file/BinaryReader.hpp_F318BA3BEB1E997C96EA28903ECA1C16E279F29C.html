@@ -1,0 +1,118 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SOULNG_UTIL_BINARY_READER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SOULNG_UTIL_BINARY_READER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/UtilApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/MappedInputFile.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;boost/uuid/uuid.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html">BinaryReader</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#constructor_BinaryReader_7F608C4B0626F344A0F012922434BEBBC5D9E81F">BinaryReader</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_FileName_0C191A1DD00D63524ED642FE5EC344854ACE0703">FileName</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#variable_fileName_7FEFC8150CEDAB5F56CEB6EBB3A228A54FCF342E">fileName</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">BinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadBool_B7C79A05473F3A9F898406C8ADA32D82A532C530">ReadBool</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadByte_40AD82D1152B6D927FB4E28FC66201D3DC730429">ReadByte</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int8_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadSByte_02B80AB96AF9E0C74DF571EB26A1E554F8FBF38C">ReadSByte</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint16_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadUShort_5AC3F8C7A5FBCC2827F8CAE1E7B6860B451A5640">ReadUShort</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int16_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadShort_21024579FA5FA20215E03D6CDB79A0AB22146B0C">ReadShort</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadUInt_C879DD64A566DD48F242E1EE7EDA280CA5DE2C3A">ReadUInt</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadInt_23EA54457C8067B9307866124A1D5DE6A4D1AE13">ReadInt</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint64_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadULong_48249DB3BEFC8A2C310F60F6E1F6DCB757AA4CF0">ReadULong</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadLong_B13E69AC9EA0C6301C9C946EFF2088C99E0C20F4">ReadLong</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">float</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadFloat_C6DDB2F02E9D17ED75CDDF4B8C0C7B4108A22787">ReadFloat</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">double</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadDouble_7A7D6DF5C1BFB2AEF25B94CBDD5F1C0CA78D98CA">ReadDouble</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">char</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadChar_6F67BFACA260A04FD6B4B9A28F50931839983C2A">ReadChar</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">char16_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadWChar_7C11708A35F67F3359804D1A8ED931F1DAB0EED4">ReadWChar</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">char32_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadUChar_15379C0395F7CBE9BB7EBBB71C06E4A0B65C6A87">ReadUChar</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadUtf8String_011671288CB47263D61AB63A20FDC55199A61BEE">ReadUtf8String</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadUtf16String_CF2C0E9A18298670FE01D72237DCE224D9356C19">ReadUtf16String</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadUtf32String_3B2A7EDE0B437661B7861B881062A2BB5ADD8193">ReadUtf32String</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadULEB128UInt_B5BB9EC972C9E9771CD007678C73CC33B5DF26E5">ReadULEB128UInt</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint64_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadULEB128ULong_8BFB34993BB9D960301C2F825ADC67D6A27EFFBC">ReadULEB128ULong</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadSLEB128Int_6A426187ADFBED74166C47CED3E57DE163A2361F">ReadSLEB128Int</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadSLEB128Long_BDFED89AFEF4469C834E12888A771E1BDB346EEC">ReadSLEB128Long</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadUuid_5544F1F7D9F65FCF4CAB2DFA4FC2DC95622E83AE">ReadUuid</a><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">uuid</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_Pos_1ED53EE61AF1EBBAA7D95217DA07021599ED72F1">Pos</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#variable_pos_271957E455D30D0E965B2E04A61DB812AC2D45CD">pos</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_Skip_F89FA4FE3244A338B8A3071DE8E0319D3031F273">Skip</a><span class="other">(</span><span class="identifier">uint32_t</span>&nbsp;<span class="identifier">size</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#variable_fileName_7FEFC8150CEDAB5F56CEB6EBB3A228A54FCF342E">fileName</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_MappedInputFile_CDC51953280288D9743911E04818086031195A14.html">MappedInputFile</a>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#variable_file_77B88F942D513ABF31CF6AE4D9CF84B61BDEB166">file</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">uint8_t</span><span class="other">*</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#variable_begin_C0D3FAA43052D15A231FA9B7DF879632AD756580">begin</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">uint8_t</span><span class="other">*</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#variable_end_9479658C41B40AF2661118058E38E3D5C65E354A">end</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#variable_pos_271957E455D30D0E965B2E04A61DB812AC2D45CD">pos</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_CheckEof_050FD4573EB2BA90721C3B68DD83E084F33852CE">CheckEof</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SOULNG_UTIL_BINARY_READER_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

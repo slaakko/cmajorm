@@ -1,0 +1,286 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/ResourceTable.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngcm/ast/Project.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Path.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/TextUtils.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">symbols</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">sngcm</span><span class="other">::</span><span class="identifier">ast</span><span class="other">::</span><span class="identifier">CmajorRootDir</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">util</span><span class="other">::</span><span class="identifier">GetFullPath</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">util</span><span class="other">::</span><span class="identifier">Path</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">util</span><span class="other">::</span><span class="identifier">EndsWith</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">::</span><span class="identifier">ToUtf8</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_ResourceTypeStr_12DF5DA9D5F1C4E090AC4EB875F67B8301E8DBC7">ResourceTypeStr</a><span class="other">(</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">::</span><a href="../enum_Type_AFE489258C62C1E486DE8522F9A205B84021172A.html">Type</a>&nbsp;<span class="identifier">resourceType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch&nbsp;</span><span class="other">(</span><span class="identifier">resourceType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">::</span><a href="../enum_Type_AFE489258C62C1E486DE8522F9A205B84021172A.html">Type</a><span class="other">::</span><a href="../enum_Type_AFE489258C62C1E486DE8522F9A205B84021172A.html#enumerator_bitmap_B63B407580B1942834427B201F5A9775FCC726CB">bitmap</a><span class="other">:</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"bitmap"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">::</span><a href="../enum_Type_AFE489258C62C1E486DE8522F9A205B84021172A.html">Type</a><span class="other">::</span><a href="../enum_Type_AFE489258C62C1E486DE8522F9A205B84021172A.html#enumerator_icon_1D603D92CB7F8F5E4B6EE48B2F726C25D96B515E">icon</a><span class="other">:</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"icon"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">::</span><a href="../enum_Type_AFE489258C62C1E486DE8522F9A205B84021172A.html">Type</a><span class="other">::</span><a href="../enum_Type_AFE489258C62C1E486DE8522F9A205B84021172A.html#enumerator_cursor_A7C655375F878B05290893153B251DFAB92C6EE3">cursor</a><span class="other">:</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"cursor"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_MakeCmajorRootDirRelativeFilePath_70A5036CA77E412FD4373F9CCE3839A89D246E5C">MakeCmajorRootDirRelativeFilePath</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"$CMAJOR$"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">filePath</span><span class="other">.</span><span class="identifier">substr</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">filePath</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_MakeFullPathFromCmajorRootDirRelativeFilePath_C8133113D05434A8D6797D583CB35F2E7ABA1690">MakeFullPathFromCmajorRootDirRelativeFilePath</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="string">"$CMAJOR$"</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../soulng/util/html/content/class_Path_4B3DE54C4207046D89CC15C18C3336BA3FDCEA6F.html">Path</a><span class="other">::</span><span class="identifier">Combine</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><span class="identifier">filePath</span><span class="other">.</span><span class="identifier">substr</span><span class="other">(</span><span class="other">8</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">filePath</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">::</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#constructor_Resource_9B3D775EB627CA9DD5453477B45639D87A57EB7C">Resource</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_name_C28458DBFA9A27E9C54E7B599B1CB6C64DFDA95B">name</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_type_B3012D04657C28EB8F381ACABC13E85ED13A12EC">type</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_filePath_0AA84536914C7AC2786C977F925644F22F537DEA">filePath</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">::</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#constructor_Resource_BDEE6746FB99D42393525A61DEEF7C30A90167B0">Resource</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><a href="../enum_Type_AFE489258C62C1E486DE8522F9A205B84021172A.html">Type</a>&nbsp;<span class="identifier">type_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_name_C28458DBFA9A27E9C54E7B599B1CB6C64DFDA95B">name</a><span class="other">(</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_type_B3012D04657C28EB8F381ACABC13E85ED13A12EC">type</a><span class="other">(</span><span class="identifier">type_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_filePath_0AA84536914C7AC2786C977F925644F22F537DEA">filePath</a><span class="other">(</span><span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">filePath_</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">::</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#function_Write_0D454AAAA3648800001847AC92BCE33371A5ECCE">Write</a><span class="other">(</span><span class="identifier">BinaryWriter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">cmajorRootDir</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_name_C28458DBFA9A27E9C54E7B599B1CB6C64DFDA95B">name</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int32_t</span><span class="other">></span><span class="other">(</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_type_B3012D04657C28EB8F381ACABC13E85ED13A12EC">type</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">MakeCmajorRootDirRelativeFilePath</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_filePath_0AA84536914C7AC2786C977F925644F22F537DEA">filePath</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">::</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#function_Read_F8AAB1D4CFF5F6CFC6214E253BF7AB4806C270C9">Read</a><span class="other">(</span><span class="identifier">BinaryReader</span><span class="other">&amp;</span>&nbsp;<span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">cmajorRootDir</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_name_C28458DBFA9A27E9C54E7B599B1CB6C64DFDA95B">name</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadUtf32String</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_type_B3012D04657C28EB8F381ACABC13E85ED13A12EC">type</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="../enum_Type_AFE489258C62C1E486DE8522F9A205B84021172A.html">Type</a><span class="other">></span><span class="other">(</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadInt</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_filePath_0AA84536914C7AC2786C977F925644F22F537DEA">filePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadUtf8String</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_filePath_0AA84536914C7AC2786C977F925644F22F537DEA">filePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">MakeFullPathFromCmajorRootDirRelativeFilePath</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_filePath_0AA84536914C7AC2786C977F925644F22F537DEA">filePath</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">::</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#function_Dump_46418A3385A206A708A726806C45A419F99C26E4">Dump</a><span class="other">(</span><span class="identifier">CodeFormatter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">index</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"RESOURCE&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">index</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"resource&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_name_C28458DBFA9A27E9C54E7B599B1CB6C64DFDA95B">name</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"resource&nbsp;type:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ResourceTypeStr</span><span class="other">(</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_type_B3012D04657C28EB8F381ACABC13E85ED13A12EC">type</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"resource&nbsp;file:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_filePath_0AA84536914C7AC2786C977F925644F22F537DEA">filePath</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html">ResourceTable</a><span class="other">::</span><a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Contains_853B805DFF33300233F07D244FD3284D8728F5AD">Contains</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">resourceName</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resourceNameSet_7ED09DCA09F75FE130210F8B8DA2C70DAE2734AF">resourceNameSet</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">resourceName</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resourceNameSet_7ED09DCA09F75FE130210F8B8DA2C70DAE2734AF">resourceNameSet</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html">ResourceTable</a><span class="other">::</span><a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_AddResource_1E3E1CD73863B5A6EC2E2684406AC64A038EEF4E">AddResource</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">&amp;</span>&nbsp;<span class="identifier">resource</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resourceNameSet_7ED09DCA09F75FE130210F8B8DA2C70DAE2734AF">resourceNameSet</a><span class="other">.</span><span class="identifier">insert</span><span class="other">(</span><span class="identifier">resource</span><span class="other">.</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_name_C28458DBFA9A27E9C54E7B599B1CB6C64DFDA95B">name</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resources_D0E781AEB3D84D133A3B19D018F0EAF2CA2FE5A3">resources</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">resource</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html">ResourceTable</a><span class="other">::</span><a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Write_E2C8154C9DCC5C37C413E365296E3593BB0DD3B7">Write</a><span class="other">(</span><span class="identifier">BinaryWriter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resources_D0E781AEB3D84D133A3B19D018F0EAF2CA2FE5A3">resources</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">n</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">n</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">cmajorRootDir</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">CmajorRootDir</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">EndsWith</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><span class="string">"/"</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">cmajorRootDir</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"/"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resources_D0E781AEB3D84D133A3B19D018F0EAF2CA2FE5A3">resources</a><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="identifier">cmajorRootDir</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html">ResourceTable</a><span class="other">::</span><a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Read_DFFAC94B529673EF6E9E7E874D53991DF2D673DB">Read</a><span class="other">(</span><span class="identifier">BinaryReader</span><span class="other">&amp;</span>&nbsp;<span class="identifier">reader</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">n</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">cmajorRootDir</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">CmajorRootDir</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">EndsWith</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><span class="string">"/"</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">cmajorRootDir</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"/"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a>&nbsp;<span class="identifier">resource</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">resource</span><span class="other">.</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="identifier">cmajorRootDir</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resources_D0E781AEB3D84D133A3B19D018F0EAF2CA2FE5A3">resources</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">resource</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html">ResourceTable</a><span class="other">::</span><a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Dump_AA7F6E0DDF039C3138714F7DC5DD2B62C11DA9C8">Dump</a><span class="other">(</span><span class="identifier">CodeFormatter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"RESOURCE&nbsp;TABLE:"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">index</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><a href="../struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">&amp;</span>&nbsp;<span class="identifier">resource</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resources_D0E781AEB3D84D133A3B19D018F0EAF2CA2FE5A3">resources</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">resource</span><span class="other">.</span><span class="identifier">Dump</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">,&nbsp;</span><span class="identifier">index</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">index</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::symbols</span></span>
+  <br/>
+ </body>
+</html>

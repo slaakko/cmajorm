@@ -1,0 +1,494 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_CMSXI_VALUE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_CMSXI_VALUE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmsxi/CmsxiApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;vector></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;set></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="pp">#include&nbsp;&lt;unordered_map></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdint.h></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmsxi</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html">PtrType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#constructor_Value_35B7FC135B02D034A332A5B806BB48B285B92DA0">Value</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">Value</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_GetType_EB9DABA41B8CAB28760683B4E28A26C415414FEA">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_Name_30CB8EE7B42C4DE8442F7A678366C56D08B598AC">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_IsLongValue_04546A128ECF17F8E6497D87E3A943CC520D1420">IsLongValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_IsAggregateValue_01BA2FD8FDAD9B740235CB79D7D48E197EB32C90">IsAggregateValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_IsStringValue_96337682444549F5500861942F73146A9A9E25B8">IsStringValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_AddDependencies_5B57933CBF03D4EB34C78A6F6CAC05018355048A">AddDependencies</a><span class="other">(</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span>&nbsp;<span class="identifier">variable</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">,&nbsp;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">nameMap</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">set</span><span class="other">&lt;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">></span><span class="other">></span><span class="other">&amp;</span><span class="identifier">dependencies</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html#function_Name_260C869ECD3B326AEB54BDFB3F6DB33E66B60824">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"constant"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_BoolValue_D833400FD32A0A68EB5CF3F15C0B14F3653B0887.html">BoolValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoolValue_D833400FD32A0A68EB5CF3F15C0B14F3653B0887.html#constructor_BoolValue_125F287B9B0B101652B904CCCE1CA87C3ADC9B4A">BoolValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoolValue_D833400FD32A0A68EB5CF3F15C0B14F3653B0887.html#constructor_BoolValue_BE8A370A45B7A1CC10DDE9E4E8F93CB7DACF135F">BoolValue</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_BoolValue_D833400FD32A0A68EB5CF3F15C0B14F3653B0887.html#function_GetType_3E0D4DC8D49F20E66EA35D9F8C07622371774AC0">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_BoolValue_D833400FD32A0A68EB5CF3F15C0B14F3653B0887.html#function_Name_D70DC172569E59F0D78FB58AF0BC46E4B5414C7A">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_BoolValue_D833400FD32A0A68EB5CF3F15C0B14F3653B0887.html#variable_value_B3611899E6756BAAD36208AB5E78A8E2187B8BCB">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_SByteValue_0CE40530780B931EB1DA326D1EC53010E098CCD4.html">SByteValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SByteValue_0CE40530780B931EB1DA326D1EC53010E098CCD4.html#constructor_SByteValue_9C09C7D062BE5E6724C8C3E4E8D5D11E0C1A4F62">SByteValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SByteValue_0CE40530780B931EB1DA326D1EC53010E098CCD4.html#constructor_SByteValue_68A9F01ED463ACB8C0FB6A63E7ED0EB21764712A">SByteValue</a><span class="other">(</span><span class="identifier">int8_t</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_SByteValue_0CE40530780B931EB1DA326D1EC53010E098CCD4.html#function_GetType_9461D151C2986E4030EB267B62DB93257FD7BBD4">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_SByteValue_0CE40530780B931EB1DA326D1EC53010E098CCD4.html#function_Name_CE465E8FBFA53AF2F9699C41E1A57E1CB04828D0">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int8_t</span>&nbsp;<a href="../class_SByteValue_0CE40530780B931EB1DA326D1EC53010E098CCD4.html#variable_value_5C210D1008765023747414984069EA487CFB4D66">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ByteValue_65290C422DB37037035C4CD7611852F7AA1EFD4C.html">ByteValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ByteValue_65290C422DB37037035C4CD7611852F7AA1EFD4C.html#constructor_ByteValue_F30226F22F1E1A7E73687CE67C25A1613D77C6B4">ByteValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ByteValue_65290C422DB37037035C4CD7611852F7AA1EFD4C.html#constructor_ByteValue_82E74A17EF60C94AE1891CCA9C63B19C1FDD42DE">ByteValue</a><span class="other">(</span><span class="identifier">uint8_t</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ByteValue_65290C422DB37037035C4CD7611852F7AA1EFD4C.html#function_GetType_CB493CD13FBB1B71D1DF4623749FED44D1EA1F4C">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ByteValue_65290C422DB37037035C4CD7611852F7AA1EFD4C.html#function_Name_6A11658A1BFA3021F36F46EB1E7B3D1678FDD564">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint8_t</span>&nbsp;<a href="../class_ByteValue_65290C422DB37037035C4CD7611852F7AA1EFD4C.html#variable_value_B78608BE1843404E79A201EAF285043293F7CAA2">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ShortValue_FF9BB36D87A7465A6654CC69FE8D67A81E596675.html">ShortValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ShortValue_FF9BB36D87A7465A6654CC69FE8D67A81E596675.html#constructor_ShortValue_D62A021445D610E8A9C10D6356D3E0F671DBE6E0">ShortValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ShortValue_FF9BB36D87A7465A6654CC69FE8D67A81E596675.html#constructor_ShortValue_1DAD240685FFFAD50F3F2C4CEB2D137D1DCCF8A8">ShortValue</a><span class="other">(</span><span class="identifier">int16_t</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ShortValue_FF9BB36D87A7465A6654CC69FE8D67A81E596675.html#function_GetType_70D82857850B4E64F93178B31E825D5F3F5DF036">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ShortValue_FF9BB36D87A7465A6654CC69FE8D67A81E596675.html#function_Name_EB046E82752EBDE5FBB66D157624C3BECB50E033">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int16_t</span>&nbsp;<a href="../class_ShortValue_FF9BB36D87A7465A6654CC69FE8D67A81E596675.html#variable_value_FE4D1E20A23BFE9A48FC2DFB1EF6CC52A1C32BB2">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_UShortValue_0C3EB8F8BC8CA6688A1803D1B1858A8C3DA07A2A.html">UShortValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UShortValue_0C3EB8F8BC8CA6688A1803D1B1858A8C3DA07A2A.html#constructor_UShortValue_87155A54B724EC6305A233592DF24339DE94D0E3">UShortValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UShortValue_0C3EB8F8BC8CA6688A1803D1B1858A8C3DA07A2A.html#constructor_UShortValue_F77197CEA6C50B9239C60DFB0C73CF25B71B1429">UShortValue</a><span class="other">(</span><span class="identifier">uint16_t</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_UShortValue_0C3EB8F8BC8CA6688A1803D1B1858A8C3DA07A2A.html#function_GetType_BFD7864B99E2E3930E334E187B6897B2F06B5156">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_UShortValue_0C3EB8F8BC8CA6688A1803D1B1858A8C3DA07A2A.html#function_Name_05F36F3614C0EE00A4000B42B1747EA3649734B1">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint16_t</span>&nbsp;<a href="../class_UShortValue_0C3EB8F8BC8CA6688A1803D1B1858A8C3DA07A2A.html#variable_value_CC40587C8F8A55AE69BB84070DC95B28CB156438">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_IntValue_CDC6340847451BFE44FD828DCED29C7E75510E78.html">IntValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_IntValue_CDC6340847451BFE44FD828DCED29C7E75510E78.html#constructor_IntValue_2C38061486DB8BE5CE8245CD8F2331B173E4D002">IntValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_IntValue_CDC6340847451BFE44FD828DCED29C7E75510E78.html#constructor_IntValue_965A2736D164B1606A98A838B2962B8DBFB801D5">IntValue</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_IntValue_CDC6340847451BFE44FD828DCED29C7E75510E78.html#function_GetType_CE7C6C22F9E36113CC8AB73BE2EC0B034A4C7C99">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_IntValue_CDC6340847451BFE44FD828DCED29C7E75510E78.html#function_Name_F34E9B826BFEB42DDE42B359958B4FA96A4BB6FF">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_IntValue_CDC6340847451BFE44FD828DCED29C7E75510E78.html#variable_value_6B172E047AD2F090969852A4A615BEDB8BB18C58">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_UIntValue_CF55EB640CAB88D798AB35D9880CDACD952AA96C.html">UIntValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UIntValue_CF55EB640CAB88D798AB35D9880CDACD952AA96C.html#constructor_UIntValue_B531CCD59EA2EEA2C943BEDD906EC425D3581B6A">UIntValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UIntValue_CF55EB640CAB88D798AB35D9880CDACD952AA96C.html#constructor_UIntValue_E970ACC86C80A0BE8F03629CA664F803C10E6112">UIntValue</a><span class="other">(</span><span class="identifier">uint32_t</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_UIntValue_CF55EB640CAB88D798AB35D9880CDACD952AA96C.html#function_GetType_B52BD54192564FAC7D032C6B5B8DBABF58058C2E">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_UIntValue_CF55EB640CAB88D798AB35D9880CDACD952AA96C.html#function_Name_12F04193451DDFB14BFB60E2587B97D7B725F0DE">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<a href="../class_UIntValue_CF55EB640CAB88D798AB35D9880CDACD952AA96C.html#variable_value_5388CBE055EAB461B684A5E0877BE8AC22312008">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html">LongValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html#constructor_LongValue_C396A41CACA4EDF8FD5C4204ABB447D609EF1840">LongValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html#constructor_LongValue_0F317BADDEE6C00C68C2FD936F4D1075D68ABBA3">LongValue</a><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html#function_GetType_BC6A0E475A5C1CC5807095D72CC2F5AE74C629C8">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html#function_Name_3DF75A6D0D2786A1048BF87462EE4AB449E5E477">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html#function_IsLongValue_C2B7180D4A3B139C913BAECB84B8792DE57C20DE">IsLongValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html#function_GetValue_53889056E7B825129E20A68DAB222FC5218A1620">GetValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html#variable_value_D24594C025AB382A4D09DBE7D80A7CAC5501C565">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html#variable_value_D24594C025AB382A4D09DBE7D80A7CAC5501C565">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ULongValue_C37BD23DF4D13F13466B9B24A1A7691D6D7B3A6C.html">ULongValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ULongValue_C37BD23DF4D13F13466B9B24A1A7691D6D7B3A6C.html#constructor_ULongValue_0FF639AB930C4A44C9E1760DA050E85DEEC1F7D4">ULongValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ULongValue_C37BD23DF4D13F13466B9B24A1A7691D6D7B3A6C.html#constructor_ULongValue_C88086FF6728C7B81E2F7C6C8FF1379C92EFA4FE">ULongValue</a><span class="other">(</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ULongValue_C37BD23DF4D13F13466B9B24A1A7691D6D7B3A6C.html#function_GetType_57000F0684AA0B9AACC185D4497C40932B5E5142">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ULongValue_C37BD23DF4D13F13466B9B24A1A7691D6D7B3A6C.html#function_Name_43D8D398D11EFFA7285D3EBFE4788F056C5FF70C">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint64_t</span>&nbsp;<a href="../class_ULongValue_C37BD23DF4D13F13466B9B24A1A7691D6D7B3A6C.html#variable_value_DB63D12BAAA5A902B2760AC1772F4CBEC0AC28B4">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_FloatValue_DA0A7851285EC32E60E9000B8F42A76B3239DBAD.html">FloatValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FloatValue_DA0A7851285EC32E60E9000B8F42A76B3239DBAD.html#constructor_FloatValue_9B633C29974A6EE4D88E02497BD4EDD39DAE97C6">FloatValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FloatValue_DA0A7851285EC32E60E9000B8F42A76B3239DBAD.html#constructor_FloatValue_50C5066BE2BDFCB8C49FC73D482AC3778A6AAD1D">FloatValue</a><span class="other">(</span><span class="kw">float</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_FloatValue_DA0A7851285EC32E60E9000B8F42A76B3239DBAD.html#function_GetType_824005A79F384F51DF4D293AD3C87C7776EA34B2">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_FloatValue_DA0A7851285EC32E60E9000B8F42A76B3239DBAD.html#function_Name_3564D0D1D6E7CF3FB27D41687EA65265B9C8CBAC">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">float</span>&nbsp;<a href="../class_FloatValue_DA0A7851285EC32E60E9000B8F42A76B3239DBAD.html#variable_value_17CD5CF83BBF8A9A4EEDC1E15601D3B1A8FA08D0">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DoubleValue_F1C37903C87086A03F09B5C4796DC234DE1C6DEF.html">DoubleValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DoubleValue_F1C37903C87086A03F09B5C4796DC234DE1C6DEF.html#constructor_DoubleValue_56CF06D4A263B167A45CB4CA63B7845DB8FB4582">DoubleValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DoubleValue_F1C37903C87086A03F09B5C4796DC234DE1C6DEF.html#constructor_DoubleValue_B719CB39DAB4DA504ACC9D879822953DB4F2B5B0">DoubleValue</a><span class="other">(</span><span class="kw">double</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_DoubleValue_F1C37903C87086A03F09B5C4796DC234DE1C6DEF.html#function_GetType_901116604FEBF10EA20DB18B0FB34F8A6588B63F">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_DoubleValue_F1C37903C87086A03F09B5C4796DC234DE1C6DEF.html#function_Name_D465CE61245842E476F9B645A86D79ED19707C1A">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">double</span>&nbsp;<a href="../class_DoubleValue_F1C37903C87086A03F09B5C4796DC234DE1C6DEF.html#variable_value_9B551F97EC11AA1E53FB36090A1CD0F3121E23A8">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_NullValue_F08C50093506164FE08DCD094A6560F51C3A4C73.html">NullValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_NullValue_F08C50093506164FE08DCD094A6560F51C3A4C73.html#constructor_NullValue_366C9C6A7B3749698B075C7684A6F50B2A47F5E8">NullValue</a><span class="other">(</span><a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html">PtrType</a><span class="other">*</span>&nbsp;<span class="identifier">ptrType_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_NullValue_F08C50093506164FE08DCD094A6560F51C3A4C73.html#function_GetType_0FEDF023E7A14DBC0FA3CA77E71745D97CEE1BE5">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_NullValue_F08C50093506164FE08DCD094A6560F51C3A4C73.html#function_Name_8C2BC048B6DAFA7AD79562F068D7CE75DBF8BEB8">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html">PtrType</a><span class="other">*</span>&nbsp;<a href="../class_NullValue_F08C50093506164FE08DCD094A6560F51C3A4C73.html#variable_ptrType_423ADBF688E4BD3CF7558EF24E5BE655F5781190">ptrType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html">ArrayValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#constructor_ArrayValue_D84CB0CF578AAAC7371422196254AFE64D079717">ArrayValue</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">type_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">elements_</span><span class="other">,&nbsp;</span><span class="kw">const</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span><span class="identifier">prefix_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#function_Name_ECCF75DBDAA43914FA9E837FADC6B661DBDB1D66">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#function_GetType_816E0906A5EE29B3C2F854EE7C683A60AFC03E7A">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_type_B4F49061E2380D7E9E64DA90266B3173A74018ED">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#function_AddElement_D7FFD1BB0D34757DFF1106201EAFA92F71080D90">AddElement</a><span class="other">(</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">element</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#function_IsAggregateValue_C6B9E7F3301D416D8D79B3E22566A6A2D6025CD7">IsAggregateValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#function_AddDependencies_39676B49CA4C73D6B59F16EB032EE72CAADE9A61">AddDependencies</a><span class="other">(</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span>&nbsp;<span class="identifier">variable</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">,&nbsp;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">nameMap</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">set</span><span class="other">&lt;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">></span><span class="other">></span><span class="other">&amp;</span><span class="identifier">dependencies</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_type_B4F49061E2380D7E9E64DA90266B3173A74018ED">type</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span><span class="other">></span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_elements_2F12B6E0163932D0BC3201D97F9E6720056E1F38">elements</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_prefix_C32382FD4F0A866868F2B06EB0B8C8697B7C97F4">prefix</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html">StructureValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html#constructor_StructureValue_F662AF151164B05DC720258587A77505D07CB863">StructureValue</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">type_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">members_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html#function_Name_AA906862D21EE59B5FE7C576F5CC7CABF7947EB7">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html#function_GetType_30F46CEE5019DD05E15AB7FAE768B40E64194EF3">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html#function_AddMember_E271AE3956696D0685D1F3AAE088532036BABF76">AddMember</a><span class="other">(</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">member</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html#function_IsAggregateValue_C0F47FB8CE5E91F881722653EF0CC9DA9BDEC148">IsAggregateValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html#function_AddDependencies_469601FB99ACA50A480E2B1DA7D81F96B30FAE97">AddDependencies</a><span class="other">(</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span>&nbsp;<span class="identifier">variable</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">,&nbsp;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">nameMap</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">set</span><span class="other">&lt;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">></span><span class="other">></span><span class="other">&amp;</span><span class="identifier">dependencies</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html#variable_type_9C226D749A1085951C4292FD8DA3C65ECA6C8A79">type</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span><span class="other">></span>&nbsp;<a href="../class_StructureValue_7F567A38AF443771F0C6A9921294722C6570616C.html#variable_members_7DBDADB31210A5587B02E109A02A215E67999EE7">members</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html">StringValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html#constructor_StringValue_D8B9AEC420F53659419C7CC599709D3935C8D3A4">StringValue</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">type_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html#function_Name_CF42D610B87F5130C2AB4D1D381757E3BC7196C1">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html#function_GetType_0B82E0603AF6CB85872D34468922943275A8778E">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html#function_IsStringValue_5AFAA6D649C2038A41A1EEA62F9E78FACBFD77F3">IsStringValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html#variable_type_5C403B7D47ECCCD660D3FD6907F65FFBDE7B170E">type</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_StringValue_E961DCB2C2AC9E008DD1CEA3AAAB0EF151242BE8.html#variable_value_C1416202B66209468434181205D5154DDF08A359">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html">ConversionValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html#constructor_ConversionValue_734BCEE66D962E42EC480AE3E6B05FBE62286203">ConversionValue</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">type_</span><span class="other">,&nbsp;</span><a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<span class="identifier">from_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html#function_Name_2ACB35FF3CB7524FEACE5CC75AD8557D394C511E">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html#function_GetType_308E70AE54604BD8811C19003B101271DC9F8F86">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html#function_AddDependencies_EB27618349D7CC66DB099BEEBE78AFADC0B31AE9">AddDependencies</a><span class="other">(</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span>&nbsp;<span class="identifier">variable</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">,&nbsp;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">nameMap</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">set</span><span class="other">&lt;</span><a href="../class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span><span class="other">></span><span class="other">></span><span class="other">&amp;</span><span class="identifier">dependencies</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html#variable_type_CDD2DA8C2F81FA447172246541FF43E13CF041A5">type</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_ConversionValue_E200412225D1D8B75DB5FDC9FB860FDFC0ABF7AF.html#variable_from_A692BD37DDAFF2D6E4A5E2EF2E0AFB693F410154">from</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ClsIdValue_9C62FA55D46519183CA969A5AD43C4BB8AF855F8.html">ClsIdValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ClsIdValue_9C62FA55D46519183CA969A5AD43C4BB8AF855F8.html#constructor_ClsIdValue_382A2BC628D2F7EBB5860C5D0F819557B1320DE4">ClsIdValue</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">typeId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ClsIdValue_9C62FA55D46519183CA969A5AD43C4BB8AF855F8.html#function_Name_416BE18BF088BE2532DFD0B99D4EC0E034218788">Name</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ClsIdValue_9C62FA55D46519183CA969A5AD43C4BB8AF855F8.html#function_GetType_931B1329293840341C96B71BABD60516F54D199E">GetType</a><span class="other">(</span><a href="../class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a><span class="other">&amp;</span>&nbsp;<span class="identifier">context</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_ClsIdValue_9C62FA55D46519183CA969A5AD43C4BB8AF855F8.html#variable_typeId_8B8A2BE6B0B8B0040E368E86BBD7503F7544662E">typeId</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmsxi</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_CMSXI_VALUE_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

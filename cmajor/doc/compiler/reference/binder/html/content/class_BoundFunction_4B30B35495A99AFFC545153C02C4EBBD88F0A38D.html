@@ -16,8 +16,8 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#16">16</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#16">16</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
@@ -41,7 +41,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_AddTemporaryDestructorCall_273B72D6E844EBC209BEA1B7CD5F50F6249D0191">AddTemporaryDestructorCall</a>(std::unique_ptr&lt;<a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>>&amp;&amp; destructorCall, <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a>* currentFunction, ContainerScope* currentContainerScope, <span class="kw">const </span>Span&amp; span)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_AddTemporaryDestructorCall_E4A44EEB46C395736263F3201B91CE77FDC9B219">AddTemporaryDestructorCall</a>(std::unique_ptr&lt;<a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>>&amp;&amp; destructorCall, <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a>* currentFunction, ContainerScope* currentContainerScope, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_BoundCompoundStatement_83075A2B16EF7318603436483D5B262D74A60859.html">BoundCompoundStatement</a>*</td>
@@ -150,6 +150,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">lineCode</td>
             </tr>
+            <tr id="variable_temporaries_BF5869C28D7B273E258214C461AE8AAF9FFCF0FE">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_LocalVariableSymbol_F5A9F74EEFC0001129616C5EEBCFE3B2DFC74FCF.html">LocalVariableSymbol</a>>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">temporaries</td>
+            </tr>
             <tr id="variable_temporaryDestructorCalls_9C5D688F47EAFB62D8EFEF596922BFB3E4E60505">
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">temporaryDestructorCalls</td>
@@ -162,13 +166,13 @@
             cmajor::binder::BoundFunction::BoundFunction(<a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>
             * boundCompileUnit_, FunctionSymbol* functionSymbol_)</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#19">19</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#19">19</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html">BoundNode</a><span class="other">(</span><span class="other">&amp;</span><span class="identifier">boundCompileUnit_</span><span class="other">-></span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">functionSymbol_</span><span class="other">-></span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundFunction_0DBA914AAAF202C18A218A90CA84ADFAE852E34D">boundFunction</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_boundCompileUnit_9587CF33E596AD1752F351429B682F74E5C611E5">boundCompileUnit</a><span class="other">(</span><span class="identifier">boundCompileUnit_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_functionSymbol_923D8EA5DFA95FFA7CA3EC4B0923174AB2935E52">functionSymbol</a><span class="other">(</span><span class="identifier">functionSymbol_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_hasGotos_4D444DD7E24779FCE682D18AC066F391A8A16066">hasGotos</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html">BoundNode</a><span class="other">(</span><span class="identifier">functionSymbol_</span><span class="other">-></span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">functionSymbol_</span><span class="other">-></span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundFunction_0DBA914AAAF202C18A218A90CA84ADFAE852E34D">boundFunction</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_boundCompileUnit_9587CF33E596AD1752F351429B682F74E5C611E5">boundCompileUnit</a><span class="other">(</span><span class="identifier">boundCompileUnit_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_functionSymbol_923D8EA5DFA95FFA7CA3EC4B0923174AB2935E52">functionSymbol</a><span class="other">(</span><span class="identifier">functionSymbol_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_hasGotos_4D444DD7E24779FCE682D18AC066F391A8A16066">hasGotos</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">{</span></span>
                 <br/>
@@ -185,8 +189,8 @@
             &amp;) <span class="kw">delete</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#20">20</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#20">20</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -199,8 +203,8 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#34">34</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#34">34</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="other">{</span></span>
@@ -213,8 +217,8 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#24">24</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Declaration at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#24">24</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -235,22 +239,22 @@
              cmajor::binder::BoundFunction::AddLabeledStatement(<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             * labeledStatement)</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#98">98</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#97">97</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_labeledStatements_D4E404FEB2BF8E896F51B88FE3CA8230F4CC750C">labeledStatements</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">labeledStatement</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_labeledStatements_D4E404FEB2BF8E896F51B88FE3CA8230F4CC750C">labeledStatements</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">labeledStatement</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#34">34</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Declaration at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#34">34</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -260,16 +264,17 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_AddTemporaryDestructorCall_273B72D6E844EBC209BEA1B7CD5F50F6249D0191">AddTemporaryDestructorCall Member Function</h3>
+        <h3 id="function_AddTemporaryDestructorCall_E4A44EEB46C395736263F3201B91CE77FDC9B219">AddTemporaryDestructorCall Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::binder::BoundFunction::AddTemporaryDestructorCall(std::unique_ptr&lt;<a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>
             >&amp;&amp; destructorCall, <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a>
             * currentFunction, ContainerScope* currentContainerScope, <span class="kw">const </span>
-            Span&amp; span)</h4>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId)</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#44">44</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#44">44</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
         </span>
         <br/>
         <br/>
@@ -278,14 +283,15 @@
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetClassTemplateRepository_EBDB3D2F37AA7376E667169B0C4C0E7C285CDD59">cmajor::binder::BoundCompileUnit::GetClassTemplateRepository</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetModule_3D1A2B5CC98F2A7EDDF7C0F95FEC80A03A352BDE">cmajor::binder::BoundCompileUnit::GetModule</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetSymbolTable_67A2A0A2C598F97CD8078339C59387139B141ECC">cmajor::binder::BoundCompileUnit::GetSymbolTable</a>
-            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_InstantiateClassTemplateMemberFunction_89ECD1B97803D7B5DB43B1C07F91944826FB58AC">cmajor::binder::BoundCompileUnit::InstantiateClassTemplateMemberFunction</a>
+            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_InstantiateClassTemplateMemberFunction_48D09FB09D1160CC0CE0D490590457772A5F3ED2">cmajor::binder::BoundCompileUnit::InstantiateClassTemplateMemberFunction</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_IsGeneratedDestructorInstantiated_AF15A0B6768316F88039CF66E1E5B469A7EB6E1B">cmajor::binder::BoundCompileUnit::IsGeneratedDestructorInstantiated</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_SetGeneratedDestructorInstantiated_54C0B49F93DB52688C5E74DD71D7E4511D6AC768">cmajor::binder::BoundCompileUnit::SetGeneratedDestructorInstantiated</a>
             , <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_GetBoundCompileUnit_8106D3698BC9D407CAD664DA1832B81E8C661571">cmajor::binder::BoundFunction::GetBoundCompileUnit</a>
             , <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_GetFunctionSymbol_8396C3A527795DD31346D4BCA3B7A1943843C353">cmajor::binder::BoundFunction::GetFunctionSymbol</a>
             , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
-            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_64A76058E4A3027994A87BF8732E9678A5A7266A">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
-            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_Instantiate_003D803D6A7DADB14637AF11D3718BDF7E5A8E3D">cmajor::binder::ClassTemplateRepository::Instantiate</a>
+            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_B141B051C0D58A636A696EB429C35BBE9303FCA4">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
+            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_Instantiate_51C116AFB8677510FF0B41763DBF181D1CB70BFF">cmajor::binder::ClassTemplateRepository::Instantiate</a>
+            , <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_GetLock_680B9FFD21FBA9443BC1EC6631E459E373509281">cmajor::symbols::Module::GetLock</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_CopyClassTemplateSpecialization_29CDF57D601A9AFA797E242670F2130FE0EEFE09">cmajor::symbols::SymbolTable::CopyClassTemplateSpecialization</a>
         </span>
         <br/>
@@ -306,8 +312,8 @@
             * cmajor::binder::BoundFunction::Body() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#28">28</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#28">28</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_body_15DD8440A3EAECDE6BB526E089AB638066371943">body</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -328,8 +334,8 @@
             >>&amp; cmajor::binder::BoundFunction::EnterCode() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#37">37</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#37">37</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_enterCode_B1DA7DEE3FCE64C04C891E9444E126B66D526AD4">enterCode</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -345,8 +351,8 @@
             >>&amp; cmajor::binder::BoundFunction::ExitCode() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#39">39</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#39">39</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_exitCode_F1CFFB5B9CB2E07F9F302137567A125323E1B1D0">exitCode</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -361,8 +367,8 @@
             * cmajor::binder::BoundFunction::GetBoundCompileUnit() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#42">42</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#42">42</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_boundCompileUnit_9587CF33E596AD1752F351429B682F74E5C611E5">boundCompileUnit</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -371,7 +377,7 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_AddTemporaryDestructorCall_273B72D6E844EBC209BEA1B7CD5F50F6249D0191">cmajor::binder::BoundFunction::AddTemporaryDestructorCall</a>
+            Called by: <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_AddTemporaryDestructorCall_E4A44EEB46C395736263F3201B91CE77FDC9B219">cmajor::binder::BoundFunction::AddTemporaryDestructorCall</a>
         </span>
         <br/>
         <br/>
@@ -383,8 +389,8 @@
             * cmajor::binder::BoundFunction::GetFunctionSymbol() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#25">25</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#25">25</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_functionSymbol_923D8EA5DFA95FFA7CA3EC4B0923174AB2935E52">functionSymbol</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -398,8 +404,8 @@
             <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
             * cmajor::binder::BoundFunction::GetFunctionSymbol()</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#26">26</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#26">26</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_functionSymbol_923D8EA5DFA95FFA7CA3EC4B0923174AB2935E52">functionSymbol</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -409,27 +415,27 @@
         <br/>
         <span>
             Called by: <a href="./class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#function_ContainsSourceFunctions_611135F97488856A51FA0709618880EC5FE85844">cmajor::binder::BoundClass::ContainsSourceFunctions</a>
-            , <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_AddTemporaryDestructorCall_273B72D6E844EBC209BEA1B7CD5F50F6249D0191">cmajor::binder::BoundFunction::AddTemporaryDestructorCall</a>
+            , <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_AddTemporaryDestructorCall_E4A44EEB46C395736263F3201B91CE77FDC9B219">cmajor::binder::BoundFunction::AddTemporaryDestructorCall</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindArrow_5149F3ED291739DEF4C1EBB81F924FE7BDCC4EDB">cmajor::binder::ExpressionBinder::BindArrow</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindBinaryOp_E3F8BE49ABA1A6849389AAC187C19334684CC435">cmajor::binder::ExpressionBinder::BindBinaryOp</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindSymbol_087961403CDA5E7BA540C4F369F32BFD5B677B27">cmajor::binder::ExpressionBinder::BindSymbol</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindUnaryOp_02ED2505ECD8A48B35E33508230FC37675E32B43">cmajor::binder::ExpressionBinder::BindUnaryOp</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_333FCA5FC1817A103EE015FE972C5B7D901E0477">cmajor::binder::ExpressionBinder::Visit</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_2919BBB3C62CD8FE7C05BA5C78547A09AC60A79F">cmajor::binder::ExpressionBinder::Visit</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_E5E7850A74F4FB3C2BD22BF9BEB490EE8A58BCB3">cmajor::binder::ExpressionBinder::Visit</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_22C09DA349C71F5C2F859A6E47AA037B88760BEE">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_64BC56F46FAE13BD5B17991312D8F14EF0C91135">cmajor::binder::ExpressionBinder::Visit</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_E5E7850A74F4FB3C2BD22BF9BEB490EE8A58BCB3">cmajor::binder::ExpressionBinder::Visit</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_2919BBB3C62CD8FE7C05BA5C78547A09AC60A79F">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_757046458F58D2740096A51BEBDD113AC972B20E">cmajor::binder::ExpressionBinder::Visit</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_DEB63F59E111775EAAC9231447756AA9B53151A3">cmajor::binder::ExpressionBinder::Visit</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_22C09DA349C71F5C2F859A6E47AA037B88760BEE">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_EDF155EF83334BEB1ABE2ADFF6F62BDDCA7F1E9A">cmajor::binder::ExpressionBinder::Visit</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_DEB63F59E111775EAAC9231447756AA9B53151A3">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_0546E0A0B2FA340F92D61A4D4A4D05E47C3825ED">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_GenerateEnterAndExitFunctionCode_94424D9F90EF970AA584D9ED903C35905F7E8318">cmajor::binder::StatementBinder::GenerateEnterAndExitFunctionCode</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_7EDCCEED4329DE9F33611B646E43120618529A68">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_09A14A297C598E5A658BE95508C8A07470178666">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_FC8A28554E92226D45F06BDE10E7D5627DF5A036">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_4BE4F162E42194D1E1C8186511AE82CC2F0F9B9D">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_6339DFF3C91504421455383DD19E9AC7304289AC">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_C1EDDF2EDB86B38A18F38A87FC0FA36F5E05EA11">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_09A14A297C598E5A658BE95508C8A07470178666">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_7EDCCEED4329DE9F33611B646E43120618529A68">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_188C244426C4D11503A88CBDD6E395EFFA821315">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_8D5184D8DBC4A9AB8A8BA5CBDBE6C3A304CD0CD6">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_E5C4EE4BCAAEE3DE8790BFB23BCFC36B2024F8C1">cmajor::binder::StatementBinder::Visit</a>
@@ -444,8 +450,8 @@
             * cmajor::binder::BoundFunction::GetLineCode() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#41">41</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#41">41</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_lineCode_1FF8FB6261257C775B1CEACC86124BE82F688FB2">lineCode</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -460,8 +466,8 @@
              cmajor::binder::BoundFunction::HasGotos() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#30">30</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#30">30</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_hasGotos_4D444DD7E24779FCE682D18AC066F391A8A16066">hasGotos</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -482,8 +488,8 @@
             *>&amp; cmajor::binder::BoundFunction::LabeledStatements() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#35">35</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#35">35</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_labeledStatements_D4E404FEB2BF8E896F51B88FE3CA8230F4CC750C">labeledStatements</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -500,13 +506,13 @@
              flags) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#24">24</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#24">24</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"cannot&nbsp;load&nbsp;from&nbsp;function"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="string">"cannot&nbsp;load&nbsp;from&nbsp;function"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="other">}</span></span>
             </span>
@@ -514,8 +520,8 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#22">22</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Declaration at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#22">22</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -525,8 +531,8 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetModule_DB6EB51F57737BE38E6D13F24AE4EC5AF448C43D">cmajor::binder::BoundNode::GetModule</a>
-            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
+            Calls: <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
+            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_ModuleId_D9B7DAF4B86F57300AF9C490E3FC47DB994C66C2">cmajor::binder::BoundNode::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -537,30 +543,30 @@
              cmajor::binder::BoundFunction::MoveTemporaryDestructorCallsTo(<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
             &amp; expression)</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#89">89</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#88">88</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">destructorCall</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_temporaryDestructorCalls_9C5D688F47EAFB62D8EFEF596922BFB3E4E60505">temporaryDestructorCalls</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">destructorCall</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_temporaryDestructorCalls_9C5D688F47EAFB62D8EFEF596922BFB3E4E60505">temporaryDestructorCalls</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">expression</span><span class="other">.</span><span class="identifier">AddTemporaryDestructorCall</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">destructorCall</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">expression</span><span class="other">.</span><span class="identifier">AddTemporaryDestructorCall</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">destructorCall</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_temporaryDestructorCalls_9C5D688F47EAFB62D8EFEF596922BFB3E4E60505">temporaryDestructorCalls</a><span class="other">.</span><span class="identifier">clear</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_temporaryDestructorCalls_9C5D688F47EAFB62D8EFEF596922BFB3E4E60505">temporaryDestructorCalls</a><span class="other">.</span><span class="identifier">clear</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#33">33</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Declaration at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#33">33</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -581,8 +587,8 @@
              cmajor::binder::BoundFunction::SetBody(std::unique_ptr&lt;<a href="./class_BoundCompoundStatement_83075A2B16EF7318603436483D5B262D74A60859.html">BoundCompoundStatement</a>
             >&amp;&amp; body_)</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#39">39</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#39">39</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">{</span></span>
@@ -595,8 +601,8 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#27">27</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Declaration at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#27">27</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -607,22 +613,22 @@
              cmajor::binder::BoundFunction::SetEnterCode(std::vector&lt;std::unique_ptr&lt;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             >>&amp;&amp; enterCode_)</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#103">103</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#102">102</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_enterCode_B1DA7DEE3FCE64C04C891E9444E126B66D526AD4">enterCode</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">enterCode_</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_enterCode_B1DA7DEE3FCE64C04C891E9444E126B66D526AD4">enterCode</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">enterCode_</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#36">36</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Declaration at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#36">36</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -638,22 +644,22 @@
              cmajor::binder::BoundFunction::SetExitCode(std::vector&lt;std::unique_ptr&lt;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             >>&amp;&amp; exitCode_)</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#108">108</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#107">107</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_exitCode_F1CFFB5B9CB2E07F9F302137567A125323E1B1D0">exitCode</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">exitCode_</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_exitCode_F1CFFB5B9CB2E07F9F302137567A125323E1B1D0">exitCode</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">exitCode_</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#38">38</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Declaration at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#38">38</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -668,8 +674,8 @@
             <span class="kw">void</span>
              cmajor::binder::BoundFunction::SetHasGotos()</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#29">29</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#29">29</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_hasGotos_4D444DD7E24779FCE682D18AC066F391A8A16066">hasGotos</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -689,22 +695,22 @@
              cmajor::binder::BoundFunction::SetLineCode(std::unique_ptr&lt;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             >&amp;&amp; lineCode_)</h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#113">113</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#112">112</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_lineCode_1FF8FB6261257C775B1CEACC86124BE82F688FB2">lineCode</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">lineCode_</span><span class="other">.</span><span class="identifier">release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_lineCode_1FF8FB6261257C775B1CEACC86124BE82F688FB2">lineCode</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">lineCode_</span><span class="other">.</span><span class="identifier">release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#40">40</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Declaration at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#40">40</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -722,13 +728,13 @@
              flags) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#29">29</a>
-             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            Definition at line <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html#29">29</a>
+             of <a href="file/BoundFunction.cpp_AC63BFDDA56475518E6B084462013232155E4097.html">BoundFunction.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"cannot&nbsp;store&nbsp;to&nbsp;function"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="string">"cannot&nbsp;store&nbsp;to&nbsp;function"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">}</span></span>
             </span>
@@ -736,8 +742,8 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#23">23</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Declaration at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#23">23</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>
@@ -747,8 +753,8 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetModule_DB6EB51F57737BE38E6D13F24AE4EC5AF448C43D">cmajor::binder::BoundNode::GetModule</a>
-            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
+            Calls: <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">cmajor::binder::BoundNode::GetSpan</a>
+            , <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_ModuleId_D9B7DAF4B86F57300AF9C490E3FC47DB994C66C2">cmajor::binder::BoundNode::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -761,8 +767,8 @@
             &amp;) <span class="kw">delete</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#21">21</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+            Definition at line <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html#21">21</a>
+             of <a href="file/BoundFunction.hpp_F3C7872DAD32C768F324E94F95079A0DC8C62840.html">BoundFunction.hpp</a>
         </span>
         <br/>
         <br/>

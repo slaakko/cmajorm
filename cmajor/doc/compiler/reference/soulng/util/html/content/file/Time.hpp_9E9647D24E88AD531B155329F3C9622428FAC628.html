@@ -1,0 +1,416 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SOULNG_UTIL_TIME_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SOULNG_UTIL_TIME_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/UtilApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;chrono></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdint.h></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">Month</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">int8_t</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">january</span><span class="other">=</span>&nbsp;&nbsp;<span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">february</span><span class="other">,&nbsp;</span><span class="identifier">march</span><span class="other">,&nbsp;</span><span class="identifier">april</span><span class="other">,&nbsp;</span><span class="identifier">may</span><span class="other">,&nbsp;</span><span class="identifier">june</span><span class="other">,&nbsp;</span><span class="identifier">july</span><span class="other">,&nbsp;</span><span class="identifier">august</span><span class="other">,&nbsp;</span><span class="identifier">september</span><span class="other">,&nbsp;</span><span class="identifier">october</span><span class="other">,&nbsp;</span><span class="identifier">november</span><span class="other">,&nbsp;</span><span class="identifier">december</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_GetMonthDays_B57C68F3875E6334F37C6C349F5F5973EE02CB77">GetMonthDays</a><span class="other">(</span><a href="../enum_Month_92FA697A3D21D76968797E2DC720D098051C1EBD.html">Month</a>&nbsp;<span class="identifier">month</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">year</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#constructor_Date_A97044D657A783E76D676F7FF91F168EC13A631C">Date</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_year_898D3CE0F2437E051B6A4E94763BAC28E5BED276">year</a><span class="other">(</span><span class="other">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_month_E5A3DE2DADFB4205D4574DED3A67068512745D0F">month</a><span class="other">(</span><a href="../enum_Month_92FA697A3D21D76968797E2DC720D098051C1EBD.html">Month</a><span class="other">::</span><a href="../enum_Month_92FA697A3D21D76968797E2DC720D098051C1EBD.html#enumerator_january_F65C8D749DAD54C267E8B1F489E8B1FA768141E0">january</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_day_7FFA5F78999BE1F2B54F2A097723EC8DFD4F0DC5">day</a><span class="other">(</span><span class="other">1</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#constructor_Date_8BE3F38F4F51F2FD837DE0203E99F039545A1344">Date</a><span class="other">(</span><span class="kw">short</span>&nbsp;<span class="identifier">year_</span><span class="other">,&nbsp;</span><a href="../enum_Month_92FA697A3D21D76968797E2DC720D098051C1EBD.html">Month</a>&nbsp;<span class="identifier">month_</span><span class="other">,&nbsp;</span><span class="identifier">int8_t</span>&nbsp;<span class="identifier">day_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_year_898D3CE0F2437E051B6A4E94763BAC28E5BED276">year</a><span class="other">(</span><span class="identifier">year_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_month_E5A3DE2DADFB4205D4574DED3A67068512745D0F">month</a><span class="other">(</span><span class="identifier">month_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_day_7FFA5F78999BE1F2B54F2A097723EC8DFD4F0DC5">day</a><span class="other">(</span><span class="identifier">day_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int16_t</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#function_Year_E3F7C303C88A8AEDC85D5F565A6B8195675D657F">Year</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_year_898D3CE0F2437E051B6A4E94763BAC28E5BED276">year</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Month_92FA697A3D21D76968797E2DC720D098051C1EBD.html">Month</a>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#function_GetMonth_EA0FB69F47602FA6EB7942C2A4E5BAAE7D809C0D">GetMonth</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_month_E5A3DE2DADFB4205D4574DED3A67068512745D0F">month</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int8_t</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#function_Day_0B2C85ACD3BD14C1BDF96710D4C2A598C4A31D23">Day</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_day_7FFA5F78999BE1F2B54F2A097723EC8DFD4F0DC5">day</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#function_AddDays_60B9B09FE6F3342DC4E78323223017DE4F743B6A">AddDays</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">n</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#function_AddMonths_4AEFE259693A64DB177218DB9E67092CEF6957F5">AddMonths</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">n</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#function_AddYears_7B2C032ED91068D2FA7A92D63DD7BDF5EEF93BC9">AddYears</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">n</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#function_ToString_A6C7542FC5D2B292C7D6A303539724BDC0DBF83A">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#function_ToString_6D13DCE738300192709C39C4FE743525AA99B51E">ToString</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">omitDashes</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int16_t</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_year_898D3CE0F2437E051B6A4E94763BAC28E5BED276">year</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Month_92FA697A3D21D76968797E2DC720D098051C1EBD.html">Month</a>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_month_E5A3DE2DADFB4205D4574DED3A67068512745D0F">month</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int8_t</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html#variable_day_7FFA5F78999BE1F2B54F2A097723EC8DFD4F0DC5">day</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="identifier">Date</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_GetCurrentDate_B9451E73EF99D3CC40EEF25024CCF02C531E80DB">GetCurrentDate</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">==</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">!=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">left</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">></span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">right</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">left</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">right</span><span class="other">&nbsp;>&nbsp;</span><span class="identifier">left</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">>=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">left</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="identifier">Date</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_ParseDate_1D705FE490A71856D7B034BDB13494332E143FAF">ParseDate</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">dateStr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#constructor_DateTime_4453EA1CBA45819658A57B7E369855886062458B">DateTime</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_date_6092FB4F4E79A10F348B571CD6E83698A4D8FD52">date</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_secs_74736D4E2567DCCFF5B9C94A86D1162867F12CB5">secs</a><span class="other">(</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#constructor_DateTime_51E76411AB175B980B60A96E33DC1F0C6C4C26F4">DateTime</a><span class="other">(</span><a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<span class="identifier">date_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_date_6092FB4F4E79A10F348B571CD6E83698A4D8FD52">date</a><span class="other">(</span><span class="identifier">date_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_secs_74736D4E2567DCCFF5B9C94A86D1162867F12CB5">secs</a><span class="other">(</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#constructor_DateTime_DD5907D37538AC5273B13569BD71403B7C554178">DateTime</a><span class="other">(</span><a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<span class="identifier">date_</span><span class="other">,&nbsp;</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">secs_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_date_6092FB4F4E79A10F348B571CD6E83698A4D8FD52">date</a><span class="other">(</span><span class="identifier">date_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_secs_74736D4E2567DCCFF5B9C94A86D1162867F12CB5">secs</a><span class="other">(</span><span class="identifier">secs_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#function_GetDate_55594EFD982305FCD5EECF4892D27716AE98E466">GetDate</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_date_6092FB4F4E79A10F348B571CD6E83698A4D8FD52">date</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#function_Hours_9E812C35CF18AA603682118BA5AD3CBE2FFB35BA">Hours</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_secs_74736D4E2567DCCFF5B9C94A86D1162867F12CB5">secs</a><span class="other">&nbsp;/&nbsp;</span><span class="other">3600</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#function_Minutes_4A1E9AA9D3561AAEB086B74BED53F0BB98AA9056">Minutes</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_secs_74736D4E2567DCCFF5B9C94A86D1162867F12CB5">secs</a><span class="other">&nbsp;/&nbsp;</span><span class="other">60</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#function_Seconds_D660EA05952711D0763E2E1206EF0FF6308BD03D">Seconds</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_secs_74736D4E2567DCCFF5B9C94A86D1162867F12CB5">secs</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#function_ToString_A6D0EF024C84D5219561F17E219C155A7DDAC5B0">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#function_ToString_35A7CFFCBB2E02EB8453AA34D90E938C49657DD2">ToString</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">omitDashes</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">omitColons</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">omitMins</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">omitSecs</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_date_6092FB4F4E79A10F348B571CD6E83698A4D8FD52">date</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html#variable_secs_74736D4E2567DCCFF5B9C94A86D1162867F12CB5">secs</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="identifier">DateTime</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_GetCurrentDateTime_46213B9C5CDAF7B6952E3D65846D56A7984133D8">GetCurrentDateTime</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">==</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">!=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">left</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">></span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">right</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">left</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">right</span><span class="other">&nbsp;>&nbsp;</span><span class="identifier">left</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">>=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">left</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="identifier">DateTime</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_ParseDateTime_B4112B4840D7BFB3B23D30C5A649ED1FC6093FDB">ParseDateTime</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">dateTimeStr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#constructor_Timestamp_B7A47FACF1C377CFC10AABF2D7144723B70494B8">Timestamp</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_dateTime_00B20BE333486B1B520C09024C55A7C5E7BE1600">dateTime</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_nanosecs_AB1325D78836A330E0E358AF423424D33C7BB7F5">nanosecs</a><span class="other">(</span><span class="other">0</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#constructor_Timestamp_8989BE54DAB2F7609651881D4A4BE56BDEAC5691">Timestamp</a><span class="other">(</span><a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<span class="identifier">date_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_dateTime_00B20BE333486B1B520C09024C55A7C5E7BE1600">dateTime</a><span class="other">(</span><span class="identifier">date_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_nanosecs_AB1325D78836A330E0E358AF423424D33C7BB7F5">nanosecs</a><span class="other">(</span><span class="other">0</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#constructor_Timestamp_1D756D723E3B9E465163C5B8D23B8BBD2FDB6FA4">Timestamp</a><span class="other">(</span><a href="../class_Date_BB1AFF51F54401ED1BE60C8FD06C971B9B3F5532.html">Date</a>&nbsp;<span class="identifier">date_</span><span class="other">,&nbsp;</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">secs_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_dateTime_00B20BE333486B1B520C09024C55A7C5E7BE1600">dateTime</a><span class="other">(</span><span class="identifier">date_</span><span class="other">,&nbsp;</span><span class="identifier">secs_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_nanosecs_AB1325D78836A330E0E358AF423424D33C7BB7F5">nanosecs</a><span class="other">(</span><span class="other">0</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#constructor_Timestamp_B515E2E3E743BE0382CC7280FFA47F81D07B49EA">Timestamp</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">dateTime_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_dateTime_00B20BE333486B1B520C09024C55A7C5E7BE1600">dateTime</a><span class="other">(</span><span class="identifier">dateTime_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_nanosecs_AB1325D78836A330E0E358AF423424D33C7BB7F5">nanosecs</a><span class="other">(</span><span class="other">0</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#constructor_Timestamp_67747AF257823E38913A9491491A325014209895">Timestamp</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">dateTime_</span><span class="other">,&nbsp;</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">nanosecs_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_dateTime_00B20BE333486B1B520C09024C55A7C5E7BE1600">dateTime</a><span class="other">(</span><span class="identifier">dateTime_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_nanosecs_AB1325D78836A330E0E358AF423424D33C7BB7F5">nanosecs</a><span class="other">(</span><span class="identifier">nanosecs_</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a><span class="other">&amp;</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#function_GetDateTime_75F61B69375A74AFA4919C4D40FA17FF711895E6">GetDateTime</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_dateTime_00B20BE333486B1B520C09024C55A7C5E7BE1600">dateTime</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#function_Nanoseconds_A2D6B6121DC7925A140A0735E87821C35C4BF2DB">Nanoseconds</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_nanosecs_AB1325D78836A330E0E358AF423424D33C7BB7F5">nanosecs</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#function_ToString_F34FF86724C86949012CDB964F2EA40D56A91E5A">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">DateTime</a>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_dateTime_00B20BE333486B1B520C09024C55A7C5E7BE1600">dateTime</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html#variable_nanosecs_AB1325D78836A330E0E358AF423424D33C7BB7F5">nanosecs</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">secsInDay</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">24</span><span class="other">&nbsp;*&nbsp;</span><span class="other">3600</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">==</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">!=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">left</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">></span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">right</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">left</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">right</span><span class="other">&nbsp;>&nbsp;</span><span class="identifier">left</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="kw">operator</span><span class="other">>=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../class_Timestamp_05FEB3C4C6258142F4A72B365936713159612DEC.html">Timestamp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">!</span><span class="other">(</span><span class="identifier">left</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;<span class="identifier">Timestamp</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_GetCurrentTimestamp_11C59695802D57B09AC266AC69B2FFA40B7265DB">GetCurrentTimestamp</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<span class="identifier">Timestamp</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_ParseTimestamp_75705B1A9DC8D10894C16387AA8D01FA10A14C76">ParseTimestamp</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">timestampStr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_FormatTimeMs_2A418248389D975A01116DB0CE01276A349C86C7">FormatTimeMs</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">milliseconds</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">int64_t</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_CurrentMs_F5575AE57E04EC8522206ACAE27A637F5022ABB6">CurrentMs</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;<span class="identifier">int64_t</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_GetCurrentTime_D021A42400C89D4F5FD24E31AD8E2C8B21BAF05D">GetCurrentTime</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_DurationStr_F8CAEFFD9E8C53297B3E4E1F4A396CBBC7590C3B">DurationStr</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">nanoseconds</span><span class="other">&amp;</span>&nbsp;<span class="identifier">duration</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_TimeInit_A06A7E0CEF6F3523CFC66D035848A0638B9220D0">TimeInit</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_TimeDone_D041173DC98F25B4107BFCF8DEB0ED94415A1B93">TimeDone</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SOULNG_UTIL_TIME_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

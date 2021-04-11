@@ -1,0 +1,774 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="pp">#include&nbsp;"Specifier.hpp"</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngcm/cmlexer/CmajorLexer.hpp></span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngcm/cmlexer/CmajorTokens.hpp></span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="comment">//&nbsp;this&nbsp;file&nbsp;has&nbsp;been&nbsp;automatically&nbsp;generated&nbsp;from&nbsp;'C:/work/cmajorm/cmajor/sngcm/cmparser/Specifier.parser'&nbsp;using&nbsp;soulng&nbsp;parser&nbsp;generator&nbsp;spg&nbsp;version&nbsp;3.10.0</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">CmajorTokens</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a>&nbsp;<a href="../struct_SpecifierParser_B6D45EB73F7A6B141F98D0184793336048BDFB55.html">SpecifierParser</a><span class="other">::</span><a href="../struct_SpecifierParser_B6D45EB73F7A6B141F98D0184793336048BDFB55.html#function_Specifiers_A3D639007A7F41329EC22138CFA4361B3B66F5A3">Specifiers</a><span class="other">(</span><a href="../../../../cmlexer/html/content/class_CmajorLexer_4C787A34AA515119265B9958A67DFB3A3E465AA6.html">CmajorLexer</a><span class="other">&amp;</span>&nbsp;<span class="identifier">lexer</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a>&nbsp;<span class="identifier">specifiers</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><span class="identifier">soulng</span><span class="other">::</span><span class="identifier">parser</span><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">></span><span class="identifier">specifier</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a>&nbsp;<span class="identifier">match</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">*</span>&nbsp;<span class="identifier">parentMatch0</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">&amp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">pos</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">lexer</span><span class="other">.</span><span class="identifier">GetPos</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a>&nbsp;<span class="identifier">match</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">*</span>&nbsp;<span class="identifier">parentMatch1</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">&amp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a>&nbsp;<span class="identifier">match</span><span class="other">(</span><span class="kw">true</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">*</span>&nbsp;<span class="identifier">parentMatch2</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">&amp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="kw">true</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">save</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">lexer</span><span class="other">.</span><span class="identifier">GetPos</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a>&nbsp;<span class="identifier">match</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">*</span>&nbsp;<span class="identifier">parentMatch3</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">&amp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a>&nbsp;<span class="identifier">match</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">*</span>&nbsp;<span class="identifier">parentMatch4</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">&amp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">pos</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">lexer</span><span class="other">.</span><span class="identifier">GetPos</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a>&nbsp;<span class="identifier">match</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../struct_SpecifierParser_B6D45EB73F7A6B141F98D0184793336048BDFB55.html">SpecifierParser</a><span class="other">::</span><span class="identifier">Specifier</span><span class="other">(</span><span class="identifier">lexer</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">specifier</span><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><span class="identifier">soulng</span><span class="other">::</span><span class="identifier">parser</span><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">match</span><span class="other">.</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html#variable_value_8FE0F1F7880494B8899979EB974FD4092F66C71B">value</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">match</span><span class="other">.</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html#variable_hit_8485410D5B2156DF12E4557CF69885F7F9DB02A8">hit</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">specifiers</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">specifiers</span><span class="other">&nbsp;|&nbsp;</span><span class="identifier">specifier</span><span class="other">-></span><span class="identifier">value</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">parentMatch4</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">parentMatch3</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">match</span><span class="other">.</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html#variable_hit_8485410D5B2156DF12E4557CF69885F7F9DB02A8">hit</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">parentMatch2</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">lexer</span><span class="other">.</span><span class="identifier">SetPos</span><span class="other">(</span><span class="identifier">save</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">parentMatch1</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">match</span><span class="other">.</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html#variable_hit_8485410D5B2156DF12E4557CF69885F7F9DB02A8">hit</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">parentMatch0</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">match</span><span class="other">.</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html#variable_hit_8485410D5B2156DF12E4557CF69885F7F9DB02A8">hit</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">match</span><span class="other">.</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html#variable_value_8FE0F1F7880494B8899979EB974FD4092F66C71B">value</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a>&nbsp;<a href="../struct_SpecifierParser_B6D45EB73F7A6B141F98D0184793336048BDFB55.html">SpecifierParser</a><span class="other">::</span><a href="../struct_SpecifierParser_B6D45EB73F7A6B141F98D0184793336048BDFB55.html#function_Specifier_2F7CDF7B8459FA25C9CA739C8A423D04BFCD21C8">Specifier</a><span class="other">(</span><a href="../../../../cmlexer/html/content/class_CmajorLexer_4C787A34AA515119265B9958A67DFB3A3E465AA6.html">CmajorLexer</a><span class="other">&amp;</span>&nbsp;<span class="identifier">lexer</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a>&nbsp;<span class="identifier">match</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">pos</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">lexer</span><span class="other">.</span><span class="identifier">GetPos</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/lexer/html/content/namespace_lexer_B617309FB5F11FACD97A0C90702D495D1129C158.html">lexer</a><span class="other">::</span><a href="../../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&nbsp;<span class="identifier">span</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">lexer</span><span class="other">.</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch&nbsp;</span><span class="other">(</span><span class="other">*</span><span class="identifier">lexer</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_PUBLIC_4132561BF09693C3DAD2E3617C4F1D93DD729686">PUBLIC</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_public__7A2C1A9F2E02303F7A93BE19C6A36D6545C8BF40">public_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_PROTECTED_A1F3778257E3A946689826E31F8EC544B8F8D39A">PROTECTED</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_protected__6577D39B6943E54BA48CBF15A52D694403DA022A">protected_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_PRIVATE_F537EED3D75F271E403928E08E61FD2E8CAC2D02">PRIVATE</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_private__51B4BA754F7E42C357C789A230AD60D1947EA607">private_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_INTERNAL_46C46B2C0CD5EF1C9306E1052F1C078871BB73E6">INTERNAL</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_internal__2E46611AE8C23C7BA68DC3642DD4ED5C728AF70C">internal_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_STATIC_F10B64C6970F5F5235291A10F63C25CCE0E03D8B">STATIC</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_static__E14435D8528A2BF6D2B6C7E8FE90FD2D59CED95D">static_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_VIRTUAL_43ED9F3B7454DF7354A61F8C9D82B50B2B0FA9B7">VIRTUAL</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_virtual__8E41FC7F0392CB0A08790E8614C9BBAEA20E7479">virtual_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_OVERRIDE_CCBE33A719DB1F50697D39253807C80ACE814D32">OVERRIDE</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_override__5F8E5104A007D3EFFB4C400A114CFA4AD0AB0ED0">override_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_ABSTRACT_C23ADF2F934AD01216F654FAF5823B24F8162EDC">ABSTRACT</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_abstract__E00C6D2881982929E908969E67FE2E2A5ED4DCEB">abstract_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_INLINE_4EECDFF254741C2507939E45E8E64A72CDD547AC">INLINE</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_inline__014BBA9EFFE84C6118A5D5BD7A1EC7F0308E5970">inline_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_EXPLICIT_E0C3ACB6F2F476534E413766334201F45F6311F5">EXPLICIT</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_explicit__F9F385E719E0D482544E8A286D68D29E48D22AC5">explicit_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_EXTERN_0050442CB9B5A4DC14D104B7EC54FCEA591FC465">EXTERN</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_external__4FF7B7B90BCED78D8EA4643B3B1C707125589F5A">external_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_SUPPRESS_F15450AE7CE4B0F67F5B11A059FFE5812A39DC3A">SUPPRESS</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_suppress__21583E5F6C83352DFB1EBDECE6AC880929D72A50">suppress_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_DEFAULT_8139858A5DE05BC43E5C908437A16ADDE764578C">DEFAULT</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="270" xml:space="preserve"><span class="lineNumber">270</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="271" xml:space="preserve"><span class="lineNumber">271</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="272" xml:space="preserve"><span class="lineNumber">272</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="273" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="274" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_default__39802008AD2A706CEF10C37BD1FC5F0CDDD6046F">default_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="275" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="276" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="277" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="278" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="279" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_CONSTEXPR_864A8FCB85E5505078703953470F79D19B25171C">CONSTEXPR</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="280" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="281" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="282" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="283" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="284" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="285" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="286" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="287" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_constexpr__E6C9D940B7D086B1B4C07112551F5AAAF14F81E4">constexpr_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="288" xml:space="preserve"><span class="lineNumber">288</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="289" xml:space="preserve"><span class="lineNumber">289</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="290" xml:space="preserve"><span class="lineNumber">290</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="291" xml:space="preserve"><span class="lineNumber">291</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="292" xml:space="preserve"><span class="lineNumber">292</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_CDECL_9AF57A4342A75761A6382CF50D638AE875F107CF">CDECL</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="293" xml:space="preserve"><span class="lineNumber">293</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="294" xml:space="preserve"><span class="lineNumber">294</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="295" xml:space="preserve"><span class="lineNumber">295</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="296" xml:space="preserve"><span class="lineNumber">296</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="297" xml:space="preserve"><span class="lineNumber">297</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="298" xml:space="preserve"><span class="lineNumber">298</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="299" xml:space="preserve"><span class="lineNumber">299</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="300" xml:space="preserve"><span class="lineNumber">300</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_cdecl__EA84C126B6E9B9ED28CEE0FEEF1C0AAA885ECC9F">cdecl_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="301" xml:space="preserve"><span class="lineNumber">301</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="302" xml:space="preserve"><span class="lineNumber">302</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="303" xml:space="preserve"><span class="lineNumber">303</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="304" xml:space="preserve"><span class="lineNumber">304</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="305" xml:space="preserve"><span class="lineNumber">305</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_NOTHROW_C86469A0A23E91BF1942E56F22B961D51CEBC183">NOTHROW</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="306" xml:space="preserve"><span class="lineNumber">306</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="307" xml:space="preserve"><span class="lineNumber">307</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="308" xml:space="preserve"><span class="lineNumber">308</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="309" xml:space="preserve"><span class="lineNumber">309</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="310" xml:space="preserve"><span class="lineNumber">310</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="311" xml:space="preserve"><span class="lineNumber">311</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="312" xml:space="preserve"><span class="lineNumber">312</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="313" xml:space="preserve"><span class="lineNumber">313</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_nothrow__A9755897DC547B513CE446344335FACBCB382791">nothrow_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="314" xml:space="preserve"><span class="lineNumber">314</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="315" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="316" xml:space="preserve"><span class="lineNumber">316</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="317" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="318" xml:space="preserve"><span class="lineNumber">318</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_THROW_CCCFB36205D03A69E9EC4FB5D44CBFB93114A6A8">THROW</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="319" xml:space="preserve"><span class="lineNumber">319</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="320" xml:space="preserve"><span class="lineNumber">320</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="321" xml:space="preserve"><span class="lineNumber">321</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="322" xml:space="preserve"><span class="lineNumber">322</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="323" xml:space="preserve"><span class="lineNumber">323</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="324" xml:space="preserve"><span class="lineNumber">324</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="325" xml:space="preserve"><span class="lineNumber">325</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="326" xml:space="preserve"><span class="lineNumber">326</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_throw__2C27D90E97937F1EE845018B3402B9C2126D6DF1">throw_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="327" xml:space="preserve"><span class="lineNumber">327</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="328" xml:space="preserve"><span class="lineNumber">328</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="329" xml:space="preserve"><span class="lineNumber">329</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="330" xml:space="preserve"><span class="lineNumber">330</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="331" xml:space="preserve"><span class="lineNumber">331</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_NEW_115CF50819BCEEDA96722EBDD01715D3BC962FB1">NEW</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="332" xml:space="preserve"><span class="lineNumber">332</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="333" xml:space="preserve"><span class="lineNumber">333</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="334" xml:space="preserve"><span class="lineNumber">334</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="335" xml:space="preserve"><span class="lineNumber">335</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="336" xml:space="preserve"><span class="lineNumber">336</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="337" xml:space="preserve"><span class="lineNumber">337</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="338" xml:space="preserve"><span class="lineNumber">338</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="339" xml:space="preserve"><span class="lineNumber">339</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_new__CE5FEE695CB4F231210AF73A2CEF6BB7DEF42B10">new_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="340" xml:space="preserve"><span class="lineNumber">340</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="341" xml:space="preserve"><span class="lineNumber">341</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="342" xml:space="preserve"><span class="lineNumber">342</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="343" xml:space="preserve"><span class="lineNumber">343</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="344" xml:space="preserve"><span class="lineNumber">344</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_UNIT_TEST_57A68E98C8B338321B3D4D6AD20210A5910C5933">UNIT_TEST</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="345" xml:space="preserve"><span class="lineNumber">345</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="346" xml:space="preserve"><span class="lineNumber">346</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="347" xml:space="preserve"><span class="lineNumber">347</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="348" xml:space="preserve"><span class="lineNumber">348</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="349" xml:space="preserve"><span class="lineNumber">349</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="350" xml:space="preserve"><span class="lineNumber">350</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="351" xml:space="preserve"><span class="lineNumber">351</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="352" xml:space="preserve"><span class="lineNumber">352</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_unit_test__7E7CA0DFD749DD4E0FFA26C406DBB59B36D726C6">unit_test_</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="353" xml:space="preserve"><span class="lineNumber">353</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="354" xml:space="preserve"><span class="lineNumber">354</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="355" xml:space="preserve"><span class="lineNumber">355</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="356" xml:space="preserve"><span class="lineNumber">356</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="357" xml:space="preserve"><span class="lineNumber">357</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../../../cmlexer/html/content/namespace_CmajorTokens_4B054033DEAA47EBC7BE178E798AC437BE3CC0AF.html#variable_WINAPI_F0B604829D2B0C82F987E2144E7052C278EF31B8">WINAPI</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="358" xml:space="preserve"><span class="lineNumber">358</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="359" xml:space="preserve"><span class="lineNumber">359</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="360" xml:space="preserve"><span class="lineNumber">360</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="361" xml:space="preserve"><span class="lineNumber">361</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="362" xml:space="preserve"><span class="lineNumber">362</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="363" xml:space="preserve"><span class="lineNumber">363</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="364" xml:space="preserve"><span class="lineNumber">364</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="365" xml:space="preserve"><span class="lineNumber">365</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html">Match</a><span class="other">(</span><span class="kw">true</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/namespace_parser_571E65E5F7D5617B3568A9D2B053BFC2BF4CF37E.html">parser</a><span class="other">::</span><a href="../../../../../soulng/parser/html/content/struct_Value_5132958A1B05D9EE564E5518C442FB9CE6FED4CF.html">Value</a><span class="other">&lt;</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="../namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">::</span><a href="../../../../ast/html/content/enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html#enumerator_winapi_559F24D069862CB1FEEDCA164629DEDB6C77DDAA">winapi</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="366" xml:space="preserve"><span class="lineNumber">366</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="367" xml:space="preserve"><span class="lineNumber">367</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="368" xml:space="preserve"><span class="lineNumber">368</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="369" xml:space="preserve"><span class="lineNumber">369</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="370" xml:space="preserve"><span class="lineNumber">370</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="371" xml:space="preserve"><span class="lineNumber">371</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;#ifdef&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="372" xml:space="preserve"><span class="lineNumber">372</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="373" xml:space="preserve"><span class="lineNumber">373</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="374" xml:space="preserve"><span class="lineNumber">374</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="375" xml:space="preserve"><span class="lineNumber">375</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="376" xml:space="preserve"><span class="lineNumber">376</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="377" xml:space="preserve"><span class="lineNumber">377</span>&nbsp;<span class="pp">&nbsp;&nbsp;&nbsp;&nbsp;#endif&nbsp;//&nbsp;SOULNG_PARSER_DEBUG_SUPPORT</span></span>
+  <br/>
+  <span class="code" id="378" xml:space="preserve"><span class="lineNumber">378</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">match</span><span class="other">.</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html#variable_hit_8485410D5B2156DF12E4557CF69885F7F9DB02A8">hit</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="379" xml:space="preserve"><span class="lineNumber">379</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="380" xml:space="preserve"><span class="lineNumber">380</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">match</span><span class="other">.</span><a href="../../../../../soulng/parser/html/content/struct_Match_E6DC679134C28598DDF53DAE7AB3DD4870CCB328.html#variable_value_8FE0F1F7880494B8899979EB974FD4092F66C71B">value</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="381" xml:space="preserve"><span class="lineNumber">381</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="382" xml:space="preserve"><span class="lineNumber">382</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">match</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="383" xml:space="preserve"><span class="lineNumber">383</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

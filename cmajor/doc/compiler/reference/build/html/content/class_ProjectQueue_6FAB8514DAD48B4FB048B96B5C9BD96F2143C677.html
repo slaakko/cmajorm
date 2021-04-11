@@ -12,14 +12,14 @@
         <hr/>
         <h1>ProjectQueue Class</h1>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#3057">3057</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#3275">3275</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#constructor_ProjectQueue_71F19EAB636ADADB07C4AAD06900321EB1FE13E2">ProjectQueue</a>(<span class="kw">bool</span>&amp; stop_, <span class="kw">const </span>std::string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#constructor_ProjectQueue_1389EBB6F15506197AA7004A8BB187714D30A7FF">ProjectQueue</a>(<span class="kw">bool</span>&amp; stop_, <span class="kw">const </span>std::string&amp; name_, std::mutex* mtx_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -32,6 +32,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#function_Put_2FDCA2CF89ECB7217F6F3BA55B6D1E42AA3BC281">Put</a>(<a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>* project)</td>
             </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#function_Stop_5330983D3AC197F8778FBA4F0AEE15F79C658B56">Stop</a>()</td>
+            </tr>
         </table>
         <h2>Member Variables</h2>
         <table>
@@ -40,7 +44,7 @@
                 <td class="functionTableSecondCol" xml:space="preserve">cond</td>
             </tr>
             <tr id="variable_mtx_F2FFE5424AEA4B37BD1BAAEACD76A6C34F1E26B9">
-                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex*</td>
                 <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
             </tr>
             <tr id="variable_name_CF4A0B0D3AC203C4595F2945D2D39296DF73F1AF">
@@ -58,28 +62,28 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_ProjectQueue_71F19EAB636ADADB07C4AAD06900321EB1FE13E2">ProjectQueue Constructor</h3>
+        <h3 id="constructor_ProjectQueue_1389EBB6F15506197AA7004A8BB187714D30A7FF">ProjectQueue Constructor</h3>
         <h4>
             cmajor::build::ProjectQueue::ProjectQueue(<span class="kw">bool</span>
             &amp; stop_, <span class="kw">const </span>
-            std::string&amp; name_)</h4>
+            std::string&amp; name_, std::mutex* mtx_)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#3071">3071</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#3291">3291</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">3071</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_stop_EB5B33D982F99158D0413F93ADFA7EF18C9E909A">stop</a><span class="other">(</span><span class="identifier">stop_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_name_CF4A0B0D3AC203C4595F2945D2D39296DF73F1AF">name</a><span class="other">(</span><span class="identifier">name_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3291</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_stop_EB5B33D982F99158D0413F93ADFA7EF18C9E909A">stop</a><span class="other">(</span><span class="identifier">stop_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_name_CF4A0B0D3AC203C4595F2945D2D39296DF73F1AF">name</a><span class="other">(</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_mtx_F2FFE5424AEA4B37BD1BAAEACD76A6C34F1E26B9">mtx</a><span class="other">(</span><span class="identifier">mtx_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3072</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3292</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">3073</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3293</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#3060">3060</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Declaration at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#3278">3278</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <br/>
@@ -90,13 +94,13 @@
             <a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>
             * cmajor::build::ProjectQueue::Get()</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#3091">3091</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#3311">3311</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#3062">3062</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Declaration at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#3280">3280</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <br/>
@@ -112,18 +116,45 @@
              cmajor::build::ProjectQueue::Put(<a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>
             * project)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#3075">3075</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#3295">3295</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#3061">3061</a>
-             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            Declaration at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#3279">3279</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Calls: <a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_Name_42F3C1984DEE80E7BAD436C9E104C94DE303D0DE">sngcm::ast::Project::Name</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Stop_5330983D3AC197F8778FBA4F0AEE15F79C658B56">Stop Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::build::ProjectQueue::Stop()</h4>
+        <span>
+            Definition at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#3337">3337</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">3338</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3339</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_stop_EB5B33D982F99158D0413F93ADFA7EF18C9E909A">stop</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3340</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#variable_cond_1AF076DE8A5A37C0190D1CACEABD418DD3033678">cond</a><span class="other">.</span><span class="identifier">notify_all</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3341</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html#3281">3281</a>
+             of <a href="file/Build.cpp_E862B1AB243FACB7AA7E46CEA4FE12738BDF991E.html">Build.cpp</a>
         </span>
         <br/>
         <br/>

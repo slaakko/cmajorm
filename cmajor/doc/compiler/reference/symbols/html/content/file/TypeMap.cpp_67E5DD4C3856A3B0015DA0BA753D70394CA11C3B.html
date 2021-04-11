@@ -1,0 +1,118 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/TypeMap.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/TypeSymbol.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">symbols</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html">TypeMap</a><span class="other">::</span><a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#constructor_TypeMap_7696B7C57830FDF8FC92C886BE8D8ECA69A9838B">TypeMap</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#variable_nextClassTemplateSpecializationId_A8BB8AD4CC3D416AAEAD4AA14FDECD632D7BFFF2">nextClassTemplateSpecializationId</a><span class="other">(</span><span class="other">1</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#variable_nextOtherTypeId_DD156134CE4FC53DA3671F7EB77ADEFBD6A4EA89">nextOtherTypeId</a><span class="other">(</span><span class="other">1000000</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html">TypeMap</a><span class="other">::</span><a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#function_GetOrInsertType_03EFE876936B8008D4BFB30ACDC66B1B0E877DF9">GetOrInsertType</a><span class="other">(</span><a href="../class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">type</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#variable_typeMap_E29F8A96F69B3EB0D6D51AE8AAD3A2E51AED48CD">typeMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">type</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#variable_typeMap_E29F8A96F69B3EB0D6D51AE8AAD3A2E51AED48CD">typeMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">typeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">type</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="../enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_classTemplateSpecializationSymbol_CF823CD12D0BFDCAE6C5293764149148F827DC38">classTemplateSpecializationSymbol</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">typeId</span><span class="other">&nbsp;=&nbsp;</span><a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#variable_nextClassTemplateSpecializationId_A8BB8AD4CC3D416AAEAD4AA14FDECD632D7BFFF2">nextClassTemplateSpecializationId</a><span class="other">++</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">typeId</span><span class="other">&nbsp;=&nbsp;</span><a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#variable_nextOtherTypeId_DD156134CE4FC53DA3671F7EB77ADEFBD6A4EA89">nextOtherTypeId</a><span class="other">++</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#variable_typeMap_E29F8A96F69B3EB0D6D51AE8AAD3A2E51AED48CD">typeMap</a><span class="other">[</span><span class="identifier">type</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="../../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">></span>&nbsp;<span class="identifier">typeElement</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="../../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">(</span><span class="string">U"type"</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">typeElement</span><span class="other">-></span><span class="identifier">SetAttribute</span><span class="other">(</span><span class="string">U"id"</span><span class="other">,&nbsp;</span><span class="string">U"type_"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">typeId</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">typeElement</span><span class="other">-></span><span class="identifier">AppendChild</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">type</span><span class="other">-></span><span class="identifier">ToDomElement</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#variable_typeIdTypeElementMap_3EF78495DD0F775EA3BE8C694AB154F5000A6AFD">typeIdTypeElementMap</a><span class="other">[</span><span class="identifier">typeId</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">typeElement</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">typeId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="../../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">></span><span class="other">></span><a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html">TypeMap</a><span class="other">::</span><a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#function_TypeElements_861A4EC96C3EDA22F57C2A81A677690A85AE3D82">TypeElements</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="../../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">></span><span class="other">></span><span class="identifier">typeElements</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html#variable_typeIdTypeElementMap_3EF78495DD0F775EA3BE8C694AB154F5000A6AFD">typeIdTypeElementMap</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">typeElements</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">typeElements</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::symbols</span></span>
+  <br/>
+ </body>
+</html>

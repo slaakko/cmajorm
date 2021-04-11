@@ -16,8 +16,8 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#37">37</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Definition at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#37">37</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
@@ -57,6 +57,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_CreateMemberSymbols_93FC0ADD8BE14808C5CDA9545C9F1F5EE5491DB8">CreateMemberSymbols</a>()</td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::string></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Errors_3DEB037134C38ECBDE20F5575F7A625629B57011">Errors</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_BoundGlobalVariable_7D7F08972E9D8B490FB2CD6E6E6FE9D7F044C9E9.html">BoundGlobalVariable</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_GetBoundGlobalVariable_DE3C66177F24F59619710F5D038CCAF7F0C97A29">GetBoundGlobalVariable</a>() <span class="kw">const</span></td>
             </tr>
@@ -67,6 +71,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_SetCurrentFunctionSymbol_81953EF1DC92AA23D9E68850CC632E0C29348FE8">SetCurrentFunctionSymbol</a>(<a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>* currentFunctionSymbol_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_SetEditMode_D84EECA16B60A9639B42DEAEC0087DA16CA35127">SetEditMode</a>()</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -247,9 +255,17 @@
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve">currentFunctionSymbol</td>
             </tr>
+            <tr id="variable_editMode_2F5DF22DABD86337591A6ADF0CBA96B4D16DC6F0">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">editMode</td>
+            </tr>
             <tr id="variable_enumType_613C5E65E03AF91E06FBA80054CED69E552F0464">
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./../../../symbols/html/content/class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html">EnumTypeSymbol</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve">enumType</td>
+            </tr>
+            <tr id="variable_errors_F7EBE5F7BBAD43B85B72E5918AF776B79C5CACDD">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::string></td>
+                <td class="functionTableSecondCol" xml:space="preserve">errors</td>
             </tr>
             <tr id="variable_module_A267A5771013FFA9AE82BE4B93F0186539917F9E">
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>*</td>
@@ -275,26 +291,28 @@
             cmajor::binder::TypeBinder::TypeBinder(<a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>
             &amp; boundCompileUnit_)</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#84">84</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#86">86</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;84</span>&nbsp;<span class="other">:</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;86</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;85</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">(</span><span class="identifier">boundCompileUnit_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_symbolTable_B449A2BD42C779EC90C423D0271B4F9348DB2598">symbolTable</a><span class="other">(</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_module_A267A5771013FFA9AE82BE4B93F0186539917F9E">module</a><span class="other">(</span><span class="other">&amp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">.</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;87</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">(</span><span class="identifier">boundCompileUnit_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_symbolTable_B449A2BD42C779EC90C423D0271B4F9348DB2598">symbolTable</a><span class="other">(</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_module_A267A5771013FFA9AE82BE4B93F0186539917F9E">module</a><span class="other">(</span><span class="other">&amp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">.</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;86</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_enumType_613C5E65E03AF91E06FBA80054CED69E552F0464">enumType</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_currentFunctionSymbol_45D1C75951A47BF3F868F3AE2FF57FD3DF985069">currentFunctionSymbol</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_currentClassTypeSymbol_8255B5D531A76A3CE88BAF1EDE08A0950853E707">currentClassTypeSymbol</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_typeResolverFlags_9B55C02DB91C78CD01610C0748901017A51028AF">typeResolverFlags</a><span class="other">(</span><a href="./enum_TypeResolverFlags_CA18C23C86F9A67F1CC84DC97BF3693A27A85D53.html">TypeResolverFlags</a><span class="other">::</span><a href="./enum_TypeResolverFlags_CA18C23C86F9A67F1CC84DC97BF3693A27A85D53.html#enumerator_none_F8E73EF916975D931866B994F7E6389AFA28A461">none</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundGlobalVariable_0347C4F5FBCC0D4D8D1AD68FC06D057EC09EBA3C">boundGlobalVariable</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;88</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_enumType_613C5E65E03AF91E06FBA80054CED69E552F0464">enumType</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_currentFunctionSymbol_45D1C75951A47BF3F868F3AE2FF57FD3DF985069">currentFunctionSymbol</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_currentClassTypeSymbol_8255B5D531A76A3CE88BAF1EDE08A0950853E707">currentClassTypeSymbol</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_typeResolverFlags_9B55C02DB91C78CD01610C0748901017A51028AF">typeResolverFlags</a><span class="other">(</span><a href="./enum_TypeResolverFlags_CA18C23C86F9A67F1CC84DC97BF3693A27A85D53.html">TypeResolverFlags</a><span class="other">::</span><a href="./enum_TypeResolverFlags_CA18C23C86F9A67F1CC84DC97BF3693A27A85D53.html#enumerator_none_F8E73EF916975D931866B994F7E6389AFA28A461">none</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundGlobalVariable_0347C4F5FBCC0D4D8D1AD68FC06D057EC09EBA3C">boundGlobalVariable</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;87</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;89</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_editMode_2F5DF22DABD86337591A6ADF0CBA96B4D16DC6F0">editMode</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;88</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;90</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;91</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#40">40</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#40">40</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -306,13 +324,13 @@
              cmajor::binder::TypeBinder::AddUsingNodesToCurrentCompileUnit(<a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>
             * node)</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#90">90</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#93">93</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#41">41</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#41">41</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -320,6 +338,7 @@
             Calls: <a href="./../../../sngcm/ast/html/content/class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html#function_Accept_8BA55CCF5E1CE5D538D2B68371A33AB7DD84231F">sngcm::ast::NamespaceNode::Accept</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetNodeType_F0791FB5502109359FB46F4C8415EC01F395AD14">sngcm::ast::Node::GetNodeType</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Parent_AE6D685D645B9ED8305101551FE6D2F584D96E7E">sngcm::ast::Node::Parent</a>
         </span>
         <br/>
@@ -340,13 +359,13 @@
             * classNode, <span class="kw">bool</span>
              fromOwnCompileUnit)</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#274">274</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#471">471</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8EB49D33A65BDC0D9E9E0C991F485A6341BFEDFF">cmajor::binder::AttributeBinder::BindAttributes</a>
+            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8D7F8FFF69333CD7225F36B419ED43EE7847BDBE">cmajor::binder::AttributeBinder::BindAttributes</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetAttributeBinder_5487628FC2C54C64DB70015C426C17F34AC8BACA">cmajor::binder::BoundCompileUnit::GetAttributeBinder</a>
             , <a href="./class_ConstraintSymbolBinder_E82577404B307FA8AF530D45100CA731ED5FBDDA.html#function_BindConstraintSymbols_7045DDD8C942EF0D60E1AAF1D6EBFD3AFD1C88DA">cmajor::binder::ConstraintSymbolBinder::BindConstraintSymbols</a>
             , <a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_AddUsingNodesToCurrentCompileUnit_98DB2DBB6EFDD409CE4435DB3FBF79C7E121E357">cmajor::binder::TypeBinder::AddUsingNodesToCurrentCompileUnit</a>
@@ -363,10 +382,10 @@
             , <a href="./../../../sngcm/ast/html/content/class_ClassNode_FBB903AD81E52A0333DC75FA12ACE469ABB991DE.html#function_Id_760BBF7CD8177206C286DD5D6E85003D74B949D8">sngcm::ast::ClassNode::Id</a>
             , <a href="./../../../sngcm/ast/html/content/class_ClassNode_FBB903AD81E52A0333DC75FA12ACE469ABB991DE.html#function_Members_7CD761EB6E45C5E714639E5334D5060C11C236A4">sngcm::ast::ClassNode::Members</a>
             , <a href="./../../../sngcm/ast/html/content/class_ClassNode_FBB903AD81E52A0333DC75FA12ACE469ABB991DE.html#function_WhereConstraint_089BDD80C4A18D2F989D20FAFE96E469C503CFA5">sngcm::ast::ClassNode::WhereConstraint</a>
-            , <a href="./../../../sngcm/ast/html/content/class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_SetSpanMapper_D7B3C9614FF99E37033BA6D70D5106CEDE916463">sngcm::ast::CloneContext::SetSpanMapper</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Accept_0539CCE30C7D07A83136B85F3DCA608EF5C4639B">sngcm::ast::Node::Accept</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetNodeType_F0791FB5502109359FB46F4C8415EC01F395AD14">sngcm::ast::Node::GetNodeType</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./../../../sngcm/ast/html/content/class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Count_6085551DEB801D74B35253F865FAD968A24AA564">sngcm::ast::NodeList::Count</a>
             , <a href="./../../../sngcm/ast/html/content/class_WhereConstraintNode_0C9AD1C057488945F020F191BFF32D20C2B333CC.html#function_Clone_CB45AE3825BF27A25852104DAEA03DE9AABD8EB7">sngcm::ast::WhereConstraintNode::Clone</a>
         </span>
@@ -374,8 +393,8 @@
         <br/>
         <span>
             Called by: <a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_BindClass_74074DF256099CF509DC32CECA3627ADED83B1B1">cmajor::binder::TypeBinder::BindClass</a>
-            , <a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_9162A580EC0BA79618F3179105ABFC1DA79628BC">cmajor::binder::TypeBinder::Visit</a>
             , <a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_F251AB3BFC03593C4B224841FB61B21CD2AFE57B">cmajor::binder::TypeBinder::Visit</a>
+            , <a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_9162A580EC0BA79618F3179105ABFC1DA79628BC">cmajor::binder::TypeBinder::Visit</a>
             , <a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_Visit_C14E1CE21D40A61AF9B177FDBF885605B5B10B30">cmajor::binder::TypeBinder::Visit</a>
         </span>
         <br/>
@@ -387,19 +406,18 @@
              cmajor::binder::TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, <a href="./../../../sngcm/ast/html/content/class_ClassNode_FBB903AD81E52A0333DC75FA12ACE469ABB991DE.html">ClassNode</a>
             * classNode)</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#242">242</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#416">416</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Calls: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetClassTemplateRepository_EBDB3D2F37AA7376E667169B0C4C0E7C285CDD59">cmajor::binder::BoundCompileUnit::GetClassTemplateRepository</a>
-            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_64A76058E4A3027994A87BF8732E9678A5A7266A">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
+            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_B141B051C0D58A636A696EB429C35BBE9303FCA4">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
             , <a href="./class_ConstraintSymbolBinder_E82577404B307FA8AF530D45100CA731ED5FBDDA.html#function_BindConstraintSymbols_7045DDD8C942EF0D60E1AAF1D6EBFD3AFD1C88DA">cmajor::binder::ConstraintSymbolBinder::BindConstraintSymbols</a>
-            , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MakeClassTemplateSpecialization_F16EF2676E981E767C890B00BB924FBCBFFD8E61">cmajor::symbols::SymbolTable::MakeClassTemplateSpecialization</a>
+            , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MakeClassTemplateSpecialization_825B4575E3319D4937B4B6A1A8118509F5096803">cmajor::symbols::SymbolTable::MakeClassTemplateSpecialization</a>
             , <a href="./../../../sngcm/ast/html/content/class_ClassNode_FBB903AD81E52A0333DC75FA12ACE469ABB991DE.html#function_GetSpecifiers_776A46ABD8CDCEE5DD8B7D9C2174460965BCE93F">sngcm::ast::ClassNode::GetSpecifiers</a>
             , <a href="./../../../sngcm/ast/html/content/class_ClassNode_FBB903AD81E52A0333DC75FA12ACE469ABB991DE.html#function_WhereConstraint_089BDD80C4A18D2F989D20FAFE96E469C503CFA5">sngcm::ast::ClassNode::WhereConstraint</a>
-            , <a href="./../../../sngcm/ast/html/content/class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_SetSpanMapper_D7B3C9614FF99E37033BA6D70D5106CEDE916463">sngcm::ast::CloneContext::SetSpanMapper</a>
             , <a href="./../../../sngcm/ast/html/content/class_WhereConstraintNode_0C9AD1C057488945F020F191BFF32D20C2B333CC.html#function_Clone_CB45AE3825BF27A25852104DAEA03DE9AABD8EB7">sngcm::ast::WhereConstraintNode::Clone</a>
         </span>
         <br/>
@@ -416,8 +434,8 @@
              cmajor::binder::TypeBinder::BindConcept(ConceptSymbol* conceptSymbol, <a href="./../../../sngcm/ast/html/content/class_ConceptNode_6E09C7B31968ECB17A6F5F9E92F29B5BABA40ECE.html">ConceptNode</a>
             * conceptNode)</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#973">973</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1468">1468</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <br/>
@@ -449,13 +467,13 @@
             * interfaceNode, <span class="kw">bool</span>
              fromOwnCompileUnit)</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#800">800</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1195">1195</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8EB49D33A65BDC0D9E9E0C991F485A6341BFEDFF">cmajor::binder::AttributeBinder::BindAttributes</a>
+            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8D7F8FFF69333CD7225F36B419ED43EE7847BDBE">cmajor::binder::AttributeBinder::BindAttributes</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetAttributeBinder_5487628FC2C54C64DB70015C426C17F34AC8BACA">cmajor::binder::BoundCompileUnit::GetAttributeBinder</a>
             , <a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_AddUsingNodesToCurrentCompileUnit_98DB2DBB6EFDD409CE4435DB3FBF79C7E121E357">cmajor::binder::TypeBinder::AddUsingNodesToCurrentCompileUnit</a>
             , <a href="./../../../sngcm/ast/html/content/class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_GetAttributes_7D0B9E3464F7DAA77904847113D8A966747D917C">sngcm::ast::InterfaceNode::GetAttributes</a>
@@ -480,8 +498,8 @@
             * typedefNode, <span class="kw">bool</span>
              fromOwnCompileUnit)</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1255">1255</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2241">2241</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <br/>
@@ -506,29 +524,44 @@
             <span class="kw">void</span>
              cmajor::binder::TypeBinder::CreateMemberSymbols()</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1422">1422</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2534">2534</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1423</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2535</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1424</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_typeResolverFlags_9B55C02DB91C78CD01610C0748901017A51028AF">typeResolverFlags</a><span class="other">&nbsp;=&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_typeResolverFlags_9B55C02DB91C78CD01610C0748901017A51028AF">typeResolverFlags</a><span class="other">&nbsp;|&nbsp;</span><a href="./enum_TypeResolverFlags_CA18C23C86F9A67F1CC84DC97BF3693A27A85D53.html">TypeResolverFlags</a><span class="other">::</span><a href="./enum_TypeResolverFlags_CA18C23C86F9A67F1CC84DC97BF3693A27A85D53.html#enumerator_createMemberSymbols_95F9A215250E5B6D39D4B4899423D82162738DC3">createMemberSymbols</a><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2536</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_typeResolverFlags_9B55C02DB91C78CD01610C0748901017A51028AF">typeResolverFlags</a><span class="other">&nbsp;=&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_typeResolverFlags_9B55C02DB91C78CD01610C0748901017A51028AF">typeResolverFlags</a><span class="other">&nbsp;|&nbsp;</span><a href="./enum_TypeResolverFlags_CA18C23C86F9A67F1CC84DC97BF3693A27A85D53.html">TypeResolverFlags</a><span class="other">::</span><a href="./enum_TypeResolverFlags_CA18C23C86F9A67F1CC84DC97BF3693A27A85D53.html#enumerator_createMemberSymbols_95F9A215250E5B6D39D4B4899423D82162738DC3">createMemberSymbols</a><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1425</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2537</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#90">90</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#90">90</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Called by: <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_64A76058E4A3027994A87BF8732E9678A5A7266A">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
+            Called by: <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_B141B051C0D58A636A696EB429C35BBE9303FCA4">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
         </span>
         <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Errors_3DEB037134C38ECBDE20F5575F7A625629B57011">Errors Member Function</h3>
+        <h4>
+            std::vector&lt;std::string> cmajor::binder::TypeBinder::Errors() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#94">94</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_errors_F7EBE5F7BBAD43B85B72E5918AF776B79C5CACDD">errors</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
         <br/>
         <hr/>
         <h3 id="function_GetBoundGlobalVariable_DE3C66177F24F59619710F5D038CCAF7F0C97A29">GetBoundGlobalVariable Member Function</h3>
@@ -537,8 +570,8 @@
             * cmajor::binder::TypeBinder::GetBoundGlobalVariable() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#91">91</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Definition at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#91">91</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundGlobalVariable_0347C4F5FBCC0D4D8D1AD68FC06D057EC09EBA3C">boundGlobalVariable</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -553,8 +586,8 @@
              cmajor::binder::TypeBinder::SetContainerScope(<a href="./../../../symbols/html/content/class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html">ContainerScope</a>
             * containerScope_)</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#88">88</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Definition at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#88">88</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">containerScope_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -563,22 +596,24 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_64A76058E4A3027994A87BF8732E9678A5A7266A">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
-            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_Instantiate_003D803D6A7DADB14637AF11D3718BDF7E5A8E3D">cmajor::binder::ClassTemplateRepository::Instantiate</a>
+            Called by: <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_B141B051C0D58A636A696EB429C35BBE9303FCA4">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
+            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_Instantiate_51C116AFB8677510FF0B41763DBF181D1CB70BFF">cmajor::binder::ClassTemplateRepository::Instantiate</a>
             , <a href="./class_ConstExprFunctionRepository_48EF82B22D2165A2986DE193E6FB5CC47A545BC8.html#function_GetFunctionNodeFor_A4C35E84FD92C5F4C22820313355F18BED66E731">cmajor::binder::ConstExprFunctionRepository::GetFunctionNodeFor</a>
             , <a href="./class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html#function_EvaluateConstantSymbol_B35CDB07299D036889A9B804DC623E51CE2E369F">cmajor::binder::Evaluator::EvaluateConstantSymbol</a>
             , <a href="./class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html#function_EvaluateEnumConstantSymbol_7C5AF31C6901CBB10F262C356B38BA5BB6474637">cmajor::binder::Evaluator::EvaluateEnumConstantSymbol</a>
             , <a href="./class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html#function_Visit_8FBEA726C3A025CD520CC23B2DAC7D551EFF9BE1">cmajor::binder::Evaluator::Visit</a>
-            , <a href="./class_InlineFunctionRepository_5087FA71559FE89FBD4D112BF75AFF6F24536D23.html#function_Instantiate_3201D7C943391886049348D6C3CEDA94F96B9C82">cmajor::binder::InlineFunctionRepository::Instantiate</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonConstructorImplementation_AC07CF0E1A5DC43F01E740B75EDDC1CB0F12A793">cmajor::binder::JsonAttributeProcessor::GenerateJsonConstructorImplementation</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonCreatorImplementation_FF6CC067584D317FE258876AB492F8EA46890785">cmajor::binder::JsonAttributeProcessor::GenerateJsonCreatorImplementation</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonImplementation_754128B46008E2C3CC8E7DB45354661910D35AAF">cmajor::binder::JsonAttributeProcessor::GenerateToJsonImplementation</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonJsonObjectImplementation_3FAF45A5B7E04DA984FA6524C226B27F24C608B1">cmajor::binder::JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_1EF5FC99D15E5C9D98078ACBA0F7210C2F840992">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_InlineFunctionRepository_5087FA71559FE89FBD4D112BF75AFF6F24536D23.html#function_Instantiate_2A5B60BDAA86B920E62DF5084CCE0F03BF56214E">cmajor::binder::InlineFunctionRepository::Instantiate</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonConstructorImplementation_7D967C1452A974A7242D4D29893ED0A3ABBDCBEE">cmajor::binder::JsonAttributeProcessor::GenerateJsonConstructorImplementation</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonCreatorImplementation_E589BC3099AD1FB1A51D6186742D87FDCDD7FFC7">cmajor::binder::JsonAttributeProcessor::GenerateJsonCreatorImplementation</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonImplementation_16565088D8E5C2EC0F93EE502BBC9224F75E1C1F">cmajor::binder::JsonAttributeProcessor::GenerateToJsonImplementation</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonJsonObjectImplementation_3AA978696F4E245F492F26E9305CE8324F41F475">cmajor::binder::JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_E5C4EE4BCAAEE3DE8790BFB23BCFC36B2024F8C1">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_FC8A28554E92226D45F06BDE10E7D5627DF5A036">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_188C244426C4D11503A88CBDD6E395EFFA821315">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_E5C4EE4BCAAEE3DE8790BFB23BCFC36B2024F8C1">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_1EF5FC99D15E5C9D98078ACBA0F7210C2F840992">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_TypeResolver_2CB187B7C01DC112ECF07B8D0C87E4AF50BCFF1A.html#function_ResolveSymbol_A0D475096639E1C58C83F70BFCAA75AA7E14C6D7">cmajor::binder::TypeResolver::ResolveSymbol</a>
+            , <a href="./class_XmlAttributeProcessor_751E137DA30066037E9EE62129A361F4592B8963.html#function_GenerateSystemDomElementConstructorImplementation_F7466C16F8F5BABCA17F4D527BCEAE20B889DCE2">cmajor::binder::XmlAttributeProcessor::GenerateSystemDomElementConstructorImplementation</a>
+            , <a href="./class_XmlAttributeProcessor_751E137DA30066037E9EE62129A361F4592B8963.html#function_GenerateToXmlMemberFunctionImplementation_8596D614E17CEA3BCBD3559BB06466470D8DF4ED">cmajor::binder::XmlAttributeProcessor::GenerateToXmlMemberFunctionImplementation</a>
         </span>
         <br/>
         <br/>
@@ -589,8 +624,8 @@
              cmajor::binder::TypeBinder::SetCurrentFunctionSymbol(<a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
             * currentFunctionSymbol_)</h4>
         <span>
-            Definition at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#89">89</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Definition at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#89">89</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_currentFunctionSymbol_45D1C75951A47BF3F868F3AE2FF57FD3DF985069">currentFunctionSymbol</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">currentFunctionSymbol_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -599,19 +634,36 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_Instantiate_003D803D6A7DADB14637AF11D3718BDF7E5A8E3D">cmajor::binder::ClassTemplateRepository::Instantiate</a>
+            Called by: <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_Instantiate_51C116AFB8677510FF0B41763DBF181D1CB70BFF">cmajor::binder::ClassTemplateRepository::Instantiate</a>
             , <a href="./class_ConstExprFunctionRepository_48EF82B22D2165A2986DE193E6FB5CC47A545BC8.html#function_GetFunctionNodeFor_A4C35E84FD92C5F4C22820313355F18BED66E731">cmajor::binder::ConstExprFunctionRepository::GetFunctionNodeFor</a>
-            , <a href="./class_InlineFunctionRepository_5087FA71559FE89FBD4D112BF75AFF6F24536D23.html#function_Instantiate_3201D7C943391886049348D6C3CEDA94F96B9C82">cmajor::binder::InlineFunctionRepository::Instantiate</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonConstructorImplementation_AC07CF0E1A5DC43F01E740B75EDDC1CB0F12A793">cmajor::binder::JsonAttributeProcessor::GenerateJsonConstructorImplementation</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonCreatorImplementation_FF6CC067584D317FE258876AB492F8EA46890785">cmajor::binder::JsonAttributeProcessor::GenerateJsonCreatorImplementation</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonImplementation_754128B46008E2C3CC8E7DB45354661910D35AAF">cmajor::binder::JsonAttributeProcessor::GenerateToJsonImplementation</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonJsonObjectImplementation_3FAF45A5B7E04DA984FA6524C226B27F24C608B1">cmajor::binder::JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_1EF5FC99D15E5C9D98078ACBA0F7210C2F840992">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_InlineFunctionRepository_5087FA71559FE89FBD4D112BF75AFF6F24536D23.html#function_Instantiate_2A5B60BDAA86B920E62DF5084CCE0F03BF56214E">cmajor::binder::InlineFunctionRepository::Instantiate</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonConstructorImplementation_7D967C1452A974A7242D4D29893ED0A3ABBDCBEE">cmajor::binder::JsonAttributeProcessor::GenerateJsonConstructorImplementation</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonCreatorImplementation_E589BC3099AD1FB1A51D6186742D87FDCDD7FFC7">cmajor::binder::JsonAttributeProcessor::GenerateJsonCreatorImplementation</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonImplementation_16565088D8E5C2EC0F93EE502BBC9224F75E1C1F">cmajor::binder::JsonAttributeProcessor::GenerateToJsonImplementation</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonJsonObjectImplementation_3AA978696F4E245F492F26E9305CE8324F41F475">cmajor::binder::JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_E5C4EE4BCAAEE3DE8790BFB23BCFC36B2024F8C1">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_FC8A28554E92226D45F06BDE10E7D5627DF5A036">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_188C244426C4D11503A88CBDD6E395EFFA821315">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_E5C4EE4BCAAEE3DE8790BFB23BCFC36B2024F8C1">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_1EF5FC99D15E5C9D98078ACBA0F7210C2F840992">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_XmlAttributeProcessor_751E137DA30066037E9EE62129A361F4592B8963.html#function_GenerateSystemDomElementConstructorImplementation_F7466C16F8F5BABCA17F4D527BCEAE20B889DCE2">cmajor::binder::XmlAttributeProcessor::GenerateSystemDomElementConstructorImplementation</a>
+            , <a href="./class_XmlAttributeProcessor_751E137DA30066037E9EE62129A361F4592B8963.html#function_GenerateToXmlMemberFunctionImplementation_8596D614E17CEA3BCBD3559BB06466470D8DF4ED">cmajor::binder::XmlAttributeProcessor::GenerateToXmlMemberFunctionImplementation</a>
         </span>
         <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetEditMode_D84EECA16B60A9639B42DEAEC0087DA16CA35127">SetEditMode Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::binder::TypeBinder::SetEditMode()</h4>
+        <span>
+            Definition at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#93">93</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_editMode_2F5DF22DABD86337591A6ADF0CBA96B4D16DC6F0">editMode</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
         <br/>
         <hr/>
         <h3 id="function_Visit_1A494F2784226C9A43E2CB3DC9A365598799C07D">Visit Member Function</h3>
@@ -621,24 +673,13 @@
             &amp; aliasNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#135">135</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;136</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">.</span><span class="identifier">FirstFileScope</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">InstallAlias</span><span class="other">(</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">aliasNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_usingNodes_30619F0F803A247277837A904C62E9577166EE8D">usingNodes</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">aliasNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;139</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#213">213</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#44">44</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#44">44</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -661,32 +702,13 @@
             &amp; caseStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1077">1077</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1078</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1079</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">caseStatementNode</span><span class="other">.</span><span class="identifier">Statements</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1080</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1081</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1082</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./../../../sngcm/ast/html/content/class_StatementNode_C645560C48648EE9245172CF4CA54D85381420E3.html">StatementNode</a><span class="other">*</span>&nbsp;<span class="identifier">statementNode</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">caseStatementNode</span><span class="other">.</span><span class="identifier">Statements</span><span class="other">(</span><span class="other">)</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1083</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">statementNode</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1084</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1085</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1788">1788</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#70">70</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#70">70</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -710,13 +732,13 @@
             &amp; catchNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1109">1109</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1895">1895</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#73">73</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#73">73</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -735,6 +757,7 @@
             , <a href="./../../../sngcm/ast/html/content/class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html#function_Accept_D09C60184CE695B4AD5EC4E8A6C993117492FBCB">sngcm::ast::CompoundStatementNode::Accept</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetNodeType_F0791FB5502109359FB46F4C8415EC01F395AD14">sngcm::ast::Node::GetNodeType</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -746,13 +769,13 @@
             &amp; classDelegateNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#878">878</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1323">1323</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#59">59</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#59">59</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -766,12 +789,13 @@
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetTypeByName_D72879D27A1343FF7933ACCD7526D826F50F36E1">cmajor::symbols::SymbolTable::GetTypeByName</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MapSymbol_71F5DA1F61645CACC4149CAF75F21426975ADC20">cmajor::symbols::SymbolTable::MapSymbol</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_SetFunctionIdFor_D5E3C31A97342751A926238488BF9961AC877728">cmajor::symbols::SymbolTable::SetFunctionIdFor</a>
-            , <a href="./../../../symbols/html/content/class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_AddPointer_AA494131510D586142787DC199249C28427EC7C7">cmajor::symbols::TypeSymbol::AddPointer</a>
+            , <a href="./../../../symbols/html/content/class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_AddPointer_5C5737DCD1018094905FF75BA3DFF092A691CE73">cmajor::symbols::TypeSymbol::AddPointer</a>
             , <a href="./../../../sngcm/ast/html/content/class_ClassDelegateNode_B7C5DF23170B00CAC64680593852E9BC52E4564F.html#function_GetSpecifiers_FE6662764B2991ED1AE6F38AD60894F9BEA0D0D1">sngcm::ast::ClassDelegateNode::GetSpecifiers</a>
             , <a href="./../../../sngcm/ast/html/content/class_ClassDelegateNode_B7C5DF23170B00CAC64680593852E9BC52E4564F.html#function_Id_DC61E4F904A1D546CE5B03F9D58E0055188BB145">sngcm::ast::ClassDelegateNode::Id</a>
             , <a href="./../../../sngcm/ast/html/content/class_ClassDelegateNode_B7C5DF23170B00CAC64680593852E9BC52E4564F.html#function_Parameters_395ACA86868FC28DD1A790E5B8005D84BC819377">sngcm::ast::ClassDelegateNode::Parameters</a>
             , <a href="./../../../sngcm/ast/html/content/class_ClassDelegateNode_B7C5DF23170B00CAC64680593852E9BC52E4564F.html#function_ReturnTypeExpr_26BF925FB76077D26EF8865604F07646CA9A1FA6">sngcm::ast::ClassDelegateNode::ReturnTypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./../../../sngcm/ast/html/content/class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Count_6085551DEB801D74B35253F865FAD968A24AA564">sngcm::ast::NodeList::Count</a>
             , <a href="./../../../sngcm/ast/html/content/class_ParameterNode_8174A86CB900D2F3FB2B7B55769E36D3F7EE04C1.html#function_TypeExpr_B312B1AA441363B763D7CA9D206F4E0CCAD0784A">sngcm::ast::ParameterNode::TypeExpr</a>
         </span>
@@ -785,28 +809,13 @@
             &amp; classNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#234">234</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;235</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Symbol</span><span class="other">*</span>&nbsp;<span class="identifier">symbol</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_symbolTable_B449A2BD42C779EC90C423D0271B4F9348DB2598">symbolTable</a><span class="other">.</span><span class="identifier">GetSymbol</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">classNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;237</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">SymbolType</span><span class="other">::</span><span class="identifier">classTypeSymbol</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">SymbolType</span><span class="other">::</span><span class="identifier">classTemplateSpecializationSymbol</span><span class="other">,&nbsp;</span><span class="string">"class&nbsp;type&nbsp;symbol&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ClassTypeSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">classTypeSymbol</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">ClassTypeSymbol</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">symbol</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BindClass</span><span class="other">(</span><span class="identifier">classTypeSymbol</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">classNode</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;240</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#383">383</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#47">47</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#47">47</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -829,32 +838,13 @@
             &amp; compileUnitNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#110">110</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;111</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">compileUnitNode</span><span class="other">.</span><span class="identifier">IsProgramMainUnit</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">.</span><span class="identifier">GenerateGlobalInitializationFunction</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">.</span><span class="identifier">AddFileScope</span><span class="other">(</span><span class="kw">new&nbsp;</span><span class="identifier">FileScope</span><span class="other">(</span><span class="other">&amp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">.</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">compileUnitNode</span><span class="other">.</span><span class="identifier">GlobalNs</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;118</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#138">138</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#42">42</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#42">42</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -866,7 +856,6 @@
         <span>
             Calls: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_AddFileScope_C8D1F37C880B53C1F4B1739ED13003314DBB6D20">cmajor::binder::BoundCompileUnit::AddFileScope</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GenerateGlobalInitializationFunction_6AA13887608B880AF4661B5E901518DE126B642F">cmajor::binder::BoundCompileUnit::GenerateGlobalInitializationFunction</a>
-            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetModule_3D1A2B5CC98F2A7EDDF7C0F95FEC80A03A352BDE">cmajor::binder::BoundCompileUnit::GetModule</a>
             , <a href="./../../../sngcm/ast/html/content/class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_GlobalNs_0212C98A659A799A03DBC5F1BBB13FA85E78CCF9">sngcm::ast::CompileUnitNode::GlobalNs</a>
             , <a href="./../../../sngcm/ast/html/content/class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_IsProgramMainUnit_2EC633AED122F733F44D1959BBA2144AF7F24106">sngcm::ast::CompileUnitNode::IsProgramMainUnit</a>
             , <a href="./../../../sngcm/ast/html/content/class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html#function_Accept_8BA55CCF5E1CE5D538D2B68371A33AB7DD84231F">sngcm::ast::NamespaceNode::Accept</a>
@@ -881,13 +870,13 @@
             &amp; compoundStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1007">1007</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1527">1527</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#63">63</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#63">63</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -912,28 +901,13 @@
             &amp; conceptNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#965">965</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;966</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;967</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Symbol</span><span class="other">*</span>&nbsp;<span class="identifier">symbol</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_symbolTable_B449A2BD42C779EC90C423D0271B4F9348DB2598">symbolTable</a><span class="other">.</span><span class="identifier">GetSymbol</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">conceptNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;968</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">SymbolType</span><span class="other">::</span><span class="identifier">conceptSymbol</span><span class="other">,&nbsp;</span><span class="string">"concept&nbsp;symbol&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;969</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ConceptSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">conceptSymbol</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">ConceptSymbol</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">symbol</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;970</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BindConcept</span><span class="other">(</span><span class="identifier">conceptSymbol</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">conceptNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;971</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1435">1435</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#60">60</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#60">60</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -956,34 +930,13 @@
             &amp; conditionalCompilationConjunctionNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1170">1170</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1171</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">conditionalCompilationConjunctionNode</span><span class="other">.</span><span class="identifier">Left</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">left</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">top</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">conditionalCompilationConjunctionNode</span><span class="other">.</span><span class="identifier">Right</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">right</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">top</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">push</span><span class="other">(</span><span class="identifier">left</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1179</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2031">2031</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#76">76</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#76">76</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1007,34 +960,13 @@
             &amp; conditionalCompilationDisjunctionNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1159">1159</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1160</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">conditionalCompilationDisjunctionNode</span><span class="other">.</span><span class="identifier">Left</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">left</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">top</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">conditionalCompilationDisjunctionNode</span><span class="other">.</span><span class="identifier">Right</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">right</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">top</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">push</span><span class="other">(</span><span class="identifier">left</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">right</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1168</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1995">1995</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#75">75</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#75">75</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1058,28 +990,13 @@
             &amp; conditionalCompilationNotNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1181">1181</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1182</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">conditionalCompilationNotNode</span><span class="other">.</span><span class="identifier">Expr</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">operand</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">top</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">push</span><span class="other">(</span><span class="other">!</span><span class="identifier">operand</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1187</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2067">2067</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#77">77</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#77">77</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1102,22 +1019,13 @@
             &amp; conditionalCompilationPartNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1154">1154</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1155</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">conditionalCompilationPartNode</span><span class="other">.</span><span class="identifier">Expr</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1157</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1965">1965</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#74">74</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#74">74</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1140,24 +1048,13 @@
             &amp; conditionalCompilationPrimaryNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1189">1189</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1190</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">defined</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_module_A267A5771013FFA9AE82BE4B93F0186539917F9E">module</a><span class="other">-></span><span class="identifier">IsSymbolDefined</span><span class="other">(</span><span class="identifier">conditionalCompilationPrimaryNode</span><span class="other">.</span><span class="identifier">Symbol</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_conditionalCompilationStack_3DF7BD7E44E798C808BA4EF8844A0301B4BCE609">conditionalCompilationStack</a><span class="other">.</span><span class="identifier">push</span><span class="other">(</span><span class="identifier">defined</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1193</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2100">2100</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#78">78</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#78">78</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1180,13 +1077,13 @@
             &amp; conditionalCompilationStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1195">1195</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2131">2131</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#79">79</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#79">79</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1214,13 +1111,13 @@
             &amp; constantNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1273">1273</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2284">2284</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#83">83</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#83">83</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1239,6 +1136,7 @@
             , <a href="./../../../sngcm/ast/html/content/class_ConstantNode_ECFC68B3CBE578FCC251D354EADA06ACC6A94A9E.html#function_TypeExpr_6BE61A30ECE352387CED0637A42EFD50CAE4974C">sngcm::ast::ConstantNode::TypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_ConstantNode_ECFC68B3CBE578FCC251D354EADA06ACC6A94A9E.html#function_Value_0E1117DAD3F629CE2400DAD793FF26C7512E7783">sngcm::ast::ConstantNode::Value</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -1250,30 +1148,13 @@
             &amp; constructionStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1054">1054</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1055</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1056</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Symbol</span><span class="other">*</span>&nbsp;<span class="identifier">symbol</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_symbolTable_B449A2BD42C779EC90C423D0271B4F9348DB2598">symbolTable</a><span class="other">.</span><span class="identifier">GetSymbol</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">constructionStatementNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1057</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">SymbolType</span><span class="other">::</span><span class="identifier">localVariableSymbol</span><span class="other">,&nbsp;</span><span class="string">"local&nbsp;variable&nbsp;symbol&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1058</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LocalVariableSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">localVariableSymbol</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">LocalVariableSymbol</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">symbol</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1059</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">TypeSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">type</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ResolveType</span><span class="other">(</span><span class="identifier">constructionStatementNode</span><span class="other">.</span><span class="identifier">TypeExpr</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_typeResolverFlags_9B55C02DB91C78CD01610C0748901017A51028AF">typeResolverFlags</a><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_currentClassTypeSymbol_8255B5D531A76A3CE88BAF1EDE08A0950853E707">currentClassTypeSymbol</a><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1060</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">localVariableSymbol</span><span class="other">-></span><span class="identifier">SetType</span><span class="other">(</span><span class="identifier">type</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1061</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1699">1699</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#68">68</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#68">68</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1283,8 +1164,13 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
+            Calls: <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_FullName_FD4E65366E3C307338DFF4C995F5CD2A1855E8E3">cmajor::symbols::FunctionSymbol::FullName</a>
+            , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
+            , <a href="./../../../sngcm/ast/html/content/class_ConstructionStatementNode_F0620C878B3D4A5922912EE438D93954AC92971A.html#function_Arguments_1B2463B41FD1EB8B74D822923A53CDA6CBED06E1">sngcm::ast::ConstructionStatementNode::Arguments</a>
             , <a href="./../../../sngcm/ast/html/content/class_ConstructionStatementNode_F0620C878B3D4A5922912EE438D93954AC92971A.html#function_TypeExpr_C5BF7B155932CF47D2CAB089543F21E080F9F95F">sngcm::ast::ConstructionStatementNode::TypeExpr</a>
+            , <a href="./../../../sngcm/ast/html/content/class_IntLiteralNode_3635610F208BAFA0526F4FF2BE23BE73D1D83FA2.html#function_SetValue_36DE5F4FC7EFC646FC360C257BCAC9238A3D99E9">sngcm::ast::IntLiteralNode::SetValue</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetNodeType_F0791FB5502109359FB46F4C8415EC01F395AD14">sngcm::ast::Node::GetNodeType</a>
+            , <a href="./../../../sngcm/ast/html/content/class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Count_6085551DEB801D74B35253F865FAD968A24AA564">sngcm::ast::NodeList::Count</a>
         </span>
         <br/>
         <br/>
@@ -1296,13 +1182,13 @@
             &amp; constructorNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#431">431</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#678">678</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#51">51</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#51">51</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1312,13 +1198,12 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8EB49D33A65BDC0D9E9E0C991F485A6341BFEDFF">cmajor::binder::AttributeBinder::BindAttributes</a>
+            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8D7F8FFF69333CD7225F36B419ED43EE7847BDBE">cmajor::binder::AttributeBinder::BindAttributes</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetAttributeBinder_5487628FC2C54C64DB70015C426C17F34AC8BACA">cmajor::binder::BoundCompileUnit::GetAttributeBinder</a>
             , <a href="./class_ConstraintSymbolBinder_E82577404B307FA8AF530D45100CA731ED5FBDDA.html#function_BindConstraintSymbols_7045DDD8C942EF0D60E1AAF1D6EBFD3AFD1C88DA">cmajor::binder::ConstraintSymbolBinder::BindConstraintSymbols</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddConversion_5D870ED67234D343ACD93D44C5CA9DE46A802894">cmajor::symbols::SymbolTable::AddConversion</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MapSymbol_71F5DA1F61645CACC4149CAF75F21426975ADC20">cmajor::symbols::SymbolTable::MapSymbol</a>
-            , <a href="./../../../sngcm/ast/html/content/class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_SetSpanMapper_D7B3C9614FF99E37033BA6D70D5106CEDE916463">sngcm::ast::CloneContext::SetSpanMapper</a>
             , <a href="./../../../sngcm/ast/html/content/class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html#function_Accept_D09C60184CE695B4AD5EC4E8A6C993117492FBCB">sngcm::ast::CompoundStatementNode::Accept</a>
             , <a href="./../../../sngcm/ast/html/content/class_ConstructorNode_99A528AD96D23E3CF43FE0E278EF7933968F3710.html#function_ClassId_4150C233B955A5C61EB39FEC6975ECE97E0B3681">sngcm::ast::ConstructorNode::ClassId</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_Body_E5EDD16EAB140A13D2F3034E6C6B306EB16BDF9A">sngcm::ast::FunctionNode::Body</a>
@@ -1340,13 +1225,13 @@
             &amp; conversionFunctionNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#692">692</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1011">1011</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#54">54</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#54">54</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1356,12 +1241,11 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8EB49D33A65BDC0D9E9E0C991F485A6341BFEDFF">cmajor::binder::AttributeBinder::BindAttributes</a>
+            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8D7F8FFF69333CD7225F36B419ED43EE7847BDBE">cmajor::binder::AttributeBinder::BindAttributes</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetAttributeBinder_5487628FC2C54C64DB70015C426C17F34AC8BACA">cmajor::binder::BoundCompileUnit::GetAttributeBinder</a>
             , <a href="./class_ConstraintSymbolBinder_E82577404B307FA8AF530D45100CA731ED5FBDDA.html#function_BindConstraintSymbols_7045DDD8C942EF0D60E1AAF1D6EBFD3AFD1C88DA">cmajor::binder::ConstraintSymbolBinder::BindConstraintSymbols</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddConversion_5D870ED67234D343ACD93D44C5CA9DE46A802894">cmajor::symbols::SymbolTable::AddConversion</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
-            , <a href="./../../../sngcm/ast/html/content/class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_SetSpanMapper_D7B3C9614FF99E37033BA6D70D5106CEDE916463">sngcm::ast::CloneContext::SetSpanMapper</a>
             , <a href="./../../../sngcm/ast/html/content/class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html#function_Accept_D09C60184CE695B4AD5EC4E8A6C993117492FBCB">sngcm::ast::CompoundStatementNode::Accept</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_Body_E5EDD16EAB140A13D2F3034E6C6B306EB16BDF9A">sngcm::ast::FunctionNode::Body</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_GetAttributes_A6B3F9230C08254F6C0C044E3585D843BC281441">sngcm::ast::FunctionNode::GetAttributes</a>
@@ -1369,6 +1253,7 @@
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_ReturnTypeExpr_4CEF6E760100D7CC470A70C90B263DF66DA503E3">sngcm::ast::FunctionNode::ReturnTypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_WhereConstraint_1DECF474ACC8DB32561C29C22CBBBC83C3AE331F">sngcm::ast::FunctionNode::WhereConstraint</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./../../../sngcm/ast/html/content/class_WhereConstraintNode_0C9AD1C057488945F020F191BFF32D20C2B333CC.html#function_Clone_CB45AE3825BF27A25852104DAEA03DE9AABD8EB7">sngcm::ast::WhereConstraintNode::Clone</a>
         </span>
         <br/>
@@ -1381,32 +1266,13 @@
             &amp; defaultStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1087">1087</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1088</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1089</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">defaultStatementNode</span><span class="other">.</span><span class="identifier">Statements</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1090</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1091</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1092</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./../../../sngcm/ast/html/content/class_StatementNode_C645560C48648EE9245172CF4CA54D85381420E3.html">StatementNode</a><span class="other">*</span>&nbsp;<span class="identifier">statementNode</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">defaultStatementNode</span><span class="other">.</span><span class="identifier">Statements</span><span class="other">(</span><span class="other">)</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1093</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">statementNode</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1094</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1095</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1823">1823</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#71">71</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#71">71</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1430,13 +1296,13 @@
             &amp; delegateNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#821">821</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1241">1241</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#58">58</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#58">58</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1455,6 +1321,7 @@
             , <a href="./../../../sngcm/ast/html/content/class_DelegateNode_C771F36CEBE70670ED8842B6DAE78190A5FCDCA3.html#function_Parameters_0B46AB7E74C0ACA1336285CB4895C2C293380895">sngcm::ast::DelegateNode::Parameters</a>
             , <a href="./../../../sngcm/ast/html/content/class_DelegateNode_C771F36CEBE70670ED8842B6DAE78190A5FCDCA3.html#function_ReturnTypeExpr_29C084DEE9C79AC4B2D3CF4AE6F0DA939DE31B1A">sngcm::ast::DelegateNode::ReturnTypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./../../../sngcm/ast/html/content/class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Count_6085551DEB801D74B35253F865FAD968A24AA564">sngcm::ast::NodeList::Count</a>
             , <a href="./../../../sngcm/ast/html/content/class_ParameterNode_8174A86CB900D2F3FB2B7B55769E36D3F7EE04C1.html#function_TypeExpr_B312B1AA441363B763D7CA9D206F4E0CCAD0784A">sngcm::ast::ParameterNode::TypeExpr</a>
         </span>
@@ -1468,13 +1335,13 @@
             &amp; destructorNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#530">530</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#803">803</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#52">52</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#52">52</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1484,12 +1351,11 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8EB49D33A65BDC0D9E9E0C991F485A6341BFEDFF">cmajor::binder::AttributeBinder::BindAttributes</a>
+            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8D7F8FFF69333CD7225F36B419ED43EE7847BDBE">cmajor::binder::AttributeBinder::BindAttributes</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetAttributeBinder_5487628FC2C54C64DB70015C426C17F34AC8BACA">cmajor::binder::BoundCompileUnit::GetAttributeBinder</a>
             , <a href="./class_ConstraintSymbolBinder_E82577404B307FA8AF530D45100CA731ED5FBDDA.html#function_BindConstraintSymbols_7045DDD8C942EF0D60E1AAF1D6EBFD3AFD1C88DA">cmajor::binder::ConstraintSymbolBinder::BindConstraintSymbols</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MapSymbol_71F5DA1F61645CACC4149CAF75F21426975ADC20">cmajor::symbols::SymbolTable::MapSymbol</a>
-            , <a href="./../../../sngcm/ast/html/content/class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_SetSpanMapper_D7B3C9614FF99E37033BA6D70D5106CEDE916463">sngcm::ast::CloneContext::SetSpanMapper</a>
             , <a href="./../../../sngcm/ast/html/content/class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html#function_Accept_D09C60184CE695B4AD5EC4E8A6C993117492FBCB">sngcm::ast::CompoundStatementNode::Accept</a>
             , <a href="./../../../sngcm/ast/html/content/class_DestructorNode_AFEC264A02A21CAD7984D4238496C9206B395DC7.html#function_ClassId_F202AA0EAB90A65488730049C90F82B4D70BF562">sngcm::ast::DestructorNode::ClassId</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_Body_E5EDD16EAB140A13D2F3034E6C6B306EB16BDF9A">sngcm::ast::FunctionNode::Body</a>
@@ -1508,22 +1374,13 @@
             &amp; doStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1037">1037</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1038</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1039</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">doStatementNode</span><span class="other">.</span><span class="identifier">Statement</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1040</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1632">1632</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#66">66</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#66">66</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1546,36 +1403,13 @@
             &amp; enumConstantNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1379">1379</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1380</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1381</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Symbol</span><span class="other">*</span>&nbsp;<span class="identifier">symbol</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_symbolTable_B449A2BD42C779EC90C423D0271B4F9348DB2598">symbolTable</a><span class="other">.</span><span class="identifier">GetSymbol</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">enumConstantNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1382</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">SymbolType</span><span class="other">::</span><span class="identifier">enumConstantSymbol</span><span class="other">,&nbsp;</span><span class="string">"enumeration&nbsp;constant&nbsp;symbol&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1383</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">EnumConstantSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">enumConstantSymbol</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">EnumConstantSymbol</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">symbol</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1384</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">enumConstantSymbol</span><span class="other">-></span><span class="identifier">ComputeMangledName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1385</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">enumConstantSymbol</span><span class="other">-></span><span class="identifier">SetEvaluating</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1386</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">Value</span><span class="other">></span>&nbsp;<span class="identifier">value</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">Evaluate</span><span class="other">(</span><span class="identifier">enumConstantNode</span><span class="other">.</span><span class="identifier">GetValue</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_enumType_613C5E65E03AF91E06FBA80054CED69E552F0464">enumType</a><span class="other">-></span><span class="identifier">UnderlyingType</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">,&nbsp;</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">,&nbsp;</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="kw">nullptr</span><span class="other">,&nbsp;</span><span class="identifier">enumConstantNode</span><span class="other">.</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1387</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">enumConstantSymbol</span><span class="other">-></span><span class="identifier">SetValue</span><span class="other">(</span><span class="identifier">value</span><span class="other">.</span><span class="identifier">release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1388</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">enumConstantSymbol</span><span class="other">-></span><span class="identifier">ResetEvaluating</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1389</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2440">2440</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#85">85</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#85">85</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1589,6 +1423,7 @@
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
             , <a href="./../../../sngcm/ast/html/content/class_EnumConstantNode_381A2BE76E395318E6BC73069CF5EBA86913675C.html#function_GetValue_8A1C4E00ED35873BE6807E73C378BE73CDFE6640">sngcm::ast::EnumConstantNode::GetValue</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -1600,13 +1435,13 @@
             &amp; enumTypeNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1309">1309</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2345">2345</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#84">84</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#84">84</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1627,6 +1462,7 @@
             , <a href="./../../../sngcm/ast/html/content/class_EnumTypeNode_7BE35177F05F418B863EEA546061B3404DBC7F99.html#function_GetUnderlyingType_792BBEBC81364C892BAD7E5F143D2FB88A03268C">sngcm::ast::EnumTypeNode::GetUnderlyingType</a>
             , <a href="./../../../sngcm/ast/html/content/class_EnumTypeNode_7BE35177F05F418B863EEA546061B3404DBC7F99.html#function_Id_62760654C90EA8BDF2EF4DC3E85D17FECD33165F">sngcm::ast::EnumTypeNode::Id</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./../../../sngcm/ast/html/content/class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Count_6085551DEB801D74B35253F865FAD968A24AA564">sngcm::ast::NodeList::Count</a>
         </span>
         <br/>
@@ -1639,36 +1475,13 @@
             &amp; forStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1042">1042</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1043</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1044</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Symbol</span><span class="other">*</span>&nbsp;<span class="identifier">symbol</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_symbolTable_B449A2BD42C779EC90C423D0271B4F9348DB2598">symbolTable</a><span class="other">.</span><span class="identifier">GetSymbol</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">forStatementNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1045</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">SymbolType</span><span class="other">::</span><span class="identifier">declarationBlock</span><span class="other">,&nbsp;</span><span class="string">"declaration&nbsp;block&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1046</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DeclarationBlock</span><span class="other">*</span>&nbsp;<span class="identifier">declarationBlock</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">DeclarationBlock</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">symbol</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1047</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ContainerScope</span><span class="other">*</span>&nbsp;<span class="identifier">prevContainerScope</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1048</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">declarationBlock</span><span class="other">-></span><span class="identifier">GetContainerScope</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1049</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">forStatementNode</span><span class="other">.</span><span class="identifier">InitS</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1050</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">forStatementNode</span><span class="other">.</span><span class="identifier">ActionS</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1051</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">prevContainerScope</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1052</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1662">1662</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#67">67</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#67">67</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1693,13 +1506,13 @@
             &amp; functionNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#147">147</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#275">275</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#46">46</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#46">46</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1709,12 +1522,11 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8EB49D33A65BDC0D9E9E0C991F485A6341BFEDFF">cmajor::binder::AttributeBinder::BindAttributes</a>
+            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8D7F8FFF69333CD7225F36B419ED43EE7847BDBE">cmajor::binder::AttributeBinder::BindAttributes</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetAttributeBinder_5487628FC2C54C64DB70015C426C17F34AC8BACA">cmajor::binder::BoundCompileUnit::GetAttributeBinder</a>
             , <a href="./class_ConstraintSymbolBinder_E82577404B307FA8AF530D45100CA731ED5FBDDA.html#function_BindConstraintSymbols_7045DDD8C942EF0D60E1AAF1D6EBFD3AFD1C88DA">cmajor::binder::ConstraintSymbolBinder::BindConstraintSymbols</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MapSymbol_71F5DA1F61645CACC4149CAF75F21426975ADC20">cmajor::symbols::SymbolTable::MapSymbol</a>
-            , <a href="./../../../sngcm/ast/html/content/class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_SetSpanMapper_D7B3C9614FF99E37033BA6D70D5106CEDE916463">sngcm::ast::CloneContext::SetSpanMapper</a>
             , <a href="./../../../sngcm/ast/html/content/class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html#function_Accept_D09C60184CE695B4AD5EC4E8A6C993117492FBCB">sngcm::ast::CompoundStatementNode::Accept</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_Body_E5EDD16EAB140A13D2F3034E6C6B306EB16BDF9A">sngcm::ast::FunctionNode::Body</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_GetAttributes_A6B3F9230C08254F6C0C044E3585D843BC281441">sngcm::ast::FunctionNode::GetAttributes</a>
@@ -1723,6 +1535,7 @@
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_ReturnTypeExpr_4CEF6E760100D7CC470A70C90B263DF66DA503E3">sngcm::ast::FunctionNode::ReturnTypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_WhereConstraint_1DECF474ACC8DB32561C29C22CBBBC83C3AE331F">sngcm::ast::FunctionNode::WhereConstraint</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./../../../sngcm/ast/html/content/class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Count_6085551DEB801D74B35253F865FAD968A24AA564">sngcm::ast::NodeList::Count</a>
             , <a href="./../../../sngcm/ast/html/content/class_ParameterNode_8174A86CB900D2F3FB2B7B55769E36D3F7EE04C1.html#function_TypeExpr_B312B1AA441363B763D7CA9D206F4E0CCAD0784A">sngcm::ast::ParameterNode::TypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_WhereConstraintNode_0C9AD1C057488945F020F191BFF32D20C2B333CC.html#function_Clone_CB45AE3825BF27A25852104DAEA03DE9AABD8EB7">sngcm::ast::WhereConstraintNode::Clone</a>
@@ -1737,13 +1550,13 @@
             &amp; globalVariableNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1391">1391</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2478">2478</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#86">86</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#86">86</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1761,6 +1574,7 @@
             , <a href="./../../../sngcm/ast/html/content/class_GlobalVariableNode_1AEB1361F97CE62C22C406721A9C3CD3690112D5.html#function_Initializer_E2DB01BE27523C66EE6A0596D9408D55AFBA7C16">sngcm::ast::GlobalVariableNode::Initializer</a>
             , <a href="./../../../sngcm/ast/html/content/class_GlobalVariableNode_1AEB1361F97CE62C22C406721A9C3CD3690112D5.html#function_TypeExpr_A01E8FDAD2E154A357D4BF5ED752D8876F25D4B6">sngcm::ast::GlobalVariableNode::TypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -1772,30 +1586,13 @@
             &amp; ifStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1023">1023</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1024</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1025</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ifStatementNode</span><span class="other">.</span><span class="identifier">ThenS</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1026</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">ifStatementNode</span><span class="other">.</span><span class="identifier">ElseS</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1027</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1028</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ifStatementNode</span><span class="other">.</span><span class="identifier">ElseS</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1029</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1030</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1568">1568</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#64">64</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#64">64</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1819,28 +1616,13 @@
             &amp; interfaceNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#792">792</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;793</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;794</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Symbol</span><span class="other">*</span>&nbsp;<span class="identifier">symbol</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_symbolTable_B449A2BD42C779EC90C423D0271B4F9348DB2598">symbolTable</a><span class="other">.</span><span class="identifier">GetSymbol</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">interfaceNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;795</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">SymbolType</span><span class="other">::</span><span class="identifier">interfaceTypeSymbol</span><span class="other">,&nbsp;</span><span class="string">"interface&nbsp;type&nbsp;symbol&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;796</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InterfaceTypeSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">interfaceTypeSymbol</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">InterfaceTypeSymbol</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">symbol</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;797</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BindInterface</span><span class="other">(</span><span class="identifier">interfaceTypeSymbol</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">interfaceNode</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;798</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1162">1162</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#56">56</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#56">56</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1863,13 +1645,13 @@
             &amp; memberFunctionNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#590">590</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#886">886</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#53">53</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#53">53</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1879,12 +1661,11 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8EB49D33A65BDC0D9E9E0C991F485A6341BFEDFF">cmajor::binder::AttributeBinder::BindAttributes</a>
+            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8D7F8FFF69333CD7225F36B419ED43EE7847BDBE">cmajor::binder::AttributeBinder::BindAttributes</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetAttributeBinder_5487628FC2C54C64DB70015C426C17F34AC8BACA">cmajor::binder::BoundCompileUnit::GetAttributeBinder</a>
             , <a href="./class_ConstraintSymbolBinder_E82577404B307FA8AF530D45100CA731ED5FBDDA.html#function_BindConstraintSymbols_7045DDD8C942EF0D60E1AAF1D6EBFD3AFD1C88DA">cmajor::binder::ConstraintSymbolBinder::BindConstraintSymbols</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MapSymbol_71F5DA1F61645CACC4149CAF75F21426975ADC20">cmajor::symbols::SymbolTable::MapSymbol</a>
-            , <a href="./../../../sngcm/ast/html/content/class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_SetSpanMapper_D7B3C9614FF99E37033BA6D70D5106CEDE916463">sngcm::ast::CloneContext::SetSpanMapper</a>
             , <a href="./../../../sngcm/ast/html/content/class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html#function_Accept_D09C60184CE695B4AD5EC4E8A6C993117492FBCB">sngcm::ast::CompoundStatementNode::Accept</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_Body_E5EDD16EAB140A13D2F3034E6C6B306EB16BDF9A">sngcm::ast::FunctionNode::Body</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_GetAttributes_A6B3F9230C08254F6C0C044E3585D843BC281441">sngcm::ast::FunctionNode::GetAttributes</a>
@@ -1893,6 +1674,7 @@
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_ReturnTypeExpr_4CEF6E760100D7CC470A70C90B263DF66DA503E3">sngcm::ast::FunctionNode::ReturnTypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_WhereConstraint_1DECF474ACC8DB32561C29C22CBBBC83C3AE331F">sngcm::ast::FunctionNode::WhereConstraint</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./../../../sngcm/ast/html/content/class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html#function_Count_6085551DEB801D74B35253F865FAD968A24AA564">sngcm::ast::NodeList::Count</a>
             , <a href="./../../../sngcm/ast/html/content/class_ParameterNode_8174A86CB900D2F3FB2B7B55769E36D3F7EE04C1.html#function_TypeExpr_B312B1AA441363B763D7CA9D206F4E0CCAD0784A">sngcm::ast::ParameterNode::TypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_WhereConstraintNode_0C9AD1C057488945F020F191BFF32D20C2B333CC.html#function_Clone_CB45AE3825BF27A25852104DAEA03DE9AABD8EB7">sngcm::ast::WhereConstraintNode::Clone</a>
@@ -1907,13 +1689,13 @@
             &amp; memberVariableNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#762">762</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1107">1107</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#55">55</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#55">55</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1923,10 +1705,10 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8EB49D33A65BDC0D9E9E0C991F485A6341BFEDFF">cmajor::binder::AttributeBinder::BindAttributes</a>
+            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8D7F8FFF69333CD7225F36B419ED43EE7847BDBE">cmajor::binder::AttributeBinder::BindAttributes</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetAttributeBinder_5487628FC2C54C64DB70015C426C17F34AC8BACA">cmajor::binder::BoundCompileUnit::GetAttributeBinder</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetClassTemplateRepository_EBDB3D2F37AA7376E667169B0C4C0E7C285CDD59">cmajor::binder::BoundCompileUnit::GetClassTemplateRepository</a>
-            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_64A76058E4A3027994A87BF8732E9678A5A7266A">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
+            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_BindClassTemplateSpecialization_B141B051C0D58A636A696EB429C35BBE9303FCA4">cmajor::binder::ClassTemplateRepository::BindClassTemplateSpecialization</a>
             , <a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#function_BindClass_74074DF256099CF509DC32CECA3627ADED83B1B1">cmajor::binder::TypeBinder::BindClass</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetNode_5ADD2EC1F5D98C84F4E442A42A8A61B247768950">cmajor::symbols::SymbolTable::GetNode</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
@@ -1935,6 +1717,7 @@
             , <a href="./../../../sngcm/ast/html/content/class_MemberVariableNode_C955E22C018764E831E18F3BD2F014BD4E19BA4A.html#function_TypeExpr_BF89DD51A63575AAB3C897C763CEBF6437FBAC7C">sngcm::ast::MemberVariableNode::TypeExpr</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetNodeType_F0791FB5502109359FB46F4C8415EC01F395AD14">sngcm::ast::Node::GetNodeType</a>
             , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -1946,24 +1729,13 @@
             &amp; namespaceImportNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#141">141</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;142</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_boundCompileUnit_97F922A74F05BD424322E962C858A10CF3AB808F">boundCompileUnit</a><span class="other">.</span><span class="identifier">FirstFileScope</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">InstallNamespaceImport</span><span class="other">(</span><a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_containerScope_2AE02D2ECE9FC1C809626673CD62152160A0677B">containerScope</a><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">namespaceImportNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_usingNodes_30619F0F803A247277837A904C62E9577166EE8D">usingNodes</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">namespaceImportNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;145</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#244">244</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#45">45</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#45">45</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -1986,13 +1758,13 @@
             &amp; namespaceNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#120">120</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#173">173</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#43">43</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#43">43</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -2017,13 +1789,13 @@
             &amp; staticConstructorNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#380">380</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#604">604</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#50">50</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#50">50</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -2033,12 +1805,11 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8EB49D33A65BDC0D9E9E0C991F485A6341BFEDFF">cmajor::binder::AttributeBinder::BindAttributes</a>
+            Calls: <a href="./class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html#function_BindAttributes_8D7F8FFF69333CD7225F36B419ED43EE7847BDBE">cmajor::binder::AttributeBinder::BindAttributes</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetAttributeBinder_5487628FC2C54C64DB70015C426C17F34AC8BACA">cmajor::binder::BoundCompileUnit::GetAttributeBinder</a>
             , <a href="./class_ConstraintSymbolBinder_E82577404B307FA8AF530D45100CA731ED5FBDDA.html#function_BindConstraintSymbols_7045DDD8C942EF0D60E1AAF1D6EBFD3AFD1C88DA">cmajor::binder::ConstraintSymbolBinder::BindConstraintSymbols</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
             , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MapSymbol_71F5DA1F61645CACC4149CAF75F21426975ADC20">cmajor::symbols::SymbolTable::MapSymbol</a>
-            , <a href="./../../../sngcm/ast/html/content/class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_SetSpanMapper_D7B3C9614FF99E37033BA6D70D5106CEDE916463">sngcm::ast::CloneContext::SetSpanMapper</a>
             , <a href="./../../../sngcm/ast/html/content/class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html#function_Accept_D09C60184CE695B4AD5EC4E8A6C993117492FBCB">sngcm::ast::CompoundStatementNode::Accept</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_Body_E5EDD16EAB140A13D2F3034E6C6B306EB16BDF9A">sngcm::ast::FunctionNode::Body</a>
             , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_GetAttributes_A6B3F9230C08254F6C0C044E3585D843BC281441">sngcm::ast::FunctionNode::GetAttributes</a>
@@ -2057,13 +1828,13 @@
             &amp; switchStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1063">1063</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1749">1749</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#69">69</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#69">69</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -2089,36 +1860,13 @@
             &amp; tryStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1097">1097</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1098</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1099</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_currentFunctionSymbol_45D1C75951A47BF3F868F3AE2FF57FD3DF985069">currentFunctionSymbol</a><span class="other">-></span><span class="identifier">SetHasTry</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">tryStatementNode</span><span class="other">.</span><span class="identifier">TryBlock</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">tryStatementNode</span><span class="other">.</span><span class="identifier">Catches</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Count</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./../../../sngcm/ast/html/content/class_CatchNode_C5332657F67C89B25013743776CA3876B3A5969A.html">CatchNode</a><span class="other">*</span>&nbsp;<span class="identifier">catchNode</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">tryStatementNode</span><span class="other">.</span><span class="identifier">Catches</span><span class="other">(</span><span class="other">)</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">catchNode</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1107</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1858">1858</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#72">72</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#72">72</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -2145,28 +1893,13 @@
             &amp; typedefNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1247">1247</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1248</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Symbol</span><span class="other">*</span>&nbsp;<span class="identifier">symbol</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html#variable_symbolTable_B449A2BD42C779EC90C423D0271B4F9348DB2598">symbolTable</a><span class="other">.</span><span class="identifier">GetSymbol</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">typedefNode</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">-></span><span class="identifier">GetSymbolType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">SymbolType</span><span class="other">::</span><span class="identifier">typedefSymbol</span><span class="other">,&nbsp;</span><span class="string">"typedef&nbsp;symbol&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">TypedefSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">typedefSymbol</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">TypedefSymbol</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">symbol</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1252</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BindTypedef</span><span class="other">(</span><span class="identifier">typedefSymbol</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">typedefNode</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1253</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#2208">2208</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#81">81</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#81">81</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>
@@ -2189,22 +1922,13 @@
             &amp; whileStatementNode) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html#1032">1032</a>
-             of <a href="file/TypeBinder.cpp_1A1C4CFE77B611DA8384C58246CBC7C8986AAF00.html">TypeBinder.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1033</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1034</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">whileStatementNode</span><span class="other">.</span><span class="identifier">Statement</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1035</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html#1602">1602</a>
+             of <a href="file/TypeBinder.cpp_3C8BA809A996A81A0793B277A7B34D7B328B114C.html">TypeBinder.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html#65">65</a>
-             of <a href="file/TypeBinder.hpp_638F03D77DD22D8452D5B9835259BA99CE642B06.html">TypeBinder.hpp</a>
+            Declaration at line <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html#65">65</a>
+             of <a href="file/TypeBinder.hpp_D395DB5734E95E6DDE6871335A07A54E6715D313.html">TypeBinder.hpp</a>
         </span>
         <br/>
         <br/>

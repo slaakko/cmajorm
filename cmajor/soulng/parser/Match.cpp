@@ -7,4 +7,4 @@
 
 namespace soulng { namespace parser {
 
-} } // namespace soulng::parser;
+} } // namespace soulng::parser

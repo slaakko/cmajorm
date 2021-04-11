@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#61">61</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Definition at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#72">72</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#constructor_MemberVariableSymbol_C8BE3A6A44BCB1A5DAC72F507E5BD7EF5994FCB0">MemberVariableSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#constructor_MemberVariableSymbol_34DDE75E022C304B1429AAE3757C51760BA3AB42">MemberVariableSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -51,6 +51,14 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_GetDIMemberType_C03271BB82AC331C6F0C02CD10DC6A09E040AC02">GetDIMemberType</a>(Emitter&amp; emitter, uint64_t offsetInBits)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_GetSymbolCategoryDescription_42B54552D9E790BB76CB02584E21A0C993FDF473">GetSymbolCategoryDescription</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_GetSymbolCategoryStr_065D1A1AE94B8FD610836216346B339E9BB97ECF">GetSymbolCategoryStr</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -94,28 +102,31 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_MemberVariableSymbol_C8BE3A6A44BCB1A5DAC72F507E5BD7EF5994FCB0">MemberVariableSymbol Constructor</h3>
+        <h3 id="constructor_MemberVariableSymbol_34DDE75E022C304B1429AAE3757C51760BA3AB42">MemberVariableSymbol Constructor</h3>
         <h4>
             cmajor::symbols::MemberVariableSymbol::MemberVariableSymbol(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#110">110</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#180">180</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_memberVariableSymbol_7AF9B3D143E442B5C92A49185E9F083005B2CB77">memberVariableSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_memberVariableSymbol_7AF9B3D143E442B5C92A49185E9F083005B2CB77">memberVariableSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#64">64</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#75">75</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -128,28 +139,28 @@
             * collector) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#131">131</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#202">202</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddMemberVariable</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddMemberVariable</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#68">68</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#79">79</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -172,30 +183,30 @@
              cmajor::symbols::MemberVariableSymbol::Check() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#263">263</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#334">334</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">335</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">336</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="other">1</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">337</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="other">1</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">338</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"member&nbsp;variable&nbsp;symbol&nbsp;contains&nbsp;invalid&nbsp;layout&nbsp;index"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">339</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="string">"member&nbsp;variable&nbsp;symbol&nbsp;contains&nbsp;invalid&nbsp;layout&nbsp;index"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">340</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">270</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">341</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#78">78</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#89">89</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -207,6 +218,7 @@
         <br/>
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#function_Check_C12F733548050AE7118AC511FE1E36027ABAF33D">cmajor::symbols::VariableSymbol::Check</a>
         </span>
         <br/>
@@ -219,11 +231,11 @@
             * cmajor::symbols::MemberVariableSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#77">77</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Definition at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#88">88</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"MemberVariableSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"MemberVariableSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -242,13 +254,13 @@
             &amp; typeMap) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#250">250</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#321">321</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#76">76</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#87">87</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -270,30 +282,30 @@
              cmajor::symbols::MemberVariableSymbol::Dump(CodeFormatter&amp; formatter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#139">139</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#210">210</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"full&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullNameWithSpecifiers</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"full&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">FullNameWithSpecifiers</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"mangled&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"mangled&nbsp;name:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"type:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"type:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">GetType</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"layout&nbsp;index:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"layout&nbsp;index:&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#69">69</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#80">80</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -317,8 +329,8 @@
             <span class="kw">void</span>
             * cmajor::symbols::MemberVariableSymbol::GetDIMemberType(Emitter&amp; emitter, uint64_t offsetInBits)</h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#232">232</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#303">303</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
         </span>
         <br/>
         <br/>
@@ -327,6 +339,7 @@
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsClassTypeSymbol_E494E01E2C84FEF70392BD65D94ACA6124099EDA">cmajor::symbols::Symbol::IsClassTypeSymbol</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Parent_A3533507B7349AA33BD1426C44AA66553C28E1A9">cmajor::symbols::Symbol::Parent</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_AlignmentInBits_655F385C28700769DF11D3EB0DB03EB2024D3AEC">cmajor::symbols::TypeSymbol::AlignmentInBits</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_GetDIType_B69A085DFFCB9BADA7D9631BBE667821F9252758">cmajor::symbols::TypeSymbol::GetDIType</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_SizeInBits_5BE86948353DB47F6AB0F1C7534F469B37BCE143">cmajor::symbols::TypeSymbol::SizeInBits</a>
@@ -341,28 +354,68 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_GetSymbolCategoryDescription_42B54552D9E790BB76CB02584E21A0C993FDF473">GetSymbolCategoryDescription Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::MemberVariableSymbol::GetSymbolCategoryDescription() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#91">91</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"member&nbsp;variable"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryDescription_34BE1EAEAA69A7557F968BD6B843A5DC2295736E">cmajor::symbols::Symbol::GetSymbolCategoryDescription</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryStr_065D1A1AE94B8FD610836216346B339E9BB97ECF">GetSymbolCategoryStr Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::MemberVariableSymbol::GetSymbolCategoryStr() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#90">90</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"MV"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryStr_DE4CB4E167EA03932F01A5903D1CC2B8A2E473DF">cmajor::symbols::Symbol::GetSymbolCategoryStr</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_IsExportSymbol_5AF53CA53438F4810D674455A7A775B56783BCFD">IsExportSymbol Member Function</h3>
         <h4>
             <span class="kw">bool</span>
              cmajor::symbols::MemberVariableSymbol::IsExportSymbol() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#126">126</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#197">197</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">::</span><span class="identifier">IsExportSymbol</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">::</span><span class="identifier">IsExportSymbol</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#67">67</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#78">78</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -382,11 +435,11 @@
             int32_t cmajor::symbols::MemberVariableSymbol::LayoutIndex() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#73">73</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Definition at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#84">84</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -405,24 +458,24 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#120">120</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#191">191</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#66">66</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#77">77</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -444,11 +497,11 @@
             <span class="kw">void</span>
              cmajor::symbols::MemberVariableSymbol::SetLayoutIndex(int32_t layoutIndex_)</h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#74">74</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Definition at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#85">85</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">layoutIndex_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">layoutIndex_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -464,13 +517,13 @@
             <span class="kw">void</span>
              cmajor::symbols::MemberVariableSymbol::SetSpecifiers(Specifiers specifiers)</h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#162">162</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#233">233</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#72">72</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#83">83</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -478,6 +531,7 @@
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetAccess_121F064F7F499D20D45D6E7192296F2A23583BE1">cmajor::symbols::Symbol::SetAccess</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetStatic_A63286AC2EC1D660021520D4AD77F66559833716">cmajor::symbols::Symbol::SetStatic</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -487,13 +541,13 @@
             std::string cmajor::symbols::MemberVariableSymbol::Syntax() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#148">148</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#219">219</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#71">71</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#82">82</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -515,11 +569,11 @@
             std::string cmajor::symbols::MemberVariableSymbol::TypeString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#70">70</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Definition at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#81">81</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"member_variable"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"member_variable"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -537,24 +591,24 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#114">114</a>
-             of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
+            Definition at line <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html#185">185</a>
+             of <a href="file/VariableSymbol.cpp_E7421B21E6BA415FA5D8484F14E3F73A39BCD4C3.html">VariableSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html">VariableSymbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#variable_layoutIndex_B1DF5E3F99E5C8F6D51D1B02AD8BA18C50621831">layoutIndex</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#65">65</a>
-             of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
+            Declaration at line <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html#76">76</a>
+             of <a href="file/VariableSymbol.hpp_DDE123ACCB69DDC19782D507B545E1136EF2181B.html">VariableSymbol.hpp</a>
         </span>
         <br/>
         <br/>

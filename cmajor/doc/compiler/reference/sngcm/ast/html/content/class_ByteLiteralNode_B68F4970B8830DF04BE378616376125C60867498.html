@@ -8,7 +8,7 @@
     <body onload="drawClassInheritanceDiagram()">
         <a href="../../../../compiler-projects.html">top</a>
          | <a href="namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">up</a>
-         | <a href="class_BreakStatementNode_08DB9BD78E7635D6E5D28CF2BEE7A990BE44FB05.html">prev</a>
+         | <a href="struct_ByProjectName_6F82A5FBC6C9D369C15C4E0187EA63B680A11B1B.html">prev</a>
          | <a href="class_ByteNode_C492431344FCF899D2F17B048418CBC7A3C90B06.html">next</a>
         <hr/>
         <h1>ByteLiteralNode Class</h1>
@@ -16,17 +16,17 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#60">60</a>
-             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            Definition at line <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html#60">60</a>
+             of <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html">Literal.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#constructor_ByteLiteralNode_7612DA8442D7616E8AF11EB4DB6B442A0072A957">ByteLiteralNode</a>(<span class="kw">const </span>Span&amp; span_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#constructor_ByteLiteralNode_8260D445602E33FD754EB95D415613D7A027FBFB">ByteLiteralNode</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId_)</td>
             </tr>
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#constructor_ByteLiteralNode_9E844DFDC681C481CD54865220590239E786D50F">ByteLiteralNode</a>(<span class="kw">const </span>Span&amp; span_, uint8_t value_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#constructor_ByteLiteralNode_A131477C90FB3386FADDC76823D391CF80C75C9A">ByteLiteralNode</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId_, uint8_t value_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -65,52 +65,58 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_ByteLiteralNode_7612DA8442D7616E8AF11EB4DB6B442A0072A957">ByteLiteralNode Constructor</h3>
+        <h3 id="constructor_ByteLiteralNode_8260D445602E33FD754EB95D415613D7A027FBFB">ByteLiteralNode Constructor</h3>
         <h4>
             sngcm::ast::ByteLiteralNode::ByteLiteralNode(<span class="kw">const </span>
-            Span&amp; span_)</h4>
+            Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId_)</h4>
         <span>
-            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#186">186</a>
-             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            Definition at line <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html#191">191</a>
+             of <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html">Literal.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_byteLiteralNode_606B9C70BD37011D6C3BB11FFB19E573F635A917">byteLiteralNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">(</span><span class="other">0u</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_byteLiteralNode_606B9C70BD37011D6C3BB11FFB19E573F635A917">byteLiteralNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">moduleId_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">(</span><span class="other">0u</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#63">63</a>
-             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            Declaration at line <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html#63">63</a>
+             of <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html">Literal.hpp</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="constructor_ByteLiteralNode_9E844DFDC681C481CD54865220590239E786D50F">ByteLiteralNode Constructor</h3>
+        <h3 id="constructor_ByteLiteralNode_A131477C90FB3386FADDC76823D391CF80C75C9A">ByteLiteralNode Constructor</h3>
         <h4>
             sngcm::ast::ByteLiteralNode::ByteLiteralNode(<span class="kw">const </span>
-            Span&amp; span_, uint8_t value_)</h4>
+            Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId_, uint8_t value_)</h4>
         <span>
-            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#190">190</a>
-             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            Definition at line <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html#196">196</a>
+             of <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html">Literal.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_byteLiteralNode_606B9C70BD37011D6C3BB11FFB19E573F635A917">byteLiteralNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_byteLiteralNode_606B9C70BD37011D6C3BB11FFB19E573F635A917">byteLiteralNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">moduleId_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#64">64</a>
-             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            Declaration at line <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html#64">64</a>
+             of <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html">Literal.hpp</a>
         </span>
         <br/>
         <br/>
@@ -123,22 +129,22 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#199">199</a>
-             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            Definition at line <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html#207">207</a>
+             of <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html">Literal.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#66">66</a>
-             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            Declaration at line <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html#66">66</a>
+             of <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html">Literal.hpp</a>
         </span>
         <br/>
         <br/>
@@ -160,22 +166,24 @@
             &amp; cloneContext) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#194">194</a>
-             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            Definition at line <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html#201">201</a>
+             of <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html">Literal.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html">ByteLiteralNode</a><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">.</span><span class="identifier">MapSpan</span><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">RootModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html">ByteLiteralNode</a><span class="other">*</span>&nbsp;<span class="identifier">clone</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html">ByteLiteralNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clone</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#65">65</a>
-             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            Declaration at line <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html#65">65</a>
+             of <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html">Literal.hpp</a>
         </span>
         <br/>
         <br/>
@@ -185,9 +193,8 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_MapSpan_4854B818E90C09061F441CEE0410C6DF44D518CF">sngcm::ast::CloneContext::MapSpan</a>
-            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
-            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_RootModuleId_2C637CA63FEB26C6458958EFD55F1248AA470C07">sngcm::ast::Node::RootModuleId</a>
+            Calls: <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -199,24 +206,24 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#210">210</a>
-             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            Definition at line <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html#218">218</a>
+             of <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html">Literal.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#68">68</a>
-             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            Declaration at line <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html#68">68</a>
+             of <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html">Literal.hpp</a>
         </span>
         <br/>
         <br/>
@@ -239,22 +246,22 @@
             std::string sngcm::ast::ByteLiteralNode::ToString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#216">216</a>
-             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            Definition at line <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html#224">224</a>
+             of <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html">Literal.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"u"</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"u"</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#69">69</a>
-             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            Declaration at line <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html#69">69</a>
+             of <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html">Literal.hpp</a>
         </span>
         <br/>
         <br/>
@@ -269,8 +276,8 @@
             uint8_t sngcm::ast::ByteLiteralNode::Value() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#70">70</a>
-             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            Definition at line <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html#70">70</a>
+             of <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html">Literal.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -291,24 +298,24 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#204">204</a>
-             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            Definition at line <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html#212">212</a>
+             of <a href="file/Literal.cpp_D2FAF240A248518F30DB50361B538311F1D00AC0.html">Literal.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#variable_value_66B7E8AB732028F3DE45BE9042CE629262DF0EFD">value</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#67">67</a>
-             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            Declaration at line <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html#67">67</a>
+             of <a href="file/Literal.hpp_A4F833EE9D97BCBAADB8C17EBBC31BA9063D36C3.html">Literal.hpp</a>
         </span>
         <br/>
         <br/>
@@ -328,7 +335,7 @@
         <hr/>
         <a href="../../../../compiler-projects.html">top</a>
          | <a href="namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">up</a>
-         | <a href="class_BreakStatementNode_08DB9BD78E7635D6E5D28CF2BEE7A990BE44FB05.html">prev</a>
+         | <a href="struct_ByProjectName_6F82A5FBC6C9D369C15C4E0187EA63B680A11B1B.html">prev</a>
          | <a href="class_ByteNode_C492431344FCF899D2F17B048418CBC7A3C90B06.html">next</a>
     </body>
 </html>

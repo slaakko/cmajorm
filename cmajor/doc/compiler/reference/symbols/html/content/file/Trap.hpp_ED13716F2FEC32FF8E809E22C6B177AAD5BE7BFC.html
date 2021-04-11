@@ -1,0 +1,60 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_SYMBOLS_TRAP_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_SYMBOLS_TRAP_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/FunctionSymbol.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">symbols</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">SymbolTable</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_TrapFunction_E88AFE1E491BF2A9DE42A43ECAF19EBC84D1CF54.html">TrapFunction</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_TrapFunction_E88AFE1E491BF2A9DE42A43ECAF19EBC84D1CF54.html#constructor_TrapFunction_8746224402D1473962EBA164C004E8F15C5D2FA4">TrapFunction</a><span class="other">(</span><a href="../class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">SymbolTable</a><span class="other">&amp;</span>&nbsp;<span class="identifier">symbolTable</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_TrapFunction_E88AFE1E491BF2A9DE42A43ECAF19EBC84D1CF54.html#constructor_TrapFunction_2BEC7E52003D5223E01DC279F5CD53C8433D6671">TrapFunction</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">sourceModuleId</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_TrapFunction_E88AFE1E491BF2A9DE42A43ECAF19EBC84D1CF54.html#function_GenerateCall_46F93B9B5E470C9AAB6A3A9837696C237DC44631">GenerateCall</a><span class="other">(</span><span class="identifier">Emitter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">GenObject</span><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">genObjects</span><span class="other">,&nbsp;</span><span class="identifier">OperationFlags</span><span class="identifier">flags</span><span class="other">,&nbsp;</span><span class="kw">const</span><span class="identifier">Span</span><span class="other">&amp;</span><span class="identifier">span</span><span class="other">,&nbsp;</span><span class="kw">const</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleId</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_InitTrap_DF06C9E3FEE1749F34CA143C98912E9A35AE7707">InitTrap</a><span class="other">(</span><a href="../class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">SymbolTable</a><span class="other">&amp;</span>&nbsp;<span class="identifier">symbolTable</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::symbols</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_SYMBOLS_TRAP_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

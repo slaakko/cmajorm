@@ -1,0 +1,200 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/rt/ConditionVariable.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/rt/Mutex.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/rt/Error.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Error.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;memory></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;mutex></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="pp">#include&nbsp;&lt;condition_variable></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdexcept></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtAllocateConditionVariable_6EB50AE9B257C0080E54DE6E4C50608A7000E4EF">RtAllocateConditionVariable</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtFreeConditionVariable_068CF2315E479CFFFBD788CA2986C4808D103329">RtFreeConditionVariable</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">delete</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtNotifyOne_BB2BEDB8D892817B1808FA2C6A7D9EC02DF3052A">RtNotifyOne</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">*</span>&nbsp;<span class="identifier">conditionVariable</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">conditionVariable</span><span class="other">-></span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">rt</a><span class="other">::</span><span class="identifier">InstallError</span><span class="other">(</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtNotifyAll_AE8982A0EA1EFDA002E1A36BC9B3BFFAE1DDD6A8">RtNotifyAll</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">*</span>&nbsp;<span class="identifier">conditionVariable</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">conditionVariable</span><span class="other">-></span><span class="identifier">notify_all</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">rt</a><span class="other">::</span><span class="identifier">InstallError</span><span class="other">(</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtWaitConditionVariable_50F218E2B63AF46C26D7590DA7FA90DE1BD9C23E">RtWaitConditionVariable</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">,&nbsp;</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">recursiveMutexHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span>&nbsp;<span class="identifier">recursiveMutex</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">recursiveMutexHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">*</span>&nbsp;<span class="identifier">conditionVariable</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><span class="other">*</span><span class="identifier">recursiveMutex</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">conditionVariable</span><span class="other">-></span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">rt</a><span class="other">::</span><span class="identifier">InstallError</span><span class="other">(</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">CondVarStatus</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">int32_t</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">timeout</span><span class="other">=</span>&nbsp;&nbsp;<span class="other">0</span><span class="other">,&nbsp;</span><span class="identifier">no_timeout</span><span class="other">=</span>&nbsp;&nbsp;<span class="other">1</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_RtWaitConditionVariableDuration_727EEAF1B88068CAB182E5E792BE5E50C2613741">RtWaitConditionVariableDuration</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeHandle</span><span class="other">,&nbsp;</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">recursiveMutexHandle</span><span class="other">,&nbsp;</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">nanoseconds</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_CondVarStatus_6F4D386AF4AAF7F856887A4A66609C54E4842B67.html">CondVarStatus</a>&nbsp;<span class="identifier">status</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../enum_CondVarStatus_6F4D386AF4AAF7F856887A4A66609C54E4842B67.html">CondVarStatus</a><span class="other">::</span><a href="../enum_CondVarStatus_6F4D386AF4AAF7F856887A4A66609C54E4842B67.html#enumerator_timeout_A0FD3C5BB0E77746A0A019B5B3779A1532A6D177">timeout</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span>&nbsp;<span class="identifier">recursiveMutex</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">recursiveMutexHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">*</span>&nbsp;<span class="identifier">conditionVariable</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable_any</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">nativeHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">nanoseconds</span>&nbsp;<span class="identifier">duration</span><span class="other">(</span><span class="identifier">nanoseconds</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">recursive_mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><span class="other">*</span><span class="identifier">recursiveMutex</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">conditionVariable</span><span class="other">-></span><span class="identifier">wait_for</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="identifier">duration</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">cv_status</span><span class="other">::</span><span class="identifier">no_timeout</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">status</span><span class="other">&nbsp;=&nbsp;</span><a href="../enum_CondVarStatus_6F4D386AF4AAF7F856887A4A66609C54E4842B67.html">CondVarStatus</a><span class="other">::</span><a href="../enum_CondVarStatus_6F4D386AF4AAF7F856887A4A66609C54E4842B67.html#enumerator_no_timeout_E4F2C45AF619633F9CD36FF17CB9161ECD08F256">no_timeout</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">status</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">rt</a><span class="other">::</span><span class="identifier">InstallError</span><span class="other">(</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">96</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

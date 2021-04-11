@@ -12,21 +12,21 @@
         <hr/>
         <h1>ScopedValue Class</h1>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#37">37</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#37">37</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#constructor_ScopedValue_FDBF46F17E635F570687599E3D03AAE681479482">ScopedValue</a>(<span class="kw">const </span>Span&amp; span_, ContainerSymbol* containerSymbol_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#constructor_ScopedValue_DFE545969E97217C7A2B0F96765553A171EBE036">ScopedValue</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId_, ContainerSymbol* containerSymbol_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
         <table class="functionTable">
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">Value*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#function_As_26C8442255F5192119F3CE96D19562307FE94F12">As</a>(TypeSymbol* targetType, <span class="kw">bool</span> cast, <span class="kw">const </span>Span&amp; span, <span class="kw">bool</span> dontThrow) <span class="kw">const override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#function_As_CB5DC022B1FCF15852153C8ED4C22395A90B7ED1">As</a>(TypeSymbol* targetType, <span class="kw">bool</span> cast, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId, <span class="kw">bool</span> dontThrow) <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">Value*</td>
@@ -94,42 +94,46 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_ScopedValue_FDBF46F17E635F570687599E3D03AAE681479482">ScopedValue Constructor</h3>
+        <h3 id="constructor_ScopedValue_DFE545969E97217C7A2B0F96765553A171EBE036">ScopedValue Constructor</h3>
         <h4>
             cmajor::binder::ScopedValue::ScopedValue(<span class="kw">const </span>
-            Span&amp; span_, ContainerSymbol* containerSymbol_)</h4>
+            Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId_, ContainerSymbol* containerSymbol_)</h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#60">60</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#60">60</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;60</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">Value</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">ValueType</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_containerSymbol_36CFFB8F5E4B9DAB91D05BEC949585DC551AF46F">containerSymbol</a><span class="other">(</span><span class="identifier">containerSymbol_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_type_2C30FC0D02986C4A5F06C532152D9224C74BE223">type</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;60</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;61</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;61</span>&nbsp;<span class="identifier">Value</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">moduleId_</span><span class="other">,&nbsp;</span><span class="identifier">ValueType</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_containerSymbol_36CFFB8F5E4B9DAB91D05BEC949585DC551AF46F">containerSymbol</a><span class="other">(</span><span class="identifier">containerSymbol_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_type_2C30FC0D02986C4A5F06C532152D9224C74BE223">type</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;62</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;62</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;63</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#40">40</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Declaration at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#40">40</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
         </span>
         <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
-        <h3 id="function_As_26C8442255F5192119F3CE96D19562307FE94F12">As Member Function</h3>
+        <h3 id="function_As_CB5DC022B1FCF15852153C8ED4C22395A90B7ED1">As Member Function</h3>
         <h4>
             Value* cmajor::binder::ScopedValue::As(TypeSymbol* targetType, <span class="kw">bool</span>
              cast, <span class="kw">const </span>
-            Span&amp; span, <span class="kw">bool</span>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId, <span class="kw">bool</span>
              dontThrow) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#48">48</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#48">48</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;48</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"scoped&nbsp;value&nbsp;cannot&nbsp;be&nbsp;converted"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -143,8 +147,8 @@
             Value* cmajor::binder::ScopedValue::Clone() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#45">45</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#45">45</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;45</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"scoped&nbsp;value&nbsp;cannot&nbsp;be&nbsp;cloned"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -159,8 +163,8 @@
             ContainerSymbol* cmajor::binder::ScopedValue::GetContainerSymbol() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#43">43</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#43">43</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;43</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_containerSymbol_36CFFB8F5E4B9DAB91D05BEC949585DC551AF46F">containerSymbol</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -173,8 +177,8 @@
         <h4>
             ContainerSymbol* cmajor::binder::ScopedValue::GetContainerSymbol()</h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#44">44</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#44">44</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;44</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_containerSymbol_36CFFB8F5E4B9DAB91D05BEC949585DC551AF46F">containerSymbol</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -193,8 +197,8 @@
             Value* cmajor::binder::ScopedValue::GetSubject() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#52">52</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#52">52</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;52</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_subject_EE2E760980A776727D0E715A92DD685994F67877">subject</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -213,8 +217,8 @@
             TypeSymbol* cmajor::binder::ScopedValue::GetType(SymbolTable* symbolTable) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#50">50</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#50">50</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;50</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_type_2C30FC0D02986C4A5F06C532152D9224C74BE223">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -234,8 +238,8 @@
             * cmajor::binder::ScopedValue::IrValue(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#49">49</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#49">49</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;49</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"scoped&nbsp;value&nbsp;does&nbsp;not&nbsp;have&nbsp;ir&nbsp;value"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -250,8 +254,8 @@
              cmajor::binder::ScopedValue::IsComplete() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#41">41</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#41">41</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;41</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -266,8 +270,8 @@
              cmajor::binder::ScopedValue::IsScopedValue() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#42">42</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#42">42</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;42</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -282,8 +286,8 @@
              cmajor::binder::ScopedValue::Read(BinaryReader&amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#47">47</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#47">47</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;47</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
@@ -297,8 +301,8 @@
             <span class="kw">void</span>
              cmajor::binder::ScopedValue::SetSubject(Value* subject_)</h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#53">53</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#53">53</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;53</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_subject_EE2E760980A776727D0E715A92DD685994F67877">subject</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">subject_</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -318,8 +322,8 @@
              cmajor::binder::ScopedValue::SetType(TypeSymbol* type_) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#51">51</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#51">51</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;51</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_ScopedValue_2C3ED81E6D73F2BE376CBEB734E95048BE78A48C.html#variable_type_2C30FC0D02986C4A5F06C532152D9224C74BE223">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">type_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -339,8 +343,8 @@
              cmajor::binder::ScopedValue::Write(BinaryWriter&amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html#46">46</a>
-             of <a href="file/Evaluator.cpp_F4BEFE869C23E4D1716FAC19756B3CB455210A89.html">Evaluator.cpp</a>
+            Definition at line <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html#46">46</a>
+             of <a href="file/Evaluator.cpp_BFE49353A48D595E1559F4BA21B3B228F887FB85.html">Evaluator.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;46</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>

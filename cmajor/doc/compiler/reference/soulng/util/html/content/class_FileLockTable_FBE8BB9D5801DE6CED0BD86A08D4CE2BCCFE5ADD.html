@@ -1,0 +1,307 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>FileLockTable Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">prev</a>
+         | <a href="class_FilePtr_2779FF05E84D4E3A6FC9A7175E8F536679D6BA3D.html">next</a>
+        <hr/>
+        <h1>FileLockTable Class</h1>
+        <span>
+            Definition at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#19">19</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#constructor_FileLockTable_59712C0E207A0267C521FC99BBED827CBF3048C3">FileLockTable</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_Done_19D54F57B373CB6672B3FDB4B68669B03CF5C7D6">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_Init_480462EA48D6AC370136C940772784C9BBF1B1D3">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_Instance_27E2926EE022C6626795098BEEC3599724FD625C">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_LockFile_CF05EF5AEC9D7291C42705E5DC14E86BC330AEA6">LockFile</a>(<span class="kw">const </span>std::string&amp; filePath, <a href="./enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a> lockKind)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_NoReaders_5EB97E7F19D76435049A4AAE3C73572F17A8A196">NoReaders</a>(<span class="kw">const </span>std::string&amp; filePath)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_NoWriters_95CF3FF1900B22B00670BF3974F0479E2A062287">NoWriters</a>(<span class="kw">const </span>std::string&amp; filePath)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_UnlockFile_B79C59EE49B9209FF61D2E8F81A8DC23342EF077">UnlockFile</a>(<span class="kw">const </span>std::string&amp; filePath, <a href="./enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a> lockKind)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_instance_60602263002AA20A9F7B341A6DD2FA8299F3EA16">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_mtx_353A791FD04ADCFB24C4DE7CA6072E63A3FAE266">
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+            <tr id="variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">
+                <td class="functionTableFirstCol" xml:space="preserve">std::map&lt;std::string, <span class="kw">int</span>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">readMap</td>
+            </tr>
+            <tr id="variable_releaseRead_5DFD89CE7AE056A302C9EE0A54F63C37DFD5A251">
+                <td class="functionTableFirstCol" xml:space="preserve">std::condition_variable</td>
+                <td class="functionTableSecondCol" xml:space="preserve">releaseRead</td>
+            </tr>
+            <tr id="variable_releaseWrite_27CAE4B3CEC44DA67FD5853BB7121DD810790CA6">
+                <td class="functionTableFirstCol" xml:space="preserve">std::condition_variable</td>
+                <td class="functionTableSecondCol" xml:space="preserve">releaseWrite</td>
+            </tr>
+            <tr id="variable_waitingReadLock_5B385260DFDD7AACF718D44E9E747674EB78E859">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">waitingReadLock</td>
+            </tr>
+            <tr id="variable_waitingWriteLock_BAE1972BE21452CA151F83AF4195F21A6F8F873F">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">waitingWriteLock</td>
+            </tr>
+            <tr id="variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">
+                <td class="functionTableFirstCol" xml:space="preserve">std::set&lt;std::string></td>
+                <td class="functionTableSecondCol" xml:space="preserve">writeLocks</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_FileLockTable_59712C0E207A0267C521FC99BBED827CBF3048C3">FileLockTable Constructor</h3>
+        <h4>
+            soulng::util::FileLockTable::FileLockTable()</h4>
+        <span>
+            Definition at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#43">43</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingReadLock_5B385260DFDD7AACF718D44E9E747674EB78E859">waitingReadLock</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingWriteLock_BAE1972BE21452CA151F83AF4195F21A6F8F873F">waitingWriteLock</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#31">31</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Done_19D54F57B373CB6672B3FDB4B68669B03CF5C7D6">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::FileLockTable::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#52">52</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_instance_60602263002AA20A9F7B341A6DD2FA8299F3EA16">instance</a><span class="other">.</span><a href="./namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#23">23</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_480462EA48D6AC370136C940772784C9BBF1B1D3">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::FileLockTable::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#47">47</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_instance_60602263002AA20A9F7B341A6DD2FA8299F3EA16">instance</a><span class="other">.</span><a href="./namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#22">22</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_27E2926EE022C6626795098BEEC3599724FD625C">Instance Member Function</h3>
+        <h4>
+            <a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a>
+            &amp; soulng::util::FileLockTable::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#24">24</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_instance_60602263002AA20A9F7B341A6DD2FA8299F3EA16">instance</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_LockFile_CF05EF5AEC9D7291C42705E5DC14E86BC330AEA6">LockFile Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::FileLockTable::LockFile(<span class="kw">const </span>
+            std::string&amp; filePath, <a href="./enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a>
+             lockKind)</h4>
+        <span>
+            Definition at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#57">57</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#25">25</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_NoReaders_5EB97E7F19D76435049A4AAE3C73572F17A8A196">soulng::util::FileLockTable::NoReaders</a>
+            , <a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_NoWriters_95CF3FF1900B22B00670BF3974F0479E2A062287">soulng::util::FileLockTable::NoWriters</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_NoReaders_5EB97E7F19D76435049A4AAE3C73572F17A8A196">NoReaders Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             soulng::util::FileLockTable::NoReaders(<span class="kw">const </span>
+            std::string&amp; filePath)</h4>
+        <span>
+            Definition at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#121">121</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">.</span><span class="identifier">end</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">numReaders</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">numReaders</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#27">27</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_LockFile_CF05EF5AEC9D7291C42705E5DC14E86BC330AEA6">soulng::util::FileLockTable::LockFile</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_NoWriters_95CF3FF1900B22B00670BF3974F0479E2A062287">NoWriters Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             soulng::util::FileLockTable::NoWriters(<span class="kw">const </span>
+            std::string&amp; filePath)</h4>
+        <span>
+            Definition at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#132">132</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#28">28</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_LockFile_CF05EF5AEC9D7291C42705E5DC14E86BC330AEA6">soulng::util::FileLockTable::LockFile</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_UnlockFile_B79C59EE49B9209FF61D2E8F81A8DC23342EF077">UnlockFile Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::FileLockTable::UnlockFile(<span class="kw">const </span>
+            std::string&amp; filePath, <a href="./enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a>
+             lockKind)</h4>
+        <span>
+            Definition at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#137">137</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html#26">26</a>
+             of <a href="file/FileLocking.cpp_53BECEC12D7CB9244117155F4843B9A93A8322A0.html">FileLocking.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_DateTime_DC21B6F1AE49E156F006D5CBD87762523ECD9909.html">prev</a>
+         | <a href="class_FilePtr_2779FF05E84D4E3A6FC9A7175E8F536679D6BA3D.html">next</a>
+    </body>
+</html>

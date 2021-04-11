@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#16">16</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#16">16</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#constructor_EnumTypeSymbol_A0AECA2E4B364DEF97AD076428DBBD567E767F3F">EnumTypeSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#constructor_EnumTypeSymbol_BBC06043C50B71631EDCF1A5E6ABA04FA85CA540">EnumTypeSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -63,6 +63,14 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;<a href="./class_EnumConstantSymbol_08D7A26EF542F380FF0C6E3270E139D2245D1CC3.html">EnumConstantSymbol</a>*></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#function_GetEnumConstants_57437BD5D0B8732CE118C4EB31AEEFCC0B1CE1AC">GetEnumConstants</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#function_GetSymbolCategoryDescription_88FA9B4F6A05F0D784BB88F8B6E2B7926922FDE0">GetSymbolCategoryDescription</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#function_GetSymbolCategoryStr_054CA7F5B53C1332534A7DB0A1AC1E456F1B8679">GetSymbolCategoryStr</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a></td>
@@ -138,28 +146,31 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_EnumTypeSymbol_A0AECA2E4B364DEF97AD076428DBBD567E767F3F">EnumTypeSymbol Constructor</h3>
+        <h3 id="constructor_EnumTypeSymbol_BBC06043C50B71631EDCF1A5E6ABA04FA85CA540">EnumTypeSymbol Constructor</h3>
         <h4>
             cmajor::symbols::EnumTypeSymbol::EnumTypeSymbol(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#20">20</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#20">20</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_enumTypeSymbol_39966A80B35615EDCDFB69F48056A18A9E25422D">enumTypeSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">(</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_enumTypeSymbol_39966A80B35615EDCDFB69F48056A18A9E25422D">enumTypeSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">(</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#19">19</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#19">19</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -172,28 +183,28 @@
             * collector) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#57">57</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#58">58</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddEnumeratedType</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">collector</span><span class="other">-></span><span class="identifier">AddEnumeratedType</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#27">27</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#27">27</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -217,30 +228,30 @@
              cmajor::symbols::EnumTypeSymbol::Check() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#212">212</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#213">213</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"enumerated&nbsp;type&nbsp;symbol&nbsp;has&nbsp;no&nbsp;underlying&nbsp;type"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span>&nbsp;<span class="string">"enumerated&nbsp;type&nbsp;symbol&nbsp;has&nbsp;no&nbsp;underlying&nbsp;type"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">SourceModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#44">44</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#44">44</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -253,6 +264,7 @@
         <br/>
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Check_6BA282B657A3D6754158A9D616ECD581E50A6A2E">cmajor::symbols::TypeSymbol::Check</a>
         </span>
         <br/>
@@ -265,8 +277,8 @@
             * cmajor::symbols::EnumTypeSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#43">43</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#43">43</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"EnumTypeSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -288,22 +300,22 @@
              cmajor::symbols::EnumTypeSymbol::CollectMembers(<a href="./class_SymbolCollector_96279A002006E750FAF6C5C4987EF78C9C152FAF.html">SymbolCollector</a>
             * collector)</h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#65">65</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#66">66</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Accept</span><span class="other">(</span><span class="identifier">collector</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Accept</span><span class="other">(</span><span class="identifier">collector</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#28">28</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#28">28</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -319,13 +331,13 @@
             * cmajor::symbols::EnumTypeSymbol::CreateDIType(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#180">180</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#181">181</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#37">37</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#37">37</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -337,13 +349,14 @@
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_MangledName_6F4B3C08E6832F2EF32DD516A461D594D5C9AC64">cmajor::symbols::Symbol::MangledName</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetTypeByName_D72879D27A1343FF7933ACCD7526D826F50F36E1">cmajor::symbols::SymbolTable::GetTypeByName</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_AlignmentInBits_655F385C28700769DF11D3EB0DB03EB2024D3AEC">cmajor::symbols::TypeSymbol::AlignmentInBits</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_GetDIType_B69A085DFFCB9BADA7D9631BBE667821F9252758">cmajor::symbols::TypeSymbol::GetDIType</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsUnsignedType_EA7D01772E849A6724E33CD41805357A90F7A484">cmajor::symbols::TypeSymbol::IsUnsignedType</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_SizeInBits_5BE86948353DB47F6AB0F1C7534F469B37BCE143">cmajor::symbols::TypeSymbol::SizeInBits</a>
             , <a href="./class_ULongValue_985C867DFFEE6DF3901A8074F6E0C0271BFD0427.html#function_GetValue_105DEBD5CD76D2385425B6A5629319C5CE3D13AA">cmajor::symbols::ULongValue::GetValue</a>
-            , <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_As_1C54933A4C34963D07764F14356395A49372051C">cmajor::symbols::Value::As</a>
+            , <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_As_B875A153D564DCB334E7C4E529E030DCAB43D28F">cmajor::symbols::Value::As</a>
         </span>
         <br/>
         <br/>
@@ -354,8 +367,8 @@
             * cmajor::symbols::EnumTypeSymbol::CreateDefaultIrValue(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#36">36</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#36">36</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">-></span><span class="identifier">CreateDefaultIrValue</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -375,13 +388,13 @@
              cmajor::symbols::EnumTypeSymbol::Dump(CodeFormatter&amp; formatter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#70">70</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#71">71</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#29">29</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#29">29</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -411,24 +424,24 @@
              index) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#38">38</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#39">39</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#22">22</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#22">22</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -443,26 +456,26 @@
             std::vector&lt;<a href="./class_EnumConstantSymbol_08D7A26EF542F380FF0C6E3270E139D2245D1CC3.html">EnumConstantSymbol</a>
             *> cmajor::symbols::EnumTypeSymbol::GetEnumConstants()</h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#158">158</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#159">159</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolCollector_96279A002006E750FAF6C5C4987EF78C9C152FAF.html">SymbolCollector</a>&nbsp;<span class="identifier">collector</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SymbolCollector_96279A002006E750FAF6C5C4987EF78C9C152FAF.html">SymbolCollector</a>&nbsp;<span class="identifier">collector</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Accept</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">collector</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Accept</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">collector</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">collector</span><span class="other">.</span><span class="identifier">EnumerationConstants</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">collector</span><span class="other">.</span><span class="identifier">EnumerationConstants</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#34">34</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#34">34</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -479,28 +492,68 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_GetSymbolCategoryDescription_88FA9B4F6A05F0D784BB88F8B6E2B7926922FDE0">GetSymbolCategoryDescription Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::EnumTypeSymbol::GetSymbolCategoryDescription() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#46">46</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"enumerated&nbsp;type"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryDescription_34BE1EAEAA69A7557F968BD6B843A5DC2295736E">cmajor::symbols::Symbol::GetSymbolCategoryDescription</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryStr_054CA7F5B53C1332534A7DB0A1AC1E456F1B8679">GetSymbolCategoryStr Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::EnumTypeSymbol::GetSymbolCategoryStr() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#45">45</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ET"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryStr_DE4CB4E167EA03932F01A5903D1CC2B8A2E473DF">cmajor::symbols::Symbol::GetSymbolCategoryStr</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_GetValueType_7C2C778BC718A4BC961E0B0C8953B884DCACF369">GetValueType Member Function</h3>
         <h4>
             <a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a>
              cmajor::symbols::EnumTypeSymbol::GetValueType() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#165">165</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#166">166</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">-></span><span class="identifier">GetValueType</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">-></span><span class="identifier">GetValueType</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#39">39</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#39">39</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -520,22 +573,22 @@
             std::u32string cmajor::symbols::EnumTypeSymbol::Id() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#175">175</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#176">176</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#41">41</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#41">41</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -556,8 +609,8 @@
             std::u32string cmajor::symbols::EnumTypeSymbol::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#42">42</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#42">42</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -582,8 +635,8 @@
             * cmajor::symbols::EnumTypeSymbol::IrType(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#35">35</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#35">35</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">-></span><span class="identifier">IrType</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -603,8 +656,8 @@
              cmajor::symbols::EnumTypeSymbol::IsEnumeratedType() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#25">25</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#25">25</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -624,8 +677,8 @@
              cmajor::symbols::EnumTypeSymbol::IsParentSymbol() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#26">26</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#26">26</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -645,8 +698,8 @@
              cmajor::symbols::EnumTypeSymbol::IsSwitchConditionType() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#38">38</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#38">38</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -666,22 +719,22 @@
             * cmajor::symbols::EnumTypeSymbol::MakeValue() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#170">170</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#171">171</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">-></span><span class="identifier">MakeValue</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">-></span><span class="identifier">MakeValue</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#40">40</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#40">40</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -703,28 +756,28 @@
             &amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#30">30</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#31">31</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span>&nbsp;<span class="identifier">underlyingTypeId</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span>&nbsp;<span class="identifier">underlyingTypeId</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUuid</span><span class="other">(</span><span class="identifier">underlyingTypeId</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUuid</span><span class="other">(</span><span class="identifier">underlyingTypeId</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">EmplaceTypeRequest</span><span class="other">(</span><span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">underlyingTypeId</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">EmplaceTypeRequest</span><span class="other">(</span><span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">underlyingTypeId</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#21">21</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#21">21</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -749,19 +802,20 @@
             <span class="kw">void</span>
              cmajor::symbols::EnumTypeSymbol::SetSpecifiers(Specifiers specifiers)</h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#88">88</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#89">89</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#30">30</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#30">30</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Calls: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetAccess_121F064F7F499D20D45D6E7192296F2A23583BE1">cmajor::symbols::Symbol::SetAccess</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
         </span>
         <br/>
         <br/>
@@ -772,8 +826,8 @@
              cmajor::symbols::EnumTypeSymbol::SetUnderlyingType(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * underlyingType_)</h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#33">33</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#33">33</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">underlyingType_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -787,13 +841,13 @@
             std::string cmajor::symbols::EnumTypeSymbol::Syntax() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#44">44</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#45">45</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#24">24</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#24">24</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -814,8 +868,8 @@
             std::string cmajor::symbols::EnumTypeSymbol::TypeString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#23">23</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#23">23</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"enumerated_type"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -838,8 +892,8 @@
             * cmajor::symbols::EnumTypeSymbol::UnderlyingType() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#31">31</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#31">31</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -853,8 +907,8 @@
             <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * cmajor::symbols::EnumTypeSymbol::UnderlyingType()</h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#32">32</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Definition at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#32">32</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -875,24 +929,24 @@
             &amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html#24">24</a>
-             of <a href="file/EnumSymbol.cpp_31F9F91170ADB10282C9710002E70B8F679CFC8B.html">EnumSymbol.cpp</a>
+            Definition at line <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html#25">25</a>
+             of <a href="file/EnumSymbol.cpp_1124D7B1CFB760BE2FEF59A5E7E8B0FCEF28AD7E.html">EnumSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#variable_underlyingType_CC7AFCC244B0453EA32D60EC6ADC66A42396848F">underlyingType</a><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html#20">20</a>
-             of <a href="file/EnumSymbol.hpp_15FA7575006AD8249029359B1F9F32BE374055D8.html">EnumSymbol.hpp</a>
+            Declaration at line <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html#20">20</a>
+             of <a href="file/EnumSymbol.hpp_C86252490DC324F6BD6155F139018E09774F4CC8.html">EnumSymbol.hpp</a>
         </span>
         <br/>
         <br/>

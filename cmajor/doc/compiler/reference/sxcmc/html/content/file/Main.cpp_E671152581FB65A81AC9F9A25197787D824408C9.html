@@ -1,0 +1,896 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngcm/ast/InitDone.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/InitDone.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/Build.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmmid/InitDone.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/Exception.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/InitDone.hpp></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/GlobalFlags.hpp></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/ModuleCache.hpp></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/Warning.hpp></span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngxml/dom/Document.hpp></span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngxml/dom/Element.hpp></span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngxml/dom/CharacterData.hpp></span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/lexer/ParsingException.hpp></span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Util.hpp></span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Path.hpp></span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Json.hpp></span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="pp">#include&nbsp;&lt;boost/filesystem.hpp></span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="pp">#include&nbsp;&lt;boost/lexical_cast.hpp></span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="pp">#include&nbsp;&lt;iostream></span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdexcept></span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="pp">#include&nbsp;&lt;chrono></span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_InitDone_628260F2CF551E7BBDED23EF835FE0EACE799BFF.html">InitDone</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_InitDone_628260F2CF551E7BBDED23EF835FE0EACE799BFF.html#constructor_InitDone_132F5DE16136E70F6F4BF9E77A98CF62E10B4251">InitDone</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">util</a><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../build/html/content/namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../symbols/html/content/namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">~</span><span class="identifier">InitDone</span><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../build/html/content/namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../symbols/html/content/namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">util</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_BackendInit_7E95CC8308DC13FDCDD091F1C61AD04C479B4144.html">BackendInit</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_BackendInit_7E95CC8308DC13FDCDD091F1C61AD04C479B4144.html#constructor_BackendInit_7F56E836B5B19CB7F232FF24147258CE2C8BD01B">BackendInit</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">CmmInit</span><span class="other">(</span><a href="../../../../build/html/content/namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../cmmid/html/content/namespace_mid_3129DC3C46A8448C2BDF46CC752977D37A01E30F.html">mid</a><span class="other">::</span><a href="../../../../cmmid/html/content/enum_BackEndKind_925F708C841BEC68CB24274EA2ABCC111972C37B.html">BackEndKind</a><span class="other">::</span><a href="../../../../cmmid/html/content/enum_BackEndKind_925F708C841BEC68CB24274EA2ABCC111972C37B.html#enumerator_cmsxBackEnd_8D321D9A89F97F7F3570FB32EE0AFC3DF440BF9D">cmsxBackEnd</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">~</span><span class="identifier">BackendInit</span><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">CmmDone</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_version_C692273DEB2772DA307FFE37041FEF77BF4BAA97">version</a>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"0.2.0"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_PrintHelp_B104979E1D924A31300FF02AD31676CDBF3DFBCA">PrintHelp</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;<span class="pp">#ifdef&nbsp;_WIN32</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="pp">#else</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cout</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"Cmajor&nbsp;System&nbsp;X&nbsp;compiler&nbsp;version&nbsp;"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_version_C692273DEB2772DA307FFE37041FEF77BF4BAA97">version</a><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="pp">#endif</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cout</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"Usage:&nbsp;sxcmc&nbsp;[options]&nbsp;{&nbsp;project.cmp&nbsp;|&nbsp;solution.cms&nbsp;}"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cout</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"Compiles&nbsp;given&nbsp;Cmajor&nbsp;solutions&nbsp;and&nbsp;projects&nbsp;to&nbsp;System&nbsp;X&nbsp;libraries&nbsp;or&nbsp;executables."</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cout</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"Options:\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--help&nbsp;(-h)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;print&nbsp;this&nbsp;help&nbsp;message\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--config=CONFIG&nbsp;(-c=CONFIG)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;set&nbsp;configuration&nbsp;to&nbsp;CONFIG&nbsp;(debug&nbsp;|&nbsp;release)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;default&nbsp;is&nbsp;debug\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--optimization-level=LEVEL&nbsp;(-O=LEVEL)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;set&nbsp;optimization&nbsp;level&nbsp;to&nbsp;LEVEL=0-3\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;defaults:&nbsp;debug=0,&nbsp;release=3\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--verbose&nbsp;(-v)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;print&nbsp;verbose&nbsp;messages\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--quiet&nbsp;(-q)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;print&nbsp;no&nbsp;messages\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--strict-nothrow&nbsp;(-s)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;treat&nbsp;nothrow&nbsp;violation&nbsp;as&nbsp;an&nbsp;error\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--time&nbsp;(-t)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;print&nbsp;duration&nbsp;of&nbsp;compilation\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--outdir=OUTDIR&nbsp;(-o=OUTDIR)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;set&nbsp;output&nbsp;directory&nbsp;root&nbsp;to&nbsp;OUTDIR\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--rebuild&nbsp;(-u)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;build&nbsp;although&nbsp;sources&nbsp;not&nbsp;changed\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--clean&nbsp;(-e)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;clean&nbsp;given&nbsp;solutions&nbsp;and&nbsp;projects\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--debug-parse&nbsp;(-p)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;debug&nbsp;parsing&nbsp;to&nbsp;stdout\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--define&nbsp;SYMBOL&nbsp;(-D&nbsp;SYMBOL)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;define&nbsp;a&nbsp;conditional&nbsp;compilation&nbsp;symbol&nbsp;SYMBOL.\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--gen-debug-info&nbsp;(-g)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;generate&nbsp;debug&nbsp;info&nbsp;(on&nbsp;by&nbsp;default&nbsp;in&nbsp;debug&nbsp;configuration)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--no-debug-info&nbsp;(-n)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;don't&nbsp;generate&nbsp;debug&nbsp;info&nbsp;even&nbsp;for&nbsp;debug&nbsp;build\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--build-threads=N&nbsp;(-bt=N)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;set&nbsp;number&nbsp;of&nbsp;build&nbsp;threads&nbsp;to&nbsp;N\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--disable-module-cache&nbsp;(-dm)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;do&nbsp;not&nbsp;cache&nbsp;recently&nbsp;built&nbsp;modules\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--single-threaded-compile&nbsp;(-st)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;compile&nbsp;source&nbsp;files&nbsp;in&nbsp;a&nbsp;project&nbsp;using&nbsp;a&nbsp;single&nbsp;thread\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"--debug-compile&nbsp;(-dc)\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"&nbsp;&nbsp;&nbsp;show&nbsp;debug&nbsp;messages&nbsp;from&nbsp;multithreaded&nbsp;compilation\n"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">util</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">symbols</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">build</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#function_main_A23FBC0F15C3FE860A255AEF375B493CB63844DF">main</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">argc</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span><span class="other">*</span>&nbsp;<span class="identifier">argv</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetBackEnd</span><span class="other">(</span><a href="../../../../build/html/content/namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../../../../symbols/html/content/namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html">BackEnd</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html#enumerator_cmsx_88D54E1901BD5000BB37BD9A9D9F02E61E795EB2">cmsx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//SetNumBuildThreads(1);</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//SetGlobalFlag(GlobalFlags::singleThreadedCompile);</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">set</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<span class="identifier">builtProjects</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">></span>&nbsp;<span class="identifier">rootModule</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">></span><span class="other">></span><span class="identifier">rootModules</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">time_point</span>&nbsp;<span class="identifier">start</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_InitDone_628260F2CF551E7BBDED23EF835FE0EACE799BFF.html">InitDone</a>&nbsp;<span class="identifier">initDone</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">projectName</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">projectDirectory</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">target</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"program"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<span class="identifier">files</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<span class="identifier">sourceFiles</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<span class="identifier">referenceFiles</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">argc</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="other">2</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">PrintHelp</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetCompilerVersion</span><span class="other">(</span><a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_version_C692273DEB2772DA307FFE37041FEF77BF4BAA97">version</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">prevWasDefine</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">noDebugInfo</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">useModuleCache</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">argc</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">arg</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">argv</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">arg</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">arg</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">'-'</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--help"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-h"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">PrintHelp</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--verbose"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-v"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--quiet"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-q"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_quiet_B040D015E8610BC7D3391E4A0D3B0E21477258DB">quiet</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--clean"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-e"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_clean_951FBFA174F68FAEE9F03AB7B40A1A88F0E440F4">clean</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--debug-parse"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-p"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_debugParsing_135FFBB809FBCAC9CBA57D87FC1F6F8BE20813B0">debugParsing</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--strict-nothrow"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-s"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_strictNothrow_0D5E23D53FC6EE167D0912E3D9CB9FD107746C9B">strictNothrow</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--time"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-t"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_time_E96D5028662574080CB31CB98BE9594CAB9E4B87">time</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--rebuild"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-u"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_rebuild_AF4A517D53C54BFD5229EAE62FF6326D4471BFFE">rebuild</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--define"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-D"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">prevWasDefine</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--gen-debug-info"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-g"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_generateDebugInfo_377F55D4118B9635B84DB9F8EFD3F5805391C7D1">generateDebugInfo</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--no-debug-info"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-n"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">noDebugInfo</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--disable-module-cache"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-dm"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">useModuleCache</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--single-threaded-compile"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-st"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_singleThreadedCompile_05EA88300E18218CF30DFB8F0194DACF6B7BDDE1">singleThreadedCompile</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--debug-compile"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-dc"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_debugCompile_08103FB4C23C1CF11BE902C8517F34E2CFA4AEDD">debugCompile</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">arg</span><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="string">'='</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">::</span><span class="identifier">npos</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<span class="identifier">components</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">Split</span><span class="other">(</span><span class="identifier">arg</span><span class="other">,&nbsp;</span><span class="string">'='</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">2</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--config"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-c"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"release"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_release_57C22A58CDBA95AD203F60F5EC829A90B27E3090">release</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">&nbsp;!=&nbsp;</span><span class="string">"debug"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"unknown&nbsp;configuration&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--optimization-level"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-O"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">optimizationLevel</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="type">lexical_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">optimizationLevel</span><span class="other">&nbsp;>=&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">optimizationLevel</span><span class="other">&nbsp;&lt;=&nbsp;</span><span class="other">3</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetOptimizationLevel</span><span class="other">(</span><span class="identifier">optimizationLevel</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"unknown&nbsp;optimization&nbsp;level&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--reference"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-r"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">file</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">path</span>&nbsp;<span class="identifier">fp</span><span class="other">(</span><span class="identifier">file</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">exists</span><span class="other">(</span><span class="identifier">fp</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"referenced&nbsp;project&nbsp;file&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;not&nbsp;found"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">referenceFiles</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">file</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--target"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-a"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">target</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">target</span><span class="other">&nbsp;!=&nbsp;</span><span class="string">"program"</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">target</span><span class="other">&nbsp;!=&nbsp;</span><span class="string">"library"</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">target</span><span class="other">&nbsp;!=&nbsp;</span><span class="string">"unitTest"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"unknown&nbsp;target&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">target</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"':&nbsp;not&nbsp;'program',&nbsp;'library',&nbsp;or&nbsp;'unitTest'"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--name"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-N"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">projectName</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--dir"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-pd"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">projectDirectory</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--build-threads"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-bt"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">numBuildThreads</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="type">lexical_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetNumBuildThreads</span><span class="other">(</span><span class="identifier">numBuildThreads</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"--outdir"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">components</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"-o"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">outdir</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">components</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetOutDir</span><span class="other">(</span><span class="identifier">outdir</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="270" xml:space="preserve"><span class="lineNumber">270</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="271" xml:space="preserve"><span class="lineNumber">271</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="272" xml:space="preserve"><span class="lineNumber">272</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"unknown&nbsp;option&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="273" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="274" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="275" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="276" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="277" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"invalid&nbsp;argument&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="278" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="279" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="280" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="281" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="282" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"unknown&nbsp;option&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">arg</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="283" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="284" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="285" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">prevWasDefine</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="286" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="287" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">prevWasDefine</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="288" xml:space="preserve"><span class="lineNumber">288</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DefineCommandLineConditionalSymbol</span><span class="other">(</span><span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="289" xml:space="preserve"><span class="lineNumber">289</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="290" xml:space="preserve"><span class="lineNumber">290</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="291" xml:space="preserve"><span class="lineNumber">291</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="292" xml:space="preserve"><span class="lineNumber">292</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">files</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="293" xml:space="preserve"><span class="lineNumber">293</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="294" xml:space="preserve"><span class="lineNumber">294</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="295" xml:space="preserve"><span class="lineNumber">295</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">files</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="296" xml:space="preserve"><span class="lineNumber">296</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="297" xml:space="preserve"><span class="lineNumber">297</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">PrintHelp</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="298" xml:space="preserve"><span class="lineNumber">298</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="299" xml:space="preserve"><span class="lineNumber">299</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="300" xml:space="preserve"><span class="lineNumber">300</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="301" xml:space="preserve"><span class="lineNumber">301</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="302" xml:space="preserve"><span class="lineNumber">302</span>&nbsp;<span class="pp">#ifdef&nbsp;_WIN32</span></span>
+  <br/>
+  <span class="code" id="303" xml:space="preserve"><span class="lineNumber">303</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="304" xml:space="preserve"><span class="lineNumber">304</span>&nbsp;<span class="pp">#else</span></span>
+  <br/>
+  <span class="code" id="305" xml:space="preserve"><span class="lineNumber">305</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cout</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"Cmajor&nbsp;System&nbsp;X&nbsp;compiler&nbsp;version&nbsp;"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_version_C692273DEB2772DA307FFE37041FEF77BF4BAA97">version</a><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="306" xml:space="preserve"><span class="lineNumber">306</span>&nbsp;<span class="pp">#endif</span></span>
+  <br/>
+  <span class="code" id="307" xml:space="preserve"><span class="lineNumber">307</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="308" xml:space="preserve"><span class="lineNumber">308</span>&nbsp;<span class="pp">#ifndef&nbsp;_WIN32</span></span>
+  <br/>
+  <span class="code" id="309" xml:space="preserve"><span class="lineNumber">309</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">noDebugInfo</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="310" xml:space="preserve"><span class="lineNumber">310</span>&nbsp;<span class="pp">#endif</span></span>
+  <br/>
+  <span class="code" id="311" xml:space="preserve"><span class="lineNumber">311</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetUseModuleCache</span><span class="other">(</span><span class="identifier">useModuleCache</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="312" xml:space="preserve"><span class="lineNumber">312</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_BackendInit_7E95CC8308DC13FDCDD091F1C61AD04C479B4144.html">BackendInit</a>&nbsp;<span class="identifier">backend</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="313" xml:space="preserve"><span class="lineNumber">313</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_release_57C22A58CDBA95AD203F60F5EC829A90B27E3090">release</a><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">!</span><span class="identifier">noDebugInfo</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="314" xml:space="preserve"><span class="lineNumber">314</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="315" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_generateDebugInfo_377F55D4118B9635B84DB9F8EFD3F5805391C7D1">generateDebugInfo</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="316" xml:space="preserve"><span class="lineNumber">316</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="317" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;<span class="pp">#ifndef&nbsp;_WIN32</span></span>
+  <br/>
+  <span class="code" id="318" xml:space="preserve"><span class="lineNumber">318</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetNumBuildThreads</span><span class="other">(</span><span class="other">1</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="319" xml:space="preserve"><span class="lineNumber">319</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_singleThreadedCompile_05EA88300E18218CF30DFB8F0194DACF6B7BDDE1">singleThreadedCompile</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="320" xml:space="preserve"><span class="lineNumber">320</span>&nbsp;<span class="pp">#endif</span></span>
+  <br/>
+  <span class="code" id="321" xml:space="preserve"><span class="lineNumber">321</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">file</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">files</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="322" xml:space="preserve"><span class="lineNumber">322</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="323" xml:space="preserve"><span class="lineNumber">323</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">path</span>&nbsp;<span class="identifier">fp</span><span class="other">(</span><span class="identifier">file</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="324" xml:space="preserve"><span class="lineNumber">324</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="string">".cms"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="325" xml:space="preserve"><span class="lineNumber">325</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="326" xml:space="preserve"><span class="lineNumber">326</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_msbuild_7A6664F5DF9DA98D959B7E158BE91EEF55910AFA">msbuild</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="327" xml:space="preserve"><span class="lineNumber">327</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="328" xml:space="preserve"><span class="lineNumber">328</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"solution&nbsp;file&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;&nbsp;cannot&nbsp;be&nbsp;given&nbsp;in&nbsp;--msbuild&nbsp;mode"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="329" xml:space="preserve"><span class="lineNumber">329</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="330" xml:space="preserve"><span class="lineNumber">330</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">exists</span><span class="other">(</span><span class="identifier">fp</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="331" xml:space="preserve"><span class="lineNumber">331</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="332" xml:space="preserve"><span class="lineNumber">332</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"solution&nbsp;file&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;not&nbsp;found"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="333" xml:space="preserve"><span class="lineNumber">333</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="334" xml:space="preserve"><span class="lineNumber">334</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="335" xml:space="preserve"><span class="lineNumber">335</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="336" xml:space="preserve"><span class="lineNumber">336</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BuildSolution</span><span class="other">(</span><span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">rootModules</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="337" xml:space="preserve"><span class="lineNumber">337</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="338" xml:space="preserve"><span class="lineNumber">338</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="339" xml:space="preserve"><span class="lineNumber">339</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="string">".cmp"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="340" xml:space="preserve"><span class="lineNumber">340</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="341" xml:space="preserve"><span class="lineNumber">341</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_msbuild_7A6664F5DF9DA98D959B7E158BE91EEF55910AFA">msbuild</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="342" xml:space="preserve"><span class="lineNumber">342</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="343" xml:space="preserve"><span class="lineNumber">343</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"project&nbsp;file&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;&nbsp;cannot&nbsp;be&nbsp;given&nbsp;in&nbsp;--msbuild&nbsp;mode"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="344" xml:space="preserve"><span class="lineNumber">344</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="345" xml:space="preserve"><span class="lineNumber">345</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">exists</span><span class="other">(</span><span class="identifier">fp</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="346" xml:space="preserve"><span class="lineNumber">346</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="347" xml:space="preserve"><span class="lineNumber">347</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"project&nbsp;file&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;not&nbsp;found"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="348" xml:space="preserve"><span class="lineNumber">348</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="349" xml:space="preserve"><span class="lineNumber">349</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="350" xml:space="preserve"><span class="lineNumber">350</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="351" xml:space="preserve"><span class="lineNumber">351</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BuildProject</span><span class="other">(</span><span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">rootModule</span><span class="other">,&nbsp;</span><span class="identifier">builtProjects</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="352" xml:space="preserve"><span class="lineNumber">352</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="353" xml:space="preserve"><span class="lineNumber">353</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="354" xml:space="preserve"><span class="lineNumber">354</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="string">".cm"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="355" xml:space="preserve"><span class="lineNumber">355</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="356" xml:space="preserve"><span class="lineNumber">356</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_msbuild_7A6664F5DF9DA98D959B7E158BE91EEF55910AFA">msbuild</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="357" xml:space="preserve"><span class="lineNumber">357</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="358" xml:space="preserve"><span class="lineNumber">358</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">path</span>&nbsp;<span class="identifier">f</span><span class="other">(</span><span class="identifier">projectDirectory</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="359" xml:space="preserve"><span class="lineNumber">359</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">f</span><span class="other">&nbsp;/=&nbsp;</span><span class="identifier">fp</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="360" xml:space="preserve"><span class="lineNumber">360</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">exists</span><span class="other">(</span><span class="identifier">f</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="361" xml:space="preserve"><span class="lineNumber">361</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="362" xml:space="preserve"><span class="lineNumber">362</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"source&nbsp;file&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">f</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;not&nbsp;found"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="363" xml:space="preserve"><span class="lineNumber">363</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="364" xml:space="preserve"><span class="lineNumber">364</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="365" xml:space="preserve"><span class="lineNumber">365</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="366" xml:space="preserve"><span class="lineNumber">366</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">sourceFiles</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">f</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="367" xml:space="preserve"><span class="lineNumber">367</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="368" xml:space="preserve"><span class="lineNumber">368</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="369" xml:space="preserve"><span class="lineNumber">369</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="370" xml:space="preserve"><span class="lineNumber">370</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="371" xml:space="preserve"><span class="lineNumber">371</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"single&nbsp;.cm&nbsp;source&nbsp;file&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;cannot&nbsp;be&nbsp;given&nbsp;if&nbsp;not&nbsp;in&nbsp;--msbuild&nbsp;mode"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="372" xml:space="preserve"><span class="lineNumber">372</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="373" xml:space="preserve"><span class="lineNumber">373</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="374" xml:space="preserve"><span class="lineNumber">374</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="375" xml:space="preserve"><span class="lineNumber">375</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="376" xml:space="preserve"><span class="lineNumber">376</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_msbuild_7A6664F5DF9DA98D959B7E158BE91EEF55910AFA">msbuild</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="377" xml:space="preserve"><span class="lineNumber">377</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="378" xml:space="preserve"><span class="lineNumber">378</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"Argument&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;has&nbsp;invalid&nbsp;extension.&nbsp;Not&nbsp;Cmajor&nbsp;source&nbsp;(.cm)&nbsp;file."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="379" xml:space="preserve"><span class="lineNumber">379</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="380" xml:space="preserve"><span class="lineNumber">380</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="381" xml:space="preserve"><span class="lineNumber">381</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="382" xml:space="preserve"><span class="lineNumber">382</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"Argument&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">fp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;has&nbsp;invalid&nbsp;extension.&nbsp;Not&nbsp;Cmajor&nbsp;solution&nbsp;(.cms)&nbsp;or&nbsp;project&nbsp;(.cmp)&nbsp;file."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="383" xml:space="preserve"><span class="lineNumber">383</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="384" xml:space="preserve"><span class="lineNumber">384</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="385" xml:space="preserve"><span class="lineNumber">385</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="386" xml:space="preserve"><span class="lineNumber">386</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">rootModule</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">!</span><span class="identifier">rootModule</span><span class="other">-></span><span class="identifier">WarningCollection</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Warnings</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="387" xml:space="preserve"><span class="lineNumber">387</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="388" xml:space="preserve"><span class="lineNumber">388</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_quiet_B040D015E8610BC7D3391E4A0D3B0E21477258DB">quiet</a><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">!</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_ide_567E31207730F5E3A59D0EF0441BB8A08CC74ED8">ide</a><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">!</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_msbuild_7A6664F5DF9DA98D959B7E158BE91EEF55910AFA">msbuild</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="389" xml:space="preserve"><span class="lineNumber">389</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="390" xml:space="preserve"><span class="lineNumber">390</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="391" xml:space="preserve"><span class="lineNumber">391</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_ide_567E31207730F5E3A59D0EF0441BB8A08CC74ED8">ide</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="392" xml:space="preserve"><span class="lineNumber">392</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="393" xml:space="preserve"><span class="lineNumber">393</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">></span>&nbsp;<span class="identifier">compileResult</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../../../../soulng/util/html/content/class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="394" xml:space="preserve"><span class="lineNumber">394</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">compileResult</span><span class="other">-></span><span class="identifier">AddField</span><span class="other">(</span><span class="string">U"success"</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../../../../soulng/util/html/content/class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">(</span><span class="kw">true</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="395" xml:space="preserve"><span class="lineNumber">395</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cerr</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">compileResult</span><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="396" xml:space="preserve"><span class="lineNumber">396</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="397" xml:space="preserve"><span class="lineNumber">397</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="398" xml:space="preserve"><span class="lineNumber">398</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_ide_567E31207730F5E3A59D0EF0441BB8A08CC74ED8">ide</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="399" xml:space="preserve"><span class="lineNumber">399</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="400" xml:space="preserve"><span class="lineNumber">400</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">></span>&nbsp;<span class="identifier">compileResult</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../../../../soulng/util/html/content/class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="401" xml:space="preserve"><span class="lineNumber">401</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">compileResult</span><span class="other">-></span><span class="identifier">AddField</span><span class="other">(</span><span class="string">U"success"</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../../../../soulng/util/html/content/class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">(</span><span class="kw">true</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="402" xml:space="preserve"><span class="lineNumber">402</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cerr</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">compileResult</span><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="403" xml:space="preserve"><span class="lineNumber">403</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="404" xml:space="preserve"><span class="lineNumber">404</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_time_E96D5028662574080CB31CB98BE9594CAB9E4B87">time</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="405" xml:space="preserve"><span class="lineNumber">405</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="406" xml:space="preserve"><span class="lineNumber">406</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">time_point</span>&nbsp;<span class="identifier">end</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="407" xml:space="preserve"><span class="lineNumber">407</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">dur</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">end</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">start</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="408" xml:space="preserve"><span class="lineNumber">408</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">long</span>&nbsp;<span class="kw">long</span>&nbsp;<span class="identifier">totalSecs</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="type">duration_cast</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">seconds</span><span class="other">></span><span class="other">(</span><span class="identifier">dur</span><span class="other">)</span><span class="other">.</span><span class="identifier">count</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="409" xml:space="preserve"><span class="lineNumber">409</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">hours</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">totalSecs</span><span class="other">&nbsp;/&nbsp;</span><span class="other">3600</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="410" xml:space="preserve"><span class="lineNumber">410</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">mins</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="other">(</span><span class="identifier">totalSecs</span><span class="other">&nbsp;/&nbsp;</span><span class="other">60</span><span class="other">)</span><span class="other">&nbsp;%&nbsp;</span><span class="other">60</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="411" xml:space="preserve"><span class="lineNumber">411</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">secs</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">totalSecs</span><span class="other">&nbsp;%&nbsp;</span><span class="other">60</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="412" xml:space="preserve"><span class="lineNumber">412</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cout</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="413" xml:space="preserve"><span class="lineNumber">413</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">(</span><span class="identifier">hours</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">&nbsp;?&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">hours</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"&nbsp;hour"</span><span class="other">&nbsp;+&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">hours</span><span class="other">&nbsp;!=&nbsp;</span><span class="other">1</span><span class="other">)</span><span class="other">&nbsp;?&nbsp;</span><span class="string">"s&nbsp;"</span><span class="other">&nbsp;:&nbsp;</span><span class="string">"&nbsp;"</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="string">""</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="414" xml:space="preserve"><span class="lineNumber">414</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">(</span><span class="identifier">mins</span><span class="other">&nbsp;>&nbsp;</span><span class="other">0</span><span class="other">&nbsp;?&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">mins</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"&nbsp;minute"</span><span class="other">&nbsp;+&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">mins</span><span class="other">&nbsp;!=&nbsp;</span><span class="other">1</span><span class="other">)</span><span class="other">&nbsp;?&nbsp;</span><span class="string">"s&nbsp;"</span><span class="other">&nbsp;:&nbsp;</span><span class="string">"&nbsp;"</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="string">""</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span></span>
+  <br/>
+  <span class="code" id="415" xml:space="preserve"><span class="lineNumber">415</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">secs</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"&nbsp;second"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">secs</span><span class="other">&nbsp;!=&nbsp;</span><span class="other">1</span><span class="other">)</span><span class="other">&nbsp;?&nbsp;</span><span class="string">"s"</span><span class="other">&nbsp;:&nbsp;</span><span class="string">""</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="416" xml:space="preserve"><span class="lineNumber">416</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="417" xml:space="preserve"><span class="lineNumber">417</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="418" xml:space="preserve"><span class="lineNumber">418</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="419" xml:space="preserve"><span class="lineNumber">419</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../soulng/lexer/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../soulng/lexer/html/content/namespace_lexer_B617309FB5F11FACD97A0C90702D495D1129C158.html">lexer</a><span class="other">::</span><a href="../../../../soulng/lexer/html/content/class_ParsingException_C05BE8706ACC70FB02C23EFE70DEE67A790A310B.html">ParsingException</a><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="420" xml:space="preserve"><span class="lineNumber">420</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="421" xml:space="preserve"><span class="lineNumber">421</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_quiet_B040D015E8610BC7D3391E4A0D3B0E21477258DB">quiet</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="422" xml:space="preserve"><span class="lineNumber">422</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="423" xml:space="preserve"><span class="lineNumber">423</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cerr</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="424" xml:space="preserve"><span class="lineNumber">424</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="425" xml:space="preserve"><span class="lineNumber">425</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="426" xml:space="preserve"><span class="lineNumber">426</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="427" xml:space="preserve"><span class="lineNumber">427</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../symbols/html/content/class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="428" xml:space="preserve"><span class="lineNumber">428</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="429" xml:space="preserve"><span class="lineNumber">429</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_quiet_B040D015E8610BC7D3391E4A0D3B0E21477258DB">quiet</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="430" xml:space="preserve"><span class="lineNumber">430</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="431" xml:space="preserve"><span class="lineNumber">431</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cerr</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">What</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="432" xml:space="preserve"><span class="lineNumber">432</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="433" xml:space="preserve"><span class="lineNumber">433</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="434" xml:space="preserve"><span class="lineNumber">434</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="435" xml:space="preserve"><span class="lineNumber">435</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="436" xml:space="preserve"><span class="lineNumber">436</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="437" xml:space="preserve"><span class="lineNumber">437</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../../../../symbols/html/content/enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_quiet_B040D015E8610BC7D3391E4A0D3B0E21477258DB">quiet</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="438" xml:space="preserve"><span class="lineNumber">438</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="439" xml:space="preserve"><span class="lineNumber">439</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">cerr</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">endl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="440" xml:space="preserve"><span class="lineNumber">440</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="441" xml:space="preserve"><span class="lineNumber">441</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="442" xml:space="preserve"><span class="lineNumber">442</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="443" xml:space="preserve"><span class="lineNumber">443</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="444" xml:space="preserve"><span class="lineNumber">444</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

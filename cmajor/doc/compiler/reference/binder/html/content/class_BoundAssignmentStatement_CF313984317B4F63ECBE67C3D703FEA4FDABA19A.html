@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#276">276</a>
-             of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            Definition at line <a href="file/BoundStatement.hpp_71E60617D1E1F607E5CC31C6FBA83EF4E8340277.html#276">276</a>
+             of <a href="file/BoundStatement.hpp_71E60617D1E1F607E5CC31C6FBA83EF4E8340277.html">BoundStatement.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundAssignmentStatement_CF313984317B4F63ECBE67C3D703FEA4FDABA19A.html#constructor_BoundAssignmentStatement_1AAC499F03A0F38BFA7DACB14B661E72C2AE8441">BoundAssignmentStatement</a>(Module* module_, std::unique_ptr&lt;<a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>>&amp;&amp; assignmentCall_, <span class="kw">const </span>Span&amp; span)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundAssignmentStatement_CF313984317B4F63ECBE67C3D703FEA4FDABA19A.html#constructor_BoundAssignmentStatement_829DD39385B06D538F252824C1983BA3F3F0A5F4">BoundAssignmentStatement</a>(std::unique_ptr&lt;<a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>>&amp;&amp; assignmentCall_, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -46,26 +46,33 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_BoundAssignmentStatement_1AAC499F03A0F38BFA7DACB14B661E72C2AE8441">BoundAssignmentStatement Constructor</h3>
+        <h3 id="constructor_BoundAssignmentStatement_829DD39385B06D538F252824C1983BA3F3F0A5F4">BoundAssignmentStatement Constructor</h3>
         <h4>
-            cmajor::binder::BoundAssignmentStatement::BoundAssignmentStatement(Module* module_, std::unique_ptr&lt;<a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>
+            cmajor::binder::BoundAssignmentStatement::BoundAssignmentStatement(std::unique_ptr&lt;<a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>
             >&amp;&amp; assignmentCall_, <span class="kw">const </span>
-            Span&amp; span)</h4>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId_)</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#291">291</a>
-             of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            Definition at line <a href="file/BoundStatement.cpp_0EB65C660870D5B5A28F76FDE0BCC56E38116903.html#292">292</a>
+             of <a href="file/BoundStatement.cpp_0EB65C660870D5B5A28F76FDE0BCC56E38116903.html">BoundStatement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">291</span>&nbsp;<span class="other">:</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">292</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">292</span>&nbsp;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a><span class="other">(</span><span class="identifier">module_</span><span class="other">,&nbsp;</span><span class="identifier">span</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundAssignmentStatement_F3DEE6683D499A00ADBC87AB1E9254AB0E9FFC0E">boundAssignmentStatement</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundAssignmentStatement_CF313984317B4F63ECBE67C3D703FEA4FDABA19A.html#variable_assignmentCall_A00E7AA86AD9A64D3F6D6EFB45CEE06CE2DACC96">assignmentCall</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">assignmentCall_</span><span class="other">)</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">293</span>&nbsp;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a><span class="other">(</span><span class="identifier">span</span><span class="other">,&nbsp;</span><span class="identifier">moduleId_</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundAssignmentStatement_F3DEE6683D499A00ADBC87AB1E9254AB0E9FFC0E">boundAssignmentStatement</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundAssignmentStatement_CF313984317B4F63ECBE67C3D703FEA4FDABA19A.html#variable_assignmentCall_A00E7AA86AD9A64D3F6D6EFB45CEE06CE2DACC96">assignmentCall</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">assignmentCall_</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">293</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">294</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">294</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">295</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/BoundStatement.hpp_71E60617D1E1F607E5CC31C6FBA83EF4E8340277.html#279">279</a>
+             of <a href="file/BoundStatement.hpp_71E60617D1E1F607E5CC31C6FBA83EF4E8340277.html">BoundStatement.hpp</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -76,22 +83,22 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#296">296</a>
-             of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            Definition at line <a href="file/BoundStatement.cpp_0EB65C660870D5B5A28F76FDE0BCC56E38116903.html#297">297</a>
+             of <a href="file/BoundStatement.cpp_0EB65C660870D5B5A28F76FDE0BCC56E38116903.html">BoundStatement.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">297</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">298</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">298</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">299</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">299</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">300</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#280">280</a>
-             of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            Declaration at line <a href="file/BoundStatement.hpp_71E60617D1E1F607E5CC31C6FBA83EF4E8340277.html#280">280</a>
+             of <a href="file/BoundStatement.hpp_71E60617D1E1F607E5CC31C6FBA83EF4E8340277.html">BoundStatement.hpp</a>
         </span>
         <br/>
         <br/>
@@ -111,8 +118,8 @@
             <a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>
             * cmajor::binder::BoundAssignmentStatement::AssignmentCall()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#281">281</a>
-             of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            Definition at line <a href="file/BoundStatement.hpp_71E60617D1E1F607E5CC31C6FBA83EF4E8340277.html#281">281</a>
+             of <a href="file/BoundStatement.hpp_71E60617D1E1F607E5CC31C6FBA83EF4E8340277.html">BoundStatement.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundAssignmentStatement_CF313984317B4F63ECBE67C3D703FEA4FDABA19A.html#variable_assignmentCall_A00E7AA86AD9A64D3F6D6EFB45CEE06CE2DACC96">assignmentCall</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>

@@ -9,28 +9,28 @@
         <a href="../../../compiler-projects.html">top</a>
          | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
          | <a href="class_ByteTypeSymbol_A37B4D4F1D5EA111842B9A8C8A5F544C4267A1BE.html">prev</a>
-         | <a href="class_CannotAssignToConstOverloadException_4BD4893331BF0A01E1660A86442C12896BB79936.html">next</a>
+         | <a href="struct_CCComponent_DC673F151283EC5A482B544C37E587EC54003F21.html">next</a>
         <hr/>
         <h1>ByteValue Abstract Class</h1>
         <div class="diagram">
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#99">99</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#101">101</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#constructor_ByteValue_730E6AE90822E4D20CD758715E49F63C8CAD1EF9">ByteValue</a>(<span class="kw">const </span>Span&amp; span_, uint8_t value_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#constructor_ByteValue_53EB47B4B54CB151AE6DDE013395485B94CE821F">ByteValue</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId_, uint8_t value_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
         <table class="functionTable">
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#function_As_1DCED04AE2BB4C1823507DE6213705EB1EB5B6E0">As</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* targetType, <span class="kw">bool</span> cast, <span class="kw">const </span>Span&amp; span, <span class="kw">bool</span> dontThrow) <span class="kw">const</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#function_As_B3E11DA12DE3E3838A782FFF861C2B901F4AA57D">As</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* targetType, <span class="kw">bool</span> cast, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId, <span class="kw">bool</span> dontThrow) <span class="kw">const</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><span class="kw">char</span>*</td>
@@ -81,16 +81,17 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_ByteValue_730E6AE90822E4D20CD758715E49F63C8CAD1EF9">ByteValue Constructor</h3>
+        <h3 id="constructor_ByteValue_53EB47B4B54CB151AE6DDE013395485B94CE821F">ByteValue Constructor</h3>
         <h4>
             cmajor::symbols::ByteValue::ByteValue(<span class="kw">const </span>
-            Span&amp; span_, uint8_t value_)</h4>
+            Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId_, uint8_t value_)</h4>
         <span>
-            Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#748">748</a>
-             of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html#748">748</a>
+             of <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html">Value.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;748</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a><span class="other">::</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html#enumerator_byteValue_B031DF220AFBB061F5101D236F532A414788CBE6">byteValue</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#variable_value_3CEC17E34983AB4356DFC40D325B1FDE4A0934D2">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;748</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">moduleId_</span><span class="other">,&nbsp;</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a><span class="other">::</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html#enumerator_byteValue_B031DF220AFBB061F5101D236F532A414788CBE6">byteValue</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#variable_value_3CEC17E34983AB4356DFC40D325B1FDE4A0934D2">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;749</span>&nbsp;<span class="other">{</span></span>
                 <br/>
@@ -101,18 +102,19 @@
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
-        <h3 id="function_As_1DCED04AE2BB4C1823507DE6213705EB1EB5B6E0">As Member Function</h3>
+        <h3 id="function_As_B3E11DA12DE3E3838A782FFF861C2B901F4AA57D">As Member Function</h3>
         <h4>
             <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             * cmajor::symbols::ByteValue::As(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * targetType, <span class="kw">bool</span>
              cast, <span class="kw">const </span>
-            Span&amp; span, <span class="kw">bool</span>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId, <span class="kw">bool</span>
              dontThrow) <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#767">767</a>
-             of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html#767">767</a>
+             of <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html">Value.cpp</a>
         </span>
         <br/>
         <br/>
@@ -130,11 +132,11 @@
             * cmajor::symbols::ByteValue::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#112">112</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#114">114</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ByteValue"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ByteValue"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -151,11 +153,11 @@
             * cmajor::symbols::ByteValue::Clone() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#104">104</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#106">106</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html">ByteValue</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#variable_value_3CEC17E34983AB4356DFC40D325B1FDE4A0934D2">value</a><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html">ByteValue</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#variable_value_3CEC17E34983AB4356DFC40D325B1FDE4A0934D2">value</a><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -167,6 +169,7 @@
         <br/>
         <span>
             Calls: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_GetSpan_298331B4DAC2019B8DFAE1A1384F1E7AA3D5EF8A">cmajor::symbols::Value::GetSpan</a>
+            , <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_ModuleId_DF7AD32E0EB819073A4CCFD23306ECB6F7823065">cmajor::symbols::Value::ModuleId</a>
         </span>
         <br/>
         <br/>
@@ -178,8 +181,8 @@
             * symbolTable) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#911">911</a>
-             of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html#911">911</a>
+             of <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html">Value.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;912</span>&nbsp;<span class="other">{</span></span>
@@ -192,8 +195,8 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#110">110</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Declaration at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#112">112</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -213,11 +216,11 @@
             uint8_t cmajor::symbols::ByteValue::GetValue() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#111">111</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#113">113</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#variable_value_3CEC17E34983AB4356DFC40D325B1FDE4A0934D2">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#variable_value_3CEC17E34983AB4356DFC40D325B1FDE4A0934D2">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -228,8 +231,8 @@
             <span class="kw">void</span>
             * cmajor::symbols::ByteValue::IrValue(Emitter&amp; emitter)</h4>
         <span>
-            Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#752">752</a>
-             of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html#752">752</a>
+             of <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html">Value.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;753</span>&nbsp;<span class="other">{</span></span>
@@ -248,8 +251,8 @@
              cmajor::symbols::ByteValue::Read(BinaryReader&amp; reader) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#762">762</a>
-             of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html#762">762</a>
+             of <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html">Value.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;763</span>&nbsp;<span class="other">{</span></span>
@@ -262,8 +265,8 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#107">107</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Declaration at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#109">109</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -278,11 +281,11 @@
             std::string cmajor::symbols::ByteValue::ToString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#109">109</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#111">111</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#variable_value_3CEC17E34983AB4356DFC40D325B1FDE4A0934D2">value</a><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#variable_value_3CEC17E34983AB4356DFC40D325B1FDE4A0934D2">value</a><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -299,8 +302,8 @@
              cmajor::symbols::ByteValue::Write(BinaryWriter&amp; writer) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#757">757</a>
-             of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html#757">757</a>
+             of <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html">Value.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;758</span>&nbsp;<span class="other">{</span></span>
@@ -313,8 +316,8 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#106">106</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Declaration at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#108">108</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -337,6 +340,6 @@
         <a href="../../../compiler-projects.html">top</a>
          | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
          | <a href="class_ByteTypeSymbol_A37B4D4F1D5EA111842B9A8C8A5F544C4267A1BE.html">prev</a>
-         | <a href="class_CannotAssignToConstOverloadException_4BD4893331BF0A01E1660A86442C12896BB79936.html">next</a>
+         | <a href="struct_CCComponent_DC673F151283EC5A482B544C37E587EC54003F21.html">next</a>
     </body>
 </html>

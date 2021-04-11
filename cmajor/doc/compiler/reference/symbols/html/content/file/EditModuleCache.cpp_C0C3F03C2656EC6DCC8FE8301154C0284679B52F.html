@@ -1,0 +1,324 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/EditModuleCache.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/GlobalFlags.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/ModuleCache.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/MappedInputFile.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Sha1.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">symbols</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="identifier">ReadProjectFunc</span>&nbsp;<span class="identifier">readProjectFunction</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_SetReadProjectFunction_E0E2EE6F4360657C8EBE47AAFFD68FE25D549B20">SetReadProjectFunction</a><span class="other">(</span><span class="identifier">ReadProjectFunc</span>&nbsp;<span class="identifier">readProjectFunc</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#variable_readProjectFunction_DA8330BF5E9FDFF8EEEA0EB79D3877C4635BCA0B">readProjectFunction</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">readProjectFunc</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_MakeEditModuleKey_CE97D6C5D80953BE29F85C6484E42A9F4D01203B">MakeEditModuleKey</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">projectFilePath</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">backendStr</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">configurationStr</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">editModuleKey</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">projectFilePath</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">editModuleKey</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">":"</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">backendStr</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">":"</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">configurationStr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">editModuleKey</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">toolChainsRead</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">EditModuleCache</span><span class="other">></span>&nbsp;<span class="identifier">EditModuleCache</span><span class="other">::</span><span class="identifier">instance</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html">EditModuleCache</a><span class="other">::</span><a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#function_Init_2C8708EED92942E4107092FBC404CCCE7A7BFD6C">Init</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_instance_6B16BC73B01DF37573BC8B3585966A5B03457DCC">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html">EditModuleCache</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html">EditModuleCache</a><span class="other">::</span><a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#function_Done_039213DBD1CE8C430156F22932990C2BCDD098C4">Done</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_instance_6B16BC73B01DF37573BC8B3585966A5B03457DCC">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html">EditModuleCache</a><span class="other">::</span><a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#constructor_EditModuleCache_41DEAFC2FA7D54C7B5B570EE2D94186A1A3BA5EB">EditModuleCache</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html">LoadEditModuleResult</a>&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html">EditModuleCache</a><span class="other">::</span><a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#function_LoadEditModule_932D3BF3DEE210BE58523A7EFFE999BE317F3639">LoadEditModule</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">projectFilePath</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">backendStr</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">configurationStr</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html">LoadEditModuleResult</a>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_ok_B904E563FB26909A84D2C6790829F35608D1234D">ok</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_error_7922A182D5CF008FC203A6AFAA0AB71C26B06533">error</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_startLoading_FACD0A353615700DD3918F9D21CC0626F327E5B3">startLoading</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_resultKind_5F37AA3A9FADBA189F78E830B699C32EEDE0A6C1">resultKind</a><span class="other">&nbsp;=&nbsp;</span><a href="../enum_LoadEditModuleResultKind_DD30E368CF8B9008E6334BA4CC86325BD3E7D75F.html">LoadEditModuleResultKind</a><span class="other">::</span><a href="../enum_LoadEditModuleResultKind_DD30E368CF8B9008E6334BA4CC86325BD3E7D75F.html#enumerator_moduleLoaded_1E4920659A7A8869E4594307D6D518F8F8C9A159">moduleLoaded</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><span class="identifier">ResetGlobalFlags</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">projectFileContent</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadFile</span><span class="other">(</span><span class="identifier">projectFilePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">projectFileHash</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">GetSha1MessageDigest</span><span class="other">(</span><span class="identifier">projectFileContent</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">index</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_editModules_4B9A4EA5C15661E5CCE819642971BD99734C64F8">editModules</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">editModuleKey</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">MakeEditModuleKey</span><span class="other">(</span><span class="identifier">projectFilePath</span><span class="other">,&nbsp;</span><span class="identifier">backendStr</span><span class="other">,&nbsp;</span><span class="identifier">configurationStr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_key_C4A0C97B0CB95292A66F69355B462A4D146626E8">key</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">editModuleKey</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_editModuleMap_362964424ED7AC0E9D93BB17160F75E93A9D3F23">editModuleMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">editModuleKey</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_editModuleMap_362964424ED7AC0E9D93BB17160F75E93A9D3F23">editModuleMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">pair</span><span class="other">&lt;</span><a href="../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">*</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">moduleHashPair</span><span class="other">=</span><span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">prevHash</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">moduleHashPair</span><span class="other">.</span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">prevHash</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">projectFileHash</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_resultKind_5F37AA3A9FADBA189F78E830B699C32EEDE0A6C1">resultKind</a><span class="other">&nbsp;=&nbsp;</span><a href="../enum_LoadEditModuleResultKind_DD30E368CF8B9008E6334BA4CC86325BD3E7D75F.html">LoadEditModuleResultKind</a><span class="other">::</span><a href="../enum_LoadEditModuleResultKind_DD30E368CF8B9008E6334BA4CC86325BD3E7D75F.html#enumerator_moduleUpToDate_881433EE439F9A9224EEE764DBFC38E32D8B2294">moduleUpToDate</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_endLoading_A50FC73C3EEB4ADB134345B05513B1340E9F1CE3">endLoading</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">*</span>&nbsp;<span class="identifier">module</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">moduleHashPair</span><span class="other">.</span><span class="identifier">first</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">index</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">module</span><span class="other">-></span><span class="identifier">Index</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_resultKind_5F37AA3A9FADBA189F78E830B699C32EEDE0A6C1">resultKind</a><span class="other">&nbsp;=&nbsp;</span><a href="../enum_LoadEditModuleResultKind_DD30E368CF8B9008E6334BA4CC86325BD3E7D75F.html">LoadEditModuleResultKind</a><span class="other">::</span><a href="../enum_LoadEditModuleResultKind_DD30E368CF8B9008E6334BA4CC86325BD3E7D75F.html#enumerator_moduleReloaded_691C3485D6F9459C323D7790BDF34C196D5CDEDB">moduleReloaded</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#variable_toolChainsRead_11F46EA58CC1F3B1027DFF8FACDF3077E00006EF">toolChainsRead</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#variable_toolChainsRead_11F46EA58CC1F3B1027DFF8FACDF3077E00006EF">toolChainsRead</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ReadToolChains</span><span class="other">(</span><span class="identifier">GetGlobalFlag</span><span class="other">(</span><a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><a href="../enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_verbose_6F5F08723B4C41C0C0725C69A0C2FC87AEE1C701">verbose</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ResetToolChain</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html">BackEnd</a>&nbsp;<span class="identifier">backend</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html">BackEnd</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html#enumerator_llvm_54F125AE8929535F83872C4B5915DD04805BB88D">llvm</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">backendStr</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"cpp"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">backend</span><span class="other">&nbsp;=&nbsp;</span><a href="../../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html">BackEnd</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html#enumerator_cppcm_0FFB6F4E1CC65E13B7EB223DE802AD1D8E82A378">cppcm</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetBackEnd</span><span class="other">(</span><a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><a href="../enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html">BackEnd</a><span class="other">::</span><a href="../enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html#enumerator_cmcpp_3AA0702D7F00DC4F5F54852FDD45A7D87201F8CA">cmcpp</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">backendStr</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"llvm"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">backend</span><span class="other">&nbsp;=&nbsp;</span><a href="../../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html">BackEnd</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html#enumerator_llvm_54F125AE8929535F83872C4B5915DD04805BB88D">llvm</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetBackEnd</span><span class="other">(</span><a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><a href="../enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html">BackEnd</a><span class="other">::</span><a href="../enum_BackEnd_15B40BD2138CC504967038D71C85657D2754C548.html#enumerator_llvm_D73498A79E8E90D775F08039D132007DFAEEF683">llvm</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_Config_9BD42A54F9D1C1EA24556BEAC7523CCF9A78D239.html">Config</a>&nbsp;<span class="identifier">config</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_Config_9BD42A54F9D1C1EA24556BEAC7523CCF9A78D239.html">Config</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_Config_9BD42A54F9D1C1EA24556BEAC7523CCF9A78D239.html#enumerator_debug_CCD44190D132A5722442F89EBC8CA749761F91FC">debug</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">configurationStr</span><span class="other">&nbsp;==&nbsp;</span><span class="string">"release"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><span class="identifier">SetGlobalFlag</span><span class="other">(</span><a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><a href="../enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html">GlobalFlags</a><span class="other">::</span><a href="../enum_GlobalFlags_967E4548FF511D5AA6E655A691A357303002CCED.html#enumerator_release_57C22A58CDBA95AD203F60F5EC829A90B27E3090">release</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">config</span><span class="other">&nbsp;=&nbsp;</span><a href="../../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_Config_9BD42A54F9D1C1EA24556BEAC7523CCF9A78D239.html">Config</a><span class="other">::</span><a href="../../../../sngcm/ast/html/content/enum_Config_9BD42A54F9D1C1EA24556BEAC7523CCF9A78D239.html#enumerator_release_17F0DE551AB34801A928873F96351A159C027408">release</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#variable_readProjectFunction_DA8330BF5E9FDFF8EEEA0EB79D3877C4635BCA0B">readProjectFunction</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_ok_B904E563FB26909A84D2C6790829F35608D1234D">ok</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_error_7922A182D5CF008FC203A6AFAA0AB71C26B06533">error</a><span class="other">&nbsp;=&nbsp;</span><span class="string">"read&nbsp;project&nbsp;function&nbsp;not&nbsp;set"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">Project</span><span class="other">></span>&nbsp;<span class="identifier">project</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#variable_readProjectFunction_DA8330BF5E9FDFF8EEEA0EB79D3877C4635BCA0B">readProjectFunction</a><span class="other">(</span><span class="identifier">projectFilePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">></span>&nbsp;<span class="identifier">module</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">(</span><span class="identifier">project</span><span class="other">-></span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">project</span><span class="other">-></span><span class="identifier">ModuleFilePath</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">project</span><span class="other">-></span><span class="identifier">GetTarget</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">module</span><span class="other">-></span><span class="identifier">SetIndex</span><span class="other">(</span><span class="identifier">index</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">module</span><span class="other">-></span><span class="identifier">SetRootModule</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetRootModuleForCurrentThread</span><span class="other">(</span><span class="identifier">module</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">module</span><span class="other">-></span><span class="identifier">SetLogStreamId</span><span class="other">(</span><span class="identifier">project</span><span class="other">-></span><span class="identifier">LogStreamId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">module</span><span class="other">-></span><span class="identifier">SetCurrentProjectName</span><span class="other">(</span><span class="identifier">project</span><span class="other">-></span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">module</span><span class="other">-></span><span class="identifier">SetCurrentToolName</span><span class="other">(</span><span class="string">U"cmccs"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">module</span><span class="other">-></span><span class="identifier">SetFlag</span><span class="other">(</span><a href="../namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">symbols</a><span class="other">::</span><a href="../enum_ModuleFlags_338749166A19EDC12D3EFCEB017DA5B27B27C184.html">ModuleFlags</a><span class="other">::</span><a href="../enum_ModuleFlags_338749166A19EDC12D3EFCEB017DA5B27B27C184.html#enumerator_compiling_26907774CC16188703B650EA95D4A5E691BE9312">compiling</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">PrepareModuleForCompilation</span><span class="other">(</span><span class="identifier">module</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">project</span><span class="other">-></span><span class="identifier">References</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">project</span><span class="other">-></span><span class="identifier">GetTarget</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">module</span><span class="other">-></span><span class="identifier">SetSources</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_Sources_057ADCA5EC1F93A4E401FAAD24CEA78A7EDC6B25.html">Sources</a><span class="other">(</span><span class="identifier">project</span><span class="other">-></span><span class="identifier">SourceFilePaths</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_ParseResult_87FC4A7225436A0E61C5124EE3FD9D905ED8C20C.html">ParseResult</a>&nbsp;<span class="identifier">parseResult</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">module</span><span class="other">-></span><span class="identifier">ParseSources</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_ok_B904E563FB26909A84D2C6790829F35608D1234D">ok</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">parseResult</span><span class="other">.</span><a href="../struct_ParseResult_87FC4A7225436A0E61C5124EE3FD9D905ED8C20C.html#variable_ok_34BC5317F6288BFD4B6A716D5BC887C4AF8D69D3">ok</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_numberOfErrors_70044B5A031237DF330248B0DEB11D935DA9B657">numberOfErrors</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">parseResult</span><span class="other">.</span><a href="../struct_ParseResult_87FC4A7225436A0E61C5124EE3FD9D905ED8C20C.html#variable_numberOfErrors_5A0A2132D67E7D0486964BA202D529A5175792CE">numberOfErrors</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_synchronized_34D92608B56AF9FAEA957B0458077B8CBB4BC385">synchronized</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">parseResult</span><span class="other">.</span><a href="../struct_ParseResult_87FC4A7225436A0E61C5124EE3FD9D905ED8C20C.html#variable_synchronized_ACA0D6D57D925BC6D177FBB0E11AF52C971E15AF">synchronized</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_error_7922A182D5CF008FC203A6AFAA0AB71C26B06533">error</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">parseResult</span><span class="other">.</span><a href="../struct_ParseResult_87FC4A7225436A0E61C5124EE3FD9D905ED8C20C.html#variable_error_A88911669A1D195EE70F8D976FDE32DF251C0EB7">error</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_startParsing_AA01581B98459C4A5687D484BE6B6EC7510112BD">startParsing</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">parseResult</span><span class="other">.</span><a href="../struct_ParseResult_87FC4A7225436A0E61C5124EE3FD9D905ED8C20C.html#variable_start_0A68308A5DCA3AD159ED3A3D97147B3B1CA9CEC1">start</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_endParsing_A5D550636465D6BD177CA4AE863FC79E7253DC88">endParsing</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">parseResult</span><span class="other">.</span><a href="../struct_ParseResult_87FC4A7225436A0E61C5124EE3FD9D905ED8C20C.html#variable_end_7792E47E596E5CDFABB330E14C39B31DDD60548A">end</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;>=&nbsp;</span><a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_editModules_4B9A4EA5C15661E5CCE819642971BD99734C64F8">editModules</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_editModules_4B9A4EA5C15661E5CCE819642971BD99734C64F8">editModules</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">></span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_editModuleMap_362964424ED7AC0E9D93BB17160F75E93A9D3F23">editModuleMap</a><span class="other">[</span><span class="identifier">editModuleKey</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">make_pair</span><span class="other">(</span><span class="identifier">module</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">projectFileHash</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_editModules_4B9A4EA5C15661E5CCE819642971BD99734C64F8">editModules</a><span class="other">[</span><span class="identifier">index</span><span class="other">]</span><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">module</span><span class="other">.</span><span class="identifier">release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><a href="../struct_LoadEditModuleResult_F8FE98F0D9F5E9D83F041DE274A370E13A1BF7C8.html#variable_endLoading_A50FC73C3EEB4ADB134345B05513B1340E9F1CE3">endLoading</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<a href="../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">*</span>&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html">EditModuleCache</a><span class="other">::</span><a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#function_GetEditModule_BE356829B533FDB71246E5B45183CB8DDAE5E85F">GetEditModule</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">projectFilePath</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">backendStr</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">configurationStr</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">editModuleKey</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">MakeEditModuleKey</span><span class="other">(</span><span class="identifier">projectFilePath</span><span class="other">,&nbsp;</span><span class="identifier">backendStr</span><span class="other">,&nbsp;</span><span class="identifier">configurationStr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_editModuleMap_362964424ED7AC0E9D93BB17160F75E93A9D3F23">editModuleMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">editModuleKey</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html#variable_editModuleMap_362964424ED7AC0E9D93BB17160F75E93A9D3F23">editModuleMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">.</span><span class="identifier">first</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_InitEditModuleCache_CE130988D100E1A68336377A0421E79BD2765584">InitEditModuleCache</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html">EditModuleCache</a><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html#function_DoneEditModuleCache_360DD2EC3600737C99D84B44D749966ECCA0EA7E">DoneEditModuleCache</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_EditModuleCache_250A17AE1BDDBB68C859AC472991EBA0CCC386EC.html">EditModuleCache</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::symbols</span></span>
+  <br/>
+ </body>
+</html>

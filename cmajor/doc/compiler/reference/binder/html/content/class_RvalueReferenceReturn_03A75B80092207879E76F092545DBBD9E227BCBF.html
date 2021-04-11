@@ -12,14 +12,14 @@
         <hr/>
         <h1>RvalueReferenceReturn Class</h1>
         <span>
-            Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#1467">1467</a>
-             of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
+            Definition at line <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html#1470">1470</a>
+             of <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html">OperationRepository.cpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_RvalueReferenceReturn_03A75B80092207879E76F092545DBBD9E227BCBF.html#constructor_RvalueReferenceReturn_F919CE7737B263E713E6020AC8960FABBCA6257C">RvalueReferenceReturn</a>(TypeSymbol* type_, <span class="kw">const </span>Span&amp; span)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_RvalueReferenceReturn_03A75B80092207879E76F092545DBBD9E227BCBF.html#constructor_RvalueReferenceReturn_407450FF1ECB5333A8CE80A50571A1B4C74342F9">RvalueReferenceReturn</a>(TypeSymbol* type_, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -34,7 +34,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_RvalueReferenceReturn_03A75B80092207879E76F092545DBBD9E227BCBF.html#function_GenerateCall_5B4D911626CC36FF713D2B9311807DB36AB6FEF7">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_RvalueReferenceReturn_03A75B80092207879E76F092545DBBD9E227BCBF.html#function_GenerateCall_E26E2055144028BF6205622D5E0568FCE2474CE5">GenerateCall</a>(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>Span&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -50,41 +50,19 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_RvalueReferenceReturn_F919CE7737B263E713E6020AC8960FABBCA6257C">RvalueReferenceReturn Constructor</h3>
+        <h3 id="constructor_RvalueReferenceReturn_407450FF1ECB5333A8CE80A50571A1B4C74342F9">RvalueReferenceReturn Constructor</h3>
         <h4>
             cmajor::binder::RvalueReferenceReturn::RvalueReferenceReturn(TypeSymbol* type_, <span class="kw">const </span>
-            Span&amp; span)</h4>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId)</h4>
         <span>
-            Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#1479">1479</a>
-             of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1479</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">FunctionSymbol</span><span class="other">(</span><span class="identifier">span</span><span class="other">,&nbsp;</span><span class="string">U"@return"</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_RvalueReferenceReturn_03A75B80092207879E76F092545DBBD9E227BCBF.html#variable_type_AF12A0858DA79A50B0B23E282348748401855642">type</a><span class="other">(</span><span class="identifier">type_</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1480</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1481</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGroupName</span><span class="other">(</span><span class="string">U"@return"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1482</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetAccess</span><span class="other">(</span><span class="identifier">SymbolAccess</span><span class="other">::</span><span class="identifier">public_</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1483</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ParameterSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">valueParam</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><span class="identifier">ParameterSymbol</span><span class="other">(</span><span class="identifier">span</span><span class="other">,&nbsp;</span><span class="string">U"value"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1484</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">valueParam</span><span class="other">-></span><span class="identifier">SetType</span><span class="other">(</span><a href="./class_RvalueReferenceReturn_03A75B80092207879E76F092545DBBD9E227BCBF.html#variable_type_AF12A0858DA79A50B0B23E282348748401855642">type</a><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1485</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddMember</span><span class="other">(</span><span class="identifier">valueParam</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1486</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetReturnType</span><span class="other">(</span><a href="./class_RvalueReferenceReturn_03A75B80092207879E76F092545DBBD9E227BCBF.html#variable_type_AF12A0858DA79A50B0B23E282348748401855642">type</a><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1487</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ComputeName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1488</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html#1482">1482</a>
+             of <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html">OperationRepository.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#1470">1470</a>
-             of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
+            Declaration at line <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html#1473">1473</a>
+             of <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html">OperationRepository.cpp</a>
         </span>
         <br/>
         <br/>
@@ -97,11 +75,11 @@
             * cmajor::binder::RvalueReferenceReturn::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#1474">1474</a>
-             of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
+            Definition at line <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html#1477">1477</a>
+             of <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html">OperationRepository.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1474</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"RvalueReferenceReturn"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1477</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"RvalueReferenceReturn"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -112,41 +90,42 @@
             SymbolAccess cmajor::binder::RvalueReferenceReturn::DeclaredAccess() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#1471">1471</a>
-             of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
+            Definition at line <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html#1474">1474</a>
+             of <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html">OperationRepository.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1471</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">SymbolAccess</span><span class="other">::</span><span class="identifier">public_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1474</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">SymbolAccess</span><span class="other">::</span><span class="identifier">public_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <hr/>
-        <h3 id="function_GenerateCall_5B4D911626CC36FF713D2B9311807DB36AB6FEF7">GenerateCall Member Function</h3>
+        <h3 id="function_GenerateCall_E26E2055144028BF6205622D5E0568FCE2474CE5">GenerateCall Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::binder::RvalueReferenceReturn::GenerateCall(Emitter&amp; emitter, std::vector&lt;GenObject*>&amp; genObjects, OperationFlags flags, <span class="kw">const </span>
-            Span&amp; span) <span class="kw">override</span>
+            Span&amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#1490">1490</a>
-             of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
+            Definition at line <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html#1494">1494</a>
+             of <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html">OperationRepository.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1491</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1495</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1492</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">genObjects</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"return&nbsp;needs&nbsp;one&nbsp;object"</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1496</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">genObjects</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"return&nbsp;needs&nbsp;one&nbsp;object"</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1493</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">genObjects</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">-></span><span class="identifier">Load</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="identifier">OperationFlags</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1497</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">genObjects</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">-></span><span class="identifier">Load</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="identifier">OperationFlags</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1494</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1498</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#1472">1472</a>
-             of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
+            Declaration at line <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html#1475">1475</a>
+             of <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html">OperationRepository.cpp</a>
         </span>
         <br/>
         <br/>
@@ -157,11 +136,11 @@
              cmajor::binder::RvalueReferenceReturn::IsBasicTypeOperation() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#1473">1473</a>
-             of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
+            Definition at line <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html#1476">1476</a>
+             of <a href="file/OperationRepository.cpp_6452D9EF29DF46E8EF1E4F185FABF73693FE0BAB.html">OperationRepository.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1473</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1476</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>

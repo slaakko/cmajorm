@@ -1,0 +1,124 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SNGXML_DOM_ELEMENT_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SNGXML_DOM_ELEMENT_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngxml/dom/Node.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;map></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">sngxml</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">dom</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html">Attr</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html#constructor_Attr_D1AE3F2EB298843BD702C3444B5448F53EE91A3F">Attr</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html#constructor_Attr_AF675F4DF61121ABBF7DEA3E4BAAAD9A5F460759">Attr</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Attr</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Attr</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Attr</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Attr</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Attr</span><span class="other">(</span><span class="identifier">Attr</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Attr</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">Attr</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span>&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html#function_CloneNode_9BFDCAC98C5C66FC918193176FEE15E73A3188A8">CloneNode</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">deep</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html#function_Write_4432FDED2A070DCF199A13C7732A505F27110CDB">Write</a><span class="other">(</span><span class="identifier">CodeFormatter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html#function_Value_E80F81FB21B5FB390ADC73F3A68F9C09EDD97FF8">Value</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html#variable_value_45FDB201C0D979F8E041C4964EDB9EBF52C9E115">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html#function_Value_7464F83195E18DA2506CC9774911572E5EEFAE59">Value</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html#variable_value_45FDB201C0D979F8E041C4964EDB9EBF52C9E115">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html#variable_value_45FDB201C0D979F8E041C4964EDB9EBF52C9E115">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_ParentNode_32EEAAD4A81494D922390069F0D2A62E62F636E6.html">ParentNode</a></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#constructor_Element_B96B5BE672D5C8C835CE7F918DE811239EF54622">Element</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#constructor_Element_7BE8DFBEA01C9E1C549A89BD71C0A9371DE5B856">Element</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html">Attr</a><span class="other">></span><span class="other">></span><span class="other">&amp;&amp;</span><span class="identifier">attributeMap_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Element</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Element</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Element</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">Element</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Element</span><span class="other">(</span><span class="identifier">Element</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Element</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">Element</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_CloneNode_FC5D4DC6041EBB243B41B7CFC47D5A176220B8A9">CloneNode</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">deep</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_TagName_1C04ACEFB687BA9AB7A27DFC7E3B5BF5DEF8B024">TagName</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_HasAttributes_9763DFFDAD0A9DAAB7F212D892B112EB0CAE76DA">HasAttributes</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_Write_97FCFF7AC97050DB8A7BAA0C4D2CC3422574E45A">Write</a><span class="other">(</span><span class="identifier">CodeFormatter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_GetAttribute_A956ED87F164978FE7E78D3341F55C950336A9E2">GetAttribute</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">attrName</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_AddAttribute_9E979641AF025352754F9D3E3AA8A24818C512B7">AddAttribute</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html">Attr</a><span class="other">></span><span class="other">&amp;&amp;</span><span class="identifier">attr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_SetAttribute_2EE78B6C6233A86AFBE33490E35F4B76470CF605">SetAttribute</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">attrName</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">attrValue</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_RemoveAttribute_6761C4F168BD6160C0945377585D6AA9ABA29281">RemoveAttribute</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">attrName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_WalkAttribute_3B62A62E0917224E9A626125779D83C1DD6C9234">WalkAttribute</a><span class="other">(</span><a href="../class_NodeOp_596E9ED551CF14B0767F0C3D6A559A59B25FF06B.html">NodeOp</a><span class="other">&amp;</span>&nbsp;<span class="identifier">nodeOp</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_NodeList_239E876DF76977B5F80705FF92011F467DB98C0F.html">NodeList</a>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_GetElementsByTagName_1EBA20BD20871E711E4AE6F80C7BB615A2E1548A">GetElementsByTagName</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">tagName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_Accept_C24BE355BA1C5832ED4E1FC2C5596B2BEE2EC1DD">Accept</a><span class="other">(</span><a href="../class_Visitor_549B96ACB368AD0D5131C27F98981FCD740BCCE0.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Attr_C5780CFC114F1695522620B2AB5B0A6080F9E78E.html">Attr</a><span class="other">></span><span class="other">></span><a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#variable_attributeMap_987E5EF06DDFC53F4885A0F4FD7ACD603342EF2B">attributeMap</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_WriteAttributes_E4B7FB1E7A63A30FC7640CDDD8CFCE0421EF300B">WriteAttributes</a><span class="other">(</span><span class="identifier">CodeFormatter</span><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html#function_HasMultilineContent_D286C70BC5BB5DDC0AA32945FBA73818C5DB10D9">HasMultilineContent</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;sngxml::dom</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SNGXML_DOM_ELEMENT_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

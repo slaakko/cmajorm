@@ -1,0 +1,154 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SNGXML_XPATH_XPATH_OBJECT</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SNGXML_XPATH_XPATH_OBJECT</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngxml/xpath/XPathApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngxml/dom/Node.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">sngxml</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">xpath</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">XPathObjectType</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">nodeSet</span><span class="other">,&nbsp;</span><span class="identifier">boolean</span><span class="other">,&nbsp;</span><span class="identifier">number</span><span class="other">,&nbsp;</span><span class="identifier">string</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html">XPathObject</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html#constructor_XPathObject_AF8913CA0B23AAFF899FC08077AFE71419C778A1">XPathObject</a><span class="other">(</span><a href="../enum_XPathObjectType_0D36BD493107D2BD601D8AABBD16C3E85880B349.html">XPathObjectType</a>&nbsp;<span class="identifier">type_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_XPathObjectType_0D36BD493107D2BD601D8AABBD16C3E85880B349.html">XPathObjectType</a>&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html#function_Type_44A175C2C50203E0BD25C7A1A2032616B25D47C3">Type</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html#variable_type_A3E9CD039A2C5580F1D6C64620610B21542251F6">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">XPathObject</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span>&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html#function_ToDom_3A657F0F11A5B5839670E8BFE03EB15A03CF9F5F">ToDom</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_XPathObjectType_0D36BD493107D2BD601D8AABBD16C3E85880B349.html">XPathObjectType</a>&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html#variable_type_A3E9CD039A2C5580F1D6C64620610B21542251F6">type</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_XPathNodeSet_A2CB16D859320AD7A0C61223797CBFB36D7F3474.html">XPathNodeSet</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html">XPathObject</a></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_XPathNodeSet_A2CB16D859320AD7A0C61223797CBFB36D7F3474.html#constructor_XPathNodeSet_D900D349B3090BD0BB95A84B73D75B7F743E57E0">XPathNodeSet</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="../../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">*</span>&nbsp;<span class="kw">operator</span><span class="other">[]</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">index</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_XPathNodeSet_A2CB16D859320AD7A0C61223797CBFB36D7F3474.html#variable_nodes_DBEF8F3C15CD4FC929442E80A6423C1398664295">nodes</a><span class="other">[</span><span class="identifier">index</span><span class="other">]</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<a href="../class_XPathNodeSet_A2CB16D859320AD7A0C61223797CBFB36D7F3474.html#function_Length_CF9CB2BD047AEE75DD259153F03E23DAFB8087E4">Length</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_XPathNodeSet_A2CB16D859320AD7A0C61223797CBFB36D7F3474.html#variable_nodes_DBEF8F3C15CD4FC929442E80A6423C1398664295">nodes</a><span class="other">.</span><span class="identifier">Length</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_XPathNodeSet_A2CB16D859320AD7A0C61223797CBFB36D7F3474.html#function_Add_D5261F1803AF3F75F01BE8B5E7C2B7D34FB58724">Add</a><span class="other">(</span><a href="../namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="../../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">node</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span>&nbsp;<a href="../class_XPathNodeSet_A2CB16D859320AD7A0C61223797CBFB36D7F3474.html#function_ToDom_5A76342BEF220D5FCCE1F54EAE21CD224E969734">ToDom</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="../../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../dom/html/content/class_NodeList_239E876DF76977B5F80705FF92011F467DB98C0F.html">NodeList</a>&nbsp;<a href="../class_XPathNodeSet_A2CB16D859320AD7A0C61223797CBFB36D7F3474.html#variable_nodes_DBEF8F3C15CD4FC929442E80A6423C1398664295">nodes</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_XPathBoolean_F510947E84BC707F5E1194A24809330E84F51574.html">XPathBoolean</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html">XPathObject</a></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_XPathBoolean_F510947E84BC707F5E1194A24809330E84F51574.html#constructor_XPathBoolean_4F6F767D014BAA89D322D1B8F849657B8B3D7CC3">XPathBoolean</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_XPathBoolean_F510947E84BC707F5E1194A24809330E84F51574.html#function_Value_9F9004ABE1F406540DE8D9360D1D45C02B97DD81">Value</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_XPathBoolean_F510947E84BC707F5E1194A24809330E84F51574.html#variable_value_05AB27504B0FFCB12FE13AE34C2B6BB64F5FF099">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span>&nbsp;<a href="../class_XPathBoolean_F510947E84BC707F5E1194A24809330E84F51574.html#function_ToDom_9BA2314444FCF1AA036F4B8804755AA02BDFEC28">ToDom</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_XPathBoolean_F510947E84BC707F5E1194A24809330E84F51574.html#variable_value_05AB27504B0FFCB12FE13AE34C2B6BB64F5FF099">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_XPathNumber_D99BEBB5FEBC4056A70E2B3C31ED48D11FD84AE3.html">XPathNumber</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html">XPathObject</a></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_XPathNumber_D99BEBB5FEBC4056A70E2B3C31ED48D11FD84AE3.html#constructor_XPathNumber_B64408479295B15D5E3915B21673650A9F22BC4A">XPathNumber</a><span class="other">(</span><span class="kw">double</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">double</span>&nbsp;<a href="../class_XPathNumber_D99BEBB5FEBC4056A70E2B3C31ED48D11FD84AE3.html#function_Value_5A929D5B1DB6388D02B79679FBE5676FFB39B88C">Value</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_XPathNumber_D99BEBB5FEBC4056A70E2B3C31ED48D11FD84AE3.html#variable_value_CD8C1373CEC40061AF80DF164D5F1606A08DDB77">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span>&nbsp;<a href="../class_XPathNumber_D99BEBB5FEBC4056A70E2B3C31ED48D11FD84AE3.html#function_ToDom_21BF1DDE7CBA42AAC3CFB83BD678CB130A996324">ToDom</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">double</span>&nbsp;<a href="../class_XPathNumber_D99BEBB5FEBC4056A70E2B3C31ED48D11FD84AE3.html#variable_value_CD8C1373CEC40061AF80DF164D5F1606A08DDB77">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_XPathString_E740106029E41791660762FC43872CE997577794.html">XPathString</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html">XPathObject</a></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_XPathString_E740106029E41791660762FC43872CE997577794.html#constructor_XPathString_1533D1E75B1FB430F587E42B6B6BCC01FAFBC7F1">XPathString</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<a href="../class_XPathString_E740106029E41791660762FC43872CE997577794.html#function_Value_B45B94A993D8E2ADAE5C8D5F282F683F3F3587C7">Value</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_XPathString_E740106029E41791660762FC43872CE997577794.html#variable_value_319E5FD605B7B3C85B9AD536B0B557C5B6629AFB">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="../../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span>&nbsp;<a href="../class_XPathString_E740106029E41791660762FC43872CE997577794.html#function_ToDom_FC5E71956D54C85CD351CB0F40E1A3CECAEEDF4B">ToDom</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<a href="../class_XPathString_E740106029E41791660762FC43872CE997577794.html#variable_value_319E5FD605B7B3C85B9AD536B0B557C5B6629AFB">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;sngxml::xpath</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SNGXML_XPATH_XPATH_OBJECT</span></span>
+  <br/>
+ </body>
+</html>

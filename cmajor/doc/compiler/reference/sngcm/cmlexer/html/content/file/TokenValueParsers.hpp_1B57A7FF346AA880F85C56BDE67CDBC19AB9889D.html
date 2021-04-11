@@ -1,0 +1,58 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;TOKEN_VALUE_PARSERS_HPP&nbsp;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;TOKEN_VALUE_PARSERS_HPP</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;sngcm/cmlexer/CmajorLexerApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/lexer/Token.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;stdint.h></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">lexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_noPrefix_6759ECD08F5B4BB482BC73DDFB6499278A713147">noPrefix</a>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_utf16Prefix_C3AF61506495ADC4BADC712127ABF51D72D5C9FC">utf16Prefix</a>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_utf32Prefix_15FBD68704920B7BB4E793B8ECACEE2C7B368CEF">utf32Prefix</a>&nbsp;<span class="other">=</span>&nbsp;<span class="other">2</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">ParseFloatingLiteral</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/struct_Token_364C47BDC35CAD9326A2AF130B5B3D3CBF447F3B.html">Token</a><span class="other">&amp;</span>&nbsp;<span class="identifier">token</span><span class="other">,&nbsp;</span><span class="kw">double</span><span class="other">&amp;</span>&nbsp;<span class="identifier">floatingLit</span><span class="other">,&nbsp;</span><span class="kw">bool</span><span class="other">&amp;</span>&nbsp;<span class="identifier">floatingLitFloat</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">ParseIntegerLiteral</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/struct_Token_364C47BDC35CAD9326A2AF130B5B3D3CBF447F3B.html">Token</a><span class="other">&amp;</span>&nbsp;<span class="identifier">token</span><span class="other">,&nbsp;</span><span class="identifier">uint64_t</span><span class="other">&amp;</span>&nbsp;<span class="identifier">intLit</span><span class="other">,&nbsp;</span><span class="kw">bool</span><span class="other">&amp;</span>&nbsp;<span class="identifier">intLitUnsigned</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">ParseCharacterLiteral</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/struct_Token_364C47BDC35CAD9326A2AF130B5B3D3CBF447F3B.html">Token</a><span class="other">&amp;</span>&nbsp;<span class="identifier">token</span><span class="other">,&nbsp;</span><span class="kw">char32_t</span><span class="other">&amp;</span>&nbsp;<span class="identifier">charLit</span><span class="other">,&nbsp;</span><span class="kw">int</span><span class="other">&amp;</span>&nbsp;<span class="identifier">charLitPrefix</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">ParseStringLiteral</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/struct_Token_364C47BDC35CAD9326A2AF130B5B3D3CBF447F3B.html">Token</a><span class="other">&amp;</span>&nbsp;<span class="identifier">token</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">stringLit</span><span class="other">,&nbsp;</span><span class="kw">int</span><span class="other">&amp;</span>&nbsp;<span class="identifier">stringLitPrefix</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">MakeFilePath</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../soulng/lexer/html/content/struct_Lexeme_4763116A7D2A379D2014BB53AC948DBADE24BFD0.html">Lexeme</a><span class="other">&amp;</span>&nbsp;<span class="identifier">lexeme</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;TOKEN_VALUE_PARSERS_HPP</span></span>
+  <br/>
+ </body>
+</html>

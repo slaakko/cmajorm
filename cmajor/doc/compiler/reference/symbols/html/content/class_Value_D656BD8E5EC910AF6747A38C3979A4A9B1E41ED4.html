@@ -16,21 +16,21 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#33">33</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#33">33</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#constructor_Value_D60D731C062EBC3A74F1F62BCDE20EB3E75036C5">Value</a>(<span class="kw">const </span>Span&amp; span_, <a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a> valueType_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#constructor_Value_2E6BFA2F0EA596F26F0E33291DCD1FBB77A410CC">Value</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId_, <a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a> valueType_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
         <table class="functionTable">
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_As_1C54933A4C34963D07764F14356395A49372051C">As</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* targetType, <span class="kw">bool</span> cast, <span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span, <span class="kw">bool</span> dontThrow) <span class="kw">const pure virtual</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_As_B875A153D564DCB334E7C4E529E030DCAB43D28F">As</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* targetType, <span class="kw">bool</span> cast, <span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span, <span class="kw">const </span>boost::uuids::uuid&amp; moduleId, <span class="kw">bool</span> dontThrow) <span class="kw">const pure virtual</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><span class="kw">char</span>*</td>
@@ -89,6 +89,10 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_IsStructuredReferenceValue_1072FA794151C5A9E9CE351D6BBC14DEAA521796">IsStructuredReferenceValue</a>() <span class="kw">const virtual</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>boost::uuids::uuid&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_ModuleId_DF7AD32E0EB819073A4CCFD23306ECB6F7823065">ModuleId</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_Read_A44DC4EA4922863478675D4887A431A53102193C">Read</a>(BinaryReader&amp; reader) <span class="kw">pure virtual</span></td>
             </tr>
@@ -111,6 +115,10 @@
         </table>
         <h2>Member Variables</h2>
         <table>
+            <tr id="variable_moduleId_BA94197285EA31BB280CE1AB346CCC7FA333CAF8">
+                <td class="functionTableFirstCol" xml:space="preserve">boost::uuids::uuid</td>
+                <td class="functionTableSecondCol" xml:space="preserve">moduleId</td>
+            </tr>
             <tr id="variable_span_8782D29345BABA58697F0E03EE269E38F4C8E3BB">
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a></td>
                 <td class="functionTableSecondCol" xml:space="preserve">span</td>
@@ -122,17 +130,18 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_Value_D60D731C062EBC3A74F1F62BCDE20EB3E75036C5">Value Constructor</h3>
+        <h3 id="constructor_Value_2E6BFA2F0EA596F26F0E33291DCD1FBB77A410CC">Value Constructor</h3>
         <h4>
             cmajor::symbols::Value::Value(<span class="kw">const </span>
-            Span&amp; span_, <a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a>
+            Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId_, <a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a>
              valueType_)</h4>
         <span>
-            Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#242">242</a>
-             of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html#242">242</a>
+             of <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html">Value.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;242</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#variable_span_8782D29345BABA58697F0E03EE269E38F4C8E3BB">span</a><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#variable_valueType_A8C9E06806C97DDB0C85989723BCC67F51E03356">valueType</a><span class="other">(</span><span class="identifier">valueType_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;242</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#variable_span_8782D29345BABA58697F0E03EE269E38F4C8E3BB">span</a><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#variable_moduleId_BA94197285EA31BB280CE1AB346CCC7FA333CAF8">moduleId</a><span class="other">(</span><span class="identifier">moduleId_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#variable_valueType_A8C9E06806C97DDB0C85989723BCC67F51E03356">valueType</a><span class="other">(</span><span class="identifier">valueType_</span><span class="other">)</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;243</span>&nbsp;<span class="other">{</span></span>
                 <br/>
@@ -143,19 +152,20 @@
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
-        <h3 id="function_As_1C54933A4C34963D07764F14356395A49372051C">As Member Function</h3>
+        <h3 id="function_As_B875A153D564DCB334E7C4E529E030DCAB43D28F">As Member Function</h3>
         <h4>
             <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             * cmajor::symbols::Value::As(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * targetType, <span class="kw">bool</span>
              cast, <span class="kw">const </span>
             <a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
-            &amp; span, <span class="kw">bool</span>
+            &amp; span, <span class="kw">const </span>
+            boost::uuids::uuid&amp; moduleId, <span class="kw">bool</span>
              dontThrow) <span class="kw">const pure virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#39">39</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#39">39</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -172,11 +182,11 @@
             * cmajor::symbols::Value::ClassName() <span class="kw">const virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#57">57</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#58">58</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"Value"</span><span class="other">;</span>&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"Value"</span><span class="other">;</span>&nbsp;&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -219,8 +229,8 @@
             * cmajor::symbols::Value::Clone() <span class="kw">const pure virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#38">38</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#38">38</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -258,8 +268,8 @@
             &amp; cmajor::symbols::Value::GetSpan() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#54">54</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#54">54</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#variable_span_8782D29345BABA58697F0E03EE269E38F4C8E3BB">span</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -281,8 +291,8 @@
             , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Clone_5A24992D04B8BE519B4794CED7504237B4D73A2F">cmajor::symbols::PointerValue::Clone</a>
             , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Deref_4C61383499A574BD257B75658B05477B830B0F70">cmajor::symbols::PointerValue::Deref</a>
             , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_PointeeType_D31CF0628E1459F36E96A9D7F7E35DB4086026A5">cmajor::symbols::PointerValue::PointeeType</a>
-            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Sub_02C74BB8DC749C57E39D5FDDDF85FC81AC532154">cmajor::symbols::PointerValue::Sub</a>
             , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Sub_8E186FD6B0B79B359F8CC282A1CC49E743D089C3">cmajor::symbols::PointerValue::Sub</a>
+            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Sub_02C74BB8DC749C57E39D5FDDDF85FC81AC532154">cmajor::symbols::PointerValue::Sub</a>
             , <a href="./class_SByteValue_3C3EAF8E7CE424628F5D4890B22AC65A8BA88E29.html#function_Clone_1177867ADE89294481D673F0E7AF6E44AB4171EA">cmajor::symbols::SByteValue::Clone</a>
             , <a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#function_Clone_0AD52E86A3B1285B9C0665E2D062287B4EF14B16">cmajor::symbols::ShortValue::Clone</a>
             , <a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#function_Clone_3661787D1B6D344A53544CE3DAC628293D2E2F21">cmajor::symbols::StringValue::Clone</a>
@@ -309,8 +319,8 @@
             * cmajor::symbols::Value::GetSubject() <span class="kw">virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#50">50</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#50">50</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">this</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -319,7 +329,7 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_ConstructValue_8D1B4D478E1F9B2E22BFF7D54DDD000488772D4C">cmajor::symbols::StringLengthFunction::ConstructValue</a>
+            Called by: <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_ConstructValue_1557510DA4C574CC1306BEF5E5E37241DF5C88FC">cmajor::symbols::StringLengthFunction::ConstructValue</a>
         </span>
         <br/>
         <br/>
@@ -331,8 +341,8 @@
             * symbolTable) <span class="kw">pure virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#52">52</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#52">52</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -369,40 +379,40 @@
              cmajor::symbols::Value::GetValueType() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#55">55</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#56">56</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#variable_valueType_A8C9E06806C97DDB0C85989723BCC67F51E03356">valueType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#variable_valueType_A8C9E06806C97DDB0C85989723BCC67F51E03356">valueType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#function_As_D2157A1A016A6DD97FFE1E5E9FE803B6FEA2A44D">cmajor::symbols::ArrayValue::As</a>
-            , <a href="./class_BoolValue_34FB4C955731A946B618B4AC8909FE8833ECAA6E.html#function_As_F5976F038137DB9955D0EF2AF7DA3480AFB4E720">cmajor::symbols::BoolValue::As</a>
-            , <a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#function_As_1DCED04AE2BB4C1823507DE6213705EB1EB5B6E0">cmajor::symbols::ByteValue::As</a>
-            , <a href="./class_CharValue_A2EBC5C85E91182D5D56754965416472645563C5.html#function_As_F67E809B33CC185AEC6B9078643FE1E77380D09D">cmajor::symbols::CharValue::As</a>
-            , <a href="./class_DoubleValue_B7EB5CADA34D2F74456A3F4DDB3ECDCEACAF9A4F.html#function_As_DC669D4407DFA9FFF84A62BDCE13304DEDEFEB91">cmajor::symbols::DoubleValue::As</a>
-            , <a href="./class_FloatValue_6C33619472BCB9F3608014CC4B34FECC7CC795F6.html#function_As_E46B1AA342006EF4191C62D4B2685A7F01804E4A">cmajor::symbols::FloatValue::As</a>
-            , <a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_As_811960B81CA90D57414600E30BCEA9039DC799A7">cmajor::symbols::IntValue::As</a>
+            Called by: <a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#function_As_A82332CD7ED27D442766FB30B21F55D7F2012E4F">cmajor::symbols::ArrayValue::As</a>
+            , <a href="./class_BoolValue_34FB4C955731A946B618B4AC8909FE8833ECAA6E.html#function_As_D0A7AA04AF919F81DC70E20A05DBD8AB5EB8BC38">cmajor::symbols::BoolValue::As</a>
+            , <a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#function_As_B3E11DA12DE3E3838A782FFF861C2B901F4AA57D">cmajor::symbols::ByteValue::As</a>
+            , <a href="./class_CharValue_A2EBC5C85E91182D5D56754965416472645563C5.html#function_As_C3A52359154B9579744CEB3E72ED6C24165AAB99">cmajor::symbols::CharValue::As</a>
+            , <a href="./class_DoubleValue_B7EB5CADA34D2F74456A3F4DDB3ECDCEACAF9A4F.html#function_As_034AB391CF80E4583781198BF121370C73140F81">cmajor::symbols::DoubleValue::As</a>
+            , <a href="./class_FloatValue_6C33619472BCB9F3608014CC4B34FECC7CC795F6.html#function_As_326225F420CA9A4681E44A78D92FA5577F6C94DB">cmajor::symbols::FloatValue::As</a>
+            , <a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_As_05D91B4EEACDC2E87FBA2A4C5DF302301E6E0A15">cmajor::symbols::IntValue::As</a>
             , <a href="./struct_IntegralValueHash_A6ECFF7A1D3C2477A7717A04CE0E43FB31485A04.html#function_operator_apply_FE1F80FA156E517430B68AF35290E987CCD794DE">cmajor::symbols::IntegralValueHash::operator()</a>
-            , <a href="./class_LongValue_1BD265CB5802007DF44E57306A8CE9482A5A8B33.html#function_As_ED8ABBA7FB074DAA15C28CAD0F12D4F6F850D19E">cmajor::symbols::LongValue::As</a>
-            , <a href="./class_NullValue_980FA2272F530AA5296339D7B50E11353EE06D59.html#function_As_EDD3299FC284D25D898212FB003A59CB0EA3251E">cmajor::symbols::NullValue::As</a>
-            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_As_7C49F17A0E99FB6EEADDA0D76DB10F25AA37ECE9">cmajor::symbols::PointerValue::As</a>
-            , <a href="./class_SByteValue_3C3EAF8E7CE424628F5D4890B22AC65A8BA88E29.html#function_As_13022A9AD9A5E58D6F7DC76C4E6BF1DB6EB5D860">cmajor::symbols::SByteValue::As</a>
-            , <a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#function_As_3DA0CB52FA23B8EFDA7EE99C50E8FF70C3B51C30">cmajor::symbols::ShortValue::As</a>
-            , <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_ConstructValue_8D1B4D478E1F9B2E22BFF7D54DDD000488772D4C">cmajor::symbols::StringLengthFunction::ConstructValue</a>
-            , <a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#function_As_05DB0B7231FF059D341910B4365F4CAFF5592C66">cmajor::symbols::StringValue::As</a>
-            , <a href="./class_StructuredValue_B2E6027F8490C6C3257E3986BF5B5EA7B7C7AF58.html#function_As_D3679CFBB2228189C8E53E89E4BC8DEECDE696EF">cmajor::symbols::StructuredValue::As</a>
-            , <a href="./class_UCharValue_E02DF40BE40FB64E9A2D586E5B4AD88330C14DB4.html#function_As_2B4878BE8BDA2C4FB6D4CE9674747D13710A6151">cmajor::symbols::UCharValue::As</a>
-            , <a href="./class_UIntValue_48F155B503D9F354BD257AD831B2B69D2FBA1438.html#function_As_7F109F42D1EB3F78BF1D80DD09D379FF85750EDA">cmajor::symbols::UIntValue::As</a>
-            , <a href="./class_ULongValue_985C867DFFEE6DF3901A8074F6E0C0271BFD0427.html#function_As_3A40D3C465DA4FB42BCD4281559C2E8EA50CEA03">cmajor::symbols::ULongValue::As</a>
-            , <a href="./class_UShortValue_9D6DCA00DA10F2F909978AC7DC1982CED1A7A6DF.html#function_As_4EF2DF1721C7531A6135B39CBF71D24F1D22A17B">cmajor::symbols::UShortValue::As</a>
-            , <a href="./class_UStringValue_5A5CEE9F935685402F095DC379B93904DC096386.html#function_As_05BDAA7A06637C5A298D39A4A93C3BFE851D773C">cmajor::symbols::UStringValue::As</a>
-            , <a href="./class_UuidValue_5583CF4406966E4F279FDA623FD9CD8984C3D97A.html#function_As_F27C30B0606B315A89C4F156CC09297EAA65D653">cmajor::symbols::UuidValue::As</a>
-            , <a href="./class_WCharValue_04AB9642246F31FF2C443849F5BF383BCBC7936E.html#function_As_BFF289D298EEA21389412525BEBD6365102266DD">cmajor::symbols::WCharValue::As</a>
-            , <a href="./class_WStringValue_B8FBEDF5FCF8A938F11E2EC9AE07D9E9C5EB0A44.html#function_As_E40A49D1FA6EB33C6D02A4D5960585C3ADCE23C6">cmajor::symbols::WStringValue::As</a>
+            , <a href="./class_LongValue_1BD265CB5802007DF44E57306A8CE9482A5A8B33.html#function_As_1C866EAE877AA2CA024DC91DBE0D7CD124EE51E8">cmajor::symbols::LongValue::As</a>
+            , <a href="./class_NullValue_980FA2272F530AA5296339D7B50E11353EE06D59.html#function_As_64C963D61C9A23CD714CD802195A55C44BD809AB">cmajor::symbols::NullValue::As</a>
+            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_As_BDE595DF9634CE269106930F92F7C1481FCAABB7">cmajor::symbols::PointerValue::As</a>
+            , <a href="./class_SByteValue_3C3EAF8E7CE424628F5D4890B22AC65A8BA88E29.html#function_As_75FFD81092F804A353C914B62A4CAC9792FAC2D0">cmajor::symbols::SByteValue::As</a>
+            , <a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#function_As_E6259B1FB2C00ECB1A2E04B77EFCB6395364C779">cmajor::symbols::ShortValue::As</a>
+            , <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_ConstructValue_1557510DA4C574CC1306BEF5E5E37241DF5C88FC">cmajor::symbols::StringLengthFunction::ConstructValue</a>
+            , <a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#function_As_11693D03136CB93AD79F0D254EBA6173A9C3CF5A">cmajor::symbols::StringValue::As</a>
+            , <a href="./class_StructuredValue_B2E6027F8490C6C3257E3986BF5B5EA7B7C7AF58.html#function_As_83E135388B988B2E288439D780F3591F72D68BD8">cmajor::symbols::StructuredValue::As</a>
+            , <a href="./class_UCharValue_E02DF40BE40FB64E9A2D586E5B4AD88330C14DB4.html#function_As_19C86409376E5671069F499B1F8D15BD6F63BB37">cmajor::symbols::UCharValue::As</a>
+            , <a href="./class_UIntValue_48F155B503D9F354BD257AD831B2B69D2FBA1438.html#function_As_9B8B4AA646FCAD71AA61761D06B83813C3EC4AB5">cmajor::symbols::UIntValue::As</a>
+            , <a href="./class_ULongValue_985C867DFFEE6DF3901A8074F6E0C0271BFD0427.html#function_As_30C2E3675516B5EF229F6B6B813B2EF4BE89E241">cmajor::symbols::ULongValue::As</a>
+            , <a href="./class_UShortValue_9D6DCA00DA10F2F909978AC7DC1982CED1A7A6DF.html#function_As_D994A00C315EDEEF777CD4266EB80DBF32DF37EE">cmajor::symbols::UShortValue::As</a>
+            , <a href="./class_UStringValue_5A5CEE9F935685402F095DC379B93904DC096386.html#function_As_EADD0473862456C9DD4DD8371BAAB53209D1F350">cmajor::symbols::UStringValue::As</a>
+            , <a href="./class_UuidValue_5583CF4406966E4F279FDA623FD9CD8984C3D97A.html#function_As_81E1B2B55DB05EF5DBDE01A89162640D74E6ABC5">cmajor::symbols::UuidValue::As</a>
+            , <a href="./class_WCharValue_04AB9642246F31FF2C443849F5BF383BCBC7936E.html#function_As_3F644C960A4C450EAF3CAC16689FFFCCCD2683C4">cmajor::symbols::WCharValue::As</a>
+            , <a href="./class_WStringValue_B8FBEDF5FCF8A938F11E2EC9AE07D9E9C5EB0A44.html#function_As_4B437F037E7EC62643678B80BC086CE0E5A2E48A">cmajor::symbols::WStringValue::As</a>
         </span>
         <br/>
         <br/>
@@ -414,8 +424,8 @@
             &amp; emitter) <span class="kw">pure virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#40">40</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#40">40</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -426,8 +436,8 @@
              cmajor::symbols::Value::IsArrayReferenceValue() <span class="kw">const virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#46">46</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#46">46</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -442,8 +452,8 @@
              cmajor::symbols::Value::IsComplete() <span class="kw">const virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#43">43</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#43">43</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -458,8 +468,8 @@
              cmajor::symbols::Value::IsComplexValue() <span class="kw">const virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#49">49</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#49">49</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -480,8 +490,8 @@
              cmajor::symbols::Value::IsFunctionGroupValue() <span class="kw">const virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#45">45</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#45">45</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -496,8 +506,8 @@
              cmajor::symbols::Value::IsScopedValue() <span class="kw">const virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#44">44</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#44">44</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -506,7 +516,7 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_ConstructValue_8D1B4D478E1F9B2E22BFF7D54DDD000488772D4C">cmajor::symbols::StringLengthFunction::ConstructValue</a>
+            Called by: <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_ConstructValue_1557510DA4C574CC1306BEF5E5E37241DF5C88FC">cmajor::symbols::StringLengthFunction::ConstructValue</a>
         </span>
         <br/>
         <br/>
@@ -517,8 +527,8 @@
              cmajor::symbols::Value::IsStringReferenceValue() <span class="kw">const virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#48">48</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#48">48</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -527,7 +537,7 @@
         </span>
         <br/>
         <span>
-            Called by: <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_ConstructValue_8D1B4D478E1F9B2E22BFF7D54DDD000488772D4C">cmajor::symbols::StringLengthFunction::ConstructValue</a>
+            Called by: <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_ConstructValue_1557510DA4C574CC1306BEF5E5E37241DF5C88FC">cmajor::symbols::StringLengthFunction::ConstructValue</a>
         </span>
         <br/>
         <br/>
@@ -538,8 +548,8 @@
              cmajor::symbols::Value::IsStructuredReferenceValue() <span class="kw">const virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#47">47</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#47">47</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -548,14 +558,65 @@
         </span>
         <br/>
         <hr/>
+        <h3 id="function_ModuleId_DF7AD32E0EB819073A4CCFD23306ECB6F7823065">ModuleId Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            boost::uuids::uuid&amp; cmajor::symbols::Value::ModuleId() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#55">55</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#variable_moduleId_BA94197285EA31BB280CE1AB346CCC7FA333CAF8">moduleId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#function_Clone_0E5338DF16DC38509AE9CBF46CC6EC1DEF071B5F">cmajor::symbols::ArrayValue::Clone</a>
+            , <a href="./class_BoolValue_34FB4C955731A946B618B4AC8909FE8833ECAA6E.html#function_Clone_9AA7A551913AC778AEC8A9BFEB4AE4D0D5C114EB">cmajor::symbols::BoolValue::Clone</a>
+            , <a href="./class_ByteValue_7D97881E4356D73208191D03E492FCD5C8B15F72.html#function_Clone_B0C83E52356C0A35EC6FF71DB07CD679F13C26DE">cmajor::symbols::ByteValue::Clone</a>
+            , <a href="./class_CharValue_A2EBC5C85E91182D5D56754965416472645563C5.html#function_Clone_581C69988C0B7D4140FCD79E8E349147AD4681E7">cmajor::symbols::CharValue::Clone</a>
+            , <a href="./class_DoubleValue_B7EB5CADA34D2F74456A3F4DDB3ECDCEACAF9A4F.html#function_Clone_0C41BA6B56BFD891CB6956DF8825BA216A8AA74D">cmajor::symbols::DoubleValue::Clone</a>
+            , <a href="./class_FloatValue_6C33619472BCB9F3608014CC4B34FECC7CC795F6.html#function_Clone_137607230DE55BE5AAE1066E79D3F9514F006EF2">cmajor::symbols::FloatValue::Clone</a>
+            , <a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_Clone_9316BFC2033B39BA04956874CC3C4A7B9AED7D52">cmajor::symbols::IntValue::Clone</a>
+            , <a href="./class_LongValue_1BD265CB5802007DF44E57306A8CE9482A5A8B33.html#function_Clone_C55B74C1A0701278626FD5A71DF2A715A5FD209D">cmajor::symbols::LongValue::Clone</a>
+            , <a href="./class_NullValue_980FA2272F530AA5296339D7B50E11353EE06D59.html#function_Clone_7E3CEFCC503612E8707AD35AFCB7357932FF7568">cmajor::symbols::NullValue::Clone</a>
+            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Add_9FB71CD119E2FF87CD9BB683400BBBCA6A0736A8">cmajor::symbols::PointerValue::Add</a>
+            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Clone_5A24992D04B8BE519B4794CED7504237B4D73A2F">cmajor::symbols::PointerValue::Clone</a>
+            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Deref_4C61383499A574BD257B75658B05477B830B0F70">cmajor::symbols::PointerValue::Deref</a>
+            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_PointeeType_D31CF0628E1459F36E96A9D7F7E35DB4086026A5">cmajor::symbols::PointerValue::PointeeType</a>
+            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Sub_8E186FD6B0B79B359F8CC282A1CC49E743D089C3">cmajor::symbols::PointerValue::Sub</a>
+            , <a href="./class_PointerValue_46AB68C9010A90C77167A957C63D66E17B8B9877.html#function_Sub_02C74BB8DC749C57E39D5FDDDF85FC81AC532154">cmajor::symbols::PointerValue::Sub</a>
+            , <a href="./class_SByteValue_3C3EAF8E7CE424628F5D4890B22AC65A8BA88E29.html#function_Clone_1177867ADE89294481D673F0E7AF6E44AB4171EA">cmajor::symbols::SByteValue::Clone</a>
+            , <a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#function_Clone_0AD52E86A3B1285B9C0665E2D062287B4EF14B16">cmajor::symbols::ShortValue::Clone</a>
+            , <a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#function_Clone_3661787D1B6D344A53544CE3DAC628293D2E2F21">cmajor::symbols::StringValue::Clone</a>
+            , <a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#function_GetType_08ADC1F9CCFB625766602C901BDC25B119B650AB">cmajor::symbols::StringValue::GetType</a>
+            , <a href="./class_StructuredValue_B2E6027F8490C6C3257E3986BF5B5EA7B7C7AF58.html#function_Clone_A1BD5D938C249EE07B2D53CE5E0AE7E76105155C">cmajor::symbols::StructuredValue::Clone</a>
+            , <a href="./class_UCharValue_E02DF40BE40FB64E9A2D586E5B4AD88330C14DB4.html#function_Clone_FC719A9AE89C575BEA3386EF1817A9BBC05FAD58">cmajor::symbols::UCharValue::Clone</a>
+            , <a href="./class_UIntValue_48F155B503D9F354BD257AD831B2B69D2FBA1438.html#function_Clone_91E7D75E15F23E5003884B0DEC1070B59CF169DE">cmajor::symbols::UIntValue::Clone</a>
+            , <a href="./class_ULongValue_985C867DFFEE6DF3901A8074F6E0C0271BFD0427.html#function_Clone_B4F15A7A7E55CB58735BF84AF9A52840F56BE1F5">cmajor::symbols::ULongValue::Clone</a>
+            , <a href="./class_UShortValue_9D6DCA00DA10F2F909978AC7DC1982CED1A7A6DF.html#function_Clone_B632CDAF5C91BA877AA121D4B0B399DAC93D794E">cmajor::symbols::UShortValue::Clone</a>
+            , <a href="./class_UStringValue_5A5CEE9F935685402F095DC379B93904DC096386.html#function_Clone_A24CC0DCE38CADBFC73631D61ECA09B12E3E17CB">cmajor::symbols::UStringValue::Clone</a>
+            , <a href="./class_UStringValue_5A5CEE9F935685402F095DC379B93904DC096386.html#function_GetType_7A492379FA1DF7D7166C509281DBFB71586D1B35">cmajor::symbols::UStringValue::GetType</a>
+            , <a href="./class_UuidValue_5583CF4406966E4F279FDA623FD9CD8984C3D97A.html#function_Clone_E8AF2B5965C5869E5A2FA69129A83DA3A8C24CCD">cmajor::symbols::UuidValue::Clone</a>
+            , <a href="./class_UuidValue_5583CF4406966E4F279FDA623FD9CD8984C3D97A.html#function_GetType_A6CB2B9A5973E180D588F7CFC0EB08349621D389">cmajor::symbols::UuidValue::GetType</a>
+            , <a href="./class_WCharValue_04AB9642246F31FF2C443849F5BF383BCBC7936E.html#function_Clone_31D4BECF13C474093F9E2FB807F06503649B9BD7">cmajor::symbols::WCharValue::Clone</a>
+            , <a href="./class_WStringValue_B8FBEDF5FCF8A938F11E2EC9AE07D9E9C5EB0A44.html#function_Clone_CF46A2B08A73BA2AFECCD72E4A779E57BAD14F07">cmajor::symbols::WStringValue::Clone</a>
+            , <a href="./class_WStringValue_B8FBEDF5FCF8A938F11E2EC9AE07D9E9C5EB0A44.html#function_GetType_BD3A221D6554C9F20D36D9DDB262E5DCD8BC6700">cmajor::symbols::WStringValue::GetType</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_Read_A44DC4EA4922863478675D4887A431A53102193C">Read Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::symbols::Value::Read(BinaryReader&amp; reader) <span class="kw">pure virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#42">42</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#42">42</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -599,8 +660,8 @@
             * type_) <span class="kw">virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#53">53</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#53">53</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
@@ -621,8 +682,8 @@
             std::unique_ptr&lt;<a href="./../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a>
             > cmajor::symbols::Value::ToDomElement()</h4>
         <span>
-            Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#250">250</a>
-             of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html#250">250</a>
+             of <a href="file/Value.cpp_14C3F733C71B53ACC33E4E61793D8B42CF0EA5BA.html">Value.cpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;251</span>&nbsp;<span class="other">{</span></span>
@@ -641,8 +702,8 @@
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#56">56</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Declaration at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#57">57</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -658,8 +719,8 @@
             std::string cmajor::symbols::Value::ToString() <span class="kw">const virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#51">51</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#51">51</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -699,8 +760,8 @@
              cmajor::symbols::Value::Write(BinaryWriter&amp; writer) <span class="kw">pure virtual</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#41">41</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html#41">41</a>
+             of <a href="file/Value.hpp_53D86DA924A047788EE20876C3AEC345CF96A949.html">Value.hpp</a>
         </span>
         <br/>
         <br/>

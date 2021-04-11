@@ -81,6 +81,7 @@ public:
     WindowSettings(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
+    bool defined;
     int32_t windowState;
     WindowLocation location;
     WindowSize size;

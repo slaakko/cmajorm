@@ -8,12 +8,12 @@
         <a href="../../../../compiler-projects.html">top</a>
          | <a href="namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">up</a>
          | <a href="class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html">prev</a>
-         | <a href="class_Attribute_4489FD4C12CB03D356A42883F1417902EBBE5792.html">next</a>
+         | <a href="class_AttributeNode_3773A18CCE422122F05FC15DC68E6FE8827EA37A.html">next</a>
         <hr/>
         <h1>AstWriter Class</h1>
         <span>
-            Definition at line <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html#20">20</a>
-             of <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html">AstWriter.hpp</a>
+            Definition at line <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html#20">20</a>
+             of <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html">AstWriter.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
@@ -34,6 +34,14 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_SetSpanConversionModuleId_49D67DFF87F6578B446FA03740F12F42D85680FB">SetSpanConversionModuleId</a>(<span class="kw">const </span>boost::uuids::uuid&amp; spanConversionModuleId_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>boost::uuids::uuid&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_SpanConversionModuleId_3926AA2B39CD2021B48C8BB0CDAA2A760A816D27">SpanConversionModuleId</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_850455A96B88F148B7F3AC00E3D2144D2647A04A">Write</a>(<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>* node)</td>
             </tr>
             <tr>
@@ -42,7 +50,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_E506CCA80B5693D1234A143199582072DA16E3DC">Write</a>(<span class="kw">const </span>Span&amp; span)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_D1B5E32970528C824707EF52FDE6E7320E110FFA">Write</a>(<span class="kw">const </span>Span&amp; span, <span class="kw">bool</span> convertExternal)</td>
             </tr>
         </table>
         <h2>Member Variables</h2>
@@ -55,6 +63,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;<a href="./../../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html">Lexer</a>*>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve">lexers</td>
             </tr>
+            <tr id="variable_spanConversionModuleId_9A8418E6A505B997F5F0CFE3F23DE09936E615E0">
+                <td class="functionTableFirstCol" xml:space="preserve">boost::uuids::uuid</td>
+                <td class="functionTableSecondCol" xml:space="preserve">spanConversionModuleId</td>
+            </tr>
         </table>
         <hr/>
         <h2>Constructor Details</h2>
@@ -63,22 +75,22 @@
             sngcm::ast::AstWriter::AstWriter(<span class="kw">const </span>
             std::string&amp; fileName_)</h4>
         <span>
-            Definition at line <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html#12">12</a>
-             of <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html">AstWriter.cpp</a>
+            Definition at line <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html#13">13</a>
+             of <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html">AstWriter.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_binaryWriter_F062BB427111A158684C8B4895FEB6B1E6431848">binaryWriter</a><span class="other">(</span><span class="identifier">fileName_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_lexers_36131D5A098FE81E0A0F1FE901C0EB059F68C8B6">lexers</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_binaryWriter_F062BB427111A158684C8B4895FEB6B1E6431848">binaryWriter</a><span class="other">(</span><span class="identifier">fileName_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_lexers_36131D5A098FE81E0A0F1FE901C0EB059F68C8B6">lexers</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_spanConversionModuleId_9A8418E6A505B997F5F0CFE3F23DE09936E615E0">spanConversionModuleId</a><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">nil_uuid</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html#23">23</a>
-             of <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html">AstWriter.hpp</a>
+            Declaration at line <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html#23">23</a>
+             of <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html">AstWriter.hpp</a>
         </span>
         <br/>
         <br/>
@@ -89,8 +101,8 @@
             <a href="./../../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html">BinaryWriter</a>
             &amp; sngcm::ast::AstWriter::GetBinaryWriter()</h4>
         <span>
-            Definition at line <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html#24">24</a>
-             of <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html">AstWriter.hpp</a>
+            Definition at line <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html#24">24</a>
+             of <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html">AstWriter.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_binaryWriter_F062BB427111A158684C8B4895FEB6B1E6431848">binaryWriter</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -100,8 +112,8 @@
         <br/>
         <span>
             Called by: <a href="./class_ArrayNode_40B5532DAE5DE789D8895E5D007F60BC2FB2917C.html#function_Write_8522F719228577F5A7F62293B4AEC0B7D351D153">sngcm::ast::ArrayNode::Write</a>
-            , <a href="./class_Attribute_4489FD4C12CB03D356A42883F1417902EBBE5792.html#function_Write_761ED1AC735DED5AD0B73A7B314257DDE1924DCC">sngcm::ast::Attribute::Write</a>
-            , <a href="./class_Attributes_3F5341E96E1F65002591A0DFAF6175C6CAE55CAD.html#function_Write_0EF2AEF62DEE3E3A8C2CE3BB7CB2BC8B7E335821">sngcm::ast::Attributes::Write</a>
+            , <a href="./class_AttributeNode_3773A18CCE422122F05FC15DC68E6FE8827EA37A.html#function_Write_819816C43B62D156EAD7735F7D4B95CE0C73959D">sngcm::ast::AttributeNode::Write</a>
+            , <a href="./class_AttributesNode_B713EAB5359EE5717474CD4C3FFD1AE0ADE44C08.html#function_Write_A5853E499BA07ABF4CF1F58F6C9E035E3ABD9BCB">sngcm::ast::AttributesNode::Write</a>
             , <a href="./class_AxiomStatementNode_DA9EE870715DB09AAA03EAC5C13883586486C0DE.html#function_Write_C4EF215D0B0D358C1D3E30F62661B768BC4A7659">sngcm::ast::AxiomStatementNode::Write</a>
             , <a href="./class_BooleanLiteralNode_BA061A8FA86B8477955DDB406C513FDEBAF71B8D.html#function_Write_56DCC3B85F5DA4C5E53FFDFA382EF33C74F40E5C">sngcm::ast::BooleanLiteralNode::Write</a>
             , <a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#function_Write_9581786BF920F95CBA74A4A8DB2EE9DF7CE41064">sngcm::ast::ByteLiteralNode::Write</a>
@@ -164,22 +176,86 @@
              sngcm::ast::AstWriter::SetLexers(std::vector&lt;<a href="./../../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html">Lexer</a>
             *>* lexers_)</h4>
         <span>
-            Definition at line <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html#50">50</a>
-             of <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html">AstWriter.cpp</a>
+            Definition at line <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html#62">62</a>
+             of <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html">AstWriter.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_lexers_36131D5A098FE81E0A0F1FE901C0EB059F68C8B6">lexers</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">lexers_</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_lexers_36131D5A098FE81E0A0F1FE901C0EB059F68C8B6">lexers</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">lexers_</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html#28">28</a>
-             of <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html">AstWriter.hpp</a>
+            Declaration at line <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html#28">28</a>
+             of <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html">AstWriter.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetSpanConversionModuleId_49D67DFF87F6578B446FA03740F12F42D85680FB">SetSpanConversionModuleId Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::AstWriter::SetSpanConversionModuleId(<span class="kw">const </span>
+            boost::uuids::uuid&amp; spanConversionModuleId_)</h4>
+        <span>
+            Definition at line <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html#67">67</a>
+             of <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html">AstWriter.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_spanConversionModuleId_9A8418E6A505B997F5F0CFE3F23DE09936E615E0">spanConversionModuleId</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">spanConversionModuleId_</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html#29">29</a>
+             of <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html">AstWriter.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SpanConversionModuleId_3926AA2B39CD2021B48C8BB0CDAA2A760A816D27">SpanConversionModuleId Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            boost::uuids::uuid&amp; sngcm::ast::AstWriter::SpanConversionModuleId() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html#30">30</a>
+             of <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html">AstWriter.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_spanConversionModuleId_9A8418E6A505B997F5F0CFE3F23DE09936E615E0">spanConversionModuleId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_AxiomNode_5436268F925DCE3FC86CB4E79017A595F8858C3F.html#function_Write_626DBBD6B952F2B46307B3578FD4051EBA0A9A2E">sngcm::ast::AxiomNode::Write</a>
+            , <a href="./class_CaseStatementNode_BEDF0E877C57D373F7DC5E810DF2A5303D7EFE70.html#function_Write_F30FD6AB7D6619742BF2C667ADDA2BFBC57861D2">sngcm::ast::CaseStatementNode::Write</a>
+            , <a href="./class_CatchNode_C5332657F67C89B25013743776CA3876B3A5969A.html#function_Write_CC4F5E11A52E00E5359712891A0F2D5F9A62B154">sngcm::ast::CatchNode::Write</a>
+            , <a href="./class_ClassNode_FBB903AD81E52A0333DC75FA12ACE469ABB991DE.html#function_Write_7053D7AF59E005C096394A51887E186DAE2E864A">sngcm::ast::ClassNode::Write</a>
+            , <a href="./class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html#function_Write_5384EDAE81158CFA4EB6BE311F89288A877DE9B3">sngcm::ast::CompoundStatementNode::Write</a>
+            , <a href="./class_ConceptNode_6E09C7B31968ECB17A6F5F9E92F29B5BABA40ECE.html#function_Write_CE1764B42769717DAEAC35283B0FD0D4501A63B4">sngcm::ast::ConceptNode::Write</a>
+            , <a href="./class_ConditionalCompilationPartNode_01E32244B3CCEB630093E6268978BAD22E17D2B7.html#function_Write_90D2F0A043B2B256C9720D8082B58C3C7650DB20">sngcm::ast::ConditionalCompilationPartNode::Write</a>
+            , <a href="./class_ConditionalCompilationStatementNode_4B98C381DE5E915EF5ED92CF39E226325697BF4E.html#function_Write_EB018FBBF5A0AF91298BDC6246477A068404CEB6">sngcm::ast::ConditionalCompilationStatementNode::Write</a>
+            , <a href="./class_DoStatementNode_37DD411BA18CF2B6FCA7E67DE7522677DE37290C.html#function_Write_9B729DA1F020836DAA0C6BC80C689F7FE41575A1">sngcm::ast::DoStatementNode::Write</a>
+            , <a href="./class_EnumTypeNode_7BE35177F05F418B863EEA546061B3404DBC7F99.html#function_Write_3BF706FAD485055BCC40A12A67CCDFF071A564A7">sngcm::ast::EnumTypeNode::Write</a>
+            , <a href="./class_ForStatementNode_447F0AF9386F92F649840B6A3FEB8D31B5EAE8A9.html#function_Write_D7BB8838E25A5E159687BC1A0B627695A18575AD">sngcm::ast::ForStatementNode::Write</a>
+            , <a href="./class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_Write_B22C87D489B91EB323670FD0CC81FCFF63452A50">sngcm::ast::FunctionNode::Write</a>
+            , <a href="./class_IfStatementNode_1C235C4870CD6C151D9B69A60EBA006443EEED71.html#function_Write_84399504E4F4979D86D1B628F5C90689AC0998B7">sngcm::ast::IfStatementNode::Write</a>
+            , <a href="./class_InterfaceNode_AC678E138F71FD1B7A1940199F1B74796F594179.html#function_Write_35996F4D8A878753889DD104F4DA8F88504D46F0">sngcm::ast::InterfaceNode::Write</a>
+            , <a href="./class_MemberVariableNode_C955E22C018764E831E18F3BD2F014BD4E19BA4A.html#function_Write_0CD41D40D73FA6348404822C4329FC326E025DE5">sngcm::ast::MemberVariableNode::Write</a>
+            , <a href="./class_RangeForStatementNode_7D56028829947B6F343397991EE1C85B89A27A9E.html#function_Write_EF3A19CC7D784FC8DD897A6087C69D5A17A0EDC5">sngcm::ast::RangeForStatementNode::Write</a>
+            , <a href="./class_SwitchStatementNode_4E903544734E2ECCB83EF97C7628D69A4B681278.html#function_Write_31CD2EFA5EAE844D3F6CD23BDB09FFDD581B135F">sngcm::ast::SwitchStatementNode::Write</a>
+            , <a href="./class_WhileStatementNode_C25A3DF1F33DC6448A67FF7E5A1443A7B7196861.html#function_Write_CF1D540B74670D4AF9886169AACE8E91614FB1F8">sngcm::ast::WhileStatementNode::Write</a>
         </span>
         <br/>
         <br/>
@@ -190,34 +266,23 @@
              sngcm::ast::AstWriter::Write(<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>
             * node)</h4>
         <span>
-            Definition at line <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html#16">16</a>
-             of <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html">AstWriter.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_binaryWriter_F062BB427111A158684C8B4895FEB6B1E6431848">binaryWriter</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint8_t</span><span class="other">></span><span class="other">(</span><span class="identifier">node</span><span class="other">-></span><span class="identifier">GetNodeType</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Write</span><span class="other">(</span><span class="identifier">node</span><span class="other">-></span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">node</span><span class="other">-></span><span class="identifier">Write</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
+            Definition at line <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html#17">17</a>
+             of <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html">AstWriter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html#25">25</a>
-             of <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html">AstWriter.hpp</a>
+            Declaration at line <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html#25">25</a>
+             of <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html">AstWriter.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_E506CCA80B5693D1234A143199582072DA16E3DC">sngcm::ast::AstWriter::Write</a>
+            Calls: <a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_D1B5E32970528C824707EF52FDE6E7320E110FFA">sngcm::ast::AstWriter::Write</a>
             , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetNodeType_F0791FB5502109359FB46F4C8415EC01F395AD14">sngcm::ast::Node::GetNodeType</a>
             , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_ModuleId_60FC85640309F69B5BDD9666EA1AAA89DD2E03C1">sngcm::ast::Node::ModuleId</a>
             , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Write_67F59ACDC95A0AD11AD691611F8AB8512CF407C5">sngcm::ast::Node::Write</a>
+            , <a href="./../../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_3E297EF11047E0C69B1F2573EE01C2915FB992C2">soulng::util::BinaryWriter::Write</a>
         </span>
         <br/>
         <br/>
@@ -228,22 +293,22 @@
              sngcm::ast::AstWriter::Write(<a href="./enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a>
              specifiers)</h4>
         <span>
-            Definition at line <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html#23">23</a>
-             of <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html">AstWriter.cpp</a>
+            Definition at line <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html#32">32</a>
+             of <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html">AstWriter.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_binaryWriter_F062BB427111A158684C8B4895FEB6B1E6431848">binaryWriter</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#variable_binaryWriter_F062BB427111A158684C8B4895FEB6B1E6431848">binaryWriter</a><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">specifiers</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html#26">26</a>
-             of <a href="file/AstWriter.hpp_E02DAF7320922E34FB29C1090CB7302D92BFEB41.html">AstWriter.hpp</a>
+            Declaration at line <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html#26">26</a>
+             of <a href="file/AstWriter.hpp_E2453CF48A424B485379E04605838D5A6E022EC5.html">AstWriter.hpp</a>
         </span>
         <br/>
         <br/>
@@ -262,14 +327,15 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_Write_E506CCA80B5693D1234A143199582072DA16E3DC">Write Member Function</h3>
+        <h3 id="function_Write_D1B5E32970528C824707EF52FDE6E7320E110FFA">Write Member Function</h3>
         <h4>
             <span class="kw">void</span>
              sngcm::ast::AstWriter::Write(<span class="kw">const </span>
-            Span&amp; span)</h4>
+            Span&amp; span, <span class="kw">bool</span>
+             convertExternal)</h4>
         <span>
-            Definition at line <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html#28">28</a>
-             of <a href="file/AstWriter.cpp_2E4BF909D5C38AC98F3974202784CDE68DC93821.html">AstWriter.cpp</a>
+            Definition at line <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html#37">37</a>
+             of <a href="file/AstWriter.cpp_27DF70DD4C0462BA9F0A5E2A685CD4F1934ED4A4.html">AstWriter.cpp</a>
         </span>
         <br/>
         <br/>
@@ -281,8 +347,8 @@
         <br/>
         <span>
             Called by: <a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_Write_850455A96B88F148B7F3AC00E3D2144D2647A04A">sngcm::ast::AstWriter::Write</a>
-            , <a href="./class_Attribute_4489FD4C12CB03D356A42883F1417902EBBE5792.html#function_Write_761ED1AC735DED5AD0B73A7B314257DDE1924DCC">sngcm::ast::Attribute::Write</a>
             , <a href="./class_AxiomNode_5436268F925DCE3FC86CB4E79017A595F8858C3F.html#function_Write_626DBBD6B952F2B46307B3578FD4051EBA0A9A2E">sngcm::ast::AxiomNode::Write</a>
+            , <a href="./class_CaseStatementNode_BEDF0E877C57D373F7DC5E810DF2A5303D7EFE70.html#function_Write_F30FD6AB7D6619742BF2C667ADDA2BFBC57861D2">sngcm::ast::CaseStatementNode::Write</a>
             , <a href="./class_CatchNode_C5332657F67C89B25013743776CA3876B3A5969A.html#function_Write_CC4F5E11A52E00E5359712891A0F2D5F9A62B154">sngcm::ast::CatchNode::Write</a>
             , <a href="./class_ClassNode_FBB903AD81E52A0333DC75FA12ACE469ABB991DE.html#function_Write_7053D7AF59E005C096394A51887E186DAE2E864A">sngcm::ast::ClassNode::Write</a>
             , <a href="./class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html#function_Write_5384EDAE81158CFA4EB6BE311F89288A877DE9B3">sngcm::ast::CompoundStatementNode::Write</a>
@@ -306,6 +372,6 @@
         <a href="../../../../compiler-projects.html">top</a>
          | <a href="namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">up</a>
          | <a href="class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html">prev</a>
-         | <a href="class_Attribute_4489FD4C12CB03D356A42883F1417902EBBE5792.html">next</a>
+         | <a href="class_AttributeNode_3773A18CCE422122F05FC15DC68E6FE8827EA37A.html">next</a>
     </body>
 </html>

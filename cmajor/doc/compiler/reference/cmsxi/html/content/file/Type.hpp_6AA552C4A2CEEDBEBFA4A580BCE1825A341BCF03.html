@@ -1,0 +1,620 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_CMSXI_TYPE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_CMSXI_TYPE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmsxi/Value.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/CodeFormatter.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;vector></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;memory></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="pp">#include&nbsp;&lt;unordered_map></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="pp">#include&nbsp;&lt;unordered_set></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmsxi</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">util</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">voidTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">boolTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">2</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">sbyteTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">3</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">byteTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">4</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">shortTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">5</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">ushortTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">6</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">intTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">7</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">uintTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">8</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">longTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">9</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">ulongTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">10</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">floatTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">11</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">doubleTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">12</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">ptrTypeId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">13</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../namespace_cmsxi_9FF0912E7694F9E263911E9FA89E89C681FEBDFA.html#function_TypeName_B7E783C369A7D09CE01AB32120F66895D9285E16">TypeName</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">typeId</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#constructor_Type_B32A0AE5D3DB7F2AA1225B4E63F88252244A9048">Type</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">id_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">Type</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#function_Name_9F2D924EA9FD589377F088C165175D6DBAF32D91">Name</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#function_DefaultValue_B5AC56D298343F2F0C0007927E7FF6AAF92B6461">DefaultValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#function_Id_41D17E922C6EDFF0F772B0F54062279028C5F1D4">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#variable_id_EC3F20B9446C3C39AF8246B68FFA12BBF14E5660">id</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">Write</span><span class="other">(</span><a href="../../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">WriteDeclaration</span><span class="other">(</span><a href="../../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#function_IsPtrType_9AFC853B6C2342636D74C1242A80ADAA1EF57CEA">IsPtrType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#variable_id_EC3F20B9446C3C39AF8246B68FFA12BBF14E5660">id</a><span class="other">&nbsp;==&nbsp;</span><a href="../namespace_cmsxi_9FF0912E7694F9E263911E9FA89E89C681FEBDFA.html#variable_ptrTypeId_6B61534CF43AD2D3E56B1D9D9DC99C2B27133F2C">ptrTypeId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#function_IsVoidType_379135462301F773E908FA18414FF54710BDDCF2">IsVoidType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#variable_id_EC3F20B9446C3C39AF8246B68FFA12BBF14E5660">id</a><span class="other">&nbsp;==&nbsp;</span><a href="../namespace_cmsxi_9FF0912E7694F9E263911E9FA89E89C681FEBDFA.html#variable_voidTypeId_48266FD0E7AA848149190CA26B23F23112397F3C">voidTypeId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#function_IsStructureType_AB26C9AD4A8DB649F07F31D25E2828366119B133">IsStructureType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#function_IsArrayType_E64A24C02BA2C44A656CCA949B2586BEDEAA57F3">IsArrayType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#function_IsFunctionType_C54E514ADE9AC82BE61BD70023E2D7E0C96DB52E">IsFunctionType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#variable_id_EC3F20B9446C3C39AF8246B68FFA12BBF14E5660">id</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html#constructor_PrimitiveType_C2C0A341B8FEEDA7314A40E743B924554AF9311B">PrimitiveType</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">id_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_VoidType_42DEE3E7E785323A9F38E75814F30CBE8F7BAEA9.html">VoidType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_VoidType_42DEE3E7E785323A9F38E75814F30CBE8F7BAEA9.html#constructor_VoidType_AA56312F11275A5A552020F685E4A40DC06F6614">VoidType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_BoolType_B6698688E31BF866F346E7CD3DEBFC2983B2DD38.html">BoolType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoolType_B6698688E31BF866F346E7CD3DEBFC2983B2DD38.html#constructor_BoolType_08FC46583FDC78BD5AB824C7549BF47A3D8AAF29">BoolType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_BoolType_B6698688E31BF866F346E7CD3DEBFC2983B2DD38.html#function_DefaultValue_312CDE633760FF7682F1908A5861EE6E6E43E1B7">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_BoolType_B6698688E31BF866F346E7CD3DEBFC2983B2DD38.html#variable_defaultValue_BB2C0EC9F75722C202D56C2648DBDF53D42E6657">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoolValue_D833400FD32A0A68EB5CF3F15C0B14F3653B0887.html">BoolValue</a>&nbsp;<a href="../class_BoolType_B6698688E31BF866F346E7CD3DEBFC2983B2DD38.html#variable_defaultValue_BB2C0EC9F75722C202D56C2648DBDF53D42E6657">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_SByteType_262D7A159C91D79E1DEE49E7FB08B53A3E622340.html">SByteType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SByteType_262D7A159C91D79E1DEE49E7FB08B53A3E622340.html#constructor_SByteType_0DCE42E0A9CA1348669598742D91025BE3129521">SByteType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_SByteType_262D7A159C91D79E1DEE49E7FB08B53A3E622340.html#function_DefaultValue_23D9F2F5AB12ECD858A1001C9CFDB0961DE3FB40">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_SByteType_262D7A159C91D79E1DEE49E7FB08B53A3E622340.html#variable_defaultValue_2D08C20C2678B319C2C99154CCE4169F9FE40CD7">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SByteValue_0CE40530780B931EB1DA326D1EC53010E098CCD4.html">SByteValue</a>&nbsp;<a href="../class_SByteType_262D7A159C91D79E1DEE49E7FB08B53A3E622340.html#variable_defaultValue_2D08C20C2678B319C2C99154CCE4169F9FE40CD7">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ByteType_47374F7D0B2F56C8DE47320B39D690C6A1C27D0B.html">ByteType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ByteType_47374F7D0B2F56C8DE47320B39D690C6A1C27D0B.html#constructor_ByteType_00C0407311A91B9955F9CAA6B58E2E9B40221CB3">ByteType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_ByteType_47374F7D0B2F56C8DE47320B39D690C6A1C27D0B.html#function_DefaultValue_F43C97231EDA4A4AB5828ABBB6CDF4EFCACF7567">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_ByteType_47374F7D0B2F56C8DE47320B39D690C6A1C27D0B.html#variable_defaultValue_30DA9C6CE17A7597CC6BA7743D9FCF3AD1523698">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ByteValue_65290C422DB37037035C4CD7611852F7AA1EFD4C.html">ByteValue</a>&nbsp;<a href="../class_ByteType_47374F7D0B2F56C8DE47320B39D690C6A1C27D0B.html#variable_defaultValue_30DA9C6CE17A7597CC6BA7743D9FCF3AD1523698">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ShortType_EF54EC73993C2FE8A235FC81DFCB246B599874AB.html">ShortType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ShortType_EF54EC73993C2FE8A235FC81DFCB246B599874AB.html#constructor_ShortType_7F00CA7AF11268A8B208D2A7CFF60748C96A724F">ShortType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_ShortType_EF54EC73993C2FE8A235FC81DFCB246B599874AB.html#function_DefaultValue_759C4405DE7EEC2FD9C684BDC13331E2C435E491">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_ShortType_EF54EC73993C2FE8A235FC81DFCB246B599874AB.html#variable_defaultValue_CF8FB854523AF7F7B0279B6260DFF3DF59DF6440">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ShortValue_FF9BB36D87A7465A6654CC69FE8D67A81E596675.html">ShortValue</a>&nbsp;<a href="../class_ShortType_EF54EC73993C2FE8A235FC81DFCB246B599874AB.html#variable_defaultValue_CF8FB854523AF7F7B0279B6260DFF3DF59DF6440">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_UShortType_F321279D4B85656ACAE3CCE3042E178D40CABCC7.html">UShortType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UShortType_F321279D4B85656ACAE3CCE3042E178D40CABCC7.html#constructor_UShortType_3A5ED028DF84CF9DCE4B8FA2138FFB660DD4616C">UShortType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_UShortType_F321279D4B85656ACAE3CCE3042E178D40CABCC7.html#function_DefaultValue_D01085D1890FFBAB9F49CF9CA9043F04AF913A6A">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_UShortType_F321279D4B85656ACAE3CCE3042E178D40CABCC7.html#variable_defaultValue_04F9252B84CECBFFEB7CC5FBD5CD37FD73F91404">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UShortValue_0C3EB8F8BC8CA6688A1803D1B1858A8C3DA07A2A.html">UShortValue</a>&nbsp;<a href="../class_UShortType_F321279D4B85656ACAE3CCE3042E178D40CABCC7.html#variable_defaultValue_04F9252B84CECBFFEB7CC5FBD5CD37FD73F91404">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_IntType_813F7BCFA95128DD6101519BA2608265F2A67EA6.html">IntType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_IntType_813F7BCFA95128DD6101519BA2608265F2A67EA6.html#constructor_IntType_1B816B416F3EE9986D62D3549A3945B00C373003">IntType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_IntType_813F7BCFA95128DD6101519BA2608265F2A67EA6.html#function_DefaultValue_CFBFC9CBE14995EE26321D1F85F3FA7EFE0DE1EF">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_IntType_813F7BCFA95128DD6101519BA2608265F2A67EA6.html#variable_defaultValue_D804727FE79E4A6C9B357FE126C96238A595FEF7">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_IntValue_CDC6340847451BFE44FD828DCED29C7E75510E78.html">IntValue</a>&nbsp;<a href="../class_IntType_813F7BCFA95128DD6101519BA2608265F2A67EA6.html#variable_defaultValue_D804727FE79E4A6C9B357FE126C96238A595FEF7">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_UIntType_F2C206E421794CCB68D51712D6471454A4F4E5BA.html">UIntType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UIntType_F2C206E421794CCB68D51712D6471454A4F4E5BA.html#constructor_UIntType_7BDCA81BFC2BBF633845EE2E4E0F57588E117F21">UIntType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_UIntType_F2C206E421794CCB68D51712D6471454A4F4E5BA.html#function_DefaultValue_83BD87D60E167D613152DE40241534124613A35E">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_UIntType_F2C206E421794CCB68D51712D6471454A4F4E5BA.html#variable_defaultValue_97D127B49C8F50ECE02D54C136BDDBAD605D9C70">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UIntValue_CF55EB640CAB88D798AB35D9880CDACD952AA96C.html">UIntValue</a>&nbsp;<a href="../class_UIntType_F2C206E421794CCB68D51712D6471454A4F4E5BA.html#variable_defaultValue_97D127B49C8F50ECE02D54C136BDDBAD605D9C70">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_LongType_782A58811BD471810C9A26FF3C2749FA143F2234.html">LongType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_LongType_782A58811BD471810C9A26FF3C2749FA143F2234.html#constructor_LongType_CF60A1DE30342504D0217A678628273CD5C76130">LongType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_LongType_782A58811BD471810C9A26FF3C2749FA143F2234.html#function_DefaultValue_4FCE8A7E3BF09394A97CBB8147D85B8EF7F18335">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_LongType_782A58811BD471810C9A26FF3C2749FA143F2234.html#variable_defaultValue_73FBA7783E5CAAB77AD61212C462595FE03E622F">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_LongValue_4D9CE8D5F910C06CD17521BF39057729B0AC5715.html">LongValue</a>&nbsp;<a href="../class_LongType_782A58811BD471810C9A26FF3C2749FA143F2234.html#variable_defaultValue_73FBA7783E5CAAB77AD61212C462595FE03E622F">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ULongType_BCF58E500C720D9AABEAECEBBECB8F42066CFEFC.html">ULongType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ULongType_BCF58E500C720D9AABEAECEBBECB8F42066CFEFC.html#constructor_ULongType_10F2775166AA9FC1AE05FD4F918B55B1650B1BEF">ULongType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_ULongType_BCF58E500C720D9AABEAECEBBECB8F42066CFEFC.html#function_DefaultValue_758F80798BF04B56EE578E5B2BD66898E80CE91C">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_ULongType_BCF58E500C720D9AABEAECEBBECB8F42066CFEFC.html#variable_defaultValue_E4BD4E47278BCC7BC46277B43117C5CE2C03AD98">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ULongValue_C37BD23DF4D13F13466B9B24A1A7691D6D7B3A6C.html">ULongValue</a>&nbsp;<a href="../class_ULongType_BCF58E500C720D9AABEAECEBBECB8F42066CFEFC.html#variable_defaultValue_E4BD4E47278BCC7BC46277B43117C5CE2C03AD98">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_FloatType_76BD053C4D5376F7B2AA14ABF157A810362A5EAA.html">FloatType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FloatType_76BD053C4D5376F7B2AA14ABF157A810362A5EAA.html#constructor_FloatType_E377433DEB7FEBBC55AC61E99F3FD3B5346EAC7D">FloatType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_FloatType_76BD053C4D5376F7B2AA14ABF157A810362A5EAA.html#function_DefaultValue_D1F3F9209339E09298FF7CDD3705D1989EFDC3C4">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_FloatType_76BD053C4D5376F7B2AA14ABF157A810362A5EAA.html#variable_defaultValue_1B5CCA9185B9A4CC05237DB84D465215BEBDE739">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FloatValue_DA0A7851285EC32E60E9000B8F42A76B3239DBAD.html">FloatValue</a>&nbsp;<a href="../class_FloatType_76BD053C4D5376F7B2AA14ABF157A810362A5EAA.html#variable_defaultValue_1B5CCA9185B9A4CC05237DB84D465215BEBDE739">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DoubleType_04052D259B5445A6EE553825B5D92046EA78469C.html">DoubleType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_PrimitiveType_5952B6FD2C54DFFD5AF5480F7EB60CF2F796FE0A.html">PrimitiveType</a></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DoubleType_04052D259B5445A6EE553825B5D92046EA78469C.html#constructor_DoubleType_32E6486096969C8FEEEA82178AF5CC784777E494">DoubleType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_DoubleType_04052D259B5445A6EE553825B5D92046EA78469C.html#function_DefaultValue_86A37222C9C8CD4674475F445702428CE4FEBB61">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_DoubleType_04052D259B5445A6EE553825B5D92046EA78469C.html#variable_defaultValue_D42B45AEABCF77F8AFD643498A5B78248D800138">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DoubleValue_F1C37903C87086A03F09B5C4796DC234DE1C6DEF.html">DoubleValue</a>&nbsp;<a href="../class_DoubleType_04052D259B5445A6EE553825B5D92046EA78469C.html#variable_defaultValue_D42B45AEABCF77F8AFD643498A5B78248D800138">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html">PtrType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html#constructor_PtrType_24041234DB0850CBD453DE9C3B385172BEC666AE">PtrType</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">baseType_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html#function_Name_34FF581EB95B2B033EECF59C8DE729DB397742A0">Name</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">*</span>&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html#function_DefaultValue_CEAD473FF918EC00247EB7283BA842A36056EBE2">DefaultValue</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html#variable_defaultValue_C8D317EBE65AECD89937AE95DD98ED055E76F6A1">defaultValue</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html#function_BaseType_3D939C9FC799611A64D91D0498A8C3E842EF5F91">BaseType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html#variable_baseType_73B056BA6ED7B642DBC10130E1469DA57659BC24">baseType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html#variable_baseType_73B056BA6ED7B642DBC10130E1469DA57659BC24">baseType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_NullValue_F08C50093506164FE08DCD094A6560F51C3A4C73.html">NullValue</a>&nbsp;<a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html#variable_defaultValue_C8D317EBE65AECD89937AE95DD98ED055E76F6A1">defaultValue</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_StructureType_24E5A52A09DC5A0F049578002D9BA8ABC337D25A.html">StructureType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_StructureType_24E5A52A09DC5A0F049578002D9BA8ABC337D25A.html#constructor_StructureType_FECBFD84FD1278AA8E18C5A919CCA21133C12A22">StructureType</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">id_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><a href="../class_StructureType_24E5A52A09DC5A0F049578002D9BA8ABC337D25A.html#function_MemberTypes_485AE34993851664F7D60A4A152CE695EFF80E06">MemberTypes</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">{</span><span class="kw">return</span><a href="../class_StructureType_24E5A52A09DC5A0F049578002D9BA8ABC337D25A.html#variable_memberTypes_BD4EC304DB6AC3CF05B53CE867B21E0470422D6A">memberTypes</a><span class="other">;</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_StructureType_24E5A52A09DC5A0F049578002D9BA8ABC337D25A.html#function_SetMemberTypes_FC2E115CFA88D8417DAE06855638D13D7C0CA7D0">SetMemberTypes</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">memberTypes_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">WriteDeclaration</span><span class="other">(</span><a href="../../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_StructureType_24E5A52A09DC5A0F049578002D9BA8ABC337D25A.html#function_IsStructureType_656E41A425CDF3D3EAF65DA479DB4C5329B8FCFF">IsStructureType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_StructureType_24E5A52A09DC5A0F049578002D9BA8ABC337D25A.html#function_GetMemberType_BA5A23BB33907A6FAAC1D28D822ADE8FDF6E1328">GetMemberType</a><span class="other">(</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">index</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span>&nbsp;<a href="../class_StructureType_24E5A52A09DC5A0F049578002D9BA8ABC337D25A.html#variable_memberTypes_BD4EC304DB6AC3CF05B53CE867B21E0470422D6A">memberTypes</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_StructureTypeHash_2800D4DCC761112BCDC9368C0E9A1DF773109258.html">StructureTypeHash</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">size_t</span>&nbsp;<span class="kw">operator</span><span class="other">()</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">memberTypes</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_StructureTypeEqual_760D3ACADC490BB727D9918B9663EAFDFC6AE6DE.html">StructureTypeEqual</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">size_t</span>&nbsp;<span class="kw">operator</span><span class="other">()</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">leftMemberTypes</span><span class="other">,&nbsp;</span><span class="kw">const</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">rightMemberTypes</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_ArrayType_8F157F833C7662AD7AB883F081E5AF17D35E6C36.html">ArrayType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ArrayType_8F157F833C7662AD7AB883F081E5AF17D35E6C36.html#constructor_ArrayType_A57DEEE63E61321AFA7734B54F334F4574614306">ArrayType</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">id_</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">elementType_</span><span class="other">,&nbsp;</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">size_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">WriteDeclaration</span><span class="other">(</span><a href="../../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_ArrayType_8F157F833C7662AD7AB883F081E5AF17D35E6C36.html#function_IsArrayType_E97F160FFF8D59F5CFE9275DF9D66FCEF08FA2E3">IsArrayType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ArrayType_8F157F833C7662AD7AB883F081E5AF17D35E6C36.html#function_ElementType_FB72323413741DD9F86FB2D96032B7FD64FE5D4E">ElementType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_ArrayType_8F157F833C7662AD7AB883F081E5AF17D35E6C36.html#variable_elementType_960D1AA79F4DF42A2F1A85B4C5B493F7C6E07E11">elementType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_ArrayType_8F157F833C7662AD7AB883F081E5AF17D35E6C36.html#variable_elementType_960D1AA79F4DF42A2F1A85B4C5B493F7C6E07E11">elementType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint64_t</span>&nbsp;<a href="../class_ArrayType_8F157F833C7662AD7AB883F081E5AF17D35E6C36.html#variable_size_2B239C91B5C7A141808C5811FF1F844D28097889">size</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html">ArrayTypeKey</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html#constructor_ArrayTypeKey_71233EE71066013E20082EB7830B76FFC536DB7E">ArrayTypeKey</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">elementType_</span><span class="other">,&nbsp;</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">size_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html#variable_elementType_2559293B3DD3D0C4CC16FDF34F2720621486A184">elementType</a><span class="other">(</span><span class="identifier">elementType_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html#variable_size_DAEAE2DEAC91C70B991686AAED9231011AACE61F">size</a><span class="other">(</span><span class="identifier">size_</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html#variable_elementType_2559293B3DD3D0C4CC16FDF34F2720621486A184">elementType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint64_t</span>&nbsp;<a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html#variable_size_DAEAE2DEAC91C70B991686AAED9231011AACE61F">size</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_ArrayTypeKeyHash_38AAB9912236EA61F10A8431CB698AC3E3DDB019.html">ArrayTypeKeyHash</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">size_t</span>&nbsp;<span class="kw">operator</span><span class="other">()</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html">ArrayTypeKey</a><span class="other">&amp;</span>&nbsp;<span class="identifier">key</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_ArrayTypeKeyEqual_1BD1E05BAE5011BFDF6B343BA6F71FBBCF1DC5DD.html">ArrayTypeKeyEqual</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">size_t</span>&nbsp;<span class="kw">operator</span><span class="other">()</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html">ArrayTypeKey</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html">ArrayTypeKey</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html">FunctionType</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html#constructor_FunctionType_0F3AEF7FBBEFF7A750450D9B936422F3F1873E5A">FunctionType</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">id_</span><span class="other">,&nbsp;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">returnType_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">paramTypes_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">WriteDeclaration</span><span class="other">(</span><a href="../../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html#function_IsFunctionType_450B76E2D504E664FE43AD73AE1BE96D1C427235">IsFunctionType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html#function_ReturnType_24705010C8CC3AEBF075DF6CA49AE3D2CC40133D">ReturnType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html#variable_returnType_F15A86BC57B0CA298600697669AE6F120D7E5C2D">returnType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html#function_ParamTypes_B3E3DAE9E8A100D05480DAA7720716D1F17950DF">ParamTypes</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">{</span><span class="kw">return</span><a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html#variable_paramTypes_06C1020C45B93F7942087C2A57ED1DB4EB412224">paramTypes</a><span class="other">;</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html#variable_returnType_F15A86BC57B0CA298600697669AE6F120D7E5C2D">returnType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span>&nbsp;<a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html#variable_paramTypes_06C1020C45B93F7942087C2A57ED1DB4EB412224">paramTypes</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_FunctionTypeKey_CC726BE9BCFF75D9FBCB838A0D1D1E07F64AF1E7.html">FunctionTypeKey</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_FunctionTypeKey_CC726BE9BCFF75D9FBCB838A0D1D1E07F64AF1E7.html#constructor_FunctionTypeKey_E4CA918D6E4E5A4161C1743CF7FC7929056ABD2B">FunctionTypeKey</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">returnType_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">paramTypes_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../struct_FunctionTypeKey_CC726BE9BCFF75D9FBCB838A0D1D1E07F64AF1E7.html#variable_returnType_96C94BA540EBE5A2699564DD0D31AF474E9C4ADC">returnType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span>&nbsp;<a href="../struct_FunctionTypeKey_CC726BE9BCFF75D9FBCB838A0D1D1E07F64AF1E7.html#variable_paramTypes_FE9B692606A3F6A621889AA2AB6D5E97540453BB">paramTypes</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_FunctionTypeKeyHash_3BA22F6032BCE9B742014295E94D78CF213F43E1.html">FunctionTypeKeyHash</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">size_t</span>&nbsp;<span class="kw">operator</span><span class="other">()</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../struct_FunctionTypeKey_CC726BE9BCFF75D9FBCB838A0D1D1E07F64AF1E7.html">FunctionTypeKey</a><span class="other">&amp;</span>&nbsp;<span class="identifier">key</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_FunctionTypeKeyEqual_11D81A75E31372FBA22E023CD8A6D593436ACD3B.html">FunctionTypeKeyEqual</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">size_t</span>&nbsp;<span class="kw">operator</span><span class="other">()</span><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../struct_FunctionTypeKey_CC726BE9BCFF75D9FBCB838A0D1D1E07F64AF1E7.html">FunctionTypeKey</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../struct_FunctionTypeKey_CC726BE9BCFF75D9FBCB838A0D1D1E07F64AF1E7.html">FunctionTypeKey</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html">TypeRepository</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#constructor_TypeRepository_DEAF8BF41799D3871B4FDD92D2A76D4F0C7B8CEF">TypeRepository</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">TypeRepository</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">TypeRepository</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">TypeRepository</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">TypeRepository</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">Write</span><span class="other">(</span><a href="../../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetVoidType_79109BA2181B1045C1815616FC9CA596B0F0A49C">GetVoidType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_voidType_5C1C422DA3D37499BBBF46F9EC773E6610B5D39D">voidType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetBoolType_3E68DFCBD175145DA7F84551741D74C446F0DBC0">GetBoolType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_boolType_E0594531E046B9653ACC15A0BF705759A5242CFD">boolType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetSByteType_B9F7E4B3EA8F39EE0548DBD20A2457EC36E534D6">GetSByteType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_sbyteType_FFA5CE6BCDA1327452227099D69EAF875BD03D46">sbyteType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetByteType_89D4BE322BFBAA5E156B54DF96B93BADF2AEFECB">GetByteType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_byteType_A0E5AE61A3CF0D5F3A7BF88A159360329F341BEE">byteType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="270" xml:space="preserve"><span class="lineNumber">270</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetShortType_DE9C642BDE3AD52C7879B3C83A5E3495C5ADFCCA">GetShortType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_shortType_219BDF4C42087CA554BB6801EF796EAC93F6D46A">shortType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="271" xml:space="preserve"><span class="lineNumber">271</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetUShortType_FE1A966628FE42AFC5DF2ADB19E58C26DB8C43B6">GetUShortType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_ushortType_196D9E606377859B5D6A851CE4138C3170A30F65">ushortType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="272" xml:space="preserve"><span class="lineNumber">272</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetIntType_F647CE7C7C670E519059C98086EEB073A7E8ACE1">GetIntType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_intType_5B0E7CBBE896F77A02CDED5AE8045BE1DBF37DDD">intType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="273" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetUIntType_E342A0D93D82981DECBDAB24C9D9F0058475DC1B">GetUIntType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_uintType_CD089D87EF0474DA05DBA064CD549B61D7325C8B">uintType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="274" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetLongType_3B1F808E405A36B53C2856A71349B0FE66A0F50F">GetLongType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_longType_A432F9ECD70E7C84D573568191A2CD95A4320969">longType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="275" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetULongType_B0953C7F08E3B3302BE4082C92C33F5C61A22741">GetULongType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_ulongType_9D72B7CB4EB0CF5A7815B1BAE7E80EA1881BB32C">ulongType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="276" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetFloatType_85BD738B0865281E5C0D304DA68D4016EF7B6DE9">GetFloatType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_floatType_0D8D3DA2A9A139EACB7BB9353CA5CF73A7D16E0E">floatType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="277" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetDoubleType_5FA05DBA5CAD62D61ED4CA2DC2E4825E0400E2A3">GetDoubleType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_doubleType_FC441D98195C71E22361D3D703FF6FE3A312770A">doubleType</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="278" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetPtrType_B3D8EED2158CCB46C4108CCF52DE0046D8A33E71">GetPtrType</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">baseType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="279" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetStructureType_56B66319DFEB505314EE254EFA5B26693052B815">GetStructureType</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">memberTypes</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="280" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_CreateStructureType_40D2E088EE29F32301BF8B13036855656E3019B9">CreateStructureType</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="281" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetArrayType_D8A33D2006767D9610609FF59F40231D7FF2ADD1">GetArrayType</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">elementType</span><span class="other">,&nbsp;</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">size</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="282" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#function_GetFunctionType_99417BEB79D46EF1B3530A352751DB1EF6EE4AE6">GetFunctionType</a><span class="other">(</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span>&nbsp;<span class="identifier">returnType</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">paramTypes</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="283" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="284" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_VoidType_42DEE3E7E785323A9F38E75814F30CBE8F7BAEA9.html">VoidType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_voidType_5C1C422DA3D37499BBBF46F9EC773E6610B5D39D">voidType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="285" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoolType_B6698688E31BF866F346E7CD3DEBFC2983B2DD38.html">BoolType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_boolType_E0594531E046B9653ACC15A0BF705759A5242CFD">boolType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="286" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SByteType_262D7A159C91D79E1DEE49E7FB08B53A3E622340.html">SByteType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_sbyteType_FFA5CE6BCDA1327452227099D69EAF875BD03D46">sbyteType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="287" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ByteType_47374F7D0B2F56C8DE47320B39D690C6A1C27D0B.html">ByteType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_byteType_A0E5AE61A3CF0D5F3A7BF88A159360329F341BEE">byteType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="288" xml:space="preserve"><span class="lineNumber">288</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ShortType_EF54EC73993C2FE8A235FC81DFCB246B599874AB.html">ShortType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_shortType_219BDF4C42087CA554BB6801EF796EAC93F6D46A">shortType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="289" xml:space="preserve"><span class="lineNumber">289</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UShortType_F321279D4B85656ACAE3CCE3042E178D40CABCC7.html">UShortType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_ushortType_196D9E606377859B5D6A851CE4138C3170A30F65">ushortType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="290" xml:space="preserve"><span class="lineNumber">290</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_IntType_813F7BCFA95128DD6101519BA2608265F2A67EA6.html">IntType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_intType_5B0E7CBBE896F77A02CDED5AE8045BE1DBF37DDD">intType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="291" xml:space="preserve"><span class="lineNumber">291</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_UIntType_F2C206E421794CCB68D51712D6471454A4F4E5BA.html">UIntType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_uintType_CD089D87EF0474DA05DBA064CD549B61D7325C8B">uintType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="292" xml:space="preserve"><span class="lineNumber">292</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_LongType_782A58811BD471810C9A26FF3C2749FA143F2234.html">LongType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_longType_A432F9ECD70E7C84D573568191A2CD95A4320969">longType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="293" xml:space="preserve"><span class="lineNumber">293</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_ULongType_BCF58E500C720D9AABEAECEBBECB8F42066CFEFC.html">ULongType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_ulongType_9D72B7CB4EB0CF5A7815B1BAE7E80EA1881BB32C">ulongType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="294" xml:space="preserve"><span class="lineNumber">294</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FloatType_76BD053C4D5376F7B2AA14ABF157A810362A5EAA.html">FloatType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_floatType_0D8D3DA2A9A139EACB7BB9353CA5CF73A7D16E0E">floatType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="295" xml:space="preserve"><span class="lineNumber">295</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DoubleType_04052D259B5445A6EE553825B5D92046EA78469C.html">DoubleType</a>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_doubleType_FC441D98195C71E22361D3D703FF6FE3A312770A">doubleType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="296" xml:space="preserve"><span class="lineNumber">296</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html">PtrType</a><span class="other">></span><span class="other">></span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_ptrTypes_4300B467EC6B679CA0D7BCDCDB8D77AA7E930D25">ptrTypes</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="297" xml:space="preserve"><span class="lineNumber">297</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">,&nbsp;</span><a href="../class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html">PtrType</a><span class="other">*</span><span class="other">></span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_ptrTypeMap_0F7242130199E52B41A9993A6CBB78CFD8B77A9D">ptrTypeMap</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="298" xml:space="preserve"><span class="lineNumber">298</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">*</span><span class="other">></span><span class="other">,&nbsp;</span><a href="../class_StructureType_24E5A52A09DC5A0F049578002D9BA8ABC337D25A.html">StructureType</a><span class="other">*</span><span class="other">,&nbsp;</span><a href="../struct_StructureTypeHash_2800D4DCC761112BCDC9368C0E9A1DF773109258.html">StructureTypeHash</a><span class="other">,&nbsp;</span><a href="../struct_StructureTypeEqual_760D3ACADC490BB727D9918B9663EAFDFC6AE6DE.html">StructureTypeEqual</a><span class="other">></span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_structureTypeMap_3C0D1BF7447F571667664E0C7D78D0A1054FC871">structureTypeMap</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="299" xml:space="preserve"><span class="lineNumber">299</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><a href="../struct_ArrayTypeKey_27EAD445D7B4010B5EE0543A5A17C903BD518D31.html">ArrayTypeKey</a><span class="other">,&nbsp;</span><a href="../class_ArrayType_8F157F833C7662AD7AB883F081E5AF17D35E6C36.html">ArrayType</a><span class="other">*</span><span class="other">,&nbsp;</span><a href="../struct_ArrayTypeKeyHash_38AAB9912236EA61F10A8431CB698AC3E3DDB019.html">ArrayTypeKeyHash</a><span class="other">,&nbsp;</span><a href="../struct_ArrayTypeKeyEqual_1BD1E05BAE5011BFDF6B343BA6F71FBBCF1DC5DD.html">ArrayTypeKeyEqual</a><span class="other">></span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_arrayTypeMap_8E42CF82FA443CDB18614156BEE231CBDCA54BC4">arrayTypeMap</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="300" xml:space="preserve"><span class="lineNumber">300</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><a href="../struct_FunctionTypeKey_CC726BE9BCFF75D9FBCB838A0D1D1E07F64AF1E7.html">FunctionTypeKey</a><span class="other">,&nbsp;</span><a href="../class_FunctionType_9473E855334C4F8638248ED9247B84740252FE21.html">FunctionType</a><span class="other">*</span><span class="other">,&nbsp;</span><a href="../struct_FunctionTypeKeyHash_3BA22F6032BCE9B742014295E94D78CF213F43E1.html">FunctionTypeKeyHash</a><span class="other">,&nbsp;</span><a href="../struct_FunctionTypeKeyEqual_11D81A75E31372FBA22E023CD8A6D593436ACD3B.html">FunctionTypeKeyEqual</a><span class="other">></span>&nbsp;<a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_functionTypeMap_6AEAC91486A0506F2F887A30FAE30DFD8EF625AA">functionTypeMap</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="301" xml:space="preserve"><span class="lineNumber">301</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html">Type</a><span class="other">></span><span class="other">></span><a href="../class_TypeRepository_77B5DF0875F3F2A17D8E206BD21DFC80666407F7.html#variable_types_991CCCCF09181040F38DA155D2794D8ABC086959">types</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="302" xml:space="preserve"><span class="lineNumber">302</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="303" xml:space="preserve"><span class="lineNumber">303</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="304" xml:space="preserve"><span class="lineNumber">304</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmsxi</span></span>
+  <br/>
+  <span class="code" id="305" xml:space="preserve"><span class="lineNumber">305</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="306" xml:space="preserve"><span class="lineNumber">306</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_CMSXI_TYPE_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

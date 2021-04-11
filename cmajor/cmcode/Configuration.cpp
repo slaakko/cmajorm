@@ -112,13 +112,14 @@ std::unique_ptr<sngxml::dom::Element> WindowSize::ToXml(const std::string& field
 }
 
 WindowSettings::WindowSettings()
-    : windowState(), location(), size(), maximizedHorizontalSplitterDistance(), maximizedVerticalSplitterDistance(), normalHorizontalSplitterDistance(), normalVerticalSplitterDistance()
+    : defined(), windowState(), location(), size(), maximizedHorizontalSplitterDistance(), maximizedVerticalSplitterDistance(), normalHorizontalSplitterDistance(), normalVerticalSplitterDistance()
 {
 }
 
 WindowSettings::WindowSettings(sngxml::dom::Element* element)
-    : windowState(), location(), size(), maximizedHorizontalSplitterDistance(), maximizedVerticalSplitterDistance(), normalHorizontalSplitterDistance(), normalVerticalSplitterDistance()
+    : defined(), windowState(), location(), size(), maximizedHorizontalSplitterDistance(), maximizedVerticalSplitterDistance(), normalHorizontalSplitterDistance(), normalVerticalSplitterDistance()
 {
+    sngxml::xmlser::FromXml(element, "defined", defined);
     sngxml::xmlser::FromXml(element, "windowState", windowState);
     sngxml::xmlser::FromXml(element, "location", location);
     sngxml::xmlser::FromXml(element, "size", size);
@@ -131,6 +132,7 @@ WindowSettings::WindowSettings(sngxml::dom::Element* element)
 std::unique_ptr<sngxml::dom::Element> WindowSettings::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(defined, "defined").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(windowState, "windowState").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(location, "location").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(size, "size").release()));

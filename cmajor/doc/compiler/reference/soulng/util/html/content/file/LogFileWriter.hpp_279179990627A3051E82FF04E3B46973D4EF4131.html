@@ -1,0 +1,96 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;SOULNG_UTIL_LOG_FILE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;SOULNG_UTIL_LOG_FILE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/UtilApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;fstream></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#constructor_LogFileWriter_B7E58C7C305E3B0FFA48AF2D4219CD45D7BB9FD3">LogFileWriter</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">logFilePath_</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">open_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#constructor_LogFileWriter_0008D3D9D8AC73B8AA823AC4F9645F31E5BCCBA4">LogFileWriter</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">logFilePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#function_WriteCurrentDateTime_ACCCC9729FAF7F2C6CB166B6B25BA99ABE2941C4">WriteCurrentDateTime</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#function_WriteLine_2CCD6BC7B74DDA16BE09DC45328186404698AF85">WriteLine</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#function_WriteLine_26C3E4BE309E271A214F3539D71603470D785515">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">line</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#function_Write_A08B47A9946B247718F095764BFB3E0EEE1C4F76">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">typedef</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">basic_ostream</span><span class="other">&lt;</span><span class="kw">char</span><span class="other">,</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">char_traits</span><span class="other">&lt;</span><span class="kw">char</span><span class="other">>></span>&nbsp;<span class="identifier">CoutType</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">typedef</span>&nbsp;<span class="identifier">CoutType</span><span class="other">&amp;</span>&nbsp;<span class="other">(</span><span class="other">*</span><span class="identifier">StandardEndLine</span><span class="other">)</span><span class="other">(</span><span class="identifier">CoutType</span><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;&lt;</span><span class="other">(</span><span class="identifier">StandardEndLine</span>&nbsp;<span class="identifier">manip</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">ostream</span><span class="other">&amp;</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#function_LogFile_2C047144C078ADEEBB0F8F96FF7D714B8E813080">LogFile</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#variable_logFile_14E32B1CAA558679B90DD7B87F18B6E2CB4E2FF0">logFile</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#variable_open_1891B2C8E59A82A1EC96B902282301C11312516D">open</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#variable_logFilePath_80678612510DB8CB84F937D08ED1CFB8E39AC089">logFilePath</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">ofstream</span>&nbsp;<a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html#variable_logFile_14E32B1CAA558679B90DD7B87F18B6E2CB4E2FF0">logFile</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="identifier">LogFileWriter</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;&lt;</span><span class="other">(</span><a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="identifier">LogFileWriter</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;&lt;</span><span class="other">(</span><a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="identifier">LogFileWriter</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;&lt;</span><span class="other">(</span><a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">char</span>&nbsp;<span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="identifier">LogFileWriter</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;&lt;</span><span class="other">(</span><a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">b</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="identifier">LogFileWriter</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;&lt;</span><span class="other">(</span><a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="identifier">LogFileWriter</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;&lt;</span><span class="other">(</span><a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">double</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="identifier">LogFileWriter</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;&lt;</span><span class="other">(</span><a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="identifier">LogFileWriter</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">&lt;&lt;</span><span class="other">(</span><a href="../class_LogFileWriter_074B6BF0CC5F36939A0598D826CF2329C0534108.html">LogFileWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="identifier">uint64_t</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;SOULNG_UTIL_LOG_FILE_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

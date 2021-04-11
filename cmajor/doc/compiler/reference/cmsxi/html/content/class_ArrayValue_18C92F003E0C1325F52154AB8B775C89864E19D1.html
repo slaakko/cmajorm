@@ -16,8 +16,8 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html#170">170</a>
-             of <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html#175">175</a>
+             of <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html">Value.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
@@ -28,6 +28,10 @@
         </table>
         <h2>Member Functions</h2>
         <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#function_AddDependencies_39676B49CA4C73D6B59F16EB032EE72CAADE9A61">AddDependencies</a>(<a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a>* variable, <span class="kw">const </span>std::unordered_map&lt;std::string, <a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a>*>&amp; nameMap, std::unordered_map&lt;<a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a>*, std::set&lt;<a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a>*>>&amp; dependencies, <a href="./class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a>&amp; context) <span class="kw">override</span></td>
+            </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#function_AddElement_D7FFD1BB0D34757DFF1106201EAFA92F71080D90">AddElement</a>(<a href="./class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a>* element)</td>
@@ -70,49 +74,83 @@
             *>&amp; elements_, <span class="kw">const </span>
             std::string&amp; prefix_)</h4>
         <span>
-            Definition at line <a href="file/Value.cpp_686C23DE06505A01D0A4B00430F1E3FC8372FA33.html#232">232</a>
-             of <a href="file/Value.cpp_686C23DE06505A01D0A4B00430F1E3FC8372FA33.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_4BDB42C5005D4BD621DF09CB9D23BD1D63CAFDD1.html#237">237</a>
+             of <a href="file/Value.cpp_4BDB42C5005D4BD621DF09CB9D23BD1D63CAFDD1.html">Value.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_type_B4F49061E2380D7E9E64DA90266B3173A74018ED">type</a><span class="other">(</span><span class="identifier">type_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_elements_2F12B6E0163932D0BC3201D97F9E6720056E1F38">elements</a><span class="other">(</span><span class="identifier">elements_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_prefix_C32382FD4F0A866868F2B06EB0B8C8697B7C97F4">prefix</a><span class="other">(</span><span class="identifier">prefix_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_type_B4F49061E2380D7E9E64DA90266B3173A74018ED">type</a><span class="other">(</span><span class="identifier">type_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_elements_2F12B6E0163932D0BC3201D97F9E6720056E1F38">elements</a><span class="other">(</span><span class="identifier">elements_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_prefix_C32382FD4F0A866868F2B06EB0B8C8697B7C97F4">prefix</a><span class="other">(</span><span class="identifier">prefix_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html#173">173</a>
-             of <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html">Value.hpp</a>
+            Declaration at line <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html#178">178</a>
+             of <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
+        <h3 id="function_AddDependencies_39676B49CA4C73D6B59F16EB032EE72CAADE9A61">AddDependencies Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmsxi::ArrayValue::AddDependencies(<a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a>
+            * variable, <span class="kw">const </span>
+            std::unordered_map&lt;std::string, <a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a>
+            *>&amp; nameMap, std::unordered_map&lt;<a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a>
+            *, std::set&lt;<a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a>
+            *>>&amp; dependencies, <a href="./class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a>
+            &amp; context) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Value.cpp_4BDB42C5005D4BD621DF09CB9D23BD1D63CAFDD1.html#268">268</a>
+             of <a href="file/Value.cpp_4BDB42C5005D4BD621DF09CB9D23BD1D63CAFDD1.html">Value.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html#183">183</a>
+             of <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html">Value.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_AddDependencies_5B57933CBF03D4EB34C78A6F6CAC05018355048A">cmsxi::Value::AddDependencies</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_AddDependencies_5B57933CBF03D4EB34C78A6F6CAC05018355048A">cmsxi::Value::AddDependencies</a>
+            , <a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_Name_30CB8EE7B42C4DE8442F7A678366C56D08B598AC">cmsxi::Value::Name</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_AddElement_D7FFD1BB0D34757DFF1106201EAFA92F71080D90">AddElement Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmsxi::ArrayValue::AddElement(<a href="./class_ConstantValue_D2FCE66847D0F91BFD727D856C2931BFAB189172.html">ConstantValue</a>
             * element)</h4>
         <span>
-            Definition at line <a href="file/Value.cpp_686C23DE06505A01D0A4B00430F1E3FC8372FA33.html#263">263</a>
-             of <a href="file/Value.cpp_686C23DE06505A01D0A4B00430F1E3FC8372FA33.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_4BDB42C5005D4BD621DF09CB9D23BD1D63CAFDD1.html#285">285</a>
+             of <a href="file/Value.cpp_4BDB42C5005D4BD621DF09CB9D23BD1D63CAFDD1.html">Value.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_elements_2F12B6E0163932D0BC3201D97F9E6720056E1F38">elements</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">element</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_elements_2F12B6E0163932D0BC3201D97F9E6720056E1F38">elements</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">element</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">288</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html#176">176</a>
-             of <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html">Value.hpp</a>
+            Declaration at line <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html#181">181</a>
+             of <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
@@ -124,11 +162,11 @@
             &amp; context) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html#175">175</a>
-             of <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html#180">180</a>
+             of <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html">Value.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_type_B4F49061E2380D7E9E64DA90266B3173A74018ED">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ArrayValue_18C92F003E0C1325F52154AB8B775C89864E19D1.html#variable_type_B4F49061E2380D7E9E64DA90266B3173A74018ED">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -145,11 +183,11 @@
              cmsxi::ArrayValue::IsAggregateValue() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html#177">177</a>
-             of <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html">Value.hpp</a>
+            Definition at line <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html#182">182</a>
+             of <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html">Value.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -166,13 +204,13 @@
             &amp; context) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Value.cpp_686C23DE06505A01D0A4B00430F1E3FC8372FA33.html#236">236</a>
-             of <a href="file/Value.cpp_686C23DE06505A01D0A4B00430F1E3FC8372FA33.html">Value.cpp</a>
+            Definition at line <a href="file/Value.cpp_4BDB42C5005D4BD621DF09CB9D23BD1D63CAFDD1.html#241">241</a>
+             of <a href="file/Value.cpp_4BDB42C5005D4BD621DF09CB9D23BD1D63CAFDD1.html">Value.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html#174">174</a>
-             of <a href="file/Value.hpp_47349FBC4FB2141B57AEF8DBB11D79FB40B56AE2.html">Value.hpp</a>
+            Declaration at line <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html#179">179</a>
+             of <a href="file/Value.hpp_533240E8A4F16BA7681F627626E6F8D8C913824A.html">Value.hpp</a>
         </span>
         <br/>
         <br/>

@@ -1,0 +1,374 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/FileLocking.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Log.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Path.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;condition_variable></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;memory></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;mutex></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="pp">#include&nbsp;&lt;map></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="pp">#include&nbsp;&lt;set></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">debugFileLocking</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_Init_480462EA48D6AC370136C940772784C9BBF1B1D3">Init</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_Done_19D54F57B373CB6672B3FDB4B68669B03CF5C7D6">Done</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">&amp;</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_Instance_27E2926EE022C6626795098BEEC3599724FD625C">Instance</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_instance_60602263002AA20A9F7B341A6DD2FA8299F3EA16">instance</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_LockFile_CF05EF5AEC9D7291C42705E5DC14E86BC330AEA6">LockFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">,&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a>&nbsp;<span class="identifier">lockKind</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_UnlockFile_B79C59EE49B9209FF61D2E8F81A8DC23342EF077">UnlockFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">,&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a>&nbsp;<span class="identifier">lockKind</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_NoReaders_5EB97E7F19D76435049A4AAE3C73572F17A8A196">NoReaders</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_NoWriters_95CF3FF1900B22B00670BF3974F0479E2A062287">NoWriters</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">></span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_instance_60602263002AA20A9F7B341A6DD2FA8299F3EA16">instance</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#constructor_FileLockTable_59712C0E207A0267C521FC99BBED827CBF3048C3">FileLockTable</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_mtx_353A791FD04ADCFB24C4DE7CA6072E63A3FAE266">mtx</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">,&nbsp;</span><span class="kw">int</span><span class="other">></span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">set</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_releaseRead_5DFD89CE7AE056A302C9EE0A54F63C37DFD5A251">releaseRead</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_releaseWrite_27CAE4B3CEC44DA67FD5853BB7121DD810790CA6">releaseWrite</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingReadLock_5B385260DFDD7AACF718D44E9E747674EB78E859">waitingReadLock</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingWriteLock_BAE1972BE21452CA151F83AF4195F21A6F8F873F">waitingWriteLock</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">FileLockTable</span><span class="other">></span>&nbsp;<span class="identifier">FileLockTable</span><span class="other">::</span><span class="identifier">instance</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#constructor_FileLockTable_59712C0E207A0267C521FC99BBED827CBF3048C3">FileLockTable</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingReadLock_5B385260DFDD7AACF718D44E9E747674EB78E859">waitingReadLock</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingWriteLock_BAE1972BE21452CA151F83AF4195F21A6F8F873F">waitingWriteLock</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_Init_480462EA48D6AC370136C940772784C9BBF1B1D3">Init</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_instance_60602263002AA20A9F7B341A6DD2FA8299F3EA16">instance</a><span class="other">.</span><a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_Done_19D54F57B373CB6672B3FDB4B68669B03CF5C7D6">Done</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_instance_60602263002AA20A9F7B341A6DD2FA8299F3EA16">instance</a><span class="other">.</span><a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_reset_D4505172AE4A6279C5D9B51155F0E78CC0555214">reset</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_LockFile_CF05EF5AEC9D7291C42705E5DC14E86BC330AEA6">LockFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">,&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a>&nbsp;<span class="identifier">lockKind</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_mtx_353A791FD04ADCFB24C4DE7CA6072E63A3FAE266">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">lockKind</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a><span class="other">::</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html#enumerator_write_23E0E747A8504567E95FC63EF71E624E647BACE5">write</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">itRead</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">itRead</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingReadLock_5B385260DFDD7AACF718D44E9E747674EB78E859">waitingReadLock</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_debugFileLocking_87EE3DDF913C2D97EEE4161A0EB550B424A6C5DA">debugFileLocking</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"File&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">filePath</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"&nbsp;locked&nbsp;for&nbsp;reading,&nbsp;number&nbsp;of&nbsp;readers&nbsp;is&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">itRead</span><span class="other">-></span><span class="identifier">second</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_releaseRead_5DFD89CE7AE056A302C9EE0A54F63C37DFD5A251">releaseRead</a><span class="other">.</span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="other">[</span><span class="kw">this</span>&nbsp;&nbsp;<span class="identifier">filePath</span><span class="other">]</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">NoReaders</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_debugFileLocking_87EE3DDF913C2D97EEE4161A0EB550B424A6C5DA">debugFileLocking</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"File&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">filePath</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"':&nbsp;readers&nbsp;exited"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingReadLock_5B385260DFDD7AACF718D44E9E747674EB78E859">waitingReadLock</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">itWrite</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">itWrite</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingWriteLock_BAE1972BE21452CA151F83AF4195F21A6F8F873F">waitingWriteLock</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_debugFileLocking_87EE3DDF913C2D97EEE4161A0EB550B424A6C5DA">debugFileLocking</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"File&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">filePath</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"&nbsp;locked&nbsp;for&nbsp;writing"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_releaseWrite_27CAE4B3CEC44DA67FD5853BB7121DD810790CA6">releaseWrite</a><span class="other">.</span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="other">[</span><span class="kw">this</span>&nbsp;&nbsp;<span class="identifier">filePath</span><span class="other">]</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">NoWriters</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_debugFileLocking_87EE3DDF913C2D97EEE4161A0EB550B424A6C5DA">debugFileLocking</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"File&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">filePath</span><span class="other">&nbsp;+&nbsp;</span><span class="string">":&nbsp;writer&nbsp;exited"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingWriteLock_BAE1972BE21452CA151F83AF4195F21A6F8F873F">waitingWriteLock</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">lockKind</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a><span class="other">::</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html#enumerator_read_68890563B06102D7E7C1720DBD1B2FDCEED48DC0">read</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">itWrite</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">itWrite</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingWriteLock_BAE1972BE21452CA151F83AF4195F21A6F8F873F">waitingWriteLock</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_debugFileLocking_87EE3DDF913C2D97EEE4161A0EB550B424A6C5DA">debugFileLocking</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"File&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">filePath</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"&nbsp;locked&nbsp;for&nbsp;writing"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_releaseWrite_27CAE4B3CEC44DA67FD5853BB7121DD810790CA6">releaseWrite</a><span class="other">.</span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="other">[</span><span class="kw">this</span>&nbsp;&nbsp;<span class="identifier">filePath</span><span class="other">]</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">NoWriters</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#variable_debugFileLocking_87EE3DDF913C2D97EEE4161A0EB550B424A6C5DA">debugFileLocking</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">LogMessage</span><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">"File&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">filePath</span><span class="other">&nbsp;+&nbsp;</span><span class="string">":&nbsp;writer&nbsp;exited"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingWriteLock_BAE1972BE21452CA151F83AF4195F21A6F8F873F">waitingWriteLock</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">lockKind</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a><span class="other">::</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html#enumerator_write_23E0E747A8504567E95FC63EF71E624E647BACE5">write</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">insert</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">lockKind</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a><span class="other">::</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html#enumerator_read_68890563B06102D7E7C1720DBD1B2FDCEED48DC0">read</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">[</span><span class="identifier">filePath</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_NoReaders_5EB97E7F19D76435049A4AAE3C73572F17A8A196">NoReaders</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;&nbsp;<span class="identifier">filePath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">.</span><span class="identifier">end</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">numReaders</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">numReaders</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_NoWriters_95CF3FF1900B22B00670BF3974F0479E2A062287">NoWriters</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#function_UnlockFile_B79C59EE49B9209FF61D2E8F81A8DC23342EF077">UnlockFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">,&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a>&nbsp;<span class="identifier">lockKind</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_mtx_353A791FD04ADCFB24C4DE7CA6072E63A3FAE266">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">lockKind</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a><span class="other">::</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html#enumerator_read_68890563B06102D7E7C1720DBD1B2FDCEED48DC0">read</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span><span class="other">&amp;</span>&nbsp;<span class="identifier">numReaders</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">[</span><span class="identifier">filePath</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">--</span><span class="identifier">numReaders</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">numReaders</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_readMap_4CEDD7F705B8DF72CCDDA3FC4E4F94A88F1CBED8">readMap</a><span class="other">.</span><span class="identifier">erase</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingReadLock_5B385260DFDD7AACF718D44E9E747674EB78E859">waitingReadLock</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_releaseRead_5DFD89CE7AE056A302C9EE0A54F63C37DFD5A251">releaseRead</a><span class="other">.</span><span class="identifier">notify_all</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">lockKind</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a><span class="other">::</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html#enumerator_write_23E0E747A8504567E95FC63EF71E624E647BACE5">write</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_writeLocks_E87ECFBFB149D7F224E1FCB35474ED6E5F1F9643">writeLocks</a><span class="other">.</span><span class="identifier">erase</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_waitingWriteLock_BAE1972BE21452CA151F83AF4195F21A6F8F873F">waitingWriteLock</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html#variable_releaseWrite_27CAE4B3CEC44DA67FD5853BB7121DD810790CA6">releaseWrite</a><span class="other">.</span><span class="identifier">notify_all</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_LockFile_20B4F55DE0846A3229BD97BBD1056BC71AC27A71">LockFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">,&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a>&nbsp;<span class="identifier">lockKind</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">LockFile</span><span class="other">(</span><span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">lockKind</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_UnlockFile_E3DE6D0C0B4593FAB8D64073B70076274C8A312B">UnlockFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">,&nbsp;</span><a href="../enum_LockKind_E58EE3AF6ACD9BD0945DBD1CCAA0A977E0237656.html">LockKind</a>&nbsp;<span class="identifier">lockKind</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">UnlockFile</span><span class="other">(</span><span class="identifier">GetFullPath</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">lockKind</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_InitFileLocking_087273676C43AD2091B4DA7A4FF3427D763DA417">InitFileLocking</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html#function_DoneFileLocking_EB93734C93C3603ADC4B096CAA9AEB2EB8AA9270">DoneFileLocking</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_FileLockTable_FBE8BB9D5801DE6CED0BD86A08D4CE2BCCFE5ADD.html">FileLockTable</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <br/>
+ </body>
+</html>

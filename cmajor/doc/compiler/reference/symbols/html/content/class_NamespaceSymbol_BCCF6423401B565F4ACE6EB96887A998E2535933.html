@@ -16,14 +16,14 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#12">12</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Definition at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#12">12</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html#constructor_NamespaceSymbol_6E6F092F3F8A9BD4578B27285C6DE78911CCF522">NamespaceSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html#constructor_NamespaceSymbol_E7039B49C40A10CB4123458B3CD4D32CB17833F0">NamespaceSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -35,6 +35,14 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html#function_CreateDomElement_E0B2938563AAB7BB034EF079B5582D3D943FDB90">CreateDomElement</a>(<a href="./class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html">TypeMap</a>&amp; typeMap) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html#function_GetSymbolCategoryDescription_510E28022C74636708EA5DA2DCBB4A7074C80950">GetSymbolCategoryDescription</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html#function_GetSymbolCategoryStr_85A75B28F6E8DBAA9A8043234FFCC617D86FF3F2">GetSymbolCategoryStr</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
@@ -63,28 +71,31 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_NamespaceSymbol_6E6F092F3F8A9BD4578B27285C6DE78911CCF522">NamespaceSymbol Constructor</h3>
+        <h3 id="constructor_NamespaceSymbol_E7039B49C40A10CB4123458B3CD4D32CB17833F0">NamespaceSymbol Constructor</h3>
         <h4>
             cmajor::symbols::NamespaceSymbol::NamespaceSymbol(<span class="kw">const </span>
             Span&amp; span_, <span class="kw">const </span>
+            boost::uuids::uuid&amp; sourceModuleId_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.cpp_0E72F61D2A533340BAFC534E692E201975454886.html#11">11</a>
-             of <a href="file/NamespaceSymbol.cpp_0E72F61D2A533340BAFC534E692E201975454886.html">NamespaceSymbol.cpp</a>
+            Definition at line <a href="file/NamespaceSymbol.cpp_49F87B993F99D66B6BE95052ABA4B4B616B33CEB.html#12">12</a>
+             of <a href="file/NamespaceSymbol.cpp_49F87B993F99D66B6BE95052ABA4B4B616B33CEB.html">NamespaceSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html">ContainerSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_namespaceSymbol_3BA02215C7D0C5FA0EE1812EF938A1E614B7B0F2">namespaceSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html">ContainerSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_namespaceSymbol_3BA02215C7D0C5FA0EE1812EF938A1E614B7B0F2">namespaceSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">sourceModuleId_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#15">15</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Declaration at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#15">15</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -97,8 +108,8 @@
             * cmajor::symbols::NamespaceSymbol::ClassName() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#23">23</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Definition at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#23">23</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"NamespaceSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -120,36 +131,36 @@
             &amp; typeMap) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.cpp_0E72F61D2A533340BAFC534E692E201975454886.html#50">50</a>
-             of <a href="file/NamespaceSymbol.cpp_0E72F61D2A533340BAFC534E692E201975454886.html">NamespaceSymbol.cpp</a>
+            Definition at line <a href="file/NamespaceSymbol.cpp_49F87B993F99D66B6BE95052ABA4B4B616B33CEB.html#52">52</a>
+             of <a href="file/NamespaceSymbol.cpp_49F87B993F99D66B6BE95052ABA4B4B616B33CEB.html">NamespaceSymbol.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">HasProjectMembers</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_private__24E6EAED6AFD4F5604BFD74E888F25D5D578EB84">private_</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">HasProjectMembers</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">Access</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_private__24E6EAED6AFD4F5604BFD74E888F25D5D578EB84">private_</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">(</span><span class="string">U"NamespaceSymbol"</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">(</span><span class="string">U"NamespaceSymbol"</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">></span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./../../../sngxml/dom/html/content/namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="./../../../sngxml/dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">></span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#21">21</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Declaration at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#21">21</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -165,13 +176,53 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_GetSymbolCategoryDescription_510E28022C74636708EA5DA2DCBB4A7074C80950">GetSymbolCategoryDescription Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::NamespaceSymbol::GetSymbolCategoryDescription() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#25">25</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"namespace"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryDescription_34BE1EAEAA69A7557F968BD6B843A5DC2295736E">cmajor::symbols::Symbol::GetSymbolCategoryDescription</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSymbolCategoryStr_85A75B28F6E8DBAA9A8043234FFCC617D86FF3F2">GetSymbolCategoryStr Member Function</h3>
+        <h4>
+            std::string cmajor::symbols::NamespaceSymbol::GetSymbolCategoryStr() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#24">24</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"NS"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolCategoryStr_DE4CB4E167EA03932F01A5903D1CC2B8A2E473DF">cmajor::symbols::Symbol::GetSymbolCategoryStr</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_Id_6F22DC1F3101C82AB780B504EB9499A1728815EB">Id Member Function</h3>
         <h4>
             std::u32string cmajor::symbols::NamespaceSymbol::Id() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#17">17</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Definition at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#17">17</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">U"ns_"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -197,13 +248,13 @@
             * that, <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">SymbolTable</a>
             &amp; symbolTable)</h4>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.cpp_0E72F61D2A533340BAFC534E692E201975454886.html#15">15</a>
-             of <a href="file/NamespaceSymbol.cpp_0E72F61D2A533340BAFC534E692E201975454886.html">NamespaceSymbol.cpp</a>
+            Definition at line <a href="file/NamespaceSymbol.cpp_49F87B993F99D66B6BE95052ABA4B4B616B33CEB.html#17">17</a>
+             of <a href="file/NamespaceSymbol.cpp_49F87B993F99D66B6BE95052ABA4B4B616B33CEB.html">NamespaceSymbol.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#19">19</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Declaration at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#19">19</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
         </span>
         <br/>
         <br/>
@@ -214,7 +265,8 @@
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
-            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginNamespace_206F85DA17D2A770B9325614C6A23AA299DA5540">cmajor::symbols::SymbolTable::BeginNamespace</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SourceModuleId_C24B6D9C17BDD90D44BC97EC5699D3D8D77AEC4C">cmajor::symbols::Symbol::SourceModuleId</a>
+            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginNamespace_2449BA15920AEB3A386EDF9E4A517467439AB47D">cmajor::symbols::SymbolTable::BeginNamespace</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_Container_9DD113D671A388284CDED7085CD47EF2D351C493">cmajor::symbols::SymbolTable::Container</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_EndNamespace_20AB381D28F14BD553B7438B53C1D0C31D1B4B2A">cmajor::symbols::SymbolTable::EndNamespace</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MapNs_654D9BE20718D0992C8197063B4D7DBE397D3832">cmajor::symbols::SymbolTable::MapNs</a>
@@ -233,8 +285,8 @@
             std::u32string cmajor::symbols::NamespaceSymbol::Info() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#22">22</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Definition at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#22">22</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -259,8 +311,8 @@
              cmajor::symbols::NamespaceSymbol::IsGlobalNamespace() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#20">20</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Definition at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#20">20</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -280,8 +332,8 @@
              cmajor::symbols::NamespaceSymbol::IsParentSymbol() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#18">18</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Definition at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#18">18</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
@@ -300,8 +352,8 @@
             std::string cmajor::symbols::NamespaceSymbol::TypeString() <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html#16">16</a>
-             of <a href="file/NamespaceSymbol.hpp_EB5E2BAECA32C1AE31315D70FB50E3375B64C8C0.html">NamespaceSymbol.hpp</a>
+            Definition at line <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html#16">16</a>
+             of <a href="file/NamespaceSymbol.hpp_818AC379741222FEEA66B846D657F8964C3EB4E1.html">NamespaceSymbol.hpp</a>
             :<br/>
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"namespace"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
