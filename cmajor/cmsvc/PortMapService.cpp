@@ -26,6 +26,11 @@ namespace cmajor { namespace service {
 using namespace soulng::unicode;
 using namespace soulng::util;
 
+std::string GetMessage(sngxml::dom::Element* element)
+{
+    return ToUtf8(element->Name());
+}
+
 int GetPortMapServicePortNumberFromConfig()
 {
     std::string portMapConfigFilePath;
@@ -87,6 +92,47 @@ bool StartPortMapServer()
     return false;
 }
 
+bool StopPortMapServer()
+{
+    try
+    {
+        int portMapServerPort = GetPortMapServicePortNumberFromConfig();
+        if (portMapServerPort == -1)
+        {
+            throw std::runtime_error("could not get port map server port number from configuration file '" + PortMapConfigFilePath() + "'");
+        }
+        TcpSocket portMapServerConnection("localhost", std::to_string(portMapServerPort));
+        PutOutputServiceMessage("connection to port map server port " + std::to_string(portMapServerPort) + " established");
+        PutOutputServiceMessage("sending stop request...");
+        StopPortMapServerRequest request;
+        std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("stopPortMapServerRequest");
+        sngxml::dom::Document requestDoc;
+        requestDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(requestElement.release()));
+        std::stringstream stream;
+        CodeFormatter formatter(stream);
+        requestDoc.Write(formatter);
+        std::string requestStr = stream.str();
+        Write(portMapServerConnection, requestStr);
+        std::string replyStr = ReadStr(portMapServerConnection);
+        std::unique_ptr<sngxml::dom::Document> replyDoc = sngxml::dom::ParseDocument(ToUtf32(replyStr), "socket");
+        std::string message = GetMessage(replyDoc->DocumentElement());
+        if (message == "stopPortMapServerReply")
+        {
+            PutOutputServiceMessage("stop reply received");
+            return true;
+        }
+        else
+        {
+            throw std::runtime_error("'stopPortMapServerReply' expected, message=" + message);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        PutOutputServiceMessage("error: could not stop port map server: " + std::string(ex.what()));
+    }
+    return false;
+}
+
 int GetPortMapServicePortNumber(bool& portMapServerStarted)
 {
     portMapServerStarted = false;
@@ -97,11 +143,6 @@ int GetPortMapServicePortNumber(bool& portMapServerStarted)
         portmapServicePortNumber = GetPortMapServicePortNumberFromConfig();
     }
     return portmapServicePortNumber;
-}
-
-std::string GetMessage(sngxml::dom::Element* element)
-{
-    return ToUtf8(element->Name());
 }
 
 int GetFreePortNumber(const std::string& processName)
@@ -166,6 +207,97 @@ int GetFreePortNumber(const std::string& processName)
         PutOutputServiceMessage("error: could not get free port number from port map server: " + std::string(ex.what()));
     }
     return -1;
+}
+
+bool IsPortMapServerRunning()
+{
+    bool logError = true;
+    try
+    {
+        int portMapServerPort = GetPortMapServicePortNumberFromConfig();
+        if (portMapServerPort == -1)
+        {
+            throw std::runtime_error("could not get port map server port number from configuration file '" + PortMapConfigFilePath() + "'");
+        }
+        logError = false;
+        TcpSocket connection("localhost", std::to_string(portMapServerPort));
+        logError = true;
+        HelloPmsRequest request;
+        std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("helloPmsRequest");
+        sngxml::dom::Document requestDoc;
+        requestDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(requestElement.release()));
+        std::stringstream stream;
+        CodeFormatter formatter(stream);
+        requestDoc.Write(formatter);
+        std::string requestStr = stream.str();
+        Write(connection, requestStr);
+        std::string replyStr = ReadStr(connection);
+        if (replyStr.empty())
+        {
+            throw std::runtime_error("'helloPmsReply' expected, please stop cmpms process from the Task Manager and use 'Server | Start' command to run updated version");
+        }
+        std::unique_ptr<sngxml::dom::Document> replyDoc = sngxml::dom::ParseDocument(ToUtf32(replyStr), "socket");
+        std::string message = GetMessage(replyDoc->DocumentElement());
+        if (message == "helloPmsReply")
+        {
+            HelloPmsReply reply(replyDoc->DocumentElement());
+            PutOutputServiceMessage("port map server (cmpms) version " + reply.version + " running");
+            return true;
+        }
+        else
+        {
+            throw std::runtime_error("'helloPmsReply' expected, message=" + message + ", please stop cmpms process from the Task Manager and use 'Server | Start' command to run updated version");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        if (logError)
+        {
+            PutOutputServiceMessage("error: " + std::string(ex.what()));
+        }
+    }
+    return false;
+}
+
+
+std::vector<PortLease> GetPortLeases()
+{
+    std::vector<PortLease> portLeases;
+    try
+    {
+        int portMapServerPort = GetPortMapServicePortNumberFromConfig();
+        if (portMapServerPort == -1)
+        {
+            throw std::runtime_error("could not get port map server port number from configuration file '" + PortMapConfigFilePath() + "'");
+        }
+        TcpSocket connection("localhost", std::to_string(portMapServerPort));
+        ViewPortLeaseRequest request;
+        std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("viewPortLeaseRequest");
+        sngxml::dom::Document requestDoc;
+        requestDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(requestElement.release()));
+        std::stringstream stream;
+        CodeFormatter formatter(stream);
+        requestDoc.Write(formatter);
+        std::string requestStr = stream.str();
+        Write(connection, requestStr);
+        std::string replyStr = ReadStr(connection);
+        std::unique_ptr<sngxml::dom::Document> replyDoc = sngxml::dom::ParseDocument(ToUtf32(replyStr), "socket");
+        std::string message = GetMessage(replyDoc->DocumentElement());
+        if (message == "viewPortLeaseReply")
+        {
+            ViewPortLeaseReply reply(replyDoc->DocumentElement());
+            return reply.portLeases;
+        }
+        else
+        {
+            throw std::runtime_error("'viewPortLeaseReply' expected, message=" + message);
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        PutOutputServiceMessage("error: " + std::string(ex.what()));
+    }
+    return portLeases;
 }
 
 } } // namespace cmajor::service

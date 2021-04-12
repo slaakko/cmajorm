@@ -38,7 +38,7 @@ using NodeHoveredEvent = EventWithArgs<TreeViewNodeEventArgs>;
 
 enum class TreeViewFlags : int
 {
-    none = 0, changed = 1 << 0, treeViewNodeChanged = 1 << 1, treeViewNodeStateChanged = 1 << 2, toolTipWindowAdded = 1 << 3, toolTipWindowShown = 1 << 4
+    none = 0, changed = 1 << 0, treeViewNodeChanged = 1 << 1, treeViewNodeStateChanged = 1 << 2, toolTipWindowAdded = 1 << 3, toolTipWindowShown = 1 << 4, addToolTipWindow = 1 << 5
 };
 
 WING_API inline TreeViewFlags operator&(TreeViewFlags left, TreeViewFlags right)
@@ -80,6 +80,7 @@ struct WING_API TreeViewCreateParams
     TreeViewCreateParams& SelectedNodeColor(const Color& color);
     TreeViewCreateParams& TextColor(const Color& color);
     TreeViewCreateParams& StateIndicatorPercentage(float percentage);
+    TreeViewCreateParams& AddToolTip(bool addToolTip_);
     ControlCreateParams controlCreateParams;
     std::string normalNodeFontFamilyName;
     float normalNodeFontSize;
@@ -91,13 +92,13 @@ struct WING_API TreeViewCreateParams
     Color selectedNodeColor;
     Color textColor;
     float stateIndicatorPercentage;
+    bool addToolTip;
 };
 
 class WING_API TreeView : public Control
 {
 public:
     TreeView(TreeViewCreateParams& createParams);
-    ~TreeView();
     TreeViewNode* Root() const { return root.get(); }
     TreeViewNode* ReleaseRoot() { return root.release(); }
     void ResetRoot(TreeViewNode* root_) { root.reset(root_); }

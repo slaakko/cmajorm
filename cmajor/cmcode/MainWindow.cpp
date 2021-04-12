@@ -3350,8 +3350,14 @@ void MainWindow::SearchResultsClick()
 
 void MainWindow::PortMapClick()
 {
-    // todo
-    ShowInfoMessageBox(Handle(), "Port Map");
+    try
+    {
+        Process* process = new Process("cmpmv", Process::Redirections::none);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
 }
 
 void MainWindow::BuildSolutionClick()

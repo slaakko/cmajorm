@@ -34,7 +34,8 @@ TreeViewCreateParams::TreeViewCreateParams() :
     stateIndicatorColor(Color::Red),
     selectedNodeColor(Color(201, 222, 245)),
     textColor(Color::Black),
-    stateIndicatorPercentage(50.0f)
+    stateIndicatorPercentage(50.0f),
+    addToolTip(true)
 {
     controlCreateParams.WindowClassName("wing.TreeView");
     controlCreateParams.WindowClassBackgroundColor(COLOR_WINDOW);
@@ -168,6 +169,12 @@ TreeViewCreateParams& TreeViewCreateParams::StateIndicatorPercentage(float perce
     return *this;
 }
 
+TreeViewCreateParams& TreeViewCreateParams::AddToolTip(bool addToolTip_)
+{
+    addToolTip = addToolTip_;
+    return *this;
+}
+
 TreeView::TreeView(TreeViewCreateParams& createParams) : 
     Control(createParams.controlCreateParams), 
     flags(),
@@ -189,28 +196,18 @@ TreeView::TreeView(TreeViewCreateParams& createParams) :
     stateIndicatorHeight(0),
     stateIndicatorPercentage(createParams.stateIndicatorPercentage),
     stringFormat(),
-    toolTipWindow(new ToolTip(ToolTipCreateParams().Defaults()))
+    toolTipWindow()
 {
     stringFormat.SetAlignment(StringAlignment::StringAlignmentNear);
     stringFormat.SetLineAlignment(StringAlignment::StringAlignmentNear);
+    if (createParams.addToolTip)
+    {
+        flags = flags | TreeViewFlags::addToolTipWindow;
+    }
     SetNormalNodeFont(createParams.normalNodeFontFamilyName, createParams.normalNodeFontSize, createParams.normalNodeFontStyle);
     SetActiveNodeFont(createParams.activeNodeFontFamilyName, createParams.activeNodeFontySize, createParams.activeNodeFontStyle);
     SetMouseHoverMs(DefaultMouseHoverMs());
     SetChanged();
-}
-
-TreeView::~TreeView()
-{
-    if (toolTipWindow && ToolTipWindowAdded())
-    {
-        ResetToolTipWindowAdded();
-        Window* window = GetWindow();
-        if (window)
-        {
-            window->RemoveChild(toolTipWindow); 
-            toolTipWindow = nullptr;
-        }
-    }
 }
 
 void TreeView::SetRoot(TreeViewNode* root_)
@@ -366,12 +363,13 @@ void TreeView::OnPaint(PaintEventArgs& args)
 {
     try
     {
-        if (toolTipWindow && !ToolTipWindowAdded())
+        if ((flags & TreeViewFlags::addToolTipWindow) != TreeViewFlags::none && !ToolTipWindowAdded())
         {
             SetToolTipWindowAdded();
             Window* window = GetWindow();
             if (window)
             {
+                toolTipWindow = new ToolTip(ToolTipCreateParams().Defaults());
                 window->AddChild(toolTipWindow);
             }
         }

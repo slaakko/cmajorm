@@ -231,6 +231,8 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmview.lib ..\lib
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcoded.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmcode.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmvd.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmpmv.exe ..\bin
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcmd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcmd.lib ..\lib
@@ -319,5 +321,4 @@ xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\spring\bin\release\spring.exe 
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\soulcm\scm2html\bin\release\scm2html.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\soulcm\scmlg\bin\release\scmlg.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\soulcm\scmpg\bin\release\scmpg.exe ..\bin
-xcopy /Y /D C:\work\cmajorm\cmajor\projects\cm\cmpmm\bin\release\cmpmm.exe ..\bin
 

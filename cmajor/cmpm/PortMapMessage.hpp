@@ -17,6 +17,25 @@ using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
 
+class CMPM_API HelloPmsRequest
+{
+public:
+    HelloPmsRequest();
+    HelloPmsRequest(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+};
+
+class CMPM_API HelloPmsReply
+{
+public:
+    HelloPmsReply();
+    HelloPmsReply(sngxml::dom::Element* element);
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+public:
+    std::string version;
+};
+
 class CMPM_API GetFreePortNumberRequest
 {
 public:

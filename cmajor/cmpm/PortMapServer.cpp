@@ -26,6 +26,8 @@
 
 namespace cmajor { namespace cmpm {
 
+const char* portMapServerVersion = "3.10.0";
+
 using namespace soulng::util;
 using namespace soulng::unicode;
 
@@ -349,7 +351,19 @@ void PortMapServer::Run()
             std::string message = GetMessage(requestDoc->DocumentElement());
             if (!message.empty())
             {
-                if (message == "getFreePortNumberRequest")
+                if (message == "helloPmsRequest")
+                {
+                    HelloPmsRequest request(requestDoc->DocumentElement());
+                    HelloPmsReply reply;
+                    reply.version = portMapServerVersion;
+                    std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("helloPmsReply");
+                    std::stringstream strStream;
+                    CodeFormatter formatter(strStream);
+                    replyValue->Write(formatter);
+                    std::string replyStr = strStream.str();
+                    Write(socket, replyStr);
+                }
+                else if (message == "getFreePortNumberRequest")
                 {
                     GetFreePortNumberRequest request(requestDoc->DocumentElement());
                     GetFreePortNumberReply reply = ProcessGetFreePortNumberRequest(request);
