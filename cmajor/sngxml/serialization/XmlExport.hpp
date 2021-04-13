@@ -12,8 +12,10 @@
 #include <boost/uuid/uuid.hpp>
 #include <chrono>
 #include <memory>
-#include <concepts>
 #include <stdint.h>
+#ifdef _WIN32
+#include <concepts>
+#endif
 
 namespace sngxml { namespace xmlser {
 
