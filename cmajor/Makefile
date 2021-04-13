@@ -93,8 +93,8 @@ BINDISTPACKAGE = cmajor-3.10.0-ubuntu-20.04-x86_64-binaries.tar.bz2
 BINDISTDIRNAME = cmajor-3.10.0
 
 bindist:
-	cmc --clean ~/cmajor-3.9.0-src/cmajor/system/platform/linux/System.cms
-	cmc --clean -c=release ~/cmajor-3.9.0-src/cmajor/system/platform/linux/System.cms
+	cmc --clean ~/cmajor-3.10.0-src/cmajor/system/platform/linux/System.cms
+	cmc --clean -c=release ~/cmajor-3.10.0-src/cmajor/system/platform/linux/System.cms
 	mkdir -p $(BINDISTDIR)
 	mkdir -p $(BINDISTDIR)/bin
 	mkdir -p $(BINDISTDIR)/config
