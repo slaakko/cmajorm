@@ -660,8 +660,8 @@ FileTable::FileTable() : flags(FileTableFlags::none)
     }
 #else
     stdInput.reset(new StdInputFile());
-    stdOutput.reset(new StdOutputFile(stdout, "STDOUT"));
-    stdError.reset(new StdOutputFile(stderr, "STDERR"));
+    stdOutput.reset(new StdOutputFile(stdout, 1, "STDOUT"));
+    stdError.reset(new StdOutputFile(stderr, 2, "STDERR"));
 #endif
 }
 
