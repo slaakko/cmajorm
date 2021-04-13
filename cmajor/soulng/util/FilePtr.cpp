@@ -8,7 +8,9 @@
 #include <soulng/util/FileLocking.hpp>
 #include <stdexcept>
 #include <stdio.h>
+#ifdef _WIN32
 #include <share.h>
+#endif
 
 namespace soulng { namespace util {
 
