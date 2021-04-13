@@ -1,4 +1,4 @@
-include Makefile.common
+include ../Makefile.common
 
 OBJECTS = BuildServerMessage.o CmdbMessage.o CmdbMessageMap.o CodeCompletionServerMessage.o
 
