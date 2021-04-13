@@ -16,6 +16,7 @@ build:
 	$(MAKE) -C cmcppi
 	$(MAKE) -C cmtoolchain
 	$(MAKE) -C cmtoolchainconfig
+	$(MAKE) -C cmmsg
 	$(MAKE) -C cmdebug
 	$(MAKE) -C symbols
 	$(MAKE) -C cmmid
@@ -146,6 +147,7 @@ clean:
 	$(MAKE) -C cmcppi clean
 	$(MAKE) -C cmtoolchain clean
 	$(MAKE) -C cmtoolchainconfig clean
+	$(MAKE) -C cmmsg clean
 	$(MAKE) -C cmdebug clean
 	$(MAKE) -C symbols clean
 	$(MAKE) -C cmmid clean
