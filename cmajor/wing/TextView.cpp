@@ -817,46 +817,36 @@ void TextView::InsertText(int lineIndex, int columnIndex, const std::u32string& 
 
 void TextView::InsertLines(int lineIndex, int columnIndex, const std::vector<std::u32string>& linesToInsert)
 {
-    if (linesToInsert.size() == 1 || linesToInsert.size() == 2 && IsEmptyOrSpaceLine(linesToInsert[1]))
+    int indent = 0;
+    int indentLineIndex = lineIndex - 1;
+    while (indent == 0 && indentLineIndex >= 0 && lineIndex < lines.size())
     {
-        while (lineIndex >= lines.size())
+        indent = GetIndent(*lines[indentLineIndex], indentLineIndex);
+        if (indent > 0 || !(lines[indentLineIndex]->empty()))
         {
-            lines.push_back(std::unique_ptr<std::u32string>(new std::u32string()));
+            break;
         }
-        std::u32string& line = *lines[lineIndex];
-        line.insert(columnIndex, linesToInsert.front());
-        LineEventArgs args(lineIndex, -1);
-        OnLineChanged(args);
-        SetCaretLineCol(lineIndex + 1, static_cast<int>(columnIndex + linesToInsert.front().length() + 1 + LineNumberFieldLength()));
-        ScrollToCaret();
-        InvalidateLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
-        SetDirty();
-        SetCCDirty();
+        --indentLineIndex;
     }
-    else
+    if (indentLineIndex < 0)
     {
-        int indent = 0;
-        if (lineIndex > 0 && lineIndex < lines.size())
-        {
-            indent = GetIndent(*lines[lineIndex - 1], lineIndex - 1);
-        }
-        int indentLineIndex = lineIndex - 1;
-        for (const std::u32string& lineToInsert : linesToInsert)
-        {
-            lines.insert(lines.begin() + lineIndex, std::unique_ptr<std::u32string>(new std::u32string(lineToInsert)));
-            SetLineNumberFieldLength(static_cast<int>(lines.size()));
-            LineEventArgs args(lineIndex, indentLineIndex);
-            OnLineInserted(args);
-            ++lineIndex;
-        }
-        SetTextExtent();
-        SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength() + indent);
-        ScrollToCaret();
-        Invalidate();
-        InvalidateLines(lineIndex + 1, static_cast<int>(lineIndex + linesToInsert.size() + 1));
-        SetDirty();
-        SetCCDirty();
+        indentLineIndex = 0;
     }
+    for (const std::u32string& lineToInsert : linesToInsert)
+    {
+        lines.insert(lines.begin() + lineIndex, std::unique_ptr<std::u32string>(new std::u32string(lineToInsert)));
+        SetLineNumberFieldLength(static_cast<int>(lines.size()));
+        LineEventArgs args(lineIndex, indentLineIndex);
+        OnLineInserted(args);
+        ++lineIndex;
+    }
+    SetTextExtent();
+    SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength() + indent);
+    ScrollToCaret();
+    Invalidate();
+    InvalidateLines(lineIndex + 1, static_cast<int>(lineIndex + linesToInsert.size() + 1));
+    SetDirty();
+    SetCCDirty();
 }
 
 void TextView::NewLine(int lineIndex, int columnIndex)
@@ -2322,14 +2312,14 @@ void TextView::DrawSelectionBackground(Graphics& graphics, int line, const Point
     else if (selection.start.line == selection.end.line)
     {
         pt.X = pt.X + charWidth * (selection.start.column - 1);
-        int selectionLength = selection.end.column - selection.start.column;
+        int selectionLength = std::max(1, selection.end.column - selection.start.column);
         rect = RectF(pt, SizeF(charWidth * selectionLength, charHeight));
     }
     else if (line == selection.start.line)
     {
         pt.X = pt.X + charWidth * (selection.start.column - 1);
         int lineLength = GetLineLength(line);
-        int selectionLength = lineLength - selection.start.column + 1;
+        int selectionLength = std::max(1, lineLength - selection.start.column + 1);
         rect = RectF(pt, SizeF(charWidth * selectionLength, charHeight));
     }
     else if (line == selection.end.line)
@@ -2431,7 +2421,6 @@ void TextView::OnClick()
 {
     Control::OnClick();
     SetFocus();
-    ResetSelection();
 }
 
 void TextView::OnMouseDoubleClick(MouseEventArgs& args)
