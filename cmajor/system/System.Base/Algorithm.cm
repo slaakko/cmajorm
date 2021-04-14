@@ -7,12 +7,12 @@ using System.Concepts;
 
 namespace System
 {
-    public constexpr nothrow inline const T& Min<T>(const T& left, const T& right) where T is LessThanComparable    
+    public constexpr nothrow inline const T& Min<T>(const T& left, const T& right) where T is LessThanComparable
     {
         if (left <= right) return left;
         return right;
     }
-
+    
     public constexpr nothrow inline const T& Max<T>(const T& left, const T& right) where T is LessThanComparable
     {
         if (right >= left) return right;
