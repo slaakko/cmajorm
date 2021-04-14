@@ -130,6 +130,20 @@ void InsertLinesCommand::Redo(TextView* textView)
     textView->InsertLines(lineIndex, columnIndex, lines);
 }
 
+InsertIntoLineCommand::InsertIntoLineCommand(int lineIndex_, int columnIndex_, const std::u32string& text_) : lineIndex(lineIndex_), columnIndex(columnIndex_), text(text_)
+{
+}
+
+void InsertIntoLineCommand::Undo(TextView* textView)
+{
+    textView->RemoveFromLine(lineIndex, columnIndex, text.size());
+}
+
+void InsertIntoLineCommand::Redo(TextView* textView)
+{
+    textView->InsertIntoLine(lineIndex, columnIndex, text);
+}
+
 RemoveSelectionCommand::RemoveSelectionCommand(const Selection& selection_, const SelectionData& selectionData_, bool wholeLine_) : 
     selection(selection_), selectionData(selectionData_), wholeLine(wholeLine_)
 {

@@ -103,6 +103,18 @@ private:
     std::vector<std::u32string> lines;
 };
 
+class WING_API InsertIntoLineCommand : public EditCommand
+{
+public:
+    InsertIntoLineCommand(int lineIndex_, int columnIndex_, const std::u32string& text_);
+    void Undo(TextView* textView) override;
+    void Redo(TextView* textView) override;
+private:
+    int lineIndex;
+    int columnIndex;
+    std::u32string text;
+};
+
 class WING_API RemoveSelectionCommand : public EditCommand
 {
 public:

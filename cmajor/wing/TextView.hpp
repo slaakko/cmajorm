@@ -222,6 +222,8 @@ public:
     void InsertChar(int lineIndex, int columnIndex, char32_t c);
     void InsertText(int lineIndex, int columnIndex, const std::u32string& text);
     void InsertLines(int lineIndex, int columnIndex, const std::vector<std::u32string>& linesToInsert);
+    void InsertIntoLine(int lineIndex, int columnIndex, const std::u32string& text);
+    void RemoveFromLine(int lineIndex, int columnIndex, int count);
     void NewLine(int lineIndex, int columnIndex);
     void Tab(int lineIndex, int columnIndex);
     void Backtab(int lineIndex, int columnIndex);
@@ -318,6 +320,7 @@ protected:
 private:
     void AddInsertCharCommand(int lineIndex, int columnIndex, char32_t c);
     void AddInsertLinesCommand(int lineIndex, int columnIndex, const std::vector<std::u32string>& linesToInsert);
+    void AddInsertIntoLineCommand(int lineIndex, int columnIndex, const std::u32string& text);
     void AddNewLineCommand(int lineIndex, int columnIndex);
     void AddBacktabCommand(int lineIndex, int columnIndex);
     void AddTabCommand(int lineIndex, int columnIndex);

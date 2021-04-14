@@ -43,6 +43,22 @@ bool IsEmptyOrSpaceLine(const std::u32string& line)
     return true;
 }
 
+bool TextBefore(const std::u32string& line, int columnIndex)
+{
+    if (line.empty()) return false;
+    bool textBefore = false;
+    int p = columnIndex;
+    while (p > 0 && line[p] == ' ')
+    {
+        --p;
+    }
+    if (line[p] != ' ')
+    {
+        textBefore = true;
+    }
+    return textBefore;
+}
+
 int ReadCaretTimeoutFromRegistry()
 {
     int caretTimeout = -1;
@@ -810,8 +826,16 @@ void TextView::InsertText(int lineIndex, int columnIndex, const std::u32string& 
         RemoveSelection();
     }
     std::vector<std::u32string> linesToInsert = SplitTextIntoLines(text);
-    AddInsertLinesCommand(lineIndex, columnIndex, linesToInsert);
-    InsertLines(lineIndex, columnIndex, linesToInsert);
+    if (linesToInsert.size() == 1 && TextBefore(*lines[lineIndex], columnIndex))
+    {
+        AddInsertIntoLineCommand(lineIndex, columnIndex, linesToInsert.front());
+        InsertIntoLine(lineIndex, columnIndex, linesToInsert.front());
+    }
+    else
+    {
+        AddInsertLinesCommand(lineIndex, columnIndex, linesToInsert);
+        InsertLines(lineIndex, columnIndex, linesToInsert);
+    }
     editCommandList.EndGroup();
 }
 
@@ -845,6 +869,34 @@ void TextView::InsertLines(int lineIndex, int columnIndex, const std::vector<std
     ScrollToCaret();
     Invalidate();
     InvalidateLines(lineIndex + 1, static_cast<int>(lineIndex + linesToInsert.size() + 1));
+    SetDirty();
+    SetCCDirty();
+}
+
+void TextView::InsertIntoLine(int lineIndex, int columnIndex, const std::u32string& text)
+{
+    lines[lineIndex]->insert(columnIndex, text);
+    LineEventArgs args(lineIndex, -1);
+    OnLineChanged(args);
+    SetTextExtent();
+    SetCaretLineCol(lineIndex + 1, 1 + LineNumberFieldLength() + columnIndex + text.size());
+    ScrollToCaret();
+    Invalidate();
+    InvalidateLines(lineIndex + 1, lineIndex + 1);
+    SetDirty();
+    SetCCDirty();
+}
+
+void TextView::RemoveFromLine(int lineIndex, int columnIndex, int count)
+{
+    lines[lineIndex]->erase(columnIndex, count);
+    LineEventArgs args(lineIndex, -1);
+    OnLineChanged(args);
+    SetTextExtent();
+    SetCaretLineCol(lineIndex + 1, 1 + LineNumberFieldLength() + columnIndex);
+    ScrollToCaret();
+    Invalidate();
+    InvalidateLines(lineIndex + 1, lineIndex + 1);
     SetDirty();
     SetCCDirty();
 }
@@ -1028,21 +1080,11 @@ void TextView::Backspace(int lineIndex, int columnIndex)
 
 void TextView::DeleteLines(int lineIndex, int columnIndex, const std::vector<std::u32string>& linesToDelete)
 {
-    if (linesToDelete.size() == 1)
+    for (int i = 0; i < linesToDelete.size(); ++i)
     {
-        std::u32string& line = *lines[lineIndex];
-        line.erase(columnIndex, linesToDelete.front().length());
+        lines.erase(lines.begin() + lineIndex);
         LineEventArgs args(lineIndex, -1);
-        OnLineChanged(args);
-    }
-    else
-    {
-        for (int i = 0; i < linesToDelete.size(); ++i)
-        {
-            lines.erase(lines.begin() + lineIndex);
-            LineEventArgs args(lineIndex, -1);
-            OnLineDeleted(args);
-        }
+        OnLineDeleted(args);
     }
     SetTextExtent();
     SetLineNumberFieldLength(static_cast<int>(lines.size()));
@@ -2568,6 +2610,11 @@ void TextView::AddInsertCharCommand(int lineIndex, int columnIndex, char32_t c)
 void TextView::AddInsertLinesCommand(int lineIndex, int columnIndex, const std::vector<std::u32string>& linesToInsert)
 {
     editCommandList.AddCommand(new InsertLinesCommand(lineIndex, columnIndex, linesToInsert));
+}
+
+void TextView::AddInsertIntoLineCommand(int lineIndex, int columnIndex, const std::u32string& text)
+{
+    editCommandList.AddCommand(new InsertIntoLineCommand(lineIndex, columnIndex, text));
 }
 
 void TextView::AddNewLineCommand(int lineIndex, int columnIndex)
