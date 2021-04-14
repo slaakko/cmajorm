@@ -1,0 +1,34 @@
+<h1>Cmajor 3.10.0 for Windows x64 and Linux</h1>
+
+<h2>Release notes</h2>
+
+<ul>
+<li><p>This version does not contain new major features. It contains many improvements and bug fixes to existing features.</p></li>
+<li><p>Recent Cmajor Code IDE versions suffer from nasty behaviour: the Cmajor Code IDE gradually slows down,
+and this is not enough, actually the entire machine slows down, until Cmajor Code is closed. 
+The reason for this behaviour is a mystery, but this problem has been fixed by rewriting the IDE in a language that works: C++.</p></li>
+<li><p>Bug fix (C++ backend compiler):
+"String not bound" error fixed.</p></li>
+<li><p>Bug fix (compiler)
+Linking error "symbol InitCompileUnit_ not defined" fixed.</p></li>
+<li><p>Bug fixes (Cmajor Code):
+Scrolling. Copy/paste. Console.</p></li>
+<li><p>Bug fix (System.Xml.Serialization):
+Reading empty list of a primitive type caused a crash.</p></li>
+<li><p>State of the Cmajor Code IDE (open files, breakpoints, expanded project tree view nodes, is locals view open, is call stack view open), 
+is saved to &lt;solution>.cms.settings.xml file, and restored from there when the solution is opened.</p></li>
+<li><p>State of a project in Cmajor Code IDE (program arguments, breakpoints), is saved to &lt;project>.cmp.settings.xml file and restored from there when a solution containing that project is opened.</p></li>
+<li><p>Startup dialog (Cmajor Code). Startup dialog can be turned off by unchecking Edit | Options | Show startup dialog.</p></li>
+<li><p>Reimplemented file I/O in the runtime library. System library file API's changed: support for old InputFileStream, OutputFileStream, etc... removed. 
+Use the static <a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_File_85477685F364D5CA8DD10F980720D3A3446A5D8A.html">File</a> class and
+<a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html">StreamWriter</a>, 
+<a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_StreamReader_8A8267CD81BA8B198AF295474A8CB0B2DFBB7B57.html">StreamReader</a>, 
+<a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_StringWriter_E76E62C541769C753BBFB8D27F20ED06AADC7D2D.html">StringWriter</a> and 
+<a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_FileByteStream_B5032C95DE0C760ED2354356BEFFAFF5F1422919.html">FileByteStream</a>, 
+<a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_BufferedByteStream_E74639F265FCFA3F7A3E61DE9D92C703A46FD573.html">BufferedByteStream</a>, etc...
+New implementation allows parallel threads to write/read simultaneously to/from different files.</p></li>
+<li><p><a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_File_85477685F364D5CA8DD10F980720D3A3446A5D8A.html#member_function_Move_File_22B84AE74D6E3523757A0E0D14AF9BA089ECC5C1">File.Move</a>.</p></li>
+<li><p>The return value of <a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_File_85477685F364D5CA8DD10F980720D3A3446A5D8A.html#member_function_Size_File_D0C8D1E0A218CED6BEA5F44A50BDDFE2468A29CA">File.Size</a>
+is now of type long (it was ulong before).</p></li>
+<li><p>ReadFile function removed. Use <a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_File_85477685F364D5CA8DD10F980720D3A3446A5D8A.html#member_function_ReadAllText_File_BF69423F5ECED3BABCA2932C268CBA63196E46E4">File.ReadAllText</a>.</p></li>
+</ul>
