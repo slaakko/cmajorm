@@ -2028,7 +2028,6 @@ void MainWindow::SetState(MainWindowState state_)
                 buildActiveProjectMenuItem->Enable();
                 rebuildActiveProjectMenuItem->Enable();
                 cleanActiveProjectMenuItem->Enable();
-                startDebuggingMenuItem->Enable();
                 startWithoutDebuggingMenuItem->Enable();
                 if (activeProject && IsProgramTarget(activeProject->GetTarget()))
                 {
