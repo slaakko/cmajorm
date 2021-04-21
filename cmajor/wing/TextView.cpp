@@ -43,22 +43,6 @@ bool IsEmptyOrSpaceLine(const std::u32string& line)
     return true;
 }
 
-bool TextBefore(const std::u32string& line, int columnIndex)
-{
-    if (line.empty()) return false;
-    bool textBefore = false;
-    int p = columnIndex;
-    while (p > 0 && line[p] == ' ')
-    {
-        --p;
-    }
-    if (line[p] != ' ')
-    {
-        textBefore = true;
-    }
-    return textBefore;
-}
-
 int ReadCaretTimeoutFromRegistry()
 {
     int caretTimeout = -1;
@@ -826,7 +810,7 @@ void TextView::InsertText(int lineIndex, int columnIndex, const std::u32string& 
         RemoveSelection();
     }
     std::vector<std::u32string> linesToInsert = SplitTextIntoLines(text);
-    if (linesToInsert.size() == 1 && TextBefore(*lines[lineIndex], columnIndex))
+    if (linesToInsert.size() == 1 && !IsEmptyOrSpaceLine(*lines[lineIndex]))
     {
         AddInsertIntoLineCommand(lineIndex, columnIndex, linesToInsert.front());
         InsertIntoLine(lineIndex, columnIndex, linesToInsert.front());
