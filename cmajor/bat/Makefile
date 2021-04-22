@@ -1,7 +1,7 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 #	Run with nmake from Visual Studio 2019 x64 Native Tools Command Prompt
 
-all: compiler cppbert sys cm tools examples
+all: compiler cppbert sys cmlean tools examples
 	install.bat
 
 compiler: buildcomp install
@@ -23,6 +23,10 @@ sys:
 cm:
 	cmc -u -v ../projects/cm/Cm.cms
 	cmc -u -v -bt=1 -c=release ../projects/cm/Cm.cms
+	
+cmlean:
+	cmc -u -v ../projects/cm/Cm.Lean.cms
+	cmc -u -v -bt=1 -c=release ../projects/cm/Cm.Lean.cms
 	
 tools:
 	cmc -u -v ../projects/tools/soulcm/scmpg/scmpg.cmp
