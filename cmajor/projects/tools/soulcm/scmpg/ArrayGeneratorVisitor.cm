@@ -19,11 +19,20 @@ namespace soulcm.scmpg
             UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span(), moduleId));
             string s = "s" + ToString(sn++);
             parser.SetArrayName(s);
-            for (uchar c : parser.Str())
+            long n = 1;
+            if (parser.Str().IsEmpty())
             {
-                arrayLiteral->AddValue(new Cm.Ast.IntLiteralNode(System.Lex.Span(), moduleId, cast<int>(c)));
+                arrayLiteral->AddValue(new Cm.Ast.IntLiteralNode(System.Lex.Span(), moduleId, cast<int>(0)));
             }
-            UniquePtr<Cm.Ast.ConstantNode> arrayConstant(new Cm.Ast.ConstantNode(System.Lex.Span(), moduleId, Specifiers.public_, new Cm.Ast.ArrayNode(System.Lex.Span(), moduleId, new Cm.Ast.IntNode(System.Lex.Span(), moduleId), new Cm.Ast.LongLiteralNode(System.Lex.Span(), moduleId, parser.Str().Length())), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, ToUtf32(s)), arrayLiteral.Release()));
+            else
+            {
+                n = parser.Str().Length();
+                for (uchar c : parser.Str())
+                {
+                    arrayLiteral->AddValue(new Cm.Ast.IntLiteralNode(System.Lex.Span(), moduleId, cast<int>(c)));
+                }
+            }
+            UniquePtr<Cm.Ast.ConstantNode> arrayConstant(new Cm.Ast.ConstantNode(System.Lex.Span(), moduleId, Specifiers.public_, new Cm.Ast.ArrayNode(System.Lex.Span(), moduleId, new Cm.Ast.IntNode(System.Lex.Span(), moduleId), new Cm.Ast.LongLiteralNode(System.Lex.Span(), moduleId, n)), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, ToUtf32(s)), arrayLiteral.Release()));
             int index = 0;
             for (int i = 0; i < ns->Members().Count(); ++i)
             {
