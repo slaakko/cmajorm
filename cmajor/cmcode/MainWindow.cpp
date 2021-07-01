@@ -50,7 +50,7 @@
 
 namespace cmcode {
 
-const char* cmajorCodeVersion = "3.10.0";
+const char* cmajorCodeVersion = "4.0.0";
 
 bool CmCodeLogFlagExists()
 {

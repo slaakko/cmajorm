@@ -239,10 +239,10 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmcmd.lib ..\lib
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmcm.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmcm.lib ..\lib
 
-xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrt3100d.dll ..\bin
-xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrt3100d.lib ..\lib
-xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrt3100.dll ..\bin
-xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrt3100.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrt400d.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrt400d.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrt400.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrt400.lib ..\lib
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrtsd.lib ..\lib\vs
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrts.lib ..\lib\vs

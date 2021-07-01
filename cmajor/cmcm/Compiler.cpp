@@ -180,7 +180,7 @@ void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, cmajor::symbols::Mo
     }
 }
 
-const char* version = "3.10.0";
+const char* version = "4.0.0";
 
 extern "C" int Compile(const char16_t* compileXmlRequest)
 {

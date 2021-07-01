@@ -65,7 +65,7 @@ struct InitDone
 using namespace soulng::util;
 using namespace soulng::unicode;
 
-const char* version = "3.10.0";
+const char* version = "4.0.0";
 
 void PrintHelp()
 {

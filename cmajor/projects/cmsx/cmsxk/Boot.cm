@@ -8,7 +8,7 @@ namespace cmsx.kernel
 
     public const char* KernelVersion()
     {
-        return "0.2.0";
+        return "4.0.0";
     }
 
     public nothrow void InitializeInterruptVector(Machine& machine)
@@ -63,7 +63,7 @@ namespace cmsx.kernel
         ulong execSystemCallAddress = cast<ulong>(cast<void*>(execSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_exec), execSystemCallAddress, Protection.write);
         SystemCallHandler killSystemCallHandler = Kill;
-        ulong killSystemCallAddress = cast<ulong>(cast<void*>(killSystemCallHandler)); 
+        ulong killSystemCallAddress = cast<ulong>(cast<void*>(killSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_kill), killSystemCallAddress, Protection.write);
         SystemCallHandler createSystemCallHandler = Create;
         ulong createSystemCallAddress = cast<ulong>(cast<void*>(createSystemCallHandler));
@@ -165,49 +165,49 @@ namespace cmsx.kernel
         ulong ioctlSystemCallAddress = cast<ulong>(cast<void*>(ioctlSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_ioctl), ioctlSystemCallAddress, Protection.write);
         SystemCallHandler chmodSystemCallHandler = Chmod;
-        ulong chmodSystemCallAddress = cast<ulong>(cast<void*>(chmodSystemCallHandler)); 
+        ulong chmodSystemCallAddress = cast<ulong>(cast<void*>(chmodSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_chmod), chmodSystemCallAddress, Protection.write);
         SystemCallHandler chownSystemCallHandler = Chown;
-        ulong chownSystemCallAddress = cast<ulong>(cast<void*>(chownSystemCallHandler)); 
+        ulong chownSystemCallAddress = cast<ulong>(cast<void*>(chownSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_chown), chownSystemCallAddress, Protection.write);
         SystemCallHandler utimeSystemCallHandler = UTime;
-        ulong utimeSystemCallAddress = cast<ulong>(cast<void*>(utimeSystemCallHandler)); 
+        ulong utimeSystemCallAddress = cast<ulong>(cast<void*>(utimeSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_utime), utimeSystemCallAddress, Protection.write);
         SystemCallHandler getuidSystemCallHandler = GetUID;
-        ulong getuidSystemCallAddress = cast<ulong>(cast<void*>(getuidSystemCallHandler)); 
+        ulong getuidSystemCallAddress = cast<ulong>(cast<void*>(getuidSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_getuid), getuidSystemCallAddress, Protection.write);
         SystemCallHandler setuidSystemCallHandler = SetUID;
-        ulong setuidSystemCallAddress = cast<ulong>(cast<void*>(setuidSystemCallHandler)); 
+        ulong setuidSystemCallAddress = cast<ulong>(cast<void*>(setuidSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_setuid), setuidSystemCallAddress, Protection.write);
         SystemCallHandler getgidSystemCallHandler = GetGID;
-        ulong getgidSystemCallAddress = cast<ulong>(cast<void*>(getgidSystemCallHandler)); 
+        ulong getgidSystemCallAddress = cast<ulong>(cast<void*>(getgidSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_getgid), getgidSystemCallAddress, Protection.write);
         SystemCallHandler setgidSystemCallHandler = SetGID;
-        ulong setgidSystemCallAddress = cast<ulong>(cast<void*>(setgidSystemCallHandler)); 
+        ulong setgidSystemCallAddress = cast<ulong>(cast<void*>(setgidSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_setgid), setgidSystemCallAddress, Protection.write);
         SystemCallHandler getpidSystemCallHandler = GetPID;
-        ulong getpidSystemCallAddress = cast<ulong>(cast<void*>(getpidSystemCallHandler)); 
+        ulong getpidSystemCallAddress = cast<ulong>(cast<void*>(getpidSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_getpid), getpidSystemCallAddress, Protection.write);
         SystemCallHandler getpgidSystemCallHandler = GetPGID;
-        ulong getpgidSystemCallAddress = cast<ulong>(cast<void*>(getpgidSystemCallHandler)); 
+        ulong getpgidSystemCallAddress = cast<ulong>(cast<void*>(getpgidSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_getpgid), getpgidSystemCallAddress, Protection.write);
         SystemCallHandler setpgidSystemCallHandler = SetPGID;
-        ulong setpgidSystemCallAddress = cast<ulong>(cast<void*>(setpgidSystemCallHandler)); 
+        ulong setpgidSystemCallAddress = cast<ulong>(cast<void*>(setpgidSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_setpgid), setpgidSystemCallAddress, Protection.write);
         SystemCallHandler getfgpidSystemCallHandler = GetFGPID;
-        ulong getfgpidSystemCallAddress = cast<ulong>(cast<void*>(getfgpidSystemCallHandler)); 
+        ulong getfgpidSystemCallAddress = cast<ulong>(cast<void*>(getfgpidSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_getfgpid), getfgpidSystemCallAddress, Protection.write);
         SystemCallHandler setfgpidSystemCallHandler = SetFGPID;
-        ulong setfgpidSystemCallAddress = cast<ulong>(cast<void*>(setfgpidSystemCallHandler)); 
+        ulong setfgpidSystemCallAddress = cast<ulong>(cast<void*>(setfgpidSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_setfgpid), setfgpidSystemCallAddress, Protection.write);
         SystemCallHandler syncSystemCallHandler = Sync;
-        ulong syncSystemCallAddress = cast<ulong>(cast<void*>(syncSystemCallHandler)); 
+        ulong syncSystemCallAddress = cast<ulong>(cast<void*>(syncSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_sync), syncSystemCallAddress, Protection.write);
         SystemCallHandler timesSystemCallHandler = Times;
-        ulong timesSystemCallAddress = cast<ulong>(cast<void*>(timesSystemCallHandler)); 
+        ulong timesSystemCallAddress = cast<ulong>(cast<void*>(timesSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_times), timesSystemCallAddress, Protection.write);
         SystemCallHandler getHostNameSystemCallHandler = GetHostName;
-        ulong getHostNameSystemCallAddress = cast<ulong>(cast<void*>(getHostNameSystemCallHandler)); 
+        ulong getHostNameSystemCallAddress = cast<ulong>(cast<void*>(getHostNameSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_get_host_name), getHostNameSystemCallAddress, Protection.write);
         SystemCallHandler dupSystemCallHandler = Dup;
         ulong dupSystemCallAddress = cast<ulong>(cast<void*>(dupSystemCallHandler));

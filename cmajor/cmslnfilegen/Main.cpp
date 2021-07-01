@@ -73,7 +73,7 @@ void GetProjectData(const std::string& projectFilePath, std::string& projectName
     }
 }
 
-const char* version = "3.10.0";
+const char* version = "4.0.0";
 
 void PrintHelp()
 {
