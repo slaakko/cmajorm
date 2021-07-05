@@ -16,4 +16,14 @@ void StartCodeCompletionServiceRequest::Execute()
     StartCodeCompletionService(startParams);
 }
 
+LoadEditModuleCodeCompletionServiceRequest::LoadEditModuleCodeCompletionServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_) :
+    projectFilePath(projectFilePath_), backend(backend_), config(config_)
+{
+}
+
+void LoadEditModuleCodeCompletionServiceRequest::Execute()
+{
+    LoadEditModule(projectFilePath, backend, config);
+}
+
 } } // namespace cmajor::service

@@ -20,6 +20,18 @@ private:
     CodeCompletionServiceStartParams startParams;
 };
 
+class CMSVC_API LoadEditModuleCodeCompletionServiceRequest : public Request
+{
+public:
+    LoadEditModuleCodeCompletionServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_);
+    void Execute() override;
+    std::string Name() const override { return "loadEditModuleCodeCompletionServiceRequest"; }
+private:
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+};
+
 } } // namespace cmajor::service
 
 #endif // CMAJOR_SERVICE_CODE_COMPLETION_SERVICE_REQUEST_INCLUDED

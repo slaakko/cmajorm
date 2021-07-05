@@ -31,4 +31,9 @@ void StopCodeCompletionService(bool log)
     }
 }
 
+void LoadEditModule(const std::string& projectFilePath, const std::string& backend, const std::string& config)
+{
+    PutRequest(new LoadEditModuleCodeCompletionServiceRequest(projectFilePath, backend, config));
+}
+
 } // namespace cmcode

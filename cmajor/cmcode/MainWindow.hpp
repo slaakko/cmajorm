@@ -11,6 +11,8 @@
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmsvc/DebugService.hpp>
 #include <cmajor/cmsvc/DebugServiceRequest.hpp>
+#include <cmajor/cmsvc/CodeCompletionService.hpp>
+#include <cmajor/cmsvc/CodeCompletionServiceRequest.hpp>
 #include <cmajor/cmmsg/BuildServerMessage.hpp>
 #include <cmajor/cmview/CmajorEditor.hpp>
 #include <cmajor/cmview/ResourceFileEditor.hpp>
@@ -43,8 +45,6 @@ const int startupDialogTimer = 15;
 const int startupDialogTimerDelay = 10;
 const int toolTipTimerId = 12;
 const int toolTipShowPeriod = 3000;
-const int startCodeCompletionTimerId = 20;
-const int startCodeCompletionTimerDelay = 50;
 
 using namespace cmajor::view;
 using namespace cmajor::wing;
@@ -53,6 +53,11 @@ using namespace soulng::rex;
 enum class MainWindowState : int
 {
     idle, building, debugging, running
+};
+
+enum class CCState : int
+{
+    idle, editModuleLoaded, error
 };
 
 struct ExpressionEvaluateRequest
@@ -116,6 +121,9 @@ private:
     void StopRunning();
     void StartCodeCompletion();
     void StopCodeCompletion(bool log);
+    void LoadEditModule();
+    void LoadEditModule(sngcm::ast::Project* project);
+    void LoadEditModuleForCurrentFile();
     void HandleServiceMessage();
     void ClearOutput();
     void WriteOutput(const std::string& text);
@@ -150,6 +158,8 @@ private:
     void HandleDebugServiceStopped();
     void HandleProcessTerminated();
     void HandleRunServiceStopped();
+    void HandleLoadEditModuleReply(const LoadEditModuleReply& loadEditModuleReply);
+    void HandleLoadEditModuleError(const std::string& error);
     void SetState(MainWindowState state_);
     void SetEditorState();
     void ResetDebugLocations();
@@ -358,6 +368,7 @@ private:
     std::string config;
     std::unique_ptr<ClipboardListener> clipboardListener;
     int pid;
+    CCState ccState;
     ClipboardFormat cmajorCodeFormat;
     std::u32string clipboardData;
     std::vector<std::unique_ptr<ClickAction>> clickActions;

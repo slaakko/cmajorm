@@ -189,6 +189,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     backend("cpp"),
     config("debug"),
     pid(GetPid()),
+    ccState(CCState::idle),
     cmajorCodeFormat("cmajor.code"),
     locations(this),
     toolTipWindow(new ToolTip(ToolTipCreateParams().Defaults()))
@@ -658,7 +659,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
 
     if (options.codeCompletion)
     {
-        SetTimer(startCodeCompletionTimerId, startCodeCompletionTimerDelay);
+        StartCodeCompletion();
     }
 
     if (!filePath.empty())
@@ -781,11 +782,6 @@ void MainWindow::OnTimer(TimerEventArgs& args)
         {
             KillTimer(toolTipTimerId);
             toolTipWindow->Hide();
-        }
-        else if (args.timerId == startCodeCompletionTimerId)
-        {
-            KillTimer(startCodeCompletionTimerId);
-            StartCodeCompletion();
         }
     }
     catch (const std::exception& ex)
@@ -1100,12 +1096,38 @@ void MainWindow::StopRunning()
 
 void MainWindow::StartCodeCompletion()
 {
-    StartCodeCompletionService(pid);
+    try
+    {
+        StartCodeCompletionService(pid);
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), std::string(ex.what()));
+    }
 }
 
 void MainWindow::StopCodeCompletion(bool log)
 {
     StopCodeCompletionService(log);
+}
+
+void MainWindow::LoadEditModule()
+{
+    if (!solutionData) return;
+    sngcm::ast::Solution* sln = solutionData->GetSolution();
+    if (!sln) return;
+    LoadEditModule(sln->ActiveProject());
+}
+
+void MainWindow::LoadEditModule(Project* project)
+{
+    if (!project) return;
+    cmcode::LoadEditModule(project->FilePath(), backend, config);
+}
+
+void MainWindow::LoadEditModuleForCurrentFile()
+{
+    LoadEditModule(CurrentProject());
 }
 
 void MainWindow::ShowBuildProgress()
@@ -1282,6 +1304,12 @@ void MainWindow::HandleServiceMessage()
                 HandleRunServiceStopped();
                 break;
             }
+            case ServiceMessageKind::loadEditModuleReply:
+            {
+                LoadEditModuleReplyServiceMessage* message = static_cast<LoadEditModuleReplyServiceMessage*>(serviceMessage.get());
+                HandleLoadEditModuleReply(message->Reply());
+                break;
+            }
         }
     }
 }
@@ -1342,6 +1370,7 @@ void MainWindow::OpenProject(const std::string& filePath)
         { 
             AddRecentSolution(ToUtf8(sln->Name()), sln->FilePath());
             SaveConfiguration();
+            LoadEditModule();
         }
         SetState(MainWindowState::idle);
     }
@@ -1902,6 +1931,25 @@ void MainWindow::HandleRunServiceStopped()
 {
     StopRunning();
     SetFocusToEditor();
+}
+
+void MainWindow::HandleLoadEditModuleReply(const LoadEditModuleReply& loadEditModuleReply)
+{
+    if (loadEditModuleReply.result == "error")
+    {
+        PutOutputServiceMessage("edit module loading error: " + loadEditModuleReply.error);
+        ccState = CCState::error;
+    }
+    else
+    {
+        PutOutputServiceMessage("edit module " + loadEditModuleReply.key + " " + loadEditModuleReply.result);
+        ccState = CCState::editModuleLoaded;
+    }
+}
+
+void MainWindow::HandleLoadEditModuleError(const std::string& error)
+{
+    ccState = CCState::error;
 }
 
 void MainWindow::HandleGetDefinitionReply(GetDefinitionReply& getDefinitionReply)
@@ -2593,7 +2641,7 @@ void MainWindow::SetProjectReferences(sngcm::ast::Project* project)
             std::vector<Project*> referencedProjects = dialog.ReferencedProjects();
             project->SetReferencedProjects(referencedProjects);
             project->Save();
-            // todo: load edit module
+            LoadEditModule(project);
         }
     }
     catch (const std::exception& ex)
@@ -3718,7 +3766,7 @@ void MainWindow::AddNewSourceFile(sngcm::ast::Project* project, TreeViewNode* pr
             }
             project->AddSourceFileName(sourceFileName, newSourceFilePath);
             project->Save();
-            // todo load edit module
+            LoadEditModule(project);
             AddFilePathsToProject(newSourceFilePath, "", "", project, projectNode);
         }
     }
@@ -3749,7 +3797,7 @@ void MainWindow::AddExistingSourceFile(sngcm::ast::Project* project, TreeViewNod
             std::string fileName = Path::GetFileName(filePath);
             project->AddSourceFileName(fileName, filePath);
             project->Save();
-            // todo: load edit module
+            LoadEditModule(project);
             AddFilePathsToProject("", "", "", project, projectNode);
         }
     }
@@ -3902,7 +3950,7 @@ void MainWindow::RemoveFile(sngcm::ast::Project* project, const std::string& fil
         project->Save();
         if (EndsWith(filePath, ".cm"))
         {
-            // todo: load edit module
+            LoadEditModule(project);
         }
         projectNode->RemoveChild(fileNode);
         Invalidate();
@@ -4362,6 +4410,7 @@ void MainWindow::CppButtonClick()
     backend = "cpp";
     llvmToolButton->SetState(ToolButtonState::normal);
     SetState(state);
+    LoadEditModuleForCurrentFile();
 }
 
 void MainWindow::LlvmButtonClick()
@@ -4369,6 +4418,7 @@ void MainWindow::LlvmButtonClick()
     backend = "llvm";
     cppToolButton->SetState(ToolButtonState::normal);
     SetState(state);
+    LoadEditModuleForCurrentFile();
 }
 
 void MainWindow::DebugButtonClick()
@@ -4376,6 +4426,7 @@ void MainWindow::DebugButtonClick()
     config = "debug";
     releaseToolButton->SetState(ToolButtonState::normal);
     SetState(state);
+    LoadEditModuleForCurrentFile();
 }
 
 void MainWindow::ReleaseButtonClick()
@@ -4383,6 +4434,7 @@ void MainWindow::ReleaseButtonClick()
     config = "release";
     debugToolButton->SetState(ToolButtonState::normal);
     SetState(state);
+    LoadEditModuleForCurrentFile();
 }
 
 void MainWindow::StopBuildServerClick()
@@ -4427,7 +4479,6 @@ void MainWindow::TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args)
                     else
                     {
                         AddCmajorEditor(data->fileName, data->key, data->filePath, data->project);
-                        // LoadEditModule(data->project->FilePath()); todo
                     }
                 }
                 else if (ext == ".xml")
@@ -4855,6 +4906,7 @@ void MainWindow::CodeTabPageSelected()
     {
         editor->Select();
         SetEditorState();
+        LoadEditModuleForCurrentFile();
     }
 }
 

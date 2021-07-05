@@ -67,6 +67,8 @@ public:
     void Run();
     bool Running();
     void KeepAlive();
+    void PutRequest(CodeCompletionServiceRequest* request);
+    void LoadEditModule(const std::string& projectFilePath, const std::string& backend, const std::string& config);
 private:
     static std::unique_ptr<CodeCompletionService> instance;
     CodeCompletionService();
@@ -77,6 +79,9 @@ private:
     void SendReceiveKeepAlive();
     void ProcessRequests();
     void ExecuteRequest(CodeCompletionServiceRequest* request);
+    void WriteMessage(sngxml::dom::Element* messageElement);
+    std::unique_ptr<sngxml::dom::Document> ReadReply(const std::string& replyMessageName);
+    TcpSocket socket;
     bool running;
     bool exiting;
     bool keepAliveThreadStarted;
@@ -93,6 +98,7 @@ private:
     std::mutex keepAliveMutex;
     std::condition_variable stopKeepAliveVar;
     std::mutex requestMutex;
+    std::mutex queueMutex;
     std::condition_variable requestAvailableOrExiting;
     std::list<std::unique_ptr<CodeCompletionServiceRequest>> requestQueue;
 };
@@ -302,6 +308,13 @@ struct CodeCompletionServiceRequestGuard
     bool& requestInProgress;
 };
 
+void CodeCompletionService::PutRequest(CodeCompletionServiceRequest* request)
+{
+    std::lock_guard<std::mutex> lock(queueMutex);
+    requestQueue.push_back(std::unique_ptr<CodeCompletionServiceRequest>(request));
+    requestAvailableOrExiting.notify_one();
+}
+
 void CodeCompletionService::ExecuteRequest(CodeCompletionServiceRequest* request)
 {
     CodeCompletionServiceRequestGuard requestGuard(requestInProgress);
@@ -315,6 +328,28 @@ void CodeCompletionService::ExecuteRequest(CodeCompletionServiceRequest* request
         request->Failed(ex.what());
         throw;
     }
+}
+
+void CodeCompletionService::WriteMessage(sngxml::dom::Element* messageElement)
+{
+    sngxml::dom::Document messageDoc;
+    messageDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(messageElement));
+    std::stringstream strStream;
+    CodeFormatter formatter(strStream);
+    messageDoc.Write(formatter);
+    Write(socket, strStream.str());
+}
+
+std::unique_ptr<sngxml::dom::Document> CodeCompletionService::ReadReply(const std::string& replyMessageName)
+{
+    std::string replyStr = ReadStr(socket);
+    std::unique_ptr<sngxml::dom::Document> replyDoc = sngxml::dom::ParseDocument(ToUtf32(replyStr), "socket");
+    std::string message = ToUtf8(replyDoc->DocumentElement()->Name());
+    if (message != replyMessageName)
+    {
+        throw std::runtime_error("'" + replyMessageName + "' message expected");
+    }
+    return replyDoc;
 }
 
 void RunCodeCompletionService()
@@ -405,6 +440,7 @@ void CodeCompletionService::Run()
                     std::this_thread::sleep_for(std::chrono::seconds(1));
                     PutOutputServiceMessage(status);
                     PutOutputServiceMessage("code completion server started");
+                    socket.Connect("localhost", std::to_string(serverPort));
                     ProcessRequests();
                 }
                 else
@@ -447,7 +483,43 @@ bool CodeCompletionService::Running()
     return running;
 }
 
+void CodeCompletionService::LoadEditModule(const std::string& projectFilePath, const std::string& backend, const std::string& config)
+{
+    LoadEditModuleRequest request;
+    request.projectFilePath = projectFilePath;
+    request.backend = backend;
+    request.config = config;
+    std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("loadEditModuleRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("loadEditModuleReply");
+    LoadEditModuleReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new LoadEditModuleReplyServiceMessage(reply));
+}
+
 CodeCompletionServiceRequest::~CodeCompletionServiceRequest()
+{
+}
+
+RunLoadEditModuleServiceRequest::RunLoadEditModuleServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_) : 
+    projectFilePath(projectFilePath_), backend(backend_), config(config_)
+{
+}
+
+void RunLoadEditModuleServiceRequest::Execute()
+{
+    CodeCompletionService::Instance().LoadEditModule(projectFilePath, backend, config);
+}
+
+void RunLoadEditModuleServiceRequest::Failed(const std::string& error)
+{
+    PutServiceMessage(new LoadEditModuleErrorServiceMessage(error));
+}
+
+LoadEditModuleReplyServiceMessage::LoadEditModuleReplyServiceMessage(const LoadEditModuleReply& reply_) : ServiceMessage(ServiceMessageKind::loadEditModuleReply), reply(reply_)
+{
+}
+
+LoadEditModuleErrorServiceMessage::LoadEditModuleErrorServiceMessage(const std::string& error_) : ServiceMessage(ServiceMessageKind::loadEditModuleError), error(error_)
 {
 }
 
@@ -464,6 +536,11 @@ void StopCodeCompletionService(bool log)
 bool CodeCompletionServiceRunning()
 {
     return CodeCompletionService::Instance().Running();
+}
+
+void LoadEditModule(const std::string& projectFilePath, const std::string& backend, const std::string& config)
+{
+    CodeCompletionService::Instance().PutRequest(new RunLoadEditModuleServiceRequest(projectFilePath, backend, config));
 }
 
 void InitCodeCompletionService()
