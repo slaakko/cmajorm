@@ -3298,6 +3298,7 @@ void MainWindow::OptionsClick()
     try
     {
         const Options& prevOptions = GetOptions();
+        bool prevCodeCompletion = prevOptions.codeCompletion;
         OptionsDialog dialog; 
         dialog.SetOptionsFrom(GetOptions());
         if (dialog.ShowDialog(*this) == DialogResult::ok)
@@ -3305,7 +3306,7 @@ void MainWindow::OptionsClick()
             const Options& options = dialog.GetOptions();
             SetOptions(options);
             SaveConfiguration();
-            if (prevOptions.codeCompletion != options.codeCompletion)
+            if (prevCodeCompletion != options.codeCompletion)
             {
                 if (options.codeCompletion)
                 {
