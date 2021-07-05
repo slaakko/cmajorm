@@ -29,14 +29,34 @@ bool IsValidRecentSolutionsNumber(const std::string& text)
     }
     return false;
 }
-    
+
+bool IsValidParsingFrequency(const std::string& text)
+{
+    try
+    {
+        if (text.empty()) return false;
+        for (char c : text)
+        {
+            if (c < '0' || c > '9') return false;
+        }
+        int number = boost::lexical_cast<int>(text);
+        if (number > 0 && number <= 60000) return true;
+    }
+    catch (...)
+    {
+    }
+    return false;
+}
+
 OptionsDialog::OptionsDialog() : Window(WindowCreateParams().WindowClassName("cmcode.OptionsDialog").WindowStyle(DialogWindowStyle()).Text("Options").
     WindowClassBackgroundColor(DefaultControlWindowClassBackgroundColor()).BackgroundColor(DefaultControlBackgroundColor()).
     Location(DefaultLocation()).SetSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(160), ScreenMetrics::Get().MMToVerticalPixels(100)))),
     okButton(nullptr),
     cancelButton(nullptr),
     showStartupDialogCheckBox(nullptr),
-    numberOfRecentSolutionsTextBox(nullptr)
+    numberOfRecentSolutionsTextBox(nullptr),
+    codeCompletionCheckBox(nullptr),
+    parsingFrequencyTextBox(nullptr)
 {
     Size s = GetSize();
     Size defaultControlSpacing = ScreenMetrics::Get().DefaultControlSpacing();
@@ -67,6 +87,26 @@ OptionsDialog::OptionsDialog() : Window(WindowCreateParams().WindowClassName("cm
         SetSize(BorderedSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height), DefaultPadding()), BorderStyle::single)).SetAnchors(Anchors::top | Anchors::left)));
     AddChild(borderedTextBox.release());
 
+    std::unique_ptr<CheckBox> codeCompletionCheckBoxPtr(new CheckBox(CheckBoxCreateParams().Text("Code completion").Location(Point(16, 24 + 24 + 24 + 24)).SetAnchors(Anchors::top | Anchors::left)));
+    codeCompletionCheckBox = codeCompletionCheckBoxPtr.get();
+    codeCompletionCheckBox->SetChecked(true);
+    AddChild(codeCompletionCheckBoxPtr.release());
+
+    Point parsingFrequencyLabelLocation(16, 24 + 24 + 24 + 24 + 24);
+    std::unique_ptr<Label> parsingFrequencyLabel(new Label(LabelCreateParams().Text("Source code parsing frequency for code completion (milliseconds):").
+        Location(parsingFrequencyLabelLocation).SetSize(defaultLabelSize).SetAnchors(Anchors::top | Anchors::left)));
+    AddChild(parsingFrequencyLabel.release());
+
+    Point parsingFrequencyTextBoxLocation(16, 24 + 24 + 24 + 24 + 24 + 24);
+    std::unique_ptr<TextBox> parsingFrequencyTextBoxPtr(new TextBox(TextBoxCreateParams().Text("1000")));
+    parsingFrequencyTextBox = parsingFrequencyTextBoxPtr.get();
+    parsingFrequencyTextBox->TextChanged().AddHandler(this, &OptionsDialog::ParsingFrequencyTextBoxTextChanged);
+    std::unique_ptr<Control> paddedPFTextBox(new PaddedControl(PaddedControlCreateParams(parsingFrequencyTextBoxPtr.release()).
+        SetSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height), DefaultPadding()))));
+    std::unique_ptr<Control> borderedPFTextBox(new BorderedControl(BorderedControlCreateParams(paddedPFTextBox.release()).Location(parsingFrequencyTextBoxLocation).
+        SetSize(BorderedSize(PaddedSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(10), defaultTextBoxSize.Height), DefaultPadding()), BorderStyle::single)).SetAnchors(Anchors::top | Anchors::left)));
+    AddChild(borderedPFTextBox.release());
+
     int x = s.Width - defaultButtonSize.Width - defaultControlSpacing.Width;
     int y = s.Height - defaultButtonSize.Height - defaultControlSpacing.Height;
     std::unique_ptr<Button> cancelButtonPtr(new Button(ControlCreateParams().Location(Point(x, y)).SetSize(defaultButtonSize).Text("Cancel").SetAnchors(Anchors::right | Anchors::bottom)));
@@ -84,9 +124,9 @@ OptionsDialog::OptionsDialog() : Window(WindowCreateParams().WindowClassName("cm
     showStartupDialogCheckBox->SetFocus();
 }
 
-void OptionsDialog::TextBoxTextChanged()
+void OptionsDialog::CheckValid() 
 {
-    if (IsValidRecentSolutionsNumber(numberOfRecentSolutionsTextBox->Text()))
+    if (IsValidRecentSolutionsNumber(numberOfRecentSolutionsTextBox->Text()) && IsValidParsingFrequency(parsingFrequencyTextBox->Text()))
     {
         okButton->Enable();
     }
@@ -96,10 +136,22 @@ void OptionsDialog::TextBoxTextChanged()
     }
 }
 
+void OptionsDialog::TextBoxTextChanged()
+{
+    CheckValid();
+}
+
+void OptionsDialog::ParsingFrequencyTextBoxTextChanged()
+{
+    CheckValid();
+}
+
 void OptionsDialog::SetOptionsFrom(const Options& options)
 {
     showStartupDialogCheckBox->SetChecked(options.showStartupDialog);
     numberOfRecentSolutionsTextBox->SetText(std::to_string(options.numberOfRecentSolutions));
+    codeCompletionCheckBox->SetChecked(options.codeCompletion);
+    parsingFrequencyTextBox->SetText(std::to_string(options.parsingFrequency));
 }
 
 Options OptionsDialog::GetOptions() const
@@ -107,6 +159,8 @@ Options OptionsDialog::GetOptions() const
     Options options;
     options.showStartupDialog = showStartupDialogCheckBox->Checked();
     options.numberOfRecentSolutions = boost::lexical_cast<int>(numberOfRecentSolutionsTextBox->Text());
+    options.codeCompletion = codeCompletionCheckBox->Checked();
+    options.parsingFrequency = boost::lexical_cast<int>(parsingFrequencyTextBox->Text());
     return options;
 }
 

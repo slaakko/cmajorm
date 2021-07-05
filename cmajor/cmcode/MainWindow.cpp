@@ -14,6 +14,7 @@
 #include <cmajor/cmcode/Build.hpp>
 #include <cmajor/cmcode/Debug.hpp>
 #include <cmajor/cmcode/Run.hpp>
+#include <cmajor/cmcode/CodeCompletion.hpp>
 #include <cmajor/cmcode/ToolBar.hpp>
 #include <cmajor/cmcode/AddNewProjectDialog.hpp>
 #include <cmajor/cmcode/NewProjectDialog.hpp>
@@ -655,6 +656,11 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
 
     SetTimer(configurationSaveTimerId, configurationSavePeriod);
 
+    if (options.codeCompletion)
+    {
+        SetTimer(startCodeCompletionTimerId, startCodeCompletionTimerDelay);
+    }
+
     if (!filePath.empty())
     {
         OpenProject(filePath);
@@ -682,6 +688,7 @@ MainWindow::~MainWindow()
     {
         StopRunService();
     }
+    StopCodeCompletion(false);
     StopRequestDispatcher();
 }
 
@@ -774,6 +781,11 @@ void MainWindow::OnTimer(TimerEventArgs& args)
         {
             KillTimer(toolTipTimerId);
             toolTipWindow->Hide();
+        }
+        else if (args.timerId == startCodeCompletionTimerId)
+        {
+            KillTimer(startCodeCompletionTimerId);
+            StartCodeCompletion();
         }
     }
     catch (const std::exception& ex)
@@ -1084,6 +1096,16 @@ void MainWindow::StopRunning()
     SetState(MainWindowState::idle);
     SetEditorsReadWrite();
     PutOutputServiceMessage("run service stopped");
+}
+
+void MainWindow::StartCodeCompletion()
+{
+    StartCodeCompletionService(pid);
+}
+
+void MainWindow::StopCodeCompletion(bool log)
+{
+    StopCodeCompletionService(log);
 }
 
 void MainWindow::ShowBuildProgress()
@@ -3275,12 +3297,25 @@ void MainWindow::OptionsClick()
 {
     try
     {
+        const Options& prevOptions = GetOptions();
         OptionsDialog dialog; 
         dialog.SetOptionsFrom(GetOptions());
         if (dialog.ShowDialog(*this) == DialogResult::ok)
         {
-            SetOptions(dialog.GetOptions());
+            const Options& options = dialog.GetOptions();
+            SetOptions(options);
             SaveConfiguration();
+            if (prevOptions.codeCompletion != options.codeCompletion)
+            {
+                if (options.codeCompletion)
+                {
+                    StartCodeCompletion();
+                }
+                else
+                {
+                    StopCodeCompletion(true);
+                }
+            }
         }
     }
     catch (const std::exception& ex)

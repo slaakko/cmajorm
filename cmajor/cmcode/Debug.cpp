@@ -6,7 +6,6 @@
 #include <cmajor/cmcode/Debug.hpp>
 #include <cmajor/cmcode/Config.hpp>
 #include <cmajor/cmsvc/DebugServiceRequest.hpp>
-#include <cmajor/cmsvc/Request.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmcode {

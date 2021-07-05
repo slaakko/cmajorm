@@ -10,6 +10,7 @@
 #include <cmajor/cmsvc/BuildService.hpp>
 #include <cmajor/cmsvc/DebugService.hpp>
 #include <cmajor/cmsvc/RunService.hpp>
+#include <cmajor/cmsvc/CodeCompletionService.hpp>
 #include <cmajor/cmdebug/CmdbSession.hpp>
 
 namespace cmajor { namespace service {
@@ -22,12 +23,14 @@ void Init()
     InitBuildService();
     InitDebugService();
     InitRunService();
+    InitCodeCompletionService();
     cmajor::debug::CmdbSessionInit();
 }
 
 void Done()
 {
     cmajor::debug::CmdbSessionDone();
+    DoneCodeCompletionService();
     DoneRunService();
     DoneDebugService();
     DoneBuildService();

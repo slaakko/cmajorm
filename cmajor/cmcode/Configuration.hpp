@@ -11,7 +11,6 @@
 
 using date = soulng::util::Date;
 using datetime = soulng::util::DateTime;
-using timestamp = soulng::util::Timestamp;
 using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
@@ -48,8 +47,11 @@ public:
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
 public:
     bool defined;
+    bool codeCompletionDefined;
     bool showStartupDialog;
     int32_t numberOfRecentSolutions;
+    bool codeCompletion;
+    int32_t parsingFrequency;
 };
 
 class WindowLocation

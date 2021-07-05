@@ -11,7 +11,6 @@
 
 using date = soulng::util::Date;
 using datetime = soulng::util::DateTime;
-using timestamp = soulng::util::Timestamp;
 using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;

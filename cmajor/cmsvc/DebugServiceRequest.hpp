@@ -3,6 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
+#ifndef CMAJOR_SERVICE_DEBUG_SERVICE_REQUEST_INCLUDED
+#define CMAJOR_SERVICE_DEBUG_SERVICE_REQUEST_INCLUDED
 #include <cmajor/cmsvc/Request.hpp>
 #include <cmajor/cmsvc/Breakpoint.hpp>
 #include <cmajor/cmsvc/DebugService.hpp>
@@ -161,3 +163,5 @@ private:
 };
 
 } } // namespace cmajor::service
+
+#endif // CMAJOR_SERVICE_DEBUG_SERVICE_REQUEST_INCLUDED

@@ -75,6 +75,13 @@ void Config::Load()
             configuration.options.defined = true;
             configuration.options.showStartupDialog = true;
             configuration.options.numberOfRecentSolutions = 5;
+            configuration.options.codeCompletion = true;
+            configuration.options.parsingFrequency = 1000;
+        }
+        if (!configuration.options.codeCompletionDefined)
+        {
+            configuration.options.codeCompletion = true;
+            configuration.options.parsingFrequency = 1000;
         }
     }
 }
@@ -83,6 +90,7 @@ void Config::Save()
 {
     std::string configXmlFilePath = Path::Combine(CmajorConfigDir(), "cmcode.config.xml");
     configuration.options.defined = true;
+    configuration.options.codeCompletionDefined = true;
     std::unique_ptr<sngxml::dom::Element> configurationElement = configuration.ToXml("configuration");
     sngxml::dom::Document configDoc;
     configDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(configurationElement.release()));
@@ -108,6 +116,14 @@ const Options& GetOptions()
         Config::Instance().GetConfiguration().options.defined = true;
         Config::Instance().GetConfiguration().options.showStartupDialog = true;
         Config::Instance().GetConfiguration().options.numberOfRecentSolutions = 5;
+        Config::Instance().GetConfiguration().options.codeCompletion = true;
+        Config::Instance().GetConfiguration().options.parsingFrequency = 1000;
+    }
+    if (!Config::Instance().GetConfiguration().options.codeCompletionDefined)
+    {
+        Config::Instance().GetConfiguration().options.codeCompletionDefined = true;
+        Config::Instance().GetConfiguration().options.codeCompletion = true;
+        Config::Instance().GetConfiguration().options.parsingFrequency = 1000;
     }
     return Config::Instance().GetConfiguration().options;
 }

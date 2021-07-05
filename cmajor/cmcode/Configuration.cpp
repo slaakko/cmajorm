@@ -50,24 +50,30 @@ std::unique_ptr<sngxml::dom::Element> BuildSettings::ToXml(const std::string& fi
 }
 
 Options::Options()
-    : defined(), showStartupDialog(), numberOfRecentSolutions()
+    : defined(), codeCompletionDefined(), showStartupDialog(), numberOfRecentSolutions(), codeCompletion(), parsingFrequency()
 {
 }
 
 Options::Options(sngxml::dom::Element* element)
-    : defined(), showStartupDialog(), numberOfRecentSolutions()
+    : defined(), codeCompletionDefined(), showStartupDialog(), numberOfRecentSolutions(), codeCompletion(), parsingFrequency()
 {
     sngxml::xmlser::FromXml(element, "defined", defined);
+    sngxml::xmlser::FromXml(element, "codeCompletionDefined", codeCompletionDefined);
     sngxml::xmlser::FromXml(element, "showStartupDialog", showStartupDialog);
     sngxml::xmlser::FromXml(element, "numberOfRecentSolutions", numberOfRecentSolutions);
+    sngxml::xmlser::FromXml(element, "codeCompletion", codeCompletion);
+    sngxml::xmlser::FromXml(element, "parsingFrequency", parsingFrequency);
 }
 
 std::unique_ptr<sngxml::dom::Element> Options::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(defined, "defined").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(codeCompletionDefined, "codeCompletionDefined").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(showStartupDialog, "showStartupDialog").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(numberOfRecentSolutions, "numberOfRecentSolutions").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(codeCompletion, "codeCompletion").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(parsingFrequency, "parsingFrequency").release()));
     return element;
 }
 

@@ -23,10 +23,14 @@ public:
     Options GetOptions() const;
 private:
     void TextBoxTextChanged();
+    void ParsingFrequencyTextBoxTextChanged();
+    void CheckValid();
     Button* okButton;
     Button* cancelButton;
     CheckBox* showStartupDialogCheckBox;
     TextBox* numberOfRecentSolutionsTextBox;
+    CheckBox* codeCompletionCheckBox;
+    TextBox* parsingFrequencyTextBox;
 };
 
 } // namespace cmcode

@@ -3,6 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
+#ifndef CMAJOR_SERVICE_BUILD_SERVICE_REQUEST_INCLUDED
+#define CMAJOR_SERVICE_BUILD_SERVICE_REQUEST_INCLUDED
 #include <cmajor/cmsvc/Request.hpp>
 #include <cmajor/cmsvc/BuildService.hpp>
 
@@ -39,3 +41,5 @@ private:
 };
 
 } } // namespace cmajor::service
+
+#endif // CMAJOR_SERVICE_BUILD_SERVICE_REQUEST_INCLUDED

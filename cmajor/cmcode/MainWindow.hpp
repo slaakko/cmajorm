@@ -43,6 +43,8 @@ const int startupDialogTimer = 15;
 const int startupDialogTimerDelay = 10;
 const int toolTipTimerId = 12;
 const int toolTipShowPeriod = 3000;
+const int startCodeCompletionTimerId = 20;
+const int startCodeCompletionTimerDelay = 50;
 
 using namespace cmajor::view;
 using namespace cmajor::wing;
@@ -112,6 +114,8 @@ private:
     void StopDebugging();
     void StartRunning();
     void StopRunning();
+    void StartCodeCompletion();
+    void StopCodeCompletion(bool log);
     void HandleServiceMessage();
     void ClearOutput();
     void WriteOutput(const std::string& text);
