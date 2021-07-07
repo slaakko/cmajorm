@@ -21,6 +21,7 @@
 #include <cmajor/cmview/LocalsView.hpp>
 #include <cmajor/cmview/ErrorView.hpp>
 #include <cmajor/cmview/SearchResultsView.hpp>
+#include <cmajor/cmview/CodeCompletionView.hpp>
 #include <cmajor/wing/Clipboard.hpp>
 #include <cmajor/wing/Console.hpp>
 #include <cmajor/wing/Window.hpp>
@@ -45,6 +46,7 @@ const int startupDialogTimer = 15;
 const int startupDialogTimerDelay = 10;
 const int toolTipTimerId = 12;
 const int toolTipShowPeriod = 3000;
+const int ccTimerId = 20;
 
 using namespace cmajor::view;
 using namespace cmajor::wing;
@@ -124,6 +126,8 @@ private:
     void LoadEditModule();
     void LoadEditModule(sngcm::ast::Project* project);
     void LoadEditModuleForCurrentFile();
+    void ResetEditModuleCache();
+    void ParseSource();
     void HandleServiceMessage();
     void ClearOutput();
     void WriteOutput(const std::string& text);
@@ -160,6 +164,12 @@ private:
     void HandleRunServiceStopped();
     void HandleLoadEditModuleReply(const LoadEditModuleReply& loadEditModuleReply);
     void HandleLoadEditModuleError(const std::string& error);
+    void HandleResetEditModuleCacheReply(const ResetEditModuleCacheReply& resetEditModuleCacherReply);
+    void HandleResetEditModuleCacheError(const std::string& error);
+    void HandleParseSourceReply(const ParseSourceReply& parseSourceReply);
+    void HandleParseSourceError(const std::string& error);
+    void HandleGetCCListReply(const GetCCListReply& getCCListReply);
+    void HandleGetCCListError(const std::string& error);
     void SetState(MainWindowState state_);
     void SetEditorState();
     void ResetDebugLocations();
@@ -231,6 +241,7 @@ private:
     void DebugButtonClick();
     void ReleaseButtonClick();
     void StopBuildServerClick();
+    void ToggleCodeCompletionClick();
     void TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args);
     void TreeViewNodeClick(TreeViewNodeClickEventArgs& args);
     void TreeViewNodeExpanded(TreeViewNodeEventArgs& args);
@@ -257,12 +268,21 @@ private:
     void ClearLocals();
     void UpdateLocals();
     void LocalsViewNodeExpanded(TreeViewNodeEventArgs& args);
-    void LocalsViewNodeHovered(TreeViewNodeEventArgs& args);
     void LocalsViewUpdateNeeded();
     Console* GetConsole();
     void UpdateCurrentDebugStrip();
     void ResetSelections();
     void ExpressionHover(ExpressionHoverEventArgs& args);
+    void CCTextChanged();
+    void CCShow();
+    void CCHide();
+    void CCNext();
+    void CCPrev();
+    void CCNextPage();
+    void CCPrevPage();
+    void CCSelect(SelectedEventArgs& args);
+    void CCStart();
+    void CCStop();
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -346,6 +366,7 @@ private:
     StatusBarTextItem* editorReadWriteIndicatorStatusBarItem;
     StatusBarTextItem* editorDirtyIndicatorStatusBarItem;
     StatusBarTextItem* sourceFilePathStatusBarItem;
+    StatusBarTextItem* codeCompletionStatusBarItem;
     StatusBarTextItem* lineStatusBarItem;
     StatusBarTextItem* columnStatusBarItem;
     int buildProgressCounter;
@@ -378,6 +399,11 @@ private:
     std::vector<std::string> buildIndicatorTexts;
     std::vector<ExpressionEvaluateRequest> expressionEvaluateRequests;
     ToolTip* toolTipWindow;
+    CodeCompletionListView* codeCompletionListView;
+    bool ccTimerRunning;
+    bool editModuleLoaded;
+    bool canSelect;
+    CCEntry currentCCEntry;
 };
 
 } // namespace cmcode

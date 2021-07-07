@@ -235,7 +235,7 @@ public:
     ParseResult ParseSources();
     ParseResult ParseSource(const std::string& sourceFilePath, const std::u32string& sourceCode);
     std::string GetCCList(const std::string& sourceFilePath, const std::string& ccText);
-    std::string GetOverloadList(const std::string& functionGroup);
+    std::string GetSymbolList(const std::string& sourceFilePath, int symbolIndex);
 private:
     uint8_t format;
     ModuleFlags flags;

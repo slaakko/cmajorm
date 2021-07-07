@@ -1982,15 +1982,16 @@ std::string Module::GetCCList(const std::string& sourceFilePath, const std::stri
     }
 }
 
-std::string Module::GetOverloadList(const std::string& functionGroup)
+std::string Module::GetSymbolList(const std::string& sourceFilePath, int symbolIndex)
 {
-    Symbol* symbol = symbolTable->GlobalNs().GetContainerScope()->Lookup(ToUtf32(functionGroup));
-    if (symbol->GetSymbolType() == SymbolType::functionGroupSymbol)
+    if (sources)
     {
-        FunctionGroupSymbol* functionGroupSymbol = static_cast<FunctionGroupSymbol*>(symbol);
-        return functionGroupSymbol->GetOverloadList();
+        return sources->GetSymbolList(this, sourceFilePath, symbolIndex);
     }
-    return std::string();
+    else
+    {
+        throw std::runtime_error("sources not set");
+    }
 }
 
 #ifdef _WIN32

@@ -19,6 +19,10 @@ namespace cmajor { namespace wing {
 
 using namespace soulng::unicode;
 
+SelectedEventArgs::SelectedEventArgs() : selected(false)
+{
+}
+
 const std::u32string ccStopChars = U" ,()[]{};\"'<=|&^!+/%~:";
 
 bool IsCCStopChar(char32_t c)
@@ -41,6 +45,55 @@ bool IsEmptyOrSpaceLine(const std::u32string& line)
         if (c != ' ') return false;
     }
     return true;
+}
+
+bool IsCCLetter(char32_t c)
+{
+    return IsLetter(c) || c == '.';
+}
+
+bool HasParen(const std::u32string& s)
+{
+    for (char32_t c : s)
+    {
+        if (c == '(') return true;
+        else if (c == '(') return false;
+    }
+    return false;
+}
+
+bool HasAngleBracket(const std::u32string& s)
+{
+    for (char32_t c : s)
+    {
+        if (c == '<') return true; 
+        else if (c == '>') return true;
+    }
+    return false;
+}
+
+bool StartCC(const std::string& ccCat, const std::u32string& currentLine)
+{
+    if (ccCat == "FN")
+    {
+        if (HasParen(currentLine)) return false;
+    }
+    else if (ccCat == "CL")
+    {
+        if (HasAngleBracket(currentLine)) return false;
+    }
+    else
+    {
+        if (HasParen(currentLine)) return false;
+    }
+    return true;
+}
+
+bool StopCC(char32_t c)
+{
+    if (c == '.') return false;
+    if (c == ' ' || IsPunctuation(c)) return true;
+    return false;
 }
 
 int ReadCaretTimeoutFromRegistry()
@@ -202,7 +255,7 @@ TextView::TextView(TextViewCreateParams& createParams) :
     flags(TextViewFlags::none), textColor(createParams.textColor), selectionBackgroundColor(createParams.selectionBackgroundColor), 
     fontFamilyName(createParams.fontFamilyName), fontSize(createParams.fontSize), cursor(LoadStandardCursor(StandardCursorId::ibeam)),
     caretTimerPeriod(defaultCaretTimerPeriod), caretColumn(1), caretLine(1), charWidth(0), charHeight(0), textWidth(0), textHeight(0), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
-    maxLineLength(0), maxLineIndex(0), indentSize(1), selection(), padding(), lines(), editCommandList(this), update(false), stringFormat()
+    maxLineLength(0), maxLineIndex(0), indentSize(1), selection(), padding(), lines(), editCommandList(this), update(false), stringFormat(), ccLineNumber(0)
 {
     int timeout = ReadCaretTimeoutFromRegistry();
     if (timeout != -1)
@@ -758,7 +811,12 @@ std::u32string TextView::GetCursorText() const
                 }
                 --startIndex;
             }
-            cursorText.append(line.substr(0, startIndex)).append(1, '$').append(line.substr(caretIndex)).append(1, '\n');
+            cursorText.append(line.substr(0, startIndex)).append(1, '$');
+            if (caretIndex < line.length())
+            {
+                cursorText.append(line.substr(caretIndex));
+            }
+            cursorText.append(1, '\n');
         }
         else
         {
@@ -766,6 +824,17 @@ std::u32string TextView::GetCursorText() const
         }
     }
     return cursorText;
+}
+
+const std::u32string& TextView::CurrentLine() const
+{
+    static std::u32string emptyLine;
+    int lineIndex = caretLine - 1;
+    if (lineIndex >= 0 && lineIndex < lines.size() - 1)
+    {
+        return *lines[lineIndex];
+    }
+    return emptyLine;
 }
 
 void TextView::InsertChar(int lineIndex, int columnIndex, char32_t c)
@@ -1490,6 +1559,16 @@ void TextView::FirePaste()
     OnPaste();
 }
 
+void TextView::FireCCStart()
+{
+    OnCCStart();
+}
+
+void TextView::FireCCStop()
+{
+    OnCCStop();
+}
+
 void TextView::OnPaint(PaintEventArgs& args)
 {
     try
@@ -2049,22 +2128,23 @@ void TextView::OnKeyDown(KeyEventArgs& args)
             {
                 if (IsCCOpen())
                 {
-                    OnCCSelect();
-                    args.handled = true;
-                    return;
-                }
-                else
-                {
-                    if (!IsReadOnly())
+                    bool selected = false;
+                    OnCCSelect(selected);
+                    if (selected)
                     {
-                        ResetSelection();
-                        int lineIndex = caretLine - 1;
-                        int columnIndex = CaretColumn() - 1;
-                        AddNewLineCommand(lineIndex, columnIndex);
-                        NewLine(lineIndex, columnIndex);
                         args.handled = true;
                         return;
                     }
+                }
+                if (!IsReadOnly())
+                {
+                    ResetSelection();
+                    int lineIndex = caretLine - 1;
+                    int columnIndex = CaretColumn() - 1;
+                    AddNewLineCommand(lineIndex, columnIndex);
+                    NewLine(lineIndex, columnIndex);
+                    args.handled = true;
+                    return;
                 }
                 break;
             }
@@ -2176,6 +2256,14 @@ void TextView::OnKeyPress(KeyPressEventArgs& args)
             RemoveSelection();
         }
         char32_t c(args.keyChar);
+        if (!IsCCActive() && IsCCLetter(c) && StartCC(ccCat, CurrentLine()))
+        {
+            FireCCStart();
+        }
+        else if (IsCCActive() && StopCC(c))
+        {
+            FireCCStop();
+        }
         int lineIndex = caretLine - 1;
         int columnIndex = CaretColumn() - 1;
         AddInsertCharCommand(lineIndex, columnIndex, c);
@@ -2221,9 +2309,14 @@ void TextView::OnCCPrevPage()
     ccPrevPage.Fire();
 }
 
-void TextView::OnCCSelect()
+void TextView::OnCCSelect(bool& selected)
 {
-    ccSelect.Fire();
+    SelectedEventArgs args;
+    ccSelect.Fire(args);
+    if (args.selected)
+    {
+        selected = true;
+    }
 }
 
 void TextView::OnGotoCaretLine()
@@ -2573,7 +2666,20 @@ void TextView::OnLinesChanged()
 
 void TextView::OnCCTextChanged()
 {
-    ccTextChanged.Fire();
+    if (IsCCActive())
+    {
+        ccTextChanged.Fire();
+    }
+}
+
+void TextView::OnCCStart()
+{
+    ccStart.Fire();
+}
+
+void TextView::OnCCStop()
+{
+    ccStop.Fire();
 }
 
 void TextView::AddInsertCharCommand(int lineIndex, int columnIndex, char32_t c)

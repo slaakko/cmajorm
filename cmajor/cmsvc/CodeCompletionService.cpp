@@ -69,6 +69,9 @@ public:
     void KeepAlive();
     void PutRequest(CodeCompletionServiceRequest* request);
     void LoadEditModule(const std::string& projectFilePath, const std::string& backend, const std::string& config);
+    void ResetEditModuleCache();
+    void ParseSource(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, std::u32string&& sourceCode);
+    void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText_);
 private:
     static std::unique_ptr<CodeCompletionService> instance;
     CodeCompletionService();
@@ -496,6 +499,46 @@ void CodeCompletionService::LoadEditModule(const std::string& projectFilePath, c
     PutServiceMessage(new LoadEditModuleReplyServiceMessage(reply));
 }
 
+void CodeCompletionService::ResetEditModuleCache()
+{
+    ResetEditModuleCacheRequest request;
+    std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("resetEditModuleCacheRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("resetEditModuleCacheReply");
+    ResetEditModuleCacheReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new ResetEditModuleCacheReplyServiceMessage(reply));
+}
+
+void CodeCompletionService::ParseSource(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, std::u32string&& sourceCode)
+{
+    ParseSourceRequest request;
+    request.projectFilePath = projectFilePath;
+    request.backend = backend;
+    request.config = config;
+    request.sourceFilePath = sourceFilePath;
+    request.sourceCode = std::move(sourceCode);
+    std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("parseSourceRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("parseSourceReply");
+    ParseSourceReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new ParseSourceReplyServiceMessage(reply));
+}
+
+void CodeCompletionService::GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText)
+{
+    GetCCListRequest request;
+    request.projectFilePath = projectFilePath;
+    request.backend = backend;
+    request.config = config;
+    request.sourceFilePath = sourceFilePath;
+    request.ccText = ccText;
+    std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("getCCListRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("getCCListReply");
+    GetCCListReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new GetCCListReplyServiceMessage(reply));
+}
+
 CodeCompletionServiceRequest::~CodeCompletionServiceRequest()
 {
 }
@@ -523,6 +566,70 @@ LoadEditModuleErrorServiceMessage::LoadEditModuleErrorServiceMessage(const std::
 {
 }
 
+void RunResetEditModuleCacheServiceRequest::Execute()
+{
+    CodeCompletionService::Instance().ResetEditModuleCache();
+}
+
+void RunResetEditModuleCacheServiceRequest::Failed(const std::string& error)
+{
+    PutServiceMessage(new ResetEditModuleCacheErrorServiceMessage(error));
+}
+
+ResetEditModuleCacheReplyServiceMessage::ResetEditModuleCacheReplyServiceMessage(const ResetEditModuleCacheReply& reply_) : ServiceMessage(ServiceMessageKind::resetEditModuleCacheReply), reply(reply_)
+{
+}
+
+ResetEditModuleCacheErrorServiceMessage::ResetEditModuleCacheErrorServiceMessage(const std::string& error_) : ServiceMessage(ServiceMessageKind::resetEditModuleCacheError), error(error_)
+{
+}
+
+RunParseSourceServiceRequest::RunParseSourceServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, std::u32string&& sourceCode_) : 
+    projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), sourceCode(std::move(sourceCode_))
+{
+}
+
+void RunParseSourceServiceRequest::Execute()
+{
+    CodeCompletionService::Instance().ParseSource(projectFilePath, backend, config, sourceFilePath, std::move(sourceCode));
+}
+
+void RunParseSourceServiceRequest::Failed(const std::string& error)
+{
+    PutServiceMessage(new ParseSourceErrorServiceMessage(error));
+}
+
+ParseSourceReplyServiceMessage::ParseSourceReplyServiceMessage(const ParseSourceReply& reply_) : ServiceMessage(ServiceMessageKind::parseSourceReply), reply(reply_)
+{
+}
+
+ParseSourceErrorServiceMessage::ParseSourceErrorServiceMessage(const std::string& error_) : ServiceMessage(ServiceMessageKind::parseSourceError), error(error_)
+{
+}
+
+RunGetCCListServiceRequest::RunGetCCListServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, const std::string& ccText_) : 
+    projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), ccText(ccText_)
+{
+}
+
+void RunGetCCListServiceRequest::Execute()
+{
+    CodeCompletionService::Instance().GetCCList(projectFilePath, backend, config, sourceFilePath, ccText);
+}
+
+void RunGetCCListServiceRequest::Failed(const std::string& error)
+{
+    PutServiceMessage(new GetCCListErrorServiceMessage(error));
+}
+
+GetCCListReplyServiceMessage::GetCCListReplyServiceMessage(const GetCCListReply& reply_) : ServiceMessage(ServiceMessageKind::getCCListReply), reply(reply_)
+{
+}
+
+GetCCListErrorServiceMessage::GetCCListErrorServiceMessage(const std::string& error_) : ServiceMessage(ServiceMessageKind::getCCListError), error(error_)
+{
+}
+
 void StartCodeCompletionService(CodeCompletionServiceStartParams& startParams)
 {
     CodeCompletionService::Instance().Start(startParams);
@@ -541,6 +648,21 @@ bool CodeCompletionServiceRunning()
 void LoadEditModule(const std::string& projectFilePath, const std::string& backend, const std::string& config)
 {
     CodeCompletionService::Instance().PutRequest(new RunLoadEditModuleServiceRequest(projectFilePath, backend, config));
+}
+
+void ResetEditModuleCache()
+{
+    CodeCompletionService::Instance().PutRequest(new RunResetEditModuleCacheServiceRequest());
+}
+
+void ParseSource(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, std::u32string&& sourceCode)
+{
+    CodeCompletionService::Instance().PutRequest(new RunParseSourceServiceRequest(projectFilePath, backend, config, sourceFilePath, std::move(sourceCode)));
+}
+
+void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText)
+{
+    CodeCompletionService::Instance().PutRequest(new RunGetCCListServiceRequest(projectFilePath, backend, config, sourceFilePath, ccText));
 }
 
 void InitCodeCompletionService()

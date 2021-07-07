@@ -36,4 +36,19 @@ void LoadEditModule(const std::string& projectFilePath, const std::string& backe
     PutRequest(new LoadEditModuleCodeCompletionServiceRequest(projectFilePath, backend, config));
 }
 
+void ResetEditModuleCache()
+{
+    PutRequest(new ResetEditModuleCacheCodeCompletionServiceRequest());
+}
+
+void ParseSource(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, std::u32string&& sourceCode)
+{
+    PutRequest(new ParseSourceCodeCompletionServiceRequest(projectFilePath, backend, config, sourceFilePath, std::move(sourceCode)));
+}
+
+void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText)
+{
+    PutRequest(new GetCCListCodeCompletionServiceRequest(projectFilePath, backend, config, sourceFilePath, ccText));
+}
+
 } // namespace cmcode

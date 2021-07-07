@@ -32,6 +32,42 @@ private:
     std::string config;
 };
 
+class CMSVC_API ResetEditModuleCacheCodeCompletionServiceRequest : public Request
+{
+public:
+    ResetEditModuleCacheCodeCompletionServiceRequest();
+    void Execute() override;
+    std::string Name() const override { return "resetEditModuleCacheCodeCompletionServiceRequest"; }
+};
+
+class CMSVC_API ParseSourceCodeCompletionServiceRequest : public Request
+{
+public:
+    ParseSourceCodeCompletionServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, std::u32string&& sourceCode_);
+    void Execute() override;
+    std::string Name() const override { return "parseSourceCodeCompletionServiceRequest"; }
+private:
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+    std::string sourceFilePath;
+    std::u32string sourceCode;
+};
+
+class CMSVC_API GetCCListCodeCompletionServiceRequest : public Request
+{
+public:
+    GetCCListCodeCompletionServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, const std::string& ccText_);
+    void Execute() override;
+    std::string Name() const override { return "getCCListCodeCompletionServiceRequest"; }
+private:
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+    std::string sourceFilePath;
+    std::string ccText;
+};
+
 } } // namespace cmajor::service
 
 #endif // CMAJOR_SERVICE_CODE_COMPLETION_SERVICE_REQUEST_INCLUDED

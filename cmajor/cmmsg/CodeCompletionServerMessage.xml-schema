@@ -84,21 +84,22 @@ class api(MSG_API) GetCCListReply : CodeCompletionReply
     time_point endGetCCList;
 }
 
-class api(MSG_API) GetOverloadListRequest : CodeCompletionRequest
+class api(MSG_API) GetSymbolListRequest : CodeCompletionRequest
 {
     string projectFilePath;
     string backend;
     string config;
-    string functionGroup;
+    string sourceFilePath;
+    int symbolIndex;
 }
 
-class api(MSG_API) GetOverloadListReply : CodeCompletionReply
+class api(MSG_API) GetSymbolListReply : CodeCompletionReply
 {
     bool ok;
     string error;
-    string overloadList;
-    time_point startGetOverloadList;
-    time_point endGetOverloadList;
+    string symbolList;
+    time_point startGetSymbolList;
+    time_point endGetSymbolList;
 }
 
 class api(MSG_API) StopCCRequest : CodeCompletionRequest

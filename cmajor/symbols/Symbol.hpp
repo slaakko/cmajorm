@@ -236,7 +236,7 @@ public:
     AttributesNode* GetAttributes() const { return attributes.get(); }
     std::unique_ptr<sngxml::dom::Element> ToDomElement(TypeMap& typeMap);
     virtual std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap);
-    virtual sngxml::dom::Element* ToCCElement(int ccPrefixLength, const std::u32string& replacement, const std::u32string& functionGroup) const;
+    virtual sngxml::dom::Element* ToCCElement(int ccPrefixLength, const std::u32string& replacement, int symbolIndex) const;
     virtual std::string GetSymbolCategoryStr() const { return "SY"; }
     virtual std::string GetSymbolCategoryDescription() const { return "symbol"; }
     virtual std::string GetSymbolHelp() const;

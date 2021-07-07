@@ -10,6 +10,12 @@
 
 namespace cmajor { namespace wing {
 
+struct WING_API SelectedEventArgs
+{
+    SelectedEventArgs();
+    bool selected;
+};
+
 using SelectionChangedEvent = Event;
 using DirtyChangedEvent = Event;
 using ReadOnlyChangedEvent = Event;
@@ -23,7 +29,9 @@ using CCNextEvent = Event;
 using CCPrevEvent = Event;
 using CCNextPageEvent = Event;
 using CCPrevPageEvent = Event;
-using CCSelectEvent = Event;
+using CCSelectEvent = EventWithArgs<SelectedEventArgs>;
+using CCStartEvent = Event;
+using CCStopEvent = Event;
 using GotoCaretLineEvent = Event;
 using CopyEvent = Event;
 using CutEvent = Event;
@@ -38,7 +46,7 @@ int ReadCaretTimeoutFromRegistry();
 
 enum class TextViewFlags : int
 {
-    none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, ccdirty = 1 << 5, mouseExtendSelection = 1 << 6, ccOpen = 1 << 7
+    none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, ccdirty = 1 << 5, mouseExtendSelection = 1 << 6, ccOpen = 1 << 7, ccActive = 1 << 8
 };
 
 WING_API inline TextViewFlags operator&(TextViewFlags left, TextViewFlags right)
@@ -163,6 +171,9 @@ public:
     bool IsCCDirty() const { return (flags & TextViewFlags::ccdirty) != TextViewFlags::none; }
     void SetCCDirty();
     void ResetCCDirty();
+    bool IsCCActive() const { return (flags & TextViewFlags::ccActive) != TextViewFlags::none; }
+    void SetCCActive() { flags = flags | TextViewFlags::ccActive; }
+    void ResetCCActive() { flags = flags & ~TextViewFlags::ccActive; }
     bool MouseExtendSelection() const { return (flags & TextViewFlags::mouseExtendSelection) != TextViewFlags::none; }
     void SetMouseExtendSelection() { flags = flags | TextViewFlags::mouseExtendSelection; }
     void ResetMouseExtendSelection() { flags = flags & ~TextViewFlags::mouseExtendSelection; }
@@ -214,11 +225,15 @@ public:
     void SetTextExtent();
     Point CaretPos();
     Point CCPos();
-    const std::u32string& GetCCTect() const { return cctext; }
+    const std::u32string& GetCCText() const { return cctext; }
     void SetCCText(const std::u32string& line, int columnIndex);
     void ResetCCText();
     void ReplaceCCText(const std::u32string& replacement);
     std::u32string GetCursorText() const;
+    int CCLineNumber() const { return ccLineNumber; }
+    void SetCCLineNumber(int ccLineNumber_) { ccLineNumber = ccLineNumber_; }
+    void SetCCCat(const std::string& ccCat_) { ccCat = ccCat_; }
+    const std::u32string& CurrentLine() const;
     void InsertChar(int lineIndex, int columnIndex, char32_t c);
     void InsertText(int lineIndex, int columnIndex, const std::u32string& text);
     void InsertLines(int lineIndex, int columnIndex, const std::vector<std::u32string>& linesToInsert);
@@ -251,6 +266,8 @@ public:
     void FireCopy();
     void FireCut();
     void FirePaste();
+    void FireCCStart();
+    void FireCCStop();
     void AddRemoveSelectionCommand();
     SelectionChangedEvent& SelectionChanged() { return selectionChanged; }
     DirtyChangedEvent& DirtyChanged() { return dirtyChanged; }
@@ -266,6 +283,10 @@ public:
     CCNextPageEvent& CCNextPage() { return ccNextPage; }
     CCPrevPageEvent& CCPrevPage() { return ccPrevPage; }
     CCSelectEvent& CCSelect() { return ccSelect; }
+    CCTextChangedEvent& CCTextChanged() { return ccTextChanged; }
+    CCStartEvent& CCStart() { return ccStart; }
+    CCStopEvent& CCStop() { return ccStop; }
+    EscapeEvent& EscapePressed() { return escape; }
     GotoCaretLineEvent& GotoCaretLine() { return gotoCaretLine; }
     CopyEvent& Copy() { return copy; }
     CutEvent& Cut() { return cut; }
@@ -286,7 +307,7 @@ protected:
     virtual void OnCCPrev();
     virtual void OnCCNextPage();
     virtual void OnCCPrevPage();
-    virtual void OnCCSelect();
+    virtual void OnCCSelect(bool& selected);
     virtual void OnGotoCaretLine();
     virtual void OnCopy();
     virtual void OnCut();
@@ -317,6 +338,8 @@ protected:
     virtual void OnCaretPosChanged();
     virtual void OnLinesChanged();
     virtual void OnCCTextChanged();
+    virtual void OnCCStart();
+    virtual void OnCCStop();
 private:
     void AddInsertCharCommand(int lineIndex, int columnIndex, char32_t c);
     void AddInsertLinesCommand(int lineIndex, int columnIndex, const std::vector<std::u32string>& linesToInsert);
@@ -363,6 +386,8 @@ private:
     SourcePos mouseSelectionStart;
     SourcePos mouseSelectionEnd;
     std::map<DWORD, SolidBrush*> brushMap;
+    int ccLineNumber;
+    std::string ccCat;
     SelectionChangedEvent selectionChanged;
     DirtyChangedEvent dirtyChanged;
     ReadOnlyChangedEvent readOnlyChanged;
@@ -380,6 +405,8 @@ private:
     CCNextPageEvent ccNextPage;
     CCPrevPageEvent ccPrevPage;
     CCSelectEvent ccSelect;
+    CCStartEvent ccStart;
+    CCStopEvent ccStop;
     GotoCaretLineEvent gotoCaretLine;
     CopyEvent copy;
     CutEvent cut;

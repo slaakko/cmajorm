@@ -170,6 +170,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     editorReadWriteIndicatorStatusBarItem(nullptr),
     editorDirtyIndicatorStatusBarItem(nullptr),
     sourceFilePathStatusBarItem(nullptr),
+    codeCompletionStatusBarItem(nullptr),
     lineStatusBarItem(nullptr),
     columnStatusBarItem(nullptr),
     buildProgressCounter(0),
@@ -192,7 +193,11 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     ccState(CCState::idle),
     cmajorCodeFormat("cmajor.code"),
     locations(this),
-    toolTipWindow(new ToolTip(ToolTipCreateParams().Defaults()))
+    toolTipWindow(new ToolTip(ToolTipCreateParams().Defaults())),
+    codeCompletionListView(nullptr),
+    ccTimerRunning(false),
+    editModuleLoaded(false),
+    canSelect(false)
 {
     buildIndicatorTexts.push_back("|");
     buildIndicatorTexts.push_back("/");
@@ -268,6 +273,10 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     searchMenuItem->SetShortcut(Keys::controlModifier | Keys::f);
     searchMenuItem->Click().AddHandler(this, &MainWindow::SearchClick);
     editMenuItem->AddMenuItem(searchMenuItemPtr.release());
+    std::unique_ptr<MenuItem> toggleCodeCompletionMenuItemPtr(new MenuItem("&Toggle Code Completion On/Off"));
+    toggleCodeCompletionMenuItemPtr->SetShortcut(Keys::controlModifier | Keys::t);
+    toggleCodeCompletionMenuItemPtr->Click().AddHandler(this, &MainWindow::ToggleCodeCompletionClick);
+    editMenuItem->AddMenuItem(toggleCodeCompletionMenuItemPtr.release());
     editMenuItem->AddMenuItem(new MenuItemSeparator());
     std::unique_ptr<MenuItem> optionsMenuItemPtr(new MenuItem("&Options..."));
     optionsMenuItem = optionsMenuItemPtr.get();
@@ -621,6 +630,11 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     sourceFilePathStatusBarItem = sourceFilePathStatusBarItemPtr.get();
     statusBar->AddItem(sourceFilePathStatusBarItemPtr.release());
     statusBar->AddItem(new StatusBarSpringItem());
+    std::unique_ptr<StatusBarTextItem> codeCompletionLabelStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(11).Text("Code Completion Status:").BorderStyle(StatusBarItemBorderStyle::flat)));
+    statusBar->AddItem(codeCompletionLabelStatusBarItemPtr.release());
+    std::unique_ptr<StatusBarTextItem> codeCompletionStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(5).BorderStyle(StatusBarItemBorderStyle::sunken)));
+    codeCompletionStatusBarItem = codeCompletionStatusBarItemPtr.get();
+    statusBar->AddItem(codeCompletionStatusBarItemPtr.release());
     std::unique_ptr<StatusBarTextItem> lineLabelStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(5).Text("Line:").BorderStyle(StatusBarItemBorderStyle::flat)));
     statusBar->AddItem(lineLabelStatusBarItemPtr.release());
     std::unique_ptr<StatusBarTextItem> lineStatusBarItemPtr(new StatusBarTextItem(StatusBarTextItemCreateParams().MaxTextLength(5).BorderStyle(StatusBarItemBorderStyle::sunken)));
@@ -634,6 +648,10 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     AddChild(statusBarPtr.release());
 
     AddChild(toolTipWindow);
+
+    codeCompletionListView = new CodeCompletionListView(CCListCreateParams().Defaults(), CodeCompletionListViewCreateParams().Defaults());
+    codeCompletionListView->Hide();
+    AddChild(codeCompletionListView);
 
     locations.SetToolButtons(prevToolButton, nextToolButton);
 
@@ -659,7 +677,12 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
 
     if (options.codeCompletion)
     {
+        codeCompletionStatusBarItem->SetText("On");
         StartCodeCompletion();
+    }
+    else
+    {
+        codeCompletionStatusBarItem->SetText("Off");
     }
 
     if (!filePath.empty())
@@ -782,6 +805,10 @@ void MainWindow::OnTimer(TimerEventArgs& args)
         {
             KillTimer(toolTipTimerId);
             toolTipWindow->Hide();
+        }
+        else if (args.timerId == ccTimerId)
+        {
+            ParseSource();
         }
     }
     catch (const std::exception& ex)
@@ -1012,6 +1039,7 @@ void MainWindow::StartBuilding()
     SetState(MainWindowState::building);
     GetErrorView()->Clear();
     ClearOutput();
+    ResetEditModuleCache();
     buildProgressCounter = 0;
     buildProgressTimerRunning = true;
     SetTimer(buildProgressTimerId, buildProgressTimerPeriod);
@@ -1108,6 +1136,7 @@ void MainWindow::StartCodeCompletion()
 
 void MainWindow::StopCodeCompletion(bool log)
 {
+    editModuleLoaded = false;
     StopCodeCompletionService(log);
 }
 
@@ -1116,6 +1145,7 @@ void MainWindow::LoadEditModule()
     if (!solutionData) return;
     sngcm::ast::Solution* sln = solutionData->GetSolution();
     if (!sln) return;
+    editModuleLoaded = true;
     LoadEditModule(sln->ActiveProject());
 }
 
@@ -1128,6 +1158,36 @@ void MainWindow::LoadEditModule(Project* project)
 void MainWindow::LoadEditModuleForCurrentFile()
 {
     LoadEditModule(CurrentProject());
+}
+
+void MainWindow::ResetEditModuleCache()
+{
+    editModuleLoaded = false;
+    ccState = CCState::idle;
+    cmcode::ResetEditModuleCache();
+}
+
+void MainWindow::ParseSource()
+{
+    Project* project = CurrentProject();
+    if (!project) return;
+    const Options& options = GetOptions();
+    if (!options.codeCompletion) return;
+    if (ccState != CCState::editModuleLoaded) return;
+    Editor* editor = CurrentEditor();
+    if (!editor) return;
+    if (!editor->IsCmajorEditor()) return;
+    if (!editor->IsCCDirty()) return;
+    CmajorEditor* cmajorEditor = static_cast<CmajorEditor*>(editor);
+    CmajorSourceCodeView* cmajorSourceCodeView = cmajorEditor->SourceCodeView();
+    if (cmajorSourceCodeView->CCLineNumber() == cmajorSourceCodeView->CaretLine()) return;
+    cmajorSourceCodeView->SetCCLineNumber(cmajorSourceCodeView->CaretLine());
+    cmajorSourceCodeView->ResetCCDirty();
+    if (!editModuleLoaded)
+    {
+        LoadEditModule();
+    }
+    cmcode::ParseSource(project->FilePath(), backend, config, cmajorSourceCodeView->FilePath(), cmajorSourceCodeView->GetCursorText());
 }
 
 void MainWindow::ShowBuildProgress()
@@ -1308,6 +1368,42 @@ void MainWindow::HandleServiceMessage()
             {
                 LoadEditModuleReplyServiceMessage* message = static_cast<LoadEditModuleReplyServiceMessage*>(serviceMessage.get());
                 HandleLoadEditModuleReply(message->Reply());
+                break;
+            }
+            case ServiceMessageKind::loadEditModuleError:
+            {
+                LoadEditModuleErrorServiceMessage* message = static_cast<LoadEditModuleErrorServiceMessage*>(serviceMessage.get());
+                HandleLoadEditModuleError(message->Error());
+                break;
+            }
+            case ServiceMessageKind::resetEditModuleCacheReply:
+            {
+                ResetEditModuleCacheReplyServiceMessage* message = static_cast<ResetEditModuleCacheReplyServiceMessage*>(serviceMessage.get());
+                HandleResetEditModuleCacheReply(message->Reply());
+                break;
+            }
+            case ServiceMessageKind::resetEditModuleCacheError:
+            {
+                ResetEditModuleCacheErrorServiceMessage* message = static_cast<ResetEditModuleCacheErrorServiceMessage*>(serviceMessage.get());
+                HandleResetEditModuleCacheError(message->Error());
+                break;
+            }
+            case ServiceMessageKind::parseSourceReply:
+            {
+                ParseSourceReplyServiceMessage* message = static_cast<ParseSourceReplyServiceMessage*>(serviceMessage.get());
+                HandleParseSourceReply(message->Reply());
+                break;
+            }
+            case ServiceMessageKind::parseSourceError:
+            {
+                ParseSourceErrorServiceMessage* message = static_cast<ParseSourceErrorServiceMessage*>(serviceMessage.get());
+                HandleParseSourceError(message->Error());
+                break;
+            }
+            case ServiceMessageKind::getCCListReply:
+            {
+                GetCCListReplyServiceMessage* message = static_cast<GetCCListReplyServiceMessage*>(serviceMessage.get());
+                HandleGetCCListReply(message->Reply());
                 break;
             }
         }
@@ -1935,21 +2031,132 @@ void MainWindow::HandleRunServiceStopped()
 
 void MainWindow::HandleLoadEditModuleReply(const LoadEditModuleReply& loadEditModuleReply)
 {
-    if (loadEditModuleReply.result == "error")
+    try
     {
-        PutOutputServiceMessage("edit module loading error: " + loadEditModuleReply.error);
-        ccState = CCState::error;
+        if (loadEditModuleReply.result == "error")
+        {
+            PutOutputServiceMessage("edit module loading error: " + loadEditModuleReply.error);
+            ccState = CCState::error;
+            if (ccTimerRunning)
+            {
+                KillTimer(ccTimerId);
+            }
+        }
+        else
+        {
+            PutOutputServiceMessage("edit module " + loadEditModuleReply.key + " " + loadEditModuleReply.result);
+            ccState = CCState::editModuleLoaded;
+            const Options& options = GetOptions();
+            if (options.codeCompletion)
+            {
+                ccTimerRunning = true;
+                SetTimer(ccTimerId, options.parsingFrequency);
+            }
+        }
     }
-    else
+    catch (const std::exception& ex)
     {
-        PutOutputServiceMessage("edit module " + loadEditModuleReply.key + " " + loadEditModuleReply.result);
-        ccState = CCState::editModuleLoaded;
+        ShowErrorMessageBox(Handle(), ex.what());
     }
 }
 
 void MainWindow::HandleLoadEditModuleError(const std::string& error)
 {
     ccState = CCState::error;
+}
+
+void MainWindow::HandleResetEditModuleCacheReply(const ResetEditModuleCacheReply& resetEditModuleCacherReply)
+{
+    if (resetEditModuleCacherReply.result == "error")
+    {
+        PutOutputServiceMessage("error resetting edit module cache: " + resetEditModuleCacherReply.error);
+    }
+    else
+    {
+        PutOutputServiceMessage("edit module cache was reset");
+    }
+}
+
+void MainWindow::HandleResetEditModuleCacheError(const std::string& error)
+{
+    // todo
+}
+
+void MainWindow::HandleParseSourceReply(const ParseSourceReply& parseSourceReply)
+{
+    if (parseSourceReply.ok)
+    {
+        Editor* editor = CurrentEditor();
+        if (editor)
+        {
+            TextView* textView = editor->GetTextView();
+            textView->SetCCCat(std::string());
+        }
+    }
+    else
+    {
+        int x = 0;
+    }
+}
+
+void MainWindow::HandleParseSourceError(const std::string& error)
+{
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        TextView* textView = editor->GetTextView();
+        textView->ResetCCActive();
+    }
+}
+
+void MainWindow::HandleGetCCListReply(const GetCCListReply& getCCListReply)
+{
+    try
+    {
+        Editor* editor = CurrentEditor();
+        if (editor)
+        {
+            TextView* textView = editor->GetTextView();
+            if (getCCListReply.ok)
+            {
+                std::vector<CCEntry> entries = ParseCCList(getCCListReply.ccList);
+                if (entries.empty())
+                {
+                    codeCompletionListView->Hide();
+                    canSelect = false;
+                }
+                else
+                {
+                    Point ccPos = textView->CCPos();
+                    Point screenPos = textView->ClientToScreen(ccPos);
+                    Point ccListPos = ScreenToClient(screenPos);
+                    codeCompletionListView->SetLocation(ccListPos);
+                    codeCompletionListView->SetContent(entries);
+                    codeCompletionListView->Show();
+                    codeCompletionListView->BringToFront();
+                    codeCompletionListView->Invalidate();
+                    codeCompletionListView->Update();
+                    codeCompletionListView->SetDefaultSize();
+                    textView->SetCCOpen();
+                    canSelect = true;
+                }
+            }
+            else
+            {
+                PutOutputServiceMessage("code completion error: " + getCCListReply.error);
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::HandleGetCCListError(const std::string& error)
+{
+    // todo
+    int x = 0;
 }
 
 void MainWindow::HandleGetDefinitionReply(GetDefinitionReply& getDefinitionReply)
@@ -2832,6 +3039,7 @@ bool MainWindow::CloseSolution()
     try
     {
         if (!solutionData) return true;
+        ccState = CCState::idle;
         callStackOpen = callStackView != nullptr;
         localsViewOpen = localsView != nullptr;
         SaveSolutionData();
@@ -3358,10 +3566,12 @@ void MainWindow::OptionsClick()
             {
                 if (options.codeCompletion)
                 {
+                    codeCompletionStatusBarItem->SetText("On");
                     StartCodeCompletion();
                 }
                 else
                 {
+                    codeCompletionStatusBarItem->SetText("Off");
                     StopCodeCompletion(true);
                 }
             }
@@ -4442,6 +4652,27 @@ void MainWindow::StopBuildServerClick()
     PutRequest(new cmajor::service::StopBuildRequest());
 }
 
+void MainWindow::ToggleCodeCompletionClick()
+{
+    const Options& oldOptions = GetOptions();
+    Options newOptions(oldOptions);
+    if (oldOptions.codeCompletion)
+    {
+        newOptions.codeCompletion = false;
+        StopCodeCompletion(true);
+        codeCompletionStatusBarItem->SetText("Off");
+    }
+    else
+    {
+        newOptions.codeCompletion = true;
+        StartCodeCompletion();
+        LoadEditModule();
+        codeCompletionStatusBarItem->SetText("On");
+    }
+    SetOptions(newOptions);
+    SaveConfiguration();
+}
+
 void MainWindow::TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args)
 {
     try
@@ -4736,6 +4967,16 @@ CmajorEditor* MainWindow::AddCmajorEditor(const std::string& fileName, const std
         sourceCodeView->Paste().AddHandler(this, &MainWindow::PasteClick);
         sourceCodeView->ExpressionHover().AddHandler(this, &MainWindow::ExpressionHover);
         sourceCodeView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
+        sourceCodeView->CCTextChanged().AddHandler(this, &MainWindow::CCTextChanged);
+        sourceCodeView->CC().AddHandler(this, &MainWindow::CCShow);
+        sourceCodeView->EscapePressed().AddHandler(this, &MainWindow::CCHide);
+        sourceCodeView->CCNext().AddHandler(this, &MainWindow::CCNext);
+        sourceCodeView->CCPrev().AddHandler(this, &MainWindow::CCPrev);
+        sourceCodeView->CCNextPage().AddHandler(this, &MainWindow::CCNextPage);
+        sourceCodeView->CCPrevPage().AddHandler(this, &MainWindow::CCPrevPage);
+        sourceCodeView->CCSelect().AddHandler(this, &MainWindow::CCSelect);
+        sourceCodeView->CCStart().AddHandler(this, &MainWindow::CCStart);
+        sourceCodeView->CCStop().AddHandler(this, &MainWindow::CCStop);
         if (state != MainWindowState::idle)
         {
             sourceCodeView->SetReadOnly();
@@ -5331,6 +5572,137 @@ void MainWindow::ExpressionHover(ExpressionHoverEventArgs& args)
     ExpressionEvaluateRequest request(args.expression, args.screenLoc);
     expressionEvaluateRequests.push_back(request);
     PutRequest(new EvaluateDebugServiceRequest(args.expression, requestId));
+}
+
+void MainWindow::CCTextChanged()
+{
+    const Options& options = GetOptions();
+    if (!options.codeCompletion) return;
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        if (!editor->GetTextView()->IsCCActive()) return;
+        if (!editModuleLoaded)
+        {
+            PutOutputServiceMessage("loading edit module...");
+            LoadEditModule();
+        }
+        std::string ccText = ToUtf8(editor->GetTextView()->GetCCText());
+        Project* project = CurrentProject();
+        if (project)
+        {
+            canSelect = false;
+            GetCCList(project->FilePath(), backend, config, editor->FilePath(), ccText);
+        }
+    }
+}
+
+void MainWindow::CCShow()
+{
+    const Options& options = GetOptions();
+    if (!options.codeCompletion) return;
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        editor->GetTextView()->SetCCActive();
+        CCTextChanged();
+    }
+}
+
+void MainWindow::CCHide()
+{
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        editor->GetTextView()->ResetCCActive();
+        editor->GetTextView()->ResetCCOpen();
+    }
+    codeCompletionListView->Hide();
+}
+
+void MainWindow::CCNext()
+{
+    const Options& options = GetOptions();
+    if (!options.codeCompletion) return;
+    codeCompletionListView->Next();
+}
+
+void MainWindow::CCPrev()
+{
+    const Options& options = GetOptions();
+    if (!options.codeCompletion) return;
+    codeCompletionListView->Prev();
+}
+
+void MainWindow::CCNextPage()
+{
+    const Options& options = GetOptions();
+    if (!options.codeCompletion) return;
+    codeCompletionListView->NextPage();
+}
+
+void MainWindow::CCPrevPage()
+{
+    const Options& options = GetOptions();
+    if (!options.codeCompletion) return;
+    codeCompletionListView->PrevPage();
+}
+
+void MainWindow::CCSelect(SelectedEventArgs& args)
+{
+    try
+    {
+        const Options& options = GetOptions();
+        if (!options.codeCompletion) return;
+        if (canSelect)
+        {
+            currentCCEntry = codeCompletionListView->GetSelectedEntry();
+            Editor* editor = CurrentEditor();
+            if (editor)
+            {
+                editor->GetTextView()->ReplaceCCText(ToUtf32(currentCCEntry.replacement));
+                editor->GetTextView()->ResetCCActive();
+                editor->GetTextView()->ResetCCOpen();
+                editor->GetTextView()->SetCCCat(currentCCEntry.category);
+            }
+            codeCompletionListView->Hide();
+            args.selected = true;
+        }
+        else
+        {
+            Editor* editor = CurrentEditor();
+            if (editor)
+            {
+                editor->GetTextView()->ResetCCOpen();
+                editor->GetTextView()->ResetCCActive();
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(Handle(), ex.what());
+    }
+}
+
+void MainWindow::CCStart()
+{
+    const Options& options = GetOptions();
+    if (!options.codeCompletion) return;
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        editor->GetTextView()->SetCCActive();
+    }
+}
+
+void MainWindow::CCStop()
+{
+    Editor* editor = CurrentEditor();
+    if (editor)
+    {
+        codeCompletionListView->Hide();
+        editor->GetTextView()->ResetCCActive();
+    }
 }
 
 } // namespace cmcode

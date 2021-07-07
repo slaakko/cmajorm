@@ -273,59 +273,61 @@ std::unique_ptr<sngxml::dom::Element> GetCCListReply::ToXml(const std::string& f
     return element;
 }
 
-GetOverloadListRequest::GetOverloadListRequest()
+GetSymbolListRequest::GetSymbolListRequest()
     : CodeCompletionRequest()
-    , projectFilePath(), backend(), config(), functionGroup()
+    , projectFilePath(), backend(), config(), sourceFilePath(), symbolIndex()
 {
 }
 
-GetOverloadListRequest::GetOverloadListRequest(sngxml::dom::Element* element)
+GetSymbolListRequest::GetSymbolListRequest(sngxml::dom::Element* element)
     : CodeCompletionRequest(sngxml::xmlser::GetXmlFieldElement("base", element))
-    , projectFilePath(), backend(), config(), functionGroup()
+    , projectFilePath(), backend(), config(), sourceFilePath(), symbolIndex()
 {
     sngxml::xmlser::FromXml(element, "projectFilePath", projectFilePath);
     sngxml::xmlser::FromXml(element, "backend", backend);
     sngxml::xmlser::FromXml(element, "config", config);
-    sngxml::xmlser::FromXml(element, "functionGroup", functionGroup);
+    sngxml::xmlser::FromXml(element, "sourceFilePath", sourceFilePath);
+    sngxml::xmlser::FromXml(element, "symbolIndex", symbolIndex);
 }
 
-std::unique_ptr<sngxml::dom::Element> GetOverloadListRequest::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> GetSymbolListRequest::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(CodeCompletionRequest::ToXml("base").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(projectFilePath, "projectFilePath").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(backend, "backend").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(config, "config").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(functionGroup, "functionGroup").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(sourceFilePath, "sourceFilePath").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(symbolIndex, "symbolIndex").release()));
     return element;
 }
 
-GetOverloadListReply::GetOverloadListReply()
+GetSymbolListReply::GetSymbolListReply()
     : CodeCompletionReply()
-    , ok(), error(), overloadList(), startGetOverloadList(), endGetOverloadList()
+    , ok(), error(), symbolList(), startGetSymbolList(), endGetSymbolList()
 {
 }
 
-GetOverloadListReply::GetOverloadListReply(sngxml::dom::Element* element)
+GetSymbolListReply::GetSymbolListReply(sngxml::dom::Element* element)
     : CodeCompletionReply(sngxml::xmlser::GetXmlFieldElement("base", element))
-    , ok(), error(), overloadList(), startGetOverloadList(), endGetOverloadList()
+    , ok(), error(), symbolList(), startGetSymbolList(), endGetSymbolList()
 {
     sngxml::xmlser::FromXml(element, "ok", ok);
     sngxml::xmlser::FromXml(element, "error", error);
-    sngxml::xmlser::FromXml(element, "overloadList", overloadList);
-    sngxml::xmlser::FromXml(element, "startGetOverloadList", startGetOverloadList);
-    sngxml::xmlser::FromXml(element, "endGetOverloadList", endGetOverloadList);
+    sngxml::xmlser::FromXml(element, "symbolList", symbolList);
+    sngxml::xmlser::FromXml(element, "startGetSymbolList", startGetSymbolList);
+    sngxml::xmlser::FromXml(element, "endGetSymbolList", endGetSymbolList);
 }
 
-std::unique_ptr<sngxml::dom::Element> GetOverloadListReply::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> GetSymbolListReply::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(CodeCompletionReply::ToXml("base").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(ok, "ok").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(error, "error").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(overloadList, "overloadList").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startGetOverloadList, "startGetOverloadList").release()));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endGetOverloadList, "endGetOverloadList").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(symbolList, "symbolList").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(startGetSymbolList, "startGetSymbolList").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(endGetSymbolList, "endGetSymbolList").release()));
     return element;
 }
 

@@ -12,6 +12,9 @@ namespace cmcode {
 void StartCodeCompletionService(int pid);
 void StopCodeCompletionService(bool log);
 void LoadEditModule(const std::string& projectFilePath, const std::string& backend, const std::string& config);
+void ResetEditModuleCache();
+void ParseSource(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, std::u32string&& sourceCode);
+void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText);
 
 } // namespace cmcode
 

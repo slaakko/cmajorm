@@ -148,31 +148,32 @@ public:
     time_point endGetCCList;
 };
 
-class MSG_API GetOverloadListRequest : public CodeCompletionRequest
+class MSG_API GetSymbolListRequest : public CodeCompletionRequest
 {
 public:
-    GetOverloadListRequest();
-    GetOverloadListRequest(sngxml::dom::Element* element);
+    GetSymbolListRequest();
+    GetSymbolListRequest(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
 public:
     std::string projectFilePath;
     std::string backend;
     std::string config;
-    std::string functionGroup;
+    std::string sourceFilePath;
+    int32_t symbolIndex;
 };
 
-class MSG_API GetOverloadListReply : public CodeCompletionReply
+class MSG_API GetSymbolListReply : public CodeCompletionReply
 {
 public:
-    GetOverloadListReply();
-    GetOverloadListReply(sngxml::dom::Element* element);
+    GetSymbolListReply();
+    GetSymbolListReply(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
 public:
     bool ok;
     std::string error;
-    std::string overloadList;
-    time_point startGetOverloadList;
-    time_point endGetOverloadList;
+    std::string symbolList;
+    time_point startGetSymbolList;
+    time_point endGetSymbolList;
 };
 
 class MSG_API StopCCRequest : public CodeCompletionRequest

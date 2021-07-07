@@ -29,7 +29,7 @@ void SetTypeBindingFunction(TypeBindingFunction typeBindingFunc)
     typeBindingFunction = typeBindingFunc;
 }
 
-bool IsValidCCSymbol(Symbol* symbol, Module* module, FunctionSymbol* fromFunction, std::u32string& functionGroup)
+bool IsValidCCSymbol(Symbol* symbol, Module* module, FunctionSymbol* fromFunction)
 {
     AccessCheckFunction hasAccess = GetAccessCheckFunction();
     switch (symbol->GetSymbolType())
@@ -39,7 +39,6 @@ bool IsValidCCSymbol(Symbol* symbol, Module* module, FunctionSymbol* fromFunctio
             FunctionGroupSymbol* group = static_cast<FunctionGroupSymbol*>(symbol);
             if (group->IsValidCCFunctionGroup(fromFunction))
             {
-                functionGroup = group->FullName();
                 return true;
             }
             else
@@ -249,6 +248,7 @@ std::vector<CCSymbolEntry> Source::LookupSymbolsBeginningWith(const std::u32stri
 
 std::string Source::GetCCList(Module* module, const std::string& ccText)
 {
+    ccSymbols.clear();
     FunctionSymbol* fromFunction = nullptr;
     if (cursorContainer)
     {
@@ -259,22 +259,35 @@ std::string Source::GetCCList(Module* module, const std::string& ccText)
     sngxml::dom::Document ccListDoc;
     sngxml::dom::Element* ccListElement = new sngxml::dom::Element(U"ccList");
     ccListDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(ccListElement));
+    int symbolIndex = 0;
     for (const CCSymbolEntry& ccSymbolEntry : ccSymbolEntries)
     {
         Symbol* symbol = ccSymbolEntry.symbol;
         int ccPrefixLength = ccSymbolEntry.ccPrefixLen;
         const std::u32string& replacement = ccSymbolEntry.replacement;
-        std::u32string functionGroup;
-        if (IsValidCCSymbol(symbol, module, fromFunction, functionGroup))
+        if (IsValidCCSymbol(symbol, module, fromFunction))
         {
-            sngxml::dom::Element* ccElement = symbol->ToCCElement(ccPrefixLength, replacement, functionGroup);
+            sngxml::dom::Element* ccElement = symbol->ToCCElement(ccPrefixLength, replacement, symbolIndex++);
             ccListElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(ccElement));
+            ccSymbols.push_back(symbol);
         }
     }
     std::stringstream s;
     CodeFormatter formatter(s);
     ccListDoc.Write(formatter);
     return s.str();
+}
+
+std::string Source::GetSymbolList(int symbolIndex)
+{
+    if (symbolIndex >= 0 && symbolIndex < ccSymbols.size())
+    {
+        return std::string("foo");
+    }
+    else
+    {
+        throw std::runtime_error("invalid symbol index");
+    }
 }
 
 struct ParserData
@@ -590,6 +603,17 @@ std::string Sources::GetCCList(Module* module, const std::string& sourceFilePath
     }
     Source* source = GetSource(index);
     return source->GetCCList(module, ccText);
+}
+
+std::string Sources::GetSymbolList(Module* module, const std::string& sourceFilePath, int symbolIndex)
+{
+    int index = GetSourceIndex(sourceFilePath);
+    if (index == -1)
+    {
+        throw std::runtime_error("source file path '" + sourceFilePath + "' not found");
+    }
+    Source* source = GetSource(index);
+    return source->GetSymbolList(symbolIndex);
 }
 
 } } // namespace cmajor::symbols

@@ -50,6 +50,7 @@ public:
     void BindTypes(Module* module);
     std::vector<CCSymbolEntry> LookupSymbolsBeginningWith(const std::u32string& prefix);
     std::string GetCCList(Module* module, const std::string& ccText);
+    std::string GetSymbolList(int symbolIndex);
 private:
     std::string filePath;
     std::u32string content;
@@ -62,6 +63,7 @@ private:
     ContainerSymbol* cursorContainer;
     ContainerScope* cursorScope;
     std::unique_ptr<FileScope> fileScope;
+    std::vector<Symbol*> ccSymbols;
 };
 
 struct SYMBOLS_API ParseResult
@@ -97,6 +99,7 @@ public:
     bool Synchronized();
     ParseResult ParseSource(Module* module, const std::string& sourceFilePath, const std::u32string& sourceCode);
     std::string GetCCList(Module* module, const std::string& sourceFilePath, const std::string& ccText);
+    std::string GetSymbolList(Module* module, const std::string& sourceFilePath, int symbolIndex);
 private:
     std::vector<std::unique_ptr<Source>> sources;
     std::map<std::string, int> sourceIndexMap;
