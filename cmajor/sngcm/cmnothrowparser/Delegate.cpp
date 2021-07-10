@@ -7,7 +7,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Delegate.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Delegate.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -24,6 +24,7 @@ soulng::parser::Match NothrowDelegateParser::Delegate(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Delegate"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 66);
     Span s = Span();
     std::unique_ptr<DelegateNode> dlg = std::unique_ptr<DelegateNode>();
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
@@ -98,7 +99,7 @@ soulng::parser::Match NothrowDelegateParser::Delegate(CmajorNothrowLexer& lexer,
                     soulng::parser::Match* parentMatch9 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+                        soulng::parser::Match match = NothrowDelegateParser::DefiningDelegateId(lexer, moduleId);
                         id.reset(static_cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
@@ -186,6 +187,50 @@ soulng::parser::Match NothrowDelegateParser::Delegate(CmajorNothrowLexer& lexer,
     return match;
 }
 
+soulng::parser::Match NothrowDelegateParser::DefiningDelegateId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId)
+{
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::Span parser_debug_match_span;
+    bool parser_debug_write_to_log = lexer.Log() != nullptr;
+    if (parser_debug_write_to_log)
+    {
+        parser_debug_match_span = lexer.GetSpan();
+        soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningDelegateId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 67);
+    std::unique_ptr<IdentifierNode> id;
+    soulng::parser::Match match(false);
+    soulng::parser::Match* parentMatch0 = &match;
+    {
+        int64_t pos = lexer.GetPos();
+        soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+        id.reset(static_cast<IdentifierNode*>(match.value));
+        if (match.hit)
+        {
+            {
+                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningDelegateId"));
+                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                return soulng::parser::Match(true, id.release());
+            }
+        }
+        *parentMatch0 = match;
+    }
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    if (parser_debug_write_to_log)
+    {
+        if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningDelegateId"));
+        else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("DefiningDelegateId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    if (!match.hit)
+    {
+        match.value = nullptr;
+    }
+    return match;
+}
+
 soulng::parser::Match NothrowDelegateParser::ClassDelegate(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
@@ -197,6 +242,7 @@ soulng::parser::Match NothrowDelegateParser::ClassDelegate(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ClassDelegate"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 68);
     Span s = Span();
     std::unique_ptr<ClassDelegateNode> clsDlg = std::unique_ptr<ClassDelegateNode>();
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
@@ -291,7 +337,7 @@ soulng::parser::Match NothrowDelegateParser::ClassDelegate(CmajorNothrowLexer& l
                     soulng::parser::Match* parentMatch11 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+                        soulng::parser::Match match = NothrowDelegateParser::DefiningClassDelegateId(lexer, moduleId);
                         id.reset(static_cast<IdentifierNode*>(match.value));
                         if (match.hit)
                         {
@@ -370,6 +416,50 @@ soulng::parser::Match NothrowDelegateParser::ClassDelegate(CmajorNothrowLexer& l
     {
         if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ClassDelegate"));
         else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("ClassDelegate"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    if (!match.hit)
+    {
+        match.value = nullptr;
+    }
+    return match;
+}
+
+soulng::parser::Match NothrowDelegateParser::DefiningClassDelegateId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId)
+{
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::Span parser_debug_match_span;
+    bool parser_debug_write_to_log = lexer.Log() != nullptr;
+    if (parser_debug_write_to_log)
+    {
+        parser_debug_match_span = lexer.GetSpan();
+        soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningClassDelegateId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 69);
+    std::unique_ptr<IdentifierNode> id;
+    soulng::parser::Match match(false);
+    soulng::parser::Match* parentMatch0 = &match;
+    {
+        int64_t pos = lexer.GetPos();
+        soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+        id.reset(static_cast<IdentifierNode*>(match.value));
+        if (match.hit)
+        {
+            {
+                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningClassDelegateId"));
+                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                return soulng::parser::Match(true, id.release());
+            }
+        }
+        *parentMatch0 = match;
+    }
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    if (parser_debug_write_to_log)
+    {
+        if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningClassDelegateId"));
+        else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("DefiningClassDelegateId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     if (!match.hit)

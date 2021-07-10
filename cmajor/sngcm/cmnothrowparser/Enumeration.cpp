@@ -7,7 +7,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Enumeration.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Enumeration.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -24,6 +24,7 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("EnumType"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 70);
     std::unique_ptr<EnumTypeNode> enumTypeNode = std::unique_ptr<EnumTypeNode>();
     Span s = Span();
     Span beginBraceSpan = Span();
@@ -91,7 +92,7 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                             {
                                 int64_t pos = lexer.GetPos();
                                 soulng::lexer::Span span = lexer.GetSpan();
-                                soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+                                soulng::parser::Match match = NothrowEnumerationParser::DefiningEnumTypeId(lexer, moduleId);
                                 enumTypeId.reset(static_cast<IdentifierNode*>(match.value));
                                 if (match.hit)
                                 {
@@ -266,6 +267,50 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
     return match;
 }
 
+soulng::parser::Match NothrowEnumerationParser::DefiningEnumTypeId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId)
+{
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::Span parser_debug_match_span;
+    bool parser_debug_write_to_log = lexer.Log() != nullptr;
+    if (parser_debug_write_to_log)
+    {
+        parser_debug_match_span = lexer.GetSpan();
+        soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningEnumTypeId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 71);
+    std::unique_ptr<IdentifierNode> enumTypeId;
+    soulng::parser::Match match(false);
+    soulng::parser::Match* parentMatch0 = &match;
+    {
+        int64_t pos = lexer.GetPos();
+        soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+        enumTypeId.reset(static_cast<IdentifierNode*>(match.value));
+        if (match.hit)
+        {
+            {
+                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningEnumTypeId"));
+                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                return soulng::parser::Match(true, enumTypeId.release());
+            }
+        }
+        *parentMatch0 = match;
+    }
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    if (parser_debug_write_to_log)
+    {
+        if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningEnumTypeId"));
+        else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("DefiningEnumTypeId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    if (!match.hit)
+    {
+        match.value = nullptr;
+    }
+    return match;
+}
+
 soulng::parser::Match NothrowEnumerationParser::UnderlyingType(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
@@ -277,6 +322,7 @@ soulng::parser::Match NothrowEnumerationParser::UnderlyingType(CmajorNothrowLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("UnderlyingType"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 72);
     std::unique_ptr<sngcm::ast::Node> type;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -340,6 +386,7 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstants(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("EnumConstants"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 73);
     std::unique_ptr<EnumConstantNode> enumConstant;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -443,6 +490,7 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstant(CmajorNothrowLexer&
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("EnumConstant"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 74);
     Span s = Span();
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     std::unique_ptr<IdentifierNode> constantId;

@@ -7,7 +7,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Constant.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Constant.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -24,6 +24,7 @@ soulng::parser::Match NothrowConstantParser::Constant(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Constant"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 65);
     Span s = Span();
     Span v = Span();
     std::unique_ptr<Node> e = std::unique_ptr<Node>();

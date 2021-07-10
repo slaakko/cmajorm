@@ -3,7 +3,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Template.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Template.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -20,6 +20,7 @@ soulng::parser::Match NothrowTemplateParser::TemplateId(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("TemplateId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 162);
     std::unique_ptr<TemplateIdNode> templateId = std::unique_ptr<TemplateIdNode>();
     Span e = Span();
     std::unique_ptr<IdentifierNode> primary;
@@ -290,6 +291,7 @@ soulng::parser::Match NothrowTemplateParser::TemplateParameter(CmajorNothrowLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("TemplateParameter"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 163);
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<sngcm::ast::Node> type;
     soulng::parser::Match match(false);
@@ -396,6 +398,7 @@ soulng::parser::Match NothrowTemplateParser::TemplateParameterList(CmajorNothrow
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("TemplateParameterList"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 164);
     std::unique_ptr<TemplateParameterNode> tp;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;

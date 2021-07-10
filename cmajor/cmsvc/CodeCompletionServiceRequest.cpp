@@ -46,13 +46,25 @@ void ParseSourceCodeCompletionServiceRequest::Execute()
 }
 
 GetCCListCodeCompletionServiceRequest::GetCCListCodeCompletionServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, 
-    const std::string& ccText_) : projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), ccText(ccText_)
+    const std::u32string& ccText_, const std::vector<int>& ruleContext_, const std::u32string& cursorLine_) : 
+    projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), ccText(ccText_), ruleContext(ruleContext_), cursorLine(cursorLine_)
 {
 }
 
 void GetCCListCodeCompletionServiceRequest::Execute()
 {
-    GetCCList(projectFilePath, backend, config, sourceFilePath, ccText);
+    GetCCList(projectFilePath, backend, config, sourceFilePath, ccText, ruleContext, cursorLine);
+}
+
+GetParamHelpListCodeCompletionServiceRequest::GetParamHelpListCodeCompletionServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, 
+    const std::string& sourceFilePath_, int symbolIndex_) :
+    projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), symbolIndex(symbolIndex_)
+{
+}
+
+void GetParamHelpListCodeCompletionServiceRequest::Execute()
+{
+    GetParamHelpList(projectFilePath, backend, config, sourceFilePath, symbolIndex);
 }
 
 } } // namespace cmajor::service

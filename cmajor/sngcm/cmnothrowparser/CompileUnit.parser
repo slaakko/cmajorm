@@ -29,6 +29,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowCompileUnitParser
     main;
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     using NothrowIdentifierParser.Identifier;
     using NothrowIdentifierParser.QualifiedId;
@@ -133,12 +134,16 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowCompileUnitParser
         ;
 
     NamespaceDefinition(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns, var std::unique_ptr<NamespaceNode> nsNode, var Span s) : NamespaceNode*
-        ::= NAMESPACE{ s = span; } (QualifiedId(moduleId):nsName{ s.end = span.end; nsNode.reset(new NamespaceNode(s, *moduleId, nsName)); } | empty{ nsNode.reset(new NamespaceNode(s, *moduleId, nullptr)); })
+        ::= NAMESPACE{ s = span; } (DefiningNamespaceId(moduleId):nsName{ s.end = span.end; nsNode.reset(new NamespaceNode(s, *moduleId, nsName)); } | empty{ nsNode.reset(new NamespaceNode(s, *moduleId, nullptr)); })
             LBRACE! NamespaceContent(moduleId, ctx, cu, nsNode.get()):content RBRACE!
         {
             nsNode->SetLexerFlags(lexer.Flags());
             return nsNode.release();
         }
+        ;
+
+    DefiningNamespaceId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= QualifiedId(moduleId):nsName{ return nsName; }
         ;
 
     TypedefDeclaration(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : TypedefNode*

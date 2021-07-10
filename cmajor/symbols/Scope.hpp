@@ -44,12 +44,17 @@ inline ScopeLookup operator~(ScopeLookup subject)
     return ScopeLookup(~uint8_t(subject));
 }
 
-struct CCSymbolEntry
+struct SYMBOLS_API CCSymbolEntry
 {
     CCSymbolEntry(Symbol* symbol_, int ccPrefixLen_, const std::u32string& replacement_) : symbol(symbol_), ccPrefixLen(ccPrefixLen_), replacement(replacement_) {}
     Symbol* symbol;
     int ccPrefixLen;
     std::u32string replacement;
+};
+
+struct SYMBOLS_API CCSymbolEntryLess
+{
+    bool operator()(const CCSymbolEntry& left, const CCSymbolEntry& right) const;
 };
 
 void AddMatches(std::vector<CCSymbolEntry>& matches, std::vector<CCSymbolEntry>& matchesToAdd);

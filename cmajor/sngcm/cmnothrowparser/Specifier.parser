@@ -14,6 +14,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowSpecifierParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     Specifiers(var sngcm::ast::Specifiers specifiers) : sngcm::ast::Specifiers
         ::= ((Specifier:specifier{ specifiers = specifiers | specifier; })*){ return specifiers; }

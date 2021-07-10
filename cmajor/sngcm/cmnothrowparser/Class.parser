@@ -31,6 +31,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowClassParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     using NothrowAttributeParser.Attributes;
     using NothrowSpecifierParser.Specifiers;
@@ -51,7 +52,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowClassParser
     using NothrowDelegateParser.ClassDelegate;
 
     Class(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<ClassNode> cls, var Span s, var Span specifierSpan, var Span classSpan, var Span beginBraceSpan, var Span endBraceSpan) : ClassNode*
-        ::= empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } CLASS{ classSpan = span; } Identifier(moduleId):id
+        ::= empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } CLASS{ classSpan = span; } DefiningClassId(moduleId):id
         {
             s.end = span.end;
             cls.reset(new ClassNode(s, *moduleId, specifiers, id, attrs));
@@ -69,6 +70,10 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowClassParser
             cls->SetLexerFlags(lexer.Flags()); 
             return cls.release();
         }
+        ;
+
+    DefiningClassId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):id{ return id; }
         ;
 
     InheritanceAndInterfaces(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::ClassNode* classNode)
@@ -246,13 +251,35 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowClassParser
         ;
 
     MemberVariable(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s, var Span specifierSpan) : MemberVariableNode*
-        ::= empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(moduleId, ctx):type Identifier(moduleId):id SEMICOLON
+        ::= empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(moduleId, ctx):type DefiningMemberVariableId(moduleId):id SEMICOLON
         {
             s.end = span.end;
             MemberVariableNode* value = new MemberVariableNode(s, *moduleId, specifiers, type, id, attrs);
             value->SetSpecifierSpan(specifierSpan);
             value->SetLexerFlags(lexer.Flags());
             return value;
+        }
+        ;
+
+    DefiningMemberVariableId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):id{ return id; }
+        ;
+}
+
+parser api(SNGCM_NOTHROW_PARSER_API) NothrowClassMemberParser
+{
+    uselexer CmajorNothrowLexer;
+    nothrow;
+    state;
+    main;
+
+    using NothrowClassParser.ClassMember;
+
+    ClassMemberMain(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<sngcm::ast::ClassNode> classNode) : sngcm::ast::Node*
+        ::= empty{ classNode.reset(new ClassNode(Span(), *moduleId, Specifiers(), new IdentifierNode(Span(), *moduleId), nullptr)); }
+            ClassMember(moduleId, ctx, classNode.get()):clsMem
+        {
+            return clsMem;
         }
         ;
 }

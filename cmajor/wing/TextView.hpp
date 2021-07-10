@@ -7,6 +7,7 @@
 #define CMAJOR_WING_TEXT_VIEW_INCLUDED
 #include <cmajor/wing/Control.hpp>
 #include <cmajor/wing/EditCommandList.hpp>
+#include <soulng/lexer/SourcePos.hpp>
 
 namespace cmajor { namespace wing {
 
@@ -32,6 +33,9 @@ using CCPrevPageEvent = Event;
 using CCSelectEvent = EventWithArgs<SelectedEventArgs>;
 using CCStartEvent = Event;
 using CCStopEvent = Event;
+using ParamHelpNextEvent = Event;
+using ParamHelpPrevEvent = Event;
+using ParamHelpCloseEvent = Event;
 using GotoCaretLineEvent = Event;
 using CopyEvent = Event;
 using CutEvent = Event;
@@ -46,7 +50,7 @@ int ReadCaretTimeoutFromRegistry();
 
 enum class TextViewFlags : int
 {
-    none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, ccdirty = 1 << 5, mouseExtendSelection = 1 << 6, ccOpen = 1 << 7, ccActive = 1 << 8
+    none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, ccdirty = 1 << 5, mouseExtendSelection = 1 << 6, ccOpen = 1 << 7, ccActive = 1 << 8, paramHelpOpen = 1 << 9
 };
 
 WING_API inline TextViewFlags operator&(TextViewFlags left, TextViewFlags right)
@@ -64,31 +68,7 @@ WING_API inline TextViewFlags operator~(TextViewFlags flags)
     return TextViewFlags(~int(flags));
 }
 
-struct WING_API SourcePos
-{
-    SourcePos();
-    SourcePos(int line_, int column_);
-    bool IsValid() const { return line != 0 && column != 0; }
-    int line;
-    int column;
-};
-
-WING_API inline bool operator==(const SourcePos& left, const SourcePos& right)
-{
-    return left.line == right.line && left.column == right.column;
-}
-
-WING_API inline bool operator!=(const SourcePos& left, const SourcePos& right)
-{
-    return !(left == right);
-}
-
-WING_API inline bool operator<(const SourcePos& left, const SourcePos& right)
-{
-    if (left.line < right.line) return true;
-    if (left.line > right.line) return false;
-    return left.column < right.column;
-}
+using soulng::lexer::SourcePos;
 
 enum class SelectionFixed : int
 {
@@ -171,15 +151,18 @@ public:
     bool IsCCDirty() const { return (flags & TextViewFlags::ccdirty) != TextViewFlags::none; }
     void SetCCDirty();
     void ResetCCDirty();
-    bool IsCCActive() const { return (flags & TextViewFlags::ccActive) != TextViewFlags::none; }
-    void SetCCActive() { flags = flags | TextViewFlags::ccActive; }
-    void ResetCCActive() { flags = flags & ~TextViewFlags::ccActive; }
-    bool MouseExtendSelection() const { return (flags & TextViewFlags::mouseExtendSelection) != TextViewFlags::none; }
-    void SetMouseExtendSelection() { flags = flags | TextViewFlags::mouseExtendSelection; }
-    void ResetMouseExtendSelection() { flags = flags & ~TextViewFlags::mouseExtendSelection; }
     bool IsCCOpen() const { return (flags & TextViewFlags::ccOpen) != TextViewFlags::none; }
     void SetCCOpen() { flags = flags | TextViewFlags::ccOpen; }
     void ResetCCOpen() { flags = flags & ~TextViewFlags::ccOpen; }
+    bool IsCCActive() const { return (flags & TextViewFlags::ccActive) != TextViewFlags::none; }
+    void SetCCActive() { flags = flags | TextViewFlags::ccActive; }
+    void ResetCCActive() { flags = flags & ~TextViewFlags::ccActive; }
+    bool IsParamHelpOpen() const { return (flags & TextViewFlags::paramHelpOpen) != TextViewFlags::none; }
+    void SetParamHelpOpen() { flags = flags | TextViewFlags::paramHelpOpen;  }
+    void ResetParamHelpOpen() { flags = flags & ~TextViewFlags::paramHelpOpen; }
+    bool MouseExtendSelection() const { return (flags & TextViewFlags::mouseExtendSelection) != TextViewFlags::none; }
+    void SetMouseExtendSelection() { flags = flags | TextViewFlags::mouseExtendSelection; }
+    void ResetMouseExtendSelection() { flags = flags & ~TextViewFlags::mouseExtendSelection; }
     const std::vector<std::unique_ptr<std::u32string>>& Lines() const { return lines; }
     std::vector<std::unique_ptr<std::u32string>>& Lines() { return lines; }
     void AddLine(const std::u32string& line);
@@ -226,6 +209,7 @@ public:
     Point CaretPos();
     Point CCPos();
     const std::u32string& GetCCText() const { return cctext; }
+    std::u32string CursorLine() const;
     void SetCCText(const std::u32string& line, int columnIndex);
     void ResetCCText();
     void ReplaceCCText(const std::u32string& replacement);
@@ -268,6 +252,7 @@ public:
     void FirePaste();
     void FireCCStart();
     void FireCCStop();
+    void FireParamHelpClose();
     void AddRemoveSelectionCommand();
     SelectionChangedEvent& SelectionChanged() { return selectionChanged; }
     DirtyChangedEvent& DirtyChanged() { return dirtyChanged; }
@@ -286,6 +271,9 @@ public:
     CCTextChangedEvent& CCTextChanged() { return ccTextChanged; }
     CCStartEvent& CCStart() { return ccStart; }
     CCStopEvent& CCStop() { return ccStop; }
+    ParamHelpNextEvent& ParamHelpNext() { return paramHelpNext; }
+    ParamHelpPrevEvent& ParamHelpPrev() { return paramHelpPrev; }
+    ParamHelpCloseEvent& ParamHelpClose() { return paramHelpClose; }
     EscapeEvent& EscapePressed() { return escape; }
     GotoCaretLineEvent& GotoCaretLine() { return gotoCaretLine; }
     CopyEvent& Copy() { return copy; }
@@ -340,6 +328,9 @@ protected:
     virtual void OnCCTextChanged();
     virtual void OnCCStart();
     virtual void OnCCStop();
+    virtual void OnParamHelpNext();
+    virtual void OnParamHelpPrev();
+    virtual void OnParamHelpClose();
 private:
     void AddInsertCharCommand(int lineIndex, int columnIndex, char32_t c);
     void AddInsertLinesCommand(int lineIndex, int columnIndex, const std::vector<std::u32string>& linesToInsert);
@@ -407,6 +398,9 @@ private:
     CCSelectEvent ccSelect;
     CCStartEvent ccStart;
     CCStopEvent ccStop;
+    ParamHelpNextEvent paramHelpNext;
+    ParamHelpPrevEvent paramHelpPrev;
+    ParamHelpCloseEvent paramHelpClose;
     GotoCaretLineEvent gotoCaretLine;
     CopyEvent copy;
     CutEvent cut;

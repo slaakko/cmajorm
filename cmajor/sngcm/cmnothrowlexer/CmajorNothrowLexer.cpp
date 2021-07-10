@@ -1,5 +1,5 @@
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowlexer/CmajorNothrowLexer.lexer' using soulng lexer generator slg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowlexer/CmajorNothrowLexer.lexer' using soulng lexer generator slg version 4.0.0
 
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowKeywords.hpp>
@@ -6614,6 +6614,7 @@ int CmajorNothrowLexer::GetTokenId(int statementIndex)
         case 43:
         {
             Retract();
+            SetCursorRuleContext();
             SetFlag(LexerFlags::cursorSeen);
             ++*this;
             return token.id;

@@ -125,7 +125,8 @@ private:
 class CMSVC_API RunGetCCListServiceRequest : public CodeCompletionServiceRequest
 {
 public:
-    RunGetCCListServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, const std::string& ccText_);
+    RunGetCCListServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, const std::u32string& ccText_, 
+        const std::vector<int>& ruleContext, const std::u32string& cursorLine_);
     void Execute() override;
     std::string Name() const override { return "runGetCCListServiceRequest"; }
     void Failed(const std::string& error) override;
@@ -134,7 +135,9 @@ private:
     std::string backend;
     std::string config;
     std::string sourceFilePath;
-    std::string ccText;
+    std::u32string ccText;
+    std::vector<int> ruleContext;
+    std::u32string cursorLine;
 };
 
 class CMSVC_API GetCCListReplyServiceMessage : public ServiceMessage
@@ -155,13 +158,48 @@ private:
     std::string error;
 };
 
+class CMSVC_API RunGetParamHelpListServiceRequest : public CodeCompletionServiceRequest
+{
+public:
+    RunGetParamHelpListServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, int symbolIndex_);
+    void Execute() override;
+    std::string Name() const override { return "runGetParamHelpListServiceRequest"; }
+    void Failed(const std::string& error) override;
+private:
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+    std::string sourceFilePath;
+    int symbolIndex;
+};
+
+class CMSVC_API GetParamHelpListReplyServiceMessage : public ServiceMessage
+{
+public:
+    GetParamHelpListReplyServiceMessage(const GetParamHelpListReply& reply_);
+    const GetParamHelpListReply& Reply() const { return reply; }
+private:
+    GetParamHelpListReply reply;
+};
+
+class CMSVC_API GetParamHelpListErrorServiceMessage : public ServiceMessage
+{
+public:
+    GetParamHelpListErrorServiceMessage(const std::string& error_);
+    const std::string& Error() const { return error; }
+private:
+    std::string error;
+};
+
 CMSVC_API void StartCodeCompletionService(CodeCompletionServiceStartParams& startParams_);
 CMSVC_API void StopCodeCompletionService(bool log);
 CMSVC_API bool CodeCompletionServiceRunning();
 CMSVC_API void LoadEditModule(const std::string& projectFilePath, const std::string& backend, const std::string& config);
 CMSVC_API void ResetEditModuleCache();
 CMSVC_API void ParseSource(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, std::u32string&& sourceCode);
-CMSVC_API void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText);
+CMSVC_API void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::u32string& ccText, const std::vector<int>& ruleContext,
+    const std::u32string& cursorLine);
+CMSVC_API void GetParamHelpList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, int symbolIndex);
 CMSVC_API void InitCodeCompletionService();
 CMSVC_API void DoneCodeCompletionService();
 

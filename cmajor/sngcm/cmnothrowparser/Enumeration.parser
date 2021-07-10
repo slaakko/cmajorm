@@ -20,6 +20,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowEnumerationParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     using NothrowSpecifierParser.Specifiers;
     using NothrowIdentifierParser.Identifier;
@@ -27,7 +28,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowEnumerationParser
     using NothrowExpressionParser.Expression;
 
     EnumType(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<EnumTypeNode> enumTypeNode, var Span s, var Span beginBraceSpan, var Span endBraceSpan) : EnumTypeNode*
-        ::= Specifiers:specifiers{ s = span; } ENUM Identifier(moduleId):enumTypeId{ s.end = span.end; enumTypeNode.reset(new EnumTypeNode(s, *moduleId, specifiers, enumTypeId)); }
+        ::= Specifiers:specifiers{ s = span; } ENUM DefiningEnumTypeId(moduleId):enumTypeId{ s.end = span.end; enumTypeNode.reset(new EnumTypeNode(s, *moduleId, specifiers, enumTypeId)); }
             (UnderlyingType(moduleId, ctx):underlyingType{ enumTypeNode->SetUnderlyingType(underlyingType); })?
             LBRACE!{ beginBraceSpan = span; } EnumConstants(moduleId, ctx, enumTypeNode.get()):enumConstants RBRACE!
             {
@@ -37,6 +38,10 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowEnumerationParser
                 enumTypeNode->SetLexerFlags(lexer.Flags());
                 return enumTypeNode.release();
             }
+        ;
+
+    DefiningEnumTypeId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):enumTypeId{ return enumTypeId; }
         ;
 
     UnderlyingType(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : Node*

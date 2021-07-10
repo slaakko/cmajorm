@@ -31,7 +31,7 @@ using namespace cmajor::symbols;
 
 enum class CodeCompletionRequestKind
 {
-    loadEditModuleRequest, resetEditModuleCacheRequest, parseSourceRequest, getCCListRequest, stopRequest
+    loadEditModuleRequest, resetEditModuleCacheRequest, parseSourceRequest, getCCListRequest, getParamHelpListRequest, stopRequest
 };
 
 class CodeCompletionServer
@@ -48,6 +48,7 @@ public:
     std::unique_ptr<CodeCompletionReply> HandleRequest(const ResetEditModuleCacheRequest& request, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const ParseSourceRequest& request, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const GetCCListRequest& request, std::string& rootElementName);
+    std::unique_ptr<CodeCompletionReply> HandleRequest(const GetParamHelpListRequest& request, std::string& rootElementName);
     std::unique_ptr<CodeCompletionReply> HandleRequest(const StopCCRequest& request, std::string& rootElementName);
 private:
     static std::unique_ptr<CodeCompletionServer> instance;
@@ -83,6 +84,7 @@ CodeCompletionServer::CodeCompletionServer() : port(-1), version(), exit(false),
     requestKindMap["resetEditModuleCacheRequest"] = CodeCompletionRequestKind::resetEditModuleCacheRequest;
     requestKindMap["parseSourceRequest"] = CodeCompletionRequestKind::parseSourceRequest;
     requestKindMap["getCCListRequest"] = CodeCompletionRequestKind::getCCListRequest;
+    requestKindMap["getParamHelpListRequest"] = CodeCompletionRequestKind::getParamHelpListRequest;
     requestKindMap["stopCCRequest"] = CodeCompletionRequestKind::stopRequest;
     SetReadProjectFunction(cmajor::build::ReadProject);
     SetTypeBindingFunction(cmajor::binder::BindTypes);
@@ -209,6 +211,11 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(sngxml:
                 GetCCListRequest request(requestElement);
                 return HandleRequest(request, rootElementName);
             }
+            case CodeCompletionRequestKind::getParamHelpListRequest:
+            {
+                GetParamHelpListRequest request(requestElement);
+                return HandleRequest(request, rootElementName);
+            }
             case CodeCompletionRequestKind::stopRequest:
             {
                 StopCCRequest request(requestElement);
@@ -302,6 +309,7 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const P
                 reply->errors = result.errors;
                 reply->synchronized = result.synchronized;
                 reply->cursorContainer = result.cursorContainer;
+                reply->ruleContext = result.ruleContext;
             }
             else
             {
@@ -336,8 +344,38 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const G
         if (module)
         {
             reply->startGetCCList = std::chrono::steady_clock::now();
-            reply->ccList = module->GetCCList(request.sourceFilePath, request.ccText);
+            reply->ccList = module->GetCCList(request.sourceFilePath, request.ccText, request.cursorLine, request.ruleContext);
             reply->endGetCCList = std::chrono::steady_clock::now();
+        }
+        else
+        {
+            throw std::runtime_error("edit module '" + MakeEditModuleKey(request.projectFilePath, request.backend, request.config) + " not found");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        reply->ok = false;
+        reply->error = ex.what();
+    }
+    return std::unique_ptr<CodeCompletionReply>(reply.release());
+}
+
+std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(const GetParamHelpListRequest& request, std::string& rootElementName)
+{
+    rootElementName = "getParamHelpListReply";
+    std::unique_ptr<GetParamHelpListReply> reply(new GetParamHelpListReply());
+    reply->ok = true;
+    reply->created = std::chrono::steady_clock::now();
+    reply->requestCreated = request.created;
+    reply->requestReceived = request.received;
+    try
+    {
+        Module* module = EditModuleCache::Instance().GetEditModule(request.projectFilePath, request.backend, request.config);
+        if (module)
+        {
+            reply->startGetParamHelpList = std::chrono::steady_clock::now();
+            reply->list = module->GetParamHelpList(request.sourceFilePath, request.symbolIndex);
+            reply->endGetParamHelpList = std::chrono::steady_clock::now();
         }
         else
         {

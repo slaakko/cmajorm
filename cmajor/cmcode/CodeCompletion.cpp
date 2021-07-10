@@ -46,9 +46,15 @@ void ParseSource(const std::string& projectFilePath, const std::string& backend,
     PutRequest(new ParseSourceCodeCompletionServiceRequest(projectFilePath, backend, config, sourceFilePath, std::move(sourceCode)));
 }
 
-void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText)
+void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::u32string& ccText, const std::vector<int>& ruleContext, 
+    const std::u32string& cursorLine)
 {
-    PutRequest(new GetCCListCodeCompletionServiceRequest(projectFilePath, backend, config, sourceFilePath, ccText));
+    PutRequest(new GetCCListCodeCompletionServiceRequest(projectFilePath, backend, config, sourceFilePath, ccText, ruleContext, cursorLine));
+}
+
+void GetParamHelpList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, int symbolIndex)
+{
+    PutRequest(new GetParamHelpListCodeCompletionServiceRequest(projectFilePath, backend, config, sourceFilePath, symbolIndex));
 }
 
 } // namespace cmcode

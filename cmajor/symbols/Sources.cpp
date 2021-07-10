@@ -7,12 +7,17 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
+#include <cmajor/symbols/KeywordSymbol.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowparser/CompileUnit.hpp>
+#include <sngcm/cmnothrowparser/Statement.hpp>
+#include <sngcm/cmnothrowparser/Class.hpp>
 #include <sngcm/cmnothrowparser/NothrowParsingContext.hpp>
+#include <sngcm/cmnothrowparser/Rules.hpp>
 #include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <algorithm>
 #include <thread>
 #include <mutex>
 #include <sstream>
@@ -21,6 +26,315 @@ namespace cmajor { namespace symbols {
 
 using namespace soulng::util;
 using namespace soulng::unicode;
+
+class SourceData
+{
+public:
+    static void Init();
+    static void Done();
+    static SourceData& Instance() { return *instance; }
+    const std::vector<int>& GlobalRuleIds() const { return globalRuleIds; }
+    const std::vector<int>& DefininingIdRules() const { return definingIdRules; }
+    const std::vector<int>& CompoundStatementRuleId() const { return compoundStatementRuleId; }
+    const std::vector<int>& StatementRuleIds() const { return statementRuleIds; }
+    const std::vector<int>& ClassRuleId() const { return classRuleId; }
+private:
+    SourceData();
+    static std::unique_ptr<SourceData> instance;
+    std::vector<int> globalRuleIds;
+    std::vector<int> definingIdRules;
+    std::vector<int> compoundStatementRuleId;
+    std::vector<int> statementRuleIds;
+    std::vector<int> classRuleId;
+};
+
+std::unique_ptr<SourceData> SourceData::instance;
+
+void SourceData::Init()
+{
+    instance.reset(new SourceData());
+}
+
+void SourceData::Done()
+{
+    instance.reset();
+}
+
+SourceData::SourceData()
+{
+    globalRuleIds.push_back(NothrowCompileUnitParser_UsingDirectives);
+    globalRuleIds.push_back(NothrowCompileUnitParser_NamespaceDefinition);
+    definingIdRules.push_back(NothrowClassParser_DefiningClassId);
+    definingIdRules.push_back(NothrowClassParser_DefiningMemberVariableId);
+    definingIdRules.push_back(NothrowCompileUnitParser_DefiningNamespaceId);
+    definingIdRules.push_back(NothrowConceptParser_DefiningConceptId);
+    definingIdRules.push_back(NothrowDelegateParser_DefiningDelegateId);
+    definingIdRules.push_back(NothrowDelegateParser_DefiningClassDelegateId);
+    definingIdRules.push_back(NothrowEnumerationParser_DefiningEnumTypeId);
+    definingIdRules.push_back(NothrowFunctionParser_FunctionGroupId);
+    definingIdRules.push_back(NothrowGlobalVariableParser_DefininigGlobalVariableId);
+    definingIdRules.push_back(NothrowInterfaceParser_DefiningInterfaceId);
+    definingIdRules.push_back(NothrowInterfaceParser_InterfaceFunctionGroupId);
+    definingIdRules.push_back(NothrowTypedefParser_DefiningTypedefId);
+    definingIdRules.push_back(NothrowStatementParser_DefiningRangeForId);
+    definingIdRules.push_back(NothrowStatementParser_DefiningLocalVariableId);
+    compoundStatementRuleId.push_back(NothrowStatementParser_CompoundStatement);
+    statementRuleIds.push_back(NothrowStatementParser_Statement);
+    statementRuleIds.push_back(NothrowStatementParser_LabeledStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ControlStatement);
+    statementRuleIds.push_back(NothrowStatementParser_CompoundStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ReturnStatement);
+    statementRuleIds.push_back(NothrowStatementParser_IfStatement);
+    statementRuleIds.push_back(NothrowStatementParser_WhileStatement);
+    statementRuleIds.push_back(NothrowStatementParser_DoStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ForStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ForInitStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ForLoopStatementExpr);
+    statementRuleIds.push_back(NothrowStatementParser_RangeForStatement);
+    statementRuleIds.push_back(NothrowStatementParser_BreakStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ContinueStatement);
+    statementRuleIds.push_back(NothrowStatementParser_GotoStatement);
+    statementRuleIds.push_back(NothrowStatementParser_SwitchStatement);
+    statementRuleIds.push_back(NothrowStatementParser_CaseStatement);
+    statementRuleIds.push_back(NothrowStatementParser_DefaultStatement);
+    statementRuleIds.push_back(NothrowStatementParser_GotoCaseStatement);
+    statementRuleIds.push_back(NothrowStatementParser_GotoDefaultStatement);
+    statementRuleIds.push_back(NothrowStatementParser_AssignmentStatementExpr);
+    statementRuleIds.push_back(NothrowStatementParser_AssignmentStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ConstructionStatement);
+    statementRuleIds.push_back(NothrowStatementParser_DeleteStatement);
+    statementRuleIds.push_back(NothrowStatementParser_DestroyStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ExpressionStatement);
+    statementRuleIds.push_back(NothrowStatementParser_EmptyStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ThrowStatement);
+    statementRuleIds.push_back(NothrowStatementParser_TryStatement);
+    statementRuleIds.push_back(NothrowStatementParser_Catch);
+    statementRuleIds.push_back(NothrowStatementParser_AssertStatement);
+    statementRuleIds.push_back(NothrowStatementParser_ConditionalCompilationStatement);
+    classRuleId.push_back(NothrowClassParser_Class);
+}
+
+bool Find(const std::vector<int>& ruleContext, const std::vector<int>& ruleIds)
+{
+    int n = ruleContext.size();
+    for (int i = n - 1; i >= 0; --i)
+    {
+        for (int r : ruleIds)
+        {
+            if (ruleContext[i] == r) return true;
+        }
+    }
+    return false;
+}
+
+std::vector<int> GetLineRuleContext(const std::u32string& cursorLine, const std::string& filePath, int index, const boost::uuids::uuid& moduleId, const std::vector<int>& globalRuleContext)
+{
+    boost::uuids::uuid mid = moduleId;
+    NothrowParsingContext parsingContext;
+    CmajorNothrowLexer lexer(cursorLine.c_str(), cursorLine.c_str() + cursorLine.length(), filePath, index);
+    if (Find(globalRuleContext, SourceData::Instance().CompoundStatementRuleId()))
+    {
+        std::unique_ptr<sngcm::ast::StatementNode> statement = NothrowStatementParser::Parse(lexer, &mid, &parsingContext);
+    }
+    else if (Find(globalRuleContext, SourceData::Instance().ClassRuleId()))
+    {
+        std::unique_ptr<sngcm::ast::Node> member = NothrowClassMemberParser::Parse(lexer, &mid, &parsingContext);
+    }
+    else if (globalRuleContext.empty() || Find(globalRuleContext, SourceData::Instance().GlobalRuleIds()))
+    {
+        std::unique_ptr<CompileUnitNode> global = NothrowCompileUnitParser::Parse(lexer, &mid, &parsingContext);
+    }
+    else
+    {
+        return globalRuleContext;
+    }
+    return lexer.CursorRuleContext();
+}
+
+bool debugCC = false;
+
+std::vector<std::string> GetRuleNames(const std::vector<int>& rules)
+{
+    std::vector<std::string> ruleNames;
+    std::vector<const char*>* ruleNameVec = GetRuleNameVecPtr();
+    for (int r : rules)
+    {
+        ruleNames.push_back((*ruleNameVec)[r]);
+    }
+    return ruleNames;
+}
+
+CCContext GetCCContext(const std::u32string& cursorLine, const std::string& filePath, int index, const boost::uuids::uuid& moduleId, const std::vector<int>& globalRuleContext)
+{
+    if (debugCC)
+    {
+        std::vector<std::string> ruleNames = GetRuleNames(globalRuleContext);
+        int x = 0;
+    }
+    if (Find(globalRuleContext, SourceData::Instance().CompoundStatementRuleId()))
+    {
+        std::vector<int> lineRuleContext = GetLineRuleContext(cursorLine, filePath, index, moduleId, globalRuleContext);
+        if (debugCC)
+        {
+            std::vector<std::string> ruleNames = GetRuleNames(lineRuleContext);
+            int x = 0;
+        }
+        if (Find(lineRuleContext, SourceData::Instance().DefininingIdRules()))
+        {
+            return CCContext::emptyContext;
+        }
+        if (Find(lineRuleContext, SourceData::Instance().StatementRuleIds()))
+        {
+            return CCContext::statementContext;
+        }
+        return CCContext::statementContext;
+    }
+    if (Find(globalRuleContext, SourceData::Instance().ClassRuleId()))
+    {
+        std::vector<int> lineRuleContext = GetLineRuleContext(cursorLine, filePath, index, moduleId, globalRuleContext);
+        if (debugCC)
+        {
+            std::vector<std::string> ruleNames = GetRuleNames(lineRuleContext);
+            int x = 0;
+        }
+        if (Find(lineRuleContext, SourceData::Instance().DefininingIdRules()))
+        {
+            return CCContext::emptyContext;
+        }
+        return CCContext::classContext;
+    }
+    if (globalRuleContext.empty() || Find(globalRuleContext, SourceData::Instance().GlobalRuleIds()))
+    {
+        std::vector<int> lineRuleContext = GetLineRuleContext(cursorLine, filePath, index, moduleId, globalRuleContext);
+        if (debugCC)
+        {
+            std::vector<std::string> ruleNames = GetRuleNames(lineRuleContext);
+            int x = 0;
+        }
+        if (Find(lineRuleContext, SourceData::Instance().DefininingIdRules()))
+        {
+            return CCContext::emptyContext;
+        }
+        return CCContext::globalContext;
+    }
+    return CCContext::genericContext;
+}
+
+void AddKeywordSymbolEntry(std::vector<CCSymbolEntry>& keywordEntries, int tokenId, const std::u32string& prefix)
+{
+    Symbol* symbol = GetKeywordSymbol(tokenId);
+    if (symbol)
+    {
+        if (StartsWith(symbol->Name(), prefix))
+        {
+            keywordEntries.push_back(CCSymbolEntry(symbol, prefix.length(), symbol->Name()));
+        }
+    }
+}
+
+std::vector<CCSymbolEntry> GetKeywordEntries(CCContext ccContext, const std::u32string& prefix)
+{
+    std::vector<CCSymbolEntry> entries;
+    switch (ccContext)
+    {
+        case CCContext::globalContext:
+        {
+            AddKeywordSymbolEntry(entries, ENUM, prefix);
+            AddKeywordSymbolEntry(entries, CAST, prefix);
+            AddKeywordSymbolEntry(entries, INTERFACE, prefix);
+            AddKeywordSymbolEntry(entries, NAMESPACE, prefix);
+            AddKeywordSymbolEntry(entries, USING, prefix);
+            AddKeywordSymbolEntry(entries, STATIC, prefix);
+            AddKeywordSymbolEntry(entries, EXTERN, prefix);
+            AddKeywordSymbolEntry(entries, DELEGATE, prefix);
+            AddKeywordSymbolEntry(entries, INLINE, prefix);
+            AddKeywordSymbolEntry(entries, CDECL, prefix);
+            AddKeywordSymbolEntry(entries, NOTHROW, prefix);
+            AddKeywordSymbolEntry(entries, PUBLIC, prefix);
+            AddKeywordSymbolEntry(entries, PROTECTED, prefix);
+            AddKeywordSymbolEntry(entries, PRIVATE, prefix);
+            AddKeywordSymbolEntry(entries, INTERNAL, prefix);
+            AddKeywordSymbolEntry(entries, ABSTRACT, prefix);
+            AddKeywordSymbolEntry(entries, WINAPI, prefix);
+            AddKeywordSymbolEntry(entries, OPERATOR, prefix);
+            AddKeywordSymbolEntry(entries, CLASS, prefix);
+            AddKeywordSymbolEntry(entries, TYPEDEF, prefix);
+            AddKeywordSymbolEntry(entries, CONST, prefix);
+            AddKeywordSymbolEntry(entries, CONSTEXPR, prefix);
+            AddKeywordSymbolEntry(entries, THROW, prefix);
+            AddKeywordSymbolEntry(entries, CONCEPT, prefix);
+            break;
+        }
+        case CCContext::classContext:
+        {
+            AddKeywordSymbolEntry(entries, ENUM, prefix);
+            AddKeywordSymbolEntry(entries, CAST, prefix);
+            AddKeywordSymbolEntry(entries, INTERFACE, prefix);
+            AddKeywordSymbolEntry(entries, STATIC, prefix);
+            AddKeywordSymbolEntry(entries, EXTERN, prefix);
+            AddKeywordSymbolEntry(entries, DELEGATE, prefix);
+            AddKeywordSymbolEntry(entries, INLINE, prefix);
+            AddKeywordSymbolEntry(entries, CDECL, prefix);
+            AddKeywordSymbolEntry(entries, NOTHROW, prefix);
+            AddKeywordSymbolEntry(entries, PUBLIC, prefix);
+            AddKeywordSymbolEntry(entries, PROTECTED, prefix);
+            AddKeywordSymbolEntry(entries, PRIVATE, prefix);
+            AddKeywordSymbolEntry(entries, INTERNAL, prefix);
+            AddKeywordSymbolEntry(entries, VIRTUAL, prefix);
+            AddKeywordSymbolEntry(entries, ABSTRACT, prefix);
+            AddKeywordSymbolEntry(entries, OVERRIDE, prefix);
+            AddKeywordSymbolEntry(entries, SUPPRESS, prefix);
+            AddKeywordSymbolEntry(entries, WINAPI, prefix);
+            AddKeywordSymbolEntry(entries, OPERATOR, prefix);
+            AddKeywordSymbolEntry(entries, CLASS, prefix);
+            AddKeywordSymbolEntry(entries, TYPEDEF, prefix);
+            AddKeywordSymbolEntry(entries, CONST, prefix);
+            AddKeywordSymbolEntry(entries, CONSTEXPR, prefix);
+            AddKeywordSymbolEntry(entries, THROW, prefix);
+            break;
+        }
+        case CCContext::statementContext:
+        {
+            AddKeywordSymbolEntry(entries, ASSERT, prefix);
+            AddKeywordSymbolEntry(entries, ELIF, prefix);
+            AddKeywordSymbolEntry(entries, ENDIF, prefix);
+            AddKeywordSymbolEntry(entries, TRUE, prefix);
+            AddKeywordSymbolEntry(entries, FALSE, prefix);
+            AddKeywordSymbolEntry(entries, CAST, prefix);
+            AddKeywordSymbolEntry(entries, AS, prefix);
+            AddKeywordSymbolEntry(entries, IS, prefix);
+            AddKeywordSymbolEntry(entries, RETURN, prefix);
+            AddKeywordSymbolEntry(entries, IF, prefix);
+            AddKeywordSymbolEntry(entries, ELSE, prefix);
+            AddKeywordSymbolEntry(entries, SWITCH, prefix);
+            AddKeywordSymbolEntry(entries, CASE, prefix);
+            AddKeywordSymbolEntry(entries, DEFAULT, prefix);
+            AddKeywordSymbolEntry(entries, WHILE, prefix);
+            AddKeywordSymbolEntry(entries, DO, prefix);
+            AddKeywordSymbolEntry(entries, FOR, prefix);
+            AddKeywordSymbolEntry(entries, BREAK, prefix);
+            AddKeywordSymbolEntry(entries, CONTINUE, prefix);
+            AddKeywordSymbolEntry(entries, GOTO, prefix);
+            AddKeywordSymbolEntry(entries, TYPEDEF, prefix);
+            AddKeywordSymbolEntry(entries, TYPENAME, prefix);
+            AddKeywordSymbolEntry(entries, TYPEID, prefix);
+            AddKeywordSymbolEntry(entries, CONST, prefix);
+            AddKeywordSymbolEntry(entries, NULLLIT, prefix);
+            AddKeywordSymbolEntry(entries, THIS, prefix);
+            AddKeywordSymbolEntry(entries, BASE, prefix);
+            AddKeywordSymbolEntry(entries, CONSTRUCT, prefix);
+            AddKeywordSymbolEntry(entries, DESTROY, prefix);
+            AddKeywordSymbolEntry(entries, NEW, prefix);
+            AddKeywordSymbolEntry(entries, DELETE, prefix);
+            AddKeywordSymbolEntry(entries, SIZEOF, prefix);
+            AddKeywordSymbolEntry(entries, TRY, prefix);
+            AddKeywordSymbolEntry(entries, CATCH, prefix);
+            AddKeywordSymbolEntry(entries, THROW, prefix);
+            break;
+        }
+    }
+    return entries;
+}
 
 TypeBindingFunction typeBindingFunction;
 
@@ -85,7 +399,9 @@ void Source::Parse(const boost::uuids::uuid& moduleId, int index)
     boost::uuids::uuid mid = moduleId;
     NothrowParsingContext parsingContext;
     std::unique_ptr<CompileUnitNode> parsedCompileUnit = NothrowCompileUnitParser::Parse(lexer, &mid, &parsingContext);
-    std::vector<std::unique_ptr<std::exception>> parsingErrors = lexer.Errors();
+    rc.clear();
+    SetRuleContext(lexer.CursorRuleContext());
+    std::vector<std::exception> parsingErrors = lexer.Errors();
     if (!parsingErrors.empty())
     {
         CmajorNothrowLexer lexer(Start(), End(), FilePath(), index);
@@ -94,16 +410,18 @@ void Source::Parse(const boost::uuids::uuid& moduleId, int index)
         parsedCompileUnit = NothrowCompileUnitParser::Parse(lexer, &mid, &parsingContext);
         parsingErrors = lexer.Errors();
         synchronized = lexer.GetFlag(LexerFlags::synchronizedAtLeastOnce);
+        SetRuleContext(lexer.CursorRuleContext());
     }
     else
     {
         synchronized = lexer.GetFlag(LexerFlags::synchronizedAtLeastOnce);
     }
-    for (const std::unique_ptr<std::exception>& ex : parsingErrors)
+    for (const std::exception& ex : parsingErrors)
     {
-        errors.push_back(ex->what());
+        errors.push_back(ex.what());
     }
     compileUnit = std::move(parsedCompileUnit);
+    SetRuleContext();
 }
 
 void Source::SetContent(const std::u32string& content_)
@@ -246,7 +564,7 @@ std::vector<CCSymbolEntry> Source::LookupSymbolsBeginningWith(const std::u32stri
     return matches;
 }
 
-std::string Source::GetCCList(Module* module, const std::string& ccText)
+std::string Source::GetCCList(Module* module, const std::u32string& ccText, const std::u32string& cursorLine, int index, const std::vector<int>& ruleContext)
 {
     ccSymbols.clear();
     FunctionSymbol* fromFunction = nullptr;
@@ -254,22 +572,30 @@ std::string Source::GetCCList(Module* module, const std::string& ccText)
     {
         fromFunction = cursorContainer->FunctionNoThrow();
     }
-    std::u32string prefix = ToUtf32(ccText);
-    std::vector<CCSymbolEntry> ccSymbolEntries = LookupSymbolsBeginningWith(prefix);
+    CCContext ccContext = GetCCContext(cursorLine, FilePath(), index, module->Id(), ruleContext);
     sngxml::dom::Document ccListDoc;
     sngxml::dom::Element* ccListElement = new sngxml::dom::Element(U"ccList");
     ccListDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(ccListElement));
-    int symbolIndex = 0;
-    for (const CCSymbolEntry& ccSymbolEntry : ccSymbolEntries)
+    if (ccContext != CCContext::emptyContext)
     {
-        Symbol* symbol = ccSymbolEntry.symbol;
-        int ccPrefixLength = ccSymbolEntry.ccPrefixLen;
-        const std::u32string& replacement = ccSymbolEntry.replacement;
-        if (IsValidCCSymbol(symbol, module, fromFunction))
+        std::vector<CCSymbolEntry> ccSymbolEntries;
+        std::vector<CCSymbolEntry> keywordEntries = GetKeywordEntries(ccContext, ccText);
+        AddMatches(ccSymbolEntries, keywordEntries);
+        std::vector<CCSymbolEntry> scopeEntries = LookupSymbolsBeginningWith(ccText);
+        AddMatches(ccSymbolEntries, scopeEntries);
+        std::sort(ccSymbolEntries.begin(), ccSymbolEntries.end(), CCSymbolEntryLess());
+        int symbolIndex = 0;
+        for (const CCSymbolEntry& ccSymbolEntry : ccSymbolEntries)
         {
-            sngxml::dom::Element* ccElement = symbol->ToCCElement(ccPrefixLength, replacement, symbolIndex++);
-            ccListElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(ccElement));
-            ccSymbols.push_back(symbol);
+            Symbol* symbol = ccSymbolEntry.symbol;
+            int ccPrefixLength = ccSymbolEntry.ccPrefixLen;
+            const std::u32string& replacement = ccSymbolEntry.replacement;
+            if (IsValidCCSymbol(symbol, module, fromFunction))
+            {
+                sngxml::dom::Element* ccElement = symbol->ToCCElement(ccPrefixLength, replacement, symbolIndex++);
+                ccListElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(ccElement));
+                ccSymbols.push_back(symbol);
+            }
         }
     }
     std::stringstream s;
@@ -278,16 +604,43 @@ std::string Source::GetCCList(Module* module, const std::string& ccText)
     return s.str();
 }
 
-std::string Source::GetSymbolList(int symbolIndex)
+std::string Source::GetParamHelpList(int symbolIndex)
 {
     if (symbolIndex >= 0 && symbolIndex < ccSymbols.size())
     {
-        return std::string("foo");
+        Symbol* symbol = ccSymbols[symbolIndex];
+        sngxml::dom::Document paramHelpListDoc;
+        sngxml::dom::Element* paramHelpListElement = new sngxml::dom::Element(U"paramHelpList");
+        paramHelpListDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(paramHelpListElement));
+        std::vector<Symbol*> paramHelpSymbols = symbol->GetParamHelpSymbols();
+        for (Symbol* paramHelpSymbol : paramHelpSymbols)
+        {
+            sngxml::dom::Element* paramHelpElement = new sngxml::dom::Element(U"element");
+            paramHelpElement->SetAttribute(U"name", paramHelpSymbol->FullName());
+            paramHelpListElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(paramHelpElement));
+        }
+        std::stringstream s;
+        CodeFormatter formatter(s);
+        paramHelpListDoc.Write(formatter);
+        return s.str();
     }
     else
     {
         throw std::runtime_error("invalid symbol index");
     }
+}
+
+void Source::SetRuleContext(const std::vector<int>& rc_)
+{
+    if (rc.size() < rc_.size())
+    {
+        rc = rc_;
+    }
+}
+
+void Source::SetRuleContext()
+{
+    ruleContext = rc;
 }
 
 struct ParserData
@@ -525,6 +878,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         }
         src->SetContent(sourceCode);
         src->Parse(module->Id(), sources.size());
+        result.ruleContext = src->RuleContext();
         if (moveSource)
         {
             for (int i = 0; i < sources.size(); ++i)
@@ -594,7 +948,7 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
     return result;
 }
 
-std::string Sources::GetCCList(Module* module, const std::string& sourceFilePath, const std::string& ccText)
+std::string Sources::GetCCList(Module* module, const std::string& sourceFilePath, const std::u32string& ccText, const std::u32string& cursorLine, const std::vector<int>& ruleContext)
 {
     int index = GetSourceIndex(sourceFilePath);
     if (index == -1)
@@ -602,10 +956,10 @@ std::string Sources::GetCCList(Module* module, const std::string& sourceFilePath
         throw std::runtime_error("source file path '" + sourceFilePath + "' not found");
     }
     Source* source = GetSource(index);
-    return source->GetCCList(module, ccText);
+    return source->GetCCList(module, ccText, cursorLine, index, ruleContext);
 }
 
-std::string Sources::GetSymbolList(Module* module, const std::string& sourceFilePath, int symbolIndex)
+std::string Sources::GetParamHelpList(Module* module, const std::string& sourceFilePath, int symbolIndex)
 {
     int index = GetSourceIndex(sourceFilePath);
     if (index == -1)
@@ -613,7 +967,17 @@ std::string Sources::GetSymbolList(Module* module, const std::string& sourceFile
         throw std::runtime_error("source file path '" + sourceFilePath + "' not found");
     }
     Source* source = GetSource(index);
-    return source->GetSymbolList(symbolIndex);
+    return source->GetParamHelpList(symbolIndex);
+}
+
+void InitSources()
+{
+    SourceData::Init();
+}
+
+void DoneSources()
+{
+    SourceData::Done();
 }
 
 } } // namespace cmajor::symbols

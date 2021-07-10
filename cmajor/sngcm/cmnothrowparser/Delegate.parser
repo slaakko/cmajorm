@@ -20,6 +20,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowDelegateParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     using NothrowSpecifierParser.Specifiers;
     using NothrowTypeExprParser.TypeExpr;
@@ -27,7 +28,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowDelegateParser
     using NothrowIdentifierParser.Identifier;
 
     Delegate(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s, var std::unique_ptr<DelegateNode> dlg) : DelegateNode*
-        ::= Specifiers:specifiers{ s = span; } DELEGATE TypeExpr(moduleId, ctx):type Identifier(moduleId):id{ dlg.reset(new DelegateNode(s, *moduleId, specifiers, type, id)); }
+        ::= Specifiers:specifiers{ s = span; } DELEGATE TypeExpr(moduleId, ctx):type DefiningDelegateId(moduleId):id{ dlg.reset(new DelegateNode(s, *moduleId, specifiers, type, id)); }
             ParameterList(moduleId, ctx, dlg.get()):paramList SEMICOLON!
         { 
             dlg->SetSpanEnd(span.end); 
@@ -36,14 +37,22 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowDelegateParser
         }
         ;
 
+    DefiningDelegateId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):id{ return id; }
+        ;
+
     ClassDelegate(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s, var std::unique_ptr<ClassDelegateNode> clsDlg) : ClassDelegateNode*
-        ::= Specifiers:specifiers{ s = span; } CLASS DELEGATE TypeExpr(moduleId, ctx):type Identifier(moduleId):id{ clsDlg.reset(new ClassDelegateNode(s, *moduleId, specifiers, type, id)); }
+        ::= Specifiers:specifiers{ s = span; } CLASS DELEGATE TypeExpr(moduleId, ctx):type DefiningClassDelegateId(moduleId):id{ clsDlg.reset(new ClassDelegateNode(s, *moduleId, specifiers, type, id)); }
             ParameterList(moduleId, ctx, clsDlg.get()):paramList SEMICOLON!
         { 
             clsDlg->SetSpanEnd(span.end); 
             clsDlg->SetLexerFlags(lexer.Flags());
             return clsDlg.release(); 
         }
+        ;
+
+    DefiningClassDelegateId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):id{ return id; }
         ;
 
     ruleinfo

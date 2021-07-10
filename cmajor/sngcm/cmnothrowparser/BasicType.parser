@@ -15,6 +15,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowBasicTypeParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     BasicType(boost::uuids::uuid* moduleId) : Node*
         ::= BOOL{ BoolNode* node = new BoolNode(span, *moduleId); node->SetLexerFlags(lexer.Flags()); return node; }

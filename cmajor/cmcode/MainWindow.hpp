@@ -128,6 +128,7 @@ private:
     void LoadEditModuleForCurrentFile();
     void ResetEditModuleCache();
     void ParseSource();
+    void GetParamHelpList(int symbolIndex);
     void HandleServiceMessage();
     void ClearOutput();
     void WriteOutput(const std::string& text);
@@ -170,6 +171,8 @@ private:
     void HandleParseSourceError(const std::string& error);
     void HandleGetCCListReply(const GetCCListReply& getCCListReply);
     void HandleGetCCListError(const std::string& error);
+    void HandleGetParamHelpListReply(const GetParamHelpListReply& getParamHelpListReply);
+    void HandleGetParamHelpListError(const std::string& error);
     void SetState(MainWindowState state_);
     void SetEditorState();
     void ResetDebugLocations();
@@ -273,6 +276,7 @@ private:
     void UpdateCurrentDebugStrip();
     void ResetSelections();
     void ExpressionHover(ExpressionHoverEventArgs& args);
+    void CCEscape();
     void CCTextChanged();
     void CCShow();
     void CCHide();
@@ -283,6 +287,10 @@ private:
     void CCSelect(SelectedEventArgs& args);
     void CCStart();
     void CCStop();
+    void ParamHelpNext();
+    void ParamHelpPrev();
+    void ParamHelpClose();
+    void CCViewLocationChanged();
     MenuItem* newProjectMenuItem;
     MenuItem* openProjectMenuItem;
     MenuItem* closeSolutionMenuItem;
@@ -400,10 +408,12 @@ private:
     std::vector<ExpressionEvaluateRequest> expressionEvaluateRequests;
     ToolTip* toolTipWindow;
     CodeCompletionListView* codeCompletionListView;
+    CodeCompletionParamHelpView* paramHelpView;
     bool ccTimerRunning;
     bool editModuleLoaded;
-    bool canSelect;
+    bool ccCanSelect;
     CCEntry currentCCEntry;
+    std::vector<int> ruleContext;
 };
 
 } // namespace cmcode

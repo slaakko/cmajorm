@@ -9,7 +9,7 @@
 #include <soulng/parser/Match.hpp>
 #include <soulng/parser/Value.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/CompileUnit.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/CompileUnit.parser' using soulng parser generator spg version 4.0.0
 
 class CmajorNothrowLexer;
 
@@ -26,6 +26,7 @@ struct SNGCM_NOTHROW_PARSER_API NothrowCompileUnitParser
     static soulng::parser::Match Definition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns);
     static soulng::parser::Match SyncDef(CmajorNothrowLexer& lexer);
     static soulng::parser::Match NamespaceDefinition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns);
+    static soulng::parser::Match DefiningNamespaceId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId);
     static soulng::parser::Match TypedefDeclaration(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match ConceptDefinition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match FunctionDefinition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);

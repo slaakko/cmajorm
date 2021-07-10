@@ -62,6 +62,7 @@ class api(MSG_API) ParseSourceReply : CodeCompletionReply
     string[] errors;
     bool synchronized;
     string cursorContainer;
+    int[] ruleContext;
     time_point startParsing;
     time_point endParsing;
 }
@@ -72,7 +73,9 @@ class api(MSG_API) GetCCListRequest : CodeCompletionRequest
     string backend;
     string config;
     string sourceFilePath;
-    string ccText;
+    ustring ccText;
+    int[] ruleContext;
+    ustring cursorLine;
 }
 
 class api(MSG_API) GetCCListReply : CodeCompletionReply
@@ -84,7 +87,7 @@ class api(MSG_API) GetCCListReply : CodeCompletionReply
     time_point endGetCCList;
 }
 
-class api(MSG_API) GetSymbolListRequest : CodeCompletionRequest
+class api(MSG_API) GetParamHelpListRequest : CodeCompletionRequest
 {
     string projectFilePath;
     string backend;
@@ -93,13 +96,13 @@ class api(MSG_API) GetSymbolListRequest : CodeCompletionRequest
     int symbolIndex;
 }
 
-class api(MSG_API) GetSymbolListReply : CodeCompletionReply
+class api(MSG_API) GetParamHelpListReply : CodeCompletionReply
 {
     bool ok;
     string error;
-    string symbolList;
-    time_point startGetSymbolList;
-    time_point endGetSymbolList;
+    string list;
+    time_point startGetParamHelpList;
+    time_point endGetParamHelpList;
 }
 
 class api(MSG_API) StopCCRequest : CodeCompletionRequest

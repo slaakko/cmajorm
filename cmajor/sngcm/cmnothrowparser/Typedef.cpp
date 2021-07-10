@@ -6,7 +6,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Typedef.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Typedef.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -23,6 +23,7 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Typedef"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 165);
     Span s = Span();
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<sngcm::ast::Node> type;
@@ -89,7 +90,7 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
             soulng::parser::Match match(false);
             soulng::parser::Match* parentMatch7 = &match;
             {
-                soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+                soulng::parser::Match match = NothrowTypedefParser::DefiningTypedefId(lexer, moduleId);
                 id.reset(static_cast<IdentifierNode*>(match.value));
                 *parentMatch7 = match;
             }
@@ -151,6 +152,50 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
     {
         if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Typedef"));
         else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("Typedef"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    if (!match.hit)
+    {
+        match.value = nullptr;
+    }
+    return match;
+}
+
+soulng::parser::Match NothrowTypedefParser::DefiningTypedefId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId)
+{
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::Span parser_debug_match_span;
+    bool parser_debug_write_to_log = lexer.Log() != nullptr;
+    if (parser_debug_write_to_log)
+    {
+        parser_debug_match_span = lexer.GetSpan();
+        soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningTypedefId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 166);
+    std::unique_ptr<IdentifierNode> id;
+    soulng::parser::Match match(false);
+    soulng::parser::Match* parentMatch0 = &match;
+    {
+        int64_t pos = lexer.GetPos();
+        soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+        id.reset(static_cast<IdentifierNode*>(match.value));
+        if (match.hit)
+        {
+            {
+                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningTypedefId"));
+                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                return soulng::parser::Match(true, id.release());
+            }
+        }
+        *parentMatch0 = match;
+    }
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    if (parser_debug_write_to_log)
+    {
+        if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningTypedefId"));
+        else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("DefiningTypedefId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     if (!match.hit)

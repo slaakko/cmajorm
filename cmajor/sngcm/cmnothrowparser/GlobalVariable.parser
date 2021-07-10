@@ -20,6 +20,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowGlobalVariableParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     using NothrowSpecifierParser.Specifiers;
     using NothrowTypeExprParser.TypeExpr;
@@ -27,7 +28,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowGlobalVariableParser
     using NothrowExpressionParser.Expression;
 
     GlobalVariable(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, var Span s) : GlobalVariableNode*
-        ::= Specifiers:specifiers{ s = span; } TypeExpr(moduleId, ctx):type Identifier(moduleId):id (ASSIGN Expression(moduleId, ctx):initializer)? SEMICOLON
+        ::= Specifiers:specifiers{ s = span; } TypeExpr(moduleId, ctx):type DefininigGlobalVariableId(moduleId):id (ASSIGN Expression(moduleId, ctx):initializer)? SEMICOLON
         {
             s.end = span.end;
             GlobalVariableNode* value = new GlobalVariableNode(s, *moduleId, specifiers, type, id, cu);
@@ -35,6 +36,10 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowGlobalVariableParser
             value->SetLexerFlags(lexer.Flags());
             return value;
         }
+        ;
+
+    DefininigGlobalVariableId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):id{ return id; }
         ;
 
     ruleinfo

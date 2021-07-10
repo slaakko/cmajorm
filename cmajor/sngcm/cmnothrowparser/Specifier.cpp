@@ -3,7 +3,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Specifier.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Specifier.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace CmajorNothrowTokens;
@@ -19,6 +19,7 @@ soulng::parser::Match NothrowSpecifierParser::Specifiers(CmajorNothrowLexer& lex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Specifiers"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 119);
     sngcm::ast::Specifiers specifiers = sngcm::ast::Specifiers();
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifier;
     soulng::parser::Match match(false);
@@ -102,8 +103,10 @@ soulng::parser::Match NothrowSpecifierParser::Specifier(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Specifier"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 120);
     soulng::parser::Match match(false);
     int64_t pos = lexer.GetPos();
+    soulng::lexer::SourcePos sourcePos = lexer.GetSourcePos(pos);
     soulng::lexer::Span span = lexer.GetSpan();
     switch (*lexer)
     {

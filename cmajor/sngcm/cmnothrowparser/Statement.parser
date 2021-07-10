@@ -19,14 +19,16 @@ using namespace CmajorNothrowTokens;
 parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
 {
     uselexer CmajorNothrowLexer;
+    main;
     nothrow;
+    state;
 
     using NothrowExpressionParser.Expression;
     using NothrowExpressionParser.ArgumentList;
     using NothrowTypeExprParser.TypeExpr;
     using NothrowIdentifierParser.Identifier;
 
-    Statement(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : StatementNode*
+    Statement(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : sngcm::ast::StatementNode*
         ::= LabeledStatement(moduleId, ctx):labeledStatement{ return labeledStatement; }
         |   ControlStatement(moduleId, ctx):controlStatement{ return controlStatement; }
         |   ExpressionStatement(moduleId, ctx):expressionStatement{ return expressionStatement; }
@@ -207,7 +209,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
     RangeForStatement(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span colonSpan) : RangeForStatementNode*
         ::=
         (
-            FOR{ s = span; } LPAREN{ leftParenSpan = span; } TypeExpr(moduleId, ctx):type Identifier(moduleId):id COLON{ colonSpan = span; } Expression(moduleId, ctx):container RPAREN!{ rightParenSpan = span; }
+            FOR{ s = span; } LPAREN{ leftParenSpan = span; } TypeExpr(moduleId, ctx):type DefiningRangeForId(moduleId):id COLON{ colonSpan = span; } Expression(moduleId, ctx):container RPAREN!{ rightParenSpan = span; }
             Statement(moduleId, ctx):action{ s.end = span.end; }
         )
         {
@@ -218,6 +220,10 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
             value->SetLexerFlags(lexer.Flags());
             return value;
         }
+        ;
+
+    DefiningRangeForId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):id{ return id; }
         ;
 
     BreakStatement(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : StatementNode*
@@ -336,7 +342,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
         ;
 
     ConstructionStatement(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<ConstructionStatementNode> constructionStatement) : ConstructionStatementNode*
-        ::= (TypeExpr(moduleId, ctx):type Identifier(moduleId):id){ constructionStatement.reset(new ConstructionStatementNode(span, *moduleId, type, id)); }
+        ::= (TypeExpr(moduleId, ctx):type DefiningLocalVariableId(moduleId):id){ constructionStatement.reset(new ConstructionStatementNode(span, *moduleId, type, id)); }
             (   ASSIGN Expression(moduleId, ctx):value{ constructionStatement->AddArgument(value); constructionStatement->SetAssignment(); }
             |   LPAREN ArgumentList(moduleId, ctx, constructionStatement.get()):argumentList RPAREN!
             |   empty{ constructionStatement->SetEmpty(); }
@@ -347,6 +353,10 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
                 constructionStatement->SetLexerFlags(lexer.Flags());
                 return constructionStatement.release(); 
             }
+        ;
+
+    DefiningLocalVariableId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):id{ return id; }
         ;
 
     DeleteStatement(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : StatementNode*
@@ -417,7 +427,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
         ;
 
     Catch(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan) : CatchNode*
-        ::= CATCH{ s = span; } LPAREN!{ leftParenSpan = span; } TypeExpr(moduleId, ctx):catchType Identifier(moduleId):catchId? RPAREN!{ rightParenSpan = span; }
+        ::= CATCH{ s = span; } LPAREN!{ leftParenSpan = span; } TypeExpr(moduleId, ctx):catchType DefiningLocalVariableId(moduleId):catchId? RPAREN!{ rightParenSpan = span; }
             CompoundStatement(moduleId, ctx):catchBlock
             {
                 s.end = span.end;

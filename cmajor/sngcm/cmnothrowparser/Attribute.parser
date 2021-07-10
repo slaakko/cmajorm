@@ -15,6 +15,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowAttributeParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     Attributes(boost::uuids::uuid* moduleId, var std::unique_ptr<sngcm::ast::AttributesNode> attributes) : sngcm::ast::AttributesNode*
         ::= LBRACKET{ attributes.reset(new sngcm::ast::AttributesNode(span, *moduleId)); } (Attribute(attributes.get(), moduleId):attribute % COMMA)? RBRACKET!

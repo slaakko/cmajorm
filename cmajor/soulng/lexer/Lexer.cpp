@@ -13,16 +13,30 @@ namespace soulng { namespace lexer {
 
 using namespace soulng::unicode;
 
+LexerState::LexerState() : token(), line(0), lexeme(), pos(), tokens(), flags(), recordedPosPair(), farthestPos(), currentPos()
+{
+}
+
+SourceInfo::SourceInfo() : fileName(), lineNumber(0), sourceLine()
+{
+}
+
+LineMapper::~LineMapper()
+{
+}
+
 Lexer::Lexer(const std::u32string& content_, const std::string& fileName_, int fileIndex_) :
     content(content_), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(nullptr), start(content.c_str()), end(content.c_str() + content.length()), pos(start), current(tokens.end()),
-    log(nullptr), countLines(true), separatorChar('\0'), flags(), commentTokenId(-1)
+    log(nullptr), countLines(true), separatorChar('\0'), flags(), commentTokenId(-1), farthestPos(GetPos()), ruleNameVecPtr(nullptr), lineMapper(nullptr)
 {
+    CalculateLineStarts();
 }
 
 Lexer::Lexer(const char32_t* start_, const char32_t* end_, const std::string& fileName_, int fileIndex_) :
     content(), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(nullptr), start(start_), end(end_), pos(start), current(tokens.end()),
-    log(nullptr), countLines(true), separatorChar('\0'), flags(), commentTokenId(-1)
+    log(nullptr), countLines(true), separatorChar('\0'), flags(), commentTokenId(-1), farthestPos(GetPos()), ruleNameVecPtr(nullptr), lineMapper(nullptr)
 {
+    CalculateLineStarts();
 }
 
 Lexer::~Lexer()
@@ -31,17 +45,44 @@ Lexer::~Lexer()
 
 void Lexer::operator++()
 {
-    if (current != tokens.end())
+    if (GetFlag(LexerFlags::recordedParse))
     {
-        ++current;
-    }
-    if (current == tokens.end())
-    {
-        NextToken();
+        // precondition: !tokens.empty() && tokens.back().id == END_TOKEN
+        int64_t currentPos = GetPos();
+        if (currentPos == recordedPosPair.end)
+        {
+            current = tokens.end() - 1; // set current to last token whose id is END_TOKEN
+            pos = tokens.back().match.end;
+        }
+        else
+        {
+            ++current;
+        }
+        line = current->line;
     }
     else
     {
-        line = current->line;
+        if (current != tokens.end())
+        {
+            ++current;
+        }
+        if (current == tokens.end())
+        {
+            NextToken();
+        }
+        else
+        {
+            line = current->line;
+        }
+        if (GetFlag(LexerFlags::farthestError))
+        {
+            int64_t p = GetPos();
+            if (p > farthestPos)
+            {
+                farthestPos = p;
+                farthestRuleContext = ruleContext;
+            }
+        }
     }
 }
 
@@ -55,6 +96,19 @@ void Lexer::SetPos(int64_t pos)
 {
     current = tokens.begin() + static_cast<int32_t>(pos);
     line = static_cast<int32_t>(pos >> 32);
+}
+
+SourcePos Lexer::GetSourcePos(int64_t pos) const
+{
+    const char32_t* s = start;
+    int line = GetLine(pos);
+    if (line < lineStarts.size())
+    {
+        s = lineStarts[line];
+    }
+    Token token = GetToken(pos);
+    int col = token.match.begin - s + 1;
+    return SourcePos(pos, line, col);
 }
 
 void Lexer::NextToken()
@@ -164,6 +218,57 @@ int Lexer::GetKeywordToken(const Lexeme& lexeme) const
     }
 }
 
+std::string Lexer::MappedFileName(const SourcePos& sourcePos) const
+{
+    SourceInfo sourceInfo;
+    if (lineMapper)
+    {
+        sourceInfo = lineMapper->GetSourceInfo(sourcePos);
+    }
+    if (!sourceInfo.fileName.empty())
+    {
+        return sourceInfo.fileName;
+    }
+    else
+    {
+        return FileName();
+    }
+}
+
+std::string Lexer::MappedFileLine(const SourcePos& sourcePos) const
+{
+    SourceInfo sourceInfo;
+    if (lineMapper)
+    {
+        sourceInfo = lineMapper->GetSourceInfo(sourcePos);
+    }
+    if (sourceInfo.lineNumber && !sourceInfo.fileName.empty())
+    {
+        return sourceInfo.fileName + ":" + std::to_string(sourceInfo.lineNumber);
+    }
+    else
+    {
+        return FileName() + ":" + std::to_string(line);
+    }
+}
+
+int Lexer::MappedLineNumber(const SourcePos& sourcePos) const
+{
+    SourceInfo sourceInfo;
+    if (lineMapper)
+    {
+        sourceInfo = lineMapper->GetSourceInfo(sourcePos);
+    }
+    if (sourceInfo.lineNumber)
+    {
+        return sourceInfo.lineNumber;
+    }
+    else
+    {
+        return line;
+    }
+}
+
 void Lexer::ConvertExternal(Span& span)
 {
     Token startToken = GetToken(span.start);
@@ -217,6 +322,11 @@ std::u32string Lexer::GetMatch(const Span& span) const
         e = token.match.end;
     }
     return match;
+}
+
+std::u32string Lexer::GetMatch(int64_t pos) const
+{
+    return GetToken(pos).match.ToString();
 }
 
 const char32_t* LineStart(const char32_t* start, const char32_t* p)
@@ -308,6 +418,27 @@ std::u32string Lexer::ErrorLines(const Token& token) const
     return lines;
 }
 
+std::string Lexer::MappedErrorLines(const Token& token) const
+{
+    SourceInfo sourceInfo;
+    if (lineMapper)
+    {
+        const char32_t* lineStart = LineStart(start, token.match.begin);
+        SourcePos sourcePos(-1, token.line, token.match.begin - lineStart);
+        sourceInfo = lineMapper->GetSourceInfo(sourcePos);
+    }
+    if (sourceInfo.lineNumber)
+    {
+        const char32_t* lineStart = LineStart(start, token.match.begin);
+        std::string caretLine = std::string(token.match.begin - lineStart, ' ') + std::string(std::max(static_cast<int64_t>(1), token.match.end - token.match.begin), '^');
+        return sourceInfo.sourceLine + caretLine;
+    }
+    else
+    {
+        return ToUtf8(ErrorLines(token));
+    }
+}
+
 std::u32string Lexer::ErrorLines(const Span& span) const
 {
     std::u32string lines;
@@ -360,28 +491,45 @@ void Lexer::GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) con
         lineEnd = lineStart;
     }
     int lineLength = static_cast<int>(lineEnd - lineStart);
-    int spanCols = std::max(static_cast<int>(1), std::min(static_cast<int>(endToken.match.end - startToken.match.begin), lineLength - cols));
+    int spanCols = std::max(static_cast<int>(1), std::min(span.end - span.start, lineLength - cols));
     endCol = startCol + spanCols;
 }
 
 void Lexer::ThrowExpectationFailure(const Span& span, const std::u32string& name)
 {
     Token token = GetToken(span.start);
-    throw ParsingException("parsing error in '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
+    throw ParsingException("parsing error at '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
+}
+
+std::string Lexer::GetFarthestError() const
+{
+    Token token = GetToken(farthestPos);
+    std::string parserStateStr = GetParserStateStr();
+    if (lineMapper)
+    {
+        const char32_t* lineStart = LineStart(start, token.match.begin);
+        SourcePos sourcePos(-1, token.line, std::max(1, static_cast<int>(token.match.begin - lineStart)));
+        SourceInfo sourceInfo = lineMapper->GetSourceInfo(sourcePos);
+        std::string caretLine = std::string(sourcePos.col - 1, ' ') + std::string(std::max(static_cast<int64_t>(1), token.match.end - token.match.begin), '^');
+        return "parsing error at '" + sourceInfo.fileName + ":" + std::to_string(sourceInfo.lineNumber) + ":\n" +
+            sourceInfo.sourceLine + caretLine + "\n" + parserStateStr;
+    }
+    else
+    {
+        return "parsing error at '" + fileName + ":" + std::to_string(token.line) + "':\n" + ToUtf8(ErrorLines(token)) + parserStateStr;
+    }
+}
+
+void Lexer::ThrowFarthestError()
+{
+    throw ParsingException(GetFarthestError(), fileName);
 }
 
 void Lexer::AddError(const Span& span, const std::u32string& name)
 {
-    if (GetFlag(LexerFlags::synchronize) && GetFlag(LexerFlags::synchronized))
-    {
-        SetFlag(LexerFlags::synchronizedAtLeastOnce);
-    }
-    else
-    {
-        Token token = GetToken(span.start);
-        ParsingException* error(new ParsingException("parsing error in '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span));
-        errors.push_back(std::unique_ptr<std::exception>(error));
-    }
+    Token token = GetToken(span.start);
+    ParsingException error("parsing error at '" + fileName + ":" + std::to_string(token.line) + "': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
+    errors.push_back(std::move(error));
 }
 
 std::u32string Lexer::RestOfLine(int maxLineLength)
@@ -499,7 +647,7 @@ bool Lexer::Synchronize()
                     return true;
                 }
             }
-            ++*this;
+            ++* this;
         }
     }
     return false;
@@ -513,6 +661,121 @@ void Lexer::SetBlockCommentStates(const std::set<int>& blockCommentStates_)
 const std::set<int>& Lexer::BlockCommentStates() const
 {
     return blockCommentStates;
+}
+
+LexerState Lexer::GetState() const
+{
+    LexerState state;
+    state.token = token;
+    state.line = line;
+    state.lexeme = lexeme;
+    state.pos = pos;
+    state.tokens = tokens;
+    state.flags = flags;
+    state.recordedPosPair = recordedPosPair;
+    state.farthestPos = farthestPos;
+    state.ruleContext = ruleContext;
+    state.farthestRuleContext = farthestRuleContext;
+    state.currentPos = GetPos();
+    return state;
+}
+
+void Lexer::SetState(const LexerState& state)
+{
+    token = state.token;
+    line = state.line;
+    lexeme = state.lexeme;
+    pos = state.pos;
+    tokens = state.tokens;
+    flags = state.flags;
+    recordedPosPair = state.recordedPosPair;
+    farthestPos = state.farthestPos;
+    ruleContext = state.ruleContext;
+    farthestRuleContext = state.farthestRuleContext;
+    SetPos(state.currentPos);
+}
+
+void Lexer::PushState()
+{
+    stateStack.push(GetState());
+}
+
+void Lexer::PopState()
+{
+    SetState(stateStack.top());
+    stateStack.pop();
+}
+
+void Lexer::BeginRecordedParse(const LexerPosPair& recordedPosPair_)
+{
+    PushState();
+    if (tokens.empty() || tokens.back().id != END_TOKEN)
+    {
+        Token endToken(END_TOKEN);
+        endToken.match.begin = end;
+        endToken.match.end = end;
+        tokens.push_back(endToken);
+    }
+    recordedPosPair = recordedPosPair_;
+    SetPos(recordedPosPair.start);
+    SetFlag(LexerFlags::recordedParse);
+}
+
+void Lexer::EndRecordedParse()
+{
+    PopState();
+}
+
+void Lexer::PushRule(int ruleId)
+{
+    ruleContext.push_back(ruleId);
+}
+
+void Lexer::PopRule()
+{
+    ruleContext.pop_back();
+}
+
+void Lexer::SetCursorRuleContext()
+{
+    cursorRuleContext = ruleContext;
+}
+
+std::string Lexer::GetParserStateStr() const
+{
+    std::string parserStateStr;
+    int n = farthestRuleContext.size();
+    if (ruleNameVecPtr && n > 0)
+    {
+        parserStateStr.append("\nParser state:\n");
+        for (int i = 0; i < n; ++i)
+        {
+            int ruleId = farthestRuleContext[i];
+            if (ruleId >= 0 && ruleId < ruleNameVecPtr->size())
+            {
+                std::string ruleName = (*ruleNameVecPtr)[ruleId];
+                parserStateStr.append(ruleName.append("\n"));
+            }
+        }
+    }
+    return parserStateStr;
+}
+
+void Lexer::CalculateLineStarts()
+{
+    lineStarts.push_back(pos);
+    const char32_t* p = pos;
+    bool startOfLine = true;
+    while (p != end)
+    {
+        if (startOfLine)
+        {
+            lineStarts.push_back(p);
+        }
+        startOfLine = *p == '\n';
+        ++p;
+    }
+    lineStarts.push_back(end);
 }
 
 void WriteBeginRuleToLog(Lexer& lexer, const std::u32string& ruleName)

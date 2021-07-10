@@ -8,12 +8,13 @@
 #include <soulng/parser/Match.hpp>
 #include <soulng/parser/Value.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Statement.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Statement.parser' using soulng parser generator spg version 4.0.0
 
 class CmajorNothrowLexer;
 
 struct SNGCM_NOTHROW_PARSER_API NothrowStatementParser
 {
+    static std::unique_ptr<sngcm::ast::StatementNode> Parse(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match Statement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match SyncStmt(CmajorNothrowLexer& lexer);
     static soulng::parser::Match Label(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId);
@@ -28,6 +29,7 @@ struct SNGCM_NOTHROW_PARSER_API NothrowStatementParser
     static soulng::parser::Match ForInitStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match ForLoopStatementExpr(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match RangeForStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
+    static soulng::parser::Match DefiningRangeForId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId);
     static soulng::parser::Match BreakStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match ContinueStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match GotoStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
@@ -39,6 +41,7 @@ struct SNGCM_NOTHROW_PARSER_API NothrowStatementParser
     static soulng::parser::Match AssignmentStatementExpr(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match AssignmentStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match ConstructionStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
+    static soulng::parser::Match DefiningLocalVariableId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId);
     static soulng::parser::Match DeleteStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match DestroyStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match ExpressionStatement(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);

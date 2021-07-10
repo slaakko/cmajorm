@@ -10,7 +10,9 @@
 #include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/EditModuleCache.hpp>
 #include <cmajor/symbols/SourceFileModuleMap.hpp>
+#include <cmajor/symbols/Sources.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
+#include <cmajor/symbols/KeywordSymbol.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -23,10 +25,14 @@ void Init()
     InitSymbolTable();
     InitSourceFileModuleMap();
     InitEditModuleCache();
+    InitKeywordSymbol();
+    InitSources();
 }
 
 void Done()
 {
+    DoneSources();
+    DoneKeywordSymbol();
     DoneEditModuleCache();
     DoneSourceFileModuleMap();
     DoneSymbolTable();
@@ -37,3 +43,4 @@ void Done()
 }
 
 } } // namespace cmajor::symbols
+

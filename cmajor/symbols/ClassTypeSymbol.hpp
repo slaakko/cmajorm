@@ -45,6 +45,7 @@ public:
     std::string GetSymbolCategoryDescription() const override { return "class"; }
     std::string GetSymbolHelp() const override;
     bool IsValidCCClassGroup(Module* module, FunctionSymbol* fromFunction) const;
+    std::vector<Symbol*> GetParamHelpSymbols() const override;
 private:
     std::unordered_map<int, ClassTypeSymbol*> arityClassMap;
 };

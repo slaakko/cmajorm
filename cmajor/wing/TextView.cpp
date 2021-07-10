@@ -66,10 +66,30 @@ bool HasAngleBracket(const std::u32string& s)
 {
     for (char32_t c : s)
     {
-        if (c == '<') return true; 
+        if (c == '<') return true;
         else if (c == '>') return true;
     }
     return false;
+}
+
+int OpenParenCount(const std::u32string& s)
+{
+    int openParenCount = 0;
+    for (char32_t c : s)
+    {
+        if (c == '(') ++openParenCount; else if (c == ')') --openParenCount;
+    }
+    return openParenCount;
+}
+
+int OpenAngleBracketCount(const std::u32string& s)
+{
+    int openAngleBracketCount = 0;
+    for (char32_t c : s)
+    {
+        if (c == '<') ++openAngleBracketCount; else if (c == '>') --openAngleBracketCount;
+    }
+    return openAngleBracketCount;
 }
 
 bool StartCC(const std::string& ccCat, const std::u32string& currentLine)
@@ -84,7 +104,7 @@ bool StartCC(const std::string& ccCat, const std::u32string& currentLine)
     }
     else
     {
-        if (HasParen(currentLine)) return false;
+        // todo: enable CC based on context
     }
     return true;
 }
@@ -93,6 +113,37 @@ bool StopCC(char32_t c)
 {
     if (c == '.') return false;
     if (c == ' ' || IsPunctuation(c)) return true;
+    return false;
+}
+
+bool CloseParamHelp(const std::string& ccCat, const std::u32string& currentLine, char32_t c)
+{
+    if (ccCat == "FN")
+    {
+        if (c == ')' && HasParen(currentLine) && OpenParenCount(currentLine) == 1) return true;
+    }
+    else if (ccCat == "CL")
+    {
+        if (c == '>')
+        {
+            if (OpenAngleBracketCount(currentLine) == 1) return true;
+        }
+        else if (c == ' ' || c == '.')
+        {
+            if (OpenAngleBracketCount(currentLine) == 0) return true;
+        }
+    }
+    else if (ccCat == "CO")
+    {
+        if (c == '>')
+        {
+            if (OpenAngleBracketCount(currentLine) == 1) return true;
+        }
+        else if (c == ' ' || c == '.')
+        {
+            if (OpenAngleBracketCount(currentLine) == 0) return true;
+        }
+    }
     return false;
 }
 
@@ -122,14 +173,6 @@ int ReadCaretTimeoutFromRegistry()
 Color DefaultSelectionBackgroundColor()
 {
     return Color(153, 201, 239);
-}
-
-SourcePos::SourcePos() : line(0), column(0)
-{
-}
-
-SourcePos::SourcePos(int line_, int column_) : line(line_), column(column_)
-{
 }
 
 Selection::Selection() : fixed(SelectionFixed::none), start(), end()
@@ -712,6 +755,11 @@ Point TextView::CCPos()
     return ccPos;
 }
 
+std::u32string TextView::CursorLine() const
+{
+    return CurrentLine().substr(0, CaretColumn()) + U"$";
+}
+
 void TextView::SetCCText(const std::u32string& line, int columnIndex)
 {
     cctext.clear();
@@ -830,7 +878,7 @@ const std::u32string& TextView::CurrentLine() const
 {
     static std::u32string emptyLine;
     int lineIndex = caretLine - 1;
-    if (lineIndex >= 0 && lineIndex < lines.size() - 1)
+    if (!lines.empty() && lineIndex >= 0 && lineIndex < lines.size())
     {
         return *lines[lineIndex];
     }
@@ -874,7 +922,7 @@ void TextView::InsertText(int lineIndex, int columnIndex, const std::u32string& 
     if (!selection.IsEmpty())
     {
         lineIndex = selection.start.line - 1;
-        columnIndex = selection.start.column - 1;
+        columnIndex = selection.start.col - 1;
         AddRemoveSelectionCommand();
         RemoveSelection();
     }
@@ -1174,7 +1222,7 @@ SelectionData TextView::GetSelection() const
     if (selection.IsEmpty()) return SelectionData();
     if (selection.start.line == selection.end.line)
     {
-        std::u32string s = (*lines[selection.start.line - 1]).substr(selection.start.column - 1, selection.end.column - selection.start.column);
+        std::u32string s = (*lines[selection.start.line - 1]).substr(selection.start.col - 1, selection.end.col - selection.start.col);
         int indent = MinIndent(s);
         SelectionData selectionData(Unindent(s, indent), indent, 0);
         return selectionData;
@@ -1182,16 +1230,16 @@ SelectionData TextView::GetSelection() const
     else
     {
         int numTrailingSpaces = 0;
-        std::u32string s = (*lines[selection.start.line - 1]).substr(selection.start.column - 1).append(1, '\n');
+        std::u32string s = (*lines[selection.start.line - 1]).substr(selection.start.col - 1).append(1, '\n');
         for (int i = selection.start.line; i < selection.end.line - 1; ++i)
         {
             s.append(*lines[i]).append(1, '\n');
         }
         if (selection.end.line - 1 < lines.size())
         {
-            if (!(*lines[selection.end.line - 1]).substr(0, selection.end.column - 1).empty())
+            if (!(*lines[selection.end.line - 1]).substr(0, selection.end.col - 1).empty())
             {
-                std::u32string lastLine = (*lines[selection.end.line - 1]).substr(0, selection.end.column - 1);
+                std::u32string lastLine = (*lines[selection.end.line - 1]).substr(0, selection.end.col - 1);
                 numTrailingSpaces = GetNumTrailingSpaces(lastLine);
                 s.append(lastLine).append(1, '\n');
             }
@@ -1237,10 +1285,10 @@ void TextView::InsertSelection(const Selection& selectionToInsert, const Selecti
             {
                 selectedText.insert(0, std::u32string(selectionData.indent, ' '));
             }
-            (*lines[lineIndex]).insert(selectionToInsert.start.column - 1, selectedText);
+            (*lines[lineIndex]).insert(selectionToInsert.start.col - 1, selectedText);
             LineEventArgs args(lineIndex, -1);
             OnLineChanged(args);
-            SetCaretLineCol(lineIndex + 1, selectionToInsert.start.column + LineNumberFieldLength());
+            SetCaretLineCol(lineIndex + 1, selectionToInsert.start.col + LineNumberFieldLength());
         }
     }
     else
@@ -1249,14 +1297,14 @@ void TextView::InsertSelection(const Selection& selectionToInsert, const Selecti
         int startLineIndex = selectionToInsert.start.line - 1;
         int endLineIndex = selectionToInsert.end.line - 1;
         int lineCount = endLineIndex - startLineIndex + 1;
-        if (selectionToInsert.start.column > 1)
+        if (selectionToInsert.start.col > 1)
         {
             std::u32string firstSelectionLine = selectionLines[0];
             if (selectionData.indent > 0)
             {
                 firstSelectionLine.insert(0, selectionData.indent, ' ');
             }
-            (*lines[startLineIndex]).insert(selectionToInsert.start.column - 1, firstSelectionLine);
+            (*lines[startLineIndex]).insert(selectionToInsert.start.col - 1, firstSelectionLine);
             LineEventArgs changeArgs(startLineIndex, -1);
             OnLineChanged(changeArgs);
             ++startLineIndex;
@@ -1309,7 +1357,7 @@ void TextView::InsertSelection(const Selection& selectionToInsert, const Selecti
         }
     }
     selection = selectionToInsert;
-    SetCaretLineCol(selection.end.line, selection.end.column + LineNumberFieldLength());
+    SetCaretLineCol(selection.end.line, selection.end.col + LineNumberFieldLength());
     Invalidate();
     SetDirty();
     SetCCDirty();
@@ -1320,7 +1368,7 @@ void TextView::RemoveSelection()
     if (selection.IsEmpty()) return;
     if (selection.start.line == selection.end.line)
     {
-        if (selection.end.column - selection.start.column >= GetLineLength(selection.start.line))
+        if (selection.end.col - selection.start.col >= GetLineLength(selection.start.line))
         {
             int lineIndex = selection.start.line - 1;
             lines.erase(lines.begin() + lineIndex);
@@ -1331,19 +1379,19 @@ void TextView::RemoveSelection()
         else
         {
             int lineIndex = selection.start.line - 1;
-            (*lines[lineIndex]).erase(selection.start.column - 1, selection.end.column - selection.start.column);
+            (*lines[lineIndex]).erase(selection.start.col - 1, selection.end.col - selection.start.col);
             LineEventArgs args(lineIndex, -1);
             OnLineChanged(args);
-            SetCaretLineCol(lineIndex + 1, selection.start.column + LineNumberFieldLength());
+            SetCaretLineCol(lineIndex + 1, selection.start.col + LineNumberFieldLength());
         }
     }
     else
     {
         int startLineIndex = selection.start.line - 1;
         int endLineIndex = selection.end.line - 1;
-        if (selection.start.column > 1)
+        if (selection.start.col > 1)
         {
-            (*lines[startLineIndex]).erase(selection.start.column - 1, GetLineLength(startLineIndex + 1) - selection.start.column + 1);
+            (*lines[startLineIndex]).erase(selection.start.col - 1, GetLineLength(startLineIndex + 1) - selection.start.col + 1);
             LineEventArgs args(startLineIndex, -1);
             OnLineChanged(args);
             ++startLineIndex;
@@ -1365,7 +1413,7 @@ void TextView::RemoveSelection()
         }
         if (endLineIndex >= 0 && endLineIndex < lines.size())
         {
-            if (selection.end.column > GetLineLength(endLineIndex + 1))
+            if (selection.end.col > GetLineLength(endLineIndex + 1))
             {
                 lines.erase(lines.begin() + endLineIndex);
                 LineEventArgs args(endLineIndex, -1);
@@ -1373,12 +1421,12 @@ void TextView::RemoveSelection()
             }
             else
             {
-                (*lines[endLineIndex]).erase(0, selection.end.column - 1);
+                (*lines[endLineIndex]).erase(0, selection.end.col - 1);
                 LineEventArgs args(endLineIndex, -1);
                 OnLineChanged(args);
             }
         }
-        SetCaretLineCol(selection.start.line, selection.start.column + LineNumberFieldLength());
+        SetCaretLineCol(selection.start.line, selection.start.col + LineNumberFieldLength());
     }
     ResetSelection();
     Invalidate();
@@ -1396,7 +1444,7 @@ void TextView::IndentSelection()
     for (int i = startLineIndex; i <= endLineIndex; ++i)
     {
         if ((*lines[i]).empty()) continue;
-        if (i == selection.end.line - 1 && (*lines[i]).substr(0, selection.end.column - 1).empty()) continue;
+        if (i == selection.end.line - 1 && (*lines[i]).substr(0, selection.end.col - 1).empty()) continue;
         (*lines[i]).insert(0, indentString);
         LineEventArgs args(i, -1);
         OnLineChanged(args);
@@ -1417,7 +1465,7 @@ void TextView::UnindentSelection()
         std::u32string line = *lines[i];
         if (i == endLineIndex)
         {
-            line = line.substr(0, selection.end.column - 1);
+            line = line.substr(0, selection.end.col - 1);
         }
         if (StartsWith(line, indentString)) 
         {
@@ -1567,6 +1615,11 @@ void TextView::FireCCStart()
 void TextView::FireCCStop()
 {
     OnCCStop();
+}
+
+void TextView::FireParamHelpClose()
+{
+    OnParamHelpClose();
 }
 
 void TextView::OnPaint(PaintEventArgs& args)
@@ -1741,7 +1794,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                 {
                     SourcePos end(start);
                     --columnNumber;
-                    --end.column;
+                    --end.col;
                     ExtendSelection(start, end);
                     InvalidateLines(selection.start.line, selection.end.line);
                 }
@@ -1752,7 +1805,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                     --end.line;
                     int lineLength = GetLineLength(lineNumber);
                     columnNumber = lineLength + 1 + LineNumberFieldLength();
-                    end.column = lineLength + 1;
+                    end.col = lineLength + 1;
                     ExtendSelection(start, end);
                     InvalidateLines(selection.start.line, selection.end.line);
                 }
@@ -1788,7 +1841,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                     if (columnNumber < lineLength + 1 + LineNumberFieldLength())
                     {
                         ++columnNumber;
-                        ++end.column;
+                        ++end.col;
                         ExtendSelection(start, end);
                     }
                     else
@@ -1796,7 +1849,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                         ++lineNumber;
                         ++end.line;
                         columnNumber = 1 + LineNumberFieldLength();
-                        end.column = 1;
+                        end.col = 1;
                         ExtendSelection(start, end);
                     }
                     InvalidateLines(selection.start.line, selection.end.line);
@@ -1806,7 +1859,11 @@ void TextView::OnKeyDown(KeyEventArgs& args)
             }
             case Keys::down:
             {
-                if (IsCCOpen())
+                if (IsParamHelpOpen())
+                {
+                    OnParamHelpNext();
+                }
+                else if (IsCCOpen())
                 {
                     OnCCNext();
                 }
@@ -1838,14 +1895,14 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                     ++end.line;
                     int lineLength = GetLineLength(lineNumber);
                     columnNumber = std::min(columnNumber, lineLength + 1 + LineNumberFieldLength());
-                    end.column = std::min(end.column, lineLength + 1);
+                    end.col = std::min(end.col, lineLength + 1);
                 }
                 else
                 {
                     lineNumber = static_cast<int>(lines.size()) + 1;
                     end.line = static_cast<int>(lines.size()) + 1;
                     columnNumber = 1 + LineNumberFieldLength();
-                    end.column = 1;
+                    end.col = 1;
                 }
                 ExtendSelection(start, end);
                 InvalidateLines(selection.start.line, selection.end.line);
@@ -1854,7 +1911,11 @@ void TextView::OnKeyDown(KeyEventArgs& args)
             }
             case Keys::up:
             {
-                if (IsCCOpen())
+                if (IsParamHelpOpen())
+                {
+                    OnParamHelpPrev();
+                }
+                else if (IsCCOpen())
                 {
                     OnCCPrev();
                 }
@@ -1881,7 +1942,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                     --end.line;
                     int lineLength = GetLineLength(lineNumber);
                     columnNumber = std::min(columnNumber, lineLength + 1 + LineNumberFieldLength());
-                    end.column = std::min(end.column, lineLength + 1);
+                    end.col = std::min(end.col, lineLength + 1);
                     ExtendSelection(start, end);
                     InvalidateLines(selection.start.line, selection.end.line);
                 }
@@ -1977,7 +2038,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                 lineNumber = 1;
                 end.line = 1;
                 columnNumber = 1 + LineNumberFieldLength();
-                end.column = 1;
+                end.col = 1;
                 ExtendSelection(start, end);
                 InvalidateLines(selection.start.line, selection.end.line);
                 args.handled = true;
@@ -1998,7 +2059,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                 lineNumber = static_cast<int>(lines.size() + 1);
                 end.line = static_cast<int>(lines.size() + 1);
                 columnNumber = 1 + LineNumberFieldLength();
-                end.column = 1;
+                end.col = 1;
                 ExtendSelection(start, end);
                 InvalidateLines(selection.start.line, selection.end.line);
                 args.handled = true;
@@ -2025,7 +2086,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                 lineNumber = line;
                 end.line = line;
                 columnNumber = col + LineNumberFieldLength();
-                end.column = col;
+                end.col = col;
                 ExtendSelection(start, end);
                 InvalidateLines(selection.start.line, selection.end.line);
                 args.handled = true;
@@ -2052,7 +2113,7 @@ void TextView::OnKeyDown(KeyEventArgs& args)
                 lineNumber = line;
                 end.line = line;
                 columnNumber = col + LineNumberFieldLength();
-                end.column = col;
+                end.col = col;
                 ExtendSelection(start, end);
                 InvalidateLines(selection.start.line, selection.end.line);
                 args.handled = true;
@@ -2256,13 +2317,20 @@ void TextView::OnKeyPress(KeyPressEventArgs& args)
             RemoveSelection();
         }
         char32_t c(args.keyChar);
-        if (!IsCCActive() && IsCCLetter(c) && StartCC(ccCat, CurrentLine()))
+        if (CloseParamHelp(ccCat, CurrentLine(), c))
         {
-            FireCCStart();
+            FireParamHelpClose();
         }
-        else if (IsCCActive() && StopCC(c))
+        if (!IsParamHelpOpen())
         {
-            FireCCStop();
+            if (!IsCCActive() && IsCCLetter(c) && StartCC(ccCat, CurrentLine()))
+            {
+                FireCCStart();
+            }
+            else if (IsCCActive() && StopCC(c))
+            {
+                FireCCStop();
+            }
         }
         int lineIndex = caretLine - 1;
         int columnIndex = CaretColumn() - 1;
@@ -2430,20 +2498,20 @@ void TextView::DrawSelectionBackground(Graphics& graphics, int line, const Point
     }
     else if (selection.start.line == selection.end.line)
     {
-        pt.X = pt.X + charWidth * (selection.start.column - 1);
-        int selectionLength = std::max(1, selection.end.column - selection.start.column);
+        pt.X = pt.X + charWidth * (selection.start.col - 1);
+        int selectionLength = std::max(1, selection.end.col - selection.start.col);
         rect = RectF(pt, SizeF(charWidth * selectionLength, charHeight));
     }
     else if (line == selection.start.line)
     {
-        pt.X = pt.X + charWidth * (selection.start.column - 1);
+        pt.X = pt.X + charWidth * (selection.start.col - 1);
         int lineLength = GetLineLength(line);
-        int selectionLength = std::max(1, lineLength - selection.start.column + 1);
+        int selectionLength = std::max(1, lineLength - selection.start.col + 1);
         rect = RectF(pt, SizeF(charWidth * selectionLength, charHeight));
     }
     else if (line == selection.end.line)
     {
-        int selectionLength = selection.end.column - 1;
+        int selectionLength = selection.end.col - 1;
         rect = RectF(pt, SizeF(charWidth * selectionLength, charHeight));
     }
     Brush* brush = GetOrInsertBrush(selectionBackgroundColor);
@@ -2583,9 +2651,9 @@ void TextView::OnMouseDoubleClick(MouseEventArgs& args)
     }
     SourcePos end(line, column);
     ExtendSelection(start, end);
-    SetCaretLineCol(start.line, start.column + LineNumberFieldLength());
+    SetCaretLineCol(start.line, start.col + LineNumberFieldLength());
     ScrollToCaret();
-    InvalidateLineCol(start.line, start.column);
+    InvalidateLineCol(start.line, start.col);
 }
 
 int TextView::GetIndent(const std::u32string& line, int lineIndex)
@@ -2680,6 +2748,21 @@ void TextView::OnCCStart()
 void TextView::OnCCStop()
 {
     ccStop.Fire();
+}
+
+void TextView::OnParamHelpNext()
+{
+    paramHelpNext.Fire();
+}
+
+void TextView::OnParamHelpPrev()
+{
+    paramHelpPrev.Fire();
+}
+
+void TextView::OnParamHelpClose()
+{
+    paramHelpClose.Fire();
 }
 
 void TextView::AddInsertCharCommand(int lineIndex, int columnIndex, char32_t c)
@@ -2792,7 +2875,7 @@ void TextView::AddRemoveSelectionCommand()
     SelectionData selectionData = GetSelection();
     if (selection.start.line == selection.end.line)
     {
-        if (selection.end.column - selection.start.column >= GetLineLength(selection.start.line))
+        if (selection.end.col - selection.start.col >= GetLineLength(selection.start.line))
         {
             wholeLine = true;
         }
@@ -2800,7 +2883,7 @@ void TextView::AddRemoveSelectionCommand()
     else
     {
         int endLineIndex = selection.end.line - 1;
-        if (selection.end.column > GetLineLength(endLineIndex + 1))
+        if (selection.end.col > GetLineLength(endLineIndex + 1))
         {
             wholeLine = true;
         }

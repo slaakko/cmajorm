@@ -24,6 +24,14 @@ class ContainerScope;
 class FileScope;
 struct CCSymbolEntry;
 
+enum class CCContext
+{
+    genericContext, emptyContext, globalContext, classContext, statementContext
+};
+
+SYMBOLS_API CCContext GetCCContext(const std::u32string& cursorLine, const std::string& filePath, int index, const std::vector<int>& globalRuleContext);
+SYMBOLS_API std::vector<CCSymbolEntry> GetKeywordEntries(CCContext ccContext, const std::u32string& prefix);
+
 using TypeBindingFunction = std::vector<std::string> (*)(Module* module, CompileUnitNode* compileUnit);
 
 SYMBOLS_API void SetTypeBindingFunction(TypeBindingFunction typeBindingFunc);
@@ -49,9 +57,12 @@ public:
     void GetScopes(Module* module);
     void BindTypes(Module* module);
     std::vector<CCSymbolEntry> LookupSymbolsBeginningWith(const std::u32string& prefix);
-    std::string GetCCList(Module* module, const std::string& ccText);
-    std::string GetSymbolList(int symbolIndex);
+    std::string GetCCList(Module* module, const std::u32string& ccText, const std::u32string& cursorLine, int index, const std::vector<int>& ruleContext);
+    std::string GetParamHelpList(int symbolIndex);
+    const std::vector<int>& RuleContext() const { return ruleContext; }
 private:
+    void SetRuleContext(const std::vector<int>& rc_);
+    void SetRuleContext();
     std::string filePath;
     std::u32string content;
     std::vector<std::string> errors;
@@ -64,6 +75,8 @@ private:
     ContainerScope* cursorScope;
     std::unique_ptr<FileScope> fileScope;
     std::vector<Symbol*> ccSymbols;
+    std::vector<int> rc;
+    std::vector<int> ruleContext;
 };
 
 struct SYMBOLS_API ParseResult
@@ -74,6 +87,7 @@ struct SYMBOLS_API ParseResult
     int numberOfErrors;
     bool synchronized;
     std::string cursorContainer;
+    std::vector<int> ruleContext;
     std::vector<std::string> errors;
     std::chrono::steady_clock::time_point start;
     std::chrono::steady_clock::time_point end;
@@ -98,12 +112,15 @@ public:
     int GetNumberOfErrors();
     bool Synchronized();
     ParseResult ParseSource(Module* module, const std::string& sourceFilePath, const std::u32string& sourceCode);
-    std::string GetCCList(Module* module, const std::string& sourceFilePath, const std::string& ccText);
-    std::string GetSymbolList(Module* module, const std::string& sourceFilePath, int symbolIndex);
+    std::string GetCCList(Module* module, const std::string& sourceFilePath, const std::u32string& ccText, const std::u32string& cursorLine, const std::vector<int>& ruleContext);
+    std::string GetParamHelpList(Module* module, const std::string& sourceFilePath, int symbolIndex);
 private:
     std::vector<std::unique_ptr<Source>> sources;
     std::map<std::string, int> sourceIndexMap;
 };
+
+SYMBOLS_API void InitSources();
+SYMBOLS_API void DoneSources();
 
 } } // namespace cmajor::symbols
 

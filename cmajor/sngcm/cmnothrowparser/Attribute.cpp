@@ -4,7 +4,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 #include <sngcm/cmnothrowlexer/NothrowTokenValueParsers.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Attribute.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Attribute.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace CmajorNothrowTokens;
@@ -20,6 +20,7 @@ soulng::parser::Match NothrowAttributeParser::Attributes(CmajorNothrowLexer& lex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Attributes"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 0);
     std::unique_ptr<sngcm::ast::AttributesNode> attributes = std::unique_ptr<sngcm::ast::AttributesNode>();
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -200,6 +201,7 @@ soulng::parser::Match NothrowAttributeParser::Attribute(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Attribute"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 1);
     Span s = Span();
     std::u32string name = std::u32string();
     std::u32string value = std::u32string();

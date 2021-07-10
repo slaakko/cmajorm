@@ -19,7 +19,7 @@ enum class ServiceMessageKind : int
     startDebugReply = 7, startError = 8, continueReply = 9, nextReply = 10, stepReply = 11, finishReply = 12, untilReply = 13, breakReply = 14, deleteReply = 15, depthReply = 16, framesReply = 17,
     evaluateReply = 18, countReply = 19, evaluateChildReply = 20, targetRunning = 21, targetInput = 22, targetOutput = 23, debugServiceStopped = 24, processTerminated = 25, runServiceStopped = 26,
     loadEditModuleReply = 27, loadEditModuleError = 28, parseSourceReply = 29, parseSourceError = 30, resetEditModuleCacheReply = 31, resetEditModuleCacheError = 32, 
-    getCCListReply = 33, getCCListError = 34
+    getCCListReply = 33, getCCListError = 34, getParamHelpListReply = 35, getParamHelpListError = 36
 };
 
 class CMSVC_API ServiceMessage

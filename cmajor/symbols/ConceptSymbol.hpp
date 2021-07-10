@@ -32,6 +32,7 @@ public:
     std::string GetSymbolCategoryStr() const override { return "CO"; }
     std::string GetSymbolCategoryDescription() const override { return "concept"; }
     std::string GetSymbolHelp() const override;
+    std::vector<Symbol*> GetParamHelpSymbols() const override;
 private:
     std::unordered_map<int, ConceptSymbol*> arityConceptMap;
 };

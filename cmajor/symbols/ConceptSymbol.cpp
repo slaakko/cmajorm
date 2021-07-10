@@ -111,6 +111,17 @@ std::string ConceptGroupSymbol::GetSymbolHelp() const
     return help;
 }
 
+std::vector<Symbol*> ConceptGroupSymbol::GetParamHelpSymbols() const
+{
+    std::vector<Symbol*> paramHelpSymbols;
+    for (const auto& p : arityConceptMap)
+    {
+        ConceptSymbol* cs = p.second;
+        paramHelpSymbols.push_back(cs);
+    }
+    return paramHelpSymbols;
+}
+
 ConceptSymbol::ConceptSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) : 
     ContainerSymbol(SymbolType::conceptSymbol, span_, sourceModuleId_, name_), refinedConcept(nullptr), typeId(boost::uuids::nil_uuid()), hasSource(false), conceptGroup(nullptr)
 {

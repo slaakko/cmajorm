@@ -13,7 +13,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/CompileUnit.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/CompileUnit.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -71,6 +71,7 @@ soulng::parser::Match NothrowCompileUnitParser::CompileUnit(CmajorNothrowLexer& 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("CompileUnit"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 19);
     std::unique_ptr<CompileUnitNode> compileUnit = std::unique_ptr<CompileUnitNode>();
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -143,6 +144,7 @@ soulng::parser::Match NothrowCompileUnitParser::NamespaceContent(CmajorNothrowLe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("NamespaceContent"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 20);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -184,6 +186,7 @@ soulng::parser::Match NothrowCompileUnitParser::UsingDirectives(CmajorNothrowLex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("UsingDirectives"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 21);
     soulng::parser::Match match(true);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -229,6 +232,7 @@ soulng::parser::Match NothrowCompileUnitParser::UsingDirective(CmajorNothrowLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("UsingDirective"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 22);
     std::unique_ptr<Node> usingAlias;
     std::unique_ptr<Node> usingNs;
     soulng::parser::Match match(false);
@@ -296,6 +300,7 @@ soulng::parser::Match NothrowCompileUnitParser::UsingAliasDirective(CmajorNothro
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("UsingAliasDirective"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 23);
     Span s = Span();
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<IdentifierNode> qid;
@@ -447,6 +452,7 @@ soulng::parser::Match NothrowCompileUnitParser::UsingNamespaceDirective(CmajorNo
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("UsingNamespaceDirective"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 24);
     Span s = Span();
     std::unique_ptr<IdentifierNode> ns;
     soulng::parser::Match match(false);
@@ -561,6 +567,7 @@ soulng::parser::Match NothrowCompileUnitParser::Definitions(CmajorNothrowLexer& 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Definitions"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 25);
     std::unique_ptr<Node> def = std::unique_ptr<Node>();
     std::unique_ptr<Node> definition;
     soulng::parser::Match match(true);
@@ -630,6 +637,7 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Definition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 26);
     std::unique_ptr<NamespaceNode> nsDefinition;
     std::unique_ptr<TypedefNode> typedefDeclaration;
     std::unique_ptr<ConceptNode> conceptDefinition;
@@ -1046,6 +1054,7 @@ soulng::parser::Match NothrowCompileUnitParser::SyncDef(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("SyncDef"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 27);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -1094,6 +1103,7 @@ soulng::parser::Match NothrowCompileUnitParser::NamespaceDefinition(CmajorNothro
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("NamespaceDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 28);
     std::unique_ptr<NamespaceNode> nsNode = std::unique_ptr<NamespaceNode>();
     Span s = Span();
     std::unique_ptr<IdentifierNode> nsName;
@@ -1145,7 +1155,7 @@ soulng::parser::Match NothrowCompileUnitParser::NamespaceDefinition(CmajorNothro
                                 {
                                     int64_t pos = lexer.GetPos();
                                     soulng::lexer::Span span = lexer.GetSpan();
-                                    soulng::parser::Match match = NothrowIdentifierParser::QualifiedId(lexer, moduleId);
+                                    soulng::parser::Match match = NothrowCompileUnitParser::DefiningNamespaceId(lexer, moduleId);
                                     nsName.reset(static_cast<IdentifierNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -1289,6 +1299,50 @@ soulng::parser::Match NothrowCompileUnitParser::NamespaceDefinition(CmajorNothro
     return match;
 }
 
+soulng::parser::Match NothrowCompileUnitParser::DefiningNamespaceId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId)
+{
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::Span parser_debug_match_span;
+    bool parser_debug_write_to_log = lexer.Log() != nullptr;
+    if (parser_debug_write_to_log)
+    {
+        parser_debug_match_span = lexer.GetSpan();
+        soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningNamespaceId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 29);
+    std::unique_ptr<IdentifierNode> nsName;
+    soulng::parser::Match match(false);
+    soulng::parser::Match* parentMatch0 = &match;
+    {
+        int64_t pos = lexer.GetPos();
+        soulng::parser::Match match = NothrowIdentifierParser::QualifiedId(lexer, moduleId);
+        nsName.reset(static_cast<IdentifierNode*>(match.value));
+        if (match.hit)
+        {
+            {
+                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningNamespaceId"));
+                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                return soulng::parser::Match(true, nsName.release());
+            }
+        }
+        *parentMatch0 = match;
+    }
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    if (parser_debug_write_to_log)
+    {
+        if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningNamespaceId"));
+        else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("DefiningNamespaceId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    if (!match.hit)
+    {
+        match.value = nullptr;
+    }
+    return match;
+}
+
 soulng::parser::Match NothrowCompileUnitParser::TypedefDeclaration(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
@@ -1300,6 +1354,7 @@ soulng::parser::Match NothrowCompileUnitParser::TypedefDeclaration(CmajorNothrow
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("TypedefDeclaration"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 30);
     std::unique_ptr<TypedefNode> typedefDeclaration;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1343,6 +1398,7 @@ soulng::parser::Match NothrowCompileUnitParser::ConceptDefinition(CmajorNothrowL
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ConceptDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 31);
     std::unique_ptr<ConceptNode> conceptDefinition;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1386,6 +1442,7 @@ soulng::parser::Match NothrowCompileUnitParser::FunctionDefinition(CmajorNothrow
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("FunctionDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 32);
     std::unique_ptr<FunctionNode> functionDefinition;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1429,6 +1486,7 @@ soulng::parser::Match NothrowCompileUnitParser::ClassDefinition(CmajorNothrowLex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ClassDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 33);
     std::unique_ptr<ClassNode> classDefinition;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1472,6 +1530,7 @@ soulng::parser::Match NothrowCompileUnitParser::InterfaceDefinition(CmajorNothro
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("InterfaceDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 34);
     std::unique_ptr<InterfaceNode> interfaceDefinition;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1515,6 +1574,7 @@ soulng::parser::Match NothrowCompileUnitParser::EnumTypeDefinition(CmajorNothrow
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("EnumTypeDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 35);
     std::unique_ptr<EnumTypeNode> enumTypeDefinition;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1558,6 +1618,7 @@ soulng::parser::Match NothrowCompileUnitParser::ConstantDefinition(CmajorNothrow
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ConstantDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 36);
     std::unique_ptr<ConstantNode> constantDefinition;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1601,6 +1662,7 @@ soulng::parser::Match NothrowCompileUnitParser::DelegateDefinition(CmajorNothrow
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DelegateDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 37);
     std::unique_ptr<DelegateNode> delegateDefinition;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1644,6 +1706,7 @@ soulng::parser::Match NothrowCompileUnitParser::ClassDelegateDefinition(CmajorNo
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ClassDelegateDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 38);
     std::unique_ptr<ClassDelegateNode> classDelegateDefinition;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1687,6 +1750,7 @@ soulng::parser::Match NothrowCompileUnitParser::GlobalVariableDefinition(CmajorN
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("GlobalVariableDefinition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 39);
     std::unique_ptr<GlobalVariableNode> globalVariableDefinition;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;

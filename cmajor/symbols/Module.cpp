@@ -1970,11 +1970,11 @@ ParseResult Module::ParseSource(const std::string& sourceFilePath, const std::u3
     }
 }
 
-std::string Module::GetCCList(const std::string& sourceFilePath, const std::string& ccText)
+std::string Module::GetCCList(const std::string& sourceFilePath, const std::u32string& ccText, const std::u32string& cursorLine, const std::vector<int>& ruleContext)
 {
     if (sources)
     {
-        return sources->GetCCList(this, sourceFilePath, ccText);
+        return sources->GetCCList(this, sourceFilePath, ccText, cursorLine, ruleContext);
     }
     else
     { 
@@ -1982,11 +1982,11 @@ std::string Module::GetCCList(const std::string& sourceFilePath, const std::stri
     }
 }
 
-std::string Module::GetSymbolList(const std::string& sourceFilePath, int symbolIndex)
+std::string Module::GetParamHelpList(const std::string& sourceFilePath, int symbolIndex)
 {
     if (sources)
     {
-        return sources->GetSymbolList(this, sourceFilePath, symbolIndex);
+        return sources->GetParamHelpList(this, sourceFilePath, symbolIndex);
     }
     else
     {

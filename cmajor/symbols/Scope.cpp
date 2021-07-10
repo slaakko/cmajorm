@@ -414,6 +414,13 @@ std::vector<CCSymbolEntry> MakeCCMatches(const std::vector<CCComponent>& compone
     return ccMatches;
 }
 
+bool CCSymbolEntryLess::operator()(const CCSymbolEntry& left, const CCSymbolEntry& right) const
+{
+    if (left.symbol->Name() < right.symbol->Name()) return true;
+    if (left.symbol->Name() > right.symbol->Name()) return false;
+    return left.symbol->GetSymbolCategoryStr() < right.symbol->GetSymbolCategoryStr();
+}
+
 void AddMatches(std::vector<CCSymbolEntry>& matches, std::vector<CCSymbolEntry>& matchesToAdd)
 {
     for (CCSymbolEntry& entry : matchesToAdd)

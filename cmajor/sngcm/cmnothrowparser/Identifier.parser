@@ -15,6 +15,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowIdentifierParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     Identifier(boost::uuids::uuid* moduleId) : IdentifierNode*
         ::= ID{ IdentifierNode* node = new IdentifierNode(span, *moduleId, lexer.GetToken(pos)); node->SetLexerFlags(lexer.Flags()); return node; }

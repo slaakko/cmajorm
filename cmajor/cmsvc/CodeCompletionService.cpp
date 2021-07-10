@@ -71,7 +71,9 @@ public:
     void LoadEditModule(const std::string& projectFilePath, const std::string& backend, const std::string& config);
     void ResetEditModuleCache();
     void ParseSource(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, std::u32string&& sourceCode);
-    void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText_);
+    void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::u32string& ccText, const std::vector<int>& ruleContext,
+        const std::u32string& cursorLine);
+    void GetParamHelpList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, int symbolIndex);
 private:
     static std::unique_ptr<CodeCompletionService> instance;
     CodeCompletionService();
@@ -524,7 +526,8 @@ void CodeCompletionService::ParseSource(const std::string& projectFilePath, cons
     PutServiceMessage(new ParseSourceReplyServiceMessage(reply));
 }
 
-void CodeCompletionService::GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText)
+void CodeCompletionService::GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::u32string& ccText, 
+    const std::vector<int>& ruleContext, const std::u32string& cursorLine)
 {
     GetCCListRequest request;
     request.projectFilePath = projectFilePath;
@@ -532,11 +535,28 @@ void CodeCompletionService::GetCCList(const std::string& projectFilePath, const 
     request.config = config;
     request.sourceFilePath = sourceFilePath;
     request.ccText = ccText;
+    request.ruleContext = ruleContext;
+    request.cursorLine = cursorLine;
     std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("getCCListRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("getCCListReply");
     GetCCListReply reply(replyDoc->DocumentElement());
     PutServiceMessage(new GetCCListReplyServiceMessage(reply));
+}
+
+void CodeCompletionService::GetParamHelpList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, int symbolIndex)
+{
+    GetParamHelpListRequest request;
+    request.projectFilePath = projectFilePath;
+    request.backend = backend;
+    request.config = config;
+    request.sourceFilePath = sourceFilePath;
+    request.symbolIndex = symbolIndex;
+    std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("getParamHelpListRequest");
+    WriteMessage(requestElement.release());
+    std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("getParamHelpListReply");
+    GetParamHelpListReply reply(replyDoc->DocumentElement());
+    PutServiceMessage(new GetParamHelpListReplyServiceMessage(reply));
 }
 
 CodeCompletionServiceRequest::~CodeCompletionServiceRequest()
@@ -607,14 +627,15 @@ ParseSourceErrorServiceMessage::ParseSourceErrorServiceMessage(const std::string
 {
 }
 
-RunGetCCListServiceRequest::RunGetCCListServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, const std::string& ccText_) : 
-    projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), ccText(ccText_)
+RunGetCCListServiceRequest::RunGetCCListServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, const std::u32string& ccText_,
+    const std::vector<int>& ruleContext_, const std::u32string& cursorLine_) : 
+    projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), ccText(ccText_), ruleContext(ruleContext_), cursorLine(cursorLine_)
 {
 }
 
 void RunGetCCListServiceRequest::Execute()
 {
-    CodeCompletionService::Instance().GetCCList(projectFilePath, backend, config, sourceFilePath, ccText);
+    CodeCompletionService::Instance().GetCCList(projectFilePath, backend, config, sourceFilePath, ccText, ruleContext, cursorLine);
 }
 
 void RunGetCCListServiceRequest::Failed(const std::string& error)
@@ -627,6 +648,29 @@ GetCCListReplyServiceMessage::GetCCListReplyServiceMessage(const GetCCListReply&
 }
 
 GetCCListErrorServiceMessage::GetCCListErrorServiceMessage(const std::string& error_) : ServiceMessage(ServiceMessageKind::getCCListError), error(error_)
+{
+}
+
+RunGetParamHelpListServiceRequest::RunGetParamHelpListServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, int symbolIndex_) :
+    projectFilePath(projectFilePath_), backend(backend_), config(config_), sourceFilePath(sourceFilePath_), symbolIndex(symbolIndex_)
+{
+}
+
+void RunGetParamHelpListServiceRequest::Execute()
+{
+    CodeCompletionService::Instance().GetParamHelpList(projectFilePath, backend, config, sourceFilePath, symbolIndex);
+}
+
+void RunGetParamHelpListServiceRequest::Failed(const std::string& error)
+{
+    PutServiceMessage(new GetParamHelpListErrorServiceMessage(error));
+}
+
+GetParamHelpListReplyServiceMessage::GetParamHelpListReplyServiceMessage(const GetParamHelpListReply& reply_) : ServiceMessage(ServiceMessageKind::getParamHelpListReply), reply(reply_)
+{
+}
+
+GetParamHelpListErrorServiceMessage::GetParamHelpListErrorServiceMessage(const std::string& error_) : ServiceMessage(ServiceMessageKind::getParamHelpListError), error(error_)
 {
 }
 
@@ -660,9 +704,15 @@ void ParseSource(const std::string& projectFilePath, const std::string& backend,
     CodeCompletionService::Instance().PutRequest(new RunParseSourceServiceRequest(projectFilePath, backend, config, sourceFilePath, std::move(sourceCode)));
 }
 
-void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::string& ccText)
+void GetCCList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, const std::u32string& ccText, const std::vector<int>& ruleContext, 
+    const std::u32string& cursorLine)
 {
-    CodeCompletionService::Instance().PutRequest(new RunGetCCListServiceRequest(projectFilePath, backend, config, sourceFilePath, ccText));
+    CodeCompletionService::Instance().PutRequest(new RunGetCCListServiceRequest(projectFilePath, backend, config, sourceFilePath, ccText, ruleContext, cursorLine));
+}
+
+void GetParamHelpList(const std::string& projectFilePath, const std::string& backend, const std::string& config, const std::string& sourceFilePath, int symbolIndex)
+{
+    CodeCompletionService::Instance().PutRequest(new RunGetParamHelpListServiceRequest(projectFilePath, backend, config, sourceFilePath, symbolIndex));
 }
 
 void InitCodeCompletionService()

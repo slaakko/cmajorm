@@ -11,7 +11,7 @@
 #include <sngcm/cmnothrowparser/Parameter.hpp>
 #include <sngcm/cmnothrowparser/Statement.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Function.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Function.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -28,6 +28,7 @@ soulng::parser::Match NothrowFunctionParser::Function(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Function"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 100);
     std::unique_ptr<FunctionNode> fun = std::unique_ptr<FunctionNode>();
     Span s = Span();
     Span specifierSpan = Span();
@@ -332,6 +333,7 @@ soulng::parser::Match NothrowFunctionParser::FunctionGroupId(CmajorNothrowLexer&
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("FunctionGroupId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 101);
     std::unique_ptr<soulng::parser::Value<std::u32string>> operatorFunctionGroupId;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -413,6 +415,7 @@ soulng::parser::Match NothrowFunctionParser::OperatorFunctionGroupId(CmajorNothr
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("OperatorFunctionGroupId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 102);
     std::unique_ptr<sngcm::ast::Node> typeExpr;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;

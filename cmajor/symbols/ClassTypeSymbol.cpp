@@ -228,6 +228,17 @@ bool ClassGroupTypeSymbol::IsValidCCClassGroup(Module* module, FunctionSymbol* f
     return false;
 }
 
+std::vector<Symbol*> ClassGroupTypeSymbol::GetParamHelpSymbols() const
+{
+    std::vector<Symbol*> paramHelpSymbols;
+    for (const auto& p : arityClassMap)
+    {
+        ClassTypeSymbol* cls = p.second;
+        paramHelpSymbols.push_back(cls);
+    }
+    return paramHelpSymbols;
+}
+
 ClassTypeSymbol::ClassTypeSymbol(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
     TypeSymbol(SymbolType::classTypeSymbol, span_, sourceModuleId_, name_),
     minArity(0), baseClass(), flags(ClassTypeSymbolFlags::none), implementedInterfaces(), templateParameters(), memberVariables(), staticMemberVariables(),

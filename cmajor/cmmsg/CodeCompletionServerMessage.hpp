@@ -116,6 +116,7 @@ public:
     std::vector<std::string> errors;
     bool synchronized;
     std::string cursorContainer;
+    std::vector<int32_t> ruleContext;
     time_point startParsing;
     time_point endParsing;
 };
@@ -131,7 +132,9 @@ public:
     std::string backend;
     std::string config;
     std::string sourceFilePath;
-    std::string ccText;
+    std::u32string ccText;
+    std::vector<int32_t> ruleContext;
+    std::u32string cursorLine;
 };
 
 class MSG_API GetCCListReply : public CodeCompletionReply
@@ -148,11 +151,11 @@ public:
     time_point endGetCCList;
 };
 
-class MSG_API GetSymbolListRequest : public CodeCompletionRequest
+class MSG_API GetParamHelpListRequest : public CodeCompletionRequest
 {
 public:
-    GetSymbolListRequest();
-    GetSymbolListRequest(sngxml::dom::Element* element);
+    GetParamHelpListRequest();
+    GetParamHelpListRequest(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
 public:
     std::string projectFilePath;
@@ -162,18 +165,18 @@ public:
     int32_t symbolIndex;
 };
 
-class MSG_API GetSymbolListReply : public CodeCompletionReply
+class MSG_API GetParamHelpListReply : public CodeCompletionReply
 {
 public:
-    GetSymbolListReply();
-    GetSymbolListReply(sngxml::dom::Element* element);
+    GetParamHelpListReply();
+    GetParamHelpListReply(sngxml::dom::Element* element);
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
 public:
     bool ok;
     std::string error;
-    std::string symbolList;
-    time_point startGetSymbolList;
-    time_point endGetSymbolList;
+    std::string list;
+    time_point startGetParamHelpList;
+    time_point endGetParamHelpList;
 };
 
 class MSG_API StopCCRequest : public CodeCompletionRequest

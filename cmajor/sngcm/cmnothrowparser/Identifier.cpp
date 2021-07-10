@@ -3,7 +3,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Identifier.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Identifier.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -20,6 +20,7 @@ soulng::parser::Match NothrowIdentifierParser::Identifier(CmajorNothrowLexer& le
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Identifier"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 105);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -69,6 +70,7 @@ soulng::parser::Match NothrowIdentifierParser::QualifiedId(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("QualifiedId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 106);
     std::u32string value = std::u32string();
     Span s = Span();
     soulng::parser::Match match(false);

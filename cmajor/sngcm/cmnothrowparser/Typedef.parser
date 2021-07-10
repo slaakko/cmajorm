@@ -19,19 +19,24 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowTypedefParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     using NothrowSpecifierParser.Specifiers;
     using NothrowTypeExprParser.TypeExpr;
     using NothrowIdentifierParser.Identifier;
 
     Typedef(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var Span s) : TypedefNode*
-        ::= Specifiers:specifiers{ s = span; } TYPEDEF TypeExpr(moduleId, ctx):type Identifier(moduleId):id SEMICOLON!
+        ::= Specifiers:specifiers{ s = span; } TYPEDEF TypeExpr(moduleId, ctx):type DefiningTypedefId(moduleId):id SEMICOLON!
         { 
             s.end = span.end; 
             TypedefNode* node = new TypedefNode(s, *moduleId, specifiers, type, id); 
             node->SetLexerFlags(lexer.Flags());
             return node;
         }
+        ;
+
+    DefiningTypedefId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):id{ return id; }
         ;
 
     ruleinfo

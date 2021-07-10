@@ -57,7 +57,8 @@ private:
 class CMSVC_API GetCCListCodeCompletionServiceRequest : public Request
 {
 public:
-    GetCCListCodeCompletionServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, const std::string& ccText_);
+    GetCCListCodeCompletionServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, const std::u32string& ccText_, 
+        const std::vector<int>& ruleContext_, const std::u32string& cursorLine_);
     void Execute() override;
     std::string Name() const override { return "getCCListCodeCompletionServiceRequest"; }
 private:
@@ -65,7 +66,23 @@ private:
     std::string backend;
     std::string config;
     std::string sourceFilePath;
-    std::string ccText;
+    std::u32string ccText;
+    std::vector<int> ruleContext;
+    std::u32string cursorLine;
+};
+
+class CMSVC_API GetParamHelpListCodeCompletionServiceRequest : public Request
+{
+public:
+    GetParamHelpListCodeCompletionServiceRequest(const std::string& projectFilePath_, const std::string& backend_, const std::string& config_, const std::string& sourceFilePath_, int symbolIndex_);
+    void Execute() override;
+    std::string Name() const override { return "getParamHelpListCodeCompletionServiceRequest"; }
+private:
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+    std::string sourceFilePath;
+    int symbolIndex;
 };
 
 } } // namespace cmajor::service

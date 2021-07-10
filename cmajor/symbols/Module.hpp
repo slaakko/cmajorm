@@ -234,8 +234,8 @@ public:
     Sources* GetSources() const { return sources.get(); }
     ParseResult ParseSources();
     ParseResult ParseSource(const std::string& sourceFilePath, const std::u32string& sourceCode);
-    std::string GetCCList(const std::string& sourceFilePath, const std::string& ccText);
-    std::string GetSymbolList(const std::string& sourceFilePath, int symbolIndex);
+    std::string GetCCList(const std::string& sourceFilePath, const std::u32string& ccText, const std::u32string& cursorLine, const std::vector<int>& ruleContext);
+    std::string GetParamHelpList(const std::string& sourceFilePath, int symbolIndex);
 private:
     uint8_t format;
     ModuleFlags flags;

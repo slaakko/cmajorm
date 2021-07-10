@@ -8,7 +8,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Interface.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Interface.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -25,6 +25,7 @@ soulng::parser::Match NothrowInterfaceParser::Interface(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Interface"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 107);
     std::unique_ptr<InterfaceNode> intf = std::unique_ptr<InterfaceNode>();
     Span s = Span();
     Span specifierSpan = Span();
@@ -152,7 +153,7 @@ soulng::parser::Match NothrowInterfaceParser::Interface(CmajorNothrowLexer& lexe
                                 {
                                     int64_t pos = lexer.GetPos();
                                     soulng::lexer::Span span = lexer.GetSpan();
-                                    soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+                                    soulng::parser::Match match = NothrowInterfaceParser::DefiningInterfaceId(lexer, moduleId);
                                     id.reset(static_cast<IdentifierNode*>(match.value));
                                     if (match.hit)
                                     {
@@ -294,6 +295,50 @@ soulng::parser::Match NothrowInterfaceParser::Interface(CmajorNothrowLexer& lexe
     return match;
 }
 
+soulng::parser::Match NothrowInterfaceParser::DefiningInterfaceId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId)
+{
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::Span parser_debug_match_span;
+    bool parser_debug_write_to_log = lexer.Log() != nullptr;
+    if (parser_debug_write_to_log)
+    {
+        parser_debug_match_span = lexer.GetSpan();
+        soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningInterfaceId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 108);
+    std::unique_ptr<IdentifierNode> id;
+    soulng::parser::Match match(false);
+    soulng::parser::Match* parentMatch0 = &match;
+    {
+        int64_t pos = lexer.GetPos();
+        soulng::parser::Match match = NothrowIdentifierParser::Identifier(lexer, moduleId);
+        id.reset(static_cast<IdentifierNode*>(match.value));
+        if (match.hit)
+        {
+            {
+                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningInterfaceId"));
+                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                return soulng::parser::Match(true, id.release());
+            }
+        }
+        *parentMatch0 = match;
+    }
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    if (parser_debug_write_to_log)
+    {
+        if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DefiningInterfaceId"));
+        else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("DefiningInterfaceId"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    if (!match.hit)
+    {
+        match.value = nullptr;
+    }
+    return match;
+}
+
 soulng::parser::Match NothrowInterfaceParser::InterfaceContent(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::InterfaceNode* intf)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
@@ -305,6 +350,7 @@ soulng::parser::Match NothrowInterfaceParser::InterfaceContent(CmajorNothrowLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("InterfaceContent"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 109);
     std::unique_ptr<Node> intfMemFun;
     soulng::parser::Match match(true);
     soulng::parser::Match* parentMatch0 = &match;
@@ -367,6 +413,7 @@ soulng::parser::Match NothrowInterfaceParser::InterfaceMemFun(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("InterfaceMemFun"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 110);
     std::unique_ptr<MemberFunctionNode> memFun = std::unique_ptr<MemberFunctionNode>();
     Span s = Span();
     std::unique_ptr<sngcm::ast::AttributesNode> attrs;
@@ -548,6 +595,7 @@ soulng::parser::Match NothrowInterfaceParser::InterfaceFunctionGroupId(CmajorNot
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("InterfaceFunctionGroupId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 111);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {

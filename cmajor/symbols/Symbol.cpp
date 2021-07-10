@@ -1069,6 +1069,11 @@ sngxml::dom::Element* Symbol::ToCCElement(int ccPrefixLength, const std::u32stri
     return ccElement;
 }
 
+std::vector<Symbol*> Symbol::GetParamHelpSymbols() const
+{
+    return std::vector<Symbol*>();
+}
+
 std::string Symbol::GetSymbolHelp() const
 {
     std::string help = "(";

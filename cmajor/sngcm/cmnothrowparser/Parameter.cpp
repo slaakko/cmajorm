@@ -5,7 +5,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Parameter.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Parameter.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -22,6 +22,7 @@ soulng::parser::Match NothrowParameterParser::ParameterList(CmajorNothrowLexer& 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ParameterList"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 117);
     std::unique_ptr<ParameterNode> param;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -198,6 +199,7 @@ soulng::parser::Match NothrowParameterParser::Parameter(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Parameter"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 118);
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> type;
     std::unique_ptr<IdentifierNode> id;

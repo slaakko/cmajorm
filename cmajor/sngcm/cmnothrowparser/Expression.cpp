@@ -9,7 +9,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Expression.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Expression.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -26,6 +26,7 @@ soulng::parser::Match NothrowExpressionParser::Expression(CmajorNothrowLexer& le
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Expression"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 75);
     std::unique_ptr<Node> equivalence;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -69,6 +70,7 @@ soulng::parser::Match NothrowExpressionParser::Equivalence(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Equivalence"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 76);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<Node> left;
@@ -220,6 +222,7 @@ soulng::parser::Match NothrowExpressionParser::Implication(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Implication"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 77);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<Node> left;
@@ -365,6 +368,7 @@ soulng::parser::Match NothrowExpressionParser::Disjunction(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Disjunction"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 78);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<Node> left;
@@ -516,6 +520,7 @@ soulng::parser::Match NothrowExpressionParser::Conjunction(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Conjunction"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 79);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<Node> left;
@@ -667,6 +672,7 @@ soulng::parser::Match NothrowExpressionParser::BitOr(CmajorNothrowLexer& lexer, 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("BitOr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 80);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<Node> left;
@@ -818,6 +824,7 @@ soulng::parser::Match NothrowExpressionParser::BitXor(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("BitXor"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 81);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<Node> left;
@@ -969,6 +976,7 @@ soulng::parser::Match NothrowExpressionParser::BitAnd(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("BitAnd"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 82);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<Node> left;
@@ -1120,6 +1128,7 @@ soulng::parser::Match NothrowExpressionParser::Equality(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Equality"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 83);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     Operator op = Operator();
@@ -1323,6 +1332,7 @@ soulng::parser::Match NothrowExpressionParser::Relational(CmajorNothrowLexer& le
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Relational"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 84);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     Operator op = Operator();
@@ -1786,6 +1796,7 @@ soulng::parser::Match NothrowExpressionParser::Shift(CmajorNothrowLexer& lexer, 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Shift"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 85);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     Operator op = Operator();
@@ -2019,6 +2030,7 @@ soulng::parser::Match NothrowExpressionParser::Additive(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Additive"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 86);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     Operator op = Operator();
@@ -2222,6 +2234,7 @@ soulng::parser::Match NothrowExpressionParser::Multiplicative(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Multiplicative"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 87);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     Operator op = Operator();
@@ -2466,6 +2479,7 @@ soulng::parser::Match NothrowExpressionParser::Prefix(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Prefix"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 88);
     std::unique_ptr<Node> prefix = std::unique_ptr<Node>();
     Span s = Span();
     Operator op = Operator();
@@ -2929,6 +2943,7 @@ soulng::parser::Match NothrowExpressionParser::Postfix(CmajorNothrowLexer& lexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Postfix"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 89);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<Node> primary;
@@ -3385,6 +3400,7 @@ soulng::parser::Match NothrowExpressionParser::Primary(CmajorNothrowLexer& lexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Primary"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 90);
     Span s = Span();
     std::unique_ptr<Node> expr;
     std::unique_ptr<LiteralNode> literal;
@@ -3914,6 +3930,7 @@ soulng::parser::Match NothrowExpressionParser::SizeOfExpr(CmajorNothrowLexer& le
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("SizeOfExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 91);
     Span s = Span();
     std::unique_ptr<Node> expr;
     soulng::parser::Match match(false);
@@ -4068,6 +4085,7 @@ soulng::parser::Match NothrowExpressionParser::TypeNameExpr(CmajorNothrowLexer& 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("TypeNameExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 92);
     Span s = Span();
     std::unique_ptr<Node> expr;
     soulng::parser::Match match(false);
@@ -4222,6 +4240,7 @@ soulng::parser::Match NothrowExpressionParser::TypeIdExpr(CmajorNothrowLexer& le
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("TypeIdExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 93);
     Span s = Span();
     std::unique_ptr<Node> expr;
     soulng::parser::Match match(false);
@@ -4376,6 +4395,7 @@ soulng::parser::Match NothrowExpressionParser::CastExpr(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("CastExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 94);
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> typeExpr;
     std::unique_ptr<Node> expr;
@@ -4617,6 +4637,7 @@ soulng::parser::Match NothrowExpressionParser::ConstructExpr(CmajorNothrowLexer&
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ConstructExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 95);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> typeExpr;
@@ -4866,6 +4887,7 @@ soulng::parser::Match NothrowExpressionParser::NewExpr(CmajorNothrowLexer& lexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("NewExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 96);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> typeExpr;
@@ -5044,6 +5066,7 @@ soulng::parser::Match NothrowExpressionParser::ArgumentList(CmajorNothrowLexer& 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ArgumentList"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 97);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -5088,6 +5111,7 @@ soulng::parser::Match NothrowExpressionParser::ExpressionList(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ExpressionList"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 98);
     std::unique_ptr<Node> arg;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -5245,6 +5269,7 @@ soulng::parser::Match NothrowExpressionParser::InvokeExpr(CmajorNothrowLexer& le
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("InvokeExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 99);
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<Node> templateId;

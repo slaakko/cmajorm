@@ -64,7 +64,7 @@ public:
     std::string GetSymbolCategoryDescription() const override { return "function"; }
     std::string GetSymbolHelp() const override;
     bool IsValidCCFunctionGroup(FunctionSymbol* fromFunction) const;
-    std::string GetOverloadList() const;
+    std::vector<Symbol*> GetParamHelpSymbols() const override;
 private:
     std::unordered_map<int, std::vector<FunctionSymbol*>> arityFunctionListMap;
     std::vector<FunctionSymbol*> varArgFunctions;

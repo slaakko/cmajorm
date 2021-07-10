@@ -22,6 +22,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     using NothrowSpecifierParser.Specifiers;
     using NothrowIdentifierParser.Identifier;
@@ -35,7 +36,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
     Concept(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<ConceptNode> conceptNode, var std::unique_ptr<WhereConstraintNode> constraint,
         var Span s, var Span beginBraceSpan, var Span endBraceSpan) : ConceptNode*
         ::= empty{ ctx->BeginParsingConcept(); }
-        (   (Specifiers:specifiers{ s = span; } CONCEPT Identifier(moduleId):conceptName){ conceptNode.reset(new ConceptNode(span, *moduleId, specifiers, conceptName)); }
+        (   (Specifiers:specifiers{ s = span; } CONCEPT DefiningConceptId(moduleId):conceptName){ conceptNode.reset(new ConceptNode(span, *moduleId, specifiers, conceptName)); }
             LANGLE! (Identifier(moduleId):typeParam{ conceptNode->AddTypeParameter(typeParam); } % COMMA) RANGLE!
             ((Refinement(moduleId):refinement{ conceptNode->SetRefinement(refinement); })?
             (WhereConstraint(moduleId, ctx):c{ s.end = span.end; constraint.reset(c); constraint->SetHeaderConstraint(); conceptNode->AddConstraint(constraint.release()); })?){ conceptNode->SetSpan(s); }
@@ -52,6 +53,10 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowConceptParser
         {
             ctx->EndParsingConcept();
         }
+        ;
+
+    DefiningConceptId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):conceptName{ return conceptName; }
         ;
 
     Refinement(boost::uuids::uuid* moduleId, var std::unique_ptr<ConceptIdNode> conceptId) : ConceptIdNode*

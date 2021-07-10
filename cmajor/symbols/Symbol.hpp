@@ -63,7 +63,7 @@ enum class SymbolType : uint8_t
     classDelegateTypeEquality, memberFunctionToClassDelegateSymbol, 
     arrayLengthFunctionSymbol, arrayBeginFunctionSymbol, arrayEndFunctionSymbol, arrayCBeginFunctionSymbol, arrayCEndFunctionSymbol,
     namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, variableValueSymbol, globalVariableSymbol, globalVariableGroupSymbol,
-    stringFunctionContainerSymbol, stringLengthFunctionSymbol, axiomSymbol,
+    stringFunctionContainerSymbol, stringLengthFunctionSymbol, axiomSymbol, keywordSymbol,
     maxSymbol
 };
 
@@ -237,6 +237,7 @@ public:
     std::unique_ptr<sngxml::dom::Element> ToDomElement(TypeMap& typeMap);
     virtual std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap);
     virtual sngxml::dom::Element* ToCCElement(int ccPrefixLength, const std::u32string& replacement, int symbolIndex) const;
+    virtual std::vector<Symbol*> GetParamHelpSymbols() const;
     virtual std::string GetSymbolCategoryStr() const { return "SY"; }
     virtual std::string GetSymbolCategoryDescription() const { return "symbol"; }
     virtual std::string GetSymbolHelp() const;

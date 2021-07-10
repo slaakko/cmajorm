@@ -7,13 +7,14 @@
 #include <soulng/parser/Match.hpp>
 #include <soulng/parser/Value.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Typedef.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/Typedef.parser' using soulng parser generator spg version 4.0.0
 
 class CmajorNothrowLexer;
 
 struct SNGCM_NOTHROW_PARSER_API NothrowTypedefParser
 {
     static soulng::parser::Match Typedef(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
+    static soulng::parser::Match DefiningTypedefId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId);
 };
 
 #endif // TYPEDEF_HPP

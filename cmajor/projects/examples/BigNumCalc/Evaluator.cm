@@ -9,8 +9,8 @@ namespace BigNumCalc
     {
         where Derived<T, BigValue>;
     }
-    
-    public class EvaluationStack 
+
+    public class EvaluationStack
     {
         public void Push(BigValue* value)
         {
@@ -23,32 +23,32 @@ namespace BigNumCalc
         }
         private Stack<UniquePtr<BigValue>> stack;
     }
-    
+
     public BigValue* UnaryEvaluate<BigValueT, Op>(BigValue* operand, Op op) where BigValueT is BigValueType and Op is UnaryFunction
     {
         BigValueT* value = cast<BigValueT*>(operand);
         BigValueT.OperandType result = op(value->Get());
         return new BigValueT(result);
     }
-    
+
     public inline BigValue* UnaryPlus<BigValueT>(BigValue* operand) where BigValueT is BigValueType
     {
         return UnaryEvaluate<BigValueT>(operand, Identity<BigValueT.OperandType>());
     }
-    
+
     public inline BigValue* UnaryMinus<BigValueT>(BigValue* operand) where BigValueT is BigValueType
     {
         return UnaryEvaluate<BigValueT>(operand, Negate<BigValueT.OperandType>());
     }
-    
+
     public delegate BigValue* UnaryOperatorDelegate(BigValue* operand);
-    
+
     public nothrow UnaryOperatorDelegate GetUnaryOperatorDelegate(uchar op, BigNumKind kind)
     {
         UnaryOperatorDelegate dlg;
         switch (op)
         {
-            case '+': 
+            case '+':
             {
                 switch (kind)
                 {
@@ -71,7 +71,7 @@ namespace BigNumCalc
         }
         return dlg;
     }
-    
+
     public BigValue* Evaluate(BigValue* operand, uchar op)
     {
         UnaryOperatorDelegate dlg = GetUnaryOperatorDelegate(op, operand->Kind());
@@ -92,7 +92,7 @@ namespace BigNumCalc
             throw Exception("operator '" + ToUtf8(CharStr(op)) + "' not implemented");
         }
     }
-    
+
     public BigValue* BinaryEvaluate<BigValueT, Op>(BigValue* left, BigValue* right, Op op) where BigValueT is BigValueType and Op is BinaryFunction
     {
         BigValueT* left_ = cast<BigValueT*>(left);
@@ -100,7 +100,7 @@ namespace BigNumCalc
         BigValueT.OperandType result = op(left_->Get(), right_->Get());
         return new BigValueT(result);
     }
-    
+
     public inline BigValue* Add<BigValueT>(BigValue* left, BigValue* right) where BigValueT is BigValueType
     {
         return BinaryEvaluate<BigValueT>(left, right, Plus<BigValueT.OperandType>());
@@ -110,7 +110,7 @@ namespace BigNumCalc
     {
         return BinaryEvaluate<BigValueT>(left, right, Minus<BigValueT.OperandType>());
     }
-    
+
     public inline BigValue* Mul<BigValueT>(BigValue* left, BigValue* right) where BigValueT is BigValueType
     {
         return BinaryEvaluate<BigValueT>(left, right, Multiplies<BigValueT.OperandType>());
@@ -122,13 +122,13 @@ namespace BigNumCalc
     }
 
     public delegate BigValue* BinaryOperatorDelegate(BigValue* left, BigValue* right);
-    
+
     public nothrow BinaryOperatorDelegate GetBinaryOperatorDelegate(uchar op, BigNumKind kind)
     {
         BinaryOperatorDelegate dlg;
         switch (op)
         {
-            case '+': 
+            case '+':
             {
                 switch (kind)
                 {
@@ -171,7 +171,7 @@ namespace BigNumCalc
         }
         return dlg;
     }
-    
+
     public BigValue* Evaluate(BigValue* left, BigValue* right, uchar op)
     {
         BigNumKind commonType = CommonType(left->Kind(), right->Kind());

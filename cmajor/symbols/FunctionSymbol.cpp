@@ -383,26 +383,17 @@ bool FunctionGroupSymbol::IsValidCCFunctionGroup(FunctionSymbol* fromFunction) c
     return false;
 }
 
-std::string FunctionGroupSymbol::GetOverloadList() const
+std::vector<Symbol*> FunctionGroupSymbol::GetParamHelpSymbols() const
 {
-    sngxml::dom::Document doc;
-    sngxml::dom::Element* root = new sngxml::dom::Element(U"overloadList");
-    doc.AppendChild(std::unique_ptr<sngxml::dom::Node>(root));
+    std::vector<Symbol*> paramHelpSymbols;
     for (const auto& p : arityFunctionListMap)
     {
         for (auto functionSymbol : p.second)
         {
-            sngxml::dom::Element* overloadElement = new sngxml::dom::Element(U"overload");
-            std::u32string overloadName = functionSymbol->FullName(true);
-            overloadElement->SetAttribute(U"name", overloadName);
-            root->AppendChild(std::unique_ptr<sngxml::dom::Node>(overloadElement));
+            paramHelpSymbols.push_back(functionSymbol);
         }
     }
-    std::stringstream s;
-    CodeFormatter formatter(s);
-    formatter.SetIndentSize(1);
-    doc.Write(formatter);
-    return s.str();
+    return paramHelpSymbols;
 }
 
 std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)

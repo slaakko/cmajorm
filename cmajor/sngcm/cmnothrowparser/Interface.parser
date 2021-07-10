@@ -22,6 +22,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowInterfaceParser
 {
     uselexer CmajorNothrowLexer;
     nothrow;
+    state;
 
     using NothrowAttributeParser.Attributes;
     using NothrowSpecifierParser.Specifiers;
@@ -31,7 +32,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowInterfaceParser
 
     Interface(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<InterfaceNode> intf, var Span s, var Span specifierSpan, var Span beginBraceSpan, var Span endBraceSpan) : InterfaceNode*
         ::=
-        (   empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } INTERFACE Identifier(moduleId):id
+        (   empty{ s = span; } Attributes(moduleId):attrs? Specifiers:specifiers{ specifierSpan = span; } INTERFACE DefiningInterfaceId(moduleId):id
             {
                 s.end = span.end;
                 intf.reset(new InterfaceNode(s, *moduleId, specifiers, id, attrs));
@@ -43,6 +44,10 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowInterfaceParser
             intf->SetLexerFlags(lexer.Flags());
             return intf.release();
         }
+        ;
+
+    DefiningInterfaceId(boost::uuids::uuid* moduleId) : IdentifierNode*
+        ::= Identifier(moduleId):id{ return id; }
         ;
 
     InterfaceContent(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::InterfaceNode* intf)

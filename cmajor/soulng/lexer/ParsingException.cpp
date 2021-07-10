@@ -12,6 +12,10 @@ ParsingException::ParsingException(const std::string& message_, const std::strin
 {
 }
 
+ParsingException::ParsingException(const std::string& message_, const std::string& fileName_) : std::runtime_error(message_), message(message_), fileName(fileName_), span(), mod(nullptr)
+{
+}
+
 void ParsingException::SetProject(const std::string& project_)
 {
     project = project_;

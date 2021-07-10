@@ -6,7 +6,7 @@
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/TypeExpr.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmnothrowparser/TypeExpr.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -64,6 +64,7 @@ soulng::parser::Match NothrowTypeExprParser::TypeExpr(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("TypeExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 167);
     std::unique_ptr<sngcm::ast::Node> prefixTypeExpr;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -107,6 +108,7 @@ soulng::parser::Match NothrowTypeExprParser::PrefixTypeExpr(CmajorNothrowLexer& 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("PrefixTypeExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 168);
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> constTypeExpr;
     std::unique_ptr<sngcm::ast::Node> postfixTypeExpr;
@@ -220,6 +222,7 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("PostfixTypeExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 169);
     std::unique_ptr<Node> typeExpr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> primaryTypeExpr;
@@ -560,6 +563,7 @@ soulng::parser::Match NothrowTypeExprParser::PrimaryTypeExpr(CmajorNothrowLexer&
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("PrimaryTypeExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 170);
     std::unique_ptr<Node> basicType;
     std::unique_ptr<Node> templateId;
     soulng::parser::Match match(false);
