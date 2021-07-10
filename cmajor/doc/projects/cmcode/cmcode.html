@@ -73,6 +73,180 @@
 		The port number server can be stopped and restarted from the Cmajor Port Map Monitor that
 		can be started from the IDE by selecting View | Port Map.
 	</p>
+	
+	<h2 id="cc">
+		Code completion
+	</h2>
+	
+	<p>
+		When editing code, the IDE obtains possible symbols for the current editing context from 
+		the Cmajor code completion server (cmccs) and shows them in a code completion list:
+	</p>
+	
+	<img src="../../image/cc.png"/>
+	
+	<p>
+		The code completion list contains a category, name, description and details for each symbol that
+		starts with letters typed. The categories of the symbols are shown in the following table:
+		
+		<table class="grammar">
+			<tr>
+				<th>Category</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td>AR</td>
+				<td>array type</td
+			</tr>
+			<tr>
+				<td>BT</td>
+				<td>basic type</td>
+			</tr>
+			<tr>
+				<td>CL</td>
+				<td>class</td>
+			</tr>
+			<tr>
+				<td>CO</td>
+				<td>concept</td>
+			</tr>
+			<tr>
+				<td>CN</td>
+				<td>constant</td>
+			</tr>
+			<tr>
+				<td>DG</td>
+				<td>delegate</td>
+			</tr>
+			<tr>
+				<td>CD</td>
+				<td>class delegate</td>
+			</tr>
+			<tr>
+				<td>ET</td>
+				<td>enumerated type</td>
+			</tr>
+			<tr>
+				<td>EC</td>
+				<td>enumeration constant</td>
+			</tr>
+			<tr>
+				<td>FN</td>
+				<td>function</td>
+			</tr>
+			<tr>
+				<td>IN</td>
+				<td>interface</td>
+			</tr>
+			<tr>
+				<td>KW</td>
+				<td>keyword</td>
+			</tr>
+			<tr>
+				<td>NS</td>
+				<td>namespace</td>
+			</tr>
+			<tr>
+				<td>TP</td>
+				<td>template parameter</td>
+			</tr>
+			<tr>
+				<td>TY</td>
+				<td>typedef</td>
+			</tr>
+			<tr>
+				<td>PA</td>
+				<td>parameter</td>
+			</tr>
+			<tr>
+				<td>MV</td>
+				<td>member variable</td>
+			</tr>
+			<tr>
+				<td>LV</td>
+				<td>local variable</td>
+			</tr>
+			<tr>
+				<td>GV</td>
+				<td>global variable</td>
+			</tr>
+			<tr>
+				<td>SY</td>
+				<td>other symbol</td>
+			</tr>
+		</table>
+	</p>
+	
+	<h3>
+		Keys
+	</h3>
+	
+	<p>
+		The code completion list keyboad shortcuts are shown in the following table:
+	</p>
+	
+	<table class="grammar">
+		<tr>
+			<th>Key</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>enter</td>
+			<td>select entry</td>
+		</tr>
+		<tr>
+			<td>down arrow</td>
+			<td>next entry</td>
+		</tr>
+		<tr>
+			<td>up arrow</td>
+			<td>previous entry</td>
+		</tr>
+		<tr>
+			<td>page down</td>
+			<td>next page</td>
+		</tr>
+		<tr>
+			<td>page up</td>
+			<td>previous page</td>
+		</tr>
+		<tr>
+			<td>ESC</td>
+			<td>hide code completion list</td>
+		</tr>
+		<tr>
+			<td>control space</td>
+			<td>show code completion list</td>
+		</tr>
+	</table>
+
+	<h3>
+		Parameter help
+	</h3>
+	
+	<p>
+		When a code completion entry is selected with the ENTER key,
+		and the selected symbol is a function, class or concept symbol,
+		a parameter help window is shown:
+	</p>
+	
+	<img src="../../image/ph.png"/>
+
+	<p>
+		When the selected symbol is a function symbol, the parameter help window shows the overloads of that function.
+		The down arrow key selects the next overload and the up arrow key selects the previous overload.
+	</p>
+	
+	<p>
+		When the selected symbol is a class symbol, the parameter help window shows classes that have the same name but different template parameter arities.
+		The down arrow key selects the next class and the up arrow key selects the previous class.
+	</p>
+	
+	<p>
+		When the selected symbol is a concept symbol, the parameter help window shows concepts that have the same name but different template parameter arities.
+		The down arrow key selects the next concept and the up arrow key selects the previous concept.
+	</p>
+	
 </body>
 
 </html>
