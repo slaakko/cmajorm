@@ -26,7 +26,7 @@ endif
 ../lib/$(soname): $(OBJECTS) $(LIBRARIES)
 	$(CXX) $(CXXFLAGS) -shared -o $@ $(OBJECTS) -lcmeh -lcmsymbols -lcmllvm -lcmir -lcmcommon -lcmsngcmcmparser -lcmsngcmcmlexer -lcmsngcmast \
 -lcmsngxmlxpath -lcmsngxmldom -lcmsngxmlxml -lcmsngparser -lcmsnglexer -lcmsngutil -ldl -ltinfo -lgnutls -lncurses
-	ln -f ../lib/$(soname) ../lib/$(sobasename).so.3
+	ln -f ../lib/$(soname) ../lib/$(sobasename).so.4
 	ln -f ../lib/$(soname) ../lib/$(sobasename).so
 
 clean:
