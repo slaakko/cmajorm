@@ -19,8 +19,8 @@ public:
     std::string GetSymbolCategoryStr() const override { return "KW"; }
     std::string GetSymbolCategoryDescription() const override { return "keyword"; }
     std::string TypeString() const override { return "keyword_symbol"; }
-    std::u32string FullName() const { return Name(); }
-    std::u32string FullNameWithSpecifiers() const { return Name(); }
+    std::u32string FullName() const override { return Name(); }
+    std::u32string FullNameWithSpecifiers() const override { return Name(); }
     int TokenId() const { return tokenId; }
 private:
     int tokenId;
