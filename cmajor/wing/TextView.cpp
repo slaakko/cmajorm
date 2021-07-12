@@ -49,7 +49,7 @@ bool IsEmptyOrSpaceLine(const std::u32string& line)
 
 bool IsCCLetter(char32_t c)
 {
-    return IsLetter(c) || c == '.';
+    return IsLetter(c) || c == '.' || c == '-' || c == '>';
 }
 
 bool HasParen(const std::u32string& s)

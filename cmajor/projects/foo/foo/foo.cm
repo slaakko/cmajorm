@@ -1,31 +1,18 @@
 using System;
 using System.Collections;
 
-public void foo(List<int>& x)
+class P
 {
-    int n = 10;
-    for (int i = 0; i < n; ++i)
+    public void foo()
     {
-        x.Add(i);
-    }
-}
-
-public void bar()
-{
-    List<int> x;
-    foo(x);
-    print(x);
-}
-
-void print(List<int>& x)
-{
-    for (int i : x)
-    {
-        Console.WriteLine(i);
     }
 }
 
 void main()
 {
-    bar();
+    P* p;
+    p->foo();
+    UniquePtr<P> u;
+    u->foo();
 }
+

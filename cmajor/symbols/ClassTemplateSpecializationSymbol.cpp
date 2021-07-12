@@ -142,7 +142,7 @@ void* ClassTemplateSpecializationSymbol::IrType(Emitter& emitter)
 
 const ContainerScope* ClassTemplateSpecializationSymbol::GetArrowScope() const
 {
-    if (classTemplate->GroupName() == U"UniquePtr" || classTemplate->GroupName() == U"SharedPtr")
+    if (classTemplate->GroupName() == U"UniquePtr" || classTemplate->GroupName() == U"SharedPtr" || classTemplate->GroupName() == U"WeakPtr")
     {
         if (templateArgumentTypes.size() == 1)
         {
@@ -154,7 +154,7 @@ const ContainerScope* ClassTemplateSpecializationSymbol::GetArrowScope() const
 
 ContainerScope* ClassTemplateSpecializationSymbol::GetArrowScope()
 {
-    if (classTemplate->GroupName() == U"UniquePtr" || classTemplate->GroupName() == U"SharedPtr")
+    if (classTemplate->GroupName() == U"UniquePtr" || classTemplate->GroupName() == U"SharedPtr" || classTemplate->GroupName() == U"WeakPtr")
     {
         if (templateArgumentTypes.size() == 1)
         {
