@@ -152,11 +152,13 @@ soulng::parser::Match NothrowAttributeParser::Attributes(CmajorNothrowLexer& lex
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch13 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch13 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACKET)));
                     }

@@ -208,6 +208,20 @@ void ClassNode::ArrangeMembers()
     }
 }
 
+int ClassNode::Level() const
+{
+    int level = 0;
+    const Node* parent = Parent();
+    if (parent)
+    {
+        if (parent->GetNodeType() == NodeType::classNode)
+        {
+            return static_cast<const ClassNode*>(parent)->Level() + 1;
+        }
+    }
+    return level;
+}
+
 InitializerNode::InitializerNode(NodeType nodeType_, const Span& span_, const boost::uuids::uuid& moduleId_) : Node(nodeType_, span_, moduleId_)
 {
 }

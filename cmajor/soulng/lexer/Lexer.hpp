@@ -18,24 +18,24 @@
 
 namespace soulng { namespace lexer {
 
-enum class LexerFlags : int8_t
+enum class LexerFlags : int
 {
-    none = 0, synchronize = 1 << 0, synchronized = 1 << 1, synchronizedAtLeastOnce = 1 << 2, cursorSeen = 1 << 3, recordedParse = 1 << 4, farthestError = 1 << 5
+    none = 0, synchronize = 1 << 0, synchronized = 1 << 1, synchronizedAtLeastOnce = 1 << 2, cursorSeen = 1 << 3, recordedParse = 1 << 4, farthestError = 1 << 5, gcc = 1 << 6, lcc = 1 << 7
 };
 
 inline LexerFlags operator|(LexerFlags left, LexerFlags right)
 {
-    return static_cast<LexerFlags>(static_cast<int8_t>(left) | static_cast<int8_t>(right));
+    return static_cast<LexerFlags>(static_cast<int>(left) | static_cast<int>(right));
 }
 
 inline LexerFlags operator&(LexerFlags left, LexerFlags right)
 {
-    return static_cast<LexerFlags>(static_cast<int8_t>(left) & static_cast<int8_t>(right));
+    return static_cast<LexerFlags>(static_cast<int>(left) & static_cast<int>(right));
 }
 
 inline LexerFlags operator~(LexerFlags flag)
 {
-    return static_cast<LexerFlags>(~static_cast<int8_t>(flag));
+    return static_cast<LexerFlags>(~static_cast<int>(flag));
 }
 
 struct SOULNG_LEXER_API LexerPosPair
@@ -144,7 +144,9 @@ public:
     const std::vector<int>& RuleContext() const { return ruleContext; }
     const std::vector<int>& FarthestRuleContext() const { return farthestRuleContext; }
     const std::vector<int>& CursorRuleContext() const { return cursorRuleContext; }
-    void SetCursorRuleContext();
+    void SetGlobalRuleContext();
+    void SetLocalRuleContext();
+    void ResetGlobalRuleContext();
     void SetRuleNameVecPtr(std::vector<const char*>* ruleNameVecPtr_) { ruleNameVecPtr = ruleNameVecPtr_; }
     std::string GetParserStateStr() const;
     void SetBlockCommentStates(const std::set<int>& blockCommentStates_);
@@ -161,6 +163,9 @@ public:
     LineMapper* GetLineMapper() { return lineMapper; }
     void SetLineMapper(LineMapper* lineMapper_) { lineMapper = lineMapper_; }
     virtual int GetCommentTokenId() const { return -1; }
+    bool Recovered() const { return recovered; }
+    void SetRecovered() { recovered = true; }
+    void ResetRecovered() { recovered = false; }
 private:
     std::u32string content;
     std::string fileName;
@@ -188,6 +193,7 @@ private:
     LineMapper* lineMapper;
     std::set<int> blockCommentStates;
     int commentTokenId;
+    bool recovered;
     void NextToken();
     void CalculateLineStarts();
 };
@@ -197,6 +203,10 @@ struct SOULNG_LEXER_API RuleGuard
     RuleGuard(Lexer& lexer_, int ruleId_) : lexer(lexer_)
     {
         lexer.PushRule(ruleId_);
+        if (lexer.GetFlag(LexerFlags::cursorSeen))
+        {
+            lexer.SetGlobalRuleContext();
+        }
     }
     ~RuleGuard()
     {

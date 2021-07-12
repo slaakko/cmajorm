@@ -1,22 +1,31 @@
 using System;
 using System.Collections;
 
-namespace Foo
+public void foo(List<int>& x)
 {
-    class X
+    int n = 10;
+    for (int i = 0; i < n; ++i)
     {
-        void f()
-        {
-        }
-        void g()
-        {
-        }
+        x.Add(i);
+    }
+}
+
+public void bar()
+{
+    List<int> x;
+    foo(x);
+    print(x);
+}
+
+void print(List<int>& x)
+{
+    for (int i : x)
+    {
+        Console.WriteLine(i);
     }
 }
 
 void main()
 {
-    List<int> x;
-    Foo.foo(x);
+    bar();
 }
-

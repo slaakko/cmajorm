@@ -6614,7 +6614,7 @@ int CmajorNothrowLexer::GetTokenId(int statementIndex)
         case 43:
         {
             Retract();
-            SetCursorRuleContext();
+            SetLocalRuleContext();
             SetFlag(LexerFlags::cursorSeen);
             ++*this;
             return token.id;

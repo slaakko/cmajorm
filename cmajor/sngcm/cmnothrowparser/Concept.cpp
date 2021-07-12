@@ -170,11 +170,13 @@ soulng::parser::Match NothrowConceptParser::Concept(CmajorNothrowLexer& lexer, b
                                                         }
                                                         if (match.hit)
                                                         {
+                                                            lexer.ResetRecovered();
                                                             *parentMatch20 = match;
                                                         }
                                                         else
                                                         {
                                                             match.hit = true;
+                                                            lexer.SetRecovered();
                                                             *parentMatch20 = match;
                                                             lexer.AddError(span, ToUtf32(GetTokenInfo(LANGLE)));
                                                         }
@@ -295,11 +297,13 @@ soulng::parser::Match NothrowConceptParser::Concept(CmajorNothrowLexer& lexer, b
                                                 }
                                                 if (match.hit)
                                                 {
+                                                    lexer.ResetRecovered();
                                                     *parentMatch31 = match;
                                                 }
                                                 else
                                                 {
                                                     match.hit = true;
+                                                    lexer.SetRecovered();
                                                     *parentMatch31 = match;
                                                     lexer.AddError(span, ToUtf32(GetTokenInfo(RANGLE)));
                                                 }
@@ -436,11 +440,13 @@ soulng::parser::Match NothrowConceptParser::Concept(CmajorNothrowLexer& lexer, b
                                             }
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch45 = match;
                                             }
                                             else
                                             {
                                                 match.hit = true;
+                                                lexer.SetRecovered();
                                                 *parentMatch45 = match;
                                                 lexer.AddError(span, ToUtf32(GetTokenInfo(LBRACE)));
                                             }
@@ -491,11 +497,13 @@ soulng::parser::Match NothrowConceptParser::Concept(CmajorNothrowLexer& lexer, b
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch49 = match;
                                     }
                                     else
                                     {
                                         match.hit = true;
+                                        lexer.SetRecovered();
                                         *parentMatch49 = match;
                                         lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACE)));
                                     }
@@ -676,11 +684,13 @@ soulng::parser::Match NothrowConceptParser::Refinement(CmajorNothrowLexer& lexer
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch9 = match;
                                 }
                                 else
                                 {
                                     match.hit = true;
+                                    lexer.SetRecovered();
                                     *parentMatch9 = match;
                                     lexer.AddError(span, ToUtf32(GetTokenInfo(LANGLE)));
                                 }
@@ -801,11 +811,13 @@ soulng::parser::Match NothrowConceptParser::Refinement(CmajorNothrowLexer& lexer
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch20 = match;
                         }
                         else
                         {
                             match.hit = true;
+                            lexer.SetRecovered();
                             *parentMatch20 = match;
                             lexer.AddError(span, ToUtf32(GetTokenInfo(RANGLE)));
                         }
@@ -1081,11 +1093,13 @@ soulng::parser::Match NothrowConceptParser::TypeNameConstraint(CmajorNothrowLexe
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch6 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch6 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }
@@ -1385,11 +1399,13 @@ soulng::parser::Match NothrowConceptParser::ConstructorConstraint(CmajorNothrowL
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch11 = match;
                             }
                             else
                             {
                                 match.hit = true;
+                                lexer.SetRecovered();
                                 *parentMatch11 = match;
                                 lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                             }
@@ -1532,11 +1548,13 @@ soulng::parser::Match NothrowConceptParser::DestructorConstraint(CmajorNothrowLe
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch10 = match;
                                 }
                                 else
                                 {
                                     match.hit = true;
+                                    lexer.SetRecovered();
                                     *parentMatch10 = match;
                                     lexer.AddError(span, ToUtf32(GetTokenInfo(LPAREN)));
                                 }
@@ -1564,11 +1582,13 @@ soulng::parser::Match NothrowConceptParser::DestructorConstraint(CmajorNothrowLe
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch12 = match;
                             }
                             else
                             {
                                 match.hit = true;
+                                lexer.SetRecovered();
                                 *parentMatch12 = match;
                                 lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                             }
@@ -1601,11 +1621,13 @@ soulng::parser::Match NothrowConceptParser::DestructorConstraint(CmajorNothrowLe
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch15 = match;
                             }
                             else
                             {
                                 match.hit = true;
+                                lexer.SetRecovered();
                                 *parentMatch15 = match;
                                 lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                             }
@@ -1777,11 +1799,13 @@ soulng::parser::Match NothrowConceptParser::MemberFunctionConstraint(CmajorNothr
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch13 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch13 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }
@@ -1908,11 +1932,13 @@ soulng::parser::Match NothrowConceptParser::FunctionConstraint(CmajorNothrowLexe
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch9 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch9 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }
@@ -1993,11 +2019,13 @@ soulng::parser::Match NothrowConceptParser::EmbeddedConstraint(CmajorNothrowLexe
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch4 = match;
                         }
                         else
                         {
                             match.hit = true;
+                            lexer.SetRecovered();
                             *parentMatch4 = match;
                             lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                         }
@@ -2513,11 +2541,13 @@ soulng::parser::Match NothrowConceptParser::PrimaryConstraintExpr(CmajorNothrowL
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch7 = match;
                         }
                         else
                         {
                             match.hit = true;
+                            lexer.SetRecovered();
                             *parentMatch7 = match;
                             lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                         }
@@ -3054,11 +3084,13 @@ soulng::parser::Match NothrowConceptParser::MultiParamConstraint(CmajorNothrowLe
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch16 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch16 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(RANGLE)));
                     }
@@ -3250,11 +3282,13 @@ soulng::parser::Match NothrowConceptParser::Axiom(CmajorNothrowLexer& lexer, boo
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch17 = match;
                                     }
                                     else
                                     {
                                         match.hit = true;
+                                        lexer.SetRecovered();
                                         *parentMatch17 = match;
                                         lexer.AddError(span, ToUtf32(GetTokenInfo(LBRACE)));
                                     }
@@ -3305,11 +3339,13 @@ soulng::parser::Match NothrowConceptParser::Axiom(CmajorNothrowLexer& lexer, boo
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch21 = match;
                             }
                             else
                             {
                                 match.hit = true;
+                                lexer.SetRecovered();
                                 *parentMatch21 = match;
                                 lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACE)));
                             }
@@ -3473,11 +3509,13 @@ soulng::parser::Match NothrowConceptParser::AxiomStatement(CmajorNothrowLexer& l
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch6 = match;
                             }
                             else
                             {
                                 match.hit = true;
+                                lexer.SetRecovered();
                                 *parentMatch6 = match;
                                 lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                             }

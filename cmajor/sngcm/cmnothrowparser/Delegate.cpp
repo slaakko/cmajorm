@@ -147,11 +147,13 @@ soulng::parser::Match NothrowDelegateParser::Delegate(CmajorNothrowLexer& lexer,
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch13 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch13 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }
@@ -385,11 +387,13 @@ soulng::parser::Match NothrowDelegateParser::ClassDelegate(CmajorNothrowLexer& l
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch15 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch15 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }

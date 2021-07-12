@@ -27,14 +27,14 @@ LineMapper::~LineMapper()
 
 Lexer::Lexer(const std::u32string& content_, const std::string& fileName_, int fileIndex_) :
     content(content_), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(nullptr), start(content.c_str()), end(content.c_str() + content.length()), pos(start), current(tokens.end()),
-    log(nullptr), countLines(true), separatorChar('\0'), flags(), commentTokenId(-1), farthestPos(GetPos()), ruleNameVecPtr(nullptr), lineMapper(nullptr)
+    log(nullptr), countLines(true), separatorChar('\0'), flags(), commentTokenId(-1), farthestPos(GetPos()), ruleNameVecPtr(nullptr), lineMapper(nullptr), recovered(false)
 {
     CalculateLineStarts();
 }
 
 Lexer::Lexer(const char32_t* start_, const char32_t* end_, const std::string& fileName_, int fileIndex_) :
     content(), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(nullptr), start(start_), end(end_), pos(start), current(tokens.end()),
-    log(nullptr), countLines(true), separatorChar('\0'), flags(), commentTokenId(-1), farthestPos(GetPos()), ruleNameVecPtr(nullptr), lineMapper(nullptr)
+    log(nullptr), countLines(true), separatorChar('\0'), flags(), commentTokenId(-1), farthestPos(GetPos()), ruleNameVecPtr(nullptr), lineMapper(nullptr), recovered(false)
 {
     CalculateLineStarts();
 }
@@ -736,9 +736,31 @@ void Lexer::PopRule()
     ruleContext.pop_back();
 }
 
-void Lexer::SetCursorRuleContext()
+void Lexer::SetGlobalRuleContext()
 {
-    cursorRuleContext = ruleContext;
+    if (GetFlag(LexerFlags::gcc))
+    {
+        if (ruleContext.size() > cursorRuleContext.size())
+        {
+            cursorRuleContext = ruleContext;
+        }
+    }
+}
+
+void Lexer::SetLocalRuleContext()
+{
+    if (GetFlag(LexerFlags::lcc))
+    {
+        cursorRuleContext = ruleContext;
+    }
+}
+
+void Lexer::ResetGlobalRuleContext()
+{
+    if (GetFlag(LexerFlags::gcc))
+    {
+        cursorRuleContext.clear();
+    }
 }
 
 std::string Lexer::GetParserStateStr() const

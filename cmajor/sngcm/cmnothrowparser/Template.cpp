@@ -524,11 +524,13 @@ soulng::parser::Match NothrowTemplateParser::TemplateParameterList(CmajorNothrow
                 }
                 if (match.hit)
                 {
+                    lexer.ResetRecovered();
                     *parentMatch12 = match;
                 }
                 else
                 {
                     match.hit = true;
+                    lexer.SetRecovered();
                     *parentMatch12 = match;
                     lexer.AddError(span, ToUtf32(GetTokenInfo(RANGLE)));
                 }

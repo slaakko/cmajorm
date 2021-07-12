@@ -400,11 +400,13 @@ soulng::parser::Match NothrowCompileUnitParser::UsingAliasDirective(CmajorNothro
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch10 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch10 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }
@@ -515,11 +517,13 @@ soulng::parser::Match NothrowCompileUnitParser::UsingNamespaceDirective(CmajorNo
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch6 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch6 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }
@@ -1212,11 +1216,13 @@ soulng::parser::Match NothrowCompileUnitParser::NamespaceDefinition(CmajorNothro
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch12 = match;
                         }
                         else
                         {
                             match.hit = true;
+                            lexer.SetRecovered();
                             *parentMatch12 = match;
                             lexer.AddError(span, ToUtf32(GetTokenInfo(LBRACE)));
                         }
@@ -1260,11 +1266,13 @@ soulng::parser::Match NothrowCompileUnitParser::NamespaceDefinition(CmajorNothro
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch16 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch16 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACE)));
                     }

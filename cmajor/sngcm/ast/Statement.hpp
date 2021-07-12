@@ -83,6 +83,7 @@ public:
     const Span& EndBraceSpan() const { return endBraceSpan; }
     bool TracerInserted() const { return tracerInserted; }
     void SetTracerInserted() { tracerInserted = true; }
+    int Level() const;
 private:
     NodeList<StatementNode> statements;
     Span beginBraceSpan;

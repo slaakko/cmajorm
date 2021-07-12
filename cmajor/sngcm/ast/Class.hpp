@@ -41,6 +41,7 @@ public:
     void SetEndBraceSpan(const Span& endBraceSpan_) { endBraceSpan = endBraceSpan_; }
     const Span& EndBraceSpan() const { return endBraceSpan; }
     void ArrangeMembers();
+    int Level() const;
 private:
     Specifiers specifiers;
     Span specifierSpan;

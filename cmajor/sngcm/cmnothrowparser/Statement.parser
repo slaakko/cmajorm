@@ -108,6 +108,13 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowStatementParser
             )* 
             RBRACE!
         {
+            if (!lexer.Recovered())
+            {
+                if (compoundStatement->Level() == 0)
+                {
+                    lexer.ResetGlobalRuleContext();
+                }
+            }
             compoundStatement->SetEndBraceSpan(span);
             compoundStatement->SetSpanEnd(span.end);
             compoundStatement->SetLexerFlags(lexer.Flags());

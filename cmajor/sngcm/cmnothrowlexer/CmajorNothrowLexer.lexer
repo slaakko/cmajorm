@@ -116,7 +116,7 @@ lexer api(SNGCM_NOTHROW_LEXER_API) CmajorNothrowLexer
     ":" { return COLON; }
     ";" { return SEMICOLON; }
     "#" { return HASH; }
-    "$" { SetCursorRuleContext(); SetFlag(LexerFlags::cursorSeen); ++*this; return token.id; }
+    "$" { SetLocalRuleContext(); SetFlag(LexerFlags::cursorSeen); ++*this; return token.id; }
 
     variables
     {

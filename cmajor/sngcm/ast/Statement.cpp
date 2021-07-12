@@ -160,6 +160,20 @@ void CompoundStatementNode::AddStatement(StatementNode* statement)
     statements.Add(statement);
 }
 
+int CompoundStatementNode::Level() const
+{
+    int level = 0;
+    const Node* parent = Parent();
+    if (parent)
+    {
+        if (parent->GetNodeType() == NodeType::compoundStatementNode)
+        {
+            return static_cast<const CompoundStatementNode*>(parent)->Level() + 1;
+        }
+    }
+    return level;
+}
+
 ReturnStatementNode::ReturnStatementNode(const Span& span_, const boost::uuids::uuid& moduleId_) : 
     StatementNode(NodeType::returnStatementNode, span_, moduleId_), expression()
 {

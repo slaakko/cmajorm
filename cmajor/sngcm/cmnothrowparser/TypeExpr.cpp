@@ -481,11 +481,13 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
                                                                 }
                                                                 if (match.hit)
                                                                 {
+                                                                    lexer.ResetRecovered();
                                                                     *parentMatch27 = match;
                                                                 }
                                                                 else
                                                                 {
                                                                     match.hit = true;
+                                                                    lexer.SetRecovered();
                                                                     *parentMatch27 = match;
                                                                     lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACKET)));
                                                                 }

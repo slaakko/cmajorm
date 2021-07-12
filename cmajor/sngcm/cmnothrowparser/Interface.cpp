@@ -191,11 +191,13 @@ soulng::parser::Match NothrowInterfaceParser::Interface(CmajorNothrowLexer& lexe
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch19 = match;
                                     }
                                     else
                                     {
                                         match.hit = true;
+                                        lexer.SetRecovered();
                                         *parentMatch19 = match;
                                         lexer.AddError(span, ToUtf32(GetTokenInfo(LBRACE)));
                                     }
@@ -246,11 +248,13 @@ soulng::parser::Match NothrowInterfaceParser::Interface(CmajorNothrowLexer& lexe
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch23 = match;
                             }
                             else
                             {
                                 match.hit = true;
+                                lexer.SetRecovered();
                                 *parentMatch23 = match;
                                 lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACE)));
                             }
@@ -545,11 +549,13 @@ soulng::parser::Match NothrowInterfaceParser::InterfaceMemFun(CmajorNothrowLexer
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch14 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch14 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }

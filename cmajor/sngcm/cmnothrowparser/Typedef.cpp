@@ -120,11 +120,13 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch10 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch10 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(SEMICOLON)));
                     }

@@ -3229,11 +3229,13 @@ soulng::parser::Match NothrowExpressionParser::Postfix(CmajorNothrowLexer& lexer
                                                                     }
                                                                     if (match.hit)
                                                                     {
+                                                                        lexer.ResetRecovered();
                                                                         *parentMatch31 = match;
                                                                     }
                                                                     else
                                                                     {
                                                                         match.hit = true;
+                                                                        lexer.SetRecovered();
                                                                         *parentMatch31 = match;
                                                                         lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACKET)));
                                                                     }
@@ -3319,11 +3321,13 @@ soulng::parser::Match NothrowExpressionParser::Postfix(CmajorNothrowLexer& lexer
                                                                 }
                                                                 if (match.hit)
                                                                 {
+                                                                    lexer.ResetRecovered();
                                                                     *parentMatch39 = match;
                                                                 }
                                                                 else
                                                                 {
                                                                     match.hit = true;
+                                                                    lexer.SetRecovered();
                                                                     *parentMatch39 = match;
                                                                     lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                                                                 }
@@ -3986,11 +3990,13 @@ soulng::parser::Match NothrowExpressionParser::SizeOfExpr(CmajorNothrowLexer& le
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch7 = match;
                                 }
                                 else
                                 {
                                     match.hit = true;
+                                    lexer.SetRecovered();
                                     *parentMatch7 = match;
                                     lexer.AddError(span, ToUtf32(GetTokenInfo(LPAREN)));
                                 }
@@ -4031,11 +4037,13 @@ soulng::parser::Match NothrowExpressionParser::SizeOfExpr(CmajorNothrowLexer& le
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch10 = match;
                         }
                         else
                         {
                             match.hit = true;
+                            lexer.SetRecovered();
                             *parentMatch10 = match;
                             lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                         }
@@ -4141,11 +4149,13 @@ soulng::parser::Match NothrowExpressionParser::TypeNameExpr(CmajorNothrowLexer& 
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch7 = match;
                                 }
                                 else
                                 {
                                     match.hit = true;
+                                    lexer.SetRecovered();
                                     *parentMatch7 = match;
                                     lexer.AddError(span, ToUtf32(GetTokenInfo(LPAREN)));
                                 }
@@ -4186,11 +4196,13 @@ soulng::parser::Match NothrowExpressionParser::TypeNameExpr(CmajorNothrowLexer& 
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch10 = match;
                         }
                         else
                         {
                             match.hit = true;
+                            lexer.SetRecovered();
                             *parentMatch10 = match;
                             lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                         }
@@ -4296,11 +4308,13 @@ soulng::parser::Match NothrowExpressionParser::TypeIdExpr(CmajorNothrowLexer& le
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch7 = match;
                                 }
                                 else
                                 {
                                     match.hit = true;
+                                    lexer.SetRecovered();
                                     *parentMatch7 = match;
                                     lexer.AddError(span, ToUtf32(GetTokenInfo(LPAREN)));
                                 }
@@ -4341,11 +4355,13 @@ soulng::parser::Match NothrowExpressionParser::TypeIdExpr(CmajorNothrowLexer& le
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch10 = match;
                         }
                         else
                         {
                             match.hit = true;
+                            lexer.SetRecovered();
                             *parentMatch10 = match;
                             lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                         }
@@ -4461,11 +4477,13 @@ soulng::parser::Match NothrowExpressionParser::CastExpr(CmajorNothrowLexer& lexe
                                             }
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch10 = match;
                                             }
                                             else
                                             {
                                                 match.hit = true;
+                                                lexer.SetRecovered();
                                                 *parentMatch10 = match;
                                                 lexer.AddError(span, ToUtf32(GetTokenInfo(LANGLE)));
                                             }
@@ -4506,11 +4524,13 @@ soulng::parser::Match NothrowExpressionParser::CastExpr(CmajorNothrowLexer& lexe
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch13 = match;
                                     }
                                     else
                                     {
                                         match.hit = true;
+                                        lexer.SetRecovered();
                                         *parentMatch13 = match;
                                         lexer.AddError(span, ToUtf32(GetTokenInfo(RANGLE)));
                                     }
@@ -4538,11 +4558,13 @@ soulng::parser::Match NothrowExpressionParser::CastExpr(CmajorNothrowLexer& lexe
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch15 = match;
                                 }
                                 else
                                 {
                                     match.hit = true;
+                                    lexer.SetRecovered();
                                     *parentMatch15 = match;
                                     lexer.AddError(span, ToUtf32(GetTokenInfo(LPAREN)));
                                 }
@@ -4583,11 +4605,13 @@ soulng::parser::Match NothrowExpressionParser::CastExpr(CmajorNothrowLexer& lexe
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch18 = match;
                         }
                         else
                         {
                             match.hit = true;
+                            lexer.SetRecovered();
                             *parentMatch18 = match;
                             lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                         }
@@ -4702,11 +4726,13 @@ soulng::parser::Match NothrowExpressionParser::ConstructExpr(CmajorNothrowLexer&
                                             }
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch10 = match;
                                             }
                                             else
                                             {
                                                 match.hit = true;
+                                                lexer.SetRecovered();
                                                 *parentMatch10 = match;
                                                 lexer.AddError(span, ToUtf32(GetTokenInfo(LANGLE)));
                                             }
@@ -4747,11 +4773,13 @@ soulng::parser::Match NothrowExpressionParser::ConstructExpr(CmajorNothrowLexer&
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch13 = match;
                                     }
                                     else
                                     {
                                         match.hit = true;
+                                        lexer.SetRecovered();
                                         *parentMatch13 = match;
                                         lexer.AddError(span, ToUtf32(GetTokenInfo(RANGLE)));
                                     }
@@ -4787,11 +4815,13 @@ soulng::parser::Match NothrowExpressionParser::ConstructExpr(CmajorNothrowLexer&
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch15 = match;
                         }
                         else
                         {
                             match.hit = true;
+                            lexer.SetRecovered();
                             *parentMatch15 = match;
                             lexer.AddError(span, ToUtf32(GetTokenInfo(LPAREN)));
                         }
@@ -4836,11 +4866,13 @@ soulng::parser::Match NothrowExpressionParser::ConstructExpr(CmajorNothrowLexer&
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch19 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch19 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                     }
@@ -5475,11 +5507,13 @@ soulng::parser::Match NothrowExpressionParser::InvokeExpr(CmajorNothrowLexer& le
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch22 = match;
                             }
                             else
                             {
                                 match.hit = true;
+                                lexer.SetRecovered();
                                 *parentMatch22 = match;
                                 lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                             }

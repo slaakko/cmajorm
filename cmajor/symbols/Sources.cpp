@@ -63,7 +63,7 @@ void SourceData::Done()
 SourceData::SourceData()
 {
     globalRuleIds.push_back(NothrowCompileUnitParser_UsingDirectives);
-    globalRuleIds.push_back(NothrowCompileUnitParser_NamespaceDefinition);
+    globalRuleIds.push_back(NothrowCompileUnitParser_NamespaceContent);
     definingIdRules.push_back(NothrowClassParser_DefiningClassId);
     definingIdRules.push_back(NothrowClassParser_DefiningMemberVariableId);
     definingIdRules.push_back(NothrowCompileUnitParser_DefiningNamespaceId);
@@ -132,6 +132,7 @@ std::vector<int> GetLineRuleContext(const std::u32string& cursorLine, const std:
     boost::uuids::uuid mid = moduleId;
     NothrowParsingContext parsingContext;
     CmajorNothrowLexer lexer(cursorLine.c_str(), cursorLine.c_str() + cursorLine.length(), filePath, index);
+    lexer.SetFlag(LexerFlags::lcc);
     if (Find(globalRuleContext, SourceData::Instance().CompoundStatementRuleId()))
     {
         std::unique_ptr<sngcm::ast::StatementNode> statement = NothrowStatementParser::Parse(lexer, &mid, &parsingContext);
@@ -151,7 +152,7 @@ std::vector<int> GetLineRuleContext(const std::u32string& cursorLine, const std:
     return lexer.CursorRuleContext();
 }
 
-bool debugCC = false;
+// #define DEBUG_CC 1
 
 std::vector<std::string> GetRuleNames(const std::vector<int>& rules)
 {
@@ -166,19 +167,21 @@ std::vector<std::string> GetRuleNames(const std::vector<int>& rules)
 
 CCContext GetCCContext(const std::u32string& cursorLine, const std::string& filePath, int index, const boost::uuids::uuid& moduleId, const std::vector<int>& globalRuleContext)
 {
-    if (debugCC)
+#ifdef DEBUG_CC
     {
         std::vector<std::string> ruleNames = GetRuleNames(globalRuleContext);
         int x = 0;
     }
+#endif
     if (Find(globalRuleContext, SourceData::Instance().CompoundStatementRuleId()))
     {
         std::vector<int> lineRuleContext = GetLineRuleContext(cursorLine, filePath, index, moduleId, globalRuleContext);
-        if (debugCC)
+#ifdef DEBUG_CC
         {
             std::vector<std::string> ruleNames = GetRuleNames(lineRuleContext);
             int x = 0;
         }
+#endif
         if (Find(lineRuleContext, SourceData::Instance().DefininingIdRules()))
         {
             return CCContext::emptyContext;
@@ -192,11 +195,12 @@ CCContext GetCCContext(const std::u32string& cursorLine, const std::string& file
     if (Find(globalRuleContext, SourceData::Instance().ClassRuleId()))
     {
         std::vector<int> lineRuleContext = GetLineRuleContext(cursorLine, filePath, index, moduleId, globalRuleContext);
-        if (debugCC)
+#ifdef DEBUG_CC
         {
             std::vector<std::string> ruleNames = GetRuleNames(lineRuleContext);
             int x = 0;
         }
+#endif
         if (Find(lineRuleContext, SourceData::Instance().DefininingIdRules()))
         {
             return CCContext::emptyContext;
@@ -206,11 +210,12 @@ CCContext GetCCContext(const std::u32string& cursorLine, const std::string& file
     if (globalRuleContext.empty() || Find(globalRuleContext, SourceData::Instance().GlobalRuleIds()))
     {
         std::vector<int> lineRuleContext = GetLineRuleContext(cursorLine, filePath, index, moduleId, globalRuleContext);
-        if (debugCC)
+#ifdef DEBUG_CC
         {
             std::vector<std::string> ruleNames = GetRuleNames(lineRuleContext);
             int x = 0;
         }
+#endif
         if (Find(lineRuleContext, SourceData::Instance().DefininingIdRules()))
         {
             return CCContext::emptyContext;
@@ -396,6 +401,7 @@ void Source::Parse(const boost::uuids::uuid& moduleId, int index)
 {
     errors.clear();
     CmajorNothrowLexer lexer(Start(), End(), FilePath(), index);
+    lexer.SetFlag(LexerFlags::gcc);
     boost::uuids::uuid mid = moduleId;
     NothrowParsingContext parsingContext;
     std::unique_ptr<CompileUnitNode> parsedCompileUnit = NothrowCompileUnitParser::Parse(lexer, &mid, &parsingContext);
@@ -405,6 +411,7 @@ void Source::Parse(const boost::uuids::uuid& moduleId, int index)
     if (!parsingErrors.empty())
     {
         CmajorNothrowLexer lexer(Start(), End(), FilePath(), index);
+        lexer.SetFlag(LexerFlags::gcc);
         lexer.SetFlag(LexerFlags::synchronize);
         NothrowParsingContext parsingContext;
         parsedCompileUnit = NothrowCompileUnitParser::Parse(lexer, &mid, &parsingContext);
@@ -879,6 +886,12 @@ ParseResult Sources::ParseSource(Module* module, const std::string& sourceFilePa
         src->SetContent(sourceCode);
         src->Parse(module->Id(), sources.size());
         result.ruleContext = src->RuleContext();
+#ifdef DEBUG_CC
+        {
+            std::vector<std::string> ruleNames = GetRuleNames(result.ruleContext);
+            int x = 0;
+        }
+#endif 
         if (moveSource)
         {
             for (int i = 0; i < sources.size(); ++i)

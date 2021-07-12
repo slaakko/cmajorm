@@ -161,11 +161,13 @@ soulng::parser::Match NothrowParameterParser::ParameterList(CmajorNothrowLexer& 
                 }
                 if (match.hit)
                 {
+                    lexer.ResetRecovered();
                     *parentMatch13 = match;
                 }
                 else
                 {
                     match.hit = true;
+                    lexer.SetRecovered();
                     *parentMatch13 = match;
                     lexer.AddError(span, ToUtf32(GetTokenInfo(RPAREN)));
                 }

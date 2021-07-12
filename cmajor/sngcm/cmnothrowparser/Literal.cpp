@@ -638,11 +638,13 @@ soulng::parser::Match NothrowLiteralParser::ArrayLiteral(CmajorNothrowLexer& lex
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch15 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch15 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACKET)));
                     }
@@ -845,11 +847,13 @@ soulng::parser::Match NothrowLiteralParser::StructuredLiteral(CmajorNothrowLexer
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch15 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch15 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACE)));
                     }

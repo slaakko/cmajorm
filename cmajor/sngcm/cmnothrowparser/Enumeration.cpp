@@ -170,11 +170,13 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch16 = match;
                             }
                             else
                             {
                                 match.hit = true;
+                                lexer.SetRecovered();
                                 *parentMatch16 = match;
                                 lexer.AddError(span, ToUtf32(GetTokenInfo(LBRACE)));
                             }
@@ -225,11 +227,13 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch20 = match;
                     }
                     else
                     {
                         match.hit = true;
+                        lexer.SetRecovered();
                         *parentMatch20 = match;
                         lexer.AddError(span, ToUtf32(GetTokenInfo(RBRACE)));
                     }

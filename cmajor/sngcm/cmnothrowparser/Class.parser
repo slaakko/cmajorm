@@ -64,6 +64,13 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowClassParser
         (WhereConstraint(moduleId, ctx):constraint{ cls->SetConstraint(constraint); })?
         LBRACE!{ beginBraceSpan = span; } ClassContent(moduleId, ctx, cls.get()):content RBRACE!
         {
+            if (!lexer.Recovered())
+            {
+                if (cls->Level() == 0)
+                {
+                    lexer.ResetGlobalRuleContext();
+                }
+            }
             endBraceSpan = span;
             cls->SetBeginBraceSpan(beginBraceSpan);
             cls->SetEndBraceSpan(endBraceSpan);
