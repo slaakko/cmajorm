@@ -2,7 +2,7 @@
 #	Run with nmake from Visual Studio 2019 x64 Native Tools Command Prompt
 
 all: compiler cppbert sys cmlean tools examples
-	install.bat
+	inst.bat
 
 compiler: buildcomp install
 
@@ -49,4 +49,4 @@ cmsx:
 	cmc -u -v -c=release -st -bt=1 ../projects/cmsx/cmsx.cms
 
 install:
-	install.bat
+	inst.bat
