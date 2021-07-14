@@ -26,7 +26,7 @@
 
 namespace cmajor { namespace cmpm {
 
-const char* portMapServerVersion = "4.0.0";
+const char* portMapServerVersion = "4.1.0";
 
 using namespace soulng::util;
 using namespace soulng::unicode;
