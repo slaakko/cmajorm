@@ -55,12 +55,20 @@ void CopyFile(const std::string& source, const std::string& dest, bool force, bo
     if (force || !boost::filesystem::exists(dest) || boost::filesystem::last_write_time(source) > boost::filesystem::last_write_time(dest))
     {
         int64_t size = boost::filesystem::file_size(source);
-        BinaryReader reader(source);
-        BinaryWriter writer(dest);
-        for (int64_t i = 0; i < size; ++i)
         {
-            uint8_t x = reader.ReadByte();
-            writer.Write(x);
+            BinaryReader reader(source);
+            BinaryWriter writer(dest);
+            for (int64_t i = 0; i < size; ++i)
+            {
+                uint8_t x = reader.ReadByte();
+                writer.Write(x);
+            }
+        }
+        boost::system::error_code ec;
+        boost::filesystem::last_write_time(dest, boost::filesystem::last_write_time(source), ec);
+        if (ec)
+        {
+            throw std::runtime_error("could not set write time of file '" + dest + "': " + ec.message());
         }
         if (verbose)
         {
