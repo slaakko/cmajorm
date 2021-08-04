@@ -50,7 +50,11 @@ void CopyFile(const std::string& source, const std::string& dest, bool force, bo
 {
     if (!boost::filesystem::exists(source))
     {
-        throw std::runtime_error("source file '" + source + "' does not exist");
+        if (verbose)
+        {
+            std::cout << "source file '" + source + "' does not exist" << std::endl;
+        }
+        return;
     }
     if (force || !boost::filesystem::exists(dest) || boost::filesystem::last_write_time(source) > boost::filesystem::last_write_time(dest))
     {
@@ -159,21 +163,32 @@ int main(int argc, const char** argv)
                 else
                 {
                     std::string dir = Path::GetDirectoryName(path);
-                    std::string fileMask = Path::GetFileName(path);
-                    boost::filesystem::directory_iterator it(dir);
-                    while (it != boost::filesystem::directory_iterator())
+                    if (boost::filesystem::exists(dir))
                     {
-                        boost::filesystem::directory_entry entry(*it);
-                        if (boost::filesystem::is_regular_file(entry.path()))
+                        std::string fileMask = Path::GetFileName(path);
+                        boost::filesystem::directory_iterator it(dir);
+                        while (it != boost::filesystem::directory_iterator())
                         {
-                            std::string fileName = Path::GetFileName(entry.path().generic_string());
-                            if (FilePatternMatch(ToUtf32(fileName), ToUtf32(fileMask)))
+                            boost::filesystem::directory_entry entry(*it);
+                            if (boost::filesystem::is_regular_file(entry.path()))
                             {
-                                std::string path = Path::Combine(dir, fileName);
-                                paths.push_back(path);
+                                std::string fileName = Path::GetFileName(entry.path().generic_string());
+                                if (FilePatternMatch(ToUtf32(fileName), ToUtf32(fileMask)))
+                                {
+                                    std::string path = Path::Combine(dir, fileName);
+                                    paths.push_back(path);
+                                }
                             }
+                            ++it;
                         }
-                        ++it;
+                    }
+                    else
+                    {
+                        if (verbose)
+                        {
+                            std::cout << "source directory '" + dir + "' does not exist" << std::endl;
+                        }
+
                     }
                 }
             }
