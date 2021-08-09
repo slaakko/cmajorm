@@ -39,10 +39,7 @@ public:
     void WriteSLEB128Long(int64_t x);
     void Write(const boost::uuids::uuid& uuid);
     void WriteTime(time_t time);
-<<<<<<< HEAD
     int64_t Position() const { return stream.Position(); }
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 private:
     Stream& stream;
 };

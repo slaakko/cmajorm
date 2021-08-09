@@ -48,10 +48,7 @@ public:
     void Flush() override;
     void Seek(int64_t pos, Origin origin) override;
     int64_t Tell() override;
-<<<<<<< HEAD
     int64_t Size() const;
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 private:
     std::string filePath;
     FILE* file;

@@ -38,10 +38,7 @@ public:
     int64_t ReadSLEB128Long();
     void ReadUuid(boost::uuids::uuid& uuid);
     time_t ReadTime();
-<<<<<<< HEAD
     int64_t Position() const { return stream.Position(); }
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 private:
     Stream& stream;
 };

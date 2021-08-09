@@ -5,10 +5,7 @@
 
 #include <soulng/util/FileStream.hpp>
 #include <soulng/util/TextUtils.hpp>
-<<<<<<< HEAD
 #include <boost/filesystem.hpp>
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 #include <stdexcept>
 
 namespace soulng { namespace util {
@@ -102,10 +99,7 @@ int FileStream::ReadByte()
             throw std::runtime_error("could not read from file '" + filePath + "': " + PlatformStringToUtf8(std::strerror(errno)));
         }
     }
-<<<<<<< HEAD
     SetPosition(Position() + 1);
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
     return result;
 }
 
@@ -116,10 +110,7 @@ int64_t FileStream::Read(uint8_t* buf, int64_t count)
     {
         throw std::runtime_error("could not read from file '" + filePath + "': " + PlatformStringToUtf8(std::strerror(errno)));
     }
-<<<<<<< HEAD
     SetPosition(Position() + result);
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
     return result;
 }
 
@@ -130,10 +121,7 @@ void FileStream::Write(uint8_t x)
     {
         throw std::runtime_error("could not write to file '" + filePath + "': " + PlatformStringToUtf8(std::strerror(errno)));
     }
-<<<<<<< HEAD
     SetPosition(Position() + 1);
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 }
 
 void FileStream::Write(uint8_t* buf, int64_t count)
@@ -143,10 +131,7 @@ void FileStream::Write(uint8_t* buf, int64_t count)
     {
         throw std::runtime_error("could not write to file '" + filePath + "': " + PlatformStringToUtf8(std::strerror(errno)));
     }
-<<<<<<< HEAD
     SetPosition(Position() + result);
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 }
 
 void FileStream::Flush()
@@ -184,7 +169,6 @@ void FileStream::Seek(int64_t pos, Origin origin)
     {
         throw std::runtime_error("could not seek file '" + filePath + "': " + PlatformStringToUtf8(std::strerror(errno)));
     }
-<<<<<<< HEAD
     switch (origin)
     {
         case Origin::seekCur:
@@ -203,8 +187,6 @@ void FileStream::Seek(int64_t pos, Origin origin)
             break;
         }
     }
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 }
 
 int64_t FileStream::Tell()
@@ -217,12 +199,9 @@ int64_t FileStream::Tell()
     return result;
 }
 
-<<<<<<< HEAD
 int64_t FileStream::Size() const
 {
     return boost::filesystem::file_size(filePath);
 }
 
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 } } // namespace soulng::util

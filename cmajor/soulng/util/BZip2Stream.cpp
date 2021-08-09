@@ -95,12 +95,8 @@ int64_t BZip2Stream::Read(uint8_t* buf, int64_t count)
             }
             while (count > 0 && outHave > 0)
             {
-<<<<<<< HEAD
                 uint8_t* o = out.get();
                 *buf++ = o[outPos++];
-=======
-                *buf++ = out[outPos++];
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
                 --count;
                 --outHave;
                 ++bytesRead;
@@ -113,10 +109,7 @@ int64_t BZip2Stream::Read(uint8_t* buf, int64_t count)
     {
         throw std::runtime_error("bzip2 stream: unexpected end of input");
     }
-<<<<<<< HEAD
     SetPosition(Position() + bytesRead);
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
     return bytesRead;
 }
 
@@ -131,10 +124,7 @@ void BZip2Stream::Write(uint8_t* buf, int64_t count)
     {
         throw std::runtime_error("bzip2 stream: cannot write in 'decompress' compression mode");
     }
-<<<<<<< HEAD
     int64_t bytesWritten = 0;
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
     while (count > 0)
     {
         uint8_t* inP = in.get();
@@ -144,10 +134,7 @@ void BZip2Stream::Write(uint8_t* buf, int64_t count)
             *inP++ = *buf++;
             --count;
             ++inAvail;
-<<<<<<< HEAD
             ++bytesWritten;
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
         }
         bz2_set_input(in.get(), inAvail, handle);
         do
@@ -162,10 +149,7 @@ void BZip2Stream::Write(uint8_t* buf, int64_t count)
         } 
         while (outAvail == 0);
     }
-<<<<<<< HEAD
     SetPosition(Position() + bytesWritten);
-=======
->>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 }
 
 void BZip2Stream::Finish()
