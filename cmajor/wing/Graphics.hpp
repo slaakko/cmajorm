@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_GRAPHICS_INCLUDED
 #define CMAJOR_WING_GRAPHICS_INCLUDED
-#include <cmajor/wing/Wing.hpp>
+#include <wing/Wing.hpp>
 #include <memory>
 
 namespace cmajor { namespace wing {

@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_WINDOW_MANAGER_INCLUDED
 #define CMAJOR_WING_WINDOW_MANAGER_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
+#include <wing/WingApi.hpp>
 #include <Windows.h>
 #include <map>
 #include <set>

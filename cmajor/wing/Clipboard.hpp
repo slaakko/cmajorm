@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_CLIPBOARD_INCLUDED
 #define CMAJOR_WING_CLIPBOARD_INCLUDED
-#include <cmajor/wing/Wing.hpp>
+#include <wing/Wing.hpp>
 
 namespace cmajor { namespace wing {
 

@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Graphics.hpp>
+#include <wing/Graphics.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {

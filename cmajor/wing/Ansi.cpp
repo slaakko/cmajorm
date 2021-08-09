@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Ansi.hpp>
+#include <wing/Ansi.hpp>
 
 namespace cmajor { namespace wing {
 

@@ -5,8 +5,8 @@
 
 #ifndef CMAJOR_WING_EDIT_COMMAND_INCLUDED
 #define CMAJOR_WING_EDIT_COMMAND_INCLUDED
-#include <cmajor/wing/EditCommandList.hpp>
-#include <cmajor/wing/TextView.hpp>
+#include <wing/EditCommandList.hpp>
+#include <wing/TextView.hpp>
 
 namespace cmajor { namespace wing {
 

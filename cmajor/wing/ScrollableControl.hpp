@@ -5,8 +5,8 @@
 
 #ifndef CMAJOR_WING_SCROLLABLE_CONTROL_INCLUDED
 #define CMAJOR_WING_SCROLLABLE_CONTROL_INCLUDED
-#include <cmajor/wing/Control.hpp>
-#include <cmajor/wing/Container.hpp>
+#include <wing/Control.hpp>
+#include <wing/Container.hpp>
 
 namespace cmajor { namespace wing {
 

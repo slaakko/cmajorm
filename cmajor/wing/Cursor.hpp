@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_CURSOR_INCLUDED
 #define CMAJOR_WING_CURSOR_INCLUDED
-#include <cmajor/wing/ResourceManager.hpp>
+#include <wing/ResourceManager.hpp>
 #include <Windows.h>
 
 namespace cmajor { namespace wing {

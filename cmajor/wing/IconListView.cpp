@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/IconListView.hpp>
-#include <cmajor/wing/Button.hpp>
-#include <cmajor/wing/Window.hpp>
+#include <wing/IconListView.hpp>
+#include <wing/Button.hpp>
+#include <wing/Window.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef min

@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_COLOR_INCLUDED
 #define CMAJOR_WING_COLOR_INCLUDED
-#include <cmajor/wing/Graphics.hpp>
+#include <wing/Graphics.hpp>
 #include <stdint.h>
 
 namespace cmajor { namespace wing {

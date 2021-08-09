@@ -1,8 +1,11 @@
 #include <soulng/rex/Match.hpp>
-#include <soulng/util/BinaryReader.hpp>
-#include <soulng/util/BinaryWriter.hpp>
+#include <soulng/util/BinaryStreamReader.hpp>
+#include <soulng/util/BinaryStreamWriter.hpp>
+#include <soulng/util/FileStream.hpp>
+#include <soulng/util/BufferedStream.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
@@ -13,7 +16,7 @@
 
 std::string version()
 {
-    return "4.0.0";
+    return "4.1.0";
 }
 
 void PrintHelp()
@@ -50,17 +53,33 @@ void CopyFile(const std::string& source, const std::string& dest, bool force, bo
 {
     if (!boost::filesystem::exists(source))
     {
-        throw std::runtime_error("source file '" + source + "' does not exist");
+        if (verbose)
+        {
+            std::cout << "source file '" + source + "' does not exist" << std::endl;
+        }
+        return;
     }
     if (force || !boost::filesystem::exists(dest) || boost::filesystem::last_write_time(source) > boost::filesystem::last_write_time(dest))
     {
         int64_t size = boost::filesystem::file_size(source);
-        BinaryReader reader(source);
-        BinaryWriter writer(dest);
-        for (int64_t i = 0; i < size; ++i)
         {
-            uint8_t x = reader.ReadByte();
-            writer.Write(x);
+            FileStream sourceFile(source, OpenMode::read | OpenMode::binary);
+            BufferedStream bufferedSource(sourceFile);
+            BinaryStreamReader reader(bufferedSource);
+            FileStream destFile(dest, OpenMode::write | OpenMode::binary);
+            BufferedStream bufferedDest(destFile);
+            BinaryStreamWriter writer(bufferedDest);
+            for (int64_t i = 0; i < size; ++i)
+            {
+                uint8_t x = reader.ReadByte();
+                writer.Write(x);
+            }
+        }
+        boost::system::error_code ec;
+        boost::filesystem::last_write_time(dest, boost::filesystem::last_write_time(source), ec);
+        if (ec)
+        {
+            throw std::runtime_error("could not set write time of file '" + dest + "': " + PlatformStringToUtf8(ec.message()));
         }
         if (verbose)
         {
@@ -151,21 +170,32 @@ int main(int argc, const char** argv)
                 else
                 {
                     std::string dir = Path::GetDirectoryName(path);
-                    std::string fileMask = Path::GetFileName(path);
-                    boost::filesystem::directory_iterator it(dir);
-                    while (it != boost::filesystem::directory_iterator())
+                    if (boost::filesystem::exists(dir))
                     {
-                        boost::filesystem::directory_entry entry(*it);
-                        if (boost::filesystem::is_regular_file(entry.path()))
+                        std::string fileMask = Path::GetFileName(path);
+                        boost::filesystem::directory_iterator it(dir);
+                        while (it != boost::filesystem::directory_iterator())
                         {
-                            std::string fileName = Path::GetFileName(entry.path().generic_string());
-                            if (FilePatternMatch(ToUtf32(fileName), ToUtf32(fileMask)))
+                            boost::filesystem::directory_entry entry(*it);
+                            if (boost::filesystem::is_regular_file(entry.path()))
                             {
-                                std::string path = Path::Combine(dir, fileName);
-                                paths.push_back(path);
+                                std::string fileName = Path::GetFileName(entry.path().generic_string());
+                                if (FilePatternMatch(ToUtf32(fileName), ToUtf32(fileMask)))
+                                {
+                                    std::string path = Path::Combine(dir, fileName);
+                                    paths.push_back(path);
+                                }
                             }
+                            ++it;
                         }
-                        ++it;
+                    }
+                    else
+                    {
+                        if (verbose)
+                        {
+                            std::cout << "source directory '" + dir + "' does not exist" << std::endl;
+                        }
+
                     }
                 }
             }

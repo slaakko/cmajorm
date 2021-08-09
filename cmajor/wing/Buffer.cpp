@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Buffer.hpp>
+#include <wing/Buffer.hpp>
 
 namespace cmajor { namespace wing {
 

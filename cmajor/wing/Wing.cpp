@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Wing.hpp>
-#include <cmajor/wing/Graphics.hpp>
+#include <wing/Wing.hpp>
+#include <wing/Graphics.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <shobjidl_core.h>
 

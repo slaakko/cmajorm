@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/StatusBar.hpp>
+#include <wing/StatusBar.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef max

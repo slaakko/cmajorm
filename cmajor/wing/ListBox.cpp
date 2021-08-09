@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/ListBox.hpp>
+#include <wing/ListBox.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {

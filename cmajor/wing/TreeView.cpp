@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/TreeView.hpp>
-#include <cmajor/wing/Window.hpp>
+#include <wing/TreeView.hpp>
+#include <wing/Window.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef min

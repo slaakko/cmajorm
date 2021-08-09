@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_TAB_CONTROL_INCLUDED
 #define CMAJOR_WING_TAB_CONTROL_INCLUDED
-#include <cmajor/wing/Panel.hpp>
+#include <wing/Panel.hpp>
 
 namespace cmajor { namespace wing {
 

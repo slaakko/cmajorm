@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/SourceCodeView.hpp>
+#include <wing/SourceCodeView.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {

@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/TextBox.hpp>
+#include <wing/TextBox.hpp>
 
 namespace cmajor { namespace wing {
 

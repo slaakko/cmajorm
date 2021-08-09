@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/BorderedControl.hpp>
-#include <cmajor/wing/ContainerControl.hpp>
+#include <wing/BorderedControl.hpp>
+#include <wing/ContainerControl.hpp>
 
 namespace cmajor { namespace wing {
 

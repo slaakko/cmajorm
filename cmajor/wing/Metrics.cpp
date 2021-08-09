@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Metrics.hpp>
+#include <wing/Metrics.hpp>
 #include <sngxml/dom/CharacterData.hpp>
 #include <sngxml/dom/Parser.hpp>
 #include <sngxml/xpath/XPathEvaluate.hpp>

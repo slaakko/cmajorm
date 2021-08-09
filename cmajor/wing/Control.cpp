@@ -3,14 +3,14 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Control.hpp>
-#include <cmajor/wing/ContainerControl.hpp>
-#include <cmajor/wing/ListBox.hpp>
-#include <cmajor/wing/Menu.hpp>
-#include <cmajor/wing/Window.hpp>
-#include <cmajor/wing/Application.hpp>
-#include <cmajor/wing/Container.hpp>
-#include <cmajor/wing/Buffer.hpp>
+#include <wing/Control.hpp>
+#include <wing/ContainerControl.hpp>
+#include <wing/ListBox.hpp>
+#include <wing/Menu.hpp>
+#include <wing/Window.hpp>
+#include <wing/Application.hpp>
+#include <wing/Container.hpp>
+#include <wing/Buffer.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <windowsx.h>
 

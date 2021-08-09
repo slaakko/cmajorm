@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Cursor.hpp>
-#include <cmajor/wing/Wing.hpp>
+#include <wing/Cursor.hpp>
+#include <wing/Wing.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {

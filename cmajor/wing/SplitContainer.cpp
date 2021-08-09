@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/SplitContainer.hpp>
-#include <cmajor/wing/Application.hpp>
-#include <cmajor/wing/Panel.hpp>
+#include <wing/SplitContainer.hpp>
+#include <wing/Application.hpp>
+#include <wing/Panel.hpp>
 
 namespace cmajor { namespace wing {
 

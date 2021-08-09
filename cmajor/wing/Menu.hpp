@@ -5,9 +5,9 @@
 
 #ifndef CMAJOR_WING_MENU_INCLUDED
 #define CMAJOR_WING_MENU_INCLUDED
-#include <cmajor/wing/Control.hpp>
-#include <cmajor/wing/Container.hpp>
-#include <cmajor/wing/Keys.hpp>
+#include <wing/Control.hpp>
+#include <wing/Container.hpp>
+#include <wing/Keys.hpp>
 
 namespace cmajor { namespace wing {
 

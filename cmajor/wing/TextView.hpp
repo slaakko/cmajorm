@@ -5,8 +5,8 @@
 
 #ifndef CMAJOR_WING_TEXT_VIEW_INCLUDED
 #define CMAJOR_WING_TEXT_VIEW_INCLUDED
-#include <cmajor/wing/Control.hpp>
-#include <cmajor/wing/EditCommandList.hpp>
+#include <wing/Control.hpp>
+#include <wing/EditCommandList.hpp>
 #include <soulng/lexer/SourcePos.hpp>
 
 namespace cmajor { namespace wing {

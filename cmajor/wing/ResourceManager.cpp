@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/ResourceManager.hpp>
-#include <cmajor/wing/Cursor.hpp>
-#include <cmajor/wing/Icon.hpp>
+#include <wing/ResourceManager.hpp>
+#include <wing/Cursor.hpp>
+#include <wing/Icon.hpp>
 #include <stdexcept>
 
 namespace cmajor { namespace wing {

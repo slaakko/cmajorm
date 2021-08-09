@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_LOG_VIEW_INCLUDED
 #define CMAJOR_WING_LOG_VIEW_INCLUDED
-#include <cmajor/wing/TextView.hpp>
+#include <wing/TextView.hpp>
 
 namespace cmajor { namespace wing {
 

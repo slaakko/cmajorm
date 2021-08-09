@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Icon.hpp>
-#include <cmajor/wing/Wing.hpp>
+#include <wing/Icon.hpp>
+#include <wing/Wing.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {

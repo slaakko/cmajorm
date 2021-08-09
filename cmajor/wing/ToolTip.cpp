@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/ToolTip.hpp>
-#include <cmajor/wing/TextView.hpp>
+#include <wing/ToolTip.hpp>
+#include <wing/TextView.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef max

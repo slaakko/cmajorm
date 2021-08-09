@@ -3,13 +3,13 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Window.hpp>
-#include <cmajor/wing/Application.hpp>
-#include <cmajor/wing/Button.hpp>
-#include <cmajor/wing/Menu.hpp>
-#include <cmajor/wing/Metrics.hpp>
-#include <cmajor/wing/Icon.hpp>
-#include <cmajor/wing/TextBox.hpp>
+#include <wing/Window.hpp>
+#include <wing/Application.hpp>
+#include <wing/Button.hpp>
+#include <wing/Menu.hpp>
+#include <wing/Metrics.hpp>
+#include <wing/Icon.hpp>
+#include <wing/TextBox.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef max

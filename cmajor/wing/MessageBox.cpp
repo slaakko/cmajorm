@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/MessageBox.hpp>
-#include <cmajor/wing/Control.hpp>
+#include <wing/MessageBox.hpp>
+#include <wing/Control.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef MessageBox

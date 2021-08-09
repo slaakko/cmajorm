@@ -5,8 +5,8 @@
 
 #ifndef CMAJOR_WING_WINDOW_INCLUDED
 #define CMAJOR_WING_WINDOW_INCLUDED
-#include <cmajor/wing/Application.hpp>
-#include <cmajor/wing/ContainerControl.hpp>
+#include <wing/Application.hpp>
+#include <wing/ContainerControl.hpp>
 
 namespace cmajor { namespace wing {
 

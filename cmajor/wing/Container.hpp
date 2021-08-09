@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_COMTAINER_INCLUDED
 #define CMAJOR_WING_COMTAINER_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
+#include <wing/WingApi.hpp>
 #include <memory>
 
 namespace cmajor { namespace wing {

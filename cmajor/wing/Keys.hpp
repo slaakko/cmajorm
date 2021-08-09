@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_KEYS_INCLUDED
 #define CMAJOR_WING_KEYS_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
+#include <wing/WingApi.hpp>
 #include <string>
 
 namespace cmajor { namespace wing {

@@ -520,6 +520,21 @@ std::string DurationStr(const std::chrono::nanoseconds& duration)
     return s;
 }
 
+std::time_t Time()
+{
+    std::time_t time = std::time(nullptr);
+    return time;
+}
+
+std::string TimeToString(std::time_t time)
+{
+    std::tm* ptm = std::localtime(&time);
+    char buffer[20];
+    // Format: 15.06.2009 20:20:00
+    std::strftime(buffer, 20, "%d.%m.%Y %H:%M:%S", ptm);
+    return buffer;
+}
+
 void TimeInit()
 {
     TimestampProvider::Init();

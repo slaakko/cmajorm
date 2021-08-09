@@ -5,8 +5,8 @@
 
 #ifndef CMAJOR_WING_TOOL_BAR_INCLUDED
 #define CMAJOR_WING_TOOL_BAR_INCLUDED
-#include <cmajor/wing/ToolTip.hpp>
-#include <cmajor/wing/Container.hpp>
+#include <wing/ToolTip.hpp>
+#include <wing/Container.hpp>
 
 namespace cmajor { namespace wing {
 

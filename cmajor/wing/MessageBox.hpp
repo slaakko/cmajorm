@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_MESSAGE_BOX_INCLUDED
 #define CMAJOR_WING_MESSAGE_BOX_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
+#include <wing/WingApi.hpp>
 #include <string>
 
 #undef MessageBox

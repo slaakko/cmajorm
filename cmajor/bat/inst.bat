@@ -12,7 +12,7 @@ cminst -v ..\x64\Release\*.lib ..\lib
 cminst -v C:\llvm-11.0.0.src\build\Release\bin\llc.exe ..\bin
 cminst -v C:\llvm-11.0.0.src\build\Release\bin\opt.exe ..\bin
 cminst -v C:\llvm-11.0.0.src\build\Release\bin\llvm-dis.exe ..\bin
-cminst -v C:\work\cmajorm\cmajor\task\bin\Release\CmajorTasks.dll ..\bin
+cminst -v ..\task\bin\Release\CmajorTasks.dll ..\bin
 cminst -v ..\projects\examples\HexDump\bin\release\hexdump.exe ..\bin
 cminst -v ..\projects\examples\sted\bin\release\sted.exe ..\bin
 cminst -v ..\projects\examples\ms\bin\release\ms.exe ..\bin
@@ -28,3 +28,6 @@ cminst -v ..\projects\tools\spring\bin\release\spring.exe ..\bin
 cminst -v ..\projects\tools\soulcm\scm2html\bin\release\scm2html.exe ..\bin
 cminst -v ..\projects\tools\soulcm\scmlg\bin\release\scmlg.exe ..\bin
 cminst -v ..\projects\tools\soulcm\scmpg\bin\release\scmpg.exe ..\bin
+cminst -v ..\..\devenv\cmdevenv\bin\x64\Release\*.exe ..\bin
+cminst -v ..\..\devenv\cmdevenv\bin\x64\Release\*.exe.config ..\bin
+cminst -v ..\..\devenv\cmdevenv\bin\x64\Release\*.dll ..\bin

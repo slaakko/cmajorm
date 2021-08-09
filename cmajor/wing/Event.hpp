@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_EVENT_INCLUDED
 #define CMAJOR_WING_EVENT_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
+#include <wing/WingApi.hpp>
 #include <functional>
 #include <map>
 #include <vector>

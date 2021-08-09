@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_WING_INCLUDED
 #define CMAJOR_WING_WING_INCLUDED
-#include <cmajor/wing/Keys.hpp>
+#include <wing/Keys.hpp>
 #include <Windows.h>
 #include <gdiplus.h>
 #include <stdexcept>

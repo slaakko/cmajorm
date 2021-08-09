@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/WindowManager.hpp>
-#include <cmajor/wing/Control.hpp>
-#include <cmajor/wing/Wing.hpp>
+#include <wing/WindowManager.hpp>
+#include <wing/Control.hpp>
+#include <wing/Wing.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <Windows.h>
 

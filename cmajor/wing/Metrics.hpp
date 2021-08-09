@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_METRICS_INCLUDED
 #define CMAJOR_WING_METRICS_INCLUDED
-#include <cmajor/wing/Graphics.hpp>
+#include <wing/Graphics.hpp>
 #include <sngxml/dom/Element.hpp>
 
 namespace cmajor { namespace wing {

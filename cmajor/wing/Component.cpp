@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Component.hpp>
+#include <wing/Component.hpp>
 
 namespace cmajor { namespace wing {
 

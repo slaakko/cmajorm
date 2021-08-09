@@ -10,7 +10,7 @@ Error.o Fiber.o InitDone.o Io.o Math.o Memory.o Multiprecision.o Mutex.o Process
 Statics.o String.o Thread.o Time.o Trace.o UnitTest.o Unwind.o 
 endif
 
-LIBRARY_NAME=libcmrt400cpp.dll
+LIBRARY_NAME=libcmrt410cpp.dll
 
 SOURCE_PREFIX=../../../..
 

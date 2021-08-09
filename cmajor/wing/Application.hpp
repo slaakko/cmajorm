@@ -5,10 +5,10 @@
 
 #ifndef CMAJOR_WING_APPLICATION_INCLUDED
 #define CMAJOR_WING_APPLICATION_INCLUDED
-#include <cmajor/wing/Keys.hpp>
-#include <cmajor/wing/Wing.hpp>
-#include <cmajor/wing/ResourceManager.hpp>
-#include <cmajor/wing/WindowManager.hpp>
+#include <wing/Keys.hpp>
+#include <wing/Wing.hpp>
+#include <wing/ResourceManager.hpp>
+#include <wing/WindowManager.hpp>
 #include <functional>
 
 namespace cmajor { namespace wing {

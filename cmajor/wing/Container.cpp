@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Container.hpp>
-#include <cmajor/wing/Component.hpp>
-#include <cmajor/wing/Control.hpp>
+#include <wing/Container.hpp>
+#include <wing/Component.hpp>
+#include <wing/Control.hpp>
 
 namespace cmajor { namespace wing {
 

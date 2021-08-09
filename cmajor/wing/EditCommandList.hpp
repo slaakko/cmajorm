@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_EDIT_COMMAND_LIST_INCLUDED
 #define CMAJOR_WING_EDIT_COMMAND_LIST_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
+#include <wing/WingApi.hpp>
 #include <memory>
 #include <vector>
 

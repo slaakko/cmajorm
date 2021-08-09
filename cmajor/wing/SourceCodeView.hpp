@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_SOURCE_CODE_VIEW_INCLUDED
 #define CMAJOR_WING_SOURCE_CODE_VIEW_INCLUDED
-#include <cmajor/wing/TextView.hpp>
+#include <wing/TextView.hpp>
 #include <soulng/lexer/Token.hpp>
 #include <soulng/util/TextUtils.hpp>
 

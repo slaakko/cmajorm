@@ -39,6 +39,8 @@ public:
     static bool IsRelative(const std::string& path);
 };
 
+UTIL_API std::string MakeNativePath(const std::string& path);
+
 } } // namespace soulng::util
 
 #endif // SOULNG_UTIL_PATH_INCLUDED

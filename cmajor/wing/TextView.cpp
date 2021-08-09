@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/TextView.hpp>
-#include <cmajor/wing/Application.hpp>
-#include <cmajor/wing/EditCommand.hpp>
+#include <wing/TextView.hpp>
+#include <wing/Application.hpp>
+#include <wing/EditCommand.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <fstream>

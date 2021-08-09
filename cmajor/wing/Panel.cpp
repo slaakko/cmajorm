@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Panel.hpp>
+#include <wing/Panel.hpp>
 
 namespace cmajor { namespace wing {
 

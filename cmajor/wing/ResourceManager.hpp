@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_RESOURCE_MANAGER_INCLUDED
 #define CMAJOR_WING_RESOURCE_MANAGER_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
+#include <wing/WingApi.hpp>
 #include <memory>
 #include <unordered_map>
 #include <vector>

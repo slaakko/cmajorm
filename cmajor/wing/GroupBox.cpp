@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/GroupBox.hpp>
-#include <cmajor/wing/RadioButton.hpp>
+#include <wing/GroupBox.hpp>
+#include <wing/RadioButton.hpp>
 
 namespace cmajor { namespace wing {
 

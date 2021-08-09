@@ -3,10 +3,11 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/InitDone.hpp>
-#include <cmajor/wing/Metrics.hpp>
-#include <cmajor/wing/Wing.hpp>
-#include <cmajor/wing/Application.hpp>
+#include <wing/InitDone.hpp>
+#include <wing/Metrics.hpp>
+#include <wing/Wing.hpp>
+#include <wing/Application.hpp>
+#include <wing/Shell.hpp>
 
 namespace cmajor { namespace wing {
 
@@ -15,10 +16,12 @@ void Init(HINSTANCE instance)
     WingInit(instance);
     ApplicationInit();
     LoadMetrics();
+    ShellInit();
 }
 
 void Done()
 {
+    ShellDone();
     ApplicationDone();
     WingDone();
 }

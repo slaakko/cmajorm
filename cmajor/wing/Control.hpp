@@ -5,12 +5,12 @@
 
 #ifndef CMAJOR_WING_CONTROL_INCLUDED
 #define CMAJOR_WING_CONTROL_INCLUDED
-#include <cmajor/wing/Component.hpp>
-#include <cmajor/wing/Cursor.hpp>
-#include <cmajor/wing/Event.hpp>
-#include <cmajor/wing/Graphics.hpp>
-#include <cmajor/wing/Keys.hpp>
-#include <cmajor/wing/Wing.hpp>
+#include <wing/Component.hpp>
+#include <wing/Cursor.hpp>
+#include <wing/Event.hpp>
+#include <wing/Graphics.hpp>
+#include <wing/Keys.hpp>
+#include <wing/Wing.hpp>
 #include <memory>
 #include <string>
 #include <vector>

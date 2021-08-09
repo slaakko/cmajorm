@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/ToolBar.hpp>
-#include <cmajor/wing/Window.hpp>
+#include <wing/ToolBar.hpp>
+#include <wing/Window.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace wing {

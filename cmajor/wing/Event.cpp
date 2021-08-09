@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Event.hpp>
+#include <wing/Event.hpp>
 
 namespace cmajor { namespace wing {
 

@@ -331,7 +331,19 @@ std::string Path::GetDirectoryName(const std::string& path)
         std::string::size_type lastDirSepPos = path.rfind('/');
         if (lastDirSepPos != std::string::npos)
         {
-            return path.substr(0, lastDirSepPos);
+            std::string dir = path.substr(0, lastDirSepPos);
+#ifdef _WIN32
+            if (dir.length() == 2 && std::isalpha(dir[0]) && dir[1] == ':')
+            {
+                dir.append(1, '/');
+            }
+#else
+            if (dir.empty())
+            {
+                dir.append(1, '/');
+            }
+#endif
+            return dir;
         }
         else
         {
@@ -489,6 +501,27 @@ std::string MakeRelativeDirPath(const std::string& dirPath, const std::string& r
         result = Path::Combine(result, pc[i]);
     }
     return result;
+}
+
+std::string MakeNativePath(const std::string& path)
+{
+#ifdef _WIN32
+    std::string nativePath;
+    for (char c : path)
+    {
+        if (c == '/')
+        {
+            nativePath.append(1, '\\');
+        }
+        else
+        {
+            nativePath.append(1, c);
+        }
+    }
+    return nativePath;
+#else
+    return path;
+#endif
 }
 
 } }

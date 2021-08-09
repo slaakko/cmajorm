@@ -1,5 +1,5 @@
-#include <cmajor/wing/Button.hpp>
-#include <cmajor/wing/Window.hpp>
+#include <wing/Button.hpp>
+#include <wing/Window.hpp>
 
 namespace cmajor { namespace wing {
 

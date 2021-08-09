@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Keys.hpp>
+#include <wing/Keys.hpp>
 
 namespace cmajor { namespace wing {
 

@@ -5,8 +5,8 @@
 
 #ifndef CMAJOR_WING_CONSOLE_INCLUDED
 #define CMAJOR_WING_CONSOLE_INCLUDED
-#include <cmajor/wing/Ansi.hpp>
-#include <cmajor/wing/TextView.hpp>
+#include <wing/Ansi.hpp>
+#include <wing/TextView.hpp>
 
 namespace cmajor { namespace wing {
 

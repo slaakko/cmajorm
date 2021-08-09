@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/EditCommand.hpp>
+#include <wing/EditCommand.hpp>
 
 namespace cmajor { namespace wing {
 

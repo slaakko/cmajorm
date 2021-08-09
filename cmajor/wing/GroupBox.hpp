@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_GROUP_BOX_INCLUDED
 #define CMAJOR_WING_GROUP_BOX_INCLUDED
-#include <cmajor/wing/Button.hpp>
+#include <wing/Button.hpp>
 
 namespace cmajor { namespace wing {
 

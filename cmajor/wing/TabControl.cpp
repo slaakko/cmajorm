@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/TabControl.hpp>
+#include <wing/TabControl.hpp>
 #include <soulng/util/Unicode.hpp>
 
 #undef min

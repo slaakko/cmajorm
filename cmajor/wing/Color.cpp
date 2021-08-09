@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Color.hpp>
+#include <wing/Color.hpp>
 
 namespace cmajor { namespace wing {
 

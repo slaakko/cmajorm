@@ -1,5 +1,5 @@
-#include <cmajor/wing/Dialog.hpp>
-#include <cmajor/wing/Wing.hpp>
+#include <wing/Dialog.hpp>
+#include <wing/Wing.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
 

@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Application.hpp>
-#include <cmajor/wing/Window.hpp>
+#include <wing/Application.hpp>
+#include <wing/Window.hpp>
 
 namespace cmajor { namespace wing {
 

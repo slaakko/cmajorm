@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Label.hpp>
+#include <wing/Label.hpp>
 
 namespace cmajor { namespace wing {
 

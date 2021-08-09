@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_WING_DIALOG_INCLUDED
 #define CMAJOR_WING_DIALOG_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
+#include <wing/WingApi.hpp>
 #include <string>
 #include <vector>
 #include <Windows.h>

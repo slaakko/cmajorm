@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/ScrollableControl.hpp>
+#include <wing/ScrollableControl.hpp>
 
 namespace cmajor { namespace wing {
 

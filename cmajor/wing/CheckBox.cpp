@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/CheckBox.hpp>
+#include <wing/CheckBox.hpp>
 
 #undef min
 #undef max

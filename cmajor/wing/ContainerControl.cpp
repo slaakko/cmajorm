@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/ContainerControl.hpp>
-#include <cmajor/wing/Menu.hpp>
+#include <wing/ContainerControl.hpp>
+#include <wing/Menu.hpp>
 
 namespace cmajor { namespace wing {
 

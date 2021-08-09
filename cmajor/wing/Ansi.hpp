@@ -5,8 +5,8 @@
 
 #ifndef CMAJOR_WING_ANSI_INCLUDED
 #define CMAJOR_WING_ANSI_INCLUDED
-#include <cmajor/wing/WingApi.hpp>
-#include <cmajor/wing/Color.hpp>
+#include <wing/WingApi.hpp>
+#include <wing/Color.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <functional>
 

@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Clipboard.hpp>
+#include <wing/Clipboard.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Random.hpp>
 #include <thread>

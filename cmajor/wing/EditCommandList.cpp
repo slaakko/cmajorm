@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/EditCommandList.hpp>
-#include <cmajor/wing/TextView.hpp>
-#include <cmajor/wing/Menu.hpp>
+#include <wing/EditCommandList.hpp>
+#include <wing/TextView.hpp>
+#include <wing/Menu.hpp>
 
 namespace cmajor { namespace wing {
 

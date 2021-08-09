@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/wing/Menu.hpp>
-#include <cmajor/wing/ContainerControl.hpp>
+#include <wing/Menu.hpp>
+#include <wing/ContainerControl.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <algorithm>
 
