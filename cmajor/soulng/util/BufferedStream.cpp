@@ -38,10 +38,15 @@ int BufferedStream::ReadByte()
             return -1;
         }
     }
+<<<<<<< HEAD
     uint8_t* b = buffer.get();
     uint8_t value = b[pos++];
     --bytesAvailable;
     SetPosition(Position() + 1);
+=======
+    uint8_t value = buffer[pos++];
+    --bytesAvailable;
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
     return value;
 }
 
@@ -56,12 +61,19 @@ int64_t BufferedStream::Read(uint8_t* buf, int64_t count)
     int64_t n = std::min(bytesAvailable, count);
     for (int64_t i = 0; i < n; ++i)
     {
+<<<<<<< HEAD
         uint8_t* b = buffer.get();
         buf[i] = b[pos++];
         ++bytesRead;
         --bytesAvailable;
     }
     SetPosition(Position() + bytesRead);
+=======
+        buf[i] = buffer[pos++];
+        ++bytesRead;
+        --bytesAvailable;
+    }
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
     return bytesRead;
 }
 
@@ -71,9 +83,13 @@ void BufferedStream::Write(uint8_t x)
     {
         Flush();
     }
+<<<<<<< HEAD
     uint8_t* b = buffer.get();
     b[end++] = x;
     SetPosition(Position() + 1);
+=======
+    buffer[end++] = x;
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 }
 
 void BufferedStream::Write(uint8_t* buf, int64_t count)

@@ -4,12 +4,16 @@
 // =================================
 
 #include <soulng/util/Stream.hpp>
+<<<<<<< HEAD
 #include <algorithm>
+=======
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 #include <stdexcept>
 #include <memory>
 
 namespace soulng { namespace util {
 
+<<<<<<< HEAD
 StreamObserver::StreamObserver()
 {
 }
@@ -19,6 +23,9 @@ StreamObserver::~StreamObserver()
 }
 
 Stream::Stream() : position(0)
+=======
+Stream::Stream()
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 {
 }
 
@@ -40,6 +47,7 @@ int64_t Stream::Tell()
     throw std::runtime_error("tell not supported");
 }
 
+<<<<<<< HEAD
 void Stream::AddObserver(StreamObserver* observer)
 {
     if (std::find(observers.begin(), observers.end(), observer) == observers.end())
@@ -65,6 +73,8 @@ void Stream::SetPosition(int64_t position_)
     }
 }
 
+=======
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 void Stream::CopyTo(Stream& destination)
 {
     CopyTo(destination, 16384);

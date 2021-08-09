@@ -63,12 +63,17 @@ void CopyFile(const std::string& source, const std::string& dest, bool force, bo
     {
         int64_t size = boost::filesystem::file_size(source);
         {
+<<<<<<< HEAD
             FileStream sourceFile(source, OpenMode::read | OpenMode::binary);
             BufferedStream bufferedSource(sourceFile);
             BinaryStreamReader reader(bufferedSource);
             FileStream destFile(dest, OpenMode::write | OpenMode::binary);
             BufferedStream bufferedDest(destFile);
             BinaryStreamWriter writer(bufferedDest);
+=======
+            BinaryReader reader(source);
+            BinaryWriter writer(dest);
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
             for (int64_t i = 0; i < size; ++i)
             {
                 uint8_t x = reader.ReadByte();
@@ -79,7 +84,11 @@ void CopyFile(const std::string& source, const std::string& dest, bool force, bo
         boost::filesystem::last_write_time(dest, boost::filesystem::last_write_time(source), ec);
         if (ec)
         {
+<<<<<<< HEAD
             throw std::runtime_error("could not set write time of file '" + dest + "': " + PlatformStringToUtf8(ec.message()));
+=======
+            throw std::runtime_error("could not set write time of file '" + dest + "': " + ec.message());
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
         }
         if (verbose)
         {

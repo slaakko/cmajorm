@@ -7,7 +7,10 @@
 #define SOULNG_UTIL_STREAM_INCLUDED
 #include <soulng/util/UtilApi.hpp>
 #include <stdint.h>
+<<<<<<< HEAD
 #include <vector>
+=======
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 
 namespace soulng { namespace util {
 
@@ -16,6 +19,7 @@ enum class Origin : uint8_t
     seekSet, seekCur, seekEnd
 };
 
+<<<<<<< HEAD
 class Stream;
 
 class UTIL_API StreamObserver
@@ -26,6 +30,8 @@ public:
     virtual void PositionChanged(Stream* stream) {}
 };
 
+=======
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 class UTIL_API Stream
 {
 public:
@@ -42,6 +48,7 @@ public:
     virtual int64_t Tell();
     void CopyTo(Stream& destination);
     void CopyTo(Stream& destination, int64_t bufferSize);
+<<<<<<< HEAD
     int64_t Position() const { return position; }
     void SetPosition(int64_t position_);
     void AddObserver(StreamObserver* observer);
@@ -49,6 +56,8 @@ public:
 private:
     int64_t position;
     std::vector<StreamObserver*> observers;
+=======
+>>>>>>> c8b260dfbbd561b2e053dafc4b764c71755fbac7
 };
 
 } } // namespace soulng::util
