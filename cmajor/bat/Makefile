@@ -48,5 +48,41 @@ cmsx:
 	cmc -u -v -st -bt=1 ../projects/cmsx/cmsx.cms
 	cmc -u -v -c=release -st -bt=1 ../projects/cmsx/cmsx.cms
 
+plain_package:
+	wingstall -v --create-package ..\..\setup\plain\cmajor.xml
+	
+plain_setup:	
+	wingstall -v --make-setup ..\..\setup\plain\cmajor.bin
+	MSBuild -m -verbosity:minimal ..\..\setup\plain\program\setup.vcxproj -p:Configuration="Debug"
+	MSBuild -m -verbosity:minimal ..\..\setup\plain\program\setup.vcxproj -p:Configuration="Release"
+
+deflate_package:
+	wingstall -v --create-package ..\..\setup\deflate\cmajor.xml
+	
+deflate_setup:	
+	wingstall -v --make-setup ..\..\setup\deflate\cmajor.bin
+	MSBuild -m -verbosity:minimal ..\..\setup\deflate\program\setup.vcxproj -p:Configuration="Debug"
+	MSBuild -m -verbosity:minimal ..\..\setup\deflate\program\setup.vcxproj -p:Configuration="Release"
+
+bzip2_package:
+	wingstall -v --create-package ..\..\setup\bzip2\cmajor.xml
+	
+bzip2_setup:	
+	wingstall -v --make-setup ..\..\setup\bzip2\cmajor.bin
+	MSBuild -m -verbosity:minimal ..\..\setup\bzip2\program\setup.vcxproj -p:Configuration="Debug"
+	MSBuild -m -verbosity:minimal ..\..\setup\bzip2\program\setup.vcxproj -p:Configuration="Release"
+	
+packages: plain_package deflate_package bzip2_package
+	
+setups: plain_setup deflate_setup bzip2_setup
+	cminst -v ..\..\setup\plain\program\x64\Debug\setupd.exe ..\..\setup\plain\bin
+	cminst -v ..\..\setup\plain\program\x64\Release\setup.exe ..\..\setup\plain\bin
+	cminst -v ..\..\setup\deflate\program\x64\Debug\setupd.exe ..\..\setup\deflate\bin
+	cminst -v ..\..\setup\deflate\program\x64\Release\setup.exe ..\..\setup\deflate\bin
+	cminst -v ..\..\setup\bzip2\program\x64\Debug\setupd.exe ..\..\setup\bzip2\bin
+	cminst -v ..\..\setup\bzip2\program\x64\Release\setup.exe ..\..\setup\bzip2\bin
+
+packages_and_setups: packages setups
+	
 install:
 	inst.bat

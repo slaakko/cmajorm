@@ -15,10 +15,6 @@ MemoryStream::MemoryStream(uint8_t* data_, int64_t size_) : Stream(), data(data_
 {
 }
 
-MemoryStream::MemoryStream(uint8_t* data, int64_t count) : Stream(), content(), readPos(0)
-{
-}
-
 int MemoryStream::ReadByte()
 {
     if (readPos < size)

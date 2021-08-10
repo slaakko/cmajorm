@@ -42,11 +42,12 @@ bool HasPathDirectory(const std::string& directory)
     if (HasSystemEnvironmentVariable("Path"))
     {
         std::string path = GetSystemEnvironmentVariable("Path");
+        std::string dirPath = ToLower(GetFullPath(directory));
         std::vector<std::string> directories = Split(path, ';');
         int n = directories.size();
         for (int i = 0; i < n; ++i)
         {
-            if (ToLower(directories[i]) == ToLower(directory)) return true;
+            if (ToLower(GetFullPath(directories[i])) == dirPath) return true;
         }
     }
     return false;
@@ -85,10 +86,11 @@ void RemovePathDirectory(const std::string& directory)
         std::vector<std::string> directories = Split(path, ';');
         std::vector<std::string> newDirectories;
         std::string newPath;
+        std::string dirPath = ToLower(GetFullPath(directory));
         int n = directories.size();
         for (int i = 0; i < n; ++i)
         {
-            if (ToLower(directories[i]) != ToLower(directory))
+            if (ToLower(GetFullPath(directories[i])) != dirPath)
             {
                 newDirectories.push_back(directories[i]);
             }
