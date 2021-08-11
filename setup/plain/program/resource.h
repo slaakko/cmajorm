@@ -1,4 +1,0 @@
-#ifndef RESOURCE_H
-#define RESOURCE_H
-#define PACKAGE_RESOURCE 101
-#endif // RESOURCE_H

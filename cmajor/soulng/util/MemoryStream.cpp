@@ -28,7 +28,7 @@ int MemoryStream::ReadByte()
 int64_t MemoryStream::Read(uint8_t* buf, int64_t count)
 {
     int64_t bytesRead = 0;
-    int64_t n = count;
+    int64_t n = size;
     while (count > 0 && readPos < n)
     {
         *buf++ = data[readPos++];

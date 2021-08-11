@@ -1,7 +1,7 @@
 #include "data.hpp"
 
-int PackageResourceId()
+std::string PackageResourceName()
 {
-    return 101;
+    return "cmajor_package";
 }
 

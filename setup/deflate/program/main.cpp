@@ -1,9 +1,12 @@
 #include <winggui/install_window.hpp>
 #include "data.hpp"
 #include <stdexcept>
+#include <wing/BinaryResourcePtr.hpp>
 #include <wing/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <soulng/util/InitDone.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/System.hpp>
 
 using namespace cmajor::wing;
 using namespace wingstall::winggui;
@@ -30,14 +33,17 @@ int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdSh
     InitDone initDone(instance);
     try
     {
+        std::string currentExecutableName = Path::GetFileName(GetFullPath(GetPathToExecutable()));
+        BinaryResourcePtr packageResource(currentExecutableName, PackageResourceName());
         SetInfoItem(InfoItemKind::appName, new StringItem("Cmajor"));
         SetInfoItem(InfoItemKind::appVersion, new StringItem("4.1.0"));
         SetInfoItem(InfoItemKind::installDirName, new StringItem("cmajor"));
         SetInfoItem(InfoItemKind::defaultContainingDirPath, new StringItem("C:/"));
         SetInfoItem(InfoItemKind::compression, new IntegerItem(static_cast<int64_t>(Compression::deflate)));
         SetInfoItem(InfoItemKind::dataSource, new IntegerItem(static_cast<int64_t>(DataSource::memory)));
-        SetInfoItem(InfoItemKind::compressedPackageSize, new IntegerItem(197218280));
-        SetInfoItem(InfoItemKind::uncompressedPackageSize, new IntegerItem(1368366183));
+        SetInfoItem(InfoItemKind::packageDataAddress, new IntegerItem(reinterpret_cast<int64_t>(packageResource.Data())));
+        SetInfoItem(InfoItemKind::compressedPackageSize, new IntegerItem(packageResource.Size()));
+        SetInfoItem(InfoItemKind::uncompressedPackageSize, new IntegerItem(1368392867)); 
         Package package;
         InstallWindow installWindow;
         installWindow.SetPackage(&package);
