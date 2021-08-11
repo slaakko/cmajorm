@@ -5,6 +5,7 @@
 
 #include <cmajor/cmview/TextFileEditor.hpp>
 #include <cmajor/wing/ScrollableControl.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace view {

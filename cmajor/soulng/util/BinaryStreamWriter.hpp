@@ -15,6 +15,7 @@ class UTIL_API BinaryStreamWriter
 {
 public:
     BinaryStreamWriter(Stream& stream_);
+    Stream& GetStream() { return stream; }
     void Write(bool x);
     void Write(uint8_t x);
     void Write(int8_t x);

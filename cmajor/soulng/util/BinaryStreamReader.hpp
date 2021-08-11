@@ -15,6 +15,7 @@ class UTIL_API BinaryStreamReader
 {
 public:
     BinaryStreamReader(Stream& stream_);
+    Stream& GetStream() { return stream; }
     bool ReadBool();
     uint8_t ReadByte();
     int8_t ReadSByte();

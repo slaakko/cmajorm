@@ -5,8 +5,8 @@
 
 #ifndef SOULNG_UNICODE_UNICODE_INCLUDED
 #define SOULNG_UNICODE_UNICODE_INCLUDED
-#include <soulng/util/BinaryWriter.hpp>
-#include <soulng/util/BinaryReader.hpp>
+#include <soulng/util/BinaryStreamWriter.hpp>
+#include <soulng/util/BinaryStreamReader.hpp>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -589,8 +589,8 @@ public:
     {
         script = script_;
     }
-    void Write(BinaryWriter& writer);
-    void Read(BinaryReader& reader);
+    void Write(BinaryStreamWriter& writer);
+    void Read(BinaryStreamReader& reader);
 private:
     uint64_t binaryProperties;
     GeneralCategoryId generalCategory;
@@ -850,8 +850,8 @@ public:
     Alias(AliasTypeId typeId_, const std::string& name_);
     AliasTypeId TypeId() const { return typeId; }
     const std::string& Name() const { return name; }
-    void Write(BinaryWriter& writer);
-    void Read(BinaryReader& reader);
+    void Write(BinaryStreamWriter& writer);
+    void Read(BinaryStreamReader& reader);
 private:
     AliasTypeId typeId;
     std::string name;
@@ -967,8 +967,8 @@ public:
     {
         bidiPairedBracket = bidiPairedBracket_;
     }
-    void Write(BinaryWriter& writer);
-    void Read(BinaryReader& reader);
+    void Write(BinaryStreamWriter& writer);
+    void Read(BinaryStreamReader& reader);
 private:
     std::string characterName;
     std::string unicode1Name;
@@ -994,8 +994,8 @@ public:
     CharacterInfoPage& operator=(const CharacterInfoPage&) = delete;
     const CharacterInfo& GetCharacterInfo(int index) const;
     CharacterInfo& GetCharacterInfo(int index);
-    void Write(BinaryWriter& writer);
-    void Read(BinaryReader& reader);
+    void Write(BinaryStreamWriter& writer);
+    void Read(BinaryStreamReader& reader);
 private:
     std::vector<CharacterInfo> characterInfos;
 };
@@ -1008,8 +1008,8 @@ public:
     ExtendedCharacterInfoPage& operator=(const ExtendedCharacterInfoPage&) = delete;
     const ExtendedCharacterInfo& GetExtendedCharacterInfo(int index) const;
     ExtendedCharacterInfo& GetExtendedCharacterInfo(int index);
-    void Write(BinaryWriter& writer);
-    void Read(BinaryReader& reader);
+    void Write(BinaryStreamWriter& writer);
+    void Read(BinaryStreamReader& reader);
 private:
     std::vector<ExtendedCharacterInfo> extendedCharacterInfos;
 };
@@ -1018,8 +1018,8 @@ class UTIL_API ExtendedCharacterInfoHeader
 {
 public:
     void AllocatePages(int numExtendedPages);
-    void Write(BinaryWriter& writer);
-    void Read(BinaryReader& reader);
+    void Write(BinaryStreamWriter& writer);
+    void Read(BinaryStreamReader& reader);
     uint32_t GetPageStart(int pageIndex) const;
     void SetPageStart(int pageIndex, uint32_t extendedPageStart);
 private:
@@ -1031,6 +1031,11 @@ const uint8_t cmajor_ucd_version_2 = '2';
 const uint8_t cmajor_ucd_version_3 = '3';
 const uint8_t current_cmajor_ucd_version = cmajor_ucd_version_3;
 
+enum class CharacterTableDataSource
+{
+    file, memory
+};
+
 class UTIL_API CharacterTable
 {
 public:
@@ -1039,14 +1044,25 @@ public:
     static void Init();
     static void Done();
     static CharacterTable& Instance() { return *instance; }
+    std::string FilePath() const;
+    std::string DeflateFilePath() const;
+    int64_t GetUncompressedFileSize() const;
     const CharacterInfo& GetCharacterInfo(char32_t codePoint);
     CharacterInfo& CreateCharacterInfo(char32_t codePoint);
     const ExtendedCharacterInfo& GetExtendedCharacterInfo(char32_t codePoint);
     ExtendedCharacterInfo& CreateExtendedCharacterInfo(char32_t codePoint);
     void Write();
+    void WriteDeflate();
+    void SetData(uint8_t* data_, int64_t size_);
+    void SetDeflateData(uint8_t* deflateData, int64_t deflateSize, int64_t uncompressedSize);
 private:
     static std::unique_ptr<CharacterTable> instance;
     CharacterTable();
+    Streams GetReadStreams();
+    CharacterTableDataSource dataSource;
+    uint8_t* data;
+    int64_t size;
+    std::vector<uint8_t> memory;
     bool headerRead;
     std::vector<std::unique_ptr<CharacterInfoPage>> pages;
     uint32_t extendedHeaderStart;
@@ -1054,9 +1070,9 @@ private:
     bool extendedHeaderRead;
     ExtendedCharacterInfoHeader extendedHeader;
     std::vector<std::unique_ptr<ExtendedCharacterInfoPage>> extendedPages;
-    void WriteHeader(BinaryWriter& writer);
-    void ReadHeader(BinaryReader& reader);
-    void ReadExtendedHeader(BinaryReader& reader);
+    void WriteHeader(BinaryStreamWriter& writer);
+    void ReadHeader(BinaryStreamReader& reader);
+    void ReadExtendedHeader(BinaryStreamReader& reader);
     const size_t headerSize = 4096;
 };
 

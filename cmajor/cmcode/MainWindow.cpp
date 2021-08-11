@@ -42,6 +42,7 @@
 #include <sngcm/ast/Project.hpp>
 #include <soulng/rex/Context.hpp>
 #include <soulng/rex/Match.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Process.hpp>
 #include <soulng/util/Unicode.hpp>

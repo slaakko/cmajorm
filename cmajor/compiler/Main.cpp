@@ -215,6 +215,7 @@ void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, Module* module)
 int main(int argc, const char** argv)
 {
     InitDone initDone;
+
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
     std::set<std::string> builtProjects;

@@ -228,7 +228,7 @@ extern "C" RT_API void* RtMemAllocInfo(int64_t size, const char* info)
         int32_t errorStringHandle = -1;
         void* stdErr = RtOpenStdFile(2, errorStringHandle);
         RtWrite(stdErr, reinterpret_cast<const uint8_t*>(str.c_str()), str.length(), errorStringHandle);
-        RtPrintCallStack(stdErrFileHandle);
+        RtPrintCallStack(cmajor::rt::stdErrFileHandle);
         exit(exitCodeOutOfMemory);
     }
     int serial = cmajor::rt::DebugHeap::Instance().NextSerial();

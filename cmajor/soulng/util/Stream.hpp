@@ -7,6 +7,7 @@
 #define SOULNG_UTIL_STREAM_INCLUDED
 #include <soulng/util/UtilApi.hpp>
 #include <stdint.h>
+#include <memory>
 #include <vector>
 
 namespace soulng { namespace util {
@@ -49,6 +50,23 @@ public:
 private:
     int64_t position;
     std::vector<StreamObserver*> observers;
+};
+
+class UTIL_API Streams
+{
+public:
+    Streams();
+    Streams(Streams&& that) noexcept;
+    Streams(const Streams&) = delete;
+    Streams& operator=(Streams&& that) noexcept;
+    Streams& operator=(const Streams&) = delete;
+    ~Streams();
+    void Add(Stream* stream);
+    Stream* Get(int index) const;
+    Stream& Back() const;
+    int Count() const { return streams.size(); }
+private:
+    std::vector<std::unique_ptr<Stream>> streams;
 };
 
 } } // namespace soulng::util

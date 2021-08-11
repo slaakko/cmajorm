@@ -1044,7 +1044,7 @@ bool FlushFile(void* fileHandle, int32_t& errorStringHandle)
 
 } }  // namespace cmajor::rt
 
-void* RtOpen(const char* filePath, OpenMode openMode, int32_t& errorStringHandle)
+void* RtOpen(const char* filePath, cmajor::rt::OpenMode openMode, int32_t& errorStringHandle)
 {
     return cmajor::rt::OpenFile(filePath, openMode, errorStringHandle);
 }
@@ -1094,7 +1094,7 @@ bool RtGetFileError(void* fileHandle, int32_t& errorStringHandle)
     return cmajor::rt::GetFileError(fileHandle, errorStringHandle);
 }
 
-bool RtSeek(void* fileHandle, int64_t pos, Origin origin, int32_t& errorStringHandle)
+bool RtSeek(void* fileHandle, int64_t pos, cmajor::rt::Origin origin, int32_t& errorStringHandle)
 {
     return cmajor::rt::SeekFile(fileHandle, pos, origin, errorStringHandle);
 }

@@ -4,6 +4,11 @@
 // =================================
 
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/FileStream.hpp>
+#include <soulng/util/BufferedStream.hpp>
+#include <soulng/util/DeflateStream.hpp>
+#include <soulng/util/MemoryStream.hpp>
+#include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 #include <cctype>
@@ -14,6 +19,26 @@ namespace soulng { namespace unicode {
 std::string CmajorVersionStr()
 {
     return "4.1.0";
+}
+
+std::string CmajorRoot()
+{
+    std::string cmajorRoot;
+    const char* cmajorRootEnv = getenv("CMAJOR_ROOT");
+    if (cmajorRootEnv)
+    {
+        cmajorRoot = cmajorRootEnv;
+    }
+    if (cmajorRoot.empty())
+    {
+        throw UnicodeException("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor-" + CmajorVersionStr() + " directory.");
+    }
+    return cmajorRoot;
+}
+
+std::string CmajorUcdFilePath()
+{
+    return (boost::filesystem::path(CmajorRoot()) / boost::filesystem::path("unicode") / boost::filesystem::path("cmajor_ucd.bin")).generic_string();
 }
 
 UnicodeException::UnicodeException(const std::string& message_) : std::runtime_error(message_)
@@ -1479,7 +1504,7 @@ CharacterInfo::CharacterInfo() :
 {
 }
 
-void CharacterInfo::Write(BinaryWriter& writer)
+void CharacterInfo::Write(BinaryStreamWriter& writer)
 {
     writer.Write(binaryProperties);
     writer.Write(static_cast<uint32_t>(generalCategory));
@@ -1492,7 +1517,7 @@ void CharacterInfo::Write(BinaryWriter& writer)
     writer.Write(static_cast<uint8_t>(script));
 }
 
-void CharacterInfo::Read(BinaryReader& reader)
+void CharacterInfo::Read(BinaryStreamReader& reader)
 {
     binaryProperties = reader.ReadULong();
     generalCategory = static_cast<GeneralCategoryId>(reader.ReadUInt());
@@ -1795,13 +1820,13 @@ Alias::Alias(AliasTypeId typeId_, const std::string& name_) : typeId(typeId_), n
 {
 }
 
-void Alias::Write(BinaryWriter& writer)
+void Alias::Write(BinaryStreamWriter& writer)
 {
     writer.Write(static_cast<uint8_t>(typeId));
     writer.Write(name);
 }
 
-void Alias::Read(BinaryReader& reader)
+void Alias::Read(BinaryStreamReader& reader)
 {
     typeId = static_cast<AliasTypeId>(reader.ReadByte());
     name = reader.ReadUtf8String();
@@ -1822,7 +1847,7 @@ void ExtendedCharacterInfo::SetUnicode1Name(const std::string& unicode1Name_)
     unicode1Name = unicode1Name_;
 }
 
-void ExtendedCharacterInfo::Write(BinaryWriter& writer)
+void ExtendedCharacterInfo::Write(BinaryStreamWriter& writer)
 {
     writer.Write(characterName);
     writer.Write(unicode1Name);
@@ -1865,7 +1890,7 @@ void ExtendedCharacterInfo::Write(BinaryWriter& writer)
     writer.Write(bidiPairedBracket);
 }
 
-void ExtendedCharacterInfo::Read(BinaryReader& reader)
+void ExtendedCharacterInfo::Read(BinaryStreamReader& reader)
 {
     characterName = reader.ReadUtf8String();
     unicode1Name = reader.ReadUtf8String();
@@ -1928,7 +1953,7 @@ const CharacterInfo& CharacterInfoPage::GetCharacterInfo(int index) const
     return characterInfos[index];
 }
 
-void CharacterInfoPage::Write(BinaryWriter& writer)
+void CharacterInfoPage::Write(BinaryStreamWriter& writer)
 {
     for (int i = 0; i < characterInfos.size(); ++i)
     {
@@ -1937,7 +1962,7 @@ void CharacterInfoPage::Write(BinaryWriter& writer)
     }
 }
 
-void CharacterInfoPage::Read(BinaryReader& reader)
+void CharacterInfoPage::Read(BinaryStreamReader& reader)
 {
     for (int i = 0; i < characterInfos.size(); ++i)
     {
@@ -1969,7 +1994,7 @@ ExtendedCharacterInfo& ExtendedCharacterInfoPage::GetExtendedCharacterInfo(int i
     return extendedCharacterInfos[index];
 }
 
-void ExtendedCharacterInfoPage::Write(BinaryWriter& writer)
+void ExtendedCharacterInfoPage::Write(BinaryStreamWriter& writer)
 {
     int n = extendedCharacterInfos.size();
     for (int i = 0; i < n; ++i)
@@ -1978,7 +2003,7 @@ void ExtendedCharacterInfoPage::Write(BinaryWriter& writer)
     }
 }
 
-void ExtendedCharacterInfoPage::Read(BinaryReader& reader) 
+void ExtendedCharacterInfoPage::Read(BinaryStreamReader& reader) 
 {
     int n = extendedCharacterInfos.size();
     for (int i = 0; i < n; ++i)
@@ -1992,7 +2017,7 @@ void ExtendedCharacterInfoHeader::AllocatePages(int numExtendedPages)
     extendedPageStarts.resize(numExtendedPages);
 }
 
-void ExtendedCharacterInfoHeader::Write(BinaryWriter& writer)
+void ExtendedCharacterInfoHeader::Write(BinaryStreamWriter& writer)
 {
     uint32_t n = extendedPageStarts.size();
     writer.Write(n);
@@ -2002,7 +2027,7 @@ void ExtendedCharacterInfoHeader::Write(BinaryWriter& writer)
     }
 }
 
-void ExtendedCharacterInfoHeader::Read(BinaryReader& reader)
+void ExtendedCharacterInfoHeader::Read(BinaryStreamReader& reader)
 {
     uint32_t n = reader.ReadUInt();
     for (uint32_t i = 0; i < n; ++i)
@@ -2048,60 +2073,120 @@ const uint8_t headerMagic[8] =
     static_cast<uint8_t>('U'), static_cast<uint8_t>('C'), static_cast<uint8_t>('D'), current_cmajor_ucd_version
 };
 
-std::string CmajorRoot()
+CharacterTable::CharacterTable() : dataSource(CharacterTableDataSource::file), data(nullptr), size(0), headerRead(false), extendedHeaderStart(0), extendedHeaderEnd(0), extendedHeaderRead(false)
 {
-    std::string cmajorRoot;
-    const char* cmajorRootEnv = getenv("CMAJOR_ROOT");
-    if (cmajorRootEnv)
-    {
-        cmajorRoot = cmajorRootEnv;
-    }
-    if (cmajorRoot.empty())
-    {
-        throw UnicodeException("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor-" + CmajorVersionStr() + " directory.");
-    }
-    return cmajorRoot;
 }
 
-std::string CmajorUcdFilePath()
+std::string CharacterTable::FilePath() const
 {
-    return (boost::filesystem::path(CmajorRoot()) / boost::filesystem::path("unicode") / boost::filesystem::path("cmajor_ucd.bin")).generic_string();
+    std::string ucdFilePath = CmajorUcdFilePath();
+    return ucdFilePath;
 }
 
-CharacterTable::CharacterTable() : headerRead(false), extendedHeaderStart(0), extendedHeaderEnd(0), extendedHeaderRead(false)
+std::string CharacterTable::DeflateFilePath() const
 {
+    return Path::ChangeExtension(FilePath(), ".deflate.bin");
+}
+
+void CharacterTable::SetData(uint8_t* data_, int64_t size_)
+{
+    data = data_;
+    size = size_;
+    dataSource = CharacterTableDataSource::memory;
+}
+
+int64_t CharacterTable::GetUncompressedFileSize() const
+{
+    std::string ucdFilePath = FilePath();
+    return boost::filesystem::file_size(ucdFilePath);
+}
+
+void CharacterTable::SetDeflateData(uint8_t* deflateData, int64_t deflateSize, int64_t uncompressedSize)
+{
+    MemoryStream memoryStream(deflateData, deflateSize);
+    DeflateStream deflateStream(CompressionMode::decompress, memoryStream);
+    BufferedStream bufferedStream(deflateStream);
+    BinaryStreamReader reader(bufferedStream);
+    memory.clear();
+    memory.reserve(uncompressedSize);
+    for (int64_t i = 0; i < uncompressedSize; ++i)
+    {
+        uint8_t x = reader.ReadByte();
+        memory.push_back(x);
+    }
+    SetData(memory.data(), memory.size());
+}
+
+Streams CharacterTable::GetReadStreams()
+{
+    Streams streams;
+    if (dataSource == CharacterTableDataSource::file)
+    {
+        std::string ucdFilePath = FilePath();
+        streams.Add(new FileStream(ucdFilePath, OpenMode::read | OpenMode::binary));
+        streams.Add(new BufferedStream(streams.Back()));
+    }
+    else if (dataSource == CharacterTableDataSource::memory)
+    {
+        streams.Add(new MemoryStream(data, size));
+    }
+    return streams;
 }
 
 void CharacterTable::Write()
 {
-    std::string ucdFilePath = CmajorUcdFilePath();
-    BinaryWriter writer(ucdFilePath);
+    std::string ucdFilePath = FilePath();
+    FileStream file(ucdFilePath, OpenMode::write | OpenMode::binary);
+    BufferedStream bufferedFile(file);
+    BinaryStreamWriter writer(bufferedFile);
     WriteHeader(writer);
-    writer.Seek(headerSize);
+    writer.GetStream().Seek(headerSize, Origin::seekSet);
     int n = pages.size();
     for (int i = 0; i < n; ++i)
     {
         CharacterInfoPage* page = pages[i].get();
         page->Write(writer);
     }
-    extendedHeaderStart = writer.Pos();
+    extendedHeaderStart = writer.Position();
     int nx = extendedPages.size();
     extendedHeader.AllocatePages(nx);
     extendedHeader.Write(writer);
-    extendedHeaderEnd = writer.Pos();
+    extendedHeaderEnd = writer.Position();
     for (int i = 0; i < nx; ++i)
     {
-        extendedHeader.SetPageStart(i, writer.Pos());
+        extendedHeader.SetPageStart(i, writer.Position());
         ExtendedCharacterInfoPage* extendedPage = extendedPages[i].get();
         extendedPage->Write(writer);
     }
-    writer.Seek(extendedHeaderStart);
+    writer.GetStream().Seek(extendedHeaderStart, Origin::seekSet);
     extendedHeader.Write(writer);
-    writer.Seek(0);
+    writer.GetStream().Seek(0, Origin::seekSet);
     WriteHeader(writer);
 }
 
-void CharacterTable::WriteHeader(BinaryWriter& writer)
+void CharacterTable::WriteDeflate()
+{
+    std::string ucdFilePath = FilePath();
+    Streams readStreams;
+    FileStream* file = new FileStream(ucdFilePath, OpenMode::read | OpenMode::binary);
+    int64_t size = file->Size();
+    readStreams.Add(file);
+    readStreams.Add(new BufferedStream(*file));
+    BinaryStreamReader reader(readStreams.Back());
+    Streams writeStreams;
+    writeStreams.Add(new FileStream(DeflateFilePath(), OpenMode::write | OpenMode::binary));
+    writeStreams.Add(new BufferedStream(writeStreams.Back()));
+    writeStreams.Add(new DeflateStream(CompressionMode::compress, writeStreams.Back()));
+    writeStreams.Add(new BufferedStream(writeStreams.Back()));
+    BinaryStreamWriter writer(writeStreams.Back());
+    for (int64_t i = 0; i < size; ++i)
+    {
+        uint8_t x = reader.ReadByte();
+        writer.Write(x);
+    }
+}
+
+void CharacterTable::WriteHeader(BinaryStreamWriter& writer)
 {
     for (int i = 0; i < 8; ++i)
     {
@@ -2111,7 +2196,7 @@ void CharacterTable::WriteHeader(BinaryWriter& writer)
     writer.Write(uint32_t(extendedHeaderEnd));
 }
 
-void CharacterTable::ReadHeader(BinaryReader& reader)
+void CharacterTable::ReadHeader(BinaryStreamReader& reader)
 {
     headerRead = true;
     uint8_t magic[8];
@@ -2132,10 +2217,9 @@ void CharacterTable::ReadHeader(BinaryReader& reader)
     }
     extendedHeaderStart = reader.ReadUInt();
     extendedHeaderEnd = reader.ReadUInt();
-    reader.Skip(headerSize - 16);
 }
 
-void CharacterTable::ReadExtendedHeader(BinaryReader& reader)
+void CharacterTable::ReadExtendedHeader(BinaryStreamReader& reader)
 {
     extendedHeaderRead = true;
     extendedHeader.Read(reader);
@@ -2164,19 +2248,14 @@ const CharacterInfo& CharacterTable::GetCharacterInfo(char32_t codePoint)
         std::lock_guard<std::mutex> lock(mtx);
         if (!page)
         {
-            std::string ucdFilePath = CmajorUcdFilePath();
-            BinaryReader reader(ucdFilePath);
-            uint32_t pageStart = 0;
+            Streams streams = GetReadStreams();
+            BinaryStreamReader reader(streams.Back());
+            uint32_t pageStart = headerSize + characterInfoPageSize * pageIndex;
             if (!headerRead)
             {
                 ReadHeader(reader);
-                pageStart = characterInfoPageSize * pageIndex;
             }
-            else
-            {
-                pageStart = headerSize + characterInfoPageSize * pageIndex;
-            }
-            reader.Skip(pageStart);
+            reader.GetStream().Seek(pageStart, Origin::seekSet);
             page = new CharacterInfoPage();
             page->Read(reader);
             pages[pageIndex] = std::move(std::unique_ptr<CharacterInfoPage>(page));
@@ -2223,30 +2302,19 @@ const ExtendedCharacterInfo& CharacterTable::GetExtendedCharacterInfo(char32_t c
         std::lock_guard<std::mutex> lock(mtx);
         if (!extendedPage)
         {
-            std::string ucdFilePath = CmajorUcdFilePath();
-            BinaryReader reader(ucdFilePath);
-            uint32_t start = 0;
-            uint32_t pageStart = 0;
+            Streams streams = GetReadStreams();
+            BinaryStreamReader reader(streams.Back());
             if (!headerRead)
             {
                 ReadHeader(reader);
-                start = extendedHeaderStart - headerSize;
-            }
-            else
-            {
-                start = extendedHeaderStart;
             }
             if (!extendedHeaderRead)
             {
-                reader.Skip(start);
+                reader.GetStream().Seek(extendedHeaderStart, Origin::seekSet);
                 ReadExtendedHeader(reader);
-                pageStart = extendedHeader.GetPageStart(pageIndex) - extendedHeaderEnd;
             }
-            else
-            {
-                pageStart = extendedHeader.GetPageStart(pageIndex);
-            }
-            reader.Skip(pageStart);
+            uint32_t pageStart = extendedHeader.GetPageStart(pageIndex);
+            reader.GetStream().Seek(pageStart, Origin::seekSet);
             extendedPage = new ExtendedCharacterInfoPage();
             extendedPage->Read(reader);
             extendedPages[pageIndex] = std::move(std::unique_ptr<ExtendedCharacterInfoPage>(extendedPage));

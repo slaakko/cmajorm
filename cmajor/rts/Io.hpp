@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <stdint.h>
 
+namespace cmajor { namespace rt {
+
 const int stdInFileHandle = 0;
 const int stdOutFileHandle = 1;
 const int stdErrFileHandle = 2;
@@ -37,7 +39,9 @@ inline OpenMode operator|(OpenMode left, OpenMode right)
     return OpenMode(uint8_t(left) | uint8_t(right));
 }
 
-extern "C" RT_API void* RtOpen(const char* filePath, OpenMode openMode, int32_t & errorStringHandle);
+} } // namespace cmajor::rt
+
+extern "C" RT_API void* RtOpen(const char* filePath, cmajor::rt::OpenMode openMode, int32_t & errorStringHandle);
 extern "C" RT_API void* RtOpenStdFile(int handle, int32_t & errorStringHandle);
 extern "C" RT_API bool RtClose(void* fileHandle, int32_t & errorStringHandle);
 extern "C" RT_API bool RtDisposeFile(void* fileHandle, int32_t & errorStringHandle);
@@ -47,7 +51,7 @@ extern "C" RT_API int64_t RtRead(void* fileHandle, uint8_t * buffer, int64_t buf
 extern "C" RT_API int32_t RtReadByte(void* fileHandle);
 extern "C" RT_API bool RtEof(void* fileHandle);
 extern "C" RT_API bool RtGetFileError(void* fileHandle, int32_t & errorStringHandle);
-extern "C" RT_API bool RtSeek(void* fileHandle, int64_t pos, Origin origin, int32_t & errorStringHandle);
+extern "C" RT_API bool RtSeek(void* fileHandle, int64_t pos, cmajor::rt::Origin origin, int32_t & errorStringHandle);
 extern "C" RT_API int64_t RtTell(void* fileHandle, int32_t & errorStringHandle);
 extern "C" RT_API bool RtFlush(void* fileHandle, int32_t & errorStringHandle);
 extern "C" RT_API bool RtFileExists(const char* filePath);
