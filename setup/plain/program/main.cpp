@@ -43,10 +43,13 @@ int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdSh
         SetInfoItem(InfoItemKind::dataSource, new IntegerItem(static_cast<int64_t>(DataSource::memory)));
         SetInfoItem(InfoItemKind::packageDataAddress, new IntegerItem(reinterpret_cast<int64_t>(packageResource.Data())));
         SetInfoItem(InfoItemKind::compressedPackageSize, new IntegerItem(packageResource.Size()));
-        SetInfoItem(InfoItemKind::uncompressedPackageSize, new IntegerItem(1368392867));
+        SetInfoItem(InfoItemKind::uncompressedPackageSize, new IntegerItem(1368393737));
+        Icon& setupIcon = Application::GetResourceManager().GetIcon("setup_icon");
         Package package;
         InstallWindow installWindow;
         installWindow.SetPackage(&package);
+        installWindow.SetIcon(setupIcon);
+        installWindow.SetSmallIcon(setupIcon);
         Application::Run(installWindow);
     }
     catch (const std::exception& ex)
