@@ -47,7 +47,10 @@ bool HasPathDirectory(const std::string& directory)
         int n = directories.size();
         for (int i = 0; i < n; ++i)
         {
-            if (ToLower(GetFullPath(directories[i])) == dirPath) return true;
+            if (ToLower(GetFullPath(directories[i])) == dirPath)
+            {
+                return true;
+            }
         }
     }
     return false;
@@ -61,14 +64,21 @@ void AppendPathDirectory(const std::string& directory)
         std::vector<std::string> directories = Split(path, ';');
         directories.push_back(directory);
         std::string newPath;
-        int n = directories.size();
-        for (int i = 0; i < n; ++i)
+        bool first = true;
+        for (const std::string& directory : directories)
         {
-            if (i > 0)
+            if (!directory.empty())
             {
-                newPath.append(1, ';');
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    newPath.append(1, ';');
+                }
+                newPath.append(directory);
             }
-            newPath.append(directories[i]);
         }
         SetSystemEnvironmentVariable("Path", newPath, RegistryValueKind::regExpandSz);
     }
@@ -87,22 +97,28 @@ void RemovePathDirectory(const std::string& directory)
         std::vector<std::string> newDirectories;
         std::string newPath;
         std::string dirPath = ToLower(GetFullPath(directory));
-        int n = directories.size();
-        for (int i = 0; i < n; ++i)
+        for (const std::string& dir : directories)
         {
-            if (ToLower(GetFullPath(directories[i])) != dirPath)
+            if (!dir.empty())
             {
-                newDirectories.push_back(directories[i]);
+                if (ToLower(GetFullPath(dir)) != dirPath)
+                {
+                    newDirectories.push_back(dir);
+                }
             }
         }
-        int m = newDirectories.size();
-        for (int i = 0; i < m; ++i)
+        bool first = true;
+        for (const std::string& dir : newDirectories)
         {
-            if (i > 0)
+            if (first)
+            {
+                first = false;
+            }
+            else
             {
                 newPath.append(1, ';');
             }
-            newPath.append(newDirectories[i]);
+            newPath.append(dir);
         }
         SetSystemEnvironmentVariable("Path", newPath, RegistryValueKind::regExpandSz);
     }

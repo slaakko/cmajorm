@@ -7,7 +7,10 @@
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/System.hpp>
+#include <soulng/util/Unicode.hpp>
 
+using namespace soulng::util;
+using namespace soulng::unicode;
 using namespace cmajor::wing;
 using namespace wingstall::winggui;
 using namespace wingstall::wingpackage;
@@ -34,17 +37,19 @@ int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdSh
     try
     {
         std::string currentExecutableName = Path::GetFileName(GetFullPath(GetPathToExecutable()));
-        BinaryResourcePtr packageResource(currentExecutableName, PackageResourceName());
-        SetInfoItem(InfoItemKind::appName, new StringItem("Cmajor"));
-        SetInfoItem(InfoItemKind::appVersion, new StringItem("4.1.0"));
-        SetInfoItem(InfoItemKind::installDirName, new StringItem("cmajor"));
-        SetInfoItem(InfoItemKind::defaultContainingDirPath, new StringItem("C:/"));
-        SetInfoItem(InfoItemKind::compression, new IntegerItem(static_cast<int64_t>(Compression::deflate)));
+        BinaryResourcePtr unicodeDBResource(currentExecutableName, setup::UnicodeDBResourceName());
+        CharacterTable::Instance().SetDeflateData(unicodeDBResource.Data(), unicodeDBResource.Size(), setup::UncompressedUnicodeDBSize());
+        BinaryResourcePtr packageResource(currentExecutableName, setup::PackageResourceName());
+        SetInfoItem(InfoItemKind::appName, new StringItem(setup::AppName()));
+        SetInfoItem(InfoItemKind::appVersion, new StringItem(setup::AppVersion()));
+        SetInfoItem(InfoItemKind::installDirName, new StringItem(setup::InstallDirName()));
+        SetInfoItem(InfoItemKind::defaultContainingDirPath, new StringItem(setup::DefaultContainingDirPath()));
+        SetInfoItem(InfoItemKind::compression, new IntegerItem(static_cast<int64_t>(setup::Compression())));
         SetInfoItem(InfoItemKind::dataSource, new IntegerItem(static_cast<int64_t>(DataSource::memory)));
         SetInfoItem(InfoItemKind::packageDataAddress, new IntegerItem(reinterpret_cast<int64_t>(packageResource.Data())));
         SetInfoItem(InfoItemKind::compressedPackageSize, new IntegerItem(packageResource.Size()));
-        SetInfoItem(InfoItemKind::uncompressedPackageSize, new IntegerItem(1368393737));
-        Icon& setupIcon = Application::GetResourceManager().GetIcon("setup_icon");
+        SetInfoItem(InfoItemKind::uncompressedPackageSize, new IntegerItem(setup::UncompressedPackageSize()));
+        Icon& setupIcon = Application::GetResourceManager().GetIcon(setup::SetupIconResourceName());
         Package package;
         InstallWindow installWindow;
         installWindow.SetPackage(&package);

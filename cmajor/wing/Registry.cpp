@@ -42,7 +42,7 @@ std::string RegistryKey::GetValue(const std::string& name) const
     {
         throw WindowsException(status);
     }
-    std::u16string value(reinterpret_cast<const char16_t*>(buffer.get()), size / sizeof(char16_t));
+    std::u16string value(reinterpret_cast<const char16_t*>(buffer.get()));
     return ToUtf8(value);
 }
 

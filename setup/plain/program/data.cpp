@@ -1,5 +1,7 @@
 #include "data.hpp"
 
+namespace setup {
+
 std::string PackageResourceName()
 {
     return "cmajor_package";
@@ -7,7 +9,7 @@ std::string PackageResourceName()
 
 int64_t UncompressedPackageSize()
 {
-    return 1368537990;
+    return 1369711998;
 }
 
 std::string UnicodeDBResourceName()
@@ -24,4 +26,32 @@ std::string SetupIconResourceName()
 {
     return "setup_icon";
 }
+
+std::string AppName()
+{
+    return "Cmajor";
+}
+
+std::string AppVersion()
+{
+    return "4.1.0";
+}
+
+int Compression()
+{
+    return 0; // none
+}
+
+std::string DefaultContainingDirPath()
+{
+    return "C:/";
+}
+
+std::string InstallDirName()
+{
+    return "cmajor";
+}
+
+
+} // setup
 

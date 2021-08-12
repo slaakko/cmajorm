@@ -2115,7 +2115,7 @@ void CharacterTable::SetDeflateData(uint8_t* deflateData, int64_t deflateSize, i
         memory.push_back(x);
     }
     SetData(memory.data(), memory.size());
-}
+} 
 
 Streams CharacterTable::GetReadStreams()
 {
