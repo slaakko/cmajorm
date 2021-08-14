@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="cmajor" appName="Cmajor" sourceRootDir="../../cmajor" targetRootDir="C:/cmajor" compression="none" version="4.1.0">
+<package name="cmajor" appName="Cmajor" sourceRootDir="../../cmajor" targetRootDir="C:/cmajor" compression="none" version="4.1.0" includeUninstaller="true">
  <environment>
   <variable name="CMAJOR_ROOT" value="$TARGET_ROOT_DIR$"/>
   <pathDirectory value="$TARGET_ROOT_DIR$/bin"/>
@@ -375,4 +375,10 @@
   <directory name="vs">
   </directory>
  </component>
+ <install>
+  <run command="checkcmajor"/>
+ </install>
+ <uninstall>
+  <run command="closecmpms"/>
+ </uninstall>
 </package>

@@ -4,6 +4,7 @@
 // =================================
 
 #include <soulng/util/ProcessImpl.hpp>
+#include <soulng/util/TextUtils.hpp>
 #ifdef _WIN32
 #include <boost/process/windows.hpp>
 #endif
@@ -94,7 +95,7 @@ ProcessImpl::ProcessImpl(const std::string& command, Process::Redirections redir
     }
     catch (const std::exception& ex)
     {
-        throw std::runtime_error("error running command '" + command + "': " + ex.what());
+        throw std::runtime_error("error running command '" + command + "': " + PlatformStringToUtf8(ex.what()));
     }
 }
 

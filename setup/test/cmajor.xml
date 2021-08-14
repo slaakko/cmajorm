@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package name="cmajor" appName="Cmajor" sourceRootDir="../../cmajor" targetRootDir="C:/cmajor" compression="none" version="4.1.0" includeUninstaller="true">
+ <environment>
+  <variable name="CMAJOR_ROOT" value="$TARGET_ROOT_DIR$"/>
+  <pathDirectory value="$TARGET_ROOT_DIR$/bin"/>
+ </environment>
+ <links>
+  <linkDirectory path="$START_MENU_PROGRAMS_FOLDER$/Cmajor"/>
+  <link 
+   linkFilePath="$START_MENU_PROGRAMS_FOLDER$/Cmajor/Cmajor Code.lnk" 
+   path="$TARGET_ROOT_DIR$/bin/cmcode.exe" 
+   workingDirectory="$TARGET_ROOT_DIR$/bin"
+   description="Cmajor Code" 
+   iconPath="$TARGET_ROOT_DIR$/bin/cmcode.exe"
+   iconIndex="0"/>
+  <link 
+   linkFilePath="$START_MENU_PROGRAMS_FOLDER$/Cmajor/CmDevEnv.lnk" 
+   path="$TARGET_ROOT_DIR$/bin/cmdevenv.exe" 
+   workingDirectory="$TARGET_ROOT_DIR$/bin"
+   description="CmDevEnv" 
+   iconPath="$TARGET_ROOT_DIR$/bin/cmdevenv.exe"
+   iconIndex="0"/>
+  <link
+   linkFilePath="$DESKTOP_FOLDER$/Cmajor Code.lnk"
+   path="$TARGET_ROOT_DIR$/bin/cmcode.exe" 
+   workingDirectory="$TARGET_ROOT_DIR$/bin"
+   description="Cmajor Code" 
+   iconPath="$TARGET_ROOT_DIR$/bin/cmcode.exe"
+   iconIndex="0"/>
+ </links>
+ <component name="binaries">
+  <directory name="bin">
+   <exclude file="*"/>
+   <include file="cmc.exe"/>
+  </directory>
+ </component>
+ <install>
+  <run command="checkcmajor"/>
+ </install>
+ <uninstall>
+  <run command="closecmpms"/>
+ </uninstall>
+</package>
