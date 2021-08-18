@@ -1056,7 +1056,9 @@ public:
     void WriteDeflate();
 #endif	
     void SetData(uint8_t* data_, int64_t size_);
+#ifdef _WIN32
     void SetDeflateData(uint8_t* deflateData, int64_t deflateSize, int64_t uncompressedSize);
+#endif	
 private:
     static std::unique_ptr<CharacterTable> instance;
     CharacterTable();

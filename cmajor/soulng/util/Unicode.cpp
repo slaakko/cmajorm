@@ -2103,6 +2103,7 @@ int64_t CharacterTable::GetUncompressedFileSize() const
     return boost::filesystem::file_size(ucdFilePath);
 }
 
+#ifdef _WIN32
 void CharacterTable::SetDeflateData(uint8_t* deflateData, int64_t deflateSize, int64_t uncompressedSize)
 {
     MemoryStream memoryStream(deflateData, deflateSize);
@@ -2118,6 +2119,7 @@ void CharacterTable::SetDeflateData(uint8_t* deflateData, int64_t deflateSize, i
     }
     SetData(memory.data(), memory.size());
 } 
+#endif
 
 Streams CharacterTable::GetReadStreams()
 {
