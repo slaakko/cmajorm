@@ -1,11 +1,19 @@
 include ../../../Makefile.common
 
+ifeq ($(PLATFORM),windows)
 OBJECTS = Ansi.o BinaryReader.o BinaryWriter.o CodeFormatter.o FilePtr.o FileLocking.o Fiber.o \
 InitDone.o Json.o Log.o LogFileWriter.o MappedInputFile.o MemoryReader.o MemoryWriter.o Multiprecision.o \
 Mutex.o Path.o Prime.o Process.o ProcessImpl.o Random.o \
 Sha1.o Socket.o SocketFwd.o System.o TextUtils.o Time.o Trace.o Unicode.o Uuid.o \
 Stream.o BinaryStreamReader.o BinaryStreamWriter.o BufferedStream.o FileStream.o MemoryStream.o \
 BZip2Stream.o Compression.o DeflateStream.o BZ2Interface.o ZLibInterface.o
+else
+OBJECTS = Ansi.o BinaryReader.o BinaryWriter.o CodeFormatter.o FilePtr.o FileLocking.o Fiber.o \
+InitDone.o Json.o Log.o LogFileWriter.o MappedInputFile.o MemoryReader.o MemoryWriter.o Multiprecision.o \
+Mutex.o Path.o Prime.o Process.o ProcessImpl.o Random.o \
+Sha1.o Socket.o SocketFwd.o System.o TextUtils.o Time.o Trace.o Unicode.o Uuid.o \
+Stream.o BinaryStreamReader.o BinaryStreamWriter.o BufferedStream.o FileStream.o MemoryStream.o
+endif
 
 LIBRARY_NAME=libcmsngutil.a
 
