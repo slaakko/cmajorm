@@ -9,8 +9,7 @@ cminst -v ..\x64\Debug\*.dll ..\bin
 cminst -v ..\x64\Release\*.dll ..\bin
 cminst -v ..\x64\Debug\*.lib ..\lib
 cminst -v ..\x64\Release\*.lib ..\lib
-cminst -v ..\installation\x64\Debug\checkcmajord.exe ..\bin
-cminst -v ..\installation\x64\Release\checkcmajor.exe ..\bin
+cminst -v ..\cmcode\res\cmcodesmall.ico ..\bin
 cminst -v C:\llvm-11.0.0.src\build\Release\bin\llc.exe ..\bin
 cminst -v C:\llvm-11.0.0.src\build\Release\bin\opt.exe ..\bin
 cminst -v C:\llvm-11.0.0.src\build\Release\bin\llvm-dis.exe ..\bin

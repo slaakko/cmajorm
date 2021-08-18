@@ -5,6 +5,7 @@
 
 #include <wing/Wing.hpp>
 #include <wing/Graphics.hpp>
+#include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <shobjidl_core.h>
 
@@ -258,7 +259,7 @@ void ShowErrorMessageBox(HWND handle, const std::string& message)
 
 std::string SelectDirectory(HWND handle, const std::string& directoryPath)
 {
-    std::u16string dirPath = ToUtf16(directoryPath);
+    std::u16string dirPath = ToUtf16(MakeNativePath(directoryPath));
     int bufferSize = 1024;
     std::unique_ptr<char16_t> buffer(new char16_t[bufferSize]);
     IFileDialog* fileDialog = nullptr;

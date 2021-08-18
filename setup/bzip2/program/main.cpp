@@ -11,7 +11,7 @@
 
 using namespace soulng::util;
 using namespace soulng::unicode;
-using namespace cmajor::wing;
+using namespace wing;
 using namespace wingstall::winggui;
 using namespace wingstall::wingpackage;
 
@@ -21,11 +21,11 @@ struct InitDone
     {
         soulng::util::Init();
         sngxml::xpath::Init();
-        cmajor::wing::Init(instance);
+        wing::Init(instance);
     }
     ~InitDone()
     {
-        cmajor::wing::Done();
+        wing::Done();
         sngxml::xpath::Done();
         soulng::util::Done();
     }

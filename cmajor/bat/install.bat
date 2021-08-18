@@ -25,6 +25,7 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmrcd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmrc.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cminstd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cminst.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\cmcode\res\cmcodesmall.ico ..\bin
 
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmd.dll ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmd.lib ..\lib

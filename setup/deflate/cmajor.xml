@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package name="cmajor" appName="Cmajor" sourceRootDir="../../cmajor" targetRootDir="C:/cmajor" compression="deflate" version="4.1.0" includeUninstaller="true">
+<package 
+	name="cmajor" 
+	appName="Cmajor" 
+	version="4.1.0" 
+	publisher="Seppo Laakko" 
+	sourceRootDir="../../cmajor" 
+	targetRootDir="C:/cmajor" 
+	compression="deflate" 
+	iconFilePath="$TARGET_ROOT_DIR$/bin/cmcodesmall.ico"
+	includeUninstaller="true">
+ <preinstall>
+  <include filePath="installation\x64\Release\checkcmajor.exe"/>
+  <run command="$PREINSTALL_DIR$\checkcmajor"/>
+ </preinstall>
  <environment>
   <variable name="CMAJOR_ROOT" value="$TARGET_ROOT_DIR$"/>
   <pathDirectory value="$TARGET_ROOT_DIR$/bin"/>
@@ -375,9 +388,6 @@
   <directory name="vs">
   </directory>
  </component>
- <install>
-  <run command="checkcmajor"/>
- </install>
  <uninstall>
   <run command="closecmpms"/>
  </uninstall>

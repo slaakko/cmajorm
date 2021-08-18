@@ -130,8 +130,15 @@ void RemovePathDirectory(const std::string& directory)
 
 void BroadcastEnvironmentChangedMessage()
 {
-    std::u16string environment = u"Environment";
-    long retval = BroadcastSystemMessageW(0, nullptr, WM_SETTINGCHANGE, 0, (LPARAM)environment.c_str());
+    const char* environment = "Environment";
+    DWORD flags = BSF_ALLOWSFW | BSF_FORCEIFHUNG | BSF_IGNORECURRENTTASK | BSF_NOHANG;
+    DWORD info = BSM_ALLCOMPONENTS | BSM_ALLDESKTOPS | BSM_APPLICATIONS;
+    UINT action = 0;
+    long retval = BroadcastSystemMessageA(flags, &info, WM_SETTINGCHANGE, action, (LPARAM)environment);
+    if (retval <= 0)
+    {
+        throw WindowsException(GetLastError());
+    }
 }
 
 } } // cmajor::wing

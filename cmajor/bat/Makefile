@@ -48,6 +48,10 @@ cmsx:
 	cmc -u -v -st -bt=1 ../projects/cmsx/cmsx.cms
 	cmc -u -v -c=release -st -bt=1 ../projects/cmsx/cmsx.cms
 
+preinstallation_check:
+	MSBuild -m -verbosity:minimal ..\installation\checkcmajor\checkcmajor.vcxproj -p:Configuration="Debug"
+	MSBuild -m -verbosity:minimal ..\installation\checkcmajor\checkcmajor.vcxproj -p:Configuration="Release"
+
 plain_package:
 	wingstall -v --create-package ..\..\setup\plain\cmajor.xml
 	
@@ -72,7 +76,7 @@ bzip2_setup:
 	MSBuild -m -verbosity:minimal ..\..\setup\bzip2\program\setup.vcxproj -p:Configuration="Debug"
 	MSBuild -m -verbosity:minimal ..\..\setup\bzip2\program\setup.vcxproj -p:Configuration="Release"
 	
-packages: plain_package deflate_package bzip2_package
+packages: preinstallation_check plain_package deflate_package bzip2_package
 	
 setups: plain_setup deflate_setup bzip2_setup
 	cminst -v ..\..\setup\plain\program\x64\Debug\setupd.exe ..\..\setup\plain\bin
