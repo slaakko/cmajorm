@@ -6,7 +6,9 @@
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/FileStream.hpp>
 #include <soulng/util/BufferedStream.hpp>
+#ifdef _WIN32
 #include <soulng/util/DeflateStream.hpp>
+#endif
 #include <soulng/util/MemoryStream.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -2164,6 +2166,7 @@ void CharacterTable::Write()
     WriteHeader(writer);
 }
 
+#ifdef _WIN32
 void CharacterTable::WriteDeflate()
 {
     std::string ucdFilePath = FilePath();
@@ -2185,6 +2188,7 @@ void CharacterTable::WriteDeflate()
         writer.Write(x);
     }
 }
+#endif
 
 void CharacterTable::WriteHeader(BinaryStreamWriter& writer)
 {

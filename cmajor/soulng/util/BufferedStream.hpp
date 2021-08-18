@@ -17,7 +17,7 @@ public:
     BufferedStream(Stream& baseStream_, int64_t bufferSize_);
     ~BufferedStream() override;
     int ReadByte() override;
-    int64_t Read(uint8_t* buf, int64_t count);
+    int64_t Read(uint8_t* buf, int64_t count) override;
     void Write(uint8_t x) override;
     void Write(uint8_t* buf, int64_t count) override;
     void Flush() override;

@@ -1052,7 +1052,9 @@ public:
     const ExtendedCharacterInfo& GetExtendedCharacterInfo(char32_t codePoint);
     ExtendedCharacterInfo& CreateExtendedCharacterInfo(char32_t codePoint);
     void Write();
+#ifdef _WIN32	
     void WriteDeflate();
+#endif	
     void SetData(uint8_t* data_, int64_t size_);
     void SetDeflateData(uint8_t* deflateData, int64_t deflateSize, int64_t uncompressedSize);
 private:
