@@ -838,7 +838,8 @@ namespace soulcm.scmpg
             if (!noParserDebugSupport)
             {
                 Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), moduleId, u"DEBUG"));
-                Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Span"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"debugSpan"));
+                Cm.Ast.ConstructionStatementNode* spanStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId,
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Span"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"debugSpan"));
                 spanStmt->SetEmpty();
                 ccstmt->AddIfStatement(spanStmt);
                 Cm.Ast.ConstructionStatementNode* writeToLog = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.BoolNode(System.Lex.Span(), moduleId), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"writeToLog"));
@@ -855,6 +856,14 @@ namespace soulcm.scmpg
                 Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"writeToLog"), thenS, null);
                 ccstmt->AddIfStatement(ifStmt);
                 currentBlock->AddStatement(ccstmt);
+            }
+            if (parser.IsState() && parser.Id() != -1)
+            {
+                Cm.Ast.ConstructionStatementNode* constructRuleGuardStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), moduleId,
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System.Lex.RuleGuard"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ruleGuard"));
+                constructRuleGuardStmt->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"));
+                constructRuleGuardStmt->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, ToUtf32(ToString(parser.Id()))));
+                currentBlock->AddStatement(constructRuleGuardStmt);
             }
             for (const UniquePtr<Variable>& variable : parser.Variables())
             {
@@ -1144,12 +1153,27 @@ namespace soulcm.scmpg
                     }
                     else
                     {
-                        Cm.Ast.InvokeNode* invokeThrow = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowExpectationFailure")));
-                        invokeThrow->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetSpan"))));
-                        Cm.Ast.InvokeNode* invokeGetTokenInfo = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetEndTokenInfo"));
-                        invokeThrow->AddArgument(invokeGetTokenInfo);
-                        Cm.Ast.ExpressionStatementNode* exprStmt2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeThrow);
-                        elseS2->AddStatement(exprStmt2);
+                        if (parser.IsFarthestError())
+                        {
+                            Cm.Ast.InvokeNode* invokeThrowFarthestError = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId,
+                                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"),
+                                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowFarthestError")));
+                            Cm.Ast.ExpressionStatementNode* exprStmtFarthest = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeThrowFarthestError);
+                            elseS2->AddStatement(exprStmtFarthest);
+                        }
+                        else
+                        {
+                            Cm.Ast.InvokeNode* invokeThrow = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId,
+                                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"),
+                                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowExpectationFailure")));
+                            invokeThrow->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId,
+                                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetSpan"))));
+                            Cm.Ast.InvokeNode* invokeGetTokenInfo = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId,
+                                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"GetEndTokenInfo"));
+                            invokeThrow->AddArgument(invokeGetTokenInfo);
+                            Cm.Ast.ExpressionStatementNode* exprStmt2 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeThrow);
+                            elseS2->AddStatement(exprStmt2);
+                        }
                     }
                     Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span(), moduleId);
                     Cm.Ast.IfStatementNode* ifStmt2 = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.EqualNode(System.Lex.Span(), moduleId, new Cm.Ast.DerefNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"END_TOKEN"))), thenS2, elseS2);
@@ -1188,11 +1212,22 @@ namespace soulcm.scmpg
                     }
                     else
                     {
-                        Cm.Ast.InvokeNode* invokeThrow2 = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowExpectationFailure")));
-                        invokeThrow2->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
-                        invokeThrow2->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, ruleInfo));
-                        Cm.Ast.ExpressionStatementNode* exprStmt3 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeThrow2);
-                        elseS->AddStatement(exprStmt3);
+                        if (parser.IsFarthestError())
+                        {
+                            Cm.Ast.InvokeNode* invokeThrowFarthestError = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId,
+                                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"),
+                                new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowFarthestError")));
+                            Cm.Ast.ExpressionStatementNode* exprStmtFarthest = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeThrowFarthestError);
+                            elseS->AddStatement(exprStmtFarthest);
+                        }
+                        else
+                        {
+                            Cm.Ast.InvokeNode* invokeThrow2 = new Cm.Ast.InvokeNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"lexer"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"ThrowExpectationFailure")));
+                            invokeThrow2->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"span"));
+                            invokeThrow2->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), moduleId, ruleInfo));
+                            Cm.Ast.ExpressionStatementNode* exprStmt3 = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), moduleId, invokeThrow2);
+                            elseS->AddStatement(exprStmt3);
+                        }
                     }
                     Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), moduleId, new Cm.Ast.DotNode(System.Lex.Span(), moduleId, new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), moduleId, u"hit")), thenS, elseS);
                     parseFunction->Body()->AddStatement(ifStmt);
@@ -1273,6 +1308,10 @@ namespace soulcm.scmpg
             {
                 parserFile->Accept(*this);
             }
+            if (!domain.RuleFilePath().IsEmpty())
+            {
+                GenerateRuleFile(domain, verbose);
+            }
         }
         private bool verbose;
         private bool debug;
@@ -1293,8 +1332,59 @@ namespace soulcm.scmpg
         private Cm.Ast.SwitchStatementNode* tokenSwitch;
         private Uuid moduleId;
     }
+    public void GenerateRuleFile(Domain& domain, bool verbose)
+    {
+        StreamWriter writer = File.CreateText(domain.RuleFilePath());
+        CodeFormatter formatter(writer);
+        formatter.WriteLine("using System;");
+        formatter.WriteLine("using System.Collections;");
+        formatter.WriteLine();
+        formatter.WriteLine("public class RuleNames");
+        formatter.WriteLine("{");
+        formatter.IncIndent();
+        formatter.WriteLine("static RuleNames() : instance(new RuleNames())");
+        formatter.WriteLine("{");
+        formatter.WriteLine("}");
+        formatter.WriteLine("public static RuleNames& Instance()");
+        formatter.WriteLine("{");
+        formatter.IncIndent();
+        formatter.WriteLine("return *instance;");
+        formatter.DecIndent();
+        formatter.WriteLine("}");
+        formatter.WriteLine("public nothrow RuleNames()");
+        formatter.WriteLine("{");
+        formatter.IncIndent();
+        for (RuleParser* rule : domain.Rules())
+        {
+            formatter.WriteLine("ruleNames.Add(\"" + ToUtf8(rule->Parent()->Name()) + "." + ToUtf8(rule->Name()) + "\");");
+        }
+        formatter.DecIndent();
+        formatter.WriteLine("}");
+        formatter.WriteLine("public nothrow List<string>* Get() const");
+        formatter.WriteLine("{");
+        formatter.IncIndent();
+        formatter.WriteLine("return &ruleNames;");
+        formatter.DecIndent();
+        formatter.WriteLine("}");
+        formatter.WriteLine("private static UniquePtr<RuleNames> instance;");
+        formatter.WriteLine("private List<string> ruleNames;");
+        formatter.DecIndent();
+        formatter.WriteLine("}");
+        formatter.WriteLine();
+        formatter.WriteLine("public nothrow List<string>* GetRuleNameList()");
+        formatter.WriteLine("{");
+        formatter.IncIndent();
+        formatter.WriteLine("return RuleNames.Instance().Get();");
+        formatter.DecIndent();
+        formatter.WriteLine("}");
+        formatter.WriteLine();
+        if (verbose)
+        {
+            Console.Out() << "==> " << domain.RuleFilePath() << endl();
+        }
+    }
     public string ParserGeneratorVersionStr()
     {
-        return "4.0.0";
+        return "5.0.0";
     }
 } // namespace soulcm.scmpg

@@ -1,0 +1,106 @@
+using System;
+using System.Collections;
+
+public class RuleNames
+{
+    static RuleNames() : instance(new RuleNames())
+    {
+    }
+    public static RuleNames& Instance()
+    {
+        return *instance;
+    }
+    public nothrow RuleNames()
+    {
+        ruleNames.Add("XmlParser.Document");
+        ruleNames.Add("XmlParser.Char");
+        ruleNames.Add("XmlParser.S");
+        ruleNames.Add("XmlParser.NameStartChar");
+        ruleNames.Add("XmlParser.NameChar");
+        ruleNames.Add("XmlParser.Name");
+        ruleNames.Add("XmlParser.Names");
+        ruleNames.Add("XmlParser.Nmtoken");
+        ruleNames.Add("XmlParser.Nmtokens");
+        ruleNames.Add("XmlParser.Prolog");
+        ruleNames.Add("XmlParser.XMLDecl");
+        ruleNames.Add("XmlParser.VersionInfo");
+        ruleNames.Add("XmlParser.VersionNum");
+        ruleNames.Add("XmlParser.VersionNumDQ");
+        ruleNames.Add("XmlParser.VersionNumSQ");
+        ruleNames.Add("XmlParser.VersionNumber");
+        ruleNames.Add("XmlParser.EncodingDecl");
+        ruleNames.Add("XmlParser.EncodingName");
+        ruleNames.Add("XmlParser.EncNameDQ");
+        ruleNames.Add("XmlParser.EncNameSQ");
+        ruleNames.Add("XmlParser.EncName");
+        ruleNames.Add("XmlParser.SDDecl");
+        ruleNames.Add("XmlParser.DocTypeDecl");
+        ruleNames.Add("XmlParser.ExternalID");
+        ruleNames.Add("XmlParser.SystemLiteral");
+        ruleNames.Add("XmlParser.PubidLiteral");
+        ruleNames.Add("XmlParser.PubidChar");
+        ruleNames.Add("XmlParser.IntSubset");
+        ruleNames.Add("XmlParser.MarkupDecl");
+        ruleNames.Add("XmlParser.DeclSep");
+        ruleNames.Add("XmlParser.ElementDecl");
+        ruleNames.Add("XmlParser.ContentSpec");
+        ruleNames.Add("XmlParser.Children");
+        ruleNames.Add("XmlParser.CP");
+        ruleNames.Add("XmlParser.Choice");
+        ruleNames.Add("XmlParser.Seq");
+        ruleNames.Add("XmlParser.Mixed");
+        ruleNames.Add("XmlParser.AttlistDecl");
+        ruleNames.Add("XmlParser.AttDef");
+        ruleNames.Add("XmlParser.AttType");
+        ruleNames.Add("XmlParser.StringType");
+        ruleNames.Add("XmlParser.TokenizedType");
+        ruleNames.Add("XmlParser.EnumeratedType");
+        ruleNames.Add("XmlParser.NotationType");
+        ruleNames.Add("XmlParser.Enumeration");
+        ruleNames.Add("XmlParser.DefaultDecl");
+        ruleNames.Add("XmlParser.EntityDecl");
+        ruleNames.Add("XmlParser.GEDecl");
+        ruleNames.Add("XmlParser.PEDecl");
+        ruleNames.Add("XmlParser.EntityDef");
+        ruleNames.Add("XmlParser.PEDef");
+        ruleNames.Add("XmlParser.EntityValue");
+        ruleNames.Add("XmlParser.NDataDecl");
+        ruleNames.Add("XmlParser.PEReference");
+        ruleNames.Add("XmlParser.NotationDecl");
+        ruleNames.Add("XmlParser.PublicID");
+        ruleNames.Add("XmlParser.Element");
+        ruleNames.Add("XmlParser.ETag");
+        ruleNames.Add("XmlParser.Content");
+        ruleNames.Add("XmlParser.CharDataChar");
+        ruleNames.Add("XmlParser.CharData");
+        ruleNames.Add("XmlParser.CDSect");
+        ruleNames.Add("XmlParser.Attribute");
+        ruleNames.Add("XmlParser.AttValueDQ");
+        ruleNames.Add("XmlParser.AttValueSQ");
+        ruleNames.Add("XmlParser.AttValue");
+        ruleNames.Add("XmlParser.EntityRef");
+        ruleNames.Add("XmlParser.DecCodePoint");
+        ruleNames.Add("XmlParser.HexCodePoint");
+        ruleNames.Add("XmlParser.CharRef");
+        ruleNames.Add("XmlParser.Reference");
+        ruleNames.Add("XmlParser.Misc");
+        ruleNames.Add("XmlParser.Comment");
+        ruleNames.Add("XmlParser.PI");
+        ruleNames.Add("XmlParser.PITarget");
+        ruleNames.Add("XmlParser.Xml");
+        ruleNames.Add("XmlParser.Eq");
+        ruleNames.Add("XmlParser.YesNo");
+    }
+    public nothrow List<string>* Get() const
+    {
+        return &ruleNames;
+    }
+    private static UniquePtr<RuleNames> instance;
+    private List<string> ruleNames;
+}
+
+public nothrow List<string>* GetRuleNameList()
+{
+    return RuleNames.Instance().Get();
+}
+

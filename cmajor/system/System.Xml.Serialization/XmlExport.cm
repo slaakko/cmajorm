@@ -13,7 +13,7 @@ namespace System.Xml.Serialization
     {
         UniquePtr<Element> T.ToXml(const string& fieldName);
     }
- 
+
     public concept XmlExportableScalarType<T>
     {
         where
@@ -36,7 +36,7 @@ namespace System.Xml.Serialization
 
     public concept XmlExportableTimeType<T>
     {
-        where T is Date or T is DateTime or T is Timestamp;
+        where T is System.Date or T is System.DateTime or T is System.Timestamp;
     }
 
     public concept XmlExportable<T>
@@ -48,8 +48,8 @@ namespace System.Xml.Serialization
             T is string or
             T is wstring or
             T is ustring or
-            T is TimePoint or
-            T is Duration;
+            T is System.TimePoint or
+            T is System.Duration;
     }
 
     public UniquePtr<Element> ToXml<T>(const T& object, const string& fieldName)
@@ -150,14 +150,14 @@ namespace System.Xml.Serialization
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const TimePoint& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const System.TimePoint& value, const string& fieldName)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(ToString(value.Rep())));
         return element;
     }
 
-    public UniquePtr<Element> ToXml(const Duration& value, const string& fieldName)
+    public UniquePtr<Element> ToXml(const System.Duration& value, const string& fieldName)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(ToString(value.Rep())));

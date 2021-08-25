@@ -5,6 +5,7 @@
 
 #include <sngxml/xml/XmlParserInterface.hpp>
 #include <sngxml/xml/XmlParser.hpp>
+#include <sngxml/xml/Rules.hpp>
 #include <soulng/lexer/TrivialLexer.hpp>
 #include <soulng/lexer/XmlParsingLog.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -46,6 +47,8 @@ void ParseXmlContent(const std::u32string& xmlContent, const std::string& system
 {
     soulng::lexer::XmlParsingLog debugLog(std::cerr);
     TrivialLexer xmlLexer(xmlContent, systemId, 0);
+    xmlLexer.SetFlag(soulng::lexer::LexerFlags::farthestError);
+    xmlLexer.SetRuleNameVecPtr(GetRuleNameVecPtr());
     if ((flags & Flags::debug) != Flags::none)
     {
         xmlLexer.SetLog(&debugLog);

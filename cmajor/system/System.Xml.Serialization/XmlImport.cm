@@ -36,12 +36,12 @@ namespace System.Xml.Serialization
             T is string or
             T is wstring or
             T is ustring or
-            T is Uuid or
-            T is Date or
-            T is DateTime or
-            T is Timestamp or
-            T is TimePoint or
-            T is Duration;
+            T is System.Uuid or
+            T is System.Date or
+            T is System.DateTime or
+            T is System.Timestamp or
+            T is System.TimePoint or
+            T is System.Duration;
     }
 
     public nothrow Element* GetXmlFieldElement(const string& fieldName, Element* fromElement)
@@ -248,7 +248,7 @@ namespace System.Xml.Serialization
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }
 
-    public void FromXml(Element* element, Date& value)
+    public void FromXml(Element* element, System.Date& value)
     {
         if (element != null)
         {
@@ -256,12 +256,12 @@ namespace System.Xml.Serialization
         }
     }
 
-    public void FromXml(Element* parentElement, const string& fieldName, Date& value)
+    public void FromXml(Element* parentElement, const string& fieldName, System.Date& value)
     {
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }
 
-    public void FromXml(Element* element, DateTime& value)
+    public void FromXml(Element* element, System.DateTime& value)
     {
         if (element != null)
         {
@@ -269,12 +269,12 @@ namespace System.Xml.Serialization
         }
     }
 
-    public void FromXml(Element* parentElement, const string& fieldName, DateTime& value)
+    public void FromXml(Element* parentElement, const string& fieldName, System.DateTime& value)
     {
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }
 
-    public void FromXml(Element* element, Timestamp& value)
+    public void FromXml(Element* element, System.Timestamp& value)
     {
         if (element != null)
         {
@@ -282,7 +282,7 @@ namespace System.Xml.Serialization
         }
     }
 
-    public void FromXml(Element* parentElement, const string& fieldName, Timestamp& value)
+    public void FromXml(Element* parentElement, const string& fieldName, System.Timestamp& value)
     {
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }
@@ -326,7 +326,7 @@ namespace System.Xml.Serialization
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }
 
-    public void FromXml(Element* element, TimePoint& value)
+    public void FromXml(Element* element, System.TimePoint& value)
     {
         if (element != null)
         {
@@ -334,12 +334,12 @@ namespace System.Xml.Serialization
         }
     }
 
-    public void FromXml(Element* parentElement, const string& fieldName, TimePoint& value)
+    public void FromXml(Element* parentElement, const string& fieldName, System.TimePoint& value)
     {
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }
 
-    public void FromXml(Element* element, Duration& value)
+    public void FromXml(Element* element, System.Duration& value)
     {
         if (element != null)
         {
@@ -347,12 +347,12 @@ namespace System.Xml.Serialization
         }
     }
 
-    public void FromXml(Element* parentElement, const string& fieldName, Duration& value)
+    public void FromXml(Element* parentElement, const string& fieldName, System.Duration& value)
     {
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }
 
-    public void FromXml(Element* element, Uuid& value)
+    public void FromXml(Element* element, System.Uuid& value)
     {
         if (element != null)
         {
@@ -360,7 +360,7 @@ namespace System.Xml.Serialization
         }
     }
 
-    public void FromXml(Element* parentElement, const string& fieldName, Uuid& value)
+    public void FromXml(Element* parentElement, const string& fieldName, System.Uuid& value)
     {
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }

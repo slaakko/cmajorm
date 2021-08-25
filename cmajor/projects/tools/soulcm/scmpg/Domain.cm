@@ -42,7 +42,27 @@ namespace soulcm.scmpg
                 throw Exception("parser \'" + ToUtf8(parserName) + "\' not found");
             }
         }
+        public nothrow void AddRule(RuleParser* rule)
+        {
+            int ruleId = cast<int>(rules.Count());
+            rule->SetId(ruleId);
+            rules.Add(rule);
+        }
+        public const List<RuleParser*>& Rules() const
+        {
+            return rules;
+        }
+        public nothrow const string& RuleFilePath() const
+        {
+            return ruleFilePath;
+        }
+        public nothrow void SetRuleFilePath(const string& ruleFilePath_)
+        {
+            ruleFilePath = ruleFilePath_;
+        }
         private List<ParserFile*> parserFiles;
         private Map<ustring, GrammarParser*> parserMap;
+        private List<RuleParser*> rules;
+        private string ruleFilePath;
     }
 } // namespace soulcm.scmpg

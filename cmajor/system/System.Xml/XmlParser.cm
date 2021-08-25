@@ -3,6 +3,8 @@ using System.Collections;
 using System.Lex;
 using System.Parsing;
 
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/system/System.Xml/XmlParser.parser' using soulcm parser generator scmpg version 5.0.0
+
 namespace
 {
     public const int[4] s70 = [34, 110, 111, 34];
@@ -52,10 +54,10 @@ namespace
     public const int[7] s6 = [118, 101, 114, 115, 105, 111, 110];
     public const int[2] s5 = [63, 62];
     public const int[5] s4 = [60, 63, 120, 109, 108];
-    public const Range[6] s0 = [{9, 9}, {10, 10}, {13, 13}, {32, 55295u}, {57344u, 65533u}, {65536, 1114111}];
+    public const Range[6] s0 = [{9, 9}, {10, 10}, {13, 13}, {32, 55295}, {57344, 65533}, {65536, 1114111}];
     public const Range[4] s1 = [{32, 32}, {9, 9}, {13, 13}, {10, 10}];
-    public const Range[16] s2 = [{58, 58}, {65, 90}, {95, 95}, {97, 122}, {192u, 214u}, {216u, 246u}, {248u, 767}, {880, 893}, {895, 8191}, {8204, 8205}, {8304, 8591}, {11264, 12271}, {12289, 55295u}, {63744u, 64975u}, {65008u, 65533u}, {65536, 983039}];
-    public const Range[6] s3 = [{45, 45}, {46, 46}, {48, 57}, {183u, 183u}, {768, 879}, {8255, 8256}];
+    public const Range[16] s2 = [{58, 58}, {65, 90}, {95, 95}, {97, 122}, {192, 214}, {216, 246}, {248, 767}, {880, 893}, {895, 8191}, {8204, 8205}, {8304, 8591}, {11264, 12271}, {12289, 55295}, {63744, 64975}, {65008, 65533}, {65536, 983039}];
+    public const Range[6] s3 = [{45, 45}, {46, 46}, {48, 57}, {183, 183}, {768, 879}, {8255, 8256}];
     public const Range[1] s7 = [{48, 57}];
     public const Range[2] s9 = [{65, 90}, {97, 122}];
     public const Range[6] s10 = [{65, 90}, {97, 122}, {48, 57}, {46, 46}, {95, 95}, {45, 45}];
@@ -77,6 +79,7 @@ namespace
     public const Range[2] s67 = [{109, 109}, {77, 77}];
     public const Range[2] s68 = [{108, 108}, {76, 76}];
 } // namespace
+
 public static class XmlParser
 {
     public static void Parse(TrivialLexer& lexer, System.Xml.XmlProcessor* processor)
@@ -99,12 +102,12 @@ public static class XmlParser
             }
             else
             {
-                lexer.ThrowExpectationFailure(lexer.GetSpan(), GetEndTokenInfo());
+                lexer.ThrowFarthestError();
             }
         }
         else
         {
-            lexer.ThrowExpectationFailure(span, u"Document");
+            lexer.ThrowFarthestError();
         }
         return;
     }
@@ -119,6 +122,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Document");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 0);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -244,6 +248,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Char");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 1);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -305,6 +310,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"S");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 2);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -380,6 +386,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"NameStartChar");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 3);
         Match match(false);
         for (const Range& range : s2)
         {
@@ -420,6 +427,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"NameChar");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 4);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -477,6 +485,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Name");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 5);
         Span s;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -590,6 +599,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Names");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 6);
         UniquePtr<Value<ustring>> name1;
         UniquePtr<Value<ustring>> name2;
         Match match(false);
@@ -684,6 +694,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Nmtoken");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 7);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -741,6 +752,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Nmtokens");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 8);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -831,6 +843,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Prolog");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 9);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -976,6 +989,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"XMLDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 10);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -992,9 +1006,11 @@ public static class XmlParser
                         Match* parentMatch4 = &match;
                         {
                             Match match(true);
-                            for (int i : s4)
+                            long __n = 5;
+                            for (long __k = 0; __k < __n; ++__k)
                             {
-                                if (*lexer == i)
+                                int __i = s4[__k];
+                                if (*lexer == __i)
                                 {
                                     ++lexer;
                                 }
@@ -1099,9 +1115,11 @@ public static class XmlParser
             Match* parentMatch12 = &match;
             {
                 Match match(true);
-                for (int i : s5)
+                long __n = 2;
+                for (long __k = 0; __k < __n; ++__k)
                 {
-                    if (*lexer == i)
+                    int __i = s5[__k];
+                    if (*lexer == __i)
                     {
                         ++lexer;
                     }
@@ -1145,6 +1163,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"VersionInfo");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 11);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -1163,9 +1182,11 @@ public static class XmlParser
                     Match* parentMatch3 = &match;
                     {
                         Match match(true);
-                        for (int i : s6)
+                        long __n = 7;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s6[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -1233,6 +1254,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"VersionNum");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 12);
         Span s;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -1407,6 +1429,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"VersionNumDQ");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 13);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -1478,6 +1501,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"VersionNumSQ");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 14);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -1549,6 +1573,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"VersionNumber");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 15);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -1597,6 +1622,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EncodingDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 16);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -1615,9 +1641,11 @@ public static class XmlParser
                     Match* parentMatch3 = &match;
                     {
                         Match match(true);
-                        for (int i : s8)
+                        long __n = 8;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s8[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -1685,6 +1713,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EncodingName");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 17);
         Span s;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -1811,6 +1840,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EncNameDQ");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 18);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -1882,6 +1912,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EncNameSQ");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 19);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -1953,6 +1984,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EncName");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 20);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -2001,6 +2033,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"SDDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 21);
         UniquePtr<Value<bool>> yn;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -2020,9 +2053,11 @@ public static class XmlParser
                     Match* parentMatch3 = &match;
                     {
                         Match match(true);
-                        for (int i : s11)
+                        long __n = 10;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s11[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -2101,6 +2136,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"DocTypeDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 22);
         UniquePtr<Value<ustring>> rootElementName;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -2121,9 +2157,11 @@ public static class XmlParser
                             Match* parentMatch5 = &match;
                             {
                                 Match match(true);
-                                for (int i : s12)
+                                long __n = 9;
+                                for (long __k = 0; __k < __n; ++__k)
                                 {
-                                    if (*lexer == i)
+                                    int __i = s12[__k];
+                                    if (*lexer == __i)
                                     {
                                         ++lexer;
                                     }
@@ -2373,6 +2411,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"ExternalID");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 23);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -2387,9 +2426,11 @@ public static class XmlParser
                     Match* parentMatch3 = &match;
                     {
                         Match match(true);
-                        for (int i : s13)
+                        long __n = 6;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s13[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -2448,9 +2489,11 @@ public static class XmlParser
                                     Match* parentMatch11 = &match;
                                     {
                                         Match match(true);
-                                        for (int i : s14)
+                                        long __n = 6;
+                                        for (long __k = 0; __k < __n; ++__k)
                                         {
-                                            if (*lexer == i)
+                                            int __i = s14[__k];
+                                            if (*lexer == __i)
                                             {
                                                 ++lexer;
                                             }
@@ -2545,6 +2588,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"SystemLiteral");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 24);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -2755,6 +2799,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"PubidLiteral");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 25);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -2964,6 +3009,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"PubidChar");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 26);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -3056,6 +3102,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"IntSubset");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 27);
         Match match(true);
         Match* parentMatch0 = &match;
         {
@@ -3128,6 +3175,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"MarkupDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 28);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -3244,6 +3292,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"DeclSep");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 29);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -3292,6 +3341,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"ElementDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 30);
         UniquePtr<Value<ustring>> elementName;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -3312,9 +3362,11 @@ public static class XmlParser
                             Match* parentMatch5 = &match;
                             {
                                 Match match(true);
-                                for (int i : s20)
+                                long __n = 9;
+                                for (long __k = 0; __k < __n; ++__k)
                                 {
-                                    if (*lexer == i)
+                                    int __i = s20[__k];
+                                    if (*lexer == __i)
                                     {
                                         ++lexer;
                                     }
@@ -3445,6 +3497,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"ContentSpec");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 31);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -3458,9 +3511,11 @@ public static class XmlParser
                 {
                     long save = lexer.GetPos();
                     Match match(true);
-                    for (int i : s21)
+                    long __n = 5;
+                    for (long __k = 0; __k < __n; ++__k)
                     {
-                        if (*lexer == i)
+                        int __i = s21[__k];
+                        if (*lexer == __i)
                         {
                             ++lexer;
                         }
@@ -3478,9 +3533,11 @@ public static class XmlParser
                         lexer.SetPos(save);
                         {
                             Match match(true);
-                            for (int i : s22)
+                            long __n = 3;
+                            for (long __k = 0; __k < __n; ++__k)
                             {
-                                if (*lexer == i)
+                                int __i = s22[__k];
+                                if (*lexer == __i)
                                 {
                                     ++lexer;
                                 }
@@ -3551,6 +3608,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Children");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 32);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -3686,6 +3744,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"CP");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 33);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -3840,6 +3899,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Choice");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 34);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -4170,6 +4230,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Seq");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 35);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -4412,6 +4473,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Mixed");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 36);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -4471,9 +4533,11 @@ public static class XmlParser
                             Match* parentMatch8 = &match;
                             {
                                 Match match(true);
-                                for (int i : s23)
+                                long __n = 7;
+                                for (long __k = 0; __k < __n; ++__k)
                                 {
-                                    if (*lexer == i)
+                                    int __i = s23[__k];
+                                    if (*lexer == __i)
                                     {
                                         ++lexer;
                                     }
@@ -4633,9 +4697,11 @@ public static class XmlParser
                 Match* parentMatch22 = &match;
                 {
                     Match match(true);
-                    for (int i : s24)
+                    long __n = 2;
+                    for (long __k = 0; __k < __n; ++__k)
                     {
-                        if (*lexer == i)
+                        int __i = s24[__k];
+                        if (*lexer == __i)
                         {
                             ++lexer;
                         }
@@ -4707,9 +4773,11 @@ public static class XmlParser
                                 Match* parentMatch30 = &match;
                                 {
                                     Match match(true);
-                                    for (int i : s25)
+                                    long __n = 7;
+                                    for (long __k = 0; __k < __n; ++__k)
                                     {
-                                        if (*lexer == i)
+                                        int __i = s25[__k];
+                                        if (*lexer == __i)
                                         {
                                             ++lexer;
                                         }
@@ -4800,6 +4868,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"AttlistDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 37);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -4817,9 +4886,11 @@ public static class XmlParser
                         Match* parentMatch4 = &match;
                         {
                             Match match(true);
-                            for (int i : s26)
+                            long __n = 9;
+                            for (long __k = 0; __k < __n; ++__k)
                             {
-                                if (*lexer == i)
+                                int __i = s26[__k];
+                                if (*lexer == __i)
                                 {
                                     ++lexer;
                                 }
@@ -4957,6 +5028,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"AttDef");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 38);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -5065,6 +5137,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"AttType");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 39);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -5130,10 +5203,13 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"StringType");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 40);
         Match match(true);
-        for (int i : s27)
+        long __n = 5;
+        for (long __k = 0; __k < __n; ++__k)
         {
-            if (*lexer == i)
+            int __i = s27[__k];
+            if (*lexer == __i)
             {
                 ++lexer;
             }
@@ -5173,6 +5249,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"TokenizedType");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 41);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -5198,9 +5275,11 @@ public static class XmlParser
                             {
                                 long save = lexer.GetPos();
                                 Match match(true);
-                                for (int i : s28)
+                                long __n = 2;
+                                for (long __k = 0; __k < __n; ++__k)
                                 {
-                                    if (*lexer == i)
+                                    int __i = s28[__k];
+                                    if (*lexer == __i)
                                     {
                                         ++lexer;
                                     }
@@ -5218,9 +5297,11 @@ public static class XmlParser
                                     lexer.SetPos(save);
                                     {
                                         Match match(true);
-                                        for (int i : s29)
+                                        long __n = 5;
+                                        for (long __k = 0; __k < __n; ++__k)
                                         {
-                                            if (*lexer == i)
+                                            int __i = s29[__k];
+                                            if (*lexer == __i)
                                             {
                                                 ++lexer;
                                             }
@@ -5243,9 +5324,11 @@ public static class XmlParser
                                 lexer.SetPos(save);
                                 {
                                     Match match(true);
-                                    for (int i : s30)
+                                    long __n = 6;
+                                    for (long __k = 0; __k < __n; ++__k)
                                     {
-                                        if (*lexer == i)
+                                        int __i = s30[__k];
+                                        if (*lexer == __i)
                                         {
                                             ++lexer;
                                         }
@@ -5268,9 +5351,11 @@ public static class XmlParser
                             lexer.SetPos(save);
                             {
                                 Match match(true);
-                                for (int i : s31)
+                                long __n = 6;
+                                for (long __k = 0; __k < __n; ++__k)
                                 {
-                                    if (*lexer == i)
+                                    int __i = s31[__k];
+                                    if (*lexer == __i)
                                     {
                                         ++lexer;
                                     }
@@ -5293,9 +5378,11 @@ public static class XmlParser
                         lexer.SetPos(save);
                         {
                             Match match(true);
-                            for (int i : s32)
+                            long __n = 8;
+                            for (long __k = 0; __k < __n; ++__k)
                             {
-                                if (*lexer == i)
+                                int __i = s32[__k];
+                                if (*lexer == __i)
                                 {
                                     ++lexer;
                                 }
@@ -5318,9 +5405,11 @@ public static class XmlParser
                     lexer.SetPos(save);
                     {
                         Match match(true);
-                        for (int i : s33)
+                        long __n = 7;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s33[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -5343,9 +5432,11 @@ public static class XmlParser
                 lexer.SetPos(save);
                 {
                     Match match(true);
-                    for (int i : s34)
+                    long __n = 8;
+                    for (long __k = 0; __k < __n; ++__k)
                     {
-                        if (*lexer == i)
+                        int __i = s34[__k];
+                        if (*lexer == __i)
                         {
                             ++lexer;
                         }
@@ -5390,6 +5481,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EnumeratedType");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 42);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -5438,6 +5530,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"NotationType");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 43);
         UniquePtr<Value<ustring>> f;
         UniquePtr<Value<ustring>> n;
         Match match(false);
@@ -5462,9 +5555,11 @@ public static class XmlParser
                                 Match* parentMatch6 = &match;
                                 {
                                     Match match(true);
-                                    for (int i : s35)
+                                    long __n = 8;
+                                    for (long __k = 0; __k < __n; ++__k)
                                     {
-                                        if (*lexer == i)
+                                        int __i = s35[__k];
+                                        if (*lexer == __i)
                                         {
                                             ++lexer;
                                         }
@@ -5726,6 +5821,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Enumeration");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 44);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -5968,6 +6064,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"DefaultDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 45);
         UniquePtr<Value<ustring>> attVAlue;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -5978,9 +6075,11 @@ public static class XmlParser
             {
                 long save = lexer.GetPos();
                 Match match(true);
-                for (int i : s36)
+                long __n = 9;
+                for (long __k = 0; __k < __n; ++__k)
                 {
-                    if (*lexer == i)
+                    int __i = s36[__k];
+                    if (*lexer == __i)
                     {
                         ++lexer;
                     }
@@ -5998,9 +6097,11 @@ public static class XmlParser
                     lexer.SetPos(save);
                     {
                         Match match(true);
-                        for (int i : s37)
+                        long __n = 8;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s37[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -6039,9 +6140,11 @@ public static class XmlParser
                                     Match* parentMatch8 = &match;
                                     {
                                         Match match(true);
-                                        for (int i : s38)
+                                        long __n = 6;
+                                        for (long __k = 0; __k < __n; ++__k)
                                         {
-                                            if (*lexer == i)
+                                            int __i = s38[__k];
+                                            if (*lexer == __i)
                                             {
                                                 ++lexer;
                                             }
@@ -6124,6 +6227,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EntityDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 46);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -6172,6 +6276,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"GEDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 47);
         UniquePtr<Value<ustring>> entityName;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -6192,9 +6297,11 @@ public static class XmlParser
                             Match* parentMatch5 = &match;
                             {
                                 Match match(true);
-                                for (int i : s39)
+                                long __n = 8;
+                                for (long __k = 0; __k < __n; ++__k)
                                 {
-                                    if (*lexer == i)
+                                    int __i = s39[__k];
+                                    if (*lexer == __i)
                                     {
                                         ++lexer;
                                     }
@@ -6325,6 +6432,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"PEDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 48);
         UniquePtr<Value<ustring>> peName;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -6351,9 +6459,11 @@ public static class XmlParser
                                     Match* parentMatch7 = &match;
                                     {
                                         Match match(true);
-                                        for (int i : s40)
+                                        long __n = 8;
+                                        for (long __k = 0; __k < __n; ++__k)
                                         {
-                                            if (*lexer == i)
+                                            int __i = s40[__k];
+                                            if (*lexer == __i)
                                             {
                                                 ++lexer;
                                             }
@@ -6513,6 +6623,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EntityDef");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 49);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -6594,6 +6705,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"PEDef");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 50);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -6642,6 +6754,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EntityValue");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 51);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -6910,6 +7023,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"NDataDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 52);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -6929,9 +7043,11 @@ public static class XmlParser
                     Match* parentMatch3 = &match;
                     {
                         Match match(true);
-                        for (int i : s43)
+                        long __n = 5;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s43[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -7000,6 +7116,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"PEReference");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 53);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -7073,6 +7190,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"NotationDecl");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 54);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -7093,9 +7211,11 @@ public static class XmlParser
                             Match* parentMatch5 = &match;
                             {
                                 Match match(true);
-                                for (int i : s44)
+                                long __n = 10;
+                                for (long __k = 0; __k < __n; ++__k)
                                 {
-                                    if (*lexer == i)
+                                    int __i = s44[__k];
+                                    if (*lexer == __i)
                                     {
                                         ++lexer;
                                     }
@@ -7248,6 +7368,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"PublicID");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 55);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -7255,9 +7376,11 @@ public static class XmlParser
             Match* parentMatch1 = &match;
             {
                 Match match(true);
-                for (int i : s45)
+                long __n = 6;
+                for (long __k = 0; __k < __n; ++__k)
                 {
-                    if (*lexer == i)
+                    int __i = s45[__k];
+                    if (*lexer == __i)
                     {
                         ++lexer;
                     }
@@ -7321,6 +7444,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Element");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 56);
         ustring tagName;
         UniquePtr<Value<ustring>> name;
         Match match(false);
@@ -7461,9 +7585,11 @@ public static class XmlParser
                             long pos = lexer.GetPos();
                             Span span = lexer.GetSpan();
                             Match match(true);
-                            for (int i : s46)
+                            long __n = 2;
+                            for (long __k = 0; __k < __n; ++__k)
                             {
-                                if (*lexer == i)
+                                int __i = s46[__k];
+                                if (*lexer == __i)
                                 {
                                     ++lexer;
                                 }
@@ -7575,6 +7701,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"ETag");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 57);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -7586,9 +7713,11 @@ public static class XmlParser
                 Match* parentMatch2 = &match;
                 {
                     Match match(true);
-                    for (int i : s47)
+                    long __n = 2;
+                    for (long __k = 0; __k < __n; ++__k)
                     {
-                        if (*lexer == i)
+                        int __i = s47[__k];
+                        if (*lexer == __i)
                         {
                             ++lexer;
                         }
@@ -7694,6 +7823,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Content");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 58);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -7878,6 +8008,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"CharDataChar");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 59);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -7937,6 +8068,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"CharData");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 60);
         ustring s;
         UniquePtr<Value<uchar>> chr;
         Match match(false);
@@ -8045,9 +8177,11 @@ public static class XmlParser
                                     Match* parentMatch11 = &match;
                                     {
                                         Match match(true);
-                                        for (int i : s50)
+                                        long __n = 3;
+                                        for (long __k = 0; __k < __n; ++__k)
                                         {
-                                            if (*lexer == i)
+                                            int __i = s50[__k];
+                                            if (*lexer == __i)
                                             {
                                                 ++lexer;
                                             }
@@ -8152,6 +8286,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"CDSect");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 61);
         ustring s;
         UniquePtr<Value<uchar>> chr;
         Match match(false);
@@ -8168,9 +8303,11 @@ public static class XmlParser
                     Match* parentMatch3 = &match;
                     {
                         Match match(true);
-                        for (int i : s52)
+                        long __n = 9;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s52[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -8221,9 +8358,11 @@ public static class XmlParser
                                                             lexer.SetPos(save);
                                                             save = tmp;
                                                             Match match(true);
-                                                            for (int i : s53)
+                                                            long __n = 3;
+                                                            for (long __k = 0; __k < __n; ++__k)
                                                             {
-                                                                if (*lexer == i)
+                                                                int __i = s53[__k];
+                                                                if (*lexer == __i)
                                                                 {
                                                                     ++lexer;
                                                                 }
@@ -8275,9 +8414,11 @@ public static class XmlParser
                     Match* parentMatch11 = &match;
                     {
                         Match match(true);
-                        for (int i : s54)
+                        long __n = 3;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s54[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -8329,6 +8470,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Attribute");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 62);
         UniquePtr<Value<ustring>> attName;
         UniquePtr<Value<ustring>> attValue;
         Match match(false);
@@ -8405,6 +8547,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"AttValueDQ");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 63);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -8567,6 +8710,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"AttValueSQ");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 64);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -8729,6 +8873,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"AttValue");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 65);
         UniquePtr<Value<ustring>> attValueDQ;
         UniquePtr<Value<ustring>> attValueSQ;
         Match match(false);
@@ -8811,6 +8956,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"EntityRef");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 66);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -8900,6 +9046,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"DecCodePoint");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 67);
         uint val;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -9028,6 +9175,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"HexCodePoint");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 68);
         uint val;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -9160,6 +9308,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"CharRef");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 69);
         UniquePtr<Value<uint>> decCodePoint;
         UniquePtr<Value<uint>> hexCodePoint;
         Match match(false);
@@ -9180,9 +9329,11 @@ public static class XmlParser
                         Match* parentMatch4 = &match;
                         {
                             Match match(true);
-                            for (int i : s59)
+                            long __n = 2;
+                            for (long __k = 0; __k < __n; ++__k)
                             {
-                                if (*lexer == i)
+                                int __i = s59[__k];
+                                if (*lexer == __i)
                                 {
                                     ++lexer;
                                 }
@@ -9251,9 +9402,11 @@ public static class XmlParser
                                 Match* parentMatch11 = &match;
                                 {
                                     Match match(true);
-                                    for (int i : s60)
+                                    long __n = 3;
+                                    for (long __k = 0; __k < __n; ++__k)
                                     {
-                                        if (*lexer == i)
+                                        int __i = s60[__k];
+                                        if (*lexer == __i)
                                         {
                                             ++lexer;
                                         }
@@ -9336,6 +9489,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Reference");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 70);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -9384,6 +9538,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Misc");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 71);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -9449,6 +9604,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Comment");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 72);
         ustring s;
         UniquePtr<Value<uchar>> chr;
         Match match(false);
@@ -9465,9 +9621,11 @@ public static class XmlParser
                     Match* parentMatch3 = &match;
                     {
                         Match match(true);
-                        for (int i : s61)
+                        long __n = 4;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s61[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -9646,9 +9804,11 @@ public static class XmlParser
                     Match* parentMatch19 = &match;
                     {
                         Match match(true);
-                        for (int i : s62)
+                        long __n = 3;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s62[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -9700,6 +9860,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"PI");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 73);
         ustring data;
         UniquePtr<Value<ustring>> target;
         UniquePtr<Value<uchar>> chr;
@@ -9723,9 +9884,11 @@ public static class XmlParser
                             Match* parentMatch5 = &match;
                             {
                                 Match match(true);
-                                for (int i : s63)
+                                long __n = 2;
+                                for (long __k = 0; __k < __n; ++__k)
                                 {
-                                    if (*lexer == i)
+                                    int __i = s63[__k];
+                                    if (*lexer == __i)
                                     {
                                         ++lexer;
                                     }
@@ -9801,9 +9964,11 @@ public static class XmlParser
                                                             lexer.SetPos(save);
                                                             save = tmp;
                                                             Match match(true);
-                                                            for (int i : s64)
+                                                            long __n = 2;
+                                                            for (long __k = 0; __k < __n; ++__k)
                                                             {
-                                                                if (*lexer == i)
+                                                                int __i = s64[__k];
+                                                                if (*lexer == __i)
                                                                 {
                                                                     ++lexer;
                                                                 }
@@ -9855,9 +10020,11 @@ public static class XmlParser
                     Match* parentMatch15 = &match;
                     {
                         Match match(true);
-                        for (int i : s65)
+                        long __n = 2;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s65[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }
@@ -9909,6 +10076,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"PITarget");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 74);
         UniquePtr<Value<ustring>> name;
         Match match(false);
         Match* parentMatch0 = &match;
@@ -9985,6 +10153,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Xml");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 75);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -10073,6 +10242,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Eq");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 76);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -10165,6 +10335,7 @@ public static class XmlParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"YesNo");
             }
         #endif
+        System.Lex.RuleGuard ruleGuard(lexer, 77);
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -10174,9 +10345,11 @@ public static class XmlParser
             {
                 long pos = lexer.GetPos();
                 Match match(true);
-                for (int i : s69)
+                long __n = 5;
+                for (long __k = 0; __k < __n; ++__k)
                 {
-                    if (*lexer == i)
+                    int __i = s69[__k];
+                    if (*lexer == __i)
                     {
                         ++lexer;
                     }
@@ -10209,9 +10382,11 @@ public static class XmlParser
                     {
                         long pos = lexer.GetPos();
                         Match match(true);
-                        for (int i : s70)
+                        long __n = 4;
+                        for (long __k = 0; __k < __n; ++__k)
                         {
-                            if (*lexer == i)
+                            int __i = s70[__k];
+                            if (*lexer == __i)
                             {
                                 ++lexer;
                             }

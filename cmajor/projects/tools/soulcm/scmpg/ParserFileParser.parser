@@ -62,6 +62,8 @@ parser ParserFileParser
         ::= MainStatement(grammarParser):mainStatement
         |   StartStatement(grammarParser):startStatement
         |   NothrowStatement(grammarParser):nothrowStatement
+        |   FarthestErrorStatement(grammarParser):farthestErrorStatement
+        |   StateStatement(grammarParser):stateStatement
         |   UsingStatement(grammarParser):usingStatement
         |   LexerStatement(grammarParser):lexerStatement
         |   RuleInfoStatement(grammarParser):ruleInfoStatement
@@ -80,6 +82,14 @@ parser ParserFileParser
         ::= NOTHROW SEMICOLON!{ grammarParser->SetNothrow(); }
         ;
 
+    FarthestErrorStatement(soulcm.scmpg.GrammarParser* grammarParser)
+        ::= FARTHEST_ERROR SEMICOLON!{ grammarParser->SetFarthestError(); }
+        ;
+
+    StateStatement(soulcm.scmpg.GrammarParser* grammarParser)
+        ::= STATE SEMICOLON!{ grammarParser->SetState(); }
+        ;
+    
     UsingStatement(soulcm.scmpg.GrammarParser* grammarParser)
         ::= USING UsingQualifiedId:parserId! SEMICOLON!{ grammarParser->AddUsing(parserId); }
         ;

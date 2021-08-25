@@ -61,6 +61,14 @@ namespace soulcm.scmpg
             }
             return false;
         }
+        public virtual nothrow bool IsState() const
+        {
+            if (parent != null)
+            {
+                return parent->IsState();
+            }
+            return false;
+        }
         public virtual Parser* Clone() const
         {
             throw Exception("this class does not support clone operation");
@@ -515,7 +523,7 @@ namespace soulcm.scmpg
     public class RuleParser : Parser
     {
         public RuleParser(const ustring& name_) :
-            base(name_), hasReturn(false)
+            base(name_), hasReturn(false), id(-1)
         {
         }
         public Parser* Definition()
@@ -582,6 +590,14 @@ namespace soulcm.scmpg
         {
             visitor.Visit(*this);
         }
+        public nothrow void SetId(int id_)
+        {
+            id = id_;
+        }
+        public nothrow inline int Id() const
+        {
+            return id;
+        }
         private UniquePtr<Parser> definition;
         private List<UniquePtr<Parameter>> parameters;
         private List<UniquePtr<Variable>> variables;
@@ -589,6 +605,7 @@ namespace soulcm.scmpg
         private List<NonterminalParser*> nonterminals;
         private ustring info;
         private bool hasReturn;
+        private int id;
     }
     public class GrammarParser : Parser
     {
@@ -627,6 +644,22 @@ namespace soulcm.scmpg
         public nothrow void SetNothrow()
         {
             isNothrow = true;
+        }
+        public override nothrow bool IsState() const
+        {
+            return state;
+        }
+        public nothrow void SetState()
+        {
+            state = true;
+        }
+        public nothrow bool IsFarthestError() const
+        {
+            return farthestError;
+        }
+        public nothrow void SetFarthestError()
+        {
+            farthestError = true;
         }
         public const List<ustring>& Usings() const
         {
@@ -686,6 +719,8 @@ namespace soulcm.scmpg
         private bool main;
         private bool start;
         private bool isNothrow;
+        private bool farthestError;
+        private bool state;
         private List<ustring> usings;
         private ustring lexer;
         private List<UniquePtr<RuleParser>> rules;

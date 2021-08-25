@@ -9,21 +9,25 @@ namespace System.Lex
 {
     public enum LexerFlags : sbyte
     {
-        none = 0, synchronize = 1 << 0, synchronized = 1 << 1, synchronizedAtLeastOnce = 1 << 2, cursorSeen = 1 << 3
+        none = 0, synchronize = 1 << 0, synchronized = 1 << 1, synchronizedAtLeastOnce = 1 << 2, cursorSeen = 1 << 3, farthestError = 1 << 4
     }
 
     public class Lexer
     {
         public Lexer(const ustring& content_, const string& fileName_, int fileIndex_) :
             content(content_), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(null), start(content.Chars()), end(content.Chars() + content.Length()), pos(start), current(tokens.End()), log(null), countLines(true), separatorChar('\0'),
-            commentTokenId(-1)
+            commentTokenId(-1), farthestPos(GetPos())
         {
         }
         public Lexer(const uchar* start_, const uchar* end_, const string& fileName_, int fileIndex_) :
             content(), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(null), start(start_), end(end_), pos(start), current(tokens.End()), log(null), countLines(true), separatorChar('\0'),
-            commentTokenId(-1)
+            commentTokenId(-1), farthestPos(GetPos())
         {
         }
+        suppress Lexer(const Lexer&);
+        suppress Lexer(Lexer&&);
+        suppress void operator=(const Lexer&);
+        suppress void operator=(Lexer&&);
         public void SetBlockCommentStates(const Set<int>& blockCommentStates_) const
         {
             blockCommentStates = blockCommentStates_;
@@ -140,6 +144,15 @@ namespace System.Lex
             else
             {
                 line = current->line;
+            }
+            if (GetFlag(LexerFlags.farthestError))
+            {
+                long p = GetPos();
+                if (p > farthestPos)
+                {
+                    farthestPos = p;
+                    farthestRuleContext = ruleContext;
+                }
             }
         }
         public long GetPos() const
@@ -406,6 +419,16 @@ namespace System.Lex
             Token token = GetToken(span.start);
             throw ParsingException("parsing error in \'" + fileName + ":" + ToString(token.line) + "\': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
         }
+        public string GetFarthestError() const
+        {
+            Token token = GetToken(farthestPos);
+            string parserStateStr = GetParserStateStr();
+            return "parsing error at '" + fileName + ":" + ToString(token.line) + "':\n" + ToUtf8(ErrorLines(token)) + parserStateStr;
+        }
+        public void ThrowFarthestError()
+        {
+            throw ParsingException(GetFarthestError(), fileName);
+        }
         public void AddError(const Span& span, const ustring& name)
         {
             if (GetFlag(LexerFlags.synchronize) && GetFlag(LexerFlags.synchronized))
@@ -419,7 +442,7 @@ namespace System.Lex
                 errors.Add(UniquePtr<Exception>(error));
             }
         }
-        public nothrow List<UniquePtr<Exception>> Errors() 
+        public nothrow List<UniquePtr<Exception>> Errors()
         {
             return Rvalue(errors);
         }
@@ -549,6 +572,45 @@ namespace System.Lex
         {
             flags = cast<LexerFlags>(flags & ~flag);
         }
+        public nothrow const List<int>& RuleContext() const
+        {
+            return ruleContext;
+        }
+        public nothrow const List<int>& FarthestRuleContext() const
+        {
+            return farthestRuleContext;
+        }
+        public nothrow void SetRuleNameListPtr(List<string>* ruleNameListPtr_)
+        {
+            ruleNameListPtr = ruleNameListPtr_;
+        }
+        public nothrow string GetParserStateStr() const
+        {
+            string parserStateStr;
+            long n = farthestRuleContext.Count();
+            if (ruleNameListPtr != null && n > 0)
+            {
+                parserStateStr.Append("\nParser state:\n");
+                for (long i = 0; i < n; ++i)
+                {
+                    int ruleId = farthestRuleContext[i];
+                    if (ruleId >= 0 && ruleId < ruleNameListPtr->Count())
+                    {
+                        string ruleName = (*ruleNameListPtr)[ruleId];
+                        parserStateStr.Append(ruleName).Append("\n");
+                    }
+                }
+            }
+            return parserStateStr;
+        }
+        public void PushRule(int ruleId)
+        {
+            ruleContext.Add(ruleId);
+        }
+        public void PopRule()
+        {
+            ruleContext.RemoveLast();
+        }
         protected Lexeme lexeme;
         protected int line;
         private ustring content;
@@ -570,6 +632,10 @@ namespace System.Lex
         private Set<int> blockCommentStates;
         private int commentTokenId;
         private LexerFlags flags;
+        private long farthestPos;
+        private List<int> ruleContext;
+        private List<int> farthestRuleContext;
+        private List<string>* ruleNameListPtr;
     }
     public const uchar* LineStart(const uchar* start, const uchar* p)
     {
@@ -661,4 +727,18 @@ namespace System.Lex
         lexer.Log()->DecIndent();
         lexer.Log()->WriteEndRule(ruleName);
     }
+
+    public class RuleGuard
+    {
+        public nothrow RuleGuard(Lexer& lexer_, int ruleId_) : lexer(lexer_)
+        {
+            lexer.PushRule(ruleId_);
+        }
+        public ~RuleGuard()
+        {
+            lexer.PopRule();
+        }
+        private Lexer& lexer;
+    }
+
 } // namespace System.Lex

@@ -19,7 +19,10 @@ parser ProjectFileParser
         ;
 
     ProjectFileContent(soulcm.scmpg.ProjectFile* projectFile)
-        ::= SourceFile(projectFile):sourceFile*
+        ::=
+        (    SourceFile(projectFile):sourceFile
+        |    RuleFile(projectFile):ruleFile
+        )*
         ;
 
     QualifiedId(var Span s) : ustring
@@ -28,5 +31,9 @@ parser ProjectFileParser
 
     SourceFile(soulcm.scmpg.ProjectFile* projectFile)
         ::= SOURCE FILEPATH!{ projectFile->AddSourceFile(lexer.filePath); } SEMICOLON!
+        ;
+
+    RuleFile(soulcm.scmpg.ProjectFile* projectFile)
+        ::= RULES FILEPATH!{ projectFile->AddRuleFile(lexer.filePath); } SEMICOLON!
         ;
 }

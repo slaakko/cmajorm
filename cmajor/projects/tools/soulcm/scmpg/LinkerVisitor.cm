@@ -74,6 +74,10 @@ namespace soulcm.scmpg
         {
             currentRule = &parser;
             parser.Definition()->Accept(*this);
+            if (stage == Stage.resolveRules)
+            {
+                domain->AddRule(&parser);
+            }
         }
         public override void Visit(GrammarParser& parser)
         {

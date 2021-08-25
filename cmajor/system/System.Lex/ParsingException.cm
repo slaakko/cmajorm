@@ -13,6 +13,10 @@ namespace System.Lex
             base(message_), message(message_), fileName(fileName_), span(span_), mod(null)
         {
         }
+        public ParsingException(const string& message_, const string& fileName_) : 
+            base(message_), message(message_), fileName(fileName_), span(), mod(null)
+        {
+        }
         public const string& Project() const
         {
             return project;

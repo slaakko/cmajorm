@@ -26,9 +26,18 @@ namespace soulcm.scmpg
         {
             sourceFiles.Add(sourceFile);
         }
+        public nothrow void AddRuleFile(const string& ruleFile)
+        {
+            ruleFiles.Add(ruleFile);
+        }
+        public nothrow const List<string>& RuleFiles() const
+        {
+            return ruleFiles;
+        }
         private string fileName;
         private string basePath;
         private ustring projectName;
         private List<string> sourceFiles;
+        private List<string> ruleFiles;
     }
 } // namespace soulcm.scmpg

@@ -133,6 +133,15 @@ public int main(int argc, const char** argv)
             parserFiles.Add(Rvalue(parserFile));
         }
         soulcm.scmpg.Domain domain;
+        if (projectFile->RuleFiles().Count() == 1)
+        {
+            string ruleFilePath = GetFullPath(Path.Combine(projectFile->BasePath(), projectFile->RuleFiles()[0]));
+            domain.SetRuleFilePath(ruleFilePath + ".cm");
+        }
+        else if (projectFile->RuleFiles().Count() > 1)
+        {
+            throw Exception("only one rule file per project allowed");
+        }
         for (const UniquePtr<soulcm.scmpg.ParserFile>& parserFile : parserFiles)
         {
             domain.AddParserFile(parserFile.Get());
