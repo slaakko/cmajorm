@@ -7178,6 +7178,7 @@ soulng::parser::Match XmlParser::Element(TrivialLexer& lexer, sngxml::xml::XmlPr
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::RuleGuard ruleGuard(lexer, 56);
     std::u32string tagName = std::u32string();
+    SourcePos sourcePos = SourcePos();
     std::unique_ptr<soulng::parser::Value<std::u32string>> name;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -7208,10 +7209,12 @@ soulng::parser::Match XmlParser::Element(TrivialLexer& lexer, sngxml::xml::XmlPr
                         soulng::parser::Match* parentMatch5 = &match;
                         {
                             int64_t pos = lexer.GetPos();
+                            soulng::lexer::SourcePos sourcePos = lexer.GetSourcePos(pos);
                             soulng::parser::Match match = XmlParser::Name(lexer);
                             name.reset(static_cast<soulng::parser::Value<std::u32string>*>(match.value));
                             if (match.hit)
                             {
+                                sourcePos = lexer.GetSourcePos(pos);
                                 tagName = name->value;
                                 processor->BeginStartTag(tagName);
                             }
@@ -7316,6 +7319,7 @@ soulng::parser::Match XmlParser::Element(TrivialLexer& lexer, sngxml::xml::XmlPr
                     {
                         int64_t pos = lexer.GetPos();
                         soulng::lexer::Span span = lexer.GetSpan();
+                        soulng::lexer::SourcePos sourcePos = lexer.GetSourcePos(pos);
                         soulng::parser::Match match(true);
                         for (int i : s46)
                         {
@@ -7331,7 +7335,7 @@ soulng::parser::Match XmlParser::Element(TrivialLexer& lexer, sngxml::xml::XmlPr
                         }
                         if (match.hit)
                         {
-                            processor->EndStartTag(span, lexer.FileName());
+                            processor->EndStartTag(span, sourcePos, lexer.FileName());
                             processor->EndTag(tagName, span, lexer.FileName());
                         }
                         *parentMatch16 = match;
@@ -7354,6 +7358,7 @@ soulng::parser::Match XmlParser::Element(TrivialLexer& lexer, sngxml::xml::XmlPr
                                     {
                                         int64_t pos = lexer.GetPos();
                                         soulng::lexer::Span span = lexer.GetSpan();
+                                        soulng::lexer::SourcePos sourcePos = lexer.GetSourcePos(pos);
                                         soulng::parser::Match match(false);
                                         if (*lexer == 62)
                                         {
@@ -7362,7 +7367,7 @@ soulng::parser::Match XmlParser::Element(TrivialLexer& lexer, sngxml::xml::XmlPr
                                         }
                                         if (match.hit)
                                         {
-                                            processor->EndStartTag(span, lexer.FileName());
+                                            processor->EndStartTag(span, sourcePos, lexer.FileName());
                                         }
                                         *parentMatch20 = match;
                                     }

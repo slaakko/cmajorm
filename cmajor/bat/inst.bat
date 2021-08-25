@@ -3,6 +3,7 @@ IF NOT EXIST cminst.exe xcopy /Y /D ..\x64\Release\cminst.exe .
 IF NOT EXIST cmsnglexer.dll xcopy /Y /D ..\x64\Release\cmsnglexer.dll .
 IF NOT EXIST cmsngrex.dll xcopy /Y /D ..\x64\Release\cmsngrex.dll .
 IF NOT EXIST cmsngutil.dll xcopy /Y /D ..\x64\Release\cmsngutil.dll .
+IF EXIST ..\bin\closecmpms.exe ..\bin\closecmpms.exe
 cminst -v ..\x64\Debug\*.exe ..\bin
 cminst -v ..\x64\Release\*.exe ..\bin
 cminst -v ..\x64\Debug\*.dll ..\bin

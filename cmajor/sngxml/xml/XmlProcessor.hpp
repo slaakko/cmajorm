@@ -6,6 +6,7 @@
 #ifndef SNGXML_XML_XML_PROCESSOR
 #define SNGXML_XML_XML_PROCESSOR
 #include <sngxml/xml/XmlContentHandler.hpp>
+#include <soulng/lexer/SourcePos.hpp>
 #include <soulng/lexer/TrivialLexer.hpp>
 #include <stack>
 #include <memory>
@@ -14,6 +15,8 @@
 #include <stdexcept>
 
 namespace sngxml { namespace xml {
+
+using soulng::lexer::SourcePos;
 
 class SNGXML_XML_API XmlProcessingException : public std::runtime_error
 {
@@ -56,7 +59,7 @@ public:
     void Standalone(bool standalone);
     void Encoding(const std::u32string& encoding);
     void BeginStartTag(const std::u32string& tagName);
-    void EndStartTag(const soulng::lexer::Span& span, const std::string& systemId);
+    void EndStartTag(const soulng::lexer::Span& span, const SourcePos& sourcePos, const std::string& systemId);
     void EndTag(const std::u32string& tagName, const soulng::lexer::Span& span, const std::string& systemId);
     void AddAttribute(const std::u32string& attName, const std::u32string& attValue, const soulng::lexer::Span& span, const std::string& systemId);
     void EntityRef(const std::u32string& entityName, const soulng::lexer::Span& span, const std::string& systemId);

@@ -1,6 +1,6 @@
 include ../../../Makefile.common
 
-OBJECTS = XmlApi.o XmlContentHandler.o XmlParser.o XmlParserInterface.o XmlProcessor.o
+OBJECTS = XmlApi.o XmlContentHandler.o XmlParser.o XmlParserInterface.o XmlProcessor.o Rules.o
 
 LIBRARY_NAME=libcmsngxmlxmld.a
 

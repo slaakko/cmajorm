@@ -6,10 +6,13 @@
 #ifndef SNGXML_XML_XML_CONTENT_HANDLER
 #define SNGXML_XML_XML_CONTENT_HANDLER
 #include <sngxml/xml/XmlApi.hpp>
+#include <soulng/lexer/SourcePos.hpp>
 #include <string>
 #include <vector>
 
 namespace sngxml { namespace xml {
+
+using soulng::lexer::SourcePos;
 
 class SNGXML_XML_API Attribute
 {
@@ -59,7 +62,7 @@ public:
     virtual void Comment(const std::u32string& comment) {}
     virtual void PI(const std::u32string& target, const std::u32string& data) {}
     virtual void CDataSection(const std::u32string& cdata) {}
-    virtual void StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const Attributes& attributes) {}
+    virtual void StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const Attributes& attributes, const SourcePos& sourcePos) {}
     virtual void EndElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName) {}
     virtual void SkippedEntity(const std::u32string& entityName) {}
 };

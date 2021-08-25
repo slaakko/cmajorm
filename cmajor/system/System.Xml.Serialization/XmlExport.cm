@@ -31,7 +31,7 @@ namespace System.Xml.Serialization
             T is char or
             T is wchar or
             T is uchar or
-            T is Uuid;
+            T is System.Uuid;
     }
 
     public concept XmlExportableTimeType<T>
@@ -52,6 +52,13 @@ namespace System.Xml.Serialization
             T is System.Duration;
     }
 
+    public UniquePtr<Element> ToXml(const System.Uuid& value, const string& fieldName)
+    {
+        UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
+        element->SetAttribute(u"value", ToUtf32(ToString(value)));
+        return element;
+    }
+    
     public UniquePtr<Element> ToXml<T>(const T& object, const string& fieldName)
         where T is XmlExportableClassType
     {
@@ -172,8 +179,21 @@ namespace System.Xml.Serialization
         return element;
     }
 
-    public UniquePtr<Element> ToXml<T>(const T& value, const string& fieldName)
-        where T is XmlExportableTimeType
+    public UniquePtr<Element> ToXml(const System.Date& value, const string& fieldName)
+    {
+        UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
+        element->SetAttribute(u"value", ToUtf32(value.ToString()));
+        return element;
+    }
+
+    public UniquePtr<Element> ToXml(const System.DateTime& value, const string& fieldName)
+    {
+        UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
+        element->SetAttribute(u"value", ToUtf32(value.ToString()));
+        return element;
+    }
+
+    public UniquePtr<Element> ToXml(const System.Timestamp& value, const string& fieldName)
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(value.ToString()));

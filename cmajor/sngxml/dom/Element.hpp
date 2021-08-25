@@ -6,9 +6,12 @@
 #ifndef SNGXML_DOM_ELEMENT_INCLUDED
 #define SNGXML_DOM_ELEMENT_INCLUDED
 #include <sngxml/dom/Node.hpp>
+#include <soulng/lexer/SourcePos.hpp>
 #include <map>
 
 namespace sngxml { namespace dom {
+
+using soulng::lexer::SourcePos;
 
 class SNGXML_DOM_API Attr : public Node
 {
@@ -47,8 +50,11 @@ public:
     void WalkAttribute(NodeOp& nodeOp) override;
     NodeList GetElementsByTagName(const std::u32string& tagName);
     void Accept(Visitor& visitor) override;
+    const SourcePos& GetSourcePos() const { return sourcePos; }
+    void SetSourcePos(const SourcePos& sourcePos_) { sourcePos = sourcePos_; }
 private:
     std::map<std::u32string, std::unique_ptr<Attr>> attributeMap;
+    SourcePos sourcePos;
     void WriteAttributes(CodeFormatter& formatter);
     bool HasMultilineContent();
 };

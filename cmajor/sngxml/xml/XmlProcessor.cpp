@@ -87,7 +87,7 @@ void XmlProcessor::BeginStartTag(const std::u32string& tagName)
     attributes.Clear();
 }
 
-void XmlProcessor::EndStartTag(const soulng::lexer::Span& span, const std::string& systemId)
+void XmlProcessor::EndStartTag(const soulng::lexer::Span& span, const SourcePos& sourcePos, const std::string& systemId)
 {
     std::u32string localName;
     std::u32string prefix;
@@ -96,7 +96,7 @@ void XmlProcessor::EndStartTag(const soulng::lexer::Span& span, const std::strin
     {
         throw XmlProcessingException(GetErrorLocationStr(systemId, span) + ": 'xmlns' prefix cannot be declared for an element");
     }
-    contentHandler->StartElement(GetNamespaceUri(prefix, span, systemId), localName, currentTagName, attributes);
+    contentHandler->StartElement(GetNamespaceUri(prefix, span, systemId), localName, currentTagName, attributes, sourcePos);
 }
 
 void XmlProcessor::EndTag(const std::u32string& tagName, const soulng::lexer::Span& span, const std::string& systemId)

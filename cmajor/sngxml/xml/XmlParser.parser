@@ -269,10 +269,10 @@ parser api(SNGXML_XML_API) XmlParser
         ::= "PUBLIC" S:s PubidLiteral:pl
         ;
 
-    Element(sngxml::xml::XmlProcessor* processor, var std::u32string tagName)
-        ::= '<' Name:name{ tagName = name; processor->BeginStartTag(tagName); } (S:s Attribute(processor):attribute)* S:s?
-            (   "/>"{ processor->EndStartTag(span, lexer.FileName()); processor->EndTag(tagName, span, lexer.FileName()); }
-            |   '>'{ processor->EndStartTag(span, lexer.FileName()); } Content(processor):content ETag(processor):etag
+    Element(sngxml::xml::XmlProcessor* processor, var std::u32string tagName, var SourcePos sourcePos)
+        ::= '<' Name:name{ sourcePos = lexer.GetSourcePos(pos); tagName = name; processor->BeginStartTag(tagName); } (S:s Attribute(processor):attribute)* S:s?
+            (   "/>"{ processor->EndStartTag(span, sourcePos, lexer.FileName()); processor->EndTag(tagName, span, lexer.FileName()); }
+            |   '>'{ processor->EndStartTag(span, sourcePos, lexer.FileName()); } Content(processor):content ETag(processor):etag
             )
         ;
 
