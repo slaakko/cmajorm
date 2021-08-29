@@ -207,12 +207,12 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     buildIndicatorTexts.push_back("\\");
     std::unique_ptr<MenuBar> menuBar(new MenuBar());
     std::unique_ptr<MenuItem> fileMenuItem(new MenuItem("&File"));
-    std::unique_ptr<MenuItem> newProjectMenuItemPtr(new MenuItem("&New Project.."));
+    std::unique_ptr<MenuItem> newProjectMenuItemPtr(new MenuItem("&New Project..."));
     newProjectMenuItem = newProjectMenuItemPtr.get();
     newProjectMenuItem->SetShortcut(Keys::controlModifier | Keys::n);
     newProjectMenuItem->Click().AddHandler(this, &MainWindow::NewProjectClick);
     fileMenuItem->AddMenuItem(newProjectMenuItemPtr.release());
-    std::unique_ptr<MenuItem> openProjectMenuItemPtr(new MenuItem("&Open Project/Solution.."));
+    std::unique_ptr<MenuItem> openProjectMenuItemPtr(new MenuItem("&Open Project/Solution..."));
     openProjectMenuItem = openProjectMenuItemPtr.get();
     openProjectMenuItem->SetShortcut(Keys::controlModifier | Keys::o);
     openProjectMenuItem->Click().AddHandler(this, &MainWindow::OpenProjectClick);

@@ -765,6 +765,10 @@ void TreeViewNode::SetState(TreeViewNodeState state_)
         if (view)
         {
             view->SetTreeViewNodeStateChanged();
+            if (state == TreeViewNodeState::collapsed)
+            {
+                view->SetContentLocation(Point(0, 0));
+            }
         }
     }
 }
