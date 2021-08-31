@@ -78,6 +78,7 @@ void ContainerControl::AddChild(Control* child)
 
 std::unique_ptr<Control> ContainerControl::RemoveChild(Control* child)
 {
+    child->Hide();
     std::unique_ptr<Component> childComponent = children.RemoveChild(child);
     ControlEventArgs args(child);
     OnControlRemoved(args);
