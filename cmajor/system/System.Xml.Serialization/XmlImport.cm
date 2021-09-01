@@ -44,6 +44,11 @@ namespace System.Xml.Serialization
             T is System.Duration;
     }
 
+    public concept XmlImportableEnumeratedType<T>
+    {
+        where System.Meta.IsEnumeratedType<T>();
+    }
+
     public nothrow Element* GetXmlFieldElement(const string& fieldName, Element* fromElement)
     {
         UniquePtr<XPathObject> result = Evaluate(ToUtf32(fieldName), fromElement);
@@ -246,6 +251,13 @@ namespace System.Xml.Serialization
     public void FromXml(Element* parentElement, const string& fieldName, uchar& value)
     {
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
+    }
+
+    public void FromXml<T>(Element* parentElement, const string& fieldName, T& value)
+        where T is XmlImportableEnumeratedType
+    {
+        long val = ParseLong(element->GetAttribute(u"value"));
+        value = cast<T>(cast<T.UnderlyingType>(val));
     }
 
     public void FromXml(Element* element, System.Date& value)

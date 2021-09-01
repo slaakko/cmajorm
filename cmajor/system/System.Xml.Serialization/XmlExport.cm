@@ -34,6 +34,11 @@ namespace System.Xml.Serialization
             T is System.Uuid;
     }
 
+    public concept XmlExportableEnumeratedType<T>
+    {
+        where System.Meta.IsEnumeratedType<T>();
+    }
+
     public concept XmlExportableTimeType<T>
     {
         where T is System.Date or T is System.DateTime or T is System.Timestamp;
@@ -44,6 +49,7 @@ namespace System.Xml.Serialization
         where
             T is XmlExportableClassType or
             T is XmlExportableScalarType or
+            T is XmlExporableEnumeratedType or
             T is XmlExportableTimeType or
             T is string or
             T is wstring or
@@ -58,7 +64,7 @@ namespace System.Xml.Serialization
         element->SetAttribute(u"value", ToUtf32(ToString(value)));
         return element;
     }
-    
+
     public UniquePtr<Element> ToXml<T>(const T& object, const string& fieldName)
         where T is XmlExportableClassType
     {
@@ -176,6 +182,15 @@ namespace System.Xml.Serialization
     {
         UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
         element->SetAttribute(u"value", ToUtf32(ToString(value)));
+        return element;
+    }
+
+    public UniquePtr<Element> ToXml<T>(T value, const string& fieldName)
+        where T is XmlExportableEnumeratedType
+    {
+        UniquePtr<Element> element(new Element(ToUtf32(fieldName)));
+        T.UnderlyingType x = cast<T.UnderlyingType>(value);
+        element->SetAttribute(u"value", ToUtf32(ToString(x)));
         return element;
     }
 

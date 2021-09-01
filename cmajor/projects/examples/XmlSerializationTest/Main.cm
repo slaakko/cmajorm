@@ -38,6 +38,11 @@ public class DerivedClass : Polymorphic
     public string transientMember; // members with [xml="false"] attribute not serialized
 }
 
+public enum EnumType
+{
+    first, second, third
+}
+
 [xml]
 public class XmlTestClass
 {
@@ -70,6 +75,7 @@ public class XmlTestClass
     public UniquePtr<Polymorphic> f26;
     public UniquePtr<Polymorphic> f27;
     public List<UniquePtr<Polymorphic>> f28;
+    public EnumType f29;
 }
 
 void main()
@@ -111,6 +117,7 @@ void main()
     testClass.f28.Add(UniquePtr<Polymorphic>(new Polymorphic()));
     testClass.f28.Add(UniquePtr<Polymorphic>(new DerivedClass()));
     testClass.f28.Add(UniquePtr<Polymorphic>());
+    testClass.f29 = EnumType.third;
 
     UniquePtr<Element> xmlElement = testClass.ToXml("object");
     Document xmlDoc;
@@ -187,13 +194,14 @@ void main()
 
     ustring docStr = ToUtf32(stringWriter.GetString());
     UniquePtr<Document> docRead = ParseDocument(docStr, "fromString");
+    docRead->Write(outFormatter);
 
-    XmlTestClass classRead(docRead->DocumentElement());
-    UniquePtr<Element> elementFromClassRead = classRead.ToXml("object");
-    Document docFromClassRead;
-    docFromClassRead.AppendChild(UniquePtr<Node>(elementFromClassRead.Release()));
-    docFromClassRead.Write(outFormatter);
-    outFormatter.WriteLine();
+    //XmlTestClass classRead(docRead->DocumentElement());
+    //UniquePtr<Element> elementFromClassRead = classRead.ToXml("object");
+    //Document docFromClassRead;
+    //docFromClassRead.AppendChild(UniquePtr<Node>(elementFromClassRead.Release()));
+    //docFromClassRead.Write(outFormatter);
+    //outFormatter.WriteLine();
 /*	Prints:
 	<object>
 	 <f0 value="true"/>
