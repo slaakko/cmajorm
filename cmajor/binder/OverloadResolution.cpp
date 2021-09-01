@@ -1124,7 +1124,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(argument->GetType());
                 if (!interfaceTypeSymbol->CopyConstructor())
                 { 
-                    boundCompileUnit.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, boundFunction, span, moduleId);
+                    boundCompileUnit.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, span, moduleId);
                 }
                 TypeSymbol* type = argument->GetType()->AddConst(span, moduleId)->AddLvalueReference(span, moduleId);
                 argument.reset(new BoundAddressOfExpression(std::move(argument), type));

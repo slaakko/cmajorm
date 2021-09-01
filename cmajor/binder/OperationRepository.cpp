@@ -4112,7 +4112,7 @@ void OperationRepository::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeS
     }
 }
 
-void OperationRepository::GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId)
+void OperationRepository::GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId)
 {
     if (boundCompileUnit.HasCopyConstructorFor(interfaceTypeSymbol->TypeId())) return;
     std::unique_ptr<InterfaceTypeCopyConstructor> copyConstructor(new InterfaceTypeCopyConstructor(interfaceTypeSymbol, span, moduleId));

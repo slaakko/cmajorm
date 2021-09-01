@@ -746,9 +746,9 @@ void BoundCompileUnit::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymb
     operationRepository.GenerateCopyConstructorFor(classTypeSymbol, containerScope, currentFunction, span, moduleId);
 }
 
-void BoundCompileUnit::GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId)
+void BoundCompileUnit::GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId)
 {
-    operationRepository.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, currentFunction, span, moduleId);
+    operationRepository.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, span, moduleId);
 }
 
 int BoundCompileUnit::Install(const std::string& str)

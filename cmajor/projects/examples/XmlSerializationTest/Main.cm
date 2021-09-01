@@ -71,19 +71,15 @@ public class XmlTestClass
     public Uuid f22;
     public Nonpolymorphic f23;
     public List<Nonpolymorphic> f24;
-    public UniquePtr<Polymorphic> f25;
-    public UniquePtr<Polymorphic> f26;
-    public UniquePtr<Polymorphic> f27;
-    public List<UniquePtr<Polymorphic>> f28;
+    //public UniquePtr<Polymorphic> f25;
+    //public UniquePtr<Polymorphic> f26;
+    //public UniquePtr<Polymorphic> f27;
+    //public List<UniquePtr<Polymorphic>> f28;
     public EnumType f29;
 }
 
 void main()
 {
-	// Note: Only classes contained by a UniquePtr or SharedPtr need to be registered:
-    RegisterXmlClass<Polymorphic>();
-    RegisterXmlClass<DerivedClass>();
-
     XmlTestClass testClass;
     testClass.f0 = true;
     testClass.f1 = 1;
@@ -111,12 +107,12 @@ void main()
     testClass.f23 = Nonpolymorphic();
     testClass.f24.Add(Nonpolymorphic());
     testClass.f24.Add(Nonpolymorphic());
-    testClass.f25.Reset(); // will be null
-    testClass.f26.Reset(new Polymorphic());
-    testClass.f27.Reset(new DerivedClass());
-    testClass.f28.Add(UniquePtr<Polymorphic>(new Polymorphic()));
-    testClass.f28.Add(UniquePtr<Polymorphic>(new DerivedClass()));
-    testClass.f28.Add(UniquePtr<Polymorphic>());
+    //testClass.f25.Reset(); // will be null
+    //testClass.f26.Reset(new Polymorphic());
+    //testClass.f27.Reset(new DerivedClass());
+    //testClass.f28.Add(UniquePtr<Polymorphic>(new Polymorphic()));
+    //testClass.f28.Add(UniquePtr<Polymorphic>(new DerivedClass()));
+    //testClass.f28.Add(UniquePtr<Polymorphic>());
     testClass.f29 = EnumType.third;
 
     UniquePtr<Element> xmlElement = testClass.ToXml("object");
@@ -196,12 +192,12 @@ void main()
     UniquePtr<Document> docRead = ParseDocument(docStr, "fromString");
     docRead->Write(outFormatter);
 
-    //XmlTestClass classRead(docRead->DocumentElement());
-    //UniquePtr<Element> elementFromClassRead = classRead.ToXml("object");
-    //Document docFromClassRead;
-    //docFromClassRead.AppendChild(UniquePtr<Node>(elementFromClassRead.Release()));
-    //docFromClassRead.Write(outFormatter);
-    //outFormatter.WriteLine();
+    XmlTestClass classRead(docRead->DocumentElement());
+    UniquePtr<Element> elementFromClassRead = classRead.ToXml("object");
+    Document docFromClassRead;
+    docFromClassRead.AppendChild(UniquePtr<Node>(elementFromClassRead.Release()));
+    docFromClassRead.Write(outFormatter);
+    outFormatter.WriteLine();
 /*	Prints:
 	<object>
 	 <f0 value="true"/>

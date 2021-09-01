@@ -321,9 +321,31 @@ void TypeBinder::Visit(FunctionNode& functionNode)
             Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
             ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
             parameterSymbol->SetType(parameterType);
+            if (parameterType->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+            {
+                InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(parameterType);
+                if (interfaceTypeSymbol->IsProject())
+                {
+                    Node* node = symbolTable.GetNode(interfaceTypeSymbol);
+                    Assert(node->GetNodeType() == NodeType::interfaceNode, "interface node expected");
+                    InterfaceNode* interfaceNode = static_cast<InterfaceNode*>(node);
+                    BindInterface(interfaceTypeSymbol, interfaceNode, false);
+                }
+            }
         }
         TypeSymbol* returnType = ResolveType(functionNode.ReturnTypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
         functionSymbol->SetReturnType(returnType);
+        if (returnType->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+        {
+            InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(returnType);
+            if (interfaceTypeSymbol->IsProject())
+            {
+                Node* node = symbolTable.GetNode(interfaceTypeSymbol);
+                Assert(node->GetNodeType() == NodeType::interfaceNode, "interface node expected");
+                InterfaceNode* interfaceNode = static_cast<InterfaceNode*>(node);
+                BindInterface(interfaceTypeSymbol, interfaceNode, false);
+            }
+        }
         if (!functionSymbol->Constraint() && functionNode.WhereConstraint())
         {
             CloneContext cloneContext;
@@ -718,6 +740,17 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
             Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
             ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
             parameterSymbol->SetType(parameterType);
+            if (parameterType->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+            {
+                InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(parameterType);
+                if (interfaceTypeSymbol->IsProject())
+                {
+                    Node* node = symbolTable.GetNode(interfaceTypeSymbol);
+                    Assert(node->GetNodeType() == NodeType::interfaceNode, "interface node expected");
+                    InterfaceNode* interfaceNode = static_cast<InterfaceNode*>(node);
+                    BindInterface(interfaceTypeSymbol, interfaceNode, false);
+                }
+            }
         }
         if (!constructorSymbol->Constraint() && constructorNode.WhereConstraint())
         {
@@ -924,9 +957,31 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
             Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
             ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
             parameterSymbol->SetType(parameterType);
+            if (parameterType->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+            {
+                InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(parameterType);
+                if (interfaceTypeSymbol->IsProject())
+                {
+                    Node* node = symbolTable.GetNode(interfaceTypeSymbol);
+                    Assert(node->GetNodeType() == NodeType::interfaceNode, "interface node expected");
+                    InterfaceNode* interfaceNode = static_cast<InterfaceNode*>(node);
+                    BindInterface(interfaceTypeSymbol, interfaceNode, false);
+                }
+            }
         }
         TypeSymbol* returnType = ResolveType(memberFunctionNode.ReturnTypeExpr(), boundCompileUnit, containerScope, typeResolverFlags, currentClassTypeSymbol);
         memberFunctionSymbol->SetReturnType(returnType);
+        if (returnType->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+        {
+            InterfaceTypeSymbol* interfaceTypeSymbol = static_cast<InterfaceTypeSymbol*>(returnType);
+            if (interfaceTypeSymbol->IsProject())
+            {
+                Node* node = symbolTable.GetNode(interfaceTypeSymbol);
+                Assert(node->GetNodeType() == NodeType::interfaceNode, "interface node expected");
+                InterfaceNode* interfaceNode = static_cast<InterfaceNode*>(node);
+                BindInterface(interfaceTypeSymbol, interfaceNode, false);
+            }
+        }
         if (!memberFunctionSymbol->Constraint() && memberFunctionNode.WhereConstraint())
         {
             CloneContext cloneContext;
@@ -1211,6 +1266,7 @@ void TypeBinder::BindInterface(InterfaceTypeSymbol* interfaceTypeSymbol, Interfa
             Node* member = interfaceNode->Members()[i];
             member->Accept(*this);
         }
+        boundCompileUnit.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, interfaceTypeSymbol->GetSpan(), interfaceTypeSymbol->SourceModuleId());
         boundCompileUnit.GetAttributeBinder()->BindAttributes(interfaceNode->GetAttributes(), interfaceTypeSymbol, boundCompileUnit, containerScope);
         containerScope = prevContainerScope;
     }

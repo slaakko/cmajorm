@@ -253,11 +253,19 @@ namespace System.Xml.Serialization
         FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }
 
+    public void FromXml<T>(Element* element, T& value)
+        where T is XmlImportableEnumeratedType
+    {
+        if (element != null)
+        {
+            value = cast<T>(cast<T.UnderlyingType>(ParseLong(ToUtf8(element->GetAttribute(u"value")))));
+        }
+    }
+
     public void FromXml<T>(Element* parentElement, const string& fieldName, T& value)
         where T is XmlImportableEnumeratedType
     {
-        long val = ParseLong(element->GetAttribute(u"value"));
-        value = cast<T>(cast<T.UnderlyingType>(val));
+        FromXml(GetXmlFieldElement(fieldName, parentElement), value);
     }
 
     public void FromXml(Element* element, System.Date& value)
@@ -386,7 +394,7 @@ namespace System.Xml.Serialization
             object = T(element);
         }
     }
-
+/*
     public void FromXml<T>(Element* parentElement, const string& fieldName, UniquePtr<T>& object)
         where T is XmlConstructible
     {
@@ -416,6 +424,7 @@ namespace System.Xml.Serialization
             }
         }
     }
+*/
 
     public void FromXml<T>(Element* parentElement, const string& fieldName, List<T>& list)
         where T is XmlImportableScalarType
@@ -476,6 +485,7 @@ namespace System.Xml.Serialization
         }
     }
 
+/*
     public void FromXml<T>(Element* parentElement, const string& fieldName, List<UniquePtr<T>>& list)
         where T is XmlConstructible
     {
@@ -543,5 +553,6 @@ namespace System.Xml.Serialization
             }
         }
     }
+*/
 }
 

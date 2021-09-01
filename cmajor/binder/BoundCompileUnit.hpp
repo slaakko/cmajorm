@@ -57,7 +57,7 @@ public:
     FunctionSymbol* InstantiateInlineFunction(FunctionSymbol* inlineFunction, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId);
     FunctionNode* GetFunctionNodeFor(FunctionSymbol* constExprFunctionSymbol);
     void GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId);
-    void GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId);
+    void GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId);
     int Install(const std::string& str);
     int Install(const std::u16string& str);
     int Install(const std::u32string& str);
