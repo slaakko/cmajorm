@@ -37,6 +37,7 @@ struct SolutionExplorerCreateParams
     SolutionExplorerCreateParams& SetAnchors(Anchors anchors_);
     SolutionExplorerCreateParams& SetDock(Dock dock_);
     ControlCreateParams controlCreateParams;
+    TreeViewCreateParams treeViewCreateParams;
 };
 
 class SolutionExplorer : public ContainerControl
@@ -46,12 +47,16 @@ public:
     TreeView* GetTreeView() const { return solutionTreeView; }
     void MakeView();
     void SetRoot(TreeViewNode* solutionNode);
+    void SetImageList(ImageList* imageList_);
+    ImageList* GetImageList() const { return imageList; }
 protected:
     void OnPaint(PaintEventArgs& args) override;
 private:
+    TreeViewCreateParams treeViewCreateParams;
     MainWindow* mainWindow;
     TreeView* solutionTreeView;
     Control* child;
+    ImageList* imageList;
 };
 
 } // namespace cmcode

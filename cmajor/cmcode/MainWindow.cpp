@@ -588,6 +588,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     //horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeViewPtr.release());
     std::unique_ptr<SolutionExplorer> solutionExplorerPtr(new SolutionExplorer(SolutionExplorerCreateParams().SetDock(Dock::fill), this));
     solutionExplorer = solutionExplorerPtr.get();
+    solutionExplorer->SetImageList(&imageList);
     horizontalSplitContainer->Pane2Container()->AddChild(solutionExplorerPtr.release());
     verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.release());
     std::unique_ptr<TabControl> outputTabControlPtr(new TabControl(TabControlCreateParams().Defaults()));
@@ -663,6 +664,12 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     paramHelpView = new CodeCompletionParamHelpView(ParamHelpCreateParams().Defaults(), CodeCompletionParamHelpViewCreateParams().Defaults());
     paramHelpView->Hide();
     AddChild(paramHelpView);
+
+    imageList.AddImage("cmfile.bitmap");
+    imageList.AddImage("xmlfile.bitmap");
+    imageList.AddImage("file.bitmap");
+    imageList.AddImage("cmproject.bitmap");
+    imageList.AddImage("cmsolution.bitmap");
 
     locations.SetToolButtons(prevToolButton, nextToolButton);
 
@@ -5182,6 +5189,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
         {
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
             fileNode->SetData(data);
+            fileNode->SetImageIndex(imageList.GetImageIndex("cmfile.bitmap"));
             projectNode->AddChild(fileNode.release());
         }
         else
@@ -5190,6 +5198,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
             data = newData.get();
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
             fileNode->SetData(newData.get());
+            fileNode->SetImageIndex(imageList.GetImageIndex("cmfile.bitmap"));
             projectNode->AddChild(fileNode.release());
             solutionData->AddTreeViewNodeData(newData.release());
         }
@@ -5206,6 +5215,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
         {
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
             fileNode->SetData(data);
+            fileNode->SetImageIndex(imageList.GetImageIndex("xmlfile.bitmap"));
             projectNode->AddChild(fileNode.release());
         }
         else
@@ -5214,6 +5224,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
             data = newData.get();
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
             fileNode->SetData(newData.get());
+            fileNode->SetImageIndex(imageList.GetImageIndex("xmlfile.bitmap"));
             projectNode->AddChild(fileNode.release());
             solutionData->AddTreeViewNodeData(newData.release());
         }
@@ -5230,6 +5241,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
         {
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
             fileNode->SetData(data);
+            fileNode->SetImageIndex(imageList.GetImageIndex("file.bitmap"));
             projectNode->AddChild(fileNode.release());
         }
         else
@@ -5238,6 +5250,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
             data = newData.get();
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
             fileNode->SetData(data);
+            fileNode->SetImageIndex(imageList.GetImageIndex("file.bitmap"));
             projectNode->AddChild(fileNode.release());
             solutionData->AddTreeViewNodeData(newData.release());
         }

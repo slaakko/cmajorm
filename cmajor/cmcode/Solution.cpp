@@ -89,6 +89,7 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, So
     std::unique_ptr<TreeViewNode> solutionNode(new TreeViewNode(ToUtf8(solution->Name())));
     std::unique_ptr<SolutionTreeViewNodeData> solutionData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::solution, solution.get(), nullptr, std::string(), std::string()));
     solutionNode->SetData(solutionData.get());
+    solutionNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex("cmsolution.bitmap"));
     treeViewData.push_back(std::move(solutionData));
     std::string solutionSettingsFilePath = solution->FilePath();
     solutionSettingsFilePath.append(".settings.xml");
@@ -106,6 +107,7 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, So
         projectNodeMap[projectName] = projectNode.get();
         std::unique_ptr<SolutionTreeViewNodeData> projectTreeViewData(new SolutionTreeViewNodeData(SolutionTreeViewNodeDataKind::project, nullptr, project.get(), std::string(), std::string()));
         projectNode->SetData(projectTreeViewData.get());
+        projectNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex("cmproject.bitmap"));
         if (project.get() == solution->ActiveProject())
         {
             activeProjectNode = projectNode.get();
@@ -136,6 +138,14 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, So
         {
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(file->fileName));
             fileNode->SetData(file.get());
+            if (Path::GetExtension(file->fileName) == ".xml")
+            {
+                fileNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex("xmlfile.bitmap"));
+            }
+            else
+            {
+                fileNode->SetImageIndex(solutionExplorer->GetImageList()->GetImageIndex("file.bitmap"));
+            }
             projectNode->AddChild(fileNode.release());
         }
         for (auto& file : fileData)

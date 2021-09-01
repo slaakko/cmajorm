@@ -35,6 +35,7 @@
 #include <cmajor/wing/ToolBar.hpp>
 #include <cmajor/wing/StatusBar.hpp>
 #include <cmajor/wing/LogView.hpp>
+#include <cmajor/wing/ImageList.hpp>
 #include <soulng/rex/Nfa.hpp>
 
 namespace cmcode {
@@ -416,6 +417,7 @@ private:
     bool ccCanSelect;
     CCEntry currentCCEntry;
     std::vector<int> ruleContext;
+    ImageList imageList;
 };
 
 } // namespace cmcode

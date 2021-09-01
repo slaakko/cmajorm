@@ -20,12 +20,18 @@ Color DefaultSolutionExplorerBackgroundColor()
     return Color::White;
 }
 
+Padding SolutionExplorerNodeImagePadding()
+{
+    return Padding(2, 2, 2, 2);
+}
+
 SolutionExplorerCreateParams::SolutionExplorerCreateParams() : controlCreateParams()
 {
     controlCreateParams.WindowClassName("cmajor.cmcode.solution_explorer");
     controlCreateParams.WindowClassBackgroundColor(COLOR_WINDOW);
     controlCreateParams.BackgroundColor(DefaultSolutionExplorerBackgroundColor());
     controlCreateParams.WindowStyle(DefaultChildWindowStyle());
+    treeViewCreateParams = TreeViewCreateParams().NodeIndentPercent(100).NodeImagePadding(SolutionExplorerNodeImagePadding());
 }
 
 SolutionExplorerCreateParams& SolutionExplorerCreateParams::Defaults()
@@ -94,7 +100,7 @@ SolutionExplorerCreateParams& SolutionExplorerCreateParams::SetDock(Dock dock_)
 }
 
 SolutionExplorer::SolutionExplorer(SolutionExplorerCreateParams& createParams, MainWindow* mainWindow_) : 
-    ContainerControl(createParams.controlCreateParams), mainWindow(mainWindow_), solutionTreeView(nullptr), child(nullptr)
+    ContainerControl(createParams.controlCreateParams), mainWindow(mainWindow_), solutionTreeView(nullptr), child(nullptr), imageList(nullptr), treeViewCreateParams(createParams.treeViewCreateParams)
 {
     MakeView();
 }
@@ -102,7 +108,13 @@ SolutionExplorer::SolutionExplorer(SolutionExplorerCreateParams& createParams, M
 void SolutionExplorer::SetRoot(TreeViewNode* solutionNode)
 {
     MakeView();
+    solutionTreeView->SetImageList(imageList);
     solutionTreeView->SetRoot(solutionNode);
+}
+
+void SolutionExplorer::SetImageList(ImageList* imageList_)
+{
+    imageList = imageList_;
 }
 
 void SolutionExplorer::OnPaint(PaintEventArgs& args)
@@ -133,7 +145,7 @@ void SolutionExplorer::MakeView()
         child = nullptr;
         solutionTreeView = nullptr;
     }
-    std::unique_ptr<TreeView> solutionTreeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
+    std::unique_ptr<TreeView> solutionTreeViewPtr(new TreeView(treeViewCreateParams));
     solutionTreeView = solutionTreeViewPtr.get();
     solutionTreeView->NodeDoubleClick().AddHandler(mainWindow, &MainWindow::TreeViewNodeDoubleClick);
     solutionTreeView->NodeClick().AddHandler(mainWindow, &MainWindow::TreeViewNodeClick);
