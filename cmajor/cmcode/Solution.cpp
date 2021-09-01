@@ -5,6 +5,7 @@
 
 #include <cmajor/cmcode/Solution.hpp>
 #include <cmajor/cmcode/SolutionSettings.hpp>
+#include <cmajor/cmcode/SolutionExplorer.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/Parser.hpp>
@@ -79,8 +80,8 @@ struct ByFileName
     }
 };
 
-SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, TreeView* solutionTreeView_) : 
-    solution(std::move(solution_)), solutionTreeView(solutionTreeView_), treeViewData(), treeViewDataMap(), activeProjectNode(nullptr), 
+SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, SolutionExplorer* solutionExplorer_) : 
+    solution(std::move(solution_)), solutionExplorer(solutionExplorer_), treeViewData(), treeViewDataMap(), activeProjectNode(nullptr),
     callStackOpen(false), localsViewOpen(false), currentCursorLine(0)
 {
     solution->SortByProjectName();
@@ -148,7 +149,8 @@ SolutionData::SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, Tr
     {
         treeViewDataMap[nodeData->key] = nodeData.get();
     }
-    solutionTreeView->SetRoot(solutionNode.release());
+    //solutionTreeView->SetRoot(solutionNode.release());
+    solutionExplorer->SetRoot(solutionNode.release());
 }
 
 bool SolutionData::Changed()

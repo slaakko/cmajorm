@@ -8,6 +8,7 @@
 #include <cmajor/cmcode/Solution.hpp>
 #include <cmajor/cmcode/LocationList.hpp>
 #include <cmajor/cmcode/SearchDialog.hpp>
+#include <cmajor/cmcode/SolutionExplorer.hpp>
 #include <cmajor/cmsvc/Message.hpp>
 #include <cmajor/cmsvc/DebugService.hpp>
 #include <cmajor/cmsvc/DebugServiceRequest.hpp>
@@ -96,6 +97,10 @@ public:
     void GotoCursor(const SourceLoc& sourceLocation);
     void GotoLocation(const DefinitionSourceLocation& location);
     void SetProjectReferences(sngcm::ast::Project* project);
+    void TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args);
+    void TreeViewNodeClick(TreeViewNodeClickEventArgs& args);
+    void TreeViewNodeExpanded(TreeViewNodeEventArgs& args);
+    void TreeViewNodeCollapsed(TreeViewNodeEventArgs& args);
 protected:
     bool ProcessMessage(Message& msg) override;
     void OnWindowStateChanged() override;
@@ -245,10 +250,6 @@ private:
     void ReleaseButtonClick();
     void StopBuildServerClick();
     void ToggleCodeCompletionClick();
-    void TreeViewNodeDoubleClick(TreeViewNodeClickEventArgs& args);
-    void TreeViewNodeClick(TreeViewNodeClickEventArgs& args);
-    void TreeViewNodeExpanded(TreeViewNodeEventArgs& args);
-    void TreeViewNodeCollapsed(TreeViewNodeEventArgs& args);
     Editor* GetEditorByTabPage(TabPage* tabPage) const;
     CmajorEditor* AddCmajorEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project);
     ResourceFileEditor* AddResourceFileEditor(const std::string& fileName, const std::string& key, const std::string& filePath, sngcm::ast::Project* project);
@@ -352,7 +353,8 @@ private:
     SplitContainer* verticalSplitContainer;
     SplitContainer* horizontalSplitContainer;
     TabControl* codeTabControl;
-    TreeView* solutionTreeView;
+    //TreeView* solutionTreeView;
+    SolutionExplorer* solutionExplorer;
     TabControl* outputTabControl;
     TabPage* outputTabPage;
     LogView* outputLogView;

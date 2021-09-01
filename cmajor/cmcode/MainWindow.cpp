@@ -149,7 +149,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     verticalSplitContainer(nullptr),
     horizontalSplitContainer(nullptr),
     codeTabControl(nullptr),
-    solutionTreeView(nullptr),
+    //solutionTreeView(nullptr),
     outputTabControl(nullptr),
     outputTabPage(nullptr),
     outputLogView(nullptr),
@@ -575,17 +575,20 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     std::unique_ptr<Control> paddedCodeTabControl(new PaddedControl(PaddedControlCreateParams(codeTabControlPtr.release()).Defaults()));
     std::unique_ptr<Control> borderedCodeTabControl(new BorderedControl(BorderedControlCreateParams(paddedCodeTabControl.release()).SetBorderStyle(BorderStyle::single).
         NormalSingleBorderColor(DefaultTabControlFrameColor()).FocusedSingleBorderColor(DefaultTabControlFrameColor()).SetDock(Dock::fill)));
-    std::unique_ptr<TreeView> solutionTreeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
-    solutionTreeView = solutionTreeViewPtr.get();
-    solutionTreeView->NodeDoubleClick().AddHandler(this, &MainWindow::TreeViewNodeDoubleClick);
-    solutionTreeView->NodeClick().AddHandler(this, &MainWindow::TreeViewNodeClick);
-    solutionTreeView->NodeExpanded().AddHandler(this, &MainWindow::TreeViewNodeExpanded);
-    solutionTreeView->NodeCollapsed().AddHandler(this, &MainWindow::TreeViewNodeCollapsed);
-    solutionTreeView->SetDoubleBuffered();
-    std::unique_ptr<PaddedControl> paddedTreeViewPtr(new PaddedControl(PaddedControlCreateParams(solutionTreeViewPtr.release()).Defaults()));
-    std::unique_ptr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(ScrollableControlCreateParams(paddedTreeViewPtr.release()).SetDock(Dock::fill)));
+    //std::unique_ptr<TreeView> solutionTreeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
+    //solutionTreeView = solutionTreeViewPtr.get();
+    //solutionTreeView->NodeDoubleClick().AddHandler(this, &MainWindow::TreeViewNodeDoubleClick);
+    //solutionTreeView->NodeClick().AddHandler(this, &MainWindow::TreeViewNodeClick);
+    //solutionTreeView->NodeExpanded().AddHandler(this, &MainWindow::TreeViewNodeExpanded);
+    //solutionTreeView->NodeCollapsed().AddHandler(this, &MainWindow::TreeViewNodeCollapsed);
+    //solutionTreeView->SetDoubleBuffered();
+    //std::unique_ptr<PaddedControl> paddedTreeViewPtr(new PaddedControl(PaddedControlCreateParams(solutionTreeViewPtr.release()).Defaults()));
+    //std::unique_ptr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(ScrollableControlCreateParams(paddedTreeViewPtr.release()).SetDock(Dock::fill)));
     horizontalSplitContainer->Pane1Container()->AddChild(borderedCodeTabControl.release());
-    horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeViewPtr.release());
+    //horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeViewPtr.release());
+    std::unique_ptr<SolutionExplorer> solutionExplorerPtr(new SolutionExplorer(SolutionExplorerCreateParams().SetDock(Dock::fill), this));
+    solutionExplorer = solutionExplorerPtr.get();
+    horizontalSplitContainer->Pane2Container()->AddChild(solutionExplorerPtr.release());
     verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.release());
     std::unique_ptr<TabControl> outputTabControlPtr(new TabControl(TabControlCreateParams().Defaults()));
     outputTabControl = outputTabControlPtr.get();
@@ -1498,7 +1501,8 @@ void MainWindow::OpenProject(const std::string& filePath)
             throw std::runtime_error("file path '" + filePath + "' is empty or does not exist");
         }
         codeTabControl->CloseAllTabPages();
-        solutionData.reset(new SolutionData(std::move(solution), solutionTreeView));
+        //solutionData.reset(new SolutionData(std::move(solution), solutionTreeView));
+        solutionData.reset(new SolutionData(std::move(solution), solutionExplorer));
         SetIDEState();
         sngcm::ast::Solution* sln = solutionData->GetSolution();
         if (sln)
@@ -3092,7 +3096,8 @@ void MainWindow::NewProjectClick()
             { 
                 return;
             }
-            solutionTreeView->SetRoot(nullptr);
+            //solutionTreeView->SetRoot(nullptr);
+            solutionExplorer->MakeView();
             OpenProject(solutionFilePath);
         }
     }
@@ -3118,7 +3123,8 @@ void MainWindow::OpenProjectClick()
         {
             if (CloseSolution())
             {
-                solutionTreeView->SetRoot(nullptr);
+                //solutionTreeView->SetRoot(nullptr);
+                solutionExplorer->MakeView();
                 OpenProject(GetFullPath(filePath));
             }
         }
@@ -3185,7 +3191,8 @@ void MainWindow::CloseSolutionClick()
 {
     if (CloseSolution())
     {
-        solutionTreeView->SetRoot(nullptr);
+        //solutionTreeView->SetRoot(nullptr);
+        solutionExplorer->MakeView();
     }
 }
 
@@ -3915,7 +3922,8 @@ void MainWindow::AddNewProject()
             {
                 return;
             }
-            solutionTreeView->SetRoot(nullptr);
+            //solutionTreeView->SetRoot(nullptr);
+            solutionExplorer->MakeView();
             OpenProject(solutionFilePath);
         }
     }
@@ -3962,7 +3970,8 @@ void MainWindow::AddExistingProject()
             {
                 return;
             }
-            solutionTreeView->SetRoot(nullptr);
+            //solutionTreeView->SetRoot(nullptr);
+            solutionExplorer->MakeView();
             OpenProject(solutionFilePath);
         }
     }
@@ -3990,7 +3999,8 @@ void MainWindow::SetActiveProject(sngcm::ast::Project* project, TreeViewNode* ne
         sngcm::ast::Solution* solution = solutionData->GetSolution();
         solution->SetActiveProject(project);
         solution->Save();
-        solutionTreeView->Invalidate();
+        //solutionTreeView->Invalidate();
+        solutionExplorer->GetTreeView()->Invalidate();
     }
     catch (const std::exception& ex)
     {
@@ -4021,7 +4031,8 @@ void MainWindow::RemoveProject(sngcm::ast::Project* project)
         {
             return;
         }
-        solutionTreeView->SetRoot(nullptr);
+        //solutionTreeView->SetRoot(nullptr);
+        solutionExplorer->MakeView();
         OpenProject(solutionFilePath);
     }
     catch (const std::exception& ex)
@@ -4884,7 +4895,8 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
                         {
                             Point treeViewContentLocation = treeView->ContentLocation();
                             Point loc(contentLoc.X, contentLoc.Y - treeViewContentLocation.Y);
-                            Point screenLoc = solutionTreeView->ClientToScreen(loc);
+                            //Point screenLoc = solutionTreeView->ClientToScreen(loc);
+                            Point screenLoc = solutionExplorer->GetTreeView()->ClientToScreen(loc);
                             ShowContextMenu(contextMenu.release(), screenLoc);
                         }
                     }
@@ -4944,7 +4956,8 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
                         {
                             Point treeViewContentLocation = treeView->ContentLocation();
                             Point loc(contentLoc.X, contentLoc.Y - treeViewContentLocation.Y);
-                            Point screenLoc = solutionTreeView->ClientToScreen(loc);
+                            //Point screenLoc = solutionTreeView->ClientToScreen(loc);
+                            Point screenLoc = solutionExplorer->GetTreeView()->ClientToScreen(loc);
                             ShowContextMenu(contextMenu.release(), screenLoc);
                         }
                     }
@@ -4968,7 +4981,8 @@ void MainWindow::TreeViewNodeClick(TreeViewNodeClickEventArgs& args)
                         {
                             Point treeViewContentLocation = treeView->ContentLocation();
                             Point loc(contentLoc.X, contentLoc.Y - treeViewContentLocation.Y);
-                            Point screenLoc = solutionTreeView->ClientToScreen(loc);
+                            //Point screenLoc = solutionTreeView->ClientToScreen(loc);
+                            Point screenLoc = solutionExplorer->GetTreeView()->ClientToScreen(loc);
                             ShowContextMenu(contextMenu.release(), screenLoc);
                         }
                     }
@@ -5234,8 +5248,10 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
         }
     }
     projectNode->Expand();
-    solutionTreeView->SetChanged();
-    solutionTreeView->Invalidate();
+    //solutionTreeView->SetChanged();
+    //solutionTreeView->Invalidate();
+    solutionExplorer->GetTreeView()->SetChanged();
+    solutionExplorer->GetTreeView()->Invalidate();
 }
 
 void MainWindow::CodeTabPageSelected()

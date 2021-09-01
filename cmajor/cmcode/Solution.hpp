@@ -15,6 +15,8 @@ namespace cmcode {
 
 using namespace cmajor::wing;
 
+class SolutionExplorer;
+
 std::unique_ptr<sngcm::ast::Project> ReadProject(const std::string& projectFilePath, std::vector<std::unique_ptr<std::u32string>>& contents);
 std::unique_ptr<sngcm::ast::Solution> ReadSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<std::u32string>>& contents);
 
@@ -37,12 +39,14 @@ struct SolutionTreeViewNodeData
 class SolutionData
 {
 public:
-    SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, TreeView* solutionTreeView_);
+    //SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, TreeView* solutionTreeView_);
+    SolutionData(std::unique_ptr<sngcm::ast::Solution>&& solution_, SolutionExplorer* solutionExplorer_);
     bool Changed();
     void Load(const std::string& solutionSettingsFilePath);
     void Save(const std::string& solutionSettingsFilePath);
     sngcm::ast::Solution* GetSolution() const { return solution.get(); }
-    TreeView* SolutionTreeView() const { return solutionTreeView; }
+    //TreeView* SolutionTreeView() const { return solutionTreeView; }
+    SolutionExplorer* GetSolutionExplorer() const { return solutionExplorer; }
     TreeViewNode* ActiveProjectNode() const { return activeProjectNode; }
     void SetActiveProjectNode(TreeViewNode* activeProjectNode_) { activeProjectNode = activeProjectNode_; }
     SolutionTreeViewNodeData* GetSolutionTreeViewNodeDataByKey(const std::string& key) const;
@@ -69,7 +73,8 @@ public:
     void RemoveProjectNode(const std::string& projectName);
 private:
     void SetActiveProject();
-    TreeView* solutionTreeView;
+    //TreeView* solutionTreeView;
+    SolutionExplorer* solutionExplorer;
     std::unique_ptr<sngcm::ast::Solution> solution;
     std::vector<std::unique_ptr<SolutionTreeViewNodeData>> treeViewData;
     std::map<std::string, SolutionTreeViewNodeData*> treeViewDataMap;
