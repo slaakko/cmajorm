@@ -5189,7 +5189,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
         {
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
             fileNode->SetData(data);
-            fileNode->SetImageIndex(imageList.GetImageIndex("cmfile.bitmap"));
+            fileNode->SetImageIndex(imageList.GetImageIndex("file.bitmap"));
             projectNode->AddChild(fileNode.release());
         }
         else
@@ -5198,7 +5198,7 @@ void MainWindow::AddFilePathsToProject(const std::string& newSourceFilePath, con
             data = newData.get();
             std::unique_ptr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
             fileNode->SetData(newData.get());
-            fileNode->SetImageIndex(imageList.GetImageIndex("cmfile.bitmap"));
+            fileNode->SetImageIndex(imageList.GetImageIndex("file.bitmap"));
             projectNode->AddChild(fileNode.release());
             solutionData->AddTreeViewNodeData(newData.release());
         }
