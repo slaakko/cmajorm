@@ -10,6 +10,7 @@
 #include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/binder/BoundExpression.hpp>
+#include <cmajor/binder/BoundFunction.hpp>
 #include <sngcm/ast/CompileUnit.hpp>
 #include <sngcm/ast/Identifier.hpp>
 #include <sngcm/ast/GlobalVariable.hpp>
@@ -1261,11 +1262,18 @@ void TypeBinder::BindInterface(InterfaceTypeSymbol* interfaceTypeSymbol, Interfa
         ContainerScope* prevContainerScope = containerScope;
         containerScope = interfaceTypeSymbol->GetContainerScope();
         int nm = interfaceNode->Members().Count();
+        if (nm == 0)
+        {
+            throw Exception("interface must have at least one member function", interfaceNode->GetSpan(), interfaceNode->ModuleId());
+        }
         for (int i = 0; i < nm; ++i)
         {
             Node* member = interfaceNode->Members()[i];
             member->Accept(*this);
         }
+        GetObjectPtrFromInterface* getObjectPtrFromInterface = new GetObjectPtrFromInterface(interfaceTypeSymbol);
+        symbolTable.SetFunctionIdFor(getObjectPtrFromInterface);
+        interfaceTypeSymbol->AddMember(getObjectPtrFromInterface);
         boundCompileUnit.GenerateCopyConstructorFor(interfaceTypeSymbol, containerScope, interfaceTypeSymbol->GetSpan(), interfaceTypeSymbol->SourceModuleId());
         boundCompileUnit.GetAttributeBinder()->BindAttributes(interfaceNode->GetAttributes(), interfaceTypeSymbol, boundCompileUnit, containerScope);
         containerScope = prevContainerScope;

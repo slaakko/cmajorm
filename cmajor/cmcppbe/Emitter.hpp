@@ -243,6 +243,7 @@ public:
     void* GetDelegateFromClassDelegate(void* classDelegatePtr) override;
     void* GetObjectFromInterface(void* interfaceTypePtr) override;
     void* GetObjectPtrFromInterface(void* interfaceTypePtr) override;
+    void* GetImtPtrPtrFromInterface(void* interfaceTypePtr) override;
     void* GetImtPtrFromInterface(void* interfaceTypePtr) override;
     void* GetInterfaceMethod(void* imtPtr, int32_t methodIndex, void* interfaceMethodType) override;
     void* GetFunctionIrType(void* functionSymbol) const override;
@@ -377,7 +378,10 @@ private:
     std::unordered_set<void*> vmtObjectCreatedSet;
     std::unordered_set<void*> staticObjectCreatedSet;
     std::unordered_map<void*, cmcppi::StructureType*> staticTypeMap;
+    std::unordered_map<void*, cmcppi::ArrayType*> vmtObjectTypeMap;
     std::unordered_map<void*, std::string> staticObjectNameMap;
+    std::unordered_map<void*, std::string> vmtObjectNameMap;
+    std::unordered_map<void*, std::string> imtArrayObjectNameMap;
     cmcppi::Value* objectPointer;
     int32_t currentLineNumber;
     bool substituteLineNumber;

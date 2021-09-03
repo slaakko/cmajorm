@@ -1524,7 +1524,14 @@ void* ClassTypeSymbol::CreateImt(Emitter& emitter, int index)
     {
         FunctionSymbol* memFun = imt[i];
         void* interfaceFun = emitter.GetOrInsertFunction(ToUtf8(memFun->MangledName()), memFun->IrType(emitter), memFun->DontThrow());
-        irImt.push_back(emitter.CreateBitCast(interfaceFun, emitter.GetIrTypeForVoidPtrType()));
+        if (GetBackEnd() == BackEnd::cmcpp)
+        {
+            irImt.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), interfaceFun));
+        }
+        else
+        {
+            irImt.push_back(emitter.CreateBitCast(interfaceFun, emitter.GetIrTypeForVoidPtrType()));
+        }
     }
     emitter.SetInitializer(imtObject, emitter.CreateIrValueForConstantArray(imtType, irImt, std::string()));
     return imtObject;
@@ -1544,7 +1551,14 @@ void* ClassTypeSymbol::CreateImts(Emitter& emitter)
     for (int i = 0; i < n; ++i)
     {
         void* irImt = CreateImt(emitter, i);
-        imtsArray.push_back(emitter.CreateBitCast(irImt, emitter.GetIrTypeForVoidPtrType()));
+        if (GetBackEnd() == BackEnd::cmcpp)
+        {
+            imtsArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), irImt));
+        }
+        else
+        {
+            imtsArray.push_back(emitter.CreateBitCast(irImt, emitter.GetIrTypeForVoidPtrType()));
+        }
     }
     emitter.SetInitializer(imtsArrayObject, emitter.CreateIrValueForConstantArray(imtsArrayType, imtsArray, std::string()));
     return imtsArrayObject;

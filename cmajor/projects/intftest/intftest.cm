@@ -1,0 +1,45 @@
+using System;
+
+interface Foo
+{
+	int f();
+}
+
+interface Goo
+{
+	void g();
+}
+
+class Base
+{
+	public virtual ~Base()
+	{
+	}
+}
+
+class Bar : Base, Foo, Goo
+{
+	public int f()
+	{
+		Console.Out() << "vau" << endl();
+		return 42;
+	}
+	public void g()
+	{
+		Console.Out() << "goo" << endl();
+	}
+}
+
+void main()
+{
+	Bar bar;
+	Foo y = bar;
+	Console.Out() << "jee" << endl();
+	int a = y.f();
+	Console.Out() << a << endl();
+	Goo goo = bar;
+	goo.g();
+	void* z = y.GetObjectPtrFromInterface();
+	Console.Out() << cast<ulong>(z) << endl();
+	Console.Out() << "jee" << endl();
+}

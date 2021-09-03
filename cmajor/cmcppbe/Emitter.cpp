@@ -13,7 +13,7 @@ namespace cmcppbe {
 
 Emitter::Emitter(cmcppbe::EmittingContext* emittingContext_) :
     cmajor::ir::Emitter(&stack), emittingContext(emittingContext_), emittingDelegate(nullptr), context(nullptr), compileUnit(nullptr), currentFunction(nullptr),
-    objectPointer(nullptr), substituteLineNumber(false), currentLineNumber(-1)
+    objectPointer(nullptr), substituteLineNumber(false), currentLineNumber(-1), boundCompileUnit(nullptr)
 {
 }
 
@@ -999,35 +999,56 @@ void* Emitter::CreateEndCatch(void* nextDest)
 
 std::string Emitter::GetVmtObjectName(void* symbol) const
 {
-    // todo
-    return std::string();
+    auto it = vmtObjectNameMap.find(symbol);
+    if (it != vmtObjectNameMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return std::string();
+    }
 }
 
 void Emitter::SetVmtObjectName(void* symbol, const std::string& vmtObjectName)
 {
-    // todo
+    vmtObjectNameMap[symbol] = vmtObjectName;
 }
 
 std::string Emitter::GetImtArrayObjectName(void* symbol) const
 {
-    // todo
-    return std::string();
+    auto it = imtArrayObjectNameMap.find(symbol);
+    if (it != imtArrayObjectNameMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return std::string();
+    }
 }
 
 void Emitter::SetImtArrayObjectName(void* symbol, const std::string& imtArrayObjectName)
 {
-    // todo
+    imtArrayObjectNameMap[symbol] = imtArrayObjectName;
 }
 
 void* Emitter::GetVmtObjectType(void* symbol) const
 {
-    // todo
-    return nullptr;
+    auto it = vmtObjectTypeMap.find(symbol);
+    if (it != vmtObjectTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 void Emitter::SetVmtObjectType(void* symbol, void* vmtObjectType)
 {
-    // todo
+    vmtObjectTypeMap[symbol] = static_cast<cmcppi::ArrayType*>(vmtObjectType);
 }
 
 void* Emitter::GetStaticObjectType(void* symbol) const
@@ -1294,11 +1315,16 @@ void* Emitter::GetObjectPtrFromInterface(void* interfaceTypePtr)
     return context->CreateElemAddr(static_cast<cmcppi::Value*>(interfaceTypePtr), context->GetLongValue(0));
 }
 
+void* Emitter::GetImtPtrPtrFromInterface(void* interfaceTypePtr)
+{
+    return context->CreateElemAddr(static_cast<cmcppi::Value*>(interfaceTypePtr), context->GetLongValue(1));
+}
+
 void* Emitter::GetImtPtrFromInterface(void* interfaceTypePtr)
 {
-    cmcppi::Value* interfacePtrAddr = context->CreateElemAddr(static_cast<cmcppi::Value*>(interfaceTypePtr), context->GetLongValue(1));
-    cmcppi::Value* interfacePtr = context->CreateLoad(interfacePtrAddr);
-    return context->CreateBitCast(interfacePtr, context->GetPtrType(context->GetVoidType()));
+    cmcppi::Value* interfacePtrPtr = context->CreateElemAddr(static_cast<cmcppi::Value*>(interfaceTypePtr), context->GetLongValue(1));
+    cmcppi::Value* interfacePtr = context->CreateLoad(interfacePtrPtr);
+    return context->CreateBitCast(interfacePtr, context->GetPtrType(context->GetPtrType(context->GetVoidType())));
 }
 
 void* Emitter::GetInterfaceMethod(void* imtPtr, int32_t methodIndex, void* interfaceMethodType)
@@ -1342,9 +1368,10 @@ void* Emitter::GetMethodPtr(void* vmtPtr, int32_t vmtIndex)
 
 void* Emitter::GetImtArray(void* vmtObjectPtr, int32_t imtsVmtIndexOffset)
 {
-    cmcppi::Value* imtsArrayPtrPtr = context->CreateElemAddr(static_cast<cmcppi::Value*>(vmtObjectPtr), context->GetLongValue(imtsVmtIndexOffset));
-    cmcppi::Value* imtsArrayPtr = context->CreateBitCast(imtsArrayPtrPtr, context->GetPtrType(context->GetPtrType(context->GetVoidType())));
-    return context->CreateLoad(imtsArrayPtr);
+    cmcppi::Value* imtsArrayPtrPtr = context->CreateBitCast(context->CreateElemAddr(static_cast<cmcppi::Value*>(vmtObjectPtr), context->GetLongValue(imtsVmtIndexOffset)),
+        context->GetPtrType(context->GetPtrType(context->GetPtrType(context->GetVoidType()))));
+    cmcppi::Value* imtsArrayPtr = context->CreateLoad(imtsArrayPtrPtr);
+    return imtsArrayPtr;
 }
 
 void* Emitter::GetImt(void* imtArray, int32_t interfaceIndex)

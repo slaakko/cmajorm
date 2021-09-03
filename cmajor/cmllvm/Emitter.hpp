@@ -212,6 +212,7 @@ public:
     void* GetDelegateFromClassDelegate(void* classDelegatePtr) override;
     void* GetObjectFromInterface(void* interfaceTypePtr) override;
     void* GetObjectPtrFromInterface(void* interfaceTypePtr) override;
+    void* GetImtPtrPtrFromInterface(void* interfaceTypePtr) override;
     void* GetImtPtrFromInterface(void* interfaceTypePtr) override;
     void* GetInterfaceMethod(void* imtPtr, int32_t methodIndex, void* interfaceMethodType) override;
     void* GetVmtPtr(void* thisPtr, int32_t vmtPtrIndex, void* vmtPtrType) override;

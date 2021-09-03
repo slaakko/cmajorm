@@ -272,6 +272,7 @@ public:
     virtual void* GetDelegateFromClassDelegate(void* classDelegatePtr) = 0;
     virtual void* GetObjectFromInterface(void* interfaceTypePtr) = 0;
     virtual void* GetObjectPtrFromInterface(void* interfaceTypePtr) = 0;
+    virtual void* GetImtPtrPtrFromInterface(void* interfaceTypePtr) = 0;
     virtual void* GetImtPtrFromInterface(void* interfaceTypePtr) = 0;
     virtual void* GetInterfaceMethod(void* imtPtr, int32_t methodIndex, void* interfaceMethodType) = 0;
     virtual void* GetFunctionIrType(void* functionSymbol) const = 0;

@@ -1,0 +1,84 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Xml.Serialization
+{
+    delegate void* FactoryFunction();
+
+    public class XmlClassRegistry
+    {
+        static XmlClassRegistry() : instance(new XmlClassRegistry())
+        {
+        }
+        public static XmlClassRegistry& Instance()
+        {
+            return *instance;
+        }
+        private nothrow XmlClassRegistry()
+        {
+        }
+        public void Register(int classId, const string& xmlSerializationName, FactoryFunction factoryFunction)
+        {
+            string xmlSerializationName = GetXmlSerializationName(classId);
+            if (!xmlSerializationName.IsEmpty())
+            {
+                throw XmlSerializationException("class having id " + ToString(classId) + " already registered with xml serialization name '" + xmlSerializationName + "'");
+            }
+            factoryMap[classId] = factoryFunction;
+            classIdSerializationNameMap[classId] = xmlSerializationName;
+            serializationNameClassIdMap[xmlSerializationName] = classId;
+        }
+        public nothrow string GetXmlSerializationName(int classId) const
+        {
+            Map<int, string>.ConstIterator it = classIdSerializationNameMap.CFind(classId);
+            if (it != classIdSerializationNameMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return string();
+            }
+        }
+        public nothrow int GetClassId(const string& xmlSerializationName) const
+        {
+            Map<string, int>.ConstIterator it = serializationNameClassIdMap.CFind(xmlSerializationName);
+            if (it != serializationNameClassIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public void* Create(int classId)
+        {
+            Map<int, FactoryFunction>.ConstIterator it = factoryMap.CFind(classId);
+            if (it != factoryMap.CEnd())
+            {
+                FactoryFunction factoryFunction = it->second;
+                return factoryFunction();
+            }
+            else
+            {
+                throw XmlSerializationException("class having id " + ToString(classId) + " not registered");
+            }
+        }
+        private static UniquePtr<XmlClassRegistry> instance;
+        private Map<int, FactoryFunction> factoryMap;
+        private Map<int, string> classIdSerializationNameMap;
+        private Map<string, int> serializationNameClassIdMap;
+    }
+
+    public void XmlRegister<T>(int classId, const string& xmlSerializationName)
+    {
+        XmlClassRegistry.Instance().Register(classId, xmlSerializationName, T.Create);
+    }
+}
+

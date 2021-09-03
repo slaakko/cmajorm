@@ -1,7 +1,7 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 #	Run with nmake from Visual Studio 2019 x64 Native Tools Command Prompt
 
-all: compiler cppbert sys cmlean tools examples
+all: compiler cppbert sys cmlean tools examples olddevenv
 	inst.bat
 
 compiler: buildcomp install
@@ -87,6 +87,10 @@ setups: plain_setup deflate_setup bzip2_setup
 	cminst -v ..\..\setup\bzip2\program\x64\Release\setup.exe ..\..\setup\bzip2\bin
 
 packages_and_setups: packages setups
+
+olddevenv:
+	MSBuild -m -verbosity:minimal ..\..\devenv\devenv.sln -p:Configuration="Debug"
+	MSBuild -m -verbosity:minimal ..\..\devenv\devenv.sln -p:Configuration="Release"
 	
 install:
 	inst.bat

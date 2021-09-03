@@ -1,0 +1,161 @@
+using System;
+using System.Text;
+using System.Xml.Serialization;
+
+namespace xmltest
+{
+    public const int vehicleClassId = 0;
+    public const int carClassId = 1;
+
+    public nothrow string XmlSerializationName<T>() where T is Vehicle
+    {
+        return "xmltest.vehicle";
+    }
+
+    public nothrow string XmlSerializationName<T>() where T is Car
+    {
+        return "xmltest.car";
+    }
+
+    //[xml, xmlSerializationName="xmltest.vehicle"]
+    public class Vehicle : XmlSerializable
+    {
+        public static nothrow Vehicle() : classId(-1)
+        {
+        }
+        public nothrow Vehicle() : objectId(Uuid.Random())
+        {
+        }
+        public nothrow Vehicle(const Uuid& objectId_) : objectId(objectId_)
+        {
+        }
+        public virtual ~Vehicle()
+        {
+        }
+        public nothrow Uuid GetObjectId() const
+        {
+            return objectId;
+        }
+        public static void Register(int classId_)
+        {
+            classId = classId_;
+            XmlRegister<Vehicle>(classId, XmlSerializationName<Vehicle>());
+        }
+        public static void* Create()
+        {
+            return new Vehicle();
+        }
+        public int ClassId()
+        {
+            return classId;
+        }
+        public Uuid ObjectId()
+        {
+            return GetObjectId();
+        }
+        public string XmlSerializationName()
+        {
+            return XmlSerializationName<Vehicle>();
+        }
+        public virtual void SetObjectXmlAttributes(System.Dom.Element* element)
+        {
+            element->SetAttribute(u"objectId", ToUtf32(ToString(objectId)));
+            element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            element->SetAttribute(u"xmlSerializationName", ToUtf32(XmlSerializationName()));
+        }
+        public virtual System.Dom.Element* ToXml(const string& elementName)
+        {
+            System.Dom.Element* element = new System.Dom.Element(ToUtf32(elementName));
+            SetObjectXmlAttributes(element);
+            return element;
+        }
+        private static int classId;
+        private Uuid objectId;
+    }
+
+    public class Car : Vehicle, XmlSerializable
+    {
+        public static nothrow Car() : classId(-1)
+        {
+        }
+        public nothrow Car() : base(Uuid.Random())
+        {
+        }
+        public static void Register(int classId_)
+        {
+            classId = classId_;
+            XmlRegister<Car>(classId, XmlSerializationName<Car>());
+        }
+        public static void* Create()
+        {
+            return new Car();
+        }
+        public int ClassId()
+        {
+            return classId;
+        }
+        public Uuid ObjectId()
+        {
+            return GetObjectId();
+        }
+        public string XmlSerializationName()
+        {
+            return XmlSerializationName<Car>();
+        }
+        public override void SetObjectXmlAttributes(System.Dom.Element* element)
+        {
+            element->SetAttribute(u"objectId", ToUtf32(ToString(GetObjectId())));
+            element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            element->SetAttribute(u"xmlSerializationName", ToUtf32(XmlSerializationName()));
+        }
+        public override System.Dom.Element* ToXml(const string& elementName)
+        {
+            System.Dom.Element* element = base->ToXml(elementName);
+            return element;
+        }
+        private static int classId;
+    }
+
+    public void Register()
+    {
+        Vehicle.Register(vehicleClassId);
+        Car.Register(carClassId);
+    }
+}
+
+int main()
+{
+    try
+    {
+        xmltest.Register();
+        UniquePtr<xmltest.Vehicle> vehicle(new xmltest.Vehicle());
+        XmlSerializable serizalizableVehicle = *(vehicle.Get());
+        int classId = serizalizableVehicle.ClassId();
+        Console.Out() << classId << endl();
+        string serializationName = serizalizableVehicle.XmlSerializationName();
+        Console.Out() << serializationName << endl();
+
+        System.Dom.Document vehicleDoc;
+        vehicleDoc.AppendChild(UniquePtr<System.Dom.Node>(serizalizableVehicle.ToXml("object")));
+        CodeFormatter formatter(Console.Out());
+        formatter.SetIndentSize(1);
+        vehicleDoc.Write(formatter);
+        
+        UniquePtr<xmltest.Car> car(new xmltest.Car());
+        XmlSerializable serializabledCar = *(car.Get());
+        int carClassId = serializabledCar.ClassId();
+        Console.Out() << carClassId << endl();
+        string carSerializationName = serializabledCar.XmlSerializationName();
+        Console.Out() << carSerializationName << endl();
+
+        System.Dom.Document carDoc;
+        carDoc.AppendChild(UniquePtr<System.Dom.Node>(serializabledCar.ToXml("object")));
+        carDoc.Write(formatter);
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

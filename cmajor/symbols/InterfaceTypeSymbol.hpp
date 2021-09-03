@@ -10,7 +10,6 @@
 
 namespace cmajor { namespace symbols {
 
-class MemberFunctionSymbol;
 class InterfaceTypeCopyConstructor;
 
 class SYMBOLS_API InterfaceTypeSymbol : public TypeSymbol
@@ -40,52 +39,86 @@ private:
 class SYMBOLS_API InterfaceTypeDefaultConstructor : public FunctionSymbol
 {
 public:
-    InterfaceTypeDefaultConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_);
+    InterfaceTypeDefaultConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    InterfaceTypeDefaultConstructor(InterfaceTypeSymbol* interfaceType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "InterfaceTypeDefaultConstructor"; }
+private:
+    InterfaceTypeSymbol* interfaceType;
 };
 
 class SYMBOLS_API InterfaceTypeCopyConstructor : public FunctionSymbol
 {
 public:
-    InterfaceTypeCopyConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_);
+    InterfaceTypeCopyConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    InterfaceTypeCopyConstructor(InterfaceTypeSymbol* interfaceType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "InterfaceTypeCopyConstructor"; }
+private:
+    InterfaceTypeSymbol* interfaceType;
 };
 
 class SYMBOLS_API InterfaceTypeMoveConstructor : public FunctionSymbol
 {
 public:
-    InterfaceTypeMoveConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_);
+    InterfaceTypeMoveConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    InterfaceTypeMoveConstructor(InterfaceTypeSymbol* interfaceType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "InterfaceTypeMoveConstructor"; }
+private:
+    InterfaceTypeSymbol* interfaceType;
 };
 
 class SYMBOLS_API InterfaceTypeCopyAssignment : public FunctionSymbol
 {
 public:
-    InterfaceTypeCopyAssignment(InterfaceTypeSymbol* interfaceType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_);
+    InterfaceTypeCopyAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    InterfaceTypeCopyAssignment(InterfaceTypeSymbol* interfaceType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "InterfaceTypeCopyAssignment"; }
+private:
+    InterfaceTypeSymbol* interfaceType;
 };
 
 class SYMBOLS_API InterfaceTypeMoveAssignment : public FunctionSymbol
 {
 public:
-    InterfaceTypeMoveAssignment(InterfaceTypeSymbol* interfaceType_, const Span& span_, const boost::uuids::uuid& sourceModuleId_);
+    InterfaceTypeMoveAssignment(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
+    InterfaceTypeMoveAssignment(InterfaceTypeSymbol* interfaceType_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "InterfaceTypeMoveAssignment"; }
+private:
+    InterfaceTypeSymbol* interfaceType;
 };
 
 class SYMBOLS_API ClassToInterfaceConversion : public FunctionSymbol
 {
 public:
+    ClassToInterfaceConversion(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_);
     ClassToInterfaceConversion(ClassTypeSymbol* sourceClassType_, InterfaceTypeSymbol* targetInterfaceType_, int32_t interfaceIndex_, const Span& span_, const boost::uuids::uuid& sourceModuleId_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
     std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
@@ -97,8 +130,22 @@ public:
 private:
     ClassTypeSymbol* sourceClassType;
     InterfaceTypeSymbol* targetInterfaceType;
-    //LocalVariableSymbol* temporaryInterfaceObjectVar;
     int32_t interfaceIndex;
+};
+
+class SYMBOLS_API GetObjectPtrFromInterface : public FunctionSymbol
+{
+public:
+    GetObjectPtrFromInterface(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_); 
+    GetObjectPtrFromInterface(InterfaceTypeSymbol* interfaceTypeSymbol);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    void EmplaceType(TypeSymbol* typeSymbol, int index) override;
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span, const boost::uuids::uuid& moduleId) override;
+    bool IsBasicTypeOperation() const override { return true; }
+    const char* ClassName() const override { return "GetObjectPtrFromInterface"; }
+private:
+    InterfaceTypeSymbol* interfaceType;
 };
 
 } } // namespace cmajor::symbols

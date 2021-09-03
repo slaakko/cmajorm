@@ -887,7 +887,7 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         {
             emitter.SetLineNumber(GetSpan().line);
         }
-        if (functionSymbol->Parent()->GetSymbolType() == SymbolType::interfaceTypeSymbol)
+        if (functionSymbol->Parent()->GetSymbolType() == SymbolType::interfaceTypeSymbol && functionSymbol->GetSymbolType() == SymbolType::memberFunctionSymbol)
         {
             InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(functionSymbol->Parent());
             MemberFunctionSymbol* interfaceMemberFunction = static_cast<MemberFunctionSymbol*>(functionSymbol);

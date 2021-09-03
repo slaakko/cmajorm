@@ -1002,6 +1002,15 @@ void* Emitter::GetObjectPtrFromInterface(void* interfaceTypePtr)
     return objectPtrPtr;
 }
 
+void* Emitter::GetImtPtrPtrFromInterface(void* interfaceTypePtr)
+{
+    ArgVector interfaceIndeces;
+    interfaceIndeces.push_back(builder.getInt32(0));
+    interfaceIndeces.push_back(builder.getInt32(1));
+    llvm::Value* interfacePtrPtr = builder.CreateGEP(static_cast<llvm::Value*>(interfaceTypePtr), interfaceIndeces);
+    return interfacePtrPtr;
+}
+
 void* Emitter::GetImtPtrFromInterface(void* interfaceTypePtr)
 {
     ArgVector interfaceIndeces;

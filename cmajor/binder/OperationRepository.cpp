@@ -1879,7 +1879,7 @@ void InterfaceDefaultConstructorOperation::CollectViableFunctions(ContainerScope
     FunctionSymbol* function = functionMap[interfaceType->TypeId()];
     if (!function)
     {
-        function = new InterfaceTypeDefaultConstructor(interfaceType, span, moduleId);
+        function = new InterfaceTypeDefaultConstructor(interfaceType);
         function->SetModule(&GetBoundCompileUnit().GetModule());
         function->SetParent(&GetSymbolTable()->GlobalNs());
         functionMap[interfaceType->TypeId()] = function;
@@ -1927,7 +1927,7 @@ void InterfaceCopyConstructorOperation::CollectViableFunctions(ContainerScope* c
         FunctionSymbol* function = functionMap[interfaceType->TypeId()];
         if (!function)
         {
-            function = new InterfaceTypeCopyConstructor(interfaceType, span, moduleId);
+            function = new InterfaceTypeCopyConstructor(interfaceType);
             GetBoundCompileUnit().AddCopyConstructorToMap(interfaceType->TypeId(), function);
             function->SetModule(&GetBoundCompileUnit().GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
@@ -1970,7 +1970,7 @@ void InterfaceMoveConstructorOperation::CollectViableFunctions(ContainerScope* c
         FunctionSymbol* function = functionMap[interfaceType->TypeId()];
         if (!function)
         {
-            function = new InterfaceTypeMoveConstructor(interfaceType, span, moduleId);
+            function = new InterfaceTypeMoveConstructor(interfaceType);
             function->SetModule(&GetBoundCompileUnit().GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[interfaceType->TypeId()] = function;
@@ -2013,7 +2013,7 @@ void InterfaceCopyAssignmentOperation::CollectViableFunctions(ContainerScope* co
         FunctionSymbol* function = functionMap[interfaceType->TypeId()];
         if (!function)
         {
-            function = new InterfaceTypeCopyAssignment(interfaceType, span, moduleId);
+            function = new InterfaceTypeCopyAssignment(interfaceType);
             function->SetModule(&GetBoundCompileUnit().GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[interfaceType->TypeId()] = function;
@@ -2055,7 +2055,7 @@ void InterfaceMoveAssignmentOperation::CollectViableFunctions(ContainerScope* co
         FunctionSymbol* function = functionMap[interfaceType->TypeId()];
         if (!function)
         {
-            function = new InterfaceTypeMoveAssignment(interfaceType, span, moduleId);
+            function = new InterfaceTypeMoveAssignment(interfaceType);
             function->SetModule(&GetBoundCompileUnit().GetModule());
             function->SetParent(&GetSymbolTable()->GlobalNs());
             functionMap[interfaceType->TypeId()] = function;
@@ -4115,7 +4115,7 @@ void OperationRepository::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeS
 void OperationRepository::GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId)
 {
     if (boundCompileUnit.HasCopyConstructorFor(interfaceTypeSymbol->TypeId())) return;
-    std::unique_ptr<InterfaceTypeCopyConstructor> copyConstructor(new InterfaceTypeCopyConstructor(interfaceTypeSymbol, span, moduleId));
+    std::unique_ptr<InterfaceTypeCopyConstructor> copyConstructor(new InterfaceTypeCopyConstructor(interfaceTypeSymbol));
     boundCompileUnit.GetSymbolTable().SetFunctionIdFor(copyConstructor.get());
     copyConstructor->SetCompileUnit(boundCompileUnit.GetCompileUnitNode());
     copyConstructor->SetModule(&boundCompileUnit.GetModule());

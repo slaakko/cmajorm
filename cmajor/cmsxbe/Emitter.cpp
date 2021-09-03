@@ -1292,6 +1292,11 @@ void* Emitter::GetObjectPtrFromInterface(void* interfaceTypePtr)
     return context->CreateElemAddr(static_cast<cmsxi::Value*>(interfaceTypePtr), context->GetLongValue(0));
 }
 
+void* Emitter::GetImtPtrPtrFromInterface(void* interfaceTypePtr)
+{
+    return context->CreateElemAddr(static_cast<cmsxi::Value*>(interfaceTypePtr), context->GetLongValue(1));
+}
+
 void* Emitter::GetImtPtrFromInterface(void* interfaceTypePtr)
 {
     cmsxi::Value* interfacePtrAddr = context->CreateElemAddr(static_cast<cmsxi::Value*>(interfaceTypePtr), context->GetLongValue(1));

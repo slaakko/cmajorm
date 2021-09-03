@@ -60,6 +60,8 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "classDelegateTypeDefaultConstructor", "classDelegateTypeCopyConstructor", "classDelegateTypeMoveConstructor", "classDelegateTypeCopyAssignment", "classDelegateTypeMoveAssignment",
     "classDelegateTypeEquality", "memberFunctionToClassDelegateSymbol", 
     "arrayLengthFunctionSymbol", "arrayBeginFunctionSymbol", "arrayEndFunctionSymbol", "arrayCBeginFunctionSymbol", "arrayCEndFunctionSymbol",
+    "interfaceTypeDefaultCtor", "interfaceTypeCopyCtor", "interfaceTypeMoveCtor", "interfaceTypeCopyAssignment", "interfaceTypeMoveAssignment", "classToInterfaceConversion", 
+    "getObjectPtrFromInterfaceSymbol",
     "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "variableValueSymbol", "globalVariableSymbol", "globalVariableGroupSymbol",
     "stringFunctionContainerSymbol", "stringLengthFunctionSymbol", "axiomSymbol"
 };
@@ -1266,6 +1268,13 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::arrayEndFunctionSymbol, new ConcreteSymbolCreator<ArrayEndFunction>());
     Register(SymbolType::arrayCBeginFunctionSymbol, new ConcreteSymbolCreator<ArrayCBeginFunction>());
     Register(SymbolType::arrayCEndFunctionSymbol, new ConcreteSymbolCreator<ArrayCEndFunction>());
+    Register(SymbolType::interfaceTypeDefaultCtor, new ConcreteSymbolCreator<InterfaceTypeDefaultConstructor>());
+    Register(SymbolType::interfaceTypeCopyCtor, new ConcreteSymbolCreator<InterfaceTypeCopyConstructor>());
+    Register(SymbolType::interfaceTypeMoveCtor, new ConcreteSymbolCreator<InterfaceTypeMoveConstructor>());
+    Register(SymbolType::interfaceTypeCopyAssignment, new ConcreteSymbolCreator<InterfaceTypeCopyAssignment>());
+    Register(SymbolType::interfaceTypeMoveAssignment, new ConcreteSymbolCreator<InterfaceTypeMoveAssignment>());
+    Register(SymbolType::classToInterfaceConversion, new ConcreteSymbolCreator<ClassToInterfaceConversion>());
+    Register(SymbolType::getObjectPtrFromInterfaceSymbol, new ConcreteSymbolCreator<GetObjectPtrFromInterface>());
     Register(SymbolType::globalVariableSymbol, new ConcreteSymbolCreator<GlobalVariableSymbol>());
     Register(SymbolType::stringFunctionContainerSymbol, new ConcreteSymbolCreator<StringFunctionContainerSymbol>());
     Register(SymbolType::stringLengthFunctionSymbol, new ConcreteSymbolCreator<StringLengthFunction>());
@@ -1312,3 +1321,4 @@ void DoneSymbol()
 }
 
 } } // namespace cmajor::symbols
+

@@ -392,7 +392,7 @@ std::string DelegateTypeSymbol::GetSymbolHelp() const
 }
 
 DelegateTypeDefaultConstructor::DelegateTypeDefaultConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
-    FunctionSymbol(SymbolType::delegateTypeDefaultConstructor, span_, sourceModuleId_, name_)
+    FunctionSymbol(SymbolType::delegateTypeDefaultConstructor, span_, sourceModuleId_, name_), delegateType(nullptr)
 {
 }
 
@@ -963,7 +963,7 @@ void ClassDelegateTypeSymbol::Check()
 }
 
 ClassDelegateTypeDefaultConstructor::ClassDelegateTypeDefaultConstructor(const Span& span_, const boost::uuids::uuid& sourceModuleId_, const std::u32string& name_) :
-    FunctionSymbol(SymbolType::classDelegateTypeDefaultConstructor, span_, sourceModuleId_, name_)
+    FunctionSymbol(SymbolType::classDelegateTypeDefaultConstructor, span_, sourceModuleId_, name_), classDelegateType(nullptr)
 {
 }
 
