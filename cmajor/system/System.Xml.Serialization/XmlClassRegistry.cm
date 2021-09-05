@@ -10,6 +10,35 @@ namespace System.Xml.Serialization
 {
     delegate void* FactoryFunction();
 
+    public abstract class XmlSerializableExtractor
+    {
+        public default virtual ~XmlSerializableExtractor();
+        public nothrow abstract XmlSerializable ExtractXmlSerializable(void* object);
+    }
+
+    public class ConcreteXmlSerializableExtractor<T> : XmlSerializableExtractor
+    {
+        public nothrow override XmlSerializable ExtractXmlSerializable(void* object)
+        {
+            if (object != null)
+            {
+                T* obj = cast<T*>(object);
+                XmlSerializable intf = *obj;
+                return intf;
+            }
+            else
+            {
+                return XmlSerializable();
+            }
+        }
+    }
+
+    public XmlSerializableExtractor* MakeXmlSerializableExtractor<T>()
+    {
+        ConcreteXmlSerializableExtractor<T>* extractor = new ConcreteXmlSerializableExtractor<T>();
+        return extractor;
+    }
+
     public class XmlClassRegistry
     {
         static XmlClassRegistry() : instance(new XmlClassRegistry())
@@ -22,39 +51,27 @@ namespace System.Xml.Serialization
         private nothrow XmlClassRegistry()
         {
         }
-        public void Register(int classId, const string& xmlSerializationName, FactoryFunction factoryFunction)
+        public void Register(int classId, FactoryFunction factoryFunction, XmlSerializableExtractor* extractor)
         {
-            string xmlSerializationName = GetXmlSerializationName(classId);
-            if (!xmlSerializationName.IsEmpty())
-            {
-                throw XmlSerializationException("class having id " + ToString(classId) + " already registered with xml serialization name '" + xmlSerializationName + "'");
-            }
             factoryMap[classId] = factoryFunction;
-            classIdSerializationNameMap[classId] = xmlSerializationName;
-            serializationNameClassIdMap[xmlSerializationName] = classId;
-        }
-        public nothrow string GetXmlSerializationName(int classId) const
-        {
-            Map<int, string>.ConstIterator it = classIdSerializationNameMap.CFind(classId);
-            if (it != classIdSerializationNameMap.CEnd())
+            if (extractor != null)
             {
-                return it->second;
+                extractorMap[classId] = extractor;
+                extractors.Add(UniquePtr<XmlSerializableExtractor>(extractor));
+            }
+        }
+        public XmlSerializable CreateXmlSerializable(int classId)
+        {
+            Map<int, XmlSerializableExtractor*>.ConstIterator it = extractorMap.CFind(classId);
+            if (it != extractorMap.CEnd())
+            {
+                XmlSerializableExtractor* extractor = it->second;
+                void* object = Create(classId);
+                return extractor->ExtractXmlSerializable(object);
             }
             else
             {
-                return string();
-            }
-        }
-        public nothrow int GetClassId(const string& xmlSerializationName) const
-        {
-            Map<string, int>.ConstIterator it = serializationNameClassIdMap.CFind(xmlSerializationName);
-            if (it != serializationNameClassIdMap.CEnd())
-            {
-                return it->second;
-            }
-            else
-            {
-                return -1;
+                throw XmlSerializationException("interface extractor for class id " + ToString(classId) + " not registered");
             }
         }
         public void* Create(int classId)
@@ -72,13 +89,13 @@ namespace System.Xml.Serialization
         }
         private static UniquePtr<XmlClassRegistry> instance;
         private Map<int, FactoryFunction> factoryMap;
-        private Map<int, string> classIdSerializationNameMap;
-        private Map<string, int> serializationNameClassIdMap;
+        private Map<int, XmlSerializableExtractor*> extractorMap;
+        private List<UniquePtr<XmlSerializableExtractor>> extractors;
     }
 
-    public void XmlRegister<T>(int classId, const string& xmlSerializationName)
+    public void XmlRegister<T>(int classId)
     {
-        XmlClassRegistry.Instance().Register(classId, xmlSerializationName, T.Create);
+        XmlClassRegistry.Instance().Register(classId, T.Create, MakeXmlSerializableExtractor<T>());
     }
 }
 

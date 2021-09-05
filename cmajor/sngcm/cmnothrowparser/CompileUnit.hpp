@@ -37,6 +37,7 @@ struct SNGCM_NOTHROW_PARSER_API NothrowCompileUnitParser
     static soulng::parser::Match DelegateDefinition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match ClassDelegateDefinition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match GlobalVariableDefinition(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::CompileUnitNode* cu);
+    static soulng::parser::Match InstantiationRequestDeclaration(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
 };
 
 #endif // COMPILEUNIT_HPP

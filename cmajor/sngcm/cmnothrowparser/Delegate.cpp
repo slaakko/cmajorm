@@ -24,7 +24,7 @@ soulng::parser::Match NothrowDelegateParser::Delegate(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Delegate"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 66);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 67);
     Span s = Span();
     std::unique_ptr<DelegateNode> dlg = std::unique_ptr<DelegateNode>();
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
@@ -200,7 +200,7 @@ soulng::parser::Match NothrowDelegateParser::DefiningDelegateId(CmajorNothrowLex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningDelegateId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 67);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 68);
     std::unique_ptr<IdentifierNode> id;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -244,7 +244,7 @@ soulng::parser::Match NothrowDelegateParser::ClassDelegate(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ClassDelegate"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 68);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 69);
     Span s = Span();
     std::unique_ptr<ClassDelegateNode> clsDlg = std::unique_ptr<ClassDelegateNode>();
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
@@ -440,7 +440,7 @@ soulng::parser::Match NothrowDelegateParser::DefiningClassDelegateId(CmajorNothr
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningClassDelegateId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 69);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 70);
     std::unique_ptr<IdentifierNode> id;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;

@@ -30,6 +30,9 @@
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/random_generator.hpp>
 #include <iostream>
 #include <string>
 #include <stdexcept>
@@ -145,6 +148,9 @@ using namespace cmajor::build;
 
 int main(int argc, const char** argv)
 {
+    //boost::uuids::uuid u = boost::uuids::random_generator()();
+    //std::string s = boost::uuids::to_string(u);
+
     SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
     SetToolChain("gcc");
     std::unique_ptr<Module> rootModule;

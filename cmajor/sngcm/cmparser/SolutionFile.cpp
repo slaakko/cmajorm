@@ -3,7 +3,7 @@
 #include <sngcm/cmlexer/ContainerFileLexer.hpp>
 #include <sngcm/cmlexer/ContainerFileTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/SolutionFile.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/SolutionFile.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -99,6 +99,7 @@ soulng::parser::Match SolutionFileParser::SolutionFile(ContainerFileLexer& lexer
                                 name.reset(static_cast<soulng::parser::Value<std::u32string>*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch6 = match;
                                 }
                                 else
@@ -133,6 +134,7 @@ soulng::parser::Match SolutionFileParser::SolutionFile(ContainerFileLexer& lexer
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch9 = match;
                                 }
                                 else

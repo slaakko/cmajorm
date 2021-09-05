@@ -1,0 +1,74 @@
+using System;
+using System.Xml.Serialization;
+
+namespace xmltest
+{
+    public class Car : Vehicle, XmlSerializable
+    {
+        public static string StaticClassName()
+        {
+            return "xmltest.Car";
+        }
+        public static void Register(int classId_)
+        {
+            classId = classId_;
+            XmlRegister<Car>(classId);
+        }
+        public static void* Create()
+        {
+            return new Car();
+        }
+        public nothrow override void DestroyObject()
+        {
+            base->DestroyObject();
+        }
+        public override XmlContainer* Container()
+        {
+            return base->Container();
+        }
+        public override void SetContainer(XmlContainer* container)
+        {
+            base->SetContainer(container);
+        }
+        public override nothrow Uuid ObjectId()
+        {
+            return base->ObjectId();
+        }
+        public override nothrow void SetObjectId(const Uuid& objectId)
+        {
+            base->SetObjectId(objectId);
+        }
+        public nothrow int ClassId()
+        {
+            return classId;
+        }
+        public nothrow string ClassName()
+        {
+            return typename(*this);
+        }
+        public int XmlPtrCount()
+        {
+            return 0;
+        }
+        public XmlPtrBase* GetXmlPtr(int index)
+        {
+            return null;
+        }
+        public override void SetObjectXmlAttributes(System.Dom.Element* element)
+        {
+            element->SetAttribute(u"objectId", ToUtf32(ToString(ObjectId())));
+            element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+        }
+        public override System.Dom.Element* ToXml(const string& elementName)
+        {
+            System.Dom.Element* element = base->ToXml(elementName);
+            return element;
+        }
+        public override void FromXml(System.Dom.Element* element)
+        {
+            base->FromXml(element);
+        }
+        private static int classId;
+    }
+}
+

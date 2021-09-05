@@ -1,0 +1,80 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Xml.Serialization
+{
+    public abstract class XmlPtrBase
+    {
+        public nothrow XmlPtrBase() : targetObjectId(Uuid()), ptr(null)
+        {
+        }
+        public virtual ~XmlPtrBase()
+        {
+        }
+        public nothrow const Uuid& TargetObjectId() const
+        {
+            return targetObjectId;
+        }
+        public nothrow void SetTargetObjectId(const Uuid& targetObjectId_)
+        {
+            targetObjectId = targetObjectId_;
+        }
+        public nothrow void* GetPtr() const
+        {
+            return ptr;
+        }
+        public nothrow void SetPtr(void* ptr_)
+        {
+            ptr = ptr_;
+        }
+        public nothrow void Resolve(XmlContainer* container)
+        {
+            XmlSerializableProxy* proxy = container->Get(targetObjectId);
+            if (proxy != null)
+            {
+                ptr = proxy->Object();
+            }
+        }
+        private Uuid targetObjectId;
+        private void* ptr;
+    }
+
+    public class XmlPtr<T> : XmlPtrBase
+    {
+        public nothrow XmlPtr() : base()
+        {
+        }
+        public nothrow XmlPtr(T* ptr_) : base()
+        {
+            Reset(ptr_);
+        }
+        public nothrow T* Get() const
+        {
+            return cast<T*>(GetPtr());
+        }
+        public nothrow void Reset(T* ptr_)
+        {
+            if (GetPtr() != null)
+            {
+                SetPtr(null);
+                targetObjectId = Uuid();
+            }
+            SetPtr(ptr_);
+            T* p = Get();
+            if (p != null)
+            {
+                XmlSerializable intf = *p;
+                targetObjectId = intf.ObjectId();
+            }
+        }
+        public nothrow void Reset()
+        {
+            Reset(null);
+        }
+    }
+}
+

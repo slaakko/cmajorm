@@ -24,7 +24,7 @@ soulng::parser::Match NothrowConstantParser::Constant(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Constant"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 65);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 66);
     Span s = Span();
     Span v = Span();
     std::unique_ptr<Node> e = std::unique_ptr<Node>();

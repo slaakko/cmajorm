@@ -9,7 +9,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Concept.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Concept.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -144,6 +144,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, boost::uuids::u
                                                                     conceptName.reset(static_cast<IdentifierNode*>(match.value));
                                                                     if (match.hit)
                                                                     {
+                                                                        lexer.ResetRecovered();
                                                                         *parentMatch19 = match;
                                                                     }
                                                                     else
@@ -182,6 +183,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, boost::uuids::u
                                                         }
                                                         if (match.hit)
                                                         {
+                                                            lexer.ResetRecovered();
                                                             *parentMatch21 = match;
                                                         }
                                                         else
@@ -305,6 +307,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, boost::uuids::u
                                                 }
                                                 if (match.hit)
                                                 {
+                                                    lexer.ResetRecovered();
                                                     *parentMatch32 = match;
                                                 }
                                                 else
@@ -444,6 +447,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, boost::uuids::u
                                             }
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch46 = match;
                                             }
                                             else
@@ -475,6 +479,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, boost::uuids::u
                                     soulng::parser::Match match = ConceptParser::ConceptBody(lexer, moduleId, ctx, conceptNode.get());
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch48 = match;
                                     }
                                     else
@@ -510,6 +515,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, boost::uuids::u
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch51 = match;
                                     }
                                     else
@@ -647,6 +653,7 @@ soulng::parser::Match ConceptParser::Refinement(CmajorLexer& lexer, boost::uuids
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch9 = match;
                                 }
                                 else
@@ -770,6 +777,7 @@ soulng::parser::Match ConceptParser::Refinement(CmajorLexer& lexer, boost::uuids
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch20 = match;
                         }
                         else
@@ -1022,6 +1030,7 @@ soulng::parser::Match ConceptParser::TypeNameConstraint(CmajorLexer& lexer, boos
                     type.reset(static_cast<sngcm::ast::Node*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch4 = match;
                     }
                     else
@@ -1057,6 +1066,7 @@ soulng::parser::Match ConceptParser::TypeNameConstraint(CmajorLexer& lexer, boos
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -1355,6 +1365,7 @@ soulng::parser::Match ConceptParser::ConstructorConstraint(CmajorLexer& lexer, b
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch11 = match;
                             }
                             else
@@ -1498,6 +1509,7 @@ soulng::parser::Match ConceptParser::DestructorConstraint(CmajorLexer& lexer, bo
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch10 = match;
                                 }
                                 else
@@ -1528,6 +1540,7 @@ soulng::parser::Match ConceptParser::DestructorConstraint(CmajorLexer& lexer, bo
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch12 = match;
                             }
                             else
@@ -1563,6 +1576,7 @@ soulng::parser::Match ConceptParser::DestructorConstraint(CmajorLexer& lexer, bo
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch15 = match;
                             }
                             else
@@ -1692,6 +1706,7 @@ soulng::parser::Match ConceptParser::MemberFunctionConstraint(CmajorLexer& lexer
                                 functionGroupId.reset(static_cast<soulng::parser::Value<std::u32string>*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch10 = match;
                                 }
                                 else
@@ -1725,6 +1740,7 @@ soulng::parser::Match ConceptParser::MemberFunctionConstraint(CmajorLexer& lexer
                     soulng::parser::Match match = ParameterParser::ParameterList(lexer, moduleId, ctx, memberFunctionConstraint.get());
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch12 = match;
                     }
                     else
@@ -1760,6 +1776,7 @@ soulng::parser::Match ConceptParser::MemberFunctionConstraint(CmajorLexer& lexer
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch15 = match;
                     }
                     else
@@ -1845,6 +1862,7 @@ soulng::parser::Match ConceptParser::FunctionConstraint(CmajorLexer& lexer, boos
                                 functionGroupId.reset(static_cast<soulng::parser::Value<std::u32string>*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch6 = match;
                                 }
                                 else
@@ -1878,6 +1896,7 @@ soulng::parser::Match ConceptParser::FunctionConstraint(CmajorLexer& lexer, boos
                     soulng::parser::Match match = ParameterParser::ParameterList(lexer, moduleId, ctx, functionConstraint.get());
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch8 = match;
                     }
                     else
@@ -1913,6 +1932,7 @@ soulng::parser::Match ConceptParser::FunctionConstraint(CmajorLexer& lexer, boos
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch11 = match;
                     }
                     else
@@ -1994,6 +2014,7 @@ soulng::parser::Match ConceptParser::EmbeddedConstraint(CmajorLexer& lexer, boos
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch4 = match;
                         }
                         else
@@ -2087,6 +2108,7 @@ soulng::parser::Match ConceptParser::WhereConstraint(CmajorLexer& lexer, boost::
                     constraint.reset(static_cast<ConstraintNode*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch4 = match;
                     }
                     else
@@ -2515,6 +2537,7 @@ soulng::parser::Match ConceptParser::PrimaryConstraintExpr(CmajorLexer& lexer, b
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch7 = match;
                         }
                         else
@@ -2806,6 +2829,7 @@ soulng::parser::Match ConceptParser::IsConstraint(CmajorLexer& lexer, boost::uui
                     conceptOrTypeName.reset(static_cast<Node*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch6 = match;
                     }
                     else
@@ -3056,6 +3080,7 @@ soulng::parser::Match ConceptParser::MultiParamConstraint(CmajorLexer& lexer, bo
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch16 = match;
                     }
                     else
@@ -3248,6 +3273,7 @@ soulng::parser::Match ConceptParser::Axiom(CmajorLexer& lexer, boost::uuids::uui
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch17 = match;
                                     }
                                     else
@@ -3279,6 +3305,7 @@ soulng::parser::Match ConceptParser::Axiom(CmajorLexer& lexer, boost::uuids::uui
                             soulng::parser::Match match = ConceptParser::AxiomBody(lexer, moduleId, ctx, axiomNode.get());
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch19 = match;
                             }
                             else
@@ -3314,6 +3341,7 @@ soulng::parser::Match ConceptParser::Axiom(CmajorLexer& lexer, boost::uuids::uui
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch22 = match;
                             }
                             else
@@ -3477,6 +3505,7 @@ soulng::parser::Match ConceptParser::AxiomStatement(CmajorLexer& lexer, boost::u
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch6 = match;
                             }
                             else

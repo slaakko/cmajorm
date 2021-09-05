@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Concepts;
 using System.Collections;
 using System.Dom;
 using System.XPath;
@@ -13,7 +14,7 @@ namespace System.Xml.Serialization
     public concept XmlConstructible<T>
     {
         where DefaultConstructible<T>;
-        T(Element* element);
+        void T.FromXml(Element* element);
     }
 
     public concept XmlImportableScalarType<T>
@@ -391,10 +392,10 @@ namespace System.Xml.Serialization
         Element* element = GetXmlFieldElement(fieldName, parentElement);
         if (element != null)
         {
-            object = T(element);
+            object.FromXml(element);
         }
     }
-/*
+
     public void FromXml<T>(Element* parentElement, const string& fieldName, UniquePtr<T>& object)
         where T is XmlConstructible
     {
@@ -405,7 +406,13 @@ namespace System.Xml.Serialization
             ustring value = element->GetAttribute(u"value");
             if (value != u"null")
             {
-                object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(element)));
+                ustring classIdAttr = element->GetAttribute(u"classId");
+                if (!classIdAttr.IsEmpty())
+                {
+                    int classId = ParseInt(ToUtf8(classIdAttr));
+                    object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(classId)));
+                    object->FromXml(element);
+                }
             }
         }
     }
@@ -420,11 +427,36 @@ namespace System.Xml.Serialization
             ustring value = element->GetAttribute(u"value");
             if (value != u"null")
             {
-                object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(element)));
+                ustring classIdAttr = element->GetAttribute(u"classId");
+                if (!classIdAttr.IsEmpty())
+                {
+                    int classId = ParseInt(ToUtf8(classIdAttr));
+                    object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(classId)));
+                    object->FromXml(element);
+                }
             }
         }
     }
-*/
+
+    public void FromXml<T>(Element* parentElement, const string& fieldName, XmlPtr<T>& ptr)
+        where T is XmlConstructible
+    {
+        ptr.Reset();
+        Element* element = GetXmlFieldElement(fieldName, parentElement);
+        if (element != null)
+        {
+            ustring value = element->GetAttribute(u"value");
+            if (value != u"null")
+            {
+                ustring objectIdAttr = element->GetAttribute(u"objectId");
+                if (!objectIdAttr.IsEmpty())
+                {
+                    Uuid objectId = ParseUuid(ToUtf8(objectIdAttr));
+                    ptr.SetTargetObjectId(objectId);
+                }
+            }
+        }
+    }
 
     public void FromXml<T>(Element* parentElement, const string& fieldName, List<T>& list)
         where T is XmlImportableScalarType
@@ -476,8 +508,9 @@ namespace System.Xml.Serialization
                         if (node is Element*)
                         {
                             Element* element = cast<Element*>(node);
-                            T value(element);
-                            list.Add(Rvalue(value));
+                            T object;
+                            object.FromXml(element);
+                            list.Add(Rvalue(object));
                         }
                     }
                 }
@@ -485,7 +518,6 @@ namespace System.Xml.Serialization
         }
     }
 
-/*
     public void FromXml<T>(Element* parentElement, const string& fieldName, List<UniquePtr<T>>& list)
         where T is XmlConstructible
     {
@@ -510,7 +542,13 @@ namespace System.Xml.Serialization
                             ustring value = element->GetAttribute(u"value");
                             if (value != u"null")
                             {
-                                object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(element)));
+                                ustring classIdAttr = element->GetAttribute(u"classId");
+                                if (!classIdAttr.IsEmpty())
+                                {
+                                    int classId = ParseInt(ToUtf8(classIdAttr));
+                                    object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(classId)));
+                                    object->FromXml(element);
+                                }
                             }
                             list.Add(Rvalue(object));
                         }
@@ -544,7 +582,13 @@ namespace System.Xml.Serialization
                             ustring value = element->GetAttribute(u"value");
                             if (value != u"null")
                             {
-                                object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(element)));
+                                ustring classIdAttr = element->GetAttribute(u"classId");
+                                if (!classIdAttr.IsEmpty())
+                                {
+                                    int classId = ParseInt(ToUtf8(classIdAttr));
+                                    object.Reset(cast<T*>(XmlClassRegistry.Instance().Create(classId)));
+                                    object->FromXml(element);
+                                }
                             }
                             list.Add(Rvalue(object));
                         }
@@ -553,6 +597,44 @@ namespace System.Xml.Serialization
             }
         }
     }
-*/
+    
+    public void FromXml<T>(Element* parentElement, const string& fieldName, List<XmlPtr<T>>& list)
+        where T is XmlConstructible
+    {
+        list.Clear();
+        Element* element = GetXmlFieldElement(fieldName, parentElement);
+        if (element != null)
+        {
+            UniquePtr<XPathObject> result = Evaluate(u"item", element);
+            if (!result.IsNull())
+            {
+                if (result.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        Node* node = (*nodeSet)[i];
+                        if (node is Element*)
+                        {
+                            Element* element = cast<Element*>(node);
+                            XmlPtr<T> ptr;
+                            ustring value = element->GetAttribute(u"value");
+                            if (value != u"null")
+                            {
+                                ustring objectIdAttr = element->GetAttribute(u"objectId");
+                                if (!objectIdAttr.IsEmpty())
+                                {
+                                    Uuid objectId = ParseUuid(ToUtf8(objectIdAttr));
+                                    ptr.SetTargetObjectId(objectId);
+                                }
+                            }
+                            list.Add(Rvalue(ptr));
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 

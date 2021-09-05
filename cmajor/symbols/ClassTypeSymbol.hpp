@@ -160,6 +160,7 @@ public:
     void SetSpecialMemberFunctions();
     const std::vector<MemberVariableSymbol*>& MemberVariables() const { return memberVariables; }
     const std::vector<MemberVariableSymbol*>& StaticMemberVariables() const { return staticMemberVariables; }
+    const std::vector<MemberFunctionSymbol*>& MemberFunctions() const { return memberFunctions; }
     MemberVariableSymbol* InitializedVar() { return initializedVar.get(); }
     void SetInitializedVar(MemberVariableSymbol* initializedVar_);
     bool IsAbstract() const { return GetFlag(ClassTypeSymbolFlags::abstract_); }

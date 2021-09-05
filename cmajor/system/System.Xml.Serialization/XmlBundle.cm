@@ -1,0 +1,121 @@
+// =================================
+// Copyright (c) 2021 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Text;
+using System.IO;
+
+namespace System.Xml.Serialization
+{
+    public abstract class ObjectManager
+    {
+        public abstract void AddObject(void* object, XmlSerializable xmlSerializable);
+    }
+
+    public class OwningXmlBundle : XmlBundle
+    {
+        public override bool TakeOwnership() const
+        {
+            return true;
+        }
+    }
+
+    public class XmlBundle : XmlContainer
+    {
+        public nothrow XmlBundle() : base()
+        {
+        }
+        public UniquePtr<System.Dom.Document> ToXmlDocument()
+        {
+            UniquePtr<System.Dom.Element> rootElement(new System.Dom.Element(u"xmlBundle"));
+            List<XmlSerializableProxy*> proxies = GetProxies();
+            for (XmlSerializableProxy* proxy : proxies)
+            {
+                if (proxy->Object() != null)
+                {
+                    UniquePtr<System.Dom.Element> serializableElement = proxy->ToXml("object");
+                    rootElement->AppendChild(UniquePtr<System.Dom.Node>(serializableElement.Release()));
+                }
+            }
+            UniquePtr<System.Dom.Document> document(new System.Dom.Document());
+            document->AppendChild(UniquePtr<System.Dom.Node>(rootElement.Release()));
+            return document;
+        }
+        public string ToXmlString() const
+        {
+            UniquePtr<System.Dom.Document> document = ToXmlDocument();
+            StringWriter stringWriter;
+            CodeFormatter formatter(stringWriter);
+            document->Write(formatter);
+            return stringWriter.GetString();
+        }
+/*        
+        public void ResolveXmlPtrs()
+        {
+            List<XmlSerializableProxy*> proxies = GetProxies();
+            for (XmlSerializableProxy* proxy : proxies)
+            {
+                int n = proxy->XmlPtrCount();
+                for (int i = 0; i < n; ++i)
+                {
+                    XmlPtrBase* ptr = proxy->GetXmlPtr(i);
+                    ptr->Resolve(this);
+                }
+            }
+        }
+*/        
+    }
+
+    public UniquePtr<XmlBundle> ToXmlBundle(const string& xmlStr, const string& systemId)
+    {
+        return ToXmlBundle(xmlStr, systemId, null);
+    }
+
+    public UniquePtr<XmlBundle> ToXmlBundle(const string& xmlStr, const string& systemId, ObjectManager* objectManager)
+    {
+        UniquePtr<XmlBundle> bundle;
+        if (objectManager == null)
+        {
+            bundle.Reset(new OwningXmlBundle());
+        }
+        else
+        {
+            bundle.Reset(new XmlBundle());
+        }
+        ustring content = ToUtf32(xmlStr);
+        UniquePtr<System.Dom.Document> document = System.Dom.ParseDocument(content, systemId);
+        UniquePtr<System.XPath.XPathObject> object = System.XPath.Evaluate(u"xmlBundle/object", document.Get());
+        if (!object.IsNull())
+        {
+            if (object.Get() is System.XPath.XPathNodeSet*)
+            {
+                System.XPath.XPathNodeSet* nodeSet = cast<System.XPath.XPathNodeSet*>(object.Get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    System.Dom.Node* node = (*nodeSet)[i];
+                    if (node is System.Dom.Element*)
+                    {
+                        System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                        ustring classIdAttr = element->GetAttribute(u"classId");
+                        if (!classIdAttr.IsEmpty())
+                        {
+                            int classId = ParseInt(ToUtf8(classIdAttr));
+                            XmlSerializable xmlSerializable = XmlClassRegistry.Instance().CreateXmlSerializable(classId);
+                            if (objectManager != null)
+                            {
+                                objectManager->AddObject(xmlSerializable.GetObjectPtrFromInterface(), xmlSerializable);
+                            }
+                            bundle->Add(xmlSerializable);
+                        }
+                    }
+                }
+            }
+        }
+        //bundle->ResolveXmlPtrs();
+        return bundle;
+    }
+}
+

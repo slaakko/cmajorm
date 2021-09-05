@@ -4,7 +4,7 @@
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 #include <sngcm/cmlexer/TokenValueParsers.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Attribute.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Attribute.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace CmajorTokens;
@@ -151,6 +151,7 @@ soulng::parser::Match AttributeParser::Attributes(CmajorLexer& lexer, boost::uui
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch13 = match;
                     }
                     else

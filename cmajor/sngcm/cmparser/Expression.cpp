@@ -9,7 +9,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Expression.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Expression.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -158,6 +158,7 @@ soulng::parser::Match ExpressionParser::Equivalence(CmajorLexer& lexer, boost::u
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch11 = match;
                                                     }
                                                     else
@@ -318,6 +319,7 @@ soulng::parser::Match ExpressionParser::Implication(CmajorLexer& lexer, boost::u
                                             right.reset(static_cast<Node*>(match.value));
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch11 = match;
                                             }
                                             else
@@ -478,6 +480,7 @@ soulng::parser::Match ExpressionParser::Disjunction(CmajorLexer& lexer, boost::u
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch11 = match;
                                                     }
                                                     else
@@ -641,6 +644,7 @@ soulng::parser::Match ExpressionParser::Conjunction(CmajorLexer& lexer, boost::u
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch11 = match;
                                                     }
                                                     else
@@ -804,6 +808,7 @@ soulng::parser::Match ExpressionParser::BitOr(CmajorLexer& lexer, boost::uuids::
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch11 = match;
                                                     }
                                                     else
@@ -967,6 +972,7 @@ soulng::parser::Match ExpressionParser::BitXor(CmajorLexer& lexer, boost::uuids:
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch11 = match;
                                                     }
                                                     else
@@ -1130,6 +1136,7 @@ soulng::parser::Match ExpressionParser::BitAnd(CmajorLexer& lexer, boost::uuids:
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch11 = match;
                                                     }
                                                     else
@@ -1338,6 +1345,7 @@ soulng::parser::Match ExpressionParser::Equality(CmajorLexer& lexer, boost::uuid
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch15 = match;
                                                     }
                                                     else
@@ -2040,6 +2048,7 @@ soulng::parser::Match ExpressionParser::Shift(CmajorLexer& lexer, boost::uuids::
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch18 = match;
                                                     }
                                                     else
@@ -2260,6 +2269,7 @@ soulng::parser::Match ExpressionParser::Additive(CmajorLexer& lexer, boost::uuid
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch15 = match;
                                                     }
                                                     else
@@ -2513,6 +2523,7 @@ soulng::parser::Match ExpressionParser::Multiplicative(CmajorLexer& lexer, boost
                                                     right.reset(static_cast<Node*>(match.value));
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch18 = match;
                                                     }
                                                     else
@@ -3344,6 +3355,7 @@ soulng::parser::Match ExpressionParser::Postfix(CmajorLexer& lexer, boost::uuids
                                                                     }
                                                                     if (match.hit)
                                                                     {
+                                                                        lexer.ResetRecovered();
                                                                         *parentMatch31 = match;
                                                                     }
                                                                     else
@@ -3432,6 +3444,7 @@ soulng::parser::Match ExpressionParser::Postfix(CmajorLexer& lexer, boost::uuids
                                                                 }
                                                                 if (match.hit)
                                                                 {
+                                                                    lexer.ResetRecovered();
                                                                     *parentMatch39 = match;
                                                                 }
                                                                 else
@@ -4092,6 +4105,7 @@ soulng::parser::Match ExpressionParser::SizeOfExpr(CmajorLexer& lexer, boost::uu
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch7 = match;
                                 }
                                 else
@@ -4118,6 +4132,7 @@ soulng::parser::Match ExpressionParser::SizeOfExpr(CmajorLexer& lexer, boost::uu
                             expr.reset(static_cast<Node*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch9 = match;
                             }
                             else
@@ -4148,6 +4163,7 @@ soulng::parser::Match ExpressionParser::SizeOfExpr(CmajorLexer& lexer, boost::uu
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch11 = match;
                         }
                         else
@@ -4253,6 +4269,7 @@ soulng::parser::Match ExpressionParser::TypeNameExpr(CmajorLexer& lexer, boost::
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch7 = match;
                                 }
                                 else
@@ -4279,6 +4296,7 @@ soulng::parser::Match ExpressionParser::TypeNameExpr(CmajorLexer& lexer, boost::
                             expr.reset(static_cast<Node*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch9 = match;
                             }
                             else
@@ -4309,6 +4327,7 @@ soulng::parser::Match ExpressionParser::TypeNameExpr(CmajorLexer& lexer, boost::
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch11 = match;
                         }
                         else
@@ -4414,6 +4433,7 @@ soulng::parser::Match ExpressionParser::TypeIdExpr(CmajorLexer& lexer, boost::uu
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch7 = match;
                                 }
                                 else
@@ -4440,6 +4460,7 @@ soulng::parser::Match ExpressionParser::TypeIdExpr(CmajorLexer& lexer, boost::uu
                             expr.reset(static_cast<Node*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch9 = match;
                             }
                             else
@@ -4470,6 +4491,7 @@ soulng::parser::Match ExpressionParser::TypeIdExpr(CmajorLexer& lexer, boost::uu
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch11 = match;
                         }
                         else
@@ -4585,6 +4607,7 @@ soulng::parser::Match ExpressionParser::CastExpr(CmajorLexer& lexer, boost::uuid
                                             }
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch10 = match;
                                             }
                                             else
@@ -4611,6 +4634,7 @@ soulng::parser::Match ExpressionParser::CastExpr(CmajorLexer& lexer, boost::uuid
                                         typeExpr.reset(static_cast<sngcm::ast::Node*>(match.value));
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch12 = match;
                                         }
                                         else
@@ -4641,6 +4665,7 @@ soulng::parser::Match ExpressionParser::CastExpr(CmajorLexer& lexer, boost::uuid
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch14 = match;
                                     }
                                     else
@@ -4671,6 +4696,7 @@ soulng::parser::Match ExpressionParser::CastExpr(CmajorLexer& lexer, boost::uuid
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch16 = match;
                                 }
                                 else
@@ -4697,6 +4723,7 @@ soulng::parser::Match ExpressionParser::CastExpr(CmajorLexer& lexer, boost::uuid
                             expr.reset(static_cast<Node*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch18 = match;
                             }
                             else
@@ -4727,6 +4754,7 @@ soulng::parser::Match ExpressionParser::CastExpr(CmajorLexer& lexer, boost::uuid
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch20 = match;
                         }
                         else
@@ -4841,6 +4869,7 @@ soulng::parser::Match ExpressionParser::ConstructExpr(CmajorLexer& lexer, boost:
                                             }
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch10 = match;
                                             }
                                             else
@@ -4867,6 +4896,7 @@ soulng::parser::Match ExpressionParser::ConstructExpr(CmajorLexer& lexer, boost:
                                         typeExpr.reset(static_cast<sngcm::ast::Node*>(match.value));
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch12 = match;
                                         }
                                         else
@@ -4897,6 +4927,7 @@ soulng::parser::Match ExpressionParser::ConstructExpr(CmajorLexer& lexer, boost:
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch14 = match;
                                     }
                                     else
@@ -4935,6 +4966,7 @@ soulng::parser::Match ExpressionParser::ConstructExpr(CmajorLexer& lexer, boost:
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch16 = match;
                         }
                         else
@@ -4960,6 +4992,7 @@ soulng::parser::Match ExpressionParser::ConstructExpr(CmajorLexer& lexer, boost:
                     soulng::parser::Match match = ExpressionParser::ExpressionList(lexer, moduleId, ctx, expr.get());
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch18 = match;
                     }
                     else
@@ -4995,6 +5028,7 @@ soulng::parser::Match ExpressionParser::ConstructExpr(CmajorLexer& lexer, boost:
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch21 = match;
                     }
                     else
@@ -5096,6 +5130,7 @@ soulng::parser::Match ExpressionParser::NewExpr(CmajorLexer& lexer, boost::uuids
                                 typeExpr.reset(static_cast<sngcm::ast::Node*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch7 = match;
                                 }
                                 else
@@ -5553,6 +5588,7 @@ soulng::parser::Match ExpressionParser::InvokeExpr(CmajorLexer& lexer, boost::uu
                                                                 dotMemberId.reset(static_cast<IdentifierNode*>(match.value));
                                                                 if (match.hit)
                                                                 {
+                                                                    lexer.ResetRecovered();
                                                                     *parentMatch17 = match;
                                                                 }
                                                                 else
@@ -5652,6 +5688,7 @@ soulng::parser::Match ExpressionParser::InvokeExpr(CmajorLexer& lexer, boost::uu
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch23 = match;
                             }
                             else

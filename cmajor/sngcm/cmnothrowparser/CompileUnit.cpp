@@ -10,6 +10,7 @@
 #include <sngcm/cmnothrowparser/Constant.hpp>
 #include <sngcm/cmnothrowparser/Delegate.hpp>
 #include <sngcm/cmnothrowparser/GlobalVariable.hpp>
+#include <sngcm/cmnothrowparser/Template.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 #include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
@@ -653,6 +654,7 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
     std::unique_ptr<DelegateNode> delegateDefinition;
     std::unique_ptr<ClassDelegateNode> classDelegateDefinition;
     std::unique_ptr<GlobalVariableNode> globalVariableDefinition;
+    std::unique_ptr<FullInstantiationRequestNode> instantiationRequestDeclaration;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -700,45 +702,78 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                                                 soulng::parser::Match match(false);
                                                 soulng::parser::Match* parentMatch11 = &match;
                                                 {
-                                                    int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = NothrowCompileUnitParser::NamespaceDefinition(lexer, moduleId, ctx, cu, ns);
-                                                    nsDefinition.reset(static_cast<NamespaceNode*>(match.value));
-                                                    if (match.hit)
+                                                    int64_t save = lexer.GetPos();
+                                                    soulng::parser::Match match(false);
+                                                    soulng::parser::Match* parentMatch12 = &match;
                                                     {
+                                                        int64_t pos = lexer.GetPos();
+                                                        soulng::parser::Match match = NothrowCompileUnitParser::NamespaceDefinition(lexer, moduleId, ctx, cu, ns);
+                                                        nsDefinition.reset(static_cast<NamespaceNode*>(match.value));
+                                                        if (match.hit)
                                                         {
-                                                            #ifdef SOULNG_PARSER_DEBUG_SUPPORT
-                                                            if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
-                                                            #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                            return soulng::parser::Match(true, nsDefinition.release());
+                                                            {
+                                                                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                                                                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
+                                                                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                                                                return soulng::parser::Match(true, nsDefinition.release());
+                                                            }
                                                         }
+                                                        *parentMatch12 = match;
                                                     }
                                                     *parentMatch11 = match;
+                                                    if (!match.hit)
+                                                    {
+                                                        soulng::parser::Match match(false);
+                                                        soulng::parser::Match* parentMatch13 = &match;
+                                                        lexer.SetPos(save);
+                                                        {
+                                                            soulng::parser::Match match(false);
+                                                            soulng::parser::Match* parentMatch14 = &match;
+                                                            {
+                                                                int64_t pos = lexer.GetPos();
+                                                                soulng::parser::Match match = NothrowCompileUnitParser::TypedefDeclaration(lexer, moduleId, ctx);
+                                                                typedefDeclaration.reset(static_cast<TypedefNode*>(match.value));
+                                                                if (match.hit)
+                                                                {
+                                                                    {
+                                                                        #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                                                                        if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
+                                                                        #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                                                                        return soulng::parser::Match(true, typedefDeclaration.release());
+                                                                    }
+                                                                }
+                                                                *parentMatch14 = match;
+                                                            }
+                                                            *parentMatch13 = match;
+                                                        }
+                                                        *parentMatch11 = match;
+                                                    }
                                                 }
                                                 *parentMatch10 = match;
                                                 if (!match.hit)
                                                 {
                                                     soulng::parser::Match match(false);
-                                                    soulng::parser::Match* parentMatch12 = &match;
+                                                    soulng::parser::Match* parentMatch15 = &match;
                                                     lexer.SetPos(save);
                                                     {
                                                         soulng::parser::Match match(false);
-                                                        soulng::parser::Match* parentMatch13 = &match;
+                                                        soulng::parser::Match* parentMatch16 = &match;
                                                         {
                                                             int64_t pos = lexer.GetPos();
-                                                            soulng::parser::Match match = NothrowCompileUnitParser::TypedefDeclaration(lexer, moduleId, ctx);
-                                                            typedefDeclaration.reset(static_cast<TypedefNode*>(match.value));
+                                                            soulng::parser::Match match = NothrowCompileUnitParser::ConceptDefinition(lexer, moduleId, ctx);
+                                                            conceptDefinition.reset(static_cast<ConceptNode*>(match.value));
                                                             if (match.hit)
                                                             {
                                                                 {
                                                                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                                                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                                    return soulng::parser::Match(true, typedefDeclaration.release());
+                                                                    return soulng::parser::Match(true, conceptDefinition.release());
                                                                 }
                                                             }
-                                                            *parentMatch13 = match;
+                                                            *parentMatch16 = match;
                                                         }
-                                                        *parentMatch12 = match;
+                                                        *parentMatch15 = match;
                                                     }
                                                     *parentMatch10 = match;
                                                 }
@@ -747,27 +782,27 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                                             if (!match.hit)
                                             {
                                                 soulng::parser::Match match(false);
-                                                soulng::parser::Match* parentMatch14 = &match;
+                                                soulng::parser::Match* parentMatch17 = &match;
                                                 lexer.SetPos(save);
                                                 {
                                                     soulng::parser::Match match(false);
-                                                    soulng::parser::Match* parentMatch15 = &match;
+                                                    soulng::parser::Match* parentMatch18 = &match;
                                                     {
                                                         int64_t pos = lexer.GetPos();
-                                                        soulng::parser::Match match = NothrowCompileUnitParser::ConceptDefinition(lexer, moduleId, ctx);
-                                                        conceptDefinition.reset(static_cast<ConceptNode*>(match.value));
+                                                        soulng::parser::Match match = NothrowCompileUnitParser::FunctionDefinition(lexer, moduleId, ctx);
+                                                        functionDefinition.reset(static_cast<FunctionNode*>(match.value));
                                                         if (match.hit)
                                                         {
                                                             {
                                                                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                                                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                                return soulng::parser::Match(true, conceptDefinition.release());
+                                                                return soulng::parser::Match(true, functionDefinition.release());
                                                             }
                                                         }
-                                                        *parentMatch15 = match;
+                                                        *parentMatch18 = match;
                                                     }
-                                                    *parentMatch14 = match;
+                                                    *parentMatch17 = match;
                                                 }
                                                 *parentMatch9 = match;
                                             }
@@ -776,27 +811,27 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                                         if (!match.hit)
                                         {
                                             soulng::parser::Match match(false);
-                                            soulng::parser::Match* parentMatch16 = &match;
+                                            soulng::parser::Match* parentMatch19 = &match;
                                             lexer.SetPos(save);
                                             {
                                                 soulng::parser::Match match(false);
-                                                soulng::parser::Match* parentMatch17 = &match;
+                                                soulng::parser::Match* parentMatch20 = &match;
                                                 {
                                                     int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = NothrowCompileUnitParser::FunctionDefinition(lexer, moduleId, ctx);
-                                                    functionDefinition.reset(static_cast<FunctionNode*>(match.value));
+                                                    soulng::parser::Match match = NothrowCompileUnitParser::ClassDefinition(lexer, moduleId, ctx);
+                                                    classDefinition.reset(static_cast<ClassNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         {
                                                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                            return soulng::parser::Match(true, functionDefinition.release());
+                                                            return soulng::parser::Match(true, classDefinition.release());
                                                         }
                                                     }
-                                                    *parentMatch17 = match;
+                                                    *parentMatch20 = match;
                                                 }
-                                                *parentMatch16 = match;
+                                                *parentMatch19 = match;
                                             }
                                             *parentMatch8 = match;
                                         }
@@ -805,27 +840,27 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                                     if (!match.hit)
                                     {
                                         soulng::parser::Match match(false);
-                                        soulng::parser::Match* parentMatch18 = &match;
+                                        soulng::parser::Match* parentMatch21 = &match;
                                         lexer.SetPos(save);
                                         {
                                             soulng::parser::Match match(false);
-                                            soulng::parser::Match* parentMatch19 = &match;
+                                            soulng::parser::Match* parentMatch22 = &match;
                                             {
                                                 int64_t pos = lexer.GetPos();
-                                                soulng::parser::Match match = NothrowCompileUnitParser::ClassDefinition(lexer, moduleId, ctx);
-                                                classDefinition.reset(static_cast<ClassNode*>(match.value));
+                                                soulng::parser::Match match = NothrowCompileUnitParser::InterfaceDefinition(lexer, moduleId, ctx);
+                                                interfaceDefinition.reset(static_cast<InterfaceNode*>(match.value));
                                                 if (match.hit)
                                                 {
                                                     {
                                                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                        return soulng::parser::Match(true, classDefinition.release());
+                                                        return soulng::parser::Match(true, interfaceDefinition.release());
                                                     }
                                                 }
-                                                *parentMatch19 = match;
+                                                *parentMatch22 = match;
                                             }
-                                            *parentMatch18 = match;
+                                            *parentMatch21 = match;
                                         }
                                         *parentMatch7 = match;
                                     }
@@ -834,27 +869,27 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                                 if (!match.hit)
                                 {
                                     soulng::parser::Match match(false);
-                                    soulng::parser::Match* parentMatch20 = &match;
+                                    soulng::parser::Match* parentMatch23 = &match;
                                     lexer.SetPos(save);
                                     {
                                         soulng::parser::Match match(false);
-                                        soulng::parser::Match* parentMatch21 = &match;
+                                        soulng::parser::Match* parentMatch24 = &match;
                                         {
                                             int64_t pos = lexer.GetPos();
-                                            soulng::parser::Match match = NothrowCompileUnitParser::InterfaceDefinition(lexer, moduleId, ctx);
-                                            interfaceDefinition.reset(static_cast<InterfaceNode*>(match.value));
+                                            soulng::parser::Match match = NothrowCompileUnitParser::EnumTypeDefinition(lexer, moduleId, ctx);
+                                            enumTypeDefinition.reset(static_cast<EnumTypeNode*>(match.value));
                                             if (match.hit)
                                             {
                                                 {
                                                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                    return soulng::parser::Match(true, interfaceDefinition.release());
+                                                    return soulng::parser::Match(true, enumTypeDefinition.release());
                                                 }
                                             }
-                                            *parentMatch21 = match;
+                                            *parentMatch24 = match;
                                         }
-                                        *parentMatch20 = match;
+                                        *parentMatch23 = match;
                                     }
                                     *parentMatch6 = match;
                                 }
@@ -863,27 +898,27 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                             if (!match.hit)
                             {
                                 soulng::parser::Match match(false);
-                                soulng::parser::Match* parentMatch22 = &match;
+                                soulng::parser::Match* parentMatch25 = &match;
                                 lexer.SetPos(save);
                                 {
                                     soulng::parser::Match match(false);
-                                    soulng::parser::Match* parentMatch23 = &match;
+                                    soulng::parser::Match* parentMatch26 = &match;
                                     {
                                         int64_t pos = lexer.GetPos();
-                                        soulng::parser::Match match = NothrowCompileUnitParser::EnumTypeDefinition(lexer, moduleId, ctx);
-                                        enumTypeDefinition.reset(static_cast<EnumTypeNode*>(match.value));
+                                        soulng::parser::Match match = NothrowCompileUnitParser::ConstantDefinition(lexer, moduleId, ctx);
+                                        constantDefinition.reset(static_cast<ConstantNode*>(match.value));
                                         if (match.hit)
                                         {
                                             {
                                                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                return soulng::parser::Match(true, enumTypeDefinition.release());
+                                                return soulng::parser::Match(true, constantDefinition.release());
                                             }
                                         }
-                                        *parentMatch23 = match;
+                                        *parentMatch26 = match;
                                     }
-                                    *parentMatch22 = match;
+                                    *parentMatch25 = match;
                                 }
                                 *parentMatch5 = match;
                             }
@@ -892,27 +927,27 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                         if (!match.hit)
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch24 = &match;
+                            soulng::parser::Match* parentMatch27 = &match;
                             lexer.SetPos(save);
                             {
                                 soulng::parser::Match match(false);
-                                soulng::parser::Match* parentMatch25 = &match;
+                                soulng::parser::Match* parentMatch28 = &match;
                                 {
                                     int64_t pos = lexer.GetPos();
-                                    soulng::parser::Match match = NothrowCompileUnitParser::ConstantDefinition(lexer, moduleId, ctx);
-                                    constantDefinition.reset(static_cast<ConstantNode*>(match.value));
+                                    soulng::parser::Match match = NothrowCompileUnitParser::DelegateDefinition(lexer, moduleId, ctx);
+                                    delegateDefinition.reset(static_cast<DelegateNode*>(match.value));
                                     if (match.hit)
                                     {
                                         {
                                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                            return soulng::parser::Match(true, constantDefinition.release());
+                                            return soulng::parser::Match(true, delegateDefinition.release());
                                         }
                                     }
-                                    *parentMatch25 = match;
+                                    *parentMatch28 = match;
                                 }
-                                *parentMatch24 = match;
+                                *parentMatch27 = match;
                             }
                             *parentMatch4 = match;
                         }
@@ -921,27 +956,27 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                     if (!match.hit)
                     {
                         soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch26 = &match;
+                        soulng::parser::Match* parentMatch29 = &match;
                         lexer.SetPos(save);
                         {
                             soulng::parser::Match match(false);
-                            soulng::parser::Match* parentMatch27 = &match;
+                            soulng::parser::Match* parentMatch30 = &match;
                             {
                                 int64_t pos = lexer.GetPos();
-                                soulng::parser::Match match = NothrowCompileUnitParser::DelegateDefinition(lexer, moduleId, ctx);
-                                delegateDefinition.reset(static_cast<DelegateNode*>(match.value));
+                                soulng::parser::Match match = NothrowCompileUnitParser::ClassDelegateDefinition(lexer, moduleId, ctx);
+                                classDelegateDefinition.reset(static_cast<ClassDelegateNode*>(match.value));
                                 if (match.hit)
                                 {
                                     {
                                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                        return soulng::parser::Match(true, delegateDefinition.release());
+                                        return soulng::parser::Match(true, classDelegateDefinition.release());
                                     }
                                 }
-                                *parentMatch27 = match;
+                                *parentMatch30 = match;
                             }
-                            *parentMatch26 = match;
+                            *parentMatch29 = match;
                         }
                         *parentMatch3 = match;
                     }
@@ -950,27 +985,27 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                 if (!match.hit)
                 {
                     soulng::parser::Match match(false);
-                    soulng::parser::Match* parentMatch28 = &match;
+                    soulng::parser::Match* parentMatch31 = &match;
                     lexer.SetPos(save);
                     {
                         soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch29 = &match;
+                        soulng::parser::Match* parentMatch32 = &match;
                         {
                             int64_t pos = lexer.GetPos();
-                            soulng::parser::Match match = NothrowCompileUnitParser::ClassDelegateDefinition(lexer, moduleId, ctx);
-                            classDelegateDefinition.reset(static_cast<ClassDelegateNode*>(match.value));
+                            soulng::parser::Match match = NothrowCompileUnitParser::GlobalVariableDefinition(lexer, moduleId, ctx, cu);
+                            globalVariableDefinition.reset(static_cast<GlobalVariableNode*>(match.value));
                             if (match.hit)
                             {
                                 {
                                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                    return soulng::parser::Match(true, classDelegateDefinition.release());
+                                    return soulng::parser::Match(true, globalVariableDefinition.release());
                                 }
                             }
-                            *parentMatch29 = match;
+                            *parentMatch32 = match;
                         }
-                        *parentMatch28 = match;
+                        *parentMatch31 = match;
                     }
                     *parentMatch2 = match;
                 }
@@ -979,27 +1014,27 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
             if (!match.hit)
             {
                 soulng::parser::Match match(false);
-                soulng::parser::Match* parentMatch30 = &match;
+                soulng::parser::Match* parentMatch33 = &match;
                 lexer.SetPos(save);
                 {
                     soulng::parser::Match match(false);
-                    soulng::parser::Match* parentMatch31 = &match;
+                    soulng::parser::Match* parentMatch34 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = NothrowCompileUnitParser::GlobalVariableDefinition(lexer, moduleId, ctx, cu);
-                        globalVariableDefinition.reset(static_cast<GlobalVariableNode*>(match.value));
+                        soulng::parser::Match match = NothrowCompileUnitParser::InstantiationRequestDeclaration(lexer, moduleId, ctx);
+                        instantiationRequestDeclaration.reset(static_cast<FullInstantiationRequestNode*>(match.value));
                         if (match.hit)
                         {
                             {
                                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Definition"));
                                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                return soulng::parser::Match(true, globalVariableDefinition.release());
+                                return soulng::parser::Match(true, instantiationRequestDeclaration.release());
                             }
                         }
-                        *parentMatch31 = match;
+                        *parentMatch34 = match;
                     }
-                    *parentMatch30 = match;
+                    *parentMatch33 = match;
                 }
                 *parentMatch1 = match;
             }
@@ -1008,11 +1043,11 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
         if (!match.hit)
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch32 = &match;
+            soulng::parser::Match* parentMatch35 = &match;
             lexer.SetPos(save);
             {
                 soulng::parser::Match match(false);
-                soulng::parser::Match* parentMatch33 = &match;
+                soulng::parser::Match* parentMatch36 = &match;
                 {
                     int64_t pos = lexer.GetPos();
                     soulng::lexer::Span span = lexer.GetSpan();
@@ -1026,9 +1061,9 @@ soulng::parser::Match NothrowCompileUnitParser::Definition(CmajorNothrowLexer& l
                             return soulng::parser::Match(true, new sngcm::ast::SyncNode(span, *moduleId));
                         }
                     }
-                    *parentMatch33 = match;
+                    *parentMatch36 = match;
                 }
-                *parentMatch32 = match;
+                *parentMatch35 = match;
             }
             *parentMatch0 = match;
         }
@@ -1782,6 +1817,50 @@ soulng::parser::Match NothrowCompileUnitParser::GlobalVariableDefinition(CmajorN
     {
         if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("GlobalVariableDefinition"));
         else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("GlobalVariableDefinition"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    if (!match.hit)
+    {
+        match.value = nullptr;
+    }
+    return match;
+}
+
+soulng::parser::Match NothrowCompileUnitParser::InstantiationRequestDeclaration(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx)
+{
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::Span parser_debug_match_span;
+    bool parser_debug_write_to_log = lexer.Log() != nullptr;
+    if (parser_debug_write_to_log)
+    {
+        parser_debug_match_span = lexer.GetSpan();
+        soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("InstantiationRequestDeclaration"));
+    }
+    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 40);
+    std::unique_ptr<FullInstantiationRequestNode> instantiationRequest;
+    soulng::parser::Match match(false);
+    soulng::parser::Match* parentMatch0 = &match;
+    {
+        int64_t pos = lexer.GetPos();
+        soulng::parser::Match match = NothrowTemplateParser::InstantiationRequest(lexer, moduleId, ctx);
+        instantiationRequest.reset(static_cast<FullInstantiationRequestNode*>(match.value));
+        if (match.hit)
+        {
+            {
+                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("InstantiationRequestDeclaration"));
+                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                return soulng::parser::Match(true, instantiationRequest.release());
+            }
+        }
+        *parentMatch0 = match;
+    }
+    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+    if (parser_debug_write_to_log)
+    {
+        if (match.hit) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("InstantiationRequestDeclaration"));
+        else soulng::lexer::WriteFailureToLog(lexer, soulng::unicode::ToUtf32("InstantiationRequestDeclaration"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     if (!match.hit)

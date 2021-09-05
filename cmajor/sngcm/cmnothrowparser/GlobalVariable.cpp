@@ -24,7 +24,7 @@ soulng::parser::Match NothrowGlobalVariableParser::GlobalVariable(CmajorNothrowL
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("GlobalVariable"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 103);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 104);
     Span s = Span();
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<sngcm::ast::Node> type;
@@ -194,7 +194,7 @@ soulng::parser::Match NothrowGlobalVariableParser::DefininigGlobalVariableId(Cma
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefininigGlobalVariableId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 104);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 105);
     std::unique_ptr<IdentifierNode> id;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;

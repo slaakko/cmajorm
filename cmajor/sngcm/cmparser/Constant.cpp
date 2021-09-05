@@ -7,7 +7,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Constant.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Constant.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -94,6 +94,7 @@ soulng::parser::Match ConstantParser::Constant(CmajorLexer& lexer, boost::uuids:
                                 type.reset(static_cast<sngcm::ast::Node*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch9 = match;
                                 }
                                 else
@@ -125,6 +126,7 @@ soulng::parser::Match ConstantParser::Constant(CmajorLexer& lexer, boost::uuids:
                                 id.reset(static_cast<IdentifierNode*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch12 = match;
                                 }
                                 else

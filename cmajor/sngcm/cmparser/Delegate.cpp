@@ -7,7 +7,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Delegate.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Delegate.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -89,6 +89,7 @@ soulng::parser::Match DelegateParser::Delegate(CmajorLexer& lexer, boost::uuids:
                             type.reset(static_cast<sngcm::ast::Node*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch8 = match;
                             }
                             else
@@ -119,6 +120,7 @@ soulng::parser::Match DelegateParser::Delegate(CmajorLexer& lexer, boost::uuids:
                             id.reset(static_cast<IdentifierNode*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch11 = match;
                             }
                             else
@@ -150,6 +152,7 @@ soulng::parser::Match DelegateParser::Delegate(CmajorLexer& lexer, boost::uuids:
                     soulng::parser::Match match = ParameterParser::ParameterList(lexer, moduleId, ctx, dlg.get());
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch13 = match;
                     }
                     else
@@ -185,6 +188,7 @@ soulng::parser::Match DelegateParser::Delegate(CmajorLexer& lexer, boost::uuids:
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch16 = match;
                     }
                     else
@@ -318,6 +322,7 @@ soulng::parser::Match DelegateParser::ClassDelegate(CmajorLexer& lexer, boost::u
                             type.reset(static_cast<sngcm::ast::Node*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch10 = match;
                             }
                             else
@@ -348,6 +353,7 @@ soulng::parser::Match DelegateParser::ClassDelegate(CmajorLexer& lexer, boost::u
                             id.reset(static_cast<IdentifierNode*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch13 = match;
                             }
                             else
@@ -379,6 +385,7 @@ soulng::parser::Match DelegateParser::ClassDelegate(CmajorLexer& lexer, boost::u
                     soulng::parser::Match match = ParameterParser::ParameterList(lexer, moduleId, ctx, clsDlg.get());
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch15 = match;
                     }
                     else
@@ -414,6 +421,7 @@ soulng::parser::Match DelegateParser::ClassDelegate(CmajorLexer& lexer, boost::u
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch18 = match;
                     }
                     else

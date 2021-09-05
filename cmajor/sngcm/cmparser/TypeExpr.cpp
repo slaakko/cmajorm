@@ -6,7 +6,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/TypeExpr.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/TypeExpr.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -310,6 +310,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, boost:
                                                                     }
                                                                     if (match.hit)
                                                                     {
+                                                                        lexer.ResetRecovered();
                                                                         *parentMatch14 = match;
                                                                     }
                                                                     else
@@ -487,6 +488,7 @@ soulng::parser::Match TypeExprParser::PostfixTypeExpr(CmajorLexer& lexer, boost:
                                                                 }
                                                                 if (match.hit)
                                                                 {
+                                                                    lexer.ResetRecovered();
                                                                     *parentMatch28 = match;
                                                                 }
                                                                 else

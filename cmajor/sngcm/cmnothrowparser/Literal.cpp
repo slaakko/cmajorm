@@ -21,7 +21,7 @@ soulng::parser::Match NothrowLiteralParser::Literal(CmajorNothrowLexer& lexer, b
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Literal"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 112);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 113);
     std::unique_ptr<LiteralNode> simpleLiteral;
     std::unique_ptr<LiteralNode> complexLiteral;
     soulng::parser::Match match(false);
@@ -99,7 +99,7 @@ soulng::parser::Match NothrowLiteralParser::SimpleLiteral(CmajorNothrowLexer& le
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("SimpleLiteral"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 113);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 114);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -404,7 +404,7 @@ soulng::parser::Match NothrowLiteralParser::ComplexLiteral(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ComplexLiteral"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 114);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 115);
     std::unique_ptr<ArrayLiteralNode> arrayLiteral;
     std::unique_ptr<StructuredLiteralNode> structuredLiteral;
     soulng::parser::Match match(false);
@@ -482,7 +482,7 @@ soulng::parser::Match NothrowLiteralParser::ArrayLiteral(CmajorNothrowLexer& lex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ArrayLiteral"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 115);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 116);
     std::unique_ptr<ArrayLiteralNode> arrayLiteral = std::unique_ptr<ArrayLiteralNode>();
     std::unique_ptr<Node> expr;
     soulng::parser::Match match(false);
@@ -691,7 +691,7 @@ soulng::parser::Match NothrowLiteralParser::StructuredLiteral(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("StructuredLiteral"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 116);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 117);
     std::unique_ptr<StructuredLiteralNode> structuredLiteral = std::unique_ptr<StructuredLiteralNode>();
     std::unique_ptr<Node> expr;
     soulng::parser::Match match(false);

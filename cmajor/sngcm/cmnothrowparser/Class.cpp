@@ -665,7 +665,7 @@ soulng::parser::Match NothrowClassParser::BaseClassOrInterface(CmajorNothrowLexe
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::RuleGuard ruleGuard(lexer, 6);
-    std::unique_ptr<Node> templateId;
+    std::unique_ptr<TemplateIdNode> templateId;
     std::unique_ptr<IdentifierNode> qid;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -676,7 +676,7 @@ soulng::parser::Match NothrowClassParser::BaseClassOrInterface(CmajorNothrowLexe
         {
             int64_t pos = lexer.GetPos();
             soulng::parser::Match match = NothrowTemplateParser::TemplateId(lexer, moduleId, ctx);
-            templateId.reset(static_cast<Node*>(match.value));
+            templateId.reset(static_cast<TemplateIdNode*>(match.value));
             if (match.hit)
             {
                 {

@@ -64,7 +64,7 @@ soulng::parser::Match NothrowTypeExprParser::TypeExpr(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("TypeExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 167);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 169);
     std::unique_ptr<sngcm::ast::Node> prefixTypeExpr;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -108,7 +108,7 @@ soulng::parser::Match NothrowTypeExprParser::PrefixTypeExpr(CmajorNothrowLexer& 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("PrefixTypeExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 168);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 170);
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> constTypeExpr;
     std::unique_ptr<sngcm::ast::Node> postfixTypeExpr;
@@ -222,7 +222,7 @@ soulng::parser::Match NothrowTypeExprParser::PostfixTypeExpr(CmajorNothrowLexer&
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("PostfixTypeExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 169);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 171);
     std::unique_ptr<Node> typeExpr = std::unique_ptr<Node>();
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> primaryTypeExpr;
@@ -565,9 +565,9 @@ soulng::parser::Match NothrowTypeExprParser::PrimaryTypeExpr(CmajorNothrowLexer&
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("PrimaryTypeExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 170);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 172);
     std::unique_ptr<Node> basicType;
-    std::unique_ptr<Node> templateId;
+    std::unique_ptr<TemplateIdNode> templateId;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -605,7 +605,7 @@ soulng::parser::Match NothrowTypeExprParser::PrimaryTypeExpr(CmajorNothrowLexer&
                     {
                         int64_t pos = lexer.GetPos();
                         soulng::parser::Match match = NothrowTemplateParser::TemplateId(lexer, moduleId, ctx);
-                        templateId.reset(static_cast<Node*>(match.value));
+                        templateId.reset(static_cast<TemplateIdNode*>(match.value));
                         if (match.hit)
                         {
                             {

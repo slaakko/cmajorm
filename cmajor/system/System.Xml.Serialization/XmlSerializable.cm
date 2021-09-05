@@ -4,15 +4,102 @@
 // =================================
 
 using System;
+using System.Collections;
 
 namespace System.Xml.Serialization
 {
     public interface XmlSerializable
     {
+        void DestroyObject();
         Uuid ObjectId();
+        void SetObjectId(const Uuid& objectId);
         int ClassId();
-        string XmlSerializationName();
+        string ClassName();
+        XmlContainer* Container();
+        void SetContainer(XmlContainer* container);
         System.Dom.Element* ToXml(const string& elementName);
+        void FromXml(System.Dom.Element* element);
+    }
+
+    public class XmlSerializableProxy
+    {
+        public nothrow XmlSerializableProxy(XmlSerializable intf_, bool isOwner_) : intf(intf_), isOwner(isOwner_)
+        {
+            if (intf.ObjectId() == Uuid())
+            {
+                intf.SetObjectId(Uuid.Random());
+            }
+        }
+        public ~XmlSerializableProxy()
+        {
+            if (isOwner)
+            {
+                intf.DestroyObject();
+            }
+        }
+        public nothrow void ResetOwner()
+        {
+            isOwner = false;
+        }
+        public nothrow XmlSerializable Interface() const
+        {
+            return intf;
+        }
+        public nothrow XmlContainer* Container() const
+        {
+            return intf.Container();
+        }
+        public nothrow void SetContainer(XmlContainer* container)
+        {
+            if (Container() == null)
+            {
+                intf.SetContainer(container);
+            }
+        }
+        public nothrow void ResetContainer()
+        {
+            intf.SetContainer(null);
+        }
+        public nothrow void* Object() const
+        {
+            return intf.GetObjectPtrFromInterface();
+        }
+        public nothrow Uuid ObjectId() const
+        {
+            return intf.ObjectId();
+        }
+        public nothrow int ClassId() const
+        {
+            return intf.ClassId();
+        }
+        public nothrow string ClassName() const
+        {
+            return intf.ClassName();
+        }
+        public System.Dom.Element* ToXml(const string& elementName)
+        {
+            return intf.ToXml(elementName);
+        }
+        public void FromXml(System.Dom.Element* element)
+        {
+            intf.FromXml(element);
+        }
+        private XmlSerializable intf;
+        private bool isOwner;
+    }
+
+    public nothrow T* XmlCast<T>(XmlSerializableProxy* proxy)
+    {
+        string className = T.StaticClassName();
+        string serializableClassName = proxy->ClassName();
+        if (className == serializableClassName)
+        {
+            return cast<T*>(proxy->Object());
+        }
+        else
+        {
+            return null;
+        }
     }
 }
 

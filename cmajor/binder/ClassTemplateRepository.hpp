@@ -28,6 +28,8 @@ public:
         const Span& span, const boost::uuids::uuid& moduleId);
     void BindClassTemplateSpecialization(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, const Span& span, const boost::uuids::uuid& moduleId);
     bool Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, const boost::uuids::uuid& moduleId);
+    void InstantiateAll(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, 
+        const boost::uuids::uuid& moduleId);
 private:
     BoundCompileUnit& boundCompileUnit;
     std::unordered_set<FunctionSymbol*> instantiatedMemberFunctions;

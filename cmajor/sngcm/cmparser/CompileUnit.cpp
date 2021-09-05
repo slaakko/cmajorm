@@ -14,7 +14,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/CompileUnit.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/CompileUnit.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -368,6 +368,7 @@ soulng::parser::Match CompileUnitParser::UsingAliasDirective(CmajorLexer& lexer,
                     qid.reset(static_cast<IdentifierNode*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch8 = match;
                     }
                     else
@@ -403,6 +404,7 @@ soulng::parser::Match CompileUnitParser::UsingAliasDirective(CmajorLexer& lexer,
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch11 = match;
                     }
                     else
@@ -491,6 +493,7 @@ soulng::parser::Match CompileUnitParser::UsingNamespaceDirective(CmajorLexer& le
                     ns.reset(static_cast<IdentifierNode*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch4 = match;
                     }
                     else
@@ -526,6 +529,7 @@ soulng::parser::Match CompileUnitParser::UsingNamespaceDirective(CmajorLexer& le
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -1161,6 +1165,7 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch12 = match;
                         }
                         else
@@ -1186,6 +1191,7 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
                     soulng::parser::Match match = CompileUnitParser::NamespaceContent(lexer, moduleId, ctx, cu, nsNode.get());
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch14 = match;
                     }
                     else
@@ -1220,6 +1226,7 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch17 = match;
                     }
                     else

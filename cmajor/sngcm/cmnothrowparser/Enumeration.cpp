@@ -24,7 +24,7 @@ soulng::parser::Match NothrowEnumerationParser::EnumType(CmajorNothrowLexer& lex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("EnumType"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 70);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 71);
     std::unique_ptr<EnumTypeNode> enumTypeNode = std::unique_ptr<EnumTypeNode>();
     Span s = Span();
     Span beginBraceSpan = Span();
@@ -282,7 +282,7 @@ soulng::parser::Match NothrowEnumerationParser::DefiningEnumTypeId(CmajorNothrow
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningEnumTypeId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 71);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 72);
     std::unique_ptr<IdentifierNode> enumTypeId;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -326,7 +326,7 @@ soulng::parser::Match NothrowEnumerationParser::UnderlyingType(CmajorNothrowLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("UnderlyingType"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 72);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 73);
     std::unique_ptr<sngcm::ast::Node> type;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -390,7 +390,7 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstants(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("EnumConstants"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 73);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 74);
     std::unique_ptr<EnumConstantNode> enumConstant;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -494,7 +494,7 @@ soulng::parser::Match NothrowEnumerationParser::EnumConstant(CmajorNothrowLexer&
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("EnumConstant"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 74);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 75);
     Span s = Span();
     std::unique_ptr<Node> expr = std::unique_ptr<Node>();
     std::unique_ptr<IdentifierNode> constantId;

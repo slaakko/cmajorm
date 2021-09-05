@@ -6,7 +6,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Statement.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Statement.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -1148,6 +1148,7 @@ soulng::parser::Match StatementParser::CompoundStatement(CmajorLexer& lexer, boo
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch9 = match;
                     }
                     else
@@ -1272,6 +1273,7 @@ soulng::parser::Match StatementParser::ReturnStatement(CmajorLexer& lexer, boost
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -1630,6 +1632,7 @@ soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, boost:
                                         }
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch9 = match;
                                         }
                                         else
@@ -1662,6 +1665,7 @@ soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, boost:
                                 cond.reset(static_cast<Node*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch11 = match;
                                 }
                                 else
@@ -1697,6 +1701,7 @@ soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, boost:
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch14 = match;
                                 }
                                 else
@@ -1734,6 +1739,7 @@ soulng::parser::Match StatementParser::WhileStatement(CmajorLexer& lexer, boost:
                             stmt.reset(static_cast<StatementNode*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch17 = match;
                             }
                             else
@@ -1855,6 +1861,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, boost::uu
                                             stmt.reset(static_cast<StatementNode*>(match.value));
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch10 = match;
                                             }
                                             else
@@ -1890,6 +1897,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, boost::uu
                                             }
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch13 = match;
                                             }
                                             else
@@ -1931,6 +1939,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, boost::uu
                                         }
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch16 = match;
                                         }
                                         else
@@ -1963,6 +1972,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, boost::uu
                                 cond.reset(static_cast<Node*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch18 = match;
                                 }
                                 else
@@ -1998,6 +2008,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, boost::uu
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch21 = match;
                                 }
                                 else
@@ -2039,6 +2050,7 @@ soulng::parser::Match StatementParser::DoStatement(CmajorLexer& lexer, boost::uu
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch24 = match;
                             }
                             else
@@ -2193,6 +2205,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, boost::u
                                             init.reset(static_cast<StatementNode*>(match.value));
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch13 = match;
                                             }
                                             else
@@ -2249,6 +2262,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, boost::u
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch17 = match;
                                     }
                                     else
@@ -2275,6 +2289,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, boost::u
                                 loop.reset(static_cast<StatementNode*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch19 = match;
                                 }
                                 else
@@ -2310,6 +2325,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, boost::u
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch22 = match;
                                 }
                                 else
@@ -2347,6 +2363,7 @@ soulng::parser::Match StatementParser::ForStatement(CmajorLexer& lexer, boost::u
                             stmt.reset(static_cast<StatementNode*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch25 = match;
                             }
                             else
@@ -2781,6 +2798,7 @@ soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, boo
                                 container.reset(static_cast<Node*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch17 = match;
                                 }
                                 else
@@ -2816,6 +2834,7 @@ soulng::parser::Match StatementParser::RangeForStatement(CmajorLexer& lexer, boo
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch20 = match;
                                 }
                                 else
@@ -2944,6 +2963,7 @@ soulng::parser::Match StatementParser::BreakStatement(CmajorLexer& lexer, boost:
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch4 = match;
                     }
                     else
@@ -3037,6 +3057,7 @@ soulng::parser::Match StatementParser::ContinueStatement(CmajorLexer& lexer, boo
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch4 = match;
                     }
                     else
@@ -3162,6 +3183,7 @@ soulng::parser::Match StatementParser::GotoStatement(CmajorLexer& lexer, boost::
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -3274,6 +3296,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, boost
                                                 }
                                                 if (match.hit)
                                                 {
+                                                    lexer.ResetRecovered();
                                                     *parentMatch10 = match;
                                                 }
                                                 else
@@ -3306,6 +3329,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, boost
                                         cond.reset(static_cast<Node*>(match.value));
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch12 = match;
                                         }
                                         else
@@ -3336,6 +3360,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, boost
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch14 = match;
                                     }
                                     else
@@ -3382,6 +3407,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, boost
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch17 = match;
                             }
                             else
@@ -3498,6 +3524,7 @@ soulng::parser::Match StatementParser::SwitchStatement(CmajorLexer& lexer, boost
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch27 = match;
                     }
                     else
@@ -3666,6 +3693,7 @@ soulng::parser::Match StatementParser::CaseStatement(CmajorLexer& lexer, boost::
                                                     }
                                                     if (match.hit)
                                                     {
+                                                        lexer.ResetRecovered();
                                                         *parentMatch16 = match;
                                                     }
                                                     else
@@ -3758,6 +3786,7 @@ soulng::parser::Match StatementParser::CaseStatement(CmajorLexer& lexer, boost::
                                                             }
                                                             if (match.hit)
                                                             {
+                                                                lexer.ResetRecovered();
                                                                 *parentMatch25 = match;
                                                             }
                                                             else
@@ -3938,6 +3967,7 @@ soulng::parser::Match StatementParser::DefaultStatement(CmajorLexer& lexer, boos
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch7 = match;
                                 }
                                 else
@@ -4123,6 +4153,7 @@ soulng::parser::Match StatementParser::GotoCaseStatement(CmajorLexer& lexer, boo
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch8 = match;
                     }
                     else
@@ -4236,6 +4267,7 @@ soulng::parser::Match StatementParser::GotoDefaultStatement(CmajorLexer& lexer, 
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch6 = match;
                     }
                     else
@@ -4514,6 +4546,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
                                 id.reset(static_cast<IdentifierNode*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch6 = match;
                                 }
                                 else
@@ -4579,6 +4612,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
                                             value.reset(static_cast<Node*>(match.value));
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch14 = match;
                                             }
                                             else
@@ -4647,6 +4681,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
                                                 }
                                                 if (match.hit)
                                                 {
+                                                    lexer.ResetRecovered();
                                                     *parentMatch20 = match;
                                                 }
                                                 else
@@ -4716,6 +4751,7 @@ soulng::parser::Match StatementParser::ConstructionStatement(CmajorLexer& lexer,
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch25 = match;
                     }
                     else
@@ -4804,6 +4840,7 @@ soulng::parser::Match StatementParser::DeleteStatement(CmajorLexer& lexer, boost
                     ptr.reset(static_cast<Node*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch4 = match;
                     }
                     else
@@ -4839,6 +4876,7 @@ soulng::parser::Match StatementParser::DeleteStatement(CmajorLexer& lexer, boost
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -4927,6 +4965,7 @@ soulng::parser::Match StatementParser::DestroyStatement(CmajorLexer& lexer, boos
                     ptr.reset(static_cast<Node*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch4 = match;
                     }
                     else
@@ -4962,6 +5001,7 @@ soulng::parser::Match StatementParser::DestroyStatement(CmajorLexer& lexer, boos
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -5256,6 +5296,7 @@ soulng::parser::Match StatementParser::ThrowStatement(CmajorLexer& lexer, boost:
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -5525,6 +5566,7 @@ soulng::parser::Match StatementParser::Catch(CmajorLexer& lexer, boost::uuids::u
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch8 = match;
                                     }
                                     else
@@ -5557,6 +5599,7 @@ soulng::parser::Match StatementParser::Catch(CmajorLexer& lexer, boost::uuids::u
                             catchType.reset(static_cast<sngcm::ast::Node*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch10 = match;
                             }
                             else
@@ -5618,6 +5661,7 @@ soulng::parser::Match StatementParser::Catch(CmajorLexer& lexer, boost::uuids::u
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch15 = match;
                         }
                         else
@@ -5753,6 +5797,7 @@ soulng::parser::Match StatementParser::AssertStatement(CmajorLexer& lexer, boost
                     expr.reset(static_cast<Node*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch6 = match;
                     }
                     else
@@ -5788,6 +5833,7 @@ soulng::parser::Match StatementParser::AssertStatement(CmajorLexer& lexer, boost
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch9 = match;
                     }
                     else
@@ -5943,6 +5989,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                                                 }
                                                 if (match.hit)
                                                 {
+                                                    lexer.ResetRecovered();
                                                     *parentMatch14 = match;
                                                 }
                                                 else
@@ -6010,6 +6057,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                                         }
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch19 = match;
                                         }
                                         else
@@ -6177,6 +6225,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                                                                     }
                                                                     if (match.hit)
                                                                     {
+                                                                        lexer.ResetRecovered();
                                                                         *parentMatch37 = match;
                                                                     }
                                                                     else
@@ -6242,6 +6291,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                                                             }
                                                             if (match.hit)
                                                             {
+                                                                lexer.ResetRecovered();
                                                                 *parentMatch42 = match;
                                                             }
                                                             else
@@ -6521,6 +6571,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationStatement(CmajorLex
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch65 = match;
                     }
                     else
@@ -6962,6 +7013,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationPrefix(CmajorLexer&
                                 primary.reset(static_cast<ConditionalCompilationExpressionNode*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch9 = match;
                                 }
                                 else
@@ -7103,6 +7155,7 @@ soulng::parser::Match StatementParser::ConditionalCompilationPrimary(CmajorLexer
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch8 = match;
                                 }
                                 else

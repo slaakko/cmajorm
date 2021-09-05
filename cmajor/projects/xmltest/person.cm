@@ -1,0 +1,86 @@
+using System;
+using System.Collections;
+using System.Xml.Serialization;
+
+namespace xmltest
+{
+    public class Person : XmlSerializable
+    {
+        public static string StaticClassName()
+        {
+            return "xmltest.Person";
+        }
+        public static void Register(int classId_)
+        {
+            classId = classId_;
+            XmlRegister<Person>(classId);
+        }
+        public static void* Create()
+        {
+            return new Person();
+        }
+        public virtual ~Person()
+        {
+        }
+        public nothrow virtual void DestroyObject()
+        {
+            delete this;
+        }
+        public virtual nothrow Uuid ObjectId()
+        {
+            return objectId;
+        }
+        public virtual nothrow void SetObjectId(const Uuid& objectId_)
+        {
+            objectId = objectId_;
+        }
+        public virtual XmlContainer* Container()
+        {
+            return container;
+        }
+        public virtual void SetContainer(XmlContainer* container)
+        {
+            container = container;
+        }
+        public int ClassId()
+        {
+            return classId;
+        }
+        public string ClassName()
+        {
+            return typename(*this);
+        }
+        public virtual void SetObjectXmlAttributes(System.Dom.Element* element)
+        {
+            element->SetAttribute(u"objectId", ToUtf32(ToString(objectId)));
+            element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+        }
+        public virtual System.Dom.Element* ToXml(const string& elementName)
+        {
+            System.Dom.Element* element = new System.Dom.Element(ToUtf32(elementName));
+            SetObjectXmlAttributes(element);
+            element->AppendChild(UniquePtr<System.Dom.Node>(System.Xml.Serialization.ToXml(vehicles, "vehicles").Release()));
+            return element;
+        }
+        public virtual void FromXml(System.Dom.Element* element)
+        {
+            ustring objectIdAttr = element->GetAttribute(u"objectId");
+            if (!objectIdAttr.IsEmpty())
+            {
+                objectId = ParseUuid(ToUtf8(objectIdAttr));
+            }
+            ustring classIdAttr = element->GetAttribute(u"classId");
+            if (!classIdAttr.IsEmpty())
+            {
+                classId = ParseInt(ToUtf8(classIdAttr));
+            }
+            System.Xml.Serialization.FromXml(element, "vehicles", vehicles);
+        }
+        private static int classId;
+        private Uuid objectId;
+        private XmlContainer* container;
+        private List<XmlPtr<Vehicle>> vehicles;
+    }
+    
+}
+

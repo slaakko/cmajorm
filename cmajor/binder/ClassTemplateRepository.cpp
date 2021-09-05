@@ -443,4 +443,28 @@ bool ClassTemplateRepository::InstantiateDestructorAndVirtualFunctions(ClassTemp
     return true;
 }
 
+void ClassTemplateRepository::InstantiateAll(ClassTemplateSpecializationSymbol* classTemplateSpecialization, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span, 
+    const boost::uuids::uuid& moduleId)
+{
+    try
+    {
+        BindClassTemplateSpecialization(classTemplateSpecialization, containerScope, span, moduleId);
+        for (MemberFunctionSymbol* memberFunction : classTemplateSpecialization->MemberFunctions())
+        {
+            if (!Instantiate(memberFunction, containerScope, currentFunction, span, moduleId))
+            {
+                throw Exception("instantation of member function '" + ToUtf8(memberFunction->Name()) + "' failed", memberFunction->GetSpan(), memberFunction->SourceModuleId());
+            }
+        }
+    }
+    catch (const Exception& ex)
+    {
+        std::vector<std::pair<Span, boost::uuids::uuid>> references;
+        references.push_back(std::make_pair(ex.Defined(), ex.DefinedModuleId()));
+        references.insert(references.end(), ex.References().begin(), ex.References().end());
+        throw Exception("full instantiation request for class template specialization '" + ToUtf8(classTemplateSpecialization->FullName()) + "' failed. Reason: " + ex.Message(), 
+            span, moduleId, references);
+    }
+}
+
 } } // namespace cmajor::binder

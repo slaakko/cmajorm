@@ -18,6 +18,7 @@ struct SNGCM_NOTHROW_PARSER_API NothrowTemplateParser
     static soulng::parser::Match TemplateId(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match TemplateParameter(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
     static soulng::parser::Match TemplateParameterList(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, sngcm::ast::Node* owner);
+    static soulng::parser::Match InstantiationRequest(CmajorNothrowLexer& lexer, boost::uuids::uuid* moduleId, NothrowParsingContext* ctx);
 };
 
 #endif // TEMPLATE_HPP

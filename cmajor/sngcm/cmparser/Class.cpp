@@ -17,7 +17,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Class.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Class.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -339,6 +339,7 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch32 = match;
                             }
                             else
@@ -392,6 +393,7 @@ soulng::parser::Match ClassParser::Class(CmajorLexer& lexer, boost::uuids::uuid*
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch36 = match;
                     }
                     else
@@ -2206,6 +2208,7 @@ soulng::parser::Match ClassParser::Destructor(CmajorLexer& lexer, boost::uuids::
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch19 = match;
                                     }
                                     else
@@ -2242,6 +2245,7 @@ soulng::parser::Match ClassParser::Destructor(CmajorLexer& lexer, boost::uuids::
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch22 = match;
                                     }
                                     else
@@ -2461,6 +2465,7 @@ soulng::parser::Match ClassParser::Initializer(CmajorLexer& lexer, boost::uuids:
                                         }
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch9 = match;
                                         }
                                         else
@@ -2486,6 +2491,7 @@ soulng::parser::Match ClassParser::Initializer(CmajorLexer& lexer, boost::uuids:
                                     soulng::parser::Match match = ExpressionParser::ArgumentList(lexer, moduleId, ctx, initializer.get());
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch11 = match;
                                     }
                                     else
@@ -2516,6 +2522,7 @@ soulng::parser::Match ClassParser::Initializer(CmajorLexer& lexer, boost::uuids:
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch13 = match;
                                 }
                                 else
@@ -2579,6 +2586,7 @@ soulng::parser::Match ClassParser::Initializer(CmajorLexer& lexer, boost::uuids:
                                                 }
                                                 if (match.hit)
                                                 {
+                                                    lexer.ResetRecovered();
                                                     *parentMatch20 = match;
                                                 }
                                                 else
@@ -2604,6 +2612,7 @@ soulng::parser::Match ClassParser::Initializer(CmajorLexer& lexer, boost::uuids:
                                             soulng::parser::Match match = ExpressionParser::ArgumentList(lexer, moduleId, ctx, initializer.get());
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch22 = match;
                                             }
                                             else
@@ -2634,6 +2643,7 @@ soulng::parser::Match ClassParser::Initializer(CmajorLexer& lexer, boost::uuids:
                                         }
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch24 = match;
                                         }
                                         else
@@ -2698,6 +2708,7 @@ soulng::parser::Match ClassParser::Initializer(CmajorLexer& lexer, boost::uuids:
                                             }
                                             if (match.hit)
                                             {
+                                                lexer.ResetRecovered();
                                                 *parentMatch31 = match;
                                             }
                                             else
@@ -2723,6 +2734,7 @@ soulng::parser::Match ClassParser::Initializer(CmajorLexer& lexer, boost::uuids:
                                         soulng::parser::Match match = ExpressionParser::ArgumentList(lexer, moduleId, ctx, initializer.get());
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch33 = match;
                                         }
                                         else
@@ -2753,6 +2765,7 @@ soulng::parser::Match ClassParser::Initializer(CmajorLexer& lexer, boost::uuids:
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch35 = match;
                                     }
                                     else
@@ -3290,6 +3303,7 @@ soulng::parser::Match ClassParser::ConversionFunction(CmajorLexer& lexer, boost:
                                         }
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch19 = match;
                                         }
                                         else
@@ -3325,6 +3339,7 @@ soulng::parser::Match ClassParser::ConversionFunction(CmajorLexer& lexer, boost:
                                         }
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch22 = match;
                                         }
                                         else

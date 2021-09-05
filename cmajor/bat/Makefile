@@ -1,7 +1,7 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 #	Run with nmake from Visual Studio 2019 x64 Native Tools Command Prompt
 
-all: compiler cppbert sys cmlean tools examples olddevenv
+all: compiler cppbert sys olddevenv
 	inst.bat
 
 compiler: buildcomp install

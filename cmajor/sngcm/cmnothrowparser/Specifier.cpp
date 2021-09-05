@@ -19,7 +19,7 @@ soulng::parser::Match NothrowSpecifierParser::Specifiers(CmajorNothrowLexer& lex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Specifiers"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 119);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 120);
     sngcm::ast::Specifiers specifiers = sngcm::ast::Specifiers();
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifier;
     soulng::parser::Match match(false);
@@ -103,7 +103,7 @@ soulng::parser::Match NothrowSpecifierParser::Specifier(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Specifier"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 120);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 121);
     soulng::parser::Match match(false);
     int64_t pos = lexer.GetPos();
     soulng::lexer::SourcePos sourcePos = lexer.GetSourcePos(pos);

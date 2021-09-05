@@ -25,7 +25,7 @@ soulng::parser::Match NothrowInterfaceParser::Interface(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Interface"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 107);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 108);
     std::unique_ptr<InterfaceNode> intf = std::unique_ptr<InterfaceNode>();
     Span s = Span();
     Span specifierSpan = Span();
@@ -310,7 +310,7 @@ soulng::parser::Match NothrowInterfaceParser::DefiningInterfaceId(CmajorNothrowL
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningInterfaceId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 108);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 109);
     std::unique_ptr<IdentifierNode> id;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -354,7 +354,7 @@ soulng::parser::Match NothrowInterfaceParser::InterfaceContent(CmajorNothrowLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("InterfaceContent"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 109);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 110);
     std::unique_ptr<Node> intfMemFun;
     soulng::parser::Match match(true);
     soulng::parser::Match* parentMatch0 = &match;
@@ -417,7 +417,7 @@ soulng::parser::Match NothrowInterfaceParser::InterfaceMemFun(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("InterfaceMemFun"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 110);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 111);
     std::unique_ptr<MemberFunctionNode> memFun = std::unique_ptr<MemberFunctionNode>();
     Span s = Span();
     std::unique_ptr<sngcm::ast::AttributesNode> attrs;
@@ -601,7 +601,7 @@ soulng::parser::Match NothrowInterfaceParser::InterfaceFunctionGroupId(CmajorNot
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("InterfaceFunctionGroupId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 111);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 112);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {

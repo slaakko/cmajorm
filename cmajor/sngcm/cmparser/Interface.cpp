@@ -8,7 +8,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Interface.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Interface.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -160,6 +160,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, boost::uuid
                                         id.reset(static_cast<IdentifierNode*>(match.value));
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch17 = match;
                                         }
                                         else
@@ -203,6 +204,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, boost::uuid
                                     }
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch20 = match;
                                     }
                                     else
@@ -256,6 +258,7 @@ soulng::parser::Match InterfaceParser::Interface(CmajorLexer& lexer, boost::uuid
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch24 = match;
                             }
                             else
@@ -466,6 +469,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, boost
                             groupId.reset(static_cast<soulng::parser::Value<std::u32string>*>(match.value));
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch11 = match;
                             }
                             else
@@ -498,6 +502,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, boost
                     soulng::parser::Match match = ParameterParser::ParameterList(lexer, moduleId, ctx, memFun.get());
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch13 = match;
                     }
                     else
@@ -532,6 +537,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, boost
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch16 = match;
                     }
                     else

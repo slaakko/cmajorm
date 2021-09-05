@@ -18,6 +18,7 @@
 [cpp]#include <sngcm/cmnothrowparser/Constant.hpp>
 [cpp]#include <sngcm/cmnothrowparser/Delegate.hpp>
 [cpp]#include <sngcm/cmnothrowparser/GlobalVariable.hpp>
+[cpp]#include <sngcm/cmnothrowparser/Template.hpp>
 [cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowLexer.hpp>
 [cpp]#include <sngcm/cmnothrowlexer/CmajorNothrowTokens.hpp>
 
@@ -43,6 +44,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowCompileUnitParser
     using NothrowDelegateParser.Delegate;
     using NothrowDelegateParser.ClassDelegate;
     using NothrowGlobalVariableParser.GlobalVariable;
+    using NothrowTemplateParser.InstantiationRequest;
 
     CompileUnit(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx, var std::unique_ptr<CompileUnitNode> compileUnit) : sngcm::ast::CompileUnitNode*
         ::= empty
@@ -116,6 +118,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowCompileUnitParser
         |   DelegateDefinition(moduleId, ctx):delegateDefinition{ return delegateDefinition; }
         |   ClassDelegateDefinition(moduleId, ctx):classDelegateDefinition{ return classDelegateDefinition; }
         |   GlobalVariableDefinition(moduleId, ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+        |   InstantiationRequestDeclaration(moduleId, ctx):instantiationRequestDeclaration{ return instantiationRequestDeclaration; }
         |   SyncDef:sync{ return new sngcm::ast::SyncNode(span, *moduleId); }
         ;
 
@@ -186,6 +189,10 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowCompileUnitParser
         ::= GlobalVariable(moduleId, ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
         ;
 
+    InstantiationRequestDeclaration(boost::uuids::uuid* moduleId, NothrowParsingContext* ctx) : FullInstantiationRequestNode*
+        ::= InstantiationRequest(moduleId, ctx):instantiationRequest{ return instantiationRequest; }
+        ;
+
     ruleinfo
     {
         (CompileUnit, "compile unit"), (NamespaceContent, "namespace content"), (UsingDirectives, "using directives"), (UsingDirective, "using directive"),
@@ -193,7 +200,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowCompileUnitParser
         (Definition, "definition"), (NamespaceDefinition, "namespace definition"), (TypedefDeclaration , "typedef declaration"), (ConceptDefinition, "concept definition"),
         (FunctionDefinition, "function definition"), (ClassDefinition, "class definition"), (InterfaceDefinition, "interface definition"), (EnumTypeDefinition, "enumerated type definition"),
         (ConstantDefinition, "constant definition"), (DelegateDefinition, "delegate definition"), (ClassDelegateDefinition, "class delegate definition"),
-        (GlobalVariableDefinition, "global variable definition")
+        (GlobalVariableDefinition, "global variable definition"), (InstantiationRequestDeclaration, "instantiation request")
     }
 }
 

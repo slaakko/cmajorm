@@ -3,7 +3,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Template.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Template.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -518,6 +518,7 @@ soulng::parser::Match TemplateParser::TemplateParameterList(CmajorLexer& lexer, 
                 }
                 if (match.hit)
                 {
+                    lexer.ResetRecovered();
                     *parentMatch12 = match;
                 }
                 else

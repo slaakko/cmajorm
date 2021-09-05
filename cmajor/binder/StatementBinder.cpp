@@ -30,6 +30,7 @@
 #include <sngcm/ast/BasicType.hpp>
 #include <sngcm/ast/Statement.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/Log.hpp>
 
 namespace cmajor { namespace binder {
 
@@ -388,6 +389,8 @@ void StatementBinder::Visit(FullInstantiationRequestNode& fullInstantiationReque
             fullInstantiationRequestNode.ModuleId());
     }
     ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
+    LogMessage(module->LogStreamId(), "generating full instantation of '" + ToUtf8(specialization->FullName()) + "'");
+    GetBoundCompileUnit().GetClassTemplateRepository().InstantiateAll(specialization, containerScope, currentFunction, fullInstantiationRequestNode.GetSpan(), fullInstantiationRequestNode.ModuleId());
     specialization->SetHasFullInstantiation();
 }
 

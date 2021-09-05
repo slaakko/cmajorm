@@ -3,7 +3,7 @@
 #include <sngcm/cmlexer/ContainerFileLexer.hpp>
 #include <sngcm/cmlexer/ContainerFileTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/ProjectFile.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/ProjectFile.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -99,6 +99,7 @@ soulng::parser::Match ProjectFileParser::ProjectFile(ContainerFileLexer& lexer, 
                                 name.reset(static_cast<soulng::parser::Value<std::u32string>*>(match.value));
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch6 = match;
                                 }
                                 else
@@ -133,6 +134,7 @@ soulng::parser::Match ProjectFileParser::ProjectFile(ContainerFileLexer& lexer, 
                                 }
                                 if (match.hit)
                                 {
+                                    lexer.ResetRecovered();
                                     *parentMatch9 = match;
                                 }
                                 else
@@ -588,6 +590,7 @@ soulng::parser::Match ProjectFileParser::ReferenceDeclaration(ContainerFileLexer
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch4 = match;
                         }
                         else
@@ -628,6 +631,7 @@ soulng::parser::Match ProjectFileParser::ReferenceDeclaration(ContainerFileLexer
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -711,6 +715,7 @@ soulng::parser::Match ProjectFileParser::SourceFileDeclaration(ContainerFileLexe
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch4 = match;
                         }
                         else
@@ -751,6 +756,7 @@ soulng::parser::Match ProjectFileParser::SourceFileDeclaration(ContainerFileLexe
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -834,6 +840,7 @@ soulng::parser::Match ProjectFileParser::ResourceFileDeclaration(ContainerFileLe
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch4 = match;
                         }
                         else
@@ -874,6 +881,7 @@ soulng::parser::Match ProjectFileParser::ResourceFileDeclaration(ContainerFileLe
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -957,6 +965,7 @@ soulng::parser::Match ProjectFileParser::TextFileDeclaration(ContainerFileLexer&
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch4 = match;
                         }
                         else
@@ -997,6 +1006,7 @@ soulng::parser::Match ProjectFileParser::TextFileDeclaration(ContainerFileLexer&
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch7 = match;
                     }
                     else
@@ -1079,6 +1089,7 @@ soulng::parser::Match ProjectFileParser::TargetDeclaration(ContainerFileLexer& l
                         }
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch4 = match;
                         }
                         else
@@ -1105,6 +1116,7 @@ soulng::parser::Match ProjectFileParser::TargetDeclaration(ContainerFileLexer& l
                     target.reset(static_cast<soulng::parser::Value<sngcm::ast::Target>*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch6 = match;
                     }
                     else
@@ -1139,6 +1151,7 @@ soulng::parser::Match ProjectFileParser::TargetDeclaration(ContainerFileLexer& l
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch9 = match;
                     }
                     else
@@ -1188,6 +1201,7 @@ soulng::parser::Match ProjectFileParser::Target(ContainerFileLexer& lexer)
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     soulng::parser::Match match(false);
     int64_t pos = lexer.GetPos();
+    soulng::lexer::SourcePos sourcePos = lexer.GetSourcePos(pos);
     soulng::lexer::Span span = lexer.GetSpan();
     switch (*lexer)
     {

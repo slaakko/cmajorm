@@ -22,7 +22,7 @@ soulng::parser::Match NothrowParameterParser::ParameterList(CmajorNothrowLexer& 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ParameterList"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 117);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 118);
     std::unique_ptr<ParameterNode> param;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -201,7 +201,7 @@ soulng::parser::Match NothrowParameterParser::Parameter(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Parameter"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 118);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 119);
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> type;
     std::unique_ptr<IdentifierNode> id;

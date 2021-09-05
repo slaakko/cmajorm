@@ -7,7 +7,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Enumeration.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Enumeration.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -99,6 +99,7 @@ soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, boost::uui
                                     enumTypeId.reset(static_cast<IdentifierNode*>(match.value));
                                     if (match.hit)
                                     {
+                                        lexer.ResetRecovered();
                                         *parentMatch10 = match;
                                     }
                                     else
@@ -182,6 +183,7 @@ soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, boost::uui
                             }
                             if (match.hit)
                             {
+                                lexer.ResetRecovered();
                                 *parentMatch17 = match;
                             }
                             else
@@ -235,6 +237,7 @@ soulng::parser::Match EnumerationParser::EnumType(CmajorLexer& lexer, boost::uui
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch21 = match;
                     }
                     else
@@ -364,6 +367,7 @@ soulng::parser::Match EnumerationParser::EnumConstants(CmajorLexer& lexer, boost
                 enumConstant.reset(static_cast<EnumConstantNode*>(match.value));
                 if (match.hit)
                 {
+                    lexer.ResetRecovered();
                     *parentMatch2 = match;
                 }
                 else
@@ -419,6 +423,7 @@ soulng::parser::Match EnumerationParser::EnumConstants(CmajorLexer& lexer, boost
                                         enumConstant.reset(static_cast<EnumConstantNode*>(match.value));
                                         if (match.hit)
                                         {
+                                            lexer.ResetRecovered();
                                             *parentMatch8 = match;
                                         }
                                         else
@@ -497,6 +502,7 @@ soulng::parser::Match EnumerationParser::EnumConstant(CmajorLexer& lexer, boost:
                 constantId.reset(static_cast<IdentifierNode*>(match.value));
                 if (match.hit)
                 {
+                    lexer.ResetRecovered();
                     *parentMatch2 = match;
                 }
                 else

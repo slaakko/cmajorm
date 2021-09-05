@@ -23,7 +23,7 @@ soulng::parser::Match NothrowTypedefParser::Typedef(CmajorNothrowLexer& lexer, b
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Typedef"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 165);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 167);
     Span s = Span();
     std::unique_ptr<soulng::parser::Value<sngcm::ast::Specifiers>> specifiers;
     std::unique_ptr<sngcm::ast::Node> type;
@@ -174,7 +174,7 @@ soulng::parser::Match NothrowTypedefParser::DefiningTypedefId(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningTypedefId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 166);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 168);
     std::unique_ptr<IdentifierNode> id;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;

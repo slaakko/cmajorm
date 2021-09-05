@@ -26,7 +26,7 @@ soulng::parser::Match NothrowConceptParser::Concept(CmajorNothrowLexer& lexer, b
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Concept"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 40);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 41);
     std::unique_ptr<ConceptNode> conceptNode = std::unique_ptr<ConceptNode>();
     std::unique_ptr<WhereConstraintNode> constraint = std::unique_ptr<WhereConstraintNode>();
     Span s = Span();
@@ -568,7 +568,7 @@ soulng::parser::Match NothrowConceptParser::DefiningConceptId(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DefiningConceptId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 41);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 42);
     std::unique_ptr<IdentifierNode> conceptName;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -612,7 +612,7 @@ soulng::parser::Match NothrowConceptParser::Refinement(CmajorNothrowLexer& lexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Refinement"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 42);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 43);
     std::unique_ptr<ConceptIdNode> conceptId = std::unique_ptr<ConceptIdNode>();
     std::unique_ptr<IdentifierNode> refinedConcept;
     std::unique_ptr<IdentifierNode> typeParam;
@@ -865,7 +865,7 @@ soulng::parser::Match NothrowConceptParser::ConceptBody(CmajorNothrowLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ConceptBody"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 43);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 44);
     soulng::parser::Match match(true);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -933,7 +933,7 @@ soulng::parser::Match NothrowConceptParser::ConceptBodyConstraint(CmajorNothrowL
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ConceptBodyConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 44);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 45);
     std::unique_ptr<ConstraintNode> typeNameConstraint;
     std::unique_ptr<ConstraintNode> signatureConstraint;
     std::unique_ptr<WhereConstraintNode> embeddedConstraint;
@@ -1030,7 +1030,7 @@ soulng::parser::Match NothrowConceptParser::TypeNameConstraint(CmajorNothrowLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("TypeNameConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 45);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 46);
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> type;
     soulng::parser::Match match(false);
@@ -1147,7 +1147,7 @@ soulng::parser::Match NothrowConceptParser::SignatureConstraint(CmajorNothrowLex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("SignatureConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 46);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 47);
     std::unique_ptr<ConstraintNode> constructorConstraint;
     std::unique_ptr<ConstraintNode> destructorConstraint;
     std::unique_ptr<ConstraintNode> memberFunctionConstraint;
@@ -1293,7 +1293,7 @@ soulng::parser::Match NothrowConceptParser::ConstructorConstraint(CmajorNothrowL
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ConstructorConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 47);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 48);
     std::unique_ptr<ConstraintNode> ctorConstraint = std::unique_ptr<ConstraintNode>();
     Span e = Span();
     std::unique_ptr<IdentifierNode> id;
@@ -1460,7 +1460,7 @@ soulng::parser::Match NothrowConceptParser::DestructorConstraint(CmajorNothrowLe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DestructorConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 48);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 49);
     Span s = Span();
     std::unique_ptr<IdentifierNode> id;
     soulng::parser::Match match(false);
@@ -1682,7 +1682,7 @@ soulng::parser::Match NothrowConceptParser::MemberFunctionConstraint(CmajorNothr
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("MemberFunctionConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 49);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 50);
     std::unique_ptr<ConstraintNode> memberFunctionConstraint = std::unique_ptr<ConstraintNode>();
     std::unique_ptr<sngcm::ast::Node> returnType;
     std::unique_ptr<IdentifierNode> typeParam;
@@ -1852,7 +1852,7 @@ soulng::parser::Match NothrowConceptParser::FunctionConstraint(CmajorNothrowLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("FunctionConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 50);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 51);
     std::unique_ptr<ConstraintNode> functionConstraint = std::unique_ptr<ConstraintNode>();
     std::unique_ptr<sngcm::ast::Node> returnType;
     std::unique_ptr<soulng::parser::Value<std::u32string>> functionGroupId;
@@ -1985,7 +1985,7 @@ soulng::parser::Match NothrowConceptParser::EmbeddedConstraint(CmajorNothrowLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("EmbeddedConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 51);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 52);
     std::unique_ptr<WhereConstraintNode> constraint = std::unique_ptr<WhereConstraintNode>();
     std::unique_ptr<WhereConstraintNode> c;
     soulng::parser::Match match(false);
@@ -2075,7 +2075,7 @@ soulng::parser::Match NothrowConceptParser::WhereConstraint(CmajorNothrowLexer& 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("WhereConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 52);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 53);
     Span s = Span();
     std::unique_ptr<ConstraintNode> constraint;
     soulng::parser::Match match(false);
@@ -2155,7 +2155,7 @@ soulng::parser::Match NothrowConceptParser::ConstraintExpr(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ConstraintExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 53);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 54);
     std::unique_ptr<ConstraintNode> disjunctiveConstraint;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -2199,7 +2199,7 @@ soulng::parser::Match NothrowConceptParser::DisjunctiveConstraintExpr(CmajorNoth
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("DisjunctiveConstraintExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 54);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 55);
     Span s = Span();
     std::unique_ptr<ConstraintNode> constraint = std::unique_ptr<ConstraintNode>();
     std::unique_ptr<ConstraintNode> left;
@@ -2336,7 +2336,7 @@ soulng::parser::Match NothrowConceptParser::ConjunctiveConstraintExpr(CmajorNoth
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ConjunctiveConstraintExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 55);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 56);
     Span s = Span();
     std::unique_ptr<ConstraintNode> constraint = std::unique_ptr<ConstraintNode>();
     std::unique_ptr<ConstraintNode> left;
@@ -2473,7 +2473,7 @@ soulng::parser::Match NothrowConceptParser::PrimaryConstraintExpr(CmajorNothrowL
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("PrimaryConstraintExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 56);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 57);
     Span s = Span();
     std::unique_ptr<ConstraintNode> constraint;
     std::unique_ptr<ConstraintNode> atomicConstraint;
@@ -2624,7 +2624,7 @@ soulng::parser::Match NothrowConceptParser::AtomicConstraintExpr(CmajorNothrowLe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("AtomicConstraintExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 57);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 58);
     std::unique_ptr<ConstraintNode> predicateConstraint;
     std::unique_ptr<ConstraintNode> isConstraint;
     std::unique_ptr<ConstraintNode> multiParamConstraint;
@@ -2736,7 +2736,7 @@ soulng::parser::Match NothrowConceptParser::PredicateConstraint(CmajorNothrowLex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("PredicateConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 58);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 59);
     std::unique_ptr<Node> invokeExpr;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -2783,7 +2783,7 @@ soulng::parser::Match NothrowConceptParser::IsConstraint(CmajorNothrowLexer& lex
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("IsConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 59);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 60);
     Span s = Span();
     std::unique_ptr<sngcm::ast::Node> type;
     std::unique_ptr<Node> conceptOrTypeName;
@@ -2880,7 +2880,7 @@ soulng::parser::Match NothrowConceptParser::ConceptOrTypeName(CmajorNothrowLexer
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ConceptOrTypeName"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 60);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 61);
     std::unique_ptr<sngcm::ast::Node> conceptOrTypeName;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -2924,7 +2924,7 @@ soulng::parser::Match NothrowConceptParser::MultiParamConstraint(CmajorNothrowLe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("MultiParamConstraint"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 61);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 62);
     std::unique_ptr<MultiParamConstraintNode> constraint = std::unique_ptr<MultiParamConstraintNode>();
     std::unique_ptr<IdentifierNode> id;
     std::unique_ptr<sngcm::ast::Node> typeExpr;
@@ -3137,7 +3137,7 @@ soulng::parser::Match NothrowConceptParser::Axiom(CmajorNothrowLexer& lexer, boo
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Axiom"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 62);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 63);
     std::unique_ptr<AxiomNode> axiomNode = std::unique_ptr<AxiomNode>();
     Span axiomSpan = Span();
     Span beginBraceSpan = Span();
@@ -3396,7 +3396,7 @@ soulng::parser::Match NothrowConceptParser::AxiomBody(CmajorNothrowLexer& lexer,
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("AxiomBody"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 63);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 64);
     std::unique_ptr<AxiomStatementNode> stmt;
     soulng::parser::Match match(true);
     soulng::parser::Match* parentMatch0 = &match;
@@ -3459,7 +3459,7 @@ soulng::parser::Match NothrowConceptParser::AxiomStatement(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("AxiomStatement"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 64);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 65);
     Span s = Span();
     std::unique_ptr<Node> expr;
     soulng::parser::Match match(false);

@@ -20,7 +20,7 @@ soulng::parser::Match NothrowIdentifierParser::Identifier(CmajorNothrowLexer& le
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Identifier"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 105);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 106);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -70,7 +70,7 @@ soulng::parser::Match NothrowIdentifierParser::QualifiedId(CmajorNothrowLexer& l
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("QualifiedId"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    soulng::lexer::RuleGuard ruleGuard(lexer, 106);
+    soulng::lexer::RuleGuard ruleGuard(lexer, 107);
     std::u32string value = std::u32string();
     Span s = Span();
     soulng::parser::Match match(false);

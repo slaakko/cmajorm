@@ -6,7 +6,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Typedef.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmparser/Typedef.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
@@ -84,6 +84,7 @@ soulng::parser::Match TypedefParser::Typedef(CmajorLexer& lexer, boost::uuids::u
                         type.reset(static_cast<sngcm::ast::Node*>(match.value));
                         if (match.hit)
                         {
+                            lexer.ResetRecovered();
                             *parentMatch7 = match;
                         }
                         else
@@ -110,6 +111,7 @@ soulng::parser::Match TypedefParser::Typedef(CmajorLexer& lexer, boost::uuids::u
                     id.reset(static_cast<IdentifierNode*>(match.value));
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch9 = match;
                     }
                     else
@@ -145,6 +147,7 @@ soulng::parser::Match TypedefParser::Typedef(CmajorLexer& lexer, boost::uuids::u
                     }
                     if (match.hit)
                     {
+                        lexer.ResetRecovered();
                         *parentMatch12 = match;
                     }
                     else
