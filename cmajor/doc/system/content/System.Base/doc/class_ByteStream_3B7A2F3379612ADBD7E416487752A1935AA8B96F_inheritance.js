@@ -269,11 +269,11 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.IO.ByteStream", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Base/doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html" },
-        { name: "System.IO.BufferedByteStream", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BufferedByteStream_E74639F265FCFA3F7A3E61DE9D92C703A46FD573.html" },
-        { name: "System.IO.Compression.BZip2Stream", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.IO.Compression/doc/class_BZip2Stream_82BE6AC7D0A89DAA12AD1CF0B26FFEAD7D90CF11.html" },
+        { name: "System.IO.BufferedByteStream", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BufferedByteStream_E74639F265FCFA3F7A3E61DE9D92C703A46FD573.html" },
+        { name: "System.IO.Compression.BZip2Stream", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.IO.Compression/doc/class_BZip2Stream_82BE6AC7D0A89DAA12AD1CF0B26FFEAD7D90CF11.html" },
         { name: "System.IO.Compression.DeflateStream", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.IO.Compression/doc/class_DeflateStream_050C0EA929943E375A089D8EAE56F631A87D3306.html" },
-        { name: "System.IO.FileByteStream", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_FileByteStream_B5032C95DE0C760ED2354356BEFFAFF5F1422919.html" },
-        { name: "System.IO.MemoryByteStream", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_MemoryByteStream_4165F89E3A15BB2E93A82F4868A08724955E8045.html" },
+        { name: "System.IO.FileByteStream", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_FileByteStream_B5032C95DE0C760ED2354356BEFFAFF5F1422919.html" },
+        { name: "System.IO.MemoryByteStream", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_MemoryByteStream_4165F89E3A15BB2E93A82F4868A08724955E8045.html" },
         { name: "System.Net.Sockets.NetworkByteStream", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Sockets/doc/class_NetworkByteStream_5A7A9D75DF6B7A874E386D849EB0B8F0D28C226D.html" }];
     drawDiagram(diagramNodes);
 }

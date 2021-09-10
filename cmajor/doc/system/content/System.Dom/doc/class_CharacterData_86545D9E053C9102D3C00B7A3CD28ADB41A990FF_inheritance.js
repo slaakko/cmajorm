@@ -270,8 +270,8 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Dom.Node", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../System.Dom/doc/class_Node_468AE9BB5CE8C45AF2E50222687752FDE34B69CA.html" },
         { name: "System.Dom.CharacterData", id: "diagram_node_1", level: 1, subject: true, hasDerivedNodes: true, link: "../../System.Dom/doc/class_CharacterData_86545D9E053C9102D3C00B7A3CD28ADB41A990FF.html" },
-        { name: "System.Dom.Comment", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Dom/doc/class_Comment_23EFDD99649A51DD89E18C3F553956F1CED8B352.html" },
-        { name: "System.Dom.EntityReference", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Dom/doc/class_EntityReference_0133D838B4F409B966287128657150B3C11204B6.html" },
+        { name: "System.Dom.Comment", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Dom/doc/class_Comment_23EFDD99649A51DD89E18C3F553956F1CED8B352.html" },
+        { name: "System.Dom.EntityReference", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Dom/doc/class_EntityReference_0133D838B4F409B966287128657150B3C11204B6.html" },
         { name: "System.Dom.Text", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Dom/doc/class_Text_B9C5802A36E281AEB71330D79A5AA8B766F57B4B.html" }];
     drawDiagram(diagramNodes);
 }

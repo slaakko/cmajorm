@@ -692,6 +692,25 @@ void GetClasses(sngxml::dom::Element* parentElement, std::unique_ptr<sngxml::xpa
     }
 }
 
+void GetInterfaces(sngxml::dom::Element* parentElement, std::unique_ptr<sngxml::xpath::XPathObject>& interfaceObject, std::vector<sngxml::dom::Element*>& interfaceElements)
+{
+    interfaceObject = sngxml::xpath::Evaluate(U"interfaces/interface", parentElement);
+    if (interfaceObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+    {
+        sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(interfaceObject.get());
+        int n = nodeSet->Length();
+        for (int i = 0; i < n; ++i)
+        {
+            sngxml::dom::Node* interfaceNode = (*nodeSet)[i];
+            if (interfaceNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
+            {
+                sngxml::dom::Element* interfaceElement = static_cast<sngxml::dom::Element*>(interfaceNode);
+                interfaceElements.push_back(interfaceElement);
+            }
+        }
+    }
+}
+
 struct BaseClassInfo
 {
     sngxml::dom::Element* baseClassElement;
@@ -2038,6 +2057,143 @@ void GenerateEnumdoc(Input* input, const std::string& docDir, sngxml::dom::Eleme
     }
 }
 
+void GenerateInterfaceDoc(Input* input, const std::string& docDir, sngxml::dom::Element* interfaceElement, sngxml::dom::Document* moduleXmlDoc, const std::vector<sngxml::dom::Document*>& otherModuleXmlDocs)
+{
+    sngxml::dom::Document* docs = input->docs.get();
+    std::u32string interfaceName = interfaceElement->GetAttribute(U"name");
+    interfaceName.append(U" Interface");
+    std::u32string specifiers = interfaceElement->GetAttribute(U"specifiers");
+    std::u32string title = interfaceName;
+    std::string styleFilePath = "../../../style/style.css";
+    sngxml::dom::Document doc;
+    std::unique_ptr<sngxml::dom::Element> htmlElement(new sngxml::dom::Element(U"html"));
+    std::unique_ptr<sngxml::dom::Element> headElement(new sngxml::dom::Element(U"head"));
+    std::unique_ptr<sngxml::dom::Element> metaElement(new sngxml::dom::Element(U"meta"));
+    metaElement->SetAttribute(U"charset", U"utf-8");
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(metaElement.release()));
+    std::unique_ptr<sngxml::dom::Element> titleElement(new sngxml::dom::Element(U"title"));
+    titleElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(title)));
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(titleElement.release()));
+    std::unique_ptr<sngxml::dom::Element> linkElement(new sngxml::dom::Element(U"link"));
+    linkElement->SetAttribute(U"rel", U"stylesheet");
+    linkElement->SetAttribute(U"type", U"text/css");
+    std::u32string relativeStyleFilePath = ToUtf32(styleFilePath);
+    linkElement->SetAttribute(U"href", relativeStyleFilePath);
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(linkElement.release()));
+
+    htmlElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(headElement.release()));
+    std::unique_ptr<sngxml::dom::Element> bodyElement(new sngxml::dom::Element(U"body"));
+    std::unique_ptr<sngxml::dom::Element> h1Element(new sngxml::dom::Element(U"h1"));
+    h1Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(title)));
+    bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h1Element.release()));
+    if (docs)
+    {
+        std::unique_ptr<sngxml::dom::Element> descriptionAndDetails = GetDescriptionAndDetails(input, interfaceElement->GetAttribute(U"id"), docs, moduleXmlDoc, otherModuleXmlDocs, std::u32string());
+        if (descriptionAndDetails)
+        {
+            bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(descriptionAndDetails.release()));
+        }
+    }
+    std::u32string filePath = interfaceElement->GetAttribute(U"filePath");
+    std::u32string line = interfaceElement->GetAttribute(U"line");
+    std::u32string fileName = interfaceElement->GetAttribute(U"fileName");
+    if (!filePath.empty() && !line.empty() && !fileName.empty())
+    {
+        std::unique_ptr<sngxml::dom::Element> h2Element(new sngxml::dom::Element(U"h2"));
+        h2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Definition")));
+        bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2Element.release()));
+        std::unique_ptr<sngxml::dom::Element> span(new sngxml::dom::Element(U"span"));
+        span->SetAttribute(U"xml:space", U"preserve");
+        span->SetAttribute(U"class", U"indent");
+        span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Line")));
+        span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+        std::unique_ptr<sngxml::dom::Element> lineLinkElement(new sngxml::dom::Element(U"a"));
+        lineLinkElement->SetAttribute(U"href", filePath + U"#" + line);
+        lineLinkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(line)));
+        span->AppendChild(std::unique_ptr<sngxml::dom::Node>(lineLinkElement.release()));
+        span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+        span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"of")));
+        span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+        std::unique_ptr<sngxml::dom::Element> fileLinkElement(new sngxml::dom::Element(U"a"));
+        fileLinkElement->SetAttribute(U"href", filePath);
+        fileLinkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(fileName)));
+        span->AppendChild(std::unique_ptr<sngxml::dom::Node>(fileLinkElement.release()));
+        bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(span.release()));
+    }
+
+    std::unique_ptr<sngxml::xpath::XPathObject> memberFunctionObject;
+    std::vector<sngxml::dom::Element*> memberFunctionElements;
+    GetFunctions(interfaceElement, memberFunctionObject, memberFunctionElements);
+    int nmf = memberFunctionElements.size();
+    if (nmf > 0)
+    {
+        std::unique_ptr<sngxml::dom::Element> h2Element(new sngxml::dom::Element(U"h2"));
+        h2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Member Functions")));
+        bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2Element.release()));
+        std::unique_ptr<sngxml::dom::Element> memberFunctionTableElement(new sngxml::dom::Element(U"table"));
+        for (int i = 0; i < nmf; ++i)
+        {
+            sngxml::dom::Element* memberFunctionElement = memberFunctionElements[i];
+            std::unique_ptr<sngxml::dom::Element> trElement(new sngxml::dom::Element(U"tr"));
+            std::unique_ptr<sngxml::dom::Element> tdElement(new sngxml::dom::Element(U"td"));
+            tdElement->SetAttribute(U"xml:space", U"preserve");
+            tdElement->SetAttribute(U"class", U"rightAlignedCol");
+            AppendSpecifiers(tdElement.get(), memberFunctionElement->GetAttribute(U"specifiers"), U"", true);
+            AppendType(input, tdElement.get(), memberFunctionElement->GetAttribute(U"returnType"), U"RETURN_TYPE", moduleXmlDoc, otherModuleXmlDocs, std::u32string());
+            trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdElement.release()));
+            std::unique_ptr<sngxml::dom::Element> td2Element(new sngxml::dom::Element(U"td"));
+            td2Element->SetAttribute(U"xml:space", U"preserve");
+            std::unique_ptr<sngxml::dom::Element> linkElement(new sngxml::dom::Element(U"a"));
+            linkElement->SetAttribute(U"href", memberFunctionElement->GetAttribute(U"docPath"));
+            std::unique_ptr<sngxml::xpath::XPathObject> templateParametersObject;
+            std::vector<sngxml::dom::Element*> templateParameterElements;
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(MakeFunctionName(memberFunctionElement, templateParametersObject, templateParameterElements))));
+            td2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(linkElement.release()));
+            AppendParameters(input, td2Element.get(), memberFunctionElement, moduleXmlDoc, otherModuleXmlDocs, std::u32string());
+            std::u32string isConst = memberFunctionElement->GetAttribute(U"const");
+            if (isConst == U"true")
+            {
+                td2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+                std::unique_ptr<sngxml::dom::Element> span(new sngxml::dom::Element(U"span"));
+                span->SetAttribute(U"class", U"kw");
+                span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"const")));
+                td2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(span.release()));
+            }
+            if (memberFunctionElement->GetAttribute(U"includeConstraint") == U"true")
+            {
+                std::unique_ptr<sngxml::xpath::XPathObject> constraintObject;
+                sngxml::dom::Element* constraintElement = GetConstraint(memberFunctionElement, constraintObject);
+                if (constraintElement)
+                {
+                    td2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+                    AppendConstraint(input, td2Element.get(), constraintElement, moduleXmlDoc, otherModuleXmlDocs, std::u32string(), true);
+                }
+            }
+            trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(td2Element.release()));
+            std::unique_ptr<sngxml::dom::Element> td3Element(new sngxml::dom::Element(U"td"));
+            td3Element->SetAttribute(U"xml:space", U"preserve");
+            if (AppendDescription(td3Element.get(), input, memberFunctionElement->GetAttribute(U"id"), docs, moduleXmlDoc, otherModuleXmlDocs, std::u32string()))
+            {
+                trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(td3Element.release()));
+            }
+            memberFunctionTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trElement.release()));
+        }
+        bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(memberFunctionTableElement.release()));
+    }
+    GenerateFunctionDetailsSection(input, bodyElement.get(), U"Member Function Details", memberFunctionElements, moduleXmlDoc, otherModuleXmlDocs, std::u32string());
+    htmlElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(bodyElement.release()));
+    doc.AppendChild(std::unique_ptr<sngxml::dom::Node>(htmlElement.release()));
+    std::string docFilePath = GetFullPath(Path::Combine(docDir, ToUtf8(interfaceElement->GetAttribute(U"id")) + ".html"));
+    std::ofstream docFile(docFilePath);
+    CodeFormatter formatter(docFile);
+    formatter.SetIndentSize(1);
+    doc.Write(formatter);
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        std::cout << "==> " << docFilePath << std::endl;
+    }
+}
+
 void GenerateClassDoc(Input* input, const std::string& docDir, sngxml::dom::Element* classElement, sngxml::dom::Document* moduleXmlDoc, const std::vector<sngxml::dom::Document*>& otherModuleXmlDocs)
 {
     sngxml::dom::Document* docs = input->docs.get();
@@ -3015,6 +3171,42 @@ void GenerateNamespaceDoc(Input* input, const std::string& docDir, sngxml::dom::
         }
         bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(classTableElement.release()));
     }
+    std::unique_ptr<sngxml::xpath::XPathObject> interfaceObject;
+    std::vector<sngxml::dom::Element*> interfaceElements;
+    GetInterfaces(nsElement, interfaceObject, interfaceElements);
+    int ni = interfaceElements.size();
+    if (ni > 0)
+    {
+        std::unique_ptr<sngxml::dom::Element> h2Element(new sngxml::dom::Element(U"h2"));
+        h2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Interfaces")));
+        bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2Element.release()));
+        std::unique_ptr<sngxml::dom::Element> interfaceTableElement(new sngxml::dom::Element(U"table"));
+        for (int i = 0; i < ni; ++i)
+        {
+            sngxml::dom::Element* interfaceElement = interfaceElements[i];
+            std::unique_ptr<sngxml::dom::Element> trElement(new sngxml::dom::Element(U"tr"));
+            std::unique_ptr<sngxml::dom::Element> tdElement(new sngxml::dom::Element(U"td"));
+            tdElement->SetAttribute(U"xml:space", U"preserve");
+            tdElement->SetAttribute(U"class", U"rightAlignedCol");
+            AppendSpecifiers(tdElement.get(), interfaceElement->GetAttribute(U"specifiers"), U"interface", false);
+            trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdElement.release()));
+            std::unique_ptr<sngxml::dom::Element> td2Element(new sngxml::dom::Element(U"td"));
+            std::unique_ptr<sngxml::dom::Element> linkElement(new sngxml::dom::Element(U"a"));
+            linkElement->SetAttribute(U"href", interfaceElement->GetAttribute(U"docPath"));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(interfaceElement->GetAttribute(U"name"))));
+            td2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(linkElement.release()));
+            trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(td2Element.release()));
+            std::unique_ptr<sngxml::dom::Element> td3Element(new sngxml::dom::Element(U"td"));
+            td3Element->SetAttribute(U"xml:space", U"preserve");
+            if (AppendDescription(td3Element.get(), input, interfaceElement->GetAttribute(U"id"), docs, moduleXmlDoc, otherModuleXmlDocs, std::u32string()))
+            {
+                trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(td3Element.release()));
+            }
+            interfaceTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trElement.release()));
+            GenerateInterfaceDoc(input, docDir, interfaceElement, moduleXmlDoc, otherModuleXmlDocs);
+        }
+        bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(interfaceTableElement.release()));
+    }
     std::unique_ptr<sngxml::xpath::XPathObject> functionObject;
     std::vector<sngxml::dom::Element*> functionElements;
     GetFunctions(nsElement, functionObject, functionElements);
@@ -3460,6 +3652,42 @@ void GenerateModuleIndexHtml(Input* input, const std::string& moduleDir, const s
                 GenerateClassDoc(input, docDir, classElement, moduleXmlDoc, otherModuleXmlDocs);
             }
             bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(classTableElement.release()));
+        }
+        std::unique_ptr<sngxml::xpath::XPathObject> interfaceObject;
+        std::vector<sngxml::dom::Element*> interfaceElements;
+        GetInterfaces(rootNamespaceElement, interfaceObject, interfaceElements);
+        int ni = interfaceElements.size();
+        if (ni > 0)
+        {
+            std::unique_ptr<sngxml::dom::Element> h2Element(new sngxml::dom::Element(U"h2"));
+            h2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Interfaces")));
+            bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2Element.release()));
+            std::unique_ptr<sngxml::dom::Element> interfaceTableElement(new sngxml::dom::Element(U"table"));
+            for (int i = 0; i < nc; ++i)
+            {
+                sngxml::dom::Element* interfaceElement = interfaceElements[i];
+                std::unique_ptr<sngxml::dom::Element> trElement(new sngxml::dom::Element(U"tr"));
+                std::unique_ptr<sngxml::dom::Element> tdElement(new sngxml::dom::Element(U"td"));
+                tdElement->SetAttribute(U"xml:space", U"preserve");
+                tdElement->SetAttribute(U"class", U"rightAlignedCol");
+                AppendSpecifiers(tdElement.get(), interfaceElement->GetAttribute(U"specifiers"), U"interface", false);
+                trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdElement.release()));
+                std::unique_ptr<sngxml::dom::Element> td2Element(new sngxml::dom::Element(U"td"));
+                std::unique_ptr<sngxml::dom::Element> linkElement(new sngxml::dom::Element(U"a"));
+                linkElement->SetAttribute(U"href", interfaceElement->GetAttribute(U"docPath"));
+                linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(interfaceElement->GetAttribute(U"name"))));
+                td2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(linkElement.release()));
+                trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(td2Element.release()));
+                std::unique_ptr<sngxml::dom::Element> td3Element(new sngxml::dom::Element(U"td"));
+                td3Element->SetAttribute(U"xml:space", U"preserve");
+                if (AppendDescription(td3Element.get(), input, interfaceElement->GetAttribute(U"id"), docs, moduleXmlDoc, otherModuleXmlDocs, std::u32string()))
+                {
+                    trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(td3Element.release()));
+                }
+                interfaceTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trElement.release()));
+                GenerateClassDoc(input, docDir, interfaceElement, moduleXmlDoc, otherModuleXmlDocs);
+            }
+            bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(interfaceTableElement.release()));
         }
         std::unique_ptr<sngxml::xpath::XPathObject> functionObject;
         std::vector<sngxml::dom::Element*> functionElements;

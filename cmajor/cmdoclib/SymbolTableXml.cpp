@@ -11,6 +11,7 @@
 #include <cmajor/symbols/ConstantSymbol.hpp>
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/DelegateSymbol.hpp>
+#include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <sngcm/ast/Visitor.hpp>
 #include <sngcm/ast/Expression.hpp>
@@ -128,6 +129,7 @@ public:
     bool AddNamespace(NamespaceSymbol& ns);
     void AddConcept(ConceptSymbol& conceptSymbol);
     void AddClass(ClassTypeSymbol& cls);
+    void AddInterface(InterfaceTypeSymbol& interface);
     void AddCtorOrDtor(FunctionSymbol& function);
     void AddFunction(FunctionSymbol& function);
     void AddDelegate(DelegateTypeSymbol& delegate);
@@ -141,6 +143,7 @@ public:
     std::vector<NamespaceSymbol*> GetNamespaces(ContainerSymbol& container);
     std::vector<ConceptSymbol*> GetConcepts(ContainerSymbol& container);
     std::vector<ClassTypeSymbol*> GetClasses(ContainerSymbol& container);
+    std::vector<InterfaceTypeSymbol*> GetInterfaces(ContainerSymbol& container);
     std::vector<FunctionSymbol*> GetConstructorsAndDestructors(ContainerSymbol& container);
     std::vector<FunctionSymbol*> GetFunctions(ContainerSymbol& container);
     std::vector<DelegateTypeSymbol*> GetDelegates(ContainerSymbol& container); 
@@ -1016,6 +1019,34 @@ void SymbolTableXmlBuilder::AddClass(ClassTypeSymbol& cls)
     currentElement = prevElement;
 }
 
+void SymbolTableXmlBuilder::AddInterface(InterfaceTypeSymbol& interface)
+{
+    std::unique_ptr<sngxml::dom::Element> interfaceElement = CreateSymbolElement(U"interface", interface);
+    std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(interface.Id()) + ".html"));
+    interfaceElement->SetAttribute(U"docPath", docPath);
+    std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(interface.Id()) + ".html"));
+    interfaceElement->SetAttribute(U"extPath", extPath);
+    File& file = fileMap[interface.GetSpan().fileIndex];
+    interfaceElement->SetAttribute(U"fileName", file.name);
+    interfaceElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
+    interfaceElement->SetAttribute(U"line", ToUtf32(std::to_string(interface.GetSpan().line)));
+    Node* node = symbolTable.GetNodeNoThrow(&interface);
+    if (node && node->GetNodeType() == NodeType::interfaceNode)
+    {
+        InterfaceNode* interfaceNode = static_cast<InterfaceNode*>(node);
+        interfaceElement->SetAttribute(U"specifiers", ToUtf32(SpecifierStr(interfaceNode->GetSpecifiers())));
+    }
+    else
+    {
+        throw std::runtime_error("interface node expected");
+    }
+    sngxml::dom::Element* prevElement = currentElement;
+    currentElement = interfaceElement.get();
+    AddChildren(interface);
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(interfaceElement.release()));
+    currentElement = prevElement;
+}
+
 void SymbolTableXmlBuilder::AddCtorOrDtor(FunctionSymbol& function)
 {
     std::unique_ptr<sngxml::dom::Element> ctorDtorElement = CreateSymbolElement(U"ctorDtor", function);
@@ -1408,6 +1439,19 @@ void SymbolTableXmlBuilder::AddChildren(ContainerSymbol& container)
             prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(classesElement.release()));
             currentElement = prevElement;
         }
+        std::vector<InterfaceTypeSymbol*> interfaces = GetInterfaces(container);
+        if (!interfaces.empty())
+        {
+            std::unique_ptr<sngxml::dom::Element> interfacesElement(new sngxml::dom::Element(U"interfaces"));
+            sngxml::dom::Element* prevElement = currentElement;
+            currentElement = interfacesElement.get();
+            for (InterfaceTypeSymbol* intf : interfaces)
+            {
+                AddInterface(*intf);
+            }
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(interfacesElement.release()));
+            currentElement = prevElement;
+        }
         std::vector<FunctionSymbol*> ctorsDtors = GetConstructorsAndDestructors(container);
         if (!ctorsDtors.empty())
         {
@@ -1595,6 +1639,21 @@ std::vector<ClassTypeSymbol*> SymbolTableXmlBuilder::GetClasses(ContainerSymbol&
     }
     std::sort(classSymbols.begin(), classSymbols.end(), ByCodeName());
     return classSymbols;
+}
+
+std::vector<InterfaceTypeSymbol*> SymbolTableXmlBuilder::GetInterfaces(ContainerSymbol& container)
+{
+    std::vector<InterfaceTypeSymbol*> interfaceSymbols;
+    for (const std::unique_ptr<Symbol>& member : container.Members())
+    {
+        if (member->GetSymbolType() == SymbolType::interfaceTypeSymbol && member->IsProject())
+        {
+            InterfaceTypeSymbol* intf = static_cast<InterfaceTypeSymbol*>(member.get());
+            interfaceSymbols.push_back(intf);
+        }
+    }
+    std::sort(interfaceSymbols.begin(), interfaceSymbols.end(), ByCodeName());
+    return interfaceSymbols;
 }
 
 std::vector<FunctionSymbol*> SymbolTableXmlBuilder::GetConstructorsAndDestructors(ContainerSymbol& container)

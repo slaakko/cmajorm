@@ -269,14 +269,14 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.XPath.XPathExpr", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.XPath/doc/class_XPathExpr_95EA600BC53B469A10904A46CE3A1CA4901C4480.html" },
-        { name: "System.XPath.XPathBinaryExpr", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathBinaryExpr_0EAB6B173744CD23F615186BED4C48FD7622A2DD.html" },
+        { name: "System.XPath.XPathBinaryExpr", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathBinaryExpr_0EAB6B173744CD23F615186BED4C48FD7622A2DD.html" },
         { name: "System.XPath.XPathFunctionCall", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathFunctionCall_C5BB4DC232BD6346E04957475A9C86B8F8521E16.html" },
         { name: "System.XPath.XPathLiteral", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathLiteral_97BC2333DDDF6EABF7DA5FD272541734687A14E8.html" },
         { name: "System.XPath.XPathLocationStepExpr", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathLocationStepExpr_9B4616EA86D04D07EC9E1FA3C0C129DFEC975494.html" },
         { name: "System.XPath.XPathNodeTestExpr", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNodeTestExpr_26AC4EE244D50D2DFBED03DCDBB56A11B4D3DFFE.html" },
-        { name: "System.XPath.XPathNumberExpr", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNumberExpr_CB62E9D51F1A4F9AA7E3937722FE3487F75F3D27.html" },
-        { name: "System.XPath.XPathRootNodeExpr", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathRootNodeExpr_80F36A5C737D3E6D91496D2F168E801F8D3AF7F9.html" },
-        { name: "System.XPath.XPathUnaryExpr", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathUnaryExpr_86009132751C9E3CD64BE15301415EF8A1979F72.html" },
+        { name: "System.XPath.XPathNumberExpr", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNumberExpr_CB62E9D51F1A4F9AA7E3937722FE3487F75F3D27.html" },
+        { name: "System.XPath.XPathRootNodeExpr", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathRootNodeExpr_80F36A5C737D3E6D91496D2F168E801F8D3AF7F9.html" },
+        { name: "System.XPath.XPathUnaryExpr", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathUnaryExpr_86009132751C9E3CD64BE15301415EF8A1979F72.html" },
         { name: "System.XPath.XPathVariableReference", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathVariableReference_73ACE515A08D085D024DDFA8B32D529F578FDFAD.html" }];
     drawDiagram(diagramNodes);
 }

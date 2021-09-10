@@ -270,14 +270,14 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.XPath.XPathExpr", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../System.XPath/doc/class_XPathExpr_95EA600BC53B469A10904A46CE3A1CA4901C4480.html" },
         { name: "System.XPath.XPathNodeTestExpr", id: "diagram_node_1", level: 1, subject: true, hasDerivedNodes: true, link: "../../System.XPath/doc/class_XPathNodeTestExpr_26AC4EE244D50D2DFBED03DCDBB56A11B4D3DFFE.html" },
-        { name: "System.XPath.XPathAnyNodeTest", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathAnyNodeTest_1653BD12B7022917E52975C2AB2EFC101974D53E.html" },
+        { name: "System.XPath.XPathAnyNodeTest", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathAnyNodeTest_1653BD12B7022917E52975C2AB2EFC101974D53E.html" },
         { name: "System.XPath.XPathCommentNodeTest", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathCommentNodeTest_8E388602C7FD6F18286CE97DC687F1196E059DDC.html" },
-        { name: "System.XPath.XPathNameTest", id: "diagram_node_5", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNameTest_1BB9325BB075144D167439A70658B1743BE5F322.html" },
-        { name: "System.XPath.XPathPILiteralTest", id: "diagram_node_6", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathPILiteralTest_3F86EF025B928E10BDB8373B7B25849DD41E16C9.html" },
-        { name: "System.XPath.XPathPINodeTest", id: "diagram_node_7", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathPINodeTest_3C6062E8681A250F424D8059EE5DD0803B3BFF00.html" },
+        { name: "System.XPath.XPathNameTest", id: "diagram_node_6", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNameTest_1BB9325BB075144D167439A70658B1743BE5F322.html" },
+        { name: "System.XPath.XPathPILiteralTest", id: "diagram_node_5", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathPILiteralTest_3F86EF025B928E10BDB8373B7B25849DD41E16C9.html" },
+        { name: "System.XPath.XPathPINodeTest", id: "diagram_node_9", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathPINodeTest_3C6062E8681A250F424D8059EE5DD0803B3BFF00.html" },
         { name: "System.XPath.XPathPrefixTest", id: "diagram_node_8", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathPrefixTest_7D0E6C8BFF9C298E4E7B339F475D675FA9161187.html" },
-        { name: "System.XPath.XPathPrincipalNodeTest", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathPrincipalNodeTest_95934E4A6771EAB845EC93002DCFD0E63193516F.html" },
-        { name: "System.XPath.XPathTextNodeTest", id: "diagram_node_9", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathTextNodeTest_F61C5D2B1A43AC9CF9EF724B603C0B62AFAFC24E.html" }];
+        { name: "System.XPath.XPathPrincipalNodeTest", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathPrincipalNodeTest_95934E4A6771EAB845EC93002DCFD0E63193516F.html" },
+        { name: "System.XPath.XPathTextNodeTest", id: "diagram_node_7", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathTextNodeTest_F61C5D2B1A43AC9CF9EF724B603C0B62AFAFC24E.html" }];
     drawDiagram(diagramNodes);
 }
 

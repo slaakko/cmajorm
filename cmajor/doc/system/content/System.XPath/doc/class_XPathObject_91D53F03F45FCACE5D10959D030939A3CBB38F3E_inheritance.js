@@ -270,8 +270,8 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.XPath.XPathObject", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html" },
         { name: "System.XPath.XPathBoolean", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathBoolean_62EBEB870905B1B981080A7A18EBBBD98ADD5C4A.html" },
-        { name: "System.XPath.XPathNodeSet", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNodeSet_70D9F2F055A2EAFCF3988BC033AE454E204F643A.html" },
-        { name: "System.XPath.XPathNumber", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNumber_030E4A77BFA393ABC52B71D17310DFB36384486F.html" },
+        { name: "System.XPath.XPathNodeSet", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNodeSet_70D9F2F055A2EAFCF3988BC033AE454E204F643A.html" },
+        { name: "System.XPath.XPathNumber", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathNumber_030E4A77BFA393ABC52B71D17310DFB36384486F.html" },
         { name: "System.XPath.XPathString", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathString_A53CB226777116E5435EF7B51EABFD704B80F682.html" }];
     drawDiagram(diagramNodes);
 }
