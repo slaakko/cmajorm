@@ -4,12 +4,20 @@
 // =================================
 
 using System;
+using System.Collections;
 
 namespace System.Xml.Serialization
 {
+    // XmlPtrBase contains an object id (UUID) of an object it points to.
+    // The Resolve member function retrieves a proxy object from an XML container,
+    // obtains an object pointer from the proxy and calls the SetPtr member function
+    // of the derived class.
+    //
+    // Each derived class implements the SetPtr member function that sets the pointer contained by the derived class.
+
     public abstract class XmlPtrBase
     {
-        public nothrow XmlPtrBase() : targetObjectId(Uuid()), ptr(null)
+        public nothrow XmlPtrBase() : targetObjectId(Uuid()), includeInBundle(true)
         {
         }
         public virtual ~XmlPtrBase()
@@ -23,58 +31,246 @@ namespace System.Xml.Serialization
         {
             targetObjectId = targetObjectId_;
         }
-        public nothrow void* GetPtr() const
+        public virtual nothrow bool IncludeInBundle() const
         {
-            return ptr;
+            return includeInBundle;
         }
-        public nothrow void SetPtr(void* ptr_)
+        public nothrow void SetIncludeInBundle(bool includeInBundle_)
         {
-            ptr = ptr_;
+             includeInBundle = includeInBundle_;
         }
         public nothrow void Resolve(XmlContainer* container)
         {
             XmlSerializableProxy* proxy = container->Get(targetObjectId);
             if (proxy != null)
             {
-                ptr = proxy->Object();
+                SetPtr(proxy->Object());
             }
         }
+        public abstract nothrow void* GetPtr() const;
+        public abstract nothrow void SetPtr(void* p);
         private Uuid targetObjectId;
-        private void* ptr;
+        private bool includeInBundle;
     }
+
+    // XmlPtr<T> is like an ordinary pointer with no ownership semantics,
+    // but it derives from the XmlPtrBase that contains an object id for the pointed-to object.
 
     public class XmlPtr<T> : XmlPtrBase
     {
-        public nothrow XmlPtr() : base()
+        private typedef XmlPtr<T> Self;
+
+        public nothrow XmlPtr() : base(), ptr(null)
         {
         }
-        public nothrow XmlPtr(T* ptr_) : base()
+        public explicit nothrow XmlPtr(T* ptr_) : base(), ptr(ptr_)
         {
-            Reset(ptr_);
         }
-        public nothrow T* Get() const
+        public nothrow XmlPtr(const Self& that) : ptr(that.ptr)
         {
-            return cast<T*>(GetPtr());
+            SetId();
+        }
+        public nothrow XmlPtr(Self&& that) : ptr(that.ptr)
+        {
+            that.ptr = null;
+            SetId();
+        }
+        public nothrow void operator=(const Self& that)
+        {
+            ptr = that.ptr;
+            SetId();
+        }
+        public nothrow void operator=(Self&& that)
+        {
+            Swap(ptr, that.ptr);
+            SetId();
+            that.SetId();
+        }
+        public nothrow void operator=(T* ptr_)
+        {
+            ptr = ptr_;
+            SetId();
         }
         public nothrow void Reset(T* ptr_)
         {
-            if (GetPtr() != null)
-            {
-                SetPtr(null);
-                targetObjectId = Uuid();
-            }
-            SetPtr(ptr_);
-            T* p = Get();
-            if (p != null)
-            {
-                XmlSerializable intf = *p;
-                targetObjectId = intf.ObjectId();
-            }
+            ptr = ptr_;
+            SetId();
         }
         public nothrow void Reset()
         {
-            Reset(null);
+            ptr = null;
+            SetId();
         }
+        public nothrow inline T* Get() const
+        {
+            return ptr;
+        }
+        public nothrow inline bool IsNull() const
+        {
+            return ptr == null;
+        }
+        public inline nothrow T* operator->()
+        {
+            return ptr;
+        }
+        public inline nothrow const T* operator->() const
+        {
+            return ptr;
+        }
+        public inline nothrow T& operator*()
+        {
+            return *ptr;
+        }
+        public inline nothrow const T& operator*() const
+        {
+            return *ptr;
+        }
+        public nothrow void Swap(Self& that)
+        {
+            Swap(ptr, that.ptr);
+            SetId();
+            that.SetId();
+        }
+        public override nothrow void* GetPtr() const
+        {
+            return ptr;
+        }
+        public override nothrow void SetPtr(void* p)
+        {
+            ptr = cast<T*>(p);
+        }
+        private nothrow void SetId()
+        {
+            if (!IsNull())
+            {
+                XmlSerializable intf = *Get();
+                SetTargetObjectId(intf.ObjectId());
+            }
+            else
+            {
+                SetTargetObjectId(Uuid());
+            }
+        }
+        private T* ptr;
+    }
+
+    public nothrow bool operator==<T>(const XmlPtr<T>& left, const XmlPtr<T>& right)
+    {
+        return left.Get() == right.Get();
+    }
+
+    public nothrow bool operator<<T>(const XmlPtr<T>& left, const XmlPtr<T>& right)
+    {
+        return left.Get() < right.Get();
+    }
+
+    // UniqueXmlPtr<T> is like a UniquePtr<T> but in addition it derives from the XmlPtrBase,
+    // that contains an object id for the pointed-to object.
+
+    public class UniqueXmlPtr<T> : XmlPtrBase
+    {
+        private typedef UniqueXmlPtr<T> Self;
+
+        public nothrow UniqueXmlPtr() : ptr()
+        {
+        }
+        public explicit nothrow UniqueXmlPtr(T* ptr_) : ptr(ptr_)
+        {
+            SetId();
+        }
+        suppress UniqueXmlPtr(const Self&);
+        public nothrow UniqueXmlPtr(Self&& that) : ptr(Rvalue(that.ptr))
+        {
+            SetId();
+            that.SetId();
+        }
+        public nothrow void operator=(T* ptr_)
+        {
+            ptr = ptr_;
+            SetId();
+        }
+        suppress void operator=(const Self&);
+        public nothrow void operator=(Self&& that)
+        {
+            ptr = Rvalue(that.ptr);
+            SetId();
+            that.SetId();
+        }
+        public nothrow void Reset()
+        {
+            ptr.Reset();
+            SetId();
+        }
+        public nothrow void Reset(T* ptr_)
+        {
+            ptr.Reset(ptr_);
+            SetId();
+        }
+        public inline nothrow T* Get()
+        {
+            return ptr.Get();
+        }
+        public inline nothrow T* Release()
+        {
+            return ptr.Release();
+        }
+        public inline nothrow bool IsNull() const
+        {
+            return ptr.IsNull();
+        }
+        public inline nothrow T* operator->()
+        {
+            return ptr.Get();
+        }
+        public inline nothrow const T* operator->() const
+        {
+            return ptr.Get();
+        }
+        public inline nothrow T& operator*()
+        {
+            return *ptr;
+        }
+        public inline nothrow const T& operator*() const
+        {
+            return *ptr;
+        }
+        public nothrow void Swap(Self& that)
+        {
+            Swap(ptr, that.ptr);
+            SetId();
+            that.SetId();
+        }
+        public override nothrow void* GetPtr() const
+        {
+            return ptr.Get();
+        }
+        public override nothrow void SetPtr(void* p)
+        {
+            ptr.Reset(cast<T*>(p));
+        }
+        private nothrow void SetId()
+        {
+            if (!IsNull())
+            {
+                XmlSerializable intf = *Get();
+                SetTargetObjectId(intf.ObjectId());
+            }
+            else
+            {
+                SetTargetObjectId(Uuid());
+            }
+        }
+        private UniquePtr<T> ptr;
+    }
+
+    public nothrow bool operator==<T>(const UniqueXmlPtr<T>& left, const UniqueXmlPtr<T>& right)
+    {
+        return left.Get() == right.Get();
+    }
+
+    public nothrow bool operator<<T>(const UniqueXmlPtr<T>& left, const UniqueXmlPtr<T>& right)
+    {
+        return left.Get() < right.Get();
     }
 }
 

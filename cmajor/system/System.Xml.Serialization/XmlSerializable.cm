@@ -19,6 +19,7 @@ namespace System.Xml.Serialization
         void SetContainer(XmlContainer* container);
         System.Dom.Element* ToXml(const string& elementName);
         void FromXml(System.Dom.Element* element);
+        List<XmlPtrBase*> GetPtrs();
     }
 
     public class XmlSerializableProxy
@@ -83,6 +84,10 @@ namespace System.Xml.Serialization
         public void FromXml(System.Dom.Element* element)
         {
             intf.FromXml(element);
+        }
+        public List<XmlPtrBase*> GetPtrs() const
+        {
+            return intf.GetPtrs();
         }
         private XmlSerializable intf;
         private bool isOwner;

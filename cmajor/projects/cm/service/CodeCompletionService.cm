@@ -100,7 +100,8 @@ namespace Cm.Service.CodeCompletion
         }
         public override UniquePtr<CodeCompletionReply> Create(Element* element)
         {
-            UniquePtr<CodeCompletionReply> reply(new T(element));
+            UniquePtr<CodeCompletionReply> reply(new T());
+            reply->FromXml(element);
             return reply;
         }
     }
@@ -373,7 +374,8 @@ namespace Cm.Service.CodeCompletion
             {
                 throw Exception("keepAliveCCReply expected, unknown reply message kind '" + messageKind + "' received");
             }
-            KeepAliveCCReply reply(replyDoc->DocumentElement());
+            KeepAliveCCReply reply;
+            reply.FromXml(replyDoc->DocumentElement());
         }
         private void Run()
         {

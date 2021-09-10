@@ -32,6 +32,17 @@ namespace System.Xml.Serialization
         {
             return false;
         }
+        public virtual nothrow void SetRootObjectId(const Uuid& objectId)
+        {
+        }
+        public nothrow long Count() const
+        {
+            return objectProxyMap.Count();
+        }
+        public nothrow bool IsEmpty() const
+        {
+            return objectProxyMap.IsEmpty();
+        }
         public void Add(XmlSerializable xmlSerializable)
         {
             Add(xmlSerializable, TakeOwnership());
@@ -95,48 +106,41 @@ namespace System.Xml.Serialization
             }
             return proxies;
         }
-        public void MoveObjectsTo(XmlContainer* that)
+        public void AddToBundle(XmlBundle& bundle, XmlSerializable intf, HashSet<Uuid>& addedSet)
         {
-            List<XmlSerializableProxy*> proxies = GetProxies();
-            for (XmlSerializableProxy* proxy : proxies)
+            if (intf.ObjectId() == Uuid())
             {
-                proxy->ResetContainer();
-                proxy->ResetOwner();
-                XmlSerializable intf = proxy->Interface();
-                that->Remove(proxy->ObjectId());
-                that->Add(intf);
-                Remove(proxy->ObjectId());
+                return;
+            }
+            if (addedSet.CFind(intf.ObjectId()) != addedSet.CEnd())
+            {
+                return;
+            }
+            bundle.Add(intf);
+            addedSet.Insert(intf.ObjectId());
+            List<XmlPtrBase*> ptrs = intf.GetPtrs();
+            for (XmlPtrBase* ptr : ptrs)
+            {
+                if (ptr->IncludeInBundle() && ptr->TargetObjectId() != Uuid())
+                {
+                    XmlSerializableProxy* target = Get(ptr->TargetObjectId());
+                    if (target != null)
+                    {
+                        AddToBundle(bundle, target->Interface(), addedSet);
+                    }
+                }
             }
         }
         public XmlBundle CreateBundle(void* object)
         {
-            HashSet<Uuid> added;
+            HashSet<Uuid> addedSet;
             XmlBundle bundle;
             XmlSerializableProxy* proxy = GetProxy(object);
             if (proxy != null)
             {
+                bundle.SetRootObjectId(proxy->ObjectId());
                 XmlSerializable intf = proxy->Interface();
-                bundle.Add(intf);
-                added.Insert(intf.ObjectId());
-/*                
-                int n = proxy->XmlPtrCount();
-                for (int i = 0; i < n; ++i)
-                {
-                    XmlPtrBase* ptr = proxy->GetXmlPtr(i);
-                    if (ptr->TargetObjectId() != Uuid())
-                    {
-                        if (added.CFind(ptr->TargetObjectId()) == added.CEnd())
-                        {
-                            XmlSerializableProxy* target = Get(ptr->TargetObjectId());
-                            if (target != null)
-                            {
-                                added.Insert(target->ObjectId());
-                                bundle.Add(target->Interface());
-                            }
-                        }
-                    }
-                }
-*/                
+                AddToBundle(bundle, intf, addedSet);
             }
             return bundle;
         }

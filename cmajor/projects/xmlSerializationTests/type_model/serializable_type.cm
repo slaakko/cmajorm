@@ -1,0 +1,58 @@
+using System;
+using System.Collections;
+using System.Xml.Serialization;
+
+namespace model
+{
+    public enum EnumType
+    {
+        red, green, blue
+    }
+
+    [xml]
+    public class ClassType
+    {
+        public string x;
+    }
+
+    [xml]
+    public class TestSerializableType
+    {
+        public ClassType x1;
+        public UniquePtr<ClassType> x2;
+        public SharedPtr<ClassType> x3;
+        public XmlPtr<ClassType> x4;
+        public UniqueXmlPtr<ClassType> x5;
+        public List<bool> x6;
+        public List<UniquePtr<ClassType>> x7;
+        public List<SharedPtr<ClassType>> x8;
+        public List<XmlPtr<ClassType>> x9;
+        public List<UniqueXmlPtr<ClassType>> x10;
+        public string x11;
+        public wstring x12;
+        public ustring x13;
+        public TimePoint x14;
+        public Duration x15;
+        public bool x16;
+        public sbyte x17;
+        public byte x18;
+        public short x19;
+        public ushort x20;
+        public int x21;
+        public uint x22;
+        public long x23;
+        public ulong x24;
+        public float x25;
+        public double x26;
+        public char x27;
+        public wchar x28;
+        public uchar x29;
+        public Uuid x30;
+        public EnumType x31;
+        public Date x32;
+        public DateTime x33;
+        public Timestamp x34;
+        public List<int> x35;
+    }
+}
+

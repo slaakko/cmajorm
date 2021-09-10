@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
- <PropertyGroup Label="Globals">
-  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>73c34a37-0e08-4c24-87df-8ca4aa2e4fca</ProjectGuid>
- </PropertyGroup>
- <PropertyGroup>
-  <TargetType>library</TargetType>
- </PropertyGroup>
- <ItemGroup>
-  <CmCompile Include="XmlClassRegistry.cm"/>
-  <CmCompile Include="XmlExport.cm"/>
-  <CmCompile Include="XmlImport.cm"/>
- </ItemGroup>
- <ItemGroup/>
- <ItemGroup>
-  <ProjectReference Include="../System.Base/System.Base.cmproj"/>
-  <ProjectReference Include="../System.Dom/System.Dom.cmproj"/>
-  <ProjectReference Include="../System.XPath/System.XPath.cmproj"/>
-  <ProjectReference Include="../System.Xml/System.Xml.cmproj"/>
- </ItemGroup>
- <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
- <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+  <PropertyGroup Label="Globals">
+    <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+    <ProjectGuid>73c34a37-0e08-4c24-87df-8ca4aa2e4fca</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetType>library</TargetType>
+  </PropertyGroup>
+  <ItemGroup>
+    <CmCompile Include="XmlBundle.cm" />
+    <CmCompile Include="XmlClassRegistry.cm" />
+    <CmCompile Include="XmlContainer.cm" />
+    <CmCompile Include="XmlExport.cm" />
+    <CmCompile Include="XmlImport.cm" />
+  </ItemGroup>
+  <ItemGroup>
+    <CmCompile Include="XmlPtr.cm" />
+    <CmCompile Include="XmlSerializable.cm" />
+    <CmCompile Include="XmlSerializationException.cm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../System.Base/System.Base.cmproj" />
+    <ProjectReference Include="../System.Dom/System.Dom.cmproj" />
+    <ProjectReference Include="../System.XPath/System.XPath.cmproj" />
+    <ProjectReference Include="../System.Xml/System.Xml.cmproj" />
+  </ItemGroup>
+  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
+  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
 </Project>

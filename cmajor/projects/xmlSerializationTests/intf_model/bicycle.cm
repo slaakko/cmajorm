@@ -1,36 +1,37 @@
 using System;
+using System.Collections;
 using System.Xml.Serialization;
 
-namespace xmltest
+namespace model
 {
-    public class Car : Vehicle, XmlSerializable
+    public class Bicycle : Vehicle, XmlSerializable
     {
-        public static string StaticClassName()
+        public nothrow static string StaticClassName()
         {
-            return "xmltest.Car";
+            return "model.Bicycle";
         }
         public static void Register(int classId_)
         {
             classId = classId_;
-            XmlRegister<Car>(classId);
+            XmlRegister<Bicycle>(classId);
         }
         public static void* Create()
         {
-            return new Car();
+            return new Bicycle();
         }
         public nothrow override void DestroyObject()
         {
             base->DestroyObject();
         }
-        public override XmlContainer* Container()
+        public override nothrow XmlContainer* Container() const
         {
             return base->Container();
         }
-        public override void SetContainer(XmlContainer* container)
+        public override nothrow void SetContainer(XmlContainer* container_)
         {
-            base->SetContainer(container);
+            base->SetContainer(container_);
         }
-        public override nothrow Uuid ObjectId()
+        public override nothrow Uuid ObjectId() const
         {
             return base->ObjectId();
         }
@@ -38,37 +39,46 @@ namespace xmltest
         {
             base->SetObjectId(objectId);
         }
-        public nothrow int ClassId()
+        public nothrow int ClassId() const
         {
             return classId;
         }
-        public nothrow string ClassName()
+        public nothrow string ClassName() const
         {
             return typename(*this);
         }
-        public int XmlPtrCount()
-        {
-            return 0;
-        }
-        public XmlPtrBase* GetXmlPtr(int index)
-        {
-            return null;
-        }
         public override void SetObjectXmlAttributes(System.Dom.Element* element)
         {
-            element->SetAttribute(u"objectId", ToUtf32(ToString(ObjectId())));
             element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            element->SetAttribute(u"objectId", ToUtf32(ToString(ObjectId())));
+            element->SetAttribute(u"className", ToUtf32(ClassName()));
         }
         public override System.Dom.Element* ToXml(const string& elementName)
         {
             System.Dom.Element* element = base->ToXml(elementName);
+            element->AppendChild(UniquePtr<System.Dom.Node>(ToXml(price, "price").Release()));
             return element;
         }
         public override void FromXml(System.Dom.Element* element)
         {
             base->FromXml(element);
+            FromXml(element, "price", price);
+        }
+        public override List<XmlPtrBase*> GetPtrs() const
+        {
+            List<XmlPtrBase*> list = base->GetPtrs();
+            return list;
+        }
+        public float Price() const
+        {
+            return price;
+        }
+        public void SetPrice(float price_)
+        {
+            price = price_;
         }
         private static int classId;
+        private float price;
     }
 }
 

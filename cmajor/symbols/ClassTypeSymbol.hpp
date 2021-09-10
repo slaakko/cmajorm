@@ -61,7 +61,9 @@ enum class ClassTypeSymbolFlags : uint16_t
     statementsNotBound = 1 << 5,
     recursiveComputed = 1 << 6,
     recursive = 1 << 7,
-    vmtEmitted = 1 << 8
+    vmtEmitted = 1 << 8,
+    staticsEmitted = 1 << 9,
+    hasXmlAttribute = 1 << 10
 };
 
 inline ClassTypeSymbolFlags operator|(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
@@ -178,11 +180,15 @@ public:
     void ResetStatementsNotBound() { ResetFlag(ClassTypeSymbolFlags::statementsNotBound); }
     bool RecursiveComputed() const { return GetFlag(ClassTypeSymbolFlags::recursiveComputed); }
     void SetRecursiveComputed() { SetFlag(ClassTypeSymbolFlags::recursiveComputed); }
+    bool HasXmlAttribute() const { return GetFlag(ClassTypeSymbolFlags::hasXmlAttribute); }
+    void SetHasXmlAttribute() { SetFlag(ClassTypeSymbolFlags::hasXmlAttribute); }
     bool IsRecursive();
     bool Recursive() const { return GetFlag(ClassTypeSymbolFlags::recursive); }
     void SetRecursive() { SetFlag(ClassTypeSymbolFlags::recursive); }
     bool VmtEmitted() const { return GetFlag(ClassTypeSymbolFlags::vmtEmitted); }
     void SetVmtEmitted() { SetFlag(ClassTypeSymbolFlags::vmtEmitted); }
+    bool StaticsEmitted() const { return GetFlag(ClassTypeSymbolFlags::staticsEmitted); }
+    void SetStaticsEmitted() { SetFlag(ClassTypeSymbolFlags::staticsEmitted); }
     ClassTypeSymbolFlags GetClassTypeSymbolFlags() const { return flags; }
     bool GetFlag(ClassTypeSymbolFlags flag) const { return (flags & flag) != ClassTypeSymbolFlags::none; }
     void SetFlag(ClassTypeSymbolFlags flag) { flags = flags | flag; }

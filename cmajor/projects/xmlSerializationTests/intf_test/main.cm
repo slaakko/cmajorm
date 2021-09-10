@@ -1,0 +1,20 @@
+using System;
+using System.Text;
+using System.Xml.Serialization;
+using model;
+
+int main()
+{
+    try
+    {
+        Register();
+        xmltest.TestXmlBundle();
+        xmltest.TestInterface();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

@@ -1,7 +1,7 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 #	Run with nmake from Visual Studio 2019 x64 Native Tools Command Prompt
 
-all: compiler cppbert sys olddevenv
+all: compiler cppbert sys cmlean tools examples xmlSerializationTests olddevenv
 	inst.bat
 
 compiler: buildcomp install
@@ -47,6 +47,10 @@ examples:
 cmsx:
 	cmc -u -v -st -bt=1 ../projects/cmsx/cmsx.cms
 	cmc -u -v -c=release -st -bt=1 ../projects/cmsx/cmsx.cms
+
+xmlSerializationTests:
+	cmc -u -v ../projects/xmlSerializationTests/xmlSerializationTests.cms
+	cmc -u -v -c=release ../projects/xmlSerializationTests/xmlSerializationTests.cms
 
 preinstallation_check:
 	MSBuild -m -verbosity:minimal ..\installation\checkcmajor\checkcmajor.vcxproj -p:Configuration="Debug"

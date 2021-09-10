@@ -1,0 +1,84 @@
+using System;
+using System.Xml.Serialization;
+
+namespace NS
+{
+    public const int carClassId = 10;
+    
+    class Car : XmlSerializable
+    {
+        public nothrow Car() : classId(carClassId), objectId(Uuid.Random())
+        {
+        }
+        public virtual ~Car()
+        {
+        }
+        public nothrow void DestroyObject()
+        {
+            delete this;
+        }
+        public nothrow Uuid ObjectId() const
+        {
+            return objectId;
+        }
+        public nothrow void SetObjectId(const Uuid& objectId_)
+        {
+            objectId = objectId_;
+        }
+        public nothrow int ClassId() const
+        {
+            return classId;
+        }
+        public nothrow string ClassName() const
+        { 
+            return typename(*this);
+        }
+        public nothrow XmlContainer* Container() const
+        {
+            return container;
+        }
+        public nothrow void SetContainer(XmlContainer* container_)
+        {
+            container = container_;
+        }
+        public System.Dom.Element* ToXml(const string& elemetnName)
+        {
+            return null;
+        }
+        public void FromXml(System.Dom.Element* element)
+        {
+        }
+        public const string& RegistrationNumber() const
+        {
+            return registrationNumber;
+        }
+        public void SetRegistrationNumber(const string& registrationNumber_)
+        {
+            registrationNumber = registrationNumber_;
+        }
+        private int classId;
+        private Uuid objectId;
+        private XmlContainer* container;
+        private string registrationNumber;
+    }
+
+    void f()
+    {
+        UniqueXmlPtr<Car> p0;
+        UniqueXmlPtr<Car> p1(Rvalue(p0));
+        p1 = Rvalue(p0);
+
+        UniqueXmlPtr<Car> c0(new Car());
+        c0->SetRegistrationNumber("ABC-123");
+        string reg = c0->RegistrationNumber();
+        Console.Out() << reg << endl();
+    }
+    
+} // NS
+
+void main()
+{
+    NS.f();
+}
+
+

@@ -1214,7 +1214,7 @@ bool Implements(MemberFunctionSymbol* classMemFun, MemberFunctionSymbol* intfMem
 {
     if (classMemFun->GroupName() != intfMemFun->GroupName()) return false;
     if (!classMemFun->ReturnType() || !intfMemFun->ReturnType()) return false;
-    if (classMemFun->ReturnType() != intfMemFun->ReturnType()) return false;
+    if (!TypesEqual(classMemFun->ReturnType(), intfMemFun->ReturnType())) return false;
     int n = classMemFun->Parameters().size();
     if (n != intfMemFun->Parameters().size()) return false;
     for (int i = 1; i < n; ++i)
@@ -1719,6 +1719,11 @@ void* ClassTypeSymbol::StaticObject(Emitter& emitter, bool create)
     {
         emitter.SetStaticObjectCreated(this);
         void* staticObjectGlobal = staticObject;
+        if (StaticsEmitted())
+        {
+            return staticObject;
+        }
+        SetStaticsEmitted();
         std::vector<void*> arrayOfStatics;
         for (TypeSymbol* type : staticLayout)
         {

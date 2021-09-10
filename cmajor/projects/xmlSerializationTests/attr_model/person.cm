@@ -1,0 +1,30 @@
+using System;
+using System.Collections;
+using System.Xml.Serialization;
+
+namespace model
+{
+    [xml]
+    public class Person
+    {
+        public nothrow Person()
+        {
+        }
+        public nothrow const string& Name() const
+        {
+            return name;
+        }
+        public nothrow void SetName(const string& name_)
+        {
+            name = name_;
+        }
+        public void AddVehicle(Vehicle* vehicle, bool includeInBunde)
+        {
+            vehicle->SetOwner(this);
+            vehicles.Add(UniqueXmlPtr<Vehicle>(vehicle));
+            vehicles.Back().SetIncludeInBundle(includeInBunde);
+        }
+        private string name;
+        private List<UniqueXmlPtr<Vehicle>> vehicles;
+    }
+}

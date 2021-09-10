@@ -78,6 +78,8 @@ public:
     void SetCurrentConstructor(ConstructorSymbol* currentConstructorSymbol_, ConstructorNode* currentConstructorNode_);
     ConstructorSymbol* CurrentConstructorSymbol() { return currentConstructorSymbol; }
     ConstructorNode* CurrentConstructorNode() { return currentConstructorNode; }
+    MemberFunctionSymbol* CurrentMemberFunctionSymbol() const { return currentMemberFunctionSymbol; }
+    MemberFunctionNode* CurrentMemberFunctionNode() const { return currentMemberFunctionNode; }
     void SetCurrentDestructor(DestructorSymbol* currentDestructorSymbol_, DestructorNode* currentDestructorNode_);
     void SetCurrentMemberFunction(MemberFunctionSymbol* currentMemberFunctionSymbol_, MemberFunctionNode* currentMemberFunctionNode_);
     BoundStatement* ReleaseStatement() { return statement.release(); }

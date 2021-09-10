@@ -252,8 +252,8 @@ namespace Cm.Service.Debug
             }
             if (args.idle)
             {
-                 serverStartCommand.Append(" --idle");   
-            }   
+                 serverStartCommand.Append(" --idle");
+            }
             if (args.wait)
             {
                 serverStartCommand.Append(" --wait");
@@ -327,7 +327,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessStartReply(Element* reply, const List<Breakpoint*>& breakpoints)
         {
-            StartDebugReply startDebugReply(reply);
+            StartDebugReply startDebugReply;
+            startDebugReply.FromXml(reply);
             if (startDebugReply.success)
             {
                 int n = cast<int>(breakpoints.Count());
@@ -385,7 +386,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessStopReply(Element* reply)
         {
-            StopDebugReply stopDebugReply(reply);
+            StopDebugReply stopDebugReply;
+            stopDebugReply.FromXml(reply);
             LogMessage("debugging stopped");
         }
         public void Continue()
@@ -404,7 +406,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessContinueReply(Element* reply)
         {
-            ContinueReply continueReply(reply);
+            ContinueReply continueReply;
+            continueReply.FromXml(reply);
             if (continueReply.success)
             {
                 if (setDebugLocation != SetDebugLocationMethod())
@@ -434,7 +437,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessNextReply(Element* reply)
         {
-            NextReply nextReply(reply);
+            NextReply nextReply;
+            nextReply.FromXml(reply);
             if (nextReply.success)
             {
                 if (setDebugLocation != SetDebugLocationMethod())
@@ -464,7 +468,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessStepReply(Element* reply)
         {
-            StepReply stepReply(reply);
+            StepReply stepReply;
+            stepReply.FromXml(reply);
             if (stepReply.success)
             {
                 if (setDebugLocation != SetDebugLocationMethod())
@@ -494,7 +499,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessFinishReply(Element* reply)
         {
-            FinishReply finishReply(reply);
+            FinishReply finishReply;
+            finishReply.FromXml(reply);
             if (finishReply.success)
             {
                 if (setDebugLocation != SetDebugLocationMethod())
@@ -527,7 +533,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessUntilReply(Element* reply)
         {
-            UntilReply untilReply(reply);
+            UntilReply untilReply;
+            untilReply.FromXml(reply);
             if (untilReply.success)
             {
                 if (setDebugLocation != SetDebugLocationMethod())
@@ -558,7 +565,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessBreakReply(Element* reply, Breakpoint* breakpoint)
         {
-            BreakReply breakReply(reply);
+            BreakReply breakReply;
+            breakReply.FromXml(reply);
             breakpoint->info = breakReply.breakpointInfo;
             if (breakpoint->info.success)
             {
@@ -585,7 +593,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessDeleteReply(Element* reply)
         {
-            DeleteReply deleteReply(reply);
+            DeleteReply deleteReply;
+            deleteReply.FromXml(reply);
             if (deleteReply.success)
             {
                 LogMessage("breakpoint removed");
@@ -612,7 +621,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessDepthReply(Element* reply, int& depth)
         {
-            DepthReply depthReply(reply);
+            DepthReply depthReply;
+            depthReply.FromXml(reply);
             if (depthReply.success)
             {
                 depth = depthReply.depth;
@@ -639,7 +649,8 @@ namespace Cm.Service.Debug
         }
         private Pair<List<Location>, bool> ProcessFramesReply(Element* reply)
         {
-            FramesReply framesReply(reply);
+            FramesReply framesReply;
+            framesReply.FromXml(reply);
             if (framesReply.success)
             {
                 return MakePair(framesReply.frames, true);
@@ -668,7 +679,8 @@ namespace Cm.Service.Debug
         }
         private void ProcessLocalVariableCountReply(Element* reply, int& count)
         {
-            CountReply countReply(reply);
+            CountReply countReply;
+            countReply.FromXml(reply);
             if (countReply.success)
             {
                 try
@@ -705,7 +717,8 @@ namespace Cm.Service.Debug
         }
         private Pair<List<ChildResult>, bool> ProcessEvaluateLocalVariablesReply(Element* reply)
         {
-            EvaluateChildReply evaluateChildReply(reply);
+            EvaluateChildReply evaluateChildReply;
+            evaluateChildReply.FromXml(reply);
             if (evaluateChildReply.success)
             {
                 return MakePair(evaluateChildReply.results, true);
@@ -734,7 +747,8 @@ namespace Cm.Service.Debug
         }
         private Pair<List<ChildResult>, bool> ProcessEvaluateChildReply(Element* reply)
         {
-            EvaluateChildReply evaluateChildReply(reply);
+            EvaluateChildReply evaluateChildReply;
+            evaluateChildReply.FromXml(reply);
             if (evaluateChildReply.success)
             {
                 return MakePair(evaluateChildReply.results, true);
@@ -760,7 +774,8 @@ namespace Cm.Service.Debug
         }
         private Pair<string, bool> ProcessEvaluateReply(Element* reply)
         {
-            EvaluateReply evaluateReply(reply);
+            EvaluateReply evaluateReply;
+            evaluateReply.FromXml(reply);
             if (evaluateReply.success)
             {
                 return MakePair(evaluateReply.result.value, true);
@@ -795,31 +810,36 @@ namespace Cm.Service.Debug
             {
                 case MessageKind.targetRunningRequest:
                 {
-                    TargetRunningRequest targetRunningRequest(message);
+                    TargetRunningRequest targetRunningRequest;
+                    targetRunningRequest.FromXml(message);
                     ProcessTargetRunningRequest(targetRunningRequest);
                     break;
                 }
                 case MessageKind.targetInputRequest:
                 {
-                    TargetInputRequest targetInputRequest(message);
+                    TargetInputRequest targetInputRequest;
+                    targetInputRequest.FromXml(message);
                     ProcessTargetInputRequest(targetInputRequest);
                     break;
                 }
                 case MessageKind.targetOutputRequest:
                 {
-                    TargetOutputRequest targetOutputRequest(message);
+                    TargetOutputRequest targetOutputRequest;
+                    targetOutputRequest.FromXml(message);
                     ProcessTargetOutputRequest(targetOutputRequest);
                     break;
                 }
                 case MessageKind.logMessageRequest:
                 {
-                    LogDebugMessageRequest logDebugMessageRequest(message);
+                    LogDebugMessageRequest logDebugMessageRequest;
+                    logDebugMessageRequest.FromXml(message);
                     ProcessLogMessageRequest(logDebugMessageRequest);
                     break;
                 }
                 case MessageKind.genericErrorReply:
                 {
-                    GenericDebugErrorReply errorReply(message);
+                    GenericDebugErrorReply errorReply;
+                    errorReply.FromXml(message);
                     ProcessErrorReply(errorReply);
                     break;
                 }

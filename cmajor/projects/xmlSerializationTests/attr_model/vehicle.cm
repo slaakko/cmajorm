@@ -1,0 +1,42 @@
+using System;
+using System.Collections;
+using System.Xml.Serialization;
+
+namespace model
+{
+    public enum VehicleColor
+    {
+        red = 0,
+        green = 1,
+        blue = 2,
+        black = 3,
+        white = 4
+    }
+
+    [xml]
+    public abstract class Vehicle
+    {
+        public virtual ~Vehicle()
+        {
+        }
+        public nothrow Person* Owner()
+        {
+            return owner.Get();
+        }
+        public nothrow void SetOwner(Person* owner_)
+        {
+            owner = owner_;
+        }
+        public nothrow VehicleColor GetColor() const
+        {
+            return color;
+        }
+        public nothrow void SetColor(VehicleColor color_)
+        {
+            color = color_;
+        }
+        private XmlPtr<Person> owner;
+        private VehicleColor color;
+    }
+}
+

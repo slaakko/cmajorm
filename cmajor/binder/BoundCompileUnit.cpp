@@ -655,9 +655,9 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
             else if (targetType->PlainType(span, moduleId)->GetSymbolType() == SymbolType::interfaceTypeSymbol && currentFunction)
             {
                 InterfaceTypeSymbol* targetInterfaceType = static_cast<InterfaceTypeSymbol*>(targetType->PlainType(span, moduleId));
-                if (sourceType->IsClassTypeSymbol()) 
+                if (sourceType->PlainType(span, moduleId)->IsClassTypeSymbol())
                 {
-                    ClassTypeSymbol* sourceClassType = static_cast<ClassTypeSymbol*>(sourceType);
+                    ClassTypeSymbol* sourceClassType = static_cast<ClassTypeSymbol*>(sourceType->PlainType(span, moduleId));
                     int32_t n = sourceClassType->ImplementedInterfaces().size();
                     for (int32_t i = 0; i < n; ++i)
                     {

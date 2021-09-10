@@ -1,0 +1,84 @@
+using System;
+using System.Collections;
+using System.Xml.Serialization;
+
+namespace model
+{
+    public class Car : Vehicle, XmlSerializable
+    {
+        public nothrow static string StaticClassName()
+        {
+            return "model.Car";
+        }
+        public static void Register(int classId_)
+        {
+            classId = classId_;
+            XmlRegister<Car>(classId);
+        }
+        public static void* Create()
+        {
+            return new Car();
+        }
+        public nothrow override void DestroyObject()
+        {
+            base->DestroyObject();
+        }
+        public override nothrow XmlContainer* Container() const
+        {
+            return base->Container();
+        }
+        public override nothrow void SetContainer(XmlContainer* container_)
+        {
+            base->SetContainer(container_);
+        }
+        public override nothrow Uuid ObjectId() const
+        {
+            return base->ObjectId();
+        }
+        public override nothrow void SetObjectId(const Uuid& objectId)
+        {
+            base->SetObjectId(objectId);
+        }
+        public nothrow int ClassId() const
+        {
+            return classId;
+        }
+        public nothrow string ClassName() const
+        {
+            return typename(*this);
+        }
+        public override void SetObjectXmlAttributes(System.Dom.Element* element)
+        {
+            element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            element->SetAttribute(u"objectId", ToUtf32(ToString(ObjectId())));
+            element->SetAttribute(u"className", ToUtf32(ClassName()));
+        }
+        public override System.Dom.Element* ToXml(const string& elementName)
+        {
+            System.Dom.Element* element = base->ToXml(elementName);
+            element->AppendChild(UniquePtr<System.Dom.Node>(ToXml(registrationNumber, "registrationNumber").Release()));
+            return element;
+        }
+        public override void FromXml(System.Dom.Element* element)
+        {
+            base->FromXml(element);
+            FromXml(element, "registrationNumber", registrationNumber);
+        }
+        public override List<XmlPtrBase*> GetPtrs() const
+        {
+            List<XmlPtrBase*> list = base->GetPtrs();
+            return list;
+        }
+        public const string& RegistrationNumber() const
+        {
+            return registrationNumber;
+        }
+        public void SetRegistrationNumber(const string& registrationNumber_)
+        {
+            registrationNumber = registrationNumber_;
+        }
+        private static int classId;
+        private string registrationNumber;
+    }
+}
+

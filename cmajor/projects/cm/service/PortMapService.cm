@@ -200,7 +200,8 @@ namespace Cm.Service.PortMap
         string message = GetMessage(replyDoc->DocumentElement());
         if (message == "stopPortMapServerReply")
         {
-            StopPortMapServerReply reply(replyDoc->DocumentElement());
+            StopPortMapServerReply reply;
+            reply.FromXml(replyDoc->DocumentElement());
         }
     }
 
@@ -240,7 +241,8 @@ namespace Cm.Service.PortMap
                     string message = GetMessage(replyDoc->DocumentElement());
                     if (message == "getFreePortNumberReply")
                     {
-                        GetFreePortNumberReply reply(replyDoc->DocumentElement());
+                        GetFreePortNumberReply reply;
+                        reply.FromXml(replyDoc->DocumentElement());
                         int freePortNumber = reply.portNumber;
                         portMapServicePortNumber = port;
                         return freePortNumber;
@@ -308,7 +310,8 @@ namespace Cm.Service.PortMap
                 string message = GetMessage(replyDoc->DocumentElement());
                 if (message == "viewPortLeaseReply")
                 {
-                    ViewPortLeaseReply reply(replyDoc->DocumentElement());
+                    ViewPortLeaseReply reply;
+                    reply.FromXml(replyDoc->DocumentElement());
                     return reply.portLeases;
                 }
                 else

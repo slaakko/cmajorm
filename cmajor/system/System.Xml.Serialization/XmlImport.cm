@@ -458,6 +458,26 @@ namespace System.Xml.Serialization
         }
     }
 
+    public void FromXml<T>(Element* parentElement, const string& fieldName, UniqueXmlPtr<T>& ptr)
+        where T is XmlConstructible
+    {
+        ptr.Reset();
+        Element* element = GetXmlFieldElement(fieldName, parentElement);
+        if (element != null)
+        {
+            ustring value = element->GetAttribute(u"value");
+            if (value != u"null")
+            {
+                ustring objectIdAttr = element->GetAttribute(u"objectId");
+                if (!objectIdAttr.IsEmpty())
+                {
+                    Uuid objectId = ParseUuid(ToUtf8(objectIdAttr));
+                    ptr.SetTargetObjectId(objectId);
+                }
+            }
+        }
+    }
+
     public void FromXml<T>(Element* parentElement, const string& fieldName, List<T>& list)
         where T is XmlImportableScalarType
     {
@@ -597,7 +617,7 @@ namespace System.Xml.Serialization
             }
         }
     }
-    
+
     public void FromXml<T>(Element* parentElement, const string& fieldName, List<XmlPtr<T>>& list)
         where T is XmlConstructible
     {
@@ -618,7 +638,8 @@ namespace System.Xml.Serialization
                         if (node is Element*)
                         {
                             Element* element = cast<Element*>(node);
-                            XmlPtr<T> ptr;
+                            list.Add(XmlPtr<T>());
+                            XmlPtr<T>& ptr = list.Back();
                             ustring value = element->GetAttribute(u"value");
                             if (value != u"null")
                             {
@@ -629,7 +650,45 @@ namespace System.Xml.Serialization
                                     ptr.SetTargetObjectId(objectId);
                                 }
                             }
-                            list.Add(Rvalue(ptr));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void FromXml<T>(Element* parentElement, const string& fieldName, List<UniqueXmlPtr<T>>& list)
+        where T is XmlConstructible
+    {
+        list.Clear();
+        Element* element = GetXmlFieldElement(fieldName, parentElement);
+        if (element != null)
+        {
+            UniquePtr<XPathObject> result = Evaluate(u"item", element);
+            if (!result.IsNull())
+            {
+                if (result.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        Node* node = (*nodeSet)[i];
+                        if (node is Element*)
+                        {
+                            Element* element = cast<Element*>(node);
+                            list.Add(UniqueXmlPtr<T>());
+                            UniqueXmlPtr<T>& ptr = list.Back();
+                            ustring value = element->GetAttribute(u"value");
+                            if (value != u"null")
+                            {
+                                ustring objectIdAttr = element->GetAttribute(u"objectId");
+                                if (!objectIdAttr.IsEmpty())
+                                {
+                                    Uuid objectId = ParseUuid(ToUtf8(objectIdAttr));
+                                    ptr.SetTargetObjectId(objectId);
+                                }
+                            }
                         }
                     }
                 }
@@ -637,4 +696,5 @@ namespace System.Xml.Serialization
         }
     }
 }
+
 

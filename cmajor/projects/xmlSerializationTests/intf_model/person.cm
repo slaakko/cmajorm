@@ -2,13 +2,13 @@ using System;
 using System.Collections;
 using System.Xml.Serialization;
 
-namespace xmltest
+namespace model
 {
     public class Person : XmlSerializable
     {
-        public static string StaticClassName()
+        public nothrow static string StaticClassName()
         {
-            return "xmltest.Person";
+            return "model.Person";
         }
         public static void Register(int classId_)
         {
@@ -26,7 +26,7 @@ namespace xmltest
         {
             delete this;
         }
-        public virtual nothrow Uuid ObjectId()
+        public virtual nothrow Uuid ObjectId() const
         {
             return objectId;
         }
@@ -34,31 +34,33 @@ namespace xmltest
         {
             objectId = objectId_;
         }
-        public virtual XmlContainer* Container()
+        public virtual XmlContainer* Container() const
         {
             return container;
         }
-        public virtual void SetContainer(XmlContainer* container)
+        public virtual void SetContainer(XmlContainer* container_)
         {
-            container = container;
+            container = container_;
         }
-        public int ClassId()
+        public int ClassId() const
         {
             return classId;
         }
-        public string ClassName()
+        public string ClassName() const
         {
             return typename(*this);
         }
         public virtual void SetObjectXmlAttributes(System.Dom.Element* element)
         {
-            element->SetAttribute(u"objectId", ToUtf32(ToString(objectId)));
             element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            element->SetAttribute(u"objectId", ToUtf32(ToString(ObjectId())));
+            element->SetAttribute(u"className", ToUtf32(ClassName()));
         }
         public virtual System.Dom.Element* ToXml(const string& elementName)
         {
             System.Dom.Element* element = new System.Dom.Element(ToUtf32(elementName));
             SetObjectXmlAttributes(element);
+            element->AppendChild(UniquePtr<System.Dom.Node>(System.Xml.Serialization.ToXml(name, "name").Release()));
             element->AppendChild(UniquePtr<System.Dom.Node>(System.Xml.Serialization.ToXml(vehicles, "vehicles").Release()));
             return element;
         }
@@ -69,18 +71,36 @@ namespace xmltest
             {
                 objectId = ParseUuid(ToUtf8(objectIdAttr));
             }
-            ustring classIdAttr = element->GetAttribute(u"classId");
-            if (!classIdAttr.IsEmpty())
-            {
-                classId = ParseInt(ToUtf8(classIdAttr));
-            }
+            System.Xml.Serialization.FromXml(element, "name", name);
             System.Xml.Serialization.FromXml(element, "vehicles", vehicles);
+        }
+        public const string& Name() const
+        {
+            return name;
+        }
+        public void SetName(const string& name_)
+        {
+            name = name_;
+        }
+        public void AddVehicle(Vehicle* vehicle)
+        {
+            vehicle->SetOwner(this);
+            vehicles.Add(UniqueXmlPtr<Vehicle>(vehicle));
+        }
+        public virtual List<XmlPtrBase*> GetPtrs() const
+        {
+            List<XmlPtrBase*> ptrs;
+            for (UniqueXmlPtr<Vehicle>& ptr : vehicles)
+            {
+                ptrs.Add(&ptr);
+            }
+            return ptrs;
         }
         private static int classId;
         private Uuid objectId;
         private XmlContainer* container;
-        private List<XmlPtr<Vehicle>> vehicles;
+        private string name;
+        private List<UniqueXmlPtr<Vehicle>> vehicles;
     }
-    
 }
 

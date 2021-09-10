@@ -146,6 +146,10 @@ Control::Control(ControlCreateParams& createParams) :
 Control::~Control()
 {
     Application::GetWindowManager().RemoveWindow(this);
+    if (handle)
+    {
+        bool succeeded = DestroyWindow(handle);
+    }
 }
 
 ContainerControl* Control::GetContainerControl() const

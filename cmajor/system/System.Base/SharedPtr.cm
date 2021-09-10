@@ -58,7 +58,7 @@ namespace System
         private int useCount;
         private int weakCount;
     }
-    
+
     public class Counter<T> : CounterBase
     {
         private typedef Counter<T> Self;
@@ -77,7 +77,7 @@ namespace System
         }
         private T* ptr;
     }
-    
+
     public class SharedCount<T>
     {
         private typedef Counter<T>* CounterPtrType;
@@ -175,7 +175,7 @@ namespace System
     {
         return SharedCount<U>(cast<Counter<U>*>(from.GetCounter()));
     }
-    
+
     public class WeakCount<T>
     {
         private typedef Counter<T>* CounterPtrType;
@@ -259,7 +259,7 @@ namespace System
         }
         private CounterPtrType counter;
     }
-    
+
     public nothrow bool operator==<T>(const WeakCount<T>& left, const WeakCount<T>& right)
     {
         return left.GetCounter() == right.GetCounter();
@@ -294,7 +294,7 @@ namespace System
         }
         public nothrow SharedPtr(const WeakPtr<T>& that) : ptr(), count(that.GetCount())
         {
-            ptr = that.Get();
+            ptr = that.GetPtrForSharedPtr();
         }
         public nothrow void Reset()
         {
@@ -386,7 +386,7 @@ namespace System
         }
         public nothrow WeakPtr(const Self& that) : ptr(), count(that.count)
         {
-            ptr = that.Lock().Get();
+            ptr = that.Lock().Ptr();
         }
         public default ~WeakPtr();
         public nothrow void operator=(const Self& that)
@@ -424,17 +424,18 @@ namespace System
             Swap(ptr, that.ptr);
             count.Swap(that.count);
         }
+        // GetPtrForSharedPtr() is not ment to be called by user code.
+        // Call the Lock() member function instead when you want to get the pointer.
+        // It returns a SharedPtr that may or may not contain a pointer,
+        // depending on whether the pointer is expired or not.
+        
+        public nothrow inline T* GetPtrForSharedPtr() const
+        {
+            return ptr;
+        }
         public inline nothrow const CountType& GetCount() const
         {
             return count;
-        }
-        public inline nothrow T* GetPtr() const
-        {
-            return ptr;
-        }
-        public inline nothrow T* Get() const
-        {
-            return ptr;
         }
         public nothrow void Assign(T* ptr_, const SharedCount<T>& count_)   // to support EnableSharedFromThis
         {
@@ -453,14 +454,14 @@ namespace System
             #assert(p.Get() == this);
             return p;
         }
-        public nothrow WeakPtr<T>& GetWeakThis() 
+        public nothrow WeakPtr<T>& GetWeakThis()
         {
             return weakThis;
         }
         private WeakPtr<T> weakThis;
     }
 
-    public nothrow inline void EnableSharedFromThis<T>(void*, void*, const SharedCount<T>&) 
+    public nothrow inline void EnableSharedFromThis<T>(void*, void*, const SharedCount<T>&)
     {
     }
 

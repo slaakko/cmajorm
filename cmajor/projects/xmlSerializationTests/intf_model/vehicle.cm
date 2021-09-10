@@ -1,0 +1,107 @@
+using System;
+using System.Collections;
+using System.Xml.Serialization;
+
+namespace model
+{
+    public enum VehicleColor
+    {
+        red = 0,
+        green = 1,
+        blue = 2,
+        black = 3,
+        white = 4
+    }
+
+    public abstract class Vehicle : XmlSerializable
+    {
+        public virtual ~Vehicle()
+        {
+        }
+        public nothrow static string StaticClassName()
+        {
+            return "model.Vehicle";
+        }
+        public nothrow int ClassId() const
+        {
+            return classId;
+        }
+        public nothrow string ClassName() const
+        {
+            return typename(*this);
+        }
+        public nothrow virtual void DestroyObject()
+        {
+            delete this;
+        }
+        public virtual nothrow Uuid ObjectId() const
+        {
+            return objectId;
+        }
+        public virtual nothrow void SetObjectId(const Uuid& objectId_)
+        {
+            objectId = objectId_;
+        }
+        public virtual nothrow XmlContainer* Container() const
+        {
+            return container;
+        }
+        public virtual nothrow void SetContainer(XmlContainer* container_)
+        {
+            container = container_;
+        }
+        public virtual void SetObjectXmlAttributes(System.Dom.Element* element)
+        {
+            element->SetAttribute(u"classId", ToUtf32(ToString(classId)));
+            element->SetAttribute(u"objectId", ToUtf32(ToString(ObjectId())));
+            element->SetAttribute(u"className", ToUtf32(ClassName()));
+        }
+        public virtual System.Dom.Element* ToXml(const string& elementName)
+        {
+            System.Dom.Element* element = new System.Dom.Element(ToUtf32(elementName));
+            SetObjectXmlAttributes(element);
+            element->AppendChild(UniquePtr<System.Dom.Node>(System.Xml.Serialization.ToXml(owner, "owner").Release()));
+            element->AppendChild(UniquePtr<System.Dom.Node>(System.Xml.Serialization.ToXml(color, "color").Release()));
+            return element;
+        }
+        public virtual void FromXml(System.Dom.Element* element)
+        {
+            ustring objectIdAttr = element->GetAttribute(u"objectId");
+            if (!objectIdAttr.IsEmpty())
+            {
+                objectId = ParseUuid(ToUtf8(objectIdAttr));
+            }
+            System.Xml.Serialization.FromXml(element, "owner", owner);
+            System.Xml.Serialization.FromXml(element, "color", color);
+
+        }
+        public virtual List<XmlPtrBase*> GetPtrs() const
+        {
+            List<XmlPtrBase*> ptrs;
+            ptrs.Add(&owner);
+            return ptrs;
+        }
+        public nothrow Person* Owner()
+        {
+            return owner.Get();
+        }
+        public nothrow void SetOwner(Person* owner_)
+        {
+            owner = owner_;
+        }
+        public nothrow VehicleColor GetColor() const
+        {
+            return color;
+        }
+        public nothrow void SetColor(VehicleColor color_)
+        {
+            color = color_;
+        }
+        private static int classId;
+        private Uuid objectId;
+        private XmlContainer* container;
+        private XmlPtr<Person> owner;
+        private VehicleColor color;
+    }
+}
+

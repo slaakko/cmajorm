@@ -1,0 +1,108 @@
+using System;
+using System.IO;
+using System.Text;
+using System.Xml.Serialization;
+using model;
+
+int main()
+{
+    try
+    {
+        Register();
+
+        XmlContainer xmlContainer;
+
+        TestSerializableType type;
+        type.x1.x = "string";
+
+        ClassType* cls = new ClassType();
+        cls->x = "unique";
+        type.x2.Reset(cls);
+
+        ClassType* cls2 = new ClassType();
+        cls2->x = "shared";
+        type.x3.Reset(cls2);
+
+        ClassType* cls3 = new ClassType();
+        Add(cls3, &xmlContainer);
+        cls3->x = "xml";
+        type.x4 = XmlPtr<ClassType>(cls3);
+
+        ClassType* cls4 = new ClassType();
+        Add(cls4, &xmlContainer);
+        type.x5 = UniqueXmlPtr<ClassType>(cls4);
+
+        type.x6.Add(true);
+        type.x6.Add(false);
+
+        ClassType* cls5 = new ClassType();
+        cls5->x = "list unique";
+        type.x7.Add(UniquePtr<ClassType>(cls5));
+
+        ClassType* cls6 = new ClassType();
+        cls6->x = "list shared";
+        type.x8.Add(SharedPtr<ClassType>(cls6));
+
+        ClassType* cls7 = new ClassType();
+        type.x9.Add(XmlPtr<ClassType>(cls7));
+
+        ClassType* cls8 = new ClassType();
+        type.x10.Add(UniqueXmlPtr<ClassType>(cls8));
+
+        type.x11 = "string";
+        type.x12 = w"wstring";
+        type.x13 = u"ustring";
+
+        type.x14 = Now();
+        type.x15 = Duration(Now() - type.x14);
+        type.x16 = true;
+        type.x17 = 1;
+        type.x18 = 2u;
+        type.x19 = 3;
+        type.x20 = 4u;
+        type.x21 = 5;
+        type.x22 = 6u;
+        type.x23 = 7;
+        type.x24 = 8u;
+        type.x25 = 9.0f;
+        type.x26 = 10.0;
+        type.x27 = 'x';
+        type.x28 = w'y';
+        type.x29 = u'z';
+        type.x30 = Uuid.Random();
+        type.x31 = EnumType.blue;
+        type.x32 = GetCurrentDate();
+        type.x33 = GetCurrentDateTime();
+        type.x34 = GetCurrentTimestamp();
+        type.x35.Add(42);
+
+        System.Dom.Element* element = type.ToXml("object");
+        System.Dom.Document doc;
+        doc.AppendChild(UniquePtr<System.Dom.Node>(element));
+        StringWriter stringWriter;
+        CodeFormatter formatter(stringWriter);
+        doc.Write(formatter);
+
+        string str = stringWriter.GetString();
+        Console.Out() << str << endl();
+
+        ustring content = ToUtf32(str);
+        UniquePtr<System.Dom.Document> readDoc = System.Dom.ParseDocument(content, "string");
+
+        TestSerializableType readType;
+        readType.FromXml(readDoc->DocumentElement());
+
+        System.Dom.Element* outElement = readType.ToXml("object");
+        System.Dom.Document outDoc;
+        outDoc.AppendChild(UniquePtr<System.Dom.Node>(outElement));
+        CodeFormatter outFormatter(Console.Out());
+        outDoc.Write(outFormatter);
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}
+

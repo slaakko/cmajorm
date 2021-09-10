@@ -47,7 +47,9 @@ AttributeBinder::AttributeBinder(Module* module)
     attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(jsonFieldNameAttributeProcessor));
     AttributeProcessor* systemDefaultAttributeProcessor = new SystemDefaultAttributeProcessor();
     attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(systemDefaultAttributeProcessor));
-    AttributeProcessor* xmlAttributeProcessor = new XmlAttributeProcessor();
+    //AttributeProcessor* xmlAttributeProcessor = new XmlAttributeProcessor();
+    //attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(xmlAttributeProcessor));
+    NewXmlAttributeProcessor* xmlAttributeProcessor = new NewXmlAttributeProcessor();
     attributeProcessors.push_back(std::unique_ptr<AttributeProcessor>(xmlAttributeProcessor));
     for (const std::unique_ptr<AttributeProcessor>& attributeProcessor : attributeProcessors)
     {

@@ -359,7 +359,8 @@ namespace Cm.Service.Build
             string messageKind = GetMessageKind(replyDoc->DocumentElement());
             if (messageKind == "stopBuildReply")
             {
-                StopBuildReply reply(replyDoc->DocumentElement());
+                StopBuildReply reply;
+                reply.FromXml(replyDoc->DocumentElement());
             }
             else
             {
@@ -378,7 +379,8 @@ namespace Cm.Service.Build
             string messageKind = GetMessageKind(replyDoc->DocumentElement());
             if (messageKind == "keepAliveBuildReply")
             {
-                KeepAliveBuildReply reply(replyDoc->DocumentElement());
+                KeepAliveBuildReply reply;
+                reply.FromXml(replyDoc->DocumentElement());
             }
             else
             {
@@ -417,7 +419,8 @@ namespace Cm.Service.Build
                 {
                     if (messageKind == "logBuildMessageRequest")
                     {
-                        LogBuildMessageRequest logBuildMessageRequest(replyDoc->DocumentElement());
+                        LogBuildMessageRequest logBuildMessageRequest;
+                        logBuildMessageRequest.FromXml(replyDoc->DocumentElement());
                         string message = logBuildMessageRequest.message;
                         LogMessage(message);
                         LogBuildMessageReply logBuildMessageReply;
@@ -428,7 +431,8 @@ namespace Cm.Service.Build
                     }
                     else if (messageKind == "buildProgressMessage")
                     {
-                        BuildProgressMessage buildProgressMessage(replyDoc->DocumentElement());
+                        BuildProgressMessage buildProgressMessage;
+                        buildProgressMessage.FromXml(replyDoc->DocumentElement());
                         notifyProgress();
                     }
                     replyStr = ReadStr(socket);
@@ -440,12 +444,14 @@ namespace Cm.Service.Build
                     StreamWriter replyWriter(File.CreateText(Path.Combine(CmCodeLogDir(), "build-reply.xml")));
                     CodeFormatter replyFormatter(replyWriter);
                     replyDoc->Write(replyFormatter);
-                    BuildReply buildReply(replyDoc->DocumentElement());
+                    BuildReply buildReply;
+                    buildReply.FromXml(replyDoc->DocumentElement());
                     return ProcessBuildReply(buildReply);
                 }
                 else if (messageKind == "genericBuildErrorReply")
                 {
-                    GenericBuildErrorReply genericBuildErrorReply(replyDoc->DocumentElement());
+                    GenericBuildErrorReply genericBuildErrorReply;
+                    genericBuildErrorReply.FromXml(replyDoc->DocumentElement());
                     LogMessage("BuildService: ProcessBuildRequest: generic error reply received: " + genericBuildErrorReply.error);
                 }
                 else
