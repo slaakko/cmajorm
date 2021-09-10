@@ -2,16 +2,21 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>0ffba54b-60e3-41ec-9cc8-fdfdc106ad7e</ProjectGuid>
+  <ProjectGuid>7045373f-aec1-4f0b-9d44-ce5528b6d186</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>program</TargetType>
  </PropertyGroup>
  <ItemGroup>
-  <CmCompile Include="Main.cm"/>
+  <CmCompile Include="main.cm"/>
+  <CmCompile Include="register.cm"/>
+  <CmCompile Include="test_bundle.cm"/>
+  <CmCompile Include="test_interface.cm"/>
  </ItemGroup>
  <ItemGroup/>
- <ItemGroup/>
+ <ItemGroup>
+  <ProjectReference Include="../intf_model/intf_model.cmproj"/>
+ </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
 </Project>
