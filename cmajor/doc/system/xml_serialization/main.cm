@@ -1,0 +1,21 @@
+// main.cm:
+
+using System;
+using System.Xml.Serialization;
+using model;
+
+public int main()
+{
+    try
+    {
+        Register();
+        Save("traffic.xml");
+        UniqueXmlPtr<Person> person = Load("traffic.xml");
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

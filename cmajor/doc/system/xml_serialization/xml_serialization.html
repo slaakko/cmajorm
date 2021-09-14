@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>XML serialization</title>
+    <link href="../style/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>XML serialization</h1>
+
+	<p>
+		Code for the example is under the <em>cmajor/projects/xmlSerializationTests</em> directory 
+		in the <em>attr_model</em> and <em>attr_test</em> projects.
+	</p>
+
+	<h2>Example</h2>
+	
+	<p>
+		Suppose you are writing a traffic simulation application. 
+		A traffic simulation may contain a person class and classes for various vehicles:
+	</P>
+	
+	<img src="image/traffic.spring.png"/>
+	
+	<p>
+		A person has a name and it may own some vehicles. A vehicle has a color and a pointer to its owner. 
+		A car derives from a vehicle and has a registration number. A bicycle derives also from a vehicle and has a price.
+	</p>
+	
+	<p>
+		In this example we build classes that can be serialized to XML and constructed from an XML representation.
+	</p>
+	
+	<h3>XML Classes</h3>
+	
+	<p>
+		Cmajor provides an automatic mechanism for serializing objects as XML.
+		This works by declaring classes with an <strong>[xml]</strong> attribute. 
+		The compiler generates <em>ToXml</em> and <em>FromXml</em> member functions for classes having that attribute. They do  
+		the actual serialization to and from XML.
+	</p>
+	
+	<p>
+		Here's code for an XML serializable person class:
+	</p>
+	
+	<div class="code">
+	<span class="line">
+	<span class="comment">// person.cm:</span>
+	<br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Collections</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">namespace</span>&nbsp;<span class="identifier">model</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">[</span><span class="identifier">xml</span><span class="other">]</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<span class="identifier">Person</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// ...</span>
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">string</span>&nbsp;<span class="identifier">name</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">List</span><span class="other">&lt;</span><span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Vehicle</span><span class="other">&gt;&gt;</span>&nbsp;<span class="identifier">vehicles</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">}</span><br/>
+	</span>
+	</div>
+	
+	<p>
+		The <em>Person</em> class has an <strong>[xml]</strong> attribute, so the compiler generates XML serialization code for it.
+		The member variables of an XML class are serialized automatically unless they have an <strong>[xml="false"]</strong> attribute,
+		so <em>name</em> and <em>vehicles</em> are serialized when Person object is serialized.
+	</p>
+	
+	<p>
+		In addition to <em>ToXml</em> and <em>FromXml</em> member functions, the compiler generates member variables for storing an integer class identifier 
+		for an XML serializable class and stroring an object ID for each XML serializable object. They can be accessed using the <em>ClassId</em> and
+		<em>ObjectId</em> member functions.
+	</p>
+		
+	<p>
+		The <a href="../content/System.Xml.Serialization/doc/class_UniqueXmlPtr_T_8EF0E7B4A0FAC86A34F0BA492592F23BB7277902.html">UniqueXmlPtr</a> 
+		is a unique ownership pointer class that contains an object ID of the object it points to. 
+		A UniqueXmlPtr pointer deletes the pointed-to object when it goes out of scope.
+	</p>
+	
+	<p>
+		Let's move on to the <em>Vehicle</em> class:
+	</p>
+	
+	<div class="code">
+	<span class="line">
+	<span class="comment">// vehicle.cm:</span>
+	<br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Collections</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">namespace</span>&nbsp;<span class="identifier">model</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">enum</span>&nbsp;<span class="identifier">VehicleColor</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">red</span>&nbsp;<span class="other">=</span>&nbsp;<span class="number">0</span><span class="other">,</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">green</span>&nbsp;<span class="other">=</span>&nbsp;<span class="number">1</span><span class="other">,</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">blue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="number">2</span><span class="other">,</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">black</span>&nbsp;<span class="other">=</span>&nbsp;<span class="number">3</span><span class="other">,</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">white</span>&nbsp;<span class="other">=</span>&nbsp;<span class="number">4</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">[</span><span class="identifier">xml</span><span class="other">]</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">abstract</span>&nbsp;<span class="keyword">class</span>&nbsp;<span class="identifier">Vehicle</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// ...</span>
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">VehicleColor</span>&nbsp;<span class="identifier">color</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">XmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">owner</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">}</span><br/>
+	</span>
+	</div>
+
+	<p>
+		Value of an enumerated type such as VehicleColor is serialized as a <strong>long</strong> value. This handles the <em>color</em> member variable of 
+		the <em>Vehicle</em> class.	For the <em>owner</em> member variable, we have used the 
+		<a href="../content/System.Xml.Serialization/doc/class_XmlPtr_T_7D32CC0147CF6ED6252FD10F4FA67369B25A0035.html">XmlPtr</a> class that is
+		like an ordinary pointer but in addition it contains an object ID of the object it points to. 
+	</p>
+
+
+	<p>
+		The <em>Car</em> class derives from the <em>Vehicle</em> class, so the compiler overrides the <em>ToXml</em> and <em>FromXml</em> member functions.
+		The overridden member functions call the base class member functions and in addition have serialization code for properties of the derived class:
+	</p>
+	
+	<div class="code">
+	<span class="line">
+	<span class="comment">// car.cm:</span>
+	<br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Collections</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">namespace</span>&nbsp;<span class="identifier">model</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">[</span><span class="identifier">xml</span><span class="other">]</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<span class="identifier">Car</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">Vehicle</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// ...</span>
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">string</span>&nbsp;<span class="identifier">registrationNumber</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">}</span><br/>
+	</span>
+	</div>
+	
+	<p>
+		The <em>Bicycle</em> is like the <em>Car</em> class and is here for completeness:
+	</p>
+
+	<div class="code">
+	<span class="line">
+	<span class="comment">// bicycle.cm:</span>
+	<br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Collections</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">namespace</span>&nbsp;<span class="identifier">model</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">[</span><span class="identifier">xml</span><span class="other">]</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">class</span>&nbsp;<span class="identifier">Bicycle</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">Vehicle</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// ...</span>
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">float</span>&nbsp;<span class="identifier">price</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">}</span><br/>
+	</span>
+	</div>
+	
+	<h3>Saving</h3>
+	
+	<p>
+		Now we are ready to create an example model consisting of XML classes and save the model to an XML file.
+		Here's the code that does this:
+	</p>
+	
+	<div class="code">
+	<span class="line">
+	<span class="comment">// save.cm:</span>
+	<br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">IO</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Collections</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">namespace</span>&nbsp;<span class="identifier">model</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span>&nbsp;<span class="identifier">Save</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlFileName</span><span class="other">)</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">XmlContainer</span>&nbsp;<span class="identifier">container</span><span class="other">;</span>&nbsp;<span class="comment">// XmlContainer does not own the objects by default</span>
+	<br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Car</span><span class="other">&gt;</span>&nbsp;<span class="identifier">car</span>&nbsp;<span class="other">=</span>&nbsp;<span class="keyword">new</span>&nbsp;<span class="identifier">Car</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">car</span><span class="other">-&gt;</span><span class="identifier">SetRegistrationNumber</span><span class="other">(</span><span class="string">&quot;ABC-123&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">car</span><span class="other">-&gt;</span><span class="identifier">SetColor</span><span class="other">(</span><span class="identifier">VehicleColor</span><span class="other">.</span><span class="identifier">red</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Add</span><span class="other">(</span><span class="identifier">car</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">&amp;</span><span class="identifier">container</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Bicycle</span><span class="other">&gt;</span>&nbsp;<span class="identifier">bicycle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="keyword">new</span>&nbsp;<span class="identifier">Bicycle</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bicycle</span><span class="other">-&gt;</span><span class="identifier">SetColor</span><span class="other">(</span><span class="identifier">VehicleColor</span><span class="other">.</span><span class="identifier">green</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bicycle</span><span class="other">-&gt;</span><span class="identifier">SetPrice</span><span class="other">(</span><span class="number">1000.0f</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Add</span><span class="other">(</span><span class="identifier">bicycle</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">&amp;</span><span class="identifier">container</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">person</span><span class="other">(</span><span class="keyword">new</span>&nbsp;<span class="identifier">Person</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">person</span><span class="other">-&gt;</span><span class="identifier">SetName</span><span class="other">(</span><span class="string">&quot;Joe Coder&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Add</span><span class="other">(</span><span class="identifier">person</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">&amp;</span><span class="identifier">container</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">person</span><span class="other">-&gt;</span><span class="identifier">AddVehicle</span><span class="other">(</span><span class="identifier">car</span><span class="other">.</span><span class="identifier">Release</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="keyword">true</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">person</span><span class="other">-&gt;</span><span class="identifier">AddVehicle</span><span class="other">(</span><span class="identifier">bicycle</span><span class="other">.</span><span class="identifier">Release</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="keyword">true</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">XmlBundle</span>&nbsp;<span class="identifier">bundle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">container</span><span class="other">.</span><span class="identifier">CreateBundle</span><span class="other">(</span><span class="identifier">person</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">string</span>&nbsp;<span class="identifier">xmlStr</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">bundle</span><span class="other">.</span><span class="identifier">ToXmlString</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">StreamWriter</span>&nbsp;<span class="identifier">xmlFile</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">File</span><span class="other">.</span><span class="identifier">CreateText</span><span class="other">(</span><span class="identifier">xmlFileName</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">xmlFile</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">xmlStr</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">}</span><br/>
+	</span>
+	</div>
+
+	<p>
+		We have created an instance of the 
+		<a href="../content/System.Xml.Serialization/doc/class_XmlContainer_3A675CCAF06087583804E6C45EE63670AAC7C2B4.html">XmlContainer</a> class,
+		and then created instances of <em>Car</em>, <em>Bicycle</em> and <em>Person</em> classes and added them to the container.
+		The container does not by default own the objects added to it, so have we used <em>UniqueXmlPtr</em> for the <em>Car</em>, 
+		<em>Bicycle</em> and <em>Person</em>. The vehicles are released and added to the person object, because the person takes ownership of the vehicles 
+		added to it.
+	</p>
+	
+	<p>
+		Then we have created an <a href="../content/System.Xml.Serialization/doc/class_XmlBundle_09EF3A12BD430DECAEEE5D0E67BDE0151E1D654A.html">XmlBundle</a> 
+		from the container by calling the <em>CreateBundle</em> function of the container. The XML bundle contains a reference to a <em>root</em> object,
+		an object passed to the <em>CreateBundle</em> function, and also references to objects reachable from the root by traversing them 
+		using the <em>XmlPtr</em> and <em>UniqueXmlPtr</em> pointer objects. 
+		If you don't want an object to be added to a bundle, you can call the <em>SetIncludeInBundle</em> member function of the 
+		<a href="../content/System.Xml.Serialization/doc/class_XmlPtrBase_118F102367E9E5B890C372D12976532DD05C82A2.html">XmlPtrBase</a> with <strong>false</strong>
+		argument. 
+	</p>
+	
+	<p>
+		Finally we have serialized the bundle to a string by calling the <em>ToXmlString</em> member function of the bundle,
+		created a text file, and written the XML string to the file.
+	</p>
+
+	<h3>XML</h3>
+	
+	<p>
+		Here's the contents of the generated XML file:
+	</p>
+
+	<pre>
+	&lt;xmlBundle rootObjectId="54c3707d-cade-1ee5-4697-f36011a7c08c">
+	 &lt;object classId="2" className="model.Person" objectId="54c3707d-cade-1ee5-4697-f36011a7c08c">
+	  &lt;name value="Joe Coder"/>
+	  &lt;vehicles>
+	   &lt;item objectId="a31587c6-0497-473f-5701-3ba9fd5d467f"/>
+	   &lt;item objectId="76e6cef3-d9f3-284f-f90e-e68b5473c1e0"/>
+	  &lt;/vehicles>
+	 &lt;/object>
+	 &lt;object classId="0" className="model.Car" objectId="a31587c6-0497-473f-5701-3ba9fd5d467f">
+	  &lt;color value="0"/>
+	  &lt;owner objectId="54c3707d-cade-1ee5-4697-f36011a7c08c"/>
+	  &lt;registrationNumber value="ABC-123"/>
+	 &lt;/object>
+	 &lt;object classId="1" className="model.Bicycle" objectId="76e6cef3-d9f3-284f-f90e-e68b5473c1e0">
+	  &lt;color value="1"/>
+	  &lt;owner objectId="54c3707d-cade-1ee5-4697-f36011a7c08c"/>
+	  &lt;price value="1000"/>
+	 &lt;/object>
+	&lt;/xmlBundle>
+	</pre>
+	
+	<p>
+		The object IDs are string representations of the 
+		<a href="../content/System.Base/doc/class_Uuid_81014B41FA199BCF75CA0E6799422874FC800AB7.html">UUID</a> class.
+		For the <em>XmlPtr</em> and <em>UniqueXmlPtr</em> only the object ID of the pointed-to object is serialized.
+		When reading an <em>XmlBundle</em> from an XML file, the bundle can recreate relations of the objects using the 
+		contained object IDs. The <em>className</em> attributes in the XML file are not used by the implementation in any way.
+		They are generated so that classes can better be recognized by human readers.
+	</p>
+
+	<h3>Registration</h3>
+	
+	<p>
+		For the system to be able to create XML serializable classes when reading their XML representation, the classes has to be 
+		registered. The registration is done by calling the compiler-generated static <em>Register</em> member function of an XML serializable class
+		with an integer class identifier. The class identifiers should be unique within a program:
+	</p>
+
+	<div class="code">
+	<span class="line">
+	<span class="comment">// register.cm:</span>
+	<br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">namespace</span>&nbsp;<span class="identifier">model</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">const</span>&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">carClassId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="number">0</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">const</span>&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">bicycleClassId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="number">1</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">const</span>&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">personClassId</span>&nbsp;<span class="other">=</span>&nbsp;<span class="number">2</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span>&nbsp;<span class="identifier">Register</span><span class="other">(</span><span class="other">)</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Car</span><span class="other">.</span><span class="identifier">Register</span><span class="other">(</span><span class="identifier">carClassId</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Bicycle</span><span class="other">.</span><span class="identifier">Register</span><span class="other">(</span><span class="identifier">bicycleClassId</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Person</span><span class="other">.</span><span class="identifier">Register</span><span class="other">(</span><span class="identifier">personClassId</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">new</span>&nbsp;<span class="keyword">class</span>&nbsp;<span class="identifier">ConcreteXmlSerializableExtractor</span><span class="other">&lt;</span><span class="identifier">Vehicle</span><span class="other">&gt;</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">new</span>&nbsp;<span class="keyword">class</span>&nbsp;<span class="identifier">ConcreteXmlSerializableExtractor</span><span class="other">&lt;</span><span class="identifier">Car</span><span class="other">&gt;</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">new</span>&nbsp;<span class="keyword">class</span>&nbsp;<span class="identifier">ConcreteXmlSerializableExtractor</span><span class="other">&lt;</span><span class="identifier">Bicycle</span><span class="other">&gt;</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">new</span>&nbsp;<span class="keyword">class</span>&nbsp;<span class="identifier">ConcreteXmlSerializableExtractor</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">}</span><br/>
+	</span>
+	</div>
+	
+	<p>
+		In addition to registration code, we have added <a href="../../langref/langref.html#full-instantiation-requests">full instantiation requests</a>
+		for the <em>ConcreteXmlSerializableExtractor</em> class template specializations of <em>Vehicle</em>, <em>Car</em>, <em>Bicycle</em> and 
+		<em>Person</em> classes, because the compiler is not able to automatically generate instantiations for them.
+	</p>
+
+	<h3>Loading</h3>
+
+	<p>
+		Now that we have the classes registered, they can be read from an XML file.
+		Here's the code that loads the model:
+	</p>
+	
+	<div class="code">
+	<span class="line">
+	<span class="comment">// load.cm:</span>
+	<br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">IO</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Collections</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">namespace</span>&nbsp;<span class="identifier">model</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">Load</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName</span><span class="other">)</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">string</span>&nbsp;<span class="identifier">xmlStr</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">File</span><span class="other">.</span><span class="identifier">ReadAllText</span><span class="other">(</span><span class="identifier">fileName</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniquePtr</span><span class="other">&lt;</span><span class="identifier">XmlBundle</span><span class="other">&gt;</span>&nbsp;<span class="identifier">bundle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ToXmlBundle</span><span class="other">(</span><span class="identifier">xmlStr</span><span class="other">,</span>&nbsp;<span class="identifier">fileName</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">root</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReleaseRoot</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span><span class="other">(</span><span class="identifier">bundle</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>&nbsp;<span class="other">(</span><span class="identifier">root</span><span class="other">.</span><span class="identifier">IsNull</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">throw</span>&nbsp;<span class="identifier">Exception</span><span class="other">(</span><span class="string">&quot;Person expected&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="identifier">root</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">}</span><br/>
+	</span>
+	</div>
+
+	<p>
+		The <em>ToXmlBundle</em> function parses an XML document from the passed XML string, creates the XML classes using class identifiers 
+		contained by the object elements, and resolves the relations of objects using object IDs.
+	</p>
+	
+	<h3>Main</h3>
+	
+	<p>
+		Here's the main program that completes this example:
+	</p>
+	
+	<div class="code">
+	<span class="line">
+	<span class="comment">// main.cm:</span>
+	<br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="keyword">using</span>&nbsp;<span class="identifier">model</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<br/>
+	</span>
+	<span class="line">
+	<span class="keyword">public</span>&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">main</span><span class="other">(</span><span class="other">)</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">try</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Register</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Save</span><span class="other">(</span><span class="string">&quot;traffic.xml&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">person</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">Load</span><span class="other">(</span><span class="string">&quot;traffic.xml&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">catch</span>&nbsp;<span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">Exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">)</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Console</span><span class="other">.</span><span class="identifier">Error</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="identifier">ex</span><span class="other">.</span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="number">1</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+	</span>
+	<span class="line">
+	&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="number">0</span><span class="other">;</span><br/>
+	</span>
+	<span class="line">
+	<span class="other">}</span><br/>
+	</span>
+	</div>
+
+	<h2>Implementation</h2>
+
+	<p>
+		Implementation of the XML serialization scheme is done in half by the compiler and in half by the 
+		<a href="../content/System.Xml.Serialization/index.html">System.Xml.Serialization</a> library.
+	</p>
+
+	<h3>Participants</h3>
+
+	<img src="image/xml_ser_implementation.spring.png"/>
+	
+	<h4>XmlSerializable interface</h4>
+	
+	<p>
+		The <a href="../content/System.Xml.Serialization/doc/bb0ec724-7c70-405b-820d-28d0c11ccba4.html">XmlSerializable</a>
+		interface has a key role in the XML serialization scheme. 
+		The compiler implements the XmlSerializable interface for each class that has an <strong>[xml]</strong> attribute.
+		In the picture above the <em>MyXmlSerializableClass</em> represents such a class. 
+		The <em>MyXmlSerializableClass</em>es do not have to derive from a common base class. We need an interface because 
+		Cmajor lacks multiple inheritance.
+		This interface contains member function signatures for generating an XML representation, the <em>ToXml</em> method, 
+		and on the other hand reading member variable values from an XML representation, the <em>FromXml</em> method.
+		It also enables putting of XML serializable classes to an 
+		<a href="../content/System.Xml.Serialization/doc/class_XmlContainer_3A675CCAF06087583804E6C45EE63670AAC7C2B4.html">XmlContainer</a> 
+		or to an <a href="../content/System.Xml.Serialization/doc/class_XmlBundle_09EF3A12BD430DECAEEE5D0E67BDE0151E1D654A.html">XmlBundle</a>.
+	</p>
+		
+	<h4>ToXml and FromXml</h4>
+	
+	<p>
+		When the compiler generates an implementation of the <em>ToXml</em> member function for a <em>MyXmlSerializableClass</em>,
+		it generates a call to one of the <em>ToXml</em> overloads contained by the 
+		<a href="../content/System.Xml.Serialization/doc/ns_System.Xml.Serialization.html">System.Xml.Serialization</a> library 
+		for each member variable of the <em>MyXmlSerializableClass</em>. 
+		Similarly when the compiler generates an implementation of the <em>FromXml</em> member function of a <em>MyXmlSerializableClass</em>,
+		it generates a call to one of the <em>FromXml</em> overloads contained by the System.Xml.Serialization library
+		for each member variable of the <em>MyXmlSerializableClass</em>. The overloads are selected by the compiler using concept-based 
+		overloading.
+	</p>
+
+	<h4>XmlSerializableProxy</h4>
+	
+	<p>
+		The reason that the 
+		<a href="../content/System.Xml.Serialization/doc/class_XmlContainer_3A675CCAF06087583804E6C45EE63670AAC7C2B4.html">XmlContainer</a>
+		does not directly contain <a href="../content/System.Xml.Serialization/doc/bb0ec724-7c70-405b-820d-28d0c11ccba4.html">XmlSerializable</a>
+		interfaces is because interface objects cannot be directly put to containers in Cmajor. We need an intermediate class that is called
+		<a href="../content/System.Xml.Serialization/doc/class_XmlSerializableProxy_7C48DE754665BAB96B91ABF4D7D62F4F8DF502EB.html">XmlSerializableProxy</a>
+		that contains the interface object. Instances of XmlSerializableProxy class on the other hand <em>can</em> be put to containers,.
+		So the 
+		<a href="../content/System.Xml.Serialization/doc/class_XmlContainer_3A675CCAF06087583804E6C45EE63670AAC7C2B4.html#member_function_Add_XmlContainer_C7E14181B6C277663C8BA04B154B8B9711743A6C">Add</a>
+		member function of the XmlContainer creates a proxy object that holds the interface object and adds the proxy.
+		The member functions of the XmlSerializableProxy delegate calls to the contained interface.
+	</p>
+	
+	<p>
+		There's also an excuse why you may not directly put instance of <em>MyXmlSerializableClass</em> to an <em>XmlContainer</em>, but
+		you have to call free <a href="../content/System.Xml.Serialization/doc/ns_System.Xml.Serialization.html#function_Add_B61D3CE67148AFE6ED6F19D749AC31903AAFFFE0">Add</a> 
+		function template to do that. It's because Cmajor lacks member function templates.
+	</p>
+	
+	<h4>XmlContainer</h4>
+	
+	<p>
+		The <a href="../content/System.Xml.Serialization/doc/class_XmlContainer_3A675CCAF06087583804E6C45EE63670AAC7C2B4.html">XmlContainer</a>
+		class has two mappings. From an object IDs to an XmlSerializableProxy* and from 
+		<em>MyXmlSerializableClass*</em> (represented as <strong>void*</strong>) to an XmlSerializableProxy*.
+		This means that you can get XmlSerializableProxy* by object ID or by object pointer.
+		You can also remove object and XmlSerializableProxy* by object ID, and create an XmlBundle from object.
+	</p>
+	
+</body>	
+    

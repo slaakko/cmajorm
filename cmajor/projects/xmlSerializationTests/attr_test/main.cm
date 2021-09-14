@@ -2,12 +2,13 @@ using System;
 using System.Xml.Serialization;
 using model;
 
-int main()
+public int main()
 {
     try
     {
         Register();
-        xmltest.TestXmlBundle();
+        Save("traffic.xml");
+        UniqueXmlPtr<Person> person = Load("traffic.xml");
     }
     catch (const Exception& ex)
     {

@@ -269,13 +269,13 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.UnaryFun&lt;Argument, Result&gt;", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Base/doc/class_UnaryFun_Argument_Result_E072A5660996486516C5B6B1316D83709BA12761.html" },
-        { name: "System.BitNot&lt;T&gt;", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BitNot_T_3C7F4E874164C72710B960115CB74428CB60AB9D.html" },
-        { name: "System.Collections.Hasher&lt;T&gt;", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325.html" },
+        { name: "System.BitNot&lt;T&gt;", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BitNot_T_3C7F4E874164C72710B960115CB74428CB60AB9D.html" },
+        { name: "System.Collections.Hasher&lt;T&gt;", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325.html" },
         { name: "System.Identity&lt;T&gt;", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Identity_T_88B6920757B097108E06B2CB21F8C2B6DE39E909.html" },
-        { name: "System.Negate&lt;T&gt;", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Negate_T_0968FCEADBF1F3ACFE5962D8AA44DA01A314480E.html" },
+        { name: "System.Negate&lt;T&gt;", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Negate_T_0968FCEADBF1F3ACFE5962D8AA44DA01A314480E.html" },
         { name: "System.SelectFirst&lt;T, U&gt;", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_SelectFirst_T_U_EFAA048DB98EF69AD2AF778B9BCDC8A98171057C.html" },
         { name: "System.SelectSecond&lt;T, U&gt;", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_SelectSecond_T_U_790D08354EC0D2291CD83DC01D02EB72936757BF.html" },
-        { name: "System.UnaryPred&lt;Argument&gt;", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_UnaryPred_Argument_09B1A6B80A77304079E63811295D476D692E47B7.html" }];
+        { name: "System.UnaryPred&lt;Argument&gt;", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_UnaryPred_Argument_09B1A6B80A77304079E63811295D476D692E47B7.html" }];
     drawDiagram(diagramNodes);
 }
 

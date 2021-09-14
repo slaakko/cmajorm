@@ -158,6 +158,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12.6 <a href="#literal-class">Literal Classes</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12.7 <a href="#class-hierarchies">Class Hierarchies</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12.8 <a href="#class-templates">Class Templates</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12.9 <a href="#full-instantiation-requests">Full Instantiation Requests</a><br />
         13 <a href="#interfaces">Interfaces</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;13.1 <a href="#interfaces-syntax">Syntax</a><br />
         14 <a href="#delegates">Delegates</a><br />
@@ -4341,11 +4342,47 @@
             <li>only those member functions that are called.</li>
         </ul>
     </p>
-
+	
     <p>
         For an example of a class template, see <a href="../code/cmdoc/content/UniquePtr/file/unique_ptr.cm.html">unique_ptr.cm</a>.
         It's a smart pointer that implements unique ownership.
     </p>
+
+	<h3 id="full-instantiation-requests">12.9 Full Instantiation Requests</h3>
+	
+	<p>
+		Sometimes the compiler fails to instantiate all needed member functions of a class template specialization.
+		This happens especially when the class template inherits from an abstract base class and the derived class template overrides some 
+		member function(s) of the abstract base class. These instantiation failures manifest themselves as linker errors.
+	</p>
+	
+	<p>
+		To get rid of the linker errors, the programmer may ask the compiler to instantate all member functions of a class template by using a
+		<em>full instantiation request</em>. The full instantiation request reuses keywords <strong>new</strong> and <strong>class</strong>.
+		It should be placed inside a namespace scope or to the global namespace. The syntax is as follows:
+		<pre>
+		<strong>new</strong> <strong>class</strong> <a href="#rule.template-id">template-id</a>;
+		</pre>
+	</p>
+	
+	<p>
+		The primary class template and the template arguments may be either user-defined classes or classes defined in the system library.
+	</p>
+	
+	<p>
+		For example having a class template 
+		<a href="../system/content/System.Base/doc/class_Counter_T_38A7F42D0E20389A22B581B3FAAD0E018811DD30.html">System.Counter</a> that
+		has an overridden <strong>Dispose</strong> member function. If the compiler fails to instantiate the <strong>Dispose</strong> function
+		for a specialization <strong>System.Counter&lt;MyClass></strong>, the programmer may place a full instantiation request inside some 
+		namespace:	
+		
+		<pre>
+		<strong>namespace</strong> MyNamespace
+		{
+			<strong>new class System.Counter&lt;MyClass>;</strong>
+		}
+		</pre>
+	</p>
 
     <h2 id="interfaces">13 Interfaces</h2>
 

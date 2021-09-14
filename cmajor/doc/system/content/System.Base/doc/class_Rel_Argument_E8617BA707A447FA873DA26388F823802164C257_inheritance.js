@@ -273,9 +273,9 @@ function drawInheritanceDiagram() {
         { name: "System.Rel&lt;Argument&gt;", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: true, link: "../../System.Base/doc/class_Rel_Argument_E8617BA707A447FA873DA26388F823802164C257.html" },
         { name: "System.EqualTo&lt;T&gt;", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_EqualTo_T_763B7164C155EA5D8436A30331F33E4E7267599E.html" },
         { name: "System.Greater&lt;T&gt;", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Greater_T_3C4BC43027D3C4A3059EDB4FD3D95FBE491F04EB.html" },
-        { name: "System.GreaterOrEqualTo&lt;T&gt;", id: "diagram_node_7", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_GreaterOrEqualTo_T_63B80274B5FA0BEE2887E0B5DC6572B68763325F.html" },
+        { name: "System.GreaterOrEqualTo&lt;T&gt;", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_GreaterOrEqualTo_T_63B80274B5FA0BEE2887E0B5DC6572B68763325F.html" },
         { name: "System.Less&lt;T&gt;", id: "diagram_node_6", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Less_T_8CD4E14D3B6BEACE17051A75B9F36A9125F2842B.html" },
-        { name: "System.LessOrEqualTo&lt;T&gt;", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_LessOrEqualTo_T_38A01AF022D23F43DB10172F664C64FD6BEC5451.html" },
+        { name: "System.LessOrEqualTo&lt;T&gt;", id: "diagram_node_7", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_LessOrEqualTo_T_38A01AF022D23F43DB10172F664C64FD6BEC5451.html" },
         { name: "System.NotEqualTo&lt;T&gt;", id: "diagram_node_8", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_NotEqualTo_T_5131DE08AD9F14B6E85B01ACCD186B5825A00C59.html" }];
     drawDiagram(diagramNodes);
 }

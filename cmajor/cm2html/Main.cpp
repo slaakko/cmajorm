@@ -1,6 +1,7 @@
 #include <sngcm/ast/InitDone.hpp>
 #include <sngcm/ast/SourceToken.hpp>
-#include <sngcm/cmparser/SourceTokenParser.hpp>
+#include <sngcm/cmlexer/CmajorTokenLexer.hpp>
+#include <sngcm/cmlexer/CmajorTokenLexerTokens.hpp>
 #include <soulng/util/MappedInputFile.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/CodeFormatter.hpp>
@@ -37,15 +38,15 @@ std::string HtmlEscape(const std::string& s)
     {
         switch (c)
         {
-        case '<': result.append("&lt;"); break;
-        case '>': result.append("&gt;"); break;
-        case '\'': result.append("&apos;"); break;
-        case '"': result.append("&quot;"); break;
-        case '&': result.append("&amp;"); break;
-        default:
-        {
-            result.append(1, c);
-        }
+            case '<': result.append("&lt;"); break;
+            case '>': result.append("&gt;"); break;
+            case '\'': result.append("&apos;"); break;
+            case '"': result.append("&quot;"); break;
+            case '&': result.append("&amp;"); break;
+            default:
+            {
+                result.append(1, c);
+            }
         }
     }
     return result;
@@ -57,6 +58,8 @@ public:
     HtmlSourceTokenFormatter(const std::string& sourceFilePath_, const std::string& styleSheetFilePath_);
     void BeginFormat() override;
     void EndFormat() override;
+    void BeginLine();
+    void EndLine();
     void Keyword(const std::u32string& token) override;
     void Identifier(const std::u32string& token) override;
     void Number(const std::u32string& token) override;
@@ -66,16 +69,18 @@ public:
     void Comment(const std::u32string& token) override;
     void NewLine(const std::u32string& token) override;
     void Other(const std::u32string& token) override;
+    const std::string& HtmlFilePath() const { return htmlFilePath; }
 private:
     std::string filePath;
     std::string styleSheetFilePath;
+    std::string htmlFilePath;
     std::ofstream htmlFile;
     std::unique_ptr<CodeFormatter> formatter;
 };
 
 HtmlSourceTokenFormatter::HtmlSourceTokenFormatter(const std::string& sourceFilePath_, const std::string& styleSheetFilePath_) : filePath(sourceFilePath_), styleSheetFilePath(styleSheetFilePath_)
 {
-    std::string htmlFilePath(sourceFilePath_);
+    htmlFilePath = sourceFilePath_;
     htmlFilePath.append(".html");
     htmlFile.open(htmlFilePath.c_str(), std::ios_base::out);
     formatter.reset(new CodeFormatter(htmlFile));
@@ -83,28 +88,22 @@ HtmlSourceTokenFormatter::HtmlSourceTokenFormatter(const std::string& sourceFile
 
 void HtmlSourceTokenFormatter::BeginFormat()
 {
-    formatter->WriteLine("<!DOCTYPE html>");
-    formatter->WriteLine("<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">");
-    formatter->WriteLine("<head>");
-    formatter->IncIndent();
-    formatter->WriteLine("<meta charset=\"utf-8\"/>");
-    boost::filesystem::path fp = filePath;
-    std::string fileName = fp.filename().generic_string();
-    formatter->WriteLine("<title>" + fileName + "</title>");
-    formatter->WriteLine("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + styleSheetFilePath + "\"/>");
-    formatter->DecIndent();
-    formatter->WriteLine("</head>");
-    formatter->WriteLine("<body>");
-    formatter->WriteLine("<pre>");
     formatter->WriteLine("<div class=\"code\">");
 }
 
 void HtmlSourceTokenFormatter::EndFormat()
 {
-    formatter->WriteLine("</div");
-    formatter->WriteLine("</pre>");
-    formatter->WriteLine("</body>");
-    formatter->WriteLine("</html>");
+    formatter->WriteLine("</div>");
+}
+
+void HtmlSourceTokenFormatter::BeginLine()
+{
+    formatter->WriteLine("<span class=\"line\">");
+}
+
+void HtmlSourceTokenFormatter::EndLine()
+{
+    formatter->WriteLine("</span>");
 }
 
 void HtmlSourceTokenFormatter::Keyword(const std::u32string& token)
@@ -134,7 +133,10 @@ void HtmlSourceTokenFormatter::String(const std::u32string& token)
 
 void HtmlSourceTokenFormatter::Spaces(const std::u32string& token)
 {
-    formatter->Write(ToUtf8(token));
+    for (char32_t c : token)
+    {
+        formatter->Write("&nbsp;");
+    }
 }
 
 void HtmlSourceTokenFormatter::Comment(const std::u32string& token)
@@ -146,7 +148,7 @@ void HtmlSourceTokenFormatter::Comment(const std::u32string& token)
 
 void HtmlSourceTokenFormatter::NewLine(const std::u32string& token)
 {
-    formatter->WriteLine();
+    formatter->WriteLine("<br/>");
 }
 
 void HtmlSourceTokenFormatter::Other(const std::u32string& token)
@@ -223,6 +225,7 @@ int main(int argc, const char** argv)
             PrintHelp();
             return 0;
         }
+        bool verbose = false;
         std::vector<std::string> sourceFiles;
         std::string styleSheetPath = "code.css";
         bool prevWasStyle = false;
@@ -240,6 +243,10 @@ int main(int argc, const char** argv)
                     PrintHelp();
                     return 0;
                 }
+                else if (arg == "-v" || arg == "--verbose")
+                {
+                    verbose = true;
+                }
                 else
                 {
                     throw std::runtime_error("unknown option '" + arg + "'");
@@ -255,17 +262,87 @@ int main(int argc, const char** argv)
                 sourceFiles.push_back(arg);
             }
         }
+        int fileIndex = 0;
         for (const std::string& sourceFile : sourceFiles)
         {
+            if (verbose)
+            {
+                std::cout << "> " << sourceFile << std::endl;
+            }
             bool inBlockComment = false;
             MappedInputFile file(sourceFile);
             std::u32string s(ToUtf32(std::string(file.Begin(), file.End())));
             HtmlSourceTokenFormatter formatter(sourceFile, styleSheetPath);
+            formatter.BeginFormat();
             std::vector<std::u32string> lines = GetLines(s);
+            int lineNumber = 1;
             for (const auto& line : lines)
             {
-                sngcm::parser::ParseSourceLine(line, &formatter, inBlockComment);
+                CmajorTokenLexer lexer(line, sourceFile, fileIndex);
+                formatter.BeginLine();
+                soulng::lexer::TokenLine tokens = lexer.TokenizeLine(line, lineNumber, 0);
+                for (int i = 0; i < tokens.tokens.size(); ++i)
+                {
+                    soulng::lexer::Token token = tokens.tokens[i];
+                    switch (token.id)
+                    {
+                        case CmajorTokenLexerTokens::END:
+                        {
+                            break;
+                        }
+                        case CmajorTokenLexerTokens::WS:
+                        {
+                            formatter.Spaces(token.match.ToString());
+                            break;
+                        }
+                        case CmajorTokenLexerTokens::KEYWORD:
+                        {
+                            formatter.Keyword(token.match.ToString());
+                            break;
+                        }
+                        case CmajorTokenLexerTokens::ID:
+                        {
+                            formatter.Identifier(token.match.ToString());
+                            break;
+                        }
+                        case CmajorTokenLexerTokens::INTLIT:
+                        case CmajorTokenLexerTokens::FLOATINGLIT:
+                        {
+                            formatter.Number(token.match.ToString());
+                            break;
+                        }
+                        case CmajorTokenLexerTokens::CHARLIT:
+                        {
+                            formatter.Char(token.match.ToString());
+                            break;
+                        }
+                        case CmajorTokenLexerTokens::STRINGLIT:
+                        {
+                            formatter.String(token.match.ToString());
+                            break;
+                        }
+                        case CmajorTokenLexerTokens::LINECOMMENT:
+                        {
+                            formatter.Comment(token.match.ToString());
+                            break;
+                        }
+                        default:
+                        {
+                            formatter.Other(token.match.ToString());
+                            break;
+                        }
+                    }
+                }
+                formatter.NewLine(std::u32string());
+                formatter.EndLine();
+                ++lineNumber;
             }
+            formatter.EndFormat();
+            if (verbose)
+            {
+                std::cout << "==> " << formatter.HtmlFilePath() << std::endl;
+            }
+            ++fileIndex;
         }
     }
     catch (const std::exception& ex)

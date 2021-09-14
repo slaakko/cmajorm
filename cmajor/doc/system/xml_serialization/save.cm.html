@@ -1,0 +1,112 @@
+<div class="code">
+<span class="line">
+<span class="comment">// save.cm:</span>
+<br/>
+</span>
+<span class="line">
+<br/>
+</span>
+<span class="line">
+<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">IO</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Collections</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<br/>
+</span>
+<span class="line">
+<span class="keyword">namespace</span>&nbsp;<span class="identifier">model</span><br/>
+</span>
+<span class="line">
+<span class="other">{</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">public</span>&nbsp;<span class="keyword">void</span>&nbsp;<span class="identifier">Save</span><span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlFileName</span><span class="other">)</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">XmlContainer</span>&nbsp;<span class="identifier">container</span><span class="other">;</span>&nbsp;<span class="comment">// XmlContainer does not own the objects by default</span>
+<br/>
+</span>
+<span class="line">
+<br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Car</span><span class="other">&gt;</span>&nbsp;<span class="identifier">car</span>&nbsp;<span class="other">=</span>&nbsp;<span class="keyword">new</span>&nbsp;<span class="identifier">Car</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">car</span><span class="other">-&gt;</span><span class="identifier">SetRegistrationNumber</span><span class="other">(</span><span class="string">&quot;ABC-123&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">car</span><span class="other">-&gt;</span><span class="identifier">SetColor</span><span class="other">(</span><span class="identifier">VehicleColor</span><span class="other">.</span><span class="identifier">red</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Add</span><span class="other">(</span><span class="identifier">car</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">&amp;</span><span class="identifier">container</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Bicycle</span><span class="other">&gt;</span>&nbsp;<span class="identifier">bicycle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="keyword">new</span>&nbsp;<span class="identifier">Bicycle</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bicycle</span><span class="other">-&gt;</span><span class="identifier">SetColor</span><span class="other">(</span><span class="identifier">VehicleColor</span><span class="other">.</span><span class="identifier">green</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bicycle</span><span class="other">-&gt;</span><span class="identifier">SetPrice</span><span class="other">(</span><span class="number">1000.0f</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Add</span><span class="other">(</span><span class="identifier">bicycle</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">&amp;</span><span class="identifier">container</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">person</span><span class="other">(</span><span class="keyword">new</span>&nbsp;<span class="identifier">Person</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">person</span><span class="other">-&gt;</span><span class="identifier">SetName</span><span class="other">(</span><span class="string">&quot;Joe Coder&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Add</span><span class="other">(</span><span class="identifier">person</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">&amp;</span><span class="identifier">container</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">person</span><span class="other">-&gt;</span><span class="identifier">AddVehicle</span><span class="other">(</span><span class="identifier">car</span><span class="other">.</span><span class="identifier">Release</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="keyword">true</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">person</span><span class="other">-&gt;</span><span class="identifier">AddVehicle</span><span class="other">(</span><span class="identifier">bicycle</span><span class="other">.</span><span class="identifier">Release</span><span class="other">(</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="keyword">true</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">XmlBundle</span>&nbsp;<span class="identifier">bundle</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">container</span><span class="other">.</span><span class="identifier">CreateBundle</span><span class="other">(</span><span class="identifier">person</span><span class="other">.</span><span class="identifier">Get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">string</span>&nbsp;<span class="identifier">xmlStr</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">bundle</span><span class="other">.</span><span class="identifier">ToXmlString</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">StreamWriter</span>&nbsp;<span class="identifier">xmlFile</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">File</span><span class="other">.</span><span class="identifier">CreateText</span><span class="other">(</span><span class="identifier">xmlFileName</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">xmlFile</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="identifier">xmlStr</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+</span>
+<span class="line">
+<span class="other">}</span><br/>
+</span>
+</div>

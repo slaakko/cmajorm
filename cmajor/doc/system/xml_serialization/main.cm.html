@@ -1,0 +1,66 @@
+<div class="code">
+<span class="line">
+<span class="comment">// main.cm:</span>
+<br/>
+</span>
+<span class="line">
+<br/>
+</span>
+<span class="line">
+<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<span class="keyword">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Xml</span><span class="other">.</span><span class="identifier">Serialization</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<span class="keyword">using</span>&nbsp;<span class="identifier">model</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<br/>
+</span>
+<span class="line">
+<span class="keyword">public</span>&nbsp;<span class="keyword">int</span>&nbsp;<span class="identifier">main</span><span class="other">(</span><span class="other">)</span><br/>
+</span>
+<span class="line">
+<span class="other">{</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">try</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Register</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Save</span><span class="other">(</span><span class="string">&quot;traffic.xml&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">UniqueXmlPtr</span><span class="other">&lt;</span><span class="identifier">Person</span><span class="other">&gt;</span>&nbsp;<span class="identifier">person</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">Load</span><span class="other">(</span><span class="string">&quot;traffic.xml&quot;</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">catch</span>&nbsp;<span class="other">(</span><span class="keyword">const</span>&nbsp;<span class="identifier">Exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">)</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Console</span><span class="other">.</span><span class="identifier">Error</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="identifier">ex</span><span class="other">.</span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">&lt;&lt;</span>&nbsp;<span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="number">1</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span><br/>
+</span>
+<span class="line">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>&nbsp;<span class="number">0</span><span class="other">;</span><br/>
+</span>
+<span class="line">
+<span class="other">}</span><br/>
+</span>
+</div>

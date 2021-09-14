@@ -23,361 +23,8 @@ namespace cmajor { namespace binder {
 using namespace soulng::unicode;
 using namespace cmajor::symbols;
 
+
 XmlAttributeProcessor::XmlAttributeProcessor() : AttributeProcessor(U"xml")
-{
-}
-
-void XmlAttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbol)
-{
-    switch (symbol->GetSymbolType())
-    {
-        case SymbolType::classTypeSymbol: case SymbolType::classTemplateSpecializationSymbol: case SymbolType::memberVariableSymbol:
-        {
-            if (attribute->Value() == U"true" || attribute->Value() == U"false")
-            {
-                return;
-            }
-            else
-            {
-                throw Exception("unknown attribute value '" + ToUtf8(attribute->Value()) + "' for attribute '" + ToUtf8(attribute->Name()) + "'", attribute->GetSpan(), attribute->ModuleId());
-            }
-            break;
-        }
-    }
-    AttributeProcessor::TypeCheck(attribute, symbol);
-}
-
-void XmlAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
-{
-    if (symbol->IsClassTypeSymbol())
-    {
-        ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(symbol);
-        if (attribute->Value() == U"true")
-        {
-            GenerateToXmlSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
-            GenerateSystemDomElementConstructorSymbol(attribute, classTypeSymbol, boundCompileUnit, containerScope);
-        }
-    }
-}
-
-void XmlAttributeProcessor::GenerateImplementation(AttributeNode* attribute, Symbol* symbol, StatementBinder* statementBinder)
-{
-    if (symbol->IsClassTypeSymbol())
-    {
-        ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(symbol);
-        auto toXmlIt = toXmlMemberFunctionSymbolMap.find(symbol);
-        if (toXmlIt != toXmlMemberFunctionSymbolMap.cend())
-        {
-            MemberFunctionSymbol* toXmlMemberFunctionSymbol = toXmlIt->second;
-            GenerateToXmlMemberFunctionImplementation(attribute, classTypeSymbol, toXmlMemberFunctionSymbol, statementBinder);
-        }
-        else
-        {
-            throw Exception("internal error in XML attribute implementation: member function 'ToXml' symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan(), attribute->ModuleId());
-        }
-        auto contructorIt = constructorSymbolMap.find(symbol);
-        if (contructorIt != constructorSymbolMap.cend())
-        {
-            ConstructorSymbol* constructorSymbol = contructorIt->second;
-            GenerateSystemDomElementConstructorImplementation(attribute, classTypeSymbol, constructorSymbol, statementBinder);
-        }
-        else
-        {
-            throw Exception("internal error in XML attribute implementation: constructor symbol for symbol '" + ToUtf8(symbol->FullName()) + "' not found", attribute->GetSpan(), attribute->ModuleId());
-        }
-    }
-}
-
-void XmlAttributeProcessor::GenerateToXmlSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
-{
-    MemberFunctionSymbol* toXmlMemberFunctionSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ToXml");
-    toXmlMemberFunctionSymbol->SetModule(&boundCompileUnit.GetModule());
-    toXmlMemberFunctionSymbol->SetGroupName(U"ToXml");
-    if (classTypeSymbol->BaseClass())
-    {
-        toXmlMemberFunctionSymbol->SetOverride();
-    }
-    else if (classTypeSymbol->Destructor() && classTypeSymbol->Destructor()->IsVirtual())
-    {
-        toXmlMemberFunctionSymbol->SetVirtual();
-    }
-    GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(toXmlMemberFunctionSymbol);
-    ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"this");
-    thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
-    ParameterSymbol* fieldNameParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"fieldName");
-    IdentifierNode* stringIdNode(new IdentifierNode(attribute->GetSpan(), attribute->ModuleId(), U"System.string"));
-    Node* refNode(new LValueRefNode(attribute->GetSpan(), attribute->ModuleId(), stringIdNode));
-    std::unique_ptr<Node> constNode(new ConstNode(attribute->GetSpan(), attribute->ModuleId(), refNode));
-    TypeSymbol* stringType = ResolveType(constNode.get(), boundCompileUnit, containerScope);
-    fieldNameParam->SetType(stringType);
-    TemplateIdNode templateId(attribute->GetSpan(), attribute->ModuleId(), new IdentifierNode(attribute->GetSpan(), attribute->ModuleId(), U"System.UniquePtr"));
-    templateId.AddTemplateArgument(new IdentifierNode(attribute->GetSpan(), attribute->ModuleId(), U"System.Dom.Element"));
-    TypeSymbol* uniquePtrElementType = ResolveType(&templateId, boundCompileUnit, containerScope);
-    toXmlMemberFunctionSymbol->SetReturnType(uniquePtrElementType);
-    ParameterSymbol* returnParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"@return");
-    returnParam->SetParent(toXmlMemberFunctionSymbol);
-    returnParam->SetType(uniquePtrElementType->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
-    toXmlMemberFunctionSymbol->SetReturnParam(returnParam);
-    toXmlMemberFunctionSymbol->SetAccess(SymbolAccess::public_);
-    toXmlMemberFunctionSymbol->AddMember(thisParam);
-    toXmlMemberFunctionSymbol->AddMember(fieldNameParam);
-    classTypeSymbol->AddMember(toXmlMemberFunctionSymbol);
-    toXmlMemberFunctionSymbol->ComputeName();
-    toXmlMemberFunctionSymbolMap[classTypeSymbol] = toXmlMemberFunctionSymbol;
-}
-
-void XmlAttributeProcessor::GenerateSystemDomElementConstructorSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
-{
-    ConstructorSymbol* constructorSymbol = new ConstructorSymbol(attribute->GetSpan(), attribute->ModuleId(), U"@constructor");
-    constructorSymbol->SetModule(&boundCompileUnit.GetModule());
-    constructorSymbol->SetGroupName(U"@constructor");
-    GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(constructorSymbol);
-    ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"this");
-    thisParam->SetType(classTypeSymbol->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
-    ParameterSymbol* elementParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"@element");
-    std::unique_ptr<PointerNode> pointertNode(new PointerNode(attribute->GetSpan(), attribute->ModuleId(), new IdentifierNode(attribute->GetSpan(), attribute->ModuleId(), U"System.Dom.Element")));
-    TypeSymbol* elementType = ResolveType(pointertNode.get(), boundCompileUnit, containerScope);
-    elementParam->SetType(elementType);
-    constructorSymbol->SetAccess(SymbolAccess::public_);
-    constructorSymbol->AddMember(thisParam);
-    constructorSymbol->AddMember(elementParam);
-    classTypeSymbol->AddMember(constructorSymbol);
-    constructorSymbol->ComputeName();
-    constructorSymbolMap[classTypeSymbol] = constructorSymbol;
-}
-
-void XmlAttributeProcessor::GenerateToXmlMemberFunctionImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toXmlMemberFunctionSymbol,
-    StatementBinder* statementBinder)
-{
-    try
-    {
-        FileScope* fileScope = new FileScope();
-        Symbol* systemDomElement = GetRootModuleForCurrentThread()->GetSymbolTable().GlobalNs().GetContainerScope()->Lookup(U"System.Dom.Element");
-        if (systemDomElement)
-        {
-            fileScope->AddContainerScope(systemDomElement->Ns()->GetContainerScope());
-        }
-        statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), toXmlMemberFunctionSymbol));
-        Span span = attribute->GetSpan();
-        boost::uuids::uuid moduleId = attribute->ModuleId();
-        CompoundStatementNode compoundStatementNode(span, moduleId);
-        compoundStatementNode.SetEndBraceSpan(span);
-
-        TemplateIdNode* uniquePtrSystemDomElement = new TemplateIdNode(span, moduleId, new IdentifierNode(span, moduleId, U"System.UniquePtr"));
-        uniquePtrSystemDomElement->AddTemplateArgument(new IdentifierNode(span, moduleId, U"System.Dom.Element"));
-        ConstructionStatementNode* constructSystemDomElementStatement = new ConstructionStatementNode(span, moduleId, uniquePtrSystemDomElement, new IdentifierNode(span, moduleId, U"@element"));
-        NewNode* newNode = new NewNode(span, moduleId, new IdentifierNode(span, moduleId, U"System.Dom.Element"));
-        InvokeNode* toUtf32Node = new InvokeNode(span, moduleId, new IdentifierNode(span, moduleId, U"System.ToUtf32"));
-        toUtf32Node->AddArgument(new IdentifierNode(span, moduleId, U"fieldName"));
-        newNode->AddArgument(toUtf32Node);
-        constructSystemDomElementStatement->AddArgument(newNode);
-        compoundStatementNode.AddStatement(constructSystemDomElementStatement);
-
-        if (classTypeSymbol->BaseClass())
-        {
-            ClassTypeSymbol* baseClassSymbol = classTypeSymbol->BaseClass();
-            AttributesNode* attributes = baseClassSymbol->GetAttributes();
-            if (attributes)
-            {
-                AttributeNode* xmlAttribute = attributes->GetAttribute(U"xml");
-                if (xmlAttribute)
-                {
-                    if (xmlAttribute->Value() == U"true")
-                    {
-                        Span span = classTypeSymbol->BaseClass()->GetSpan();
-                        boost::uuids::uuid moduleId = classTypeSymbol->SourceModuleId();
-                        BaseNode* baseNode = new BaseNode(span, moduleId);
-                        ArrowNode* arrowNode = new ArrowNode(span, moduleId, baseNode, new IdentifierNode(span, moduleId, U"ToXml"));
-                        InvokeNode* toXmlInvokeNode = new InvokeNode(span, moduleId, arrowNode);
-                        toXmlInvokeNode->AddArgument(new StringLiteralNode(span, moduleId, "base"));
-                        DotNode* dotNode = new DotNode(span, moduleId, toXmlInvokeNode, new IdentifierNode(span, moduleId, U"Release"));
-                        InvokeNode* dotInvokeNode = new InvokeNode(span, moduleId, dotNode);
-                        TemplateIdNode* uniquePtrNode = new TemplateIdNode(span, moduleId, new IdentifierNode(span, moduleId, U"System.UniquePtr"));
-                        uniquePtrNode->AddTemplateArgument(new IdentifierNode(span, moduleId, U"System.Dom.Node"));
-                        InvokeNode* uniquePtrNodeInvokeNode = new InvokeNode(span, moduleId, uniquePtrNode);
-                        uniquePtrNodeInvokeNode->AddArgument(dotInvokeNode);
-                        ArrowNode* appendChildArrowNode = new ArrowNode(span, moduleId, new IdentifierNode(span, moduleId, U"@element"), new IdentifierNode(span, moduleId, U"AppendChild"));
-                        InvokeNode* appendChildInvokeNode = new InvokeNode(span, moduleId, appendChildArrowNode);
-                        appendChildInvokeNode->AddArgument(uniquePtrNodeInvokeNode);
-                        ExpressionStatementNode* appendChildStatement = new ExpressionStatementNode(span, moduleId, appendChildInvokeNode);
-                        compoundStatementNode.AddStatement(appendChildStatement);
-                    }
-                }
-            }
-        }
-
-        for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
-        {
-            AttributesNode* attributes = memberVariableSymbol->GetAttributes();
-            if (attributes)
-            {
-                AttributeNode* xmlAttribute = attributes->GetAttribute(U"xml");
-                if (xmlAttribute)
-                {
-                    if (xmlAttribute->Value() == U"false")
-                    {
-                        continue;
-                    }
-                }
-            }
-            InvokeNode* toXmlInvokeNode = new InvokeNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), new IdentifierNode(span, moduleId, U"ToXml"));
-            toXmlInvokeNode->AddArgument(new IdentifierNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), memberVariableSymbol->Name()));
-            toXmlInvokeNode->AddArgument(new StringLiteralNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), ToUtf8(memberVariableSymbol->Name())));
-            DotNode* dotNode = new DotNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), toXmlInvokeNode, new IdentifierNode(
-                memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), U"Release"));
-            InvokeNode* dotInvokeNode = new InvokeNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), dotNode);
-            TemplateIdNode* uniquePtrNode = new TemplateIdNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(),
-                new IdentifierNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), U"System.UniquePtr"));
-            uniquePtrNode->AddTemplateArgument(new IdentifierNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(),
-                U"System.Dom.Node"));
-            InvokeNode* uniquePtrNodeInvokeNode = new InvokeNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), uniquePtrNode);
-            uniquePtrNodeInvokeNode->AddArgument(dotInvokeNode);
-            ArrowNode* appendChildArrowNode = new ArrowNode(span, moduleId, new IdentifierNode(span, moduleId, U"@element"), new IdentifierNode(span, moduleId, U"AppendChild"));
-            InvokeNode* appendChildInvokeNode = new InvokeNode(span, moduleId, appendChildArrowNode);
-            appendChildInvokeNode->AddArgument(uniquePtrNodeInvokeNode);
-            ExpressionStatementNode* appendChildStatement = new ExpressionStatementNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), appendChildInvokeNode);
-            compoundStatementNode.AddStatement(appendChildStatement);
-        }
-
-        TemplateIdNode* uniquePtrNode = new TemplateIdNode(span, moduleId, new IdentifierNode(span, moduleId, U"System.UniquePtr"));
-        uniquePtrNode->AddTemplateArgument(new IdentifierNode(span, moduleId, U"System.Dom.Element"));
-        InvokeNode* invokeReleaseUniquePtrNode = new InvokeNode(span, moduleId, uniquePtrNode);
-        invokeReleaseUniquePtrNode->AddArgument(new InvokeNode(span, moduleId, new DotNode(span, moduleId, new IdentifierNode(span, moduleId, U"@element"), 
-            new IdentifierNode(span, moduleId, U"Release"))));
-        ReturnStatementNode* returnStatementNode = new ReturnStatementNode(span, moduleId, invokeReleaseUniquePtrNode);
-        compoundStatementNode.AddStatement(returnStatementNode);
-
-        SymbolTable& symbolTable = statementBinder->GetBoundCompileUnit().GetSymbolTable();
-        symbolTable.BeginContainer(toXmlMemberFunctionSymbol);
-        SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
-        compoundStatementNode.Accept(symbolCreatorVisitor);
-        symbolTable.EndContainer();
-        TypeBinder typeBinder(statementBinder->GetBoundCompileUnit());
-        ContainerScope* containerScope = statementBinder->GetContainerScope();
-        typeBinder.SetContainerScope(containerScope);
-        statementBinder->SetContainerScope(toXmlMemberFunctionSymbol->GetContainerScope());
-        typeBinder.SetCurrentFunctionSymbol(toXmlMemberFunctionSymbol);
-        compoundStatementNode.Accept(typeBinder);
-        BoundFunction* prevFunction = statementBinder->CurrentFunction();
-        statementBinder->SetCurrentFunction(boundFunction.get());
-        compoundStatementNode.Accept(*statementBinder);
-        statementBinder->SetContainerScope(containerScope);
-        BoundStatement* boundStatement = statementBinder->ReleaseStatement();
-        Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
-        BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
-        boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
-        statementBinder->CurrentClass()->AddMember(std::move(boundFunction));
-        statementBinder->SetCurrentFunction(prevFunction);
-        statementBinder->GetBoundCompileUnit().RemoveLastFileScope();
-    }
-    catch (const Exception& ex)
-    {
-        std::vector<std::pair<Span, boost::uuids::uuid>> references;
-        references.push_back(std::make_pair(ex.Defined(), ex.DefinedModuleId()));
-        references.insert(references.end(), ex.References().begin(), ex.References().end());
-        throw Exception("error in XML attribute generation: could not create 'UniquePtr<System.Dom.Element> ToXml(const string& fieldName)' member function for class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
-            classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId(), references);
-    }
-}
-
-void XmlAttributeProcessor::GenerateSystemDomElementConstructorImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, ConstructorSymbol* constructorSymbol, StatementBinder* statementBinder)
-{
-    try
-    {
-        FileScope* fileScope = new FileScope();
-        statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), constructorSymbol));
-        Span span = attribute->GetSpan();
-        boost::uuids::uuid moduleId = attribute->ModuleId();
-        ConstructorNode constructorNode(span, moduleId);
-        CompoundStatementNode compoundStatementNode(span, moduleId);
-        compoundStatementNode.SetEndBraceSpan(span);
-
-        ClassTypeSymbol* baseClass = classTypeSymbol->BaseClass();
-        if (baseClass)
-        {
-            AttributesNode* attributes = baseClass->GetAttributes();
-            if (attributes)
-            {
-                AttributeNode* xmlAttribute = attributes->GetAttribute(U"xml");
-                if (xmlAttribute)
-                {
-                    if (xmlAttribute->Value() == U"true")
-                    {
-                        Span span = baseClass->GetSpan();
-                        boost::uuids::uuid moduleId = classTypeSymbol->SourceModuleId();
-                        InvokeNode* invokeNode = new InvokeNode(span, moduleId, new IdentifierNode(span, moduleId, U"GetXmlFieldElement"));
-                        invokeNode->AddArgument(new StringLiteralNode(span, moduleId, "base"));
-                        invokeNode->AddArgument(new IdentifierNode(span, moduleId, U"@element"));
-                        BaseInitializerNode* baseInitializer = new BaseInitializerNode(span, moduleId);
-                        baseInitializer->AddArgument(invokeNode);
-                        constructorNode.AddInitializer(baseInitializer);
-                    }
-                }
-            }
-        }
-
-        for (MemberVariableSymbol* memberVariableSymbol : classTypeSymbol->MemberVariables())
-        {
-            AttributesNode* attributes = memberVariableSymbol->GetAttributes();
-            if (attributes)
-            {
-                AttributeNode* xmlAttribute = attributes->GetAttribute(U"xml");
-                if (xmlAttribute)
-                {
-                    if (xmlAttribute->Value() == U"false")
-                    {
-                        continue;
-                    }
-                }
-            }
-            InvokeNode* invokeNode = new InvokeNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), new IdentifierNode(span, moduleId, U"FromXml"));
-            invokeNode->AddArgument(new IdentifierNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), U"@element"));
-            invokeNode->AddArgument(new StringLiteralNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), ToUtf8(memberVariableSymbol->Name())));
-            invokeNode->AddArgument(new IdentifierNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), memberVariableSymbol->Name()));
-            ExpressionStatementNode* fromXmlStatement = new ExpressionStatementNode(memberVariableSymbol->GetSpan(), memberVariableSymbol->SourceModuleId(), invokeNode);
-            compoundStatementNode.AddStatement(fromXmlStatement);
-        }
-
-        SymbolTable& symbolTable = statementBinder->GetBoundCompileUnit().GetSymbolTable();
-        symbolTable.BeginContainer(constructorSymbol);
-        SymbolCreatorVisitor symbolCreatorVisitor(symbolTable);
-        compoundStatementNode.Accept(symbolCreatorVisitor);
-        symbolTable.EndContainer();
-        TypeBinder typeBinder(statementBinder->GetBoundCompileUnit());
-        ContainerScope* containerScope = statementBinder->GetContainerScope();
-        typeBinder.SetContainerScope(containerScope);
-        statementBinder->SetContainerScope(constructorSymbol->GetContainerScope());
-        typeBinder.SetCurrentFunctionSymbol(constructorSymbol);
-        compoundStatementNode.Accept(typeBinder);
-        BoundFunction* prevFunction = statementBinder->CurrentFunction();
-        statementBinder->SetCurrentFunction(boundFunction.get());
-        ConstructorSymbol* prevConstructorSymbol = statementBinder->CurrentConstructorSymbol();
-        ConstructorNode* prevConstructorNode = statementBinder->CurrentConstructorNode();
-        statementBinder->SetCurrentConstructor(constructorSymbol, &constructorNode);
-        compoundStatementNode.Accept(*statementBinder);
-        statementBinder->SetContainerScope(containerScope);
-        BoundStatement* boundStatement = statementBinder->ReleaseStatement();
-        Assert(boundStatement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement, "bound compound statement expected");
-        BoundCompoundStatement* compoundStatement = static_cast<BoundCompoundStatement*>(boundStatement);
-        boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(compoundStatement));
-        statementBinder->CurrentClass()->AddMember(std::move(boundFunction));
-        statementBinder->SetCurrentConstructor(prevConstructorSymbol, prevConstructorNode);
-        statementBinder->SetCurrentFunction(prevFunction);
-        statementBinder->GetBoundCompileUnit().RemoveLastFileScope();
-    }
-    catch (const Exception& ex)
-    {
-        std::vector<std::pair<Span, boost::uuids::uuid>> references;
-        references.push_back(std::make_pair(ex.Defined(), ex.DefinedModuleId()));
-        references.insert(references.end(), ex.References().begin(), ex.References().end());
-        throw Exception("error in XML attribute generation: could not create constructor taking System.Dom.Element* for the class '" + ToUtf8(classTypeSymbol->FullName()) + "': " + ex.Message(),
-            classTypeSymbol->GetSpan(), classTypeSymbol->SourceModuleId(), references);
-    }
-}
-
-NewXmlAttributeProcessor::NewXmlAttributeProcessor() : AttributeProcessor(U"xml")
 {
     reservedMemberFunctionNames.insert(U"StaticClassName");
     reservedMemberFunctionNames.insert(U"Register");
@@ -397,7 +44,7 @@ NewXmlAttributeProcessor::NewXmlAttributeProcessor() : AttributeProcessor(U"xml"
     reservedMemberVariableNames.insert(U"container");
 }
 
-void NewXmlAttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbol)
+void XmlAttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbol)
 {
     switch (symbol->GetSymbolType())
     {
@@ -421,7 +68,7 @@ void NewXmlAttributeProcessor::TypeCheck(AttributeNode* attribute, Symbol* symbo
     AttributeProcessor::TypeCheck(attribute, symbol);
 }
 
-void NewXmlAttributeProcessor::TypeCheckClass(ClassTypeSymbol* classType)
+void XmlAttributeProcessor::TypeCheckClass(ClassTypeSymbol* classType)
 {
     for (MemberFunctionSymbol* memberFunction : classType->MemberFunctions())
     {
@@ -450,7 +97,7 @@ void NewXmlAttributeProcessor::TypeCheckClass(ClassTypeSymbol* classType)
     classType->SetHasXmlAttribute();
 }
 
-void NewXmlAttributeProcessor::GenerateMemberSymbols(AttributeNode* attribute, ClassTypeSymbol* classType, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateMemberSymbols(AttributeNode* attribute, ClassTypeSymbol* classType, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     for (MemberVariableSymbol* memberVariableSymbol : classType->MemberVariables())
     {
@@ -499,7 +146,7 @@ const int toXmlId = 12;
 const int fromXmlId = 13;
 const int getPtrsId = 14;
 
-void NewXmlAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     if (symbol->IsClassTypeSymbol())
     {
@@ -531,7 +178,7 @@ void NewXmlAttributeProcessor::GenerateSymbols(AttributeNode* attribute, Symbol*
     }
 }
 
-void NewXmlAttributeProcessor::CheckXmlSerializableInterface(ClassTypeSymbol* classType, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::CheckXmlSerializableInterface(ClassTypeSymbol* classType, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     const std::vector<InterfaceTypeSymbol*>& interfaces = classType->ImplementedInterfaces();
     bool xmlSerializableInterfaceFound = false;
@@ -556,7 +203,7 @@ void NewXmlAttributeProcessor::CheckXmlSerializableInterface(ClassTypeSymbol* cl
 
 }
 
-void NewXmlAttributeProcessor::CheckVirtualDestructor(ClassTypeSymbol* classTypeSymbol)
+void XmlAttributeProcessor::CheckVirtualDestructor(ClassTypeSymbol* classTypeSymbol)
 {
     if (classTypeSymbol->Destructor())
     {
@@ -575,7 +222,7 @@ void NewXmlAttributeProcessor::CheckVirtualDestructor(ClassTypeSymbol* classType
     }
 }
 
-void NewXmlAttributeProcessor::GenerateImplementation(AttributeNode* attribute, Symbol* symbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateImplementation(AttributeNode* attribute, Symbol* symbol, StatementBinder* statementBinder)
 {
     if (symbol->IsClassTypeSymbol())
     {
@@ -685,7 +332,7 @@ void NewXmlAttributeProcessor::GenerateImplementation(AttributeNode* attribute, 
     }
 }
 
-void NewXmlAttributeProcessor::GenerateDestructorImplementation(DestructorSymbol* destructorSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateDestructorImplementation(DestructorSymbol* destructorSymbol, StatementBinder* statementBinder)
 {
     BoundCompileUnit& boundCompileUnit = statementBinder->GetBoundCompileUnit();
     if (!boundCompileUnit.IsGeneratedDestructorInstantiated(destructorSymbol))
@@ -696,7 +343,7 @@ void NewXmlAttributeProcessor::GenerateDestructorImplementation(DestructorSymbol
     }
 }
 
-void NewXmlAttributeProcessor::GenerateMemberVariableSymbols(AttributeNode* attribute, ClassTypeSymbol* classType, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateMemberVariableSymbols(AttributeNode* attribute, ClassTypeSymbol* classType, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberVariableSymbol* classIdSymbol = new MemberVariableSymbol(attribute->GetSpan(), attribute->ModuleId(), U"classId");
@@ -706,20 +353,23 @@ void NewXmlAttributeProcessor::GenerateMemberVariableSymbols(AttributeNode* attr
     classIdSymbol->SetType(symbolTable.GetTypeByName(U"int"));
     classType->AddMember(classIdSymbol);
 
-    MemberVariableSymbol* objectIdSymbol = new MemberVariableSymbol(attribute->GetSpan(), attribute->ModuleId(), U"objectId");
-    objectIdSymbol->SetModule(&boundCompileUnit.GetModule());
-    objectIdSymbol->SetAccess(SymbolAccess::public_);
-    objectIdSymbol->SetType(symbolTable.GetTypeByName(U"System.Uuid"));
-    classType->AddMember(objectIdSymbol);
+    if (!HasXmlBaseClass(classType))
+    {
+        MemberVariableSymbol* objectIdSymbol = new MemberVariableSymbol(attribute->GetSpan(), attribute->ModuleId(), U"objectId");
+        objectIdSymbol->SetModule(&boundCompileUnit.GetModule());
+        objectIdSymbol->SetAccess(SymbolAccess::public_);
+        objectIdSymbol->SetType(symbolTable.GetTypeByName(U"System.Uuid"));
+        classType->AddMember(objectIdSymbol);
 
-    MemberVariableSymbol* containerSymbol = new MemberVariableSymbol(attribute->GetSpan(), attribute->ModuleId(), U"container");
-    containerSymbol->SetModule(&boundCompileUnit.GetModule());
-    containerSymbol->SetAccess(SymbolAccess::public_);
-    containerSymbol->SetType(symbolTable.GetTypeByName(U"System.Xml.Serialization.XmlContainer")->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
-    classType->AddMember(containerSymbol);
+        MemberVariableSymbol* containerSymbol = new MemberVariableSymbol(attribute->GetSpan(), attribute->ModuleId(), U"container");
+        containerSymbol->SetModule(&boundCompileUnit.GetModule());
+        containerSymbol->SetAccess(SymbolAccess::public_);
+        containerSymbol->SetType(symbolTable.GetTypeByName(U"System.Xml.Serialization.XmlContainer")->AddPointer(attribute->GetSpan(), attribute->ModuleId()));
+        classType->AddMember(containerSymbol);
+    }
 }
 
-void NewXmlAttributeProcessor::GenerateStaticClassNameSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateStaticClassNameSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     try
     {
@@ -751,7 +401,7 @@ void NewXmlAttributeProcessor::GenerateStaticClassNameSymbol(AttributeNode* attr
     }
 }
 
-void NewXmlAttributeProcessor::GenerateStaticClassNameImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* staticClassNameSymbol, 
+void XmlAttributeProcessor::GenerateStaticClassNameImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* staticClassNameSymbol,
     StatementBinder* statementBinder)
 {
     try
@@ -781,7 +431,7 @@ void NewXmlAttributeProcessor::GenerateStaticClassNameImplementation(AttributeNo
     }
 }
 
-void NewXmlAttributeProcessor::GenerateCreateFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateCreateFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* createSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"Create");
@@ -803,7 +453,7 @@ void NewXmlAttributeProcessor::GenerateCreateFunctionSymbol(AttributeNode* attri
     m.push_back(std::make_pair(createSymbol, createId));
 }
 
-void NewXmlAttributeProcessor::GenerateCreateImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* createFunctionSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateCreateImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* createFunctionSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -833,7 +483,7 @@ void NewXmlAttributeProcessor::GenerateCreateImplementation(AttributeNode* attri
     }
 }
 
-void NewXmlAttributeProcessor::GenerateRegisterFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateRegisterFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* registerSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"Register");
@@ -859,7 +509,7 @@ void NewXmlAttributeProcessor::GenerateRegisterFunctionSymbol(AttributeNode* att
     m.push_back(std::make_pair(registerSymbol, registerId));
 }
 
-void NewXmlAttributeProcessor::GenerateRegisterImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* registerSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateRegisterImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* registerSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -894,7 +544,7 @@ void NewXmlAttributeProcessor::GenerateRegisterImplementation(AttributeNode* att
     }
 }
 
-void NewXmlAttributeProcessor::GenerateDestroyObjectFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateDestroyObjectFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* destroyObjectSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"DestroyObject");
@@ -926,7 +576,7 @@ void NewXmlAttributeProcessor::GenerateDestroyObjectFunctionSymbol(AttributeNode
     m.push_back(std::make_pair(destroyObjectSymbol, destroyObjectId));
 }
 
-void NewXmlAttributeProcessor::GenerateDestroyObjectImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* destroyObjectSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateDestroyObjectImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* destroyObjectSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -964,7 +614,7 @@ void NewXmlAttributeProcessor::GenerateDestroyObjectImplementation(AttributeNode
     }
 }
 
-void NewXmlAttributeProcessor::GenerateObjectIdFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateObjectIdFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* objectIdSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ObjectId");
@@ -1002,7 +652,7 @@ void NewXmlAttributeProcessor::GenerateObjectIdFunctionSymbol(AttributeNode* att
     m.push_back(std::make_pair(objectIdSymbol, objectIdId));
 }
 
-void NewXmlAttributeProcessor::GenerateObjectIdImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* objectIdSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateObjectIdImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* objectIdSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -1041,7 +691,7 @@ void NewXmlAttributeProcessor::GenerateObjectIdImplementation(AttributeNode* att
     }
 }
 
-void NewXmlAttributeProcessor::GenerateSetObjectIdFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateSetObjectIdFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* setObjectIdSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"SetObjectId");
@@ -1077,7 +727,7 @@ void NewXmlAttributeProcessor::GenerateSetObjectIdFunctionSymbol(AttributeNode* 
     m.push_back(std::make_pair(setObjectIdSymbol, setObjectIdId));
 }
 
-bool NewXmlAttributeProcessor::HasXmlBaseClass(ClassTypeSymbol* classType) const
+bool XmlAttributeProcessor::HasXmlBaseClass(ClassTypeSymbol* classType) const
 {
     ClassTypeSymbol* baseClass = classType->BaseClass();
     if (baseClass)
@@ -1087,7 +737,7 @@ bool NewXmlAttributeProcessor::HasXmlBaseClass(ClassTypeSymbol* classType) const
     return false;
 }
 
-void NewXmlAttributeProcessor::GenerateSetObjectIdImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* setObjectIdSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateSetObjectIdImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* setObjectIdSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -1129,7 +779,7 @@ void NewXmlAttributeProcessor::GenerateSetObjectIdImplementation(AttributeNode* 
     }
 }
 
-void NewXmlAttributeProcessor::GenerateContainerFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateContainerFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* containerSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"Container");
@@ -1162,7 +812,7 @@ void NewXmlAttributeProcessor::GenerateContainerFunctionSymbol(AttributeNode* at
     m.push_back(std::make_pair(containerSymbol, containerId));
 }
 
-void NewXmlAttributeProcessor::GenerateContainerImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* containerSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateContainerImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* containerSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -1201,7 +851,7 @@ void NewXmlAttributeProcessor::GenerateContainerImplementation(AttributeNode* at
     }
 }
 
-void NewXmlAttributeProcessor::GenerateSetContainerFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateSetContainerFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* setContainerSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"SetContainer");
@@ -1237,7 +887,7 @@ void NewXmlAttributeProcessor::GenerateSetContainerFunctionSymbol(AttributeNode*
     m.push_back(std::make_pair(setContainerSymbol, setContainerId));
 }
 
-void NewXmlAttributeProcessor::GenerateSetContainerImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* setContainerSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateSetContainerImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* setContainerSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -1279,7 +929,7 @@ void NewXmlAttributeProcessor::GenerateSetContainerImplementation(AttributeNode*
     }
 }
 
-void NewXmlAttributeProcessor::GenerateClassIdFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateClassIdFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* classIdSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ClassId");
@@ -1303,7 +953,7 @@ void NewXmlAttributeProcessor::GenerateClassIdFunctionSymbol(AttributeNode* attr
     m.push_back(std::make_pair(classIdSymbol, classIdId));
 }
 
-void NewXmlAttributeProcessor::GenerateClassIdImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* classIdSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateClassIdImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* classIdSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -1333,7 +983,7 @@ void NewXmlAttributeProcessor::GenerateClassIdImplementation(AttributeNode* attr
     }
 }
 
-void NewXmlAttributeProcessor::GenerateClassNameFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateClassNameFunctionSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* classNameSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ClassName");
@@ -1362,7 +1012,7 @@ void NewXmlAttributeProcessor::GenerateClassNameFunctionSymbol(AttributeNode* at
     m.push_back(std::make_pair(classNameSymbol, classNameId));
 }
 
-void NewXmlAttributeProcessor::GenerateClassNameImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* classNameSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateClassNameImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* classNameSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -1393,7 +1043,7 @@ void NewXmlAttributeProcessor::GenerateClassNameImplementation(AttributeNode* at
     }
 }
 
-void NewXmlAttributeProcessor::GenerateSetObjectXmlAttributesSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateSetObjectXmlAttributesSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* setObjectXmlAttributesSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"SetObjectXmlAttributes");
@@ -1429,7 +1079,7 @@ void NewXmlAttributeProcessor::GenerateSetObjectXmlAttributesSymbol(AttributeNod
     m.push_back(std::make_pair(setObjectXmlAttributesSymbol, setObjectXmlAttributesId));
 }
 
-void NewXmlAttributeProcessor::GenerateSetObjectXmlAttributesImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* setObjectXmlAttributesSymbol,
+void XmlAttributeProcessor::GenerateSetObjectXmlAttributesImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* setObjectXmlAttributesSymbol,
     StatementBinder* statementBinder)
 {
     try
@@ -1489,7 +1139,7 @@ void NewXmlAttributeProcessor::GenerateSetObjectXmlAttributesImplementation(Attr
     }
 }
 
-void NewXmlAttributeProcessor::GenerateToXmlSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateToXmlSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* toXmlSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ToXml");
@@ -1525,7 +1175,7 @@ void NewXmlAttributeProcessor::GenerateToXmlSymbol(AttributeNode* attribute, Cla
     m.push_back(std::make_pair(toXmlSymbol, toXmlId));
 }
 
-void NewXmlAttributeProcessor::GenerateToXmlImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toXmlSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateToXmlImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* toXmlSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -1628,7 +1278,7 @@ void NewXmlAttributeProcessor::GenerateToXmlImplementation(AttributeNode* attrib
     }
 }
 
-void NewXmlAttributeProcessor::GenerateFromXmlSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateFromXmlSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* fromXmlSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"FromXml");
@@ -1663,7 +1313,7 @@ void NewXmlAttributeProcessor::GenerateFromXmlSymbol(AttributeNode* attribute, C
     m.push_back(std::make_pair(fromXmlSymbol, fromXmlId));
 }
 
-void NewXmlAttributeProcessor::GenerateFromXmlImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* fromXmlSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateFromXmlImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* fromXmlSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -1753,7 +1403,7 @@ void NewXmlAttributeProcessor::GenerateFromXmlImplementation(AttributeNode* attr
     }
 }
 
-void NewXmlAttributeProcessor::GenerateGetPtrsSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
+void XmlAttributeProcessor::GenerateGetPtrsSymbol(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     MemberFunctionSymbol* getPtrsSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"GetPtrs");
@@ -1791,7 +1441,7 @@ void NewXmlAttributeProcessor::GenerateGetPtrsSymbol(AttributeNode* attribute, C
     m.push_back(std::make_pair(getPtrsSymbol, getPtrsId));
 }
 
-void NewXmlAttributeProcessor::GenerateGetPtrsImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* getPtrsSymbol, StatementBinder* statementBinder)
+void XmlAttributeProcessor::GenerateGetPtrsImplementation(AttributeNode* attribute, ClassTypeSymbol* classTypeSymbol, MemberFunctionSymbol* getPtrsSymbol, StatementBinder* statementBinder)
 {
     try
     {
@@ -1914,7 +1564,7 @@ void NewXmlAttributeProcessor::GenerateGetPtrsImplementation(AttributeNode* attr
     }
 }
 
-void NewXmlAttributeProcessor::CompileMemberFunction(MemberFunctionSymbol* memberFunctionSymbol, CompoundStatementNode& compoundStatementNode, MemberFunctionNode& memberFunctionNode, 
+void XmlAttributeProcessor::CompileMemberFunction(MemberFunctionSymbol* memberFunctionSymbol, CompoundStatementNode& compoundStatementNode, MemberFunctionNode& memberFunctionNode,
     std::unique_ptr<BoundFunction>&& boundFunction, StatementBinder* statementBinder)
 {
     SymbolTable& symbolTable = statementBinder->GetBoundCompileUnit().GetSymbolTable();

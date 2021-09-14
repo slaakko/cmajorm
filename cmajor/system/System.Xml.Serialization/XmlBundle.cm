@@ -11,7 +11,7 @@ namespace System.Xml.Serialization
 {
     public class OwningXmlBundle : XmlBundle
     {
-        public override bool TakeOwnership() const
+        public nothrow override bool TakeOwnership() const
         {
             return true;
         }
@@ -60,9 +60,14 @@ namespace System.Xml.Serialization
         }
         public string ToXmlString() const
         {
+            return ToXmlString(1);
+        }
+        public string ToXmlString(int indent) const
+        {
             UniquePtr<System.Dom.Document> document = ToXmlDocument();
             StringWriter stringWriter;
             CodeFormatter formatter(stringWriter);
+            formatter.SetIndentSize(indent);
             document->Write(formatter);
             return stringWriter.GetString();
         }

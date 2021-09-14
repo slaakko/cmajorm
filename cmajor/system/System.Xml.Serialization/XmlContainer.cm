@@ -10,7 +10,7 @@ namespace System.Xml.Serialization
 {
     public class OwningXmlContainer : XmlContainer
     {
-        public override bool TakeOwnership() const
+        public nothrow override bool TakeOwnership() const
         {
             return true;
         }
@@ -28,7 +28,7 @@ namespace System.Xml.Serialization
                 delete p.second;
             }
         }
-        public virtual bool TakeOwnership() const
+        public virtual nothrow bool TakeOwnership() const
         {
             return false;
         }

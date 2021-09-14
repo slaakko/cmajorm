@@ -1,0 +1,25 @@
+// vehicle.cm:
+
+using System;
+using System.Collections;
+using System.Xml.Serialization;
+
+namespace model
+{
+    public enum VehicleColor
+    {
+        red = 0,
+        green = 1,
+        blue = 2,
+        black = 3,
+        white = 4
+    }
+
+    [xml]
+    public abstract class Vehicle
+    {
+        // ...
+        public VehicleColor color;
+        public XmlPtr<Person> owner;
+    }
+}

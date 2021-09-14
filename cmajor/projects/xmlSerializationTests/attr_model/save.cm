@@ -1,0 +1,33 @@
+using System;
+using System.IO;
+using System.Collections;
+using System.Xml.Serialization;
+
+namespace model
+{
+    public void Save(const string& xmlFileName)
+    {
+        XmlContainer container; // XmlContainer does not own the objects by default
+
+        UniqueXmlPtr<Car> car = new Car();
+        car->SetRegistrationNumber("ABC-123");
+        car->SetColor(VehicleColor.red);
+        Add(car.Get(), &container);
+
+        UniqueXmlPtr<Bicycle> bicycle = new Bicycle();
+        bicycle->SetColor(VehicleColor.green);
+        bicycle->SetPrice(1000.0f);
+        Add(bicycle.Get(), &container);
+
+        UniqueXmlPtr<Person> person(new Person());
+        person->SetName("Joe Coder");
+        Add(person.Get(), &container);
+        person->AddVehicle(car.Release(), true);
+        person->AddVehicle(bicycle.Release(), true);
+        XmlBundle bundle = container.CreateBundle(person.Get());
+
+        string xmlStr = bundle.ToXmlString();
+        StreamWriter xmlFile = File.CreateText(xmlFileName);
+        xmlFile.WriteLine(xmlStr);
+    }
+}

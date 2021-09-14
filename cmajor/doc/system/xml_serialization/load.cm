@@ -1,0 +1,21 @@
+// load.cm:
+
+using System;
+using System.IO;
+using System.Collections;
+using System.Xml.Serialization;
+
+namespace model
+{
+    public UniqueXmlPtr<Person> Load(const string& fileName)
+    {
+        string xmlStr = File.ReadAllText(fileName);
+        UniquePtr<XmlBundle> bundle = ToXmlBundle(xmlStr, fileName);
+        UniqueXmlPtr<Person> root = ReleaseRoot<Person>(bundle.Get());
+        if (root.IsNull())
+        {
+            throw Exception("Person expected");
+        }
+        return root;
+    }
+}

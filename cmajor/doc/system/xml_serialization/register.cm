@@ -1,0 +1,23 @@
+// register.cm:
+
+using System;
+using System.Xml.Serialization;
+
+namespace model
+{
+    public const int carClassId = 0;
+    public const int bicycleClassId = 1;
+    public const int personClassId = 2;
+
+    public void Register()
+    {
+        Car.Register(carClassId);
+        Bicycle.Register(bicycleClassId);
+        Person.Register(personClassId);
+    }
+
+    new class ConcreteXmlSerializableExtractor<Vehicle>;
+    new class ConcreteXmlSerializableExtractor<Car>;
+    new class ConcreteXmlSerializableExtractor<Bicycle>;
+    new class ConcreteXmlSerializableExtractor<Person>;
+}
