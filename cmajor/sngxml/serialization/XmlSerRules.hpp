@@ -17,8 +17,11 @@ const int XmlSerParser_ClassKey = 7;
 const int XmlSerParser_Inheritance = 8;
 const int XmlSerParser_ClassContent = 9;
 const int XmlSerParser_MemberVariable = 10;
-const int XmlSerParser_Type = 11;
-const int XmlSerParser_ScalarType = 12;
-const int XmlSerParser_ClassType = 13;
+const int XmlSerParser_Enum = 11;
+const int XmlSerParser_EnumContent = 12;
+const int XmlSerParser_EnumConstant = 13;
+const int XmlSerParser_Type = 14;
+const int XmlSerParser_ScalarType = 15;
+const int XmlSerParser_ClassType = 16;
 
 #endif // RULES_H

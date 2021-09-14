@@ -39,6 +39,14 @@ void DefaultVisitor::Visit(MemberVariableNode& node)
     node.Type()->Accept(*this);
 }
 
+void DefaultVisitor::Visit(EnumTypeNode& node)
+{
+    for (const std::unique_ptr<EnumConstantNode>& enumConstantNode : node.EnumConstants())
+    {
+        enumConstantNode->Accept(*this);
+    }
+}
+
 void DefaultVisitor::Visit(ArrayNode& node)
 {
     node.Type()->Accept(*this);

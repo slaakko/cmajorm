@@ -11,45 +11,47 @@ namespace XmlSerTokens
     void InitTokenIdMap()
     {
         tokenIdMap[U"API"] = 1;
-        tokenIdMap[U"AST"] = 34;
-        tokenIdMap[U"BASE"] = 4;
-        tokenIdMap[U"BOOL"] = 5;
-        tokenIdMap[U"BYTE"] = 7;
-        tokenIdMap[U"CHAR"] = 16;
+        tokenIdMap[U"AST"] = 35;
+        tokenIdMap[U"BASE"] = 5;
+        tokenIdMap[U"BOOL"] = 6;
+        tokenIdMap[U"BYTE"] = 8;
+        tokenIdMap[U"CHAR"] = 17;
         tokenIdMap[U"CLASS"] = 3;
-        tokenIdMap[U"COLON"] = 33;
-        tokenIdMap[U"DATE"] = 23;
-        tokenIdMap[U"DATETIME"] = 24;
-        tokenIdMap[U"DOUBLE"] = 15;
-        tokenIdMap[U"DURATION"] = 27;
-        tokenIdMap[U"FILEPATH"] = 39;
-        tokenIdMap[U"FLOAT"] = 14;
-        tokenIdMap[U"HASH"] = 37;
+        tokenIdMap[U"COLON"] = 34;
+        tokenIdMap[U"COMMA"] = 38;
+        tokenIdMap[U"DATE"] = 24;
+        tokenIdMap[U"DATETIME"] = 25;
+        tokenIdMap[U"DOUBLE"] = 16;
+        tokenIdMap[U"DURATION"] = 28;
+        tokenIdMap[U"ENUM"] = 4;
+        tokenIdMap[U"FILEPATH"] = 41;
+        tokenIdMap[U"FLOAT"] = 15;
+        tokenIdMap[U"HASH"] = 39;
         tokenIdMap[U"ID"] = 2;
-        tokenIdMap[U"INCLUDE"] = 38;
-        tokenIdMap[U"INT"] = 10;
-        tokenIdMap[U"LBRACE"] = 30;
-        tokenIdMap[U"LBRACKET"] = 28;
-        tokenIdMap[U"LONG"] = 12;
-        tokenIdMap[U"LPAREN"] = 35;
-        tokenIdMap[U"NAMESPACE"] = 40;
-        tokenIdMap[U"RBRACE"] = 31;
-        tokenIdMap[U"RBRACKET"] = 29;
-        tokenIdMap[U"RPAREN"] = 36;
-        tokenIdMap[U"SBYTE"] = 6;
-        tokenIdMap[U"SEMICOLON"] = 32;
-        tokenIdMap[U"SHORT"] = 8;
-        tokenIdMap[U"STRING"] = 20;
-        tokenIdMap[U"TIMESTAMP"] = 25;
-        tokenIdMap[U"TIME_POINT"] = 26;
-        tokenIdMap[U"UCHAR"] = 18;
-        tokenIdMap[U"UINT"] = 11;
-        tokenIdMap[U"ULONG"] = 13;
-        tokenIdMap[U"USHORT"] = 9;
-        tokenIdMap[U"USTRING"] = 22;
-        tokenIdMap[U"UUID"] = 19;
-        tokenIdMap[U"WCHAR"] = 17;
-        tokenIdMap[U"WSTRING"] = 21;
+        tokenIdMap[U"INCLUDE"] = 40;
+        tokenIdMap[U"INT"] = 11;
+        tokenIdMap[U"LBRACE"] = 31;
+        tokenIdMap[U"LBRACKET"] = 29;
+        tokenIdMap[U"LONG"] = 13;
+        tokenIdMap[U"LPAREN"] = 36;
+        tokenIdMap[U"NAMESPACE"] = 42;
+        tokenIdMap[U"RBRACE"] = 32;
+        tokenIdMap[U"RBRACKET"] = 30;
+        tokenIdMap[U"RPAREN"] = 37;
+        tokenIdMap[U"SBYTE"] = 7;
+        tokenIdMap[U"SEMICOLON"] = 33;
+        tokenIdMap[U"SHORT"] = 9;
+        tokenIdMap[U"STRING"] = 21;
+        tokenIdMap[U"TIMESTAMP"] = 26;
+        tokenIdMap[U"TIME_POINT"] = 27;
+        tokenIdMap[U"UCHAR"] = 19;
+        tokenIdMap[U"UINT"] = 12;
+        tokenIdMap[U"ULONG"] = 14;
+        tokenIdMap[U"USHORT"] = 10;
+        tokenIdMap[U"USTRING"] = 23;
+        tokenIdMap[U"UUID"] = 20;
+        tokenIdMap[U"WCHAR"] = 18;
+        tokenIdMap[U"WSTRING"] = 22;
     }
 
     int GetTokenId(const std::u32string& tokenName)
@@ -71,6 +73,7 @@ namespace XmlSerTokens
         "API",
         "ID",
         "CLASS",
+        "ENUM",
         "BASE",
         "BOOL",
         "SBYTE",
@@ -104,6 +107,7 @@ namespace XmlSerTokens
         "AST",
         "LPAREN",
         "RPAREN",
+        "COMMA",
         "HASH",
         "INCLUDE",
         "FILEPATH",
@@ -121,6 +125,7 @@ namespace XmlSerTokens
         "'api'",
         "'identifier'",
         "'class'",
+        "'enum'",
         "'base'",
         "'bool'",
         "'sbyte'",
@@ -154,6 +159,7 @@ namespace XmlSerTokens
         "'*'",
         "'('",
         "')'",
+        "','",
         "'#'",
         "'include'",
         "'filepath'",

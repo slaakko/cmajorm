@@ -5,6 +5,7 @@
 
 #include <sngxml/serialization/XmlExport.hpp>
 #include <soulng/util/TextUtils.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace sngxml { namespace xmlser {
 
@@ -32,11 +33,7 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const std::u32string& value, const s
 std::unique_ptr<sngxml::dom::Element> ToXml(const uuid& value, const std::string& fieldName)
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    std::string s;
-    for (uint8_t x : value)
-    {
-        s.append(ToHexString(x));
-    }
+    std::string s = boost::uuids::to_string(value);
     element->SetAttribute(U"value", ToUtf32(s));
     return element;
 }

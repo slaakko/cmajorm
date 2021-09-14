@@ -254,6 +254,37 @@ private:
     std::vector<std::unique_ptr<MemberVariableNode>> memberVariables;
 };
 
+class SNGXML_SERIALIZATION_API EnumConstantNode : public Node
+{
+public:
+    EnumConstantNode(const std::string& id_);
+    EnumConstantNode(const EnumConstantNode&) = delete;
+    EnumConstantNode(EnumConstantNode&&) = delete;
+    EnumConstantNode& operator=(const EnumConstantNode&) = delete;
+    EnumConstantNode& operator=(EnumConstantNode&&) = delete;
+    const std::string& Id() const { return id; }
+    void Accept(Visitor& visitor) override;
+private:
+    std::string id;
+};
+
+class SNGXML_SERIALIZATION_API EnumTypeNode : public Node
+{
+public:
+    EnumTypeNode(const std::string& id_);
+    EnumTypeNode(const EnumTypeNode&) = delete;
+    EnumTypeNode(EnumTypeNode&&) = delete;
+    EnumTypeNode& operator=(const EnumTypeNode&) = delete;
+    EnumTypeNode& operator=(EnumTypeNode&&) = delete;
+    const std::string& Id() const { return id; }
+    void AddEnumConstant(EnumConstantNode* enumConstant);
+    const std::vector<std::unique_ptr<EnumConstantNode>>& EnumConstants() const { return enumConstants; }
+    void Accept(Visitor& visitor) override;
+private:
+    std::string id;
+    std::vector<std::unique_ptr<EnumConstantNode>> enumConstants;
+};
+
 class SNGXML_SERIALIZATION_API SourceFileNode : public Node
 {
 public:

@@ -38,6 +38,8 @@ class ArrayNode;
 class MemberVariableNode;
 class NamespaceNode;
 class ClassNode;
+class EnumTypeNode;
+class EnumConstantNode;
 class SourceFileNode;
 
 class Visitor
@@ -73,6 +75,8 @@ public:
     virtual void Visit(MemberVariableNode& node) {}
     virtual void Visit(NamespaceNode& node) {}
     virtual void Visit(ClassNode& node) {}
+    virtual void Visit(EnumTypeNode& node) {}
+    virtual void Visit(EnumConstantNode& node) {}
     virtual void Visit(SourceFileNode& node) {}
 };
 
@@ -83,6 +87,7 @@ public:
     void Visit(NamespaceNode& node) override;
     void Visit(ClassNode& node) override;
     void Visit(MemberVariableNode& node) override;
+    void Visit(EnumTypeNode& node) override;
     void Visit(ArrayNode& node) override;
     void Visit(PointerNode& node) override;
 };

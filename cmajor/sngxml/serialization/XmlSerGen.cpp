@@ -48,6 +48,7 @@ public:
     void Visit(NamespaceNode& node) override;
     void Visit(ClassNode& node) override;
     void Visit(MemberVariableNode& node) override;
+    void Visit(EnumTypeNode& node) override;
     void Visit(PointerNode& node) override;
     void Visit(ArrayNode& node) override;
     void Visit(BoolNode& node) override;
@@ -197,6 +198,29 @@ void HeaderGeneratorVisitor::Visit(MemberVariableNode& node)
     formatter.Write(" ");
     formatter.Write(node.Id());
     formatter.WriteLine(";");
+}
+
+void HeaderGeneratorVisitor::Visit(EnumTypeNode& node)
+{
+    formatter.WriteLine();
+    formatter.WriteLine("enum class " + node.Id());
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    bool first = true;
+    for (const auto& enumConstant : node.EnumConstants())
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            formatter.Write(", ");
+        }
+        formatter.WriteLine(enumConstant->Id());
+    }
+    formatter.DecIndent();
+    formatter.WriteLine("};");
 }
 
 void HeaderGeneratorVisitor::Visit(PointerNode& node)

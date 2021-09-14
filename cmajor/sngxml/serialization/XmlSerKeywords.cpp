@@ -12,6 +12,7 @@ namespace XmlSerKeywords
     {
         {U"api", API}, 
         {U"class", CLASS}, 
+        {U"enum", ENUM}, 
         {U"base", BASE}, 
         {U"bool", BOOL}, 
         {U"sbyte", SBYTE}, 

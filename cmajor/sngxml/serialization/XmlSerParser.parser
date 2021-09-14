@@ -38,6 +38,7 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
         
     Definition : sngxml::xmlser::Node*
         ::= Class:cls{ return cls;}
+        |   Enum:enm{ return enm; }
         |   Namespace:ns{ return ns; }
         ;
 
@@ -79,6 +80,25 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
         {
             return new sngxml::xmlser::MemberVariableNode(type, memberVarId);
         }
+        ;
+
+    Enum(var std::unique_ptr<sngxml::xmlser::EnumTypeNode> enumTypeNode) : sngxml::xmlser::EnumTypeNode*
+        ::= 
+        (
+            ENUM ID{ enumTypeNode.reset(new sngxml::xmlser::EnumTypeNode(ToUtf8(lexer.GetMatch(span)))); }
+            LBRACE EnumContent(enumTypeNode.get()):enumContent RBRACE
+        )
+        {
+            return enumTypeNode.release();
+        }
+        ;
+
+    EnumContent(sngxml::xmlser::EnumTypeNode* enumTypeNode)
+        ::= (EnumConstant:first{ enumTypeNode->AddEnumConstant(first); } (COMMA EnumConstant:next{ enumTypeNode->AddEnumConstant(next); })*)?
+        ;
+
+    EnumConstant : sngxml::xmlser::EnumConstantNode*
+        ::= ID{ return new sngxml::xmlser::EnumConstantNode(ToUtf8(lexer.GetMatch(span))); }
         ;
 
     Type(var std::unique_ptr<sngxml::xmlser::TypeNode> typeNode) : sngxml::xmlser::TypeNode*

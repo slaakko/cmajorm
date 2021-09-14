@@ -24,6 +24,9 @@ struct SNGXML_SERIALIZATION_API XmlSerParser
     static soulng::parser::Match Inheritance(XmlSerLexer& lexer);
     static soulng::parser::Match ClassContent(XmlSerLexer& lexer, sngxml::xmlser::ClassNode* classNode);
     static soulng::parser::Match MemberVariable(XmlSerLexer& lexer);
+    static soulng::parser::Match Enum(XmlSerLexer& lexer);
+    static soulng::parser::Match EnumContent(XmlSerLexer& lexer, sngxml::xmlser::EnumTypeNode* enumTypeNode);
+    static soulng::parser::Match EnumConstant(XmlSerLexer& lexer);
     static soulng::parser::Match Type(XmlSerLexer& lexer);
     static soulng::parser::Match ScalarType(XmlSerLexer& lexer);
     static soulng::parser::Match ClassType(XmlSerLexer& lexer);

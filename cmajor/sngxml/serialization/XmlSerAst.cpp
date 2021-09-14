@@ -205,6 +205,29 @@ void ClassNode::AddMemberVariable(MemberVariableNode* memberVariable)
     memberVariables.push_back(std::unique_ptr<MemberVariableNode>(memberVariable));
 }
 
+EnumConstantNode::EnumConstantNode(const std::string& id_) : id(id_)
+{
+}
+
+void EnumConstantNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+EnumTypeNode::EnumTypeNode(const std::string& id_) : id(id_)
+{
+}
+
+void EnumTypeNode::AddEnumConstant(EnumConstantNode* enumConstant)
+{
+    enumConstants.push_back(std::unique_ptr<EnumConstantNode>(enumConstant));
+}
+
+void EnumTypeNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 SourceFileNode::SourceFileNode() : globalNs(std::string())
 {
 }

@@ -127,6 +127,9 @@ template<class T>
 concept XmlExportableClassType = std::is_class_v<T> && requires(T t, const std::string& u) { t.ToXml(u); };
 
 template<class T>
+concept XmlExporableEnumType = std::is_enum_v<T>;
+
+template<class T>
 concept XmlExportableScalarType = 
 std::is_fundamental_v<T> ||
 std::is_same_v<T, std::string> ||
@@ -168,6 +171,14 @@ std::unique_ptr<sngxml::dom::Element> ToXml(const T& object, const std::string& 
 {
     std::unique_ptr<sngxml::dom::Element> element = object.ToXml(fieldName);
     element->SetAttribute(U"className", ToUtf32(MakeClassNameStr(typeid(T).name())));
+    return element;
+}
+
+template<XmlExporableEnumType T>
+std::unique_ptr<sngxml::dom::Element> ToXml(const T& value, const std::string& fieldName)
+{
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    element->SetAttribute(U"value", ToUtf32(std::to_string(static_cast<int64_t>(value))));
     return element;
 }
 
