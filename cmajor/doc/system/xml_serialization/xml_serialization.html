@@ -8,13 +8,35 @@
 </head>
 <body>
     <h1>XML serialization</h1>
+	
+	<h2>Table of contents</h2>
+	
+	<div class="toc">
+		1 <a href="#example">Example</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;1.1 <a href="#xml-classes">XML Classes</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;1.2 <a href="#saving">Saving</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;1.3 <a href="#xml">XML</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;1.4 <a href="#registration">Registration</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;1.5 <a href="#loading">Loading</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;1.6 <a href="#main">Main</a><br />
+		2 <a href="#implementation">Implementation</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="#participants">Participants</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.1 <a href="#xml-serializable">XmlSerializable Interface</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.2 <a href="#to-xml-and-from-xml">ToXml and FromXml</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.3 <a href="#xml-serializable-proxy">XmlSerializableProxy</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.4 <a href="#xml-container">XmlContainer</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.5 <a href="#xml-bundle">XmlBundle</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.6 <a href="#xml-serializable-extractor">XmlSerializableExtractor and ConcreteXmlSerializableExtractor</a><br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.7 <a href="#xml-class-registry">XmlClassRegistry</a><br />
+		
+	</div>
 
 	<p>
 		Code for the example is under the <em>cmajor/projects/xmlSerializationTests</em> directory 
 		in the <em>attr_model</em> and <em>attr_test</em> projects.
 	</p>
 
-	<h2>Example</h2>
+	<h2 id="example">1 Example</h2>
 	
 	<p>
 		Suppose you are writing a traffic simulation application. 
@@ -32,7 +54,7 @@
 		In this example we build classes that can be serialized to XML and constructed from an XML representation.
 	</p>
 	
-	<h3>XML Classes</h3>
+	<h3 id="xml-classes">1.1 XML Classes</h3>
 	
 	<p>
 		Cmajor provides an automatic mechanism for serializing objects as XML.
@@ -317,7 +339,7 @@
 	</span>
 	</div>
 	
-	<h3>Saving</h3>
+	<h3 id="saving">1.2 Saving</h3>
 	
 	<p>
 		Now we are ready to create an example model consisting of XML classes and save the model to an XML file.
@@ -461,7 +483,7 @@
 		created a text file, and written the XML string to the file.
 	</p>
 
-	<h3>XML</h3>
+	<h3 id="xml">1.3 XML</h3>
 	
 	<p>
 		Here's the contents of the generated XML file:
@@ -498,7 +520,7 @@
 		They are generated so that classes can better be recognized by human readers.
 	</p>
 
-	<h3>Registration</h3>
+	<h3 id="registration">1.4 Registration</h3>
 	
 	<p>
 		For the system to be able to create XML serializable classes when reading their XML representation, the classes has to be 
@@ -585,7 +607,7 @@
 		<em>Person</em> classes, because the compiler is not able to automatically generate instantiations for them.
 	</p>
 
-	<h3>Loading</h3>
+	<h3 id="loading">1.5 Loading</h3>
 
 	<p>
 		Now that we have the classes registered, they can be read from an XML file.
@@ -664,7 +686,7 @@
 		contained by the object elements, and resolves the relations of objects using object IDs.
 	</p>
 	
-	<h3>Main</h3>
+	<h3 id="main">1.6 Main</h3>
 	
 	<p>
 		Here's the main program that completes this example:
@@ -737,18 +759,18 @@
 	</span>
 	</div>
 
-	<h2>Implementation</h2>
+	<h2 id="implementation">2 Implementation</h2>
 
 	<p>
 		Implementation of the XML serialization scheme is done in half by the compiler and in half by the 
 		<a href="../content/System.Xml.Serialization/index.html">System.Xml.Serialization</a> library.
 	</p>
 
-	<h3>Participants</h3>
+	<h3 id="participants">2.1 Participants</h3>
 
 	<img src="image/xml_ser_implementation.spring.png"/>
 	
-	<h4>XmlSerializable interface</h4>
+	<h4 id="xml-serializable">2.1.1 XmlSerializable Interface</h4>
 	
 	<p>
 		The <a href="../content/System.Xml.Serialization/doc/bb0ec724-7c70-405b-820d-28d0c11ccba4.html">XmlSerializable</a>
@@ -764,7 +786,7 @@
 		or to an <a href="../content/System.Xml.Serialization/doc/class_XmlBundle_09EF3A12BD430DECAEEE5D0E67BDE0151E1D654A.html">XmlBundle</a>.
 	</p>
 		
-	<h4>ToXml and FromXml</h4>
+	<h4 id="to-xml-and-from-xml">2.1.2 ToXml and FromXml</h4>
 	
 	<p>
 		When the compiler generates an implementation of the <em>ToXml</em> member function for a <em>MyXmlSerializableClass</em>,
@@ -777,7 +799,7 @@
 		overloading.
 	</p>
 
-	<h4>XmlSerializableProxy</h4>
+	<h4 id="xml-serializable-proxy">2.1.3 XmlSerializableProxy</h4>
 	
 	<p>
 		The reason that the 
@@ -793,20 +815,56 @@
 	</p>
 	
 	<p>
-		There's also an excuse why you may not directly put instance of <em>MyXmlSerializableClass</em> to an <em>XmlContainer</em>, but
+		There's also an excuse why you can not directly put <em>MyXmlSerializableClass*</em> to an <em>XmlContainer*</em>, but
 		you have to call free <a href="../content/System.Xml.Serialization/doc/ns_System.Xml.Serialization.html#function_Add_B61D3CE67148AFE6ED6F19D749AC31903AAFFFE0">Add</a> 
 		function template to do that. It's because Cmajor lacks member function templates.
 	</p>
 	
-	<h4>XmlContainer</h4>
+	<h4 id="xml-container">2.1.4 XmlContainer</h4>
 	
 	<p>
 		The <a href="../content/System.Xml.Serialization/doc/class_XmlContainer_3A675CCAF06087583804E6C45EE63670AAC7C2B4.html">XmlContainer</a>
 		class has two mappings. From an object IDs to an XmlSerializableProxy* and from 
 		<em>MyXmlSerializableClass*</em> (represented as <strong>void*</strong>) to an XmlSerializableProxy*.
 		This means that you can get XmlSerializableProxy* by object ID or by object pointer.
-		You can also remove object and XmlSerializableProxy* by object ID, and create an XmlBundle from an object.
+		You can also remove object and XmlSerializableProxy* by object ID, and create an XmlBundle from an object pointer.
 	</p>
 	
+	<h4 id="xml-bundle">2.1.5 XmlBundle</h4>
+	
+	<p>
+		An <a href="../content/System.Xml.Serialization/doc/class_XmlBundle_09EF3A12BD430DECAEEE5D0E67BDE0151E1D654A.html">XmlBundle</a>
+		contains a root object and objects reachable from the root using those <em>XmlPtr</em>s and <em>UniqueXmlPtr</em>s for which
+		IncludeInBundle() is true. This is true by default but you can set it to false by calling the <em>SetIncludeInBundle()</em> member 
+		function of the <a href="../content/System.Xml.Serialization/doc/class_XmlPtrBase_118F102367E9E5B890C372D12976532DD05C82A2.html">XmlPtrBase</a> class.
+	</p>
+	
+	<p>
+		When constructing an XmlBundle from an XML string, the 
+		<a href="../content/System.Xml.Serialization/doc/ns_System.Xml.Serialization.html#function_ToXmlBundle_CEEA50265D00BFB02CB0AAF2C000AB2698485890">ToXmlBundle</a>
+		function uses the 
+		<a href="../content/System.Xml.Serialization/doc/class_XmlClassRegistry_A04F69080097E88C2760B47F593F4EA6F87544AF.html">XmlClassRegistry</a>
+		singleton to create a <em>MyXmlSerializableClass</em> associated with the class identifier read from an <em>object</em> XML element 
+		contained by the XML representation of the bundle.
+	</p>
+	
+	<h4 id="xml-serializable-extractor">2.1.6 XmlSerializableExtractor and ConcreteXmlSerializableExtractor</h4>
+	
+	<p>
+		The <a href="../content/System.Xml.Serialization/doc/class_XmlSerializableExtractor_A17EDF0AC3527D65988CA8382F1F051791DA9256.html">XmlSerializableExtractor</a>
+		is an abstract class that contains an abstract member function for creating an <em>XmlSerializable</em> interface from an object pointer.
+		The <a href="../content/System.Xml.Serialization/doc/class_ConcreteXmlSerializableExtractor_T_4816B568633C4C8227984B3273723858080CBFB3.html">ConcreteXmlSerializableExtractor</a>
+		overrides that member function for some class registered to <em>XmlClassRegistry</em> by a class identifier.
+	</p>
+	
+	<h4 id="xml-class-registry">2.1.7 XmlClassRegistry</h4>
+	
+	<p>
+		The <a href="../content/System.Xml.Serialization/doc/class_XmlClassRegistry_A04F69080097E88C2760B47F593F4EA6F87544AF.html">XmlClassRegistry</a>
+		is a singleton class that has two maps and can create a <em>MyXmlSerializableClass</em> using class identifier,
+		and extract an <em>XmlSerializable</em> interface from that object pointer using an <em>XmlSerializableExtractor</em>.
+		The first map associates a class identifier to a function pointer that creates an object and the second map associates a class identifier to an 
+		<em>XmlSerializableExtractor</em>.
+	</p>
 </body>	
     
