@@ -3,7 +3,7 @@
 #include <sngxml/serialization/XmlSerTokens.hpp>
 #include <sngxml/serialization/XmlSerAst.hpp>
 
-// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngxml/serialization/XmlSerParser.parser' using soulng parser generator spg version 3.10.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngxml/serialization/XmlSerParser.parser' using soulng parser generator spg version 4.0.0
 
 using namespace soulng::unicode;
 using namespace XmlSerTokens;
@@ -37,12 +37,12 @@ std::unique_ptr<sngxml::xmlser::SourceFileNode> XmlSerParser::Parse(XmlSerLexer&
         }
         else
         {
-            lexer.ThrowExpectationFailure(lexer.GetSpan(), ToUtf32(soulng::lexer::GetEndTokenInfo()));
+            lexer.ThrowFarthestError();
         }
     }
     else
     {
-        lexer.ThrowExpectationFailure(span, U"SourceFile");
+        lexer.ThrowFarthestError();
     }
     return value;
 }
@@ -58,6 +58,7 @@ soulng::parser::Match XmlSerParser::SourceFile(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("SourceFile"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 0);
     std::unique_ptr<sngxml::xmlser::SourceFileNode> sourceFile = std::unique_ptr<sngxml::xmlser::SourceFileNode>();
     std::unique_ptr<soulng::parser::Value<std::string>> id;
     soulng::parser::Match match(false);
@@ -231,6 +232,7 @@ soulng::parser::Match XmlSerParser::IncludeDirective(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("IncludeDirective"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 1);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -318,6 +320,7 @@ soulng::parser::Match XmlSerParser::NamespaceContent(XmlSerLexer& lexer, sngxml:
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("NamespaceContent"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 2);
     std::unique_ptr<sngxml::xmlser::Node> definition;
     soulng::parser::Match match(true);
     soulng::parser::Match* parentMatch0 = &match;
@@ -380,6 +383,7 @@ soulng::parser::Match XmlSerParser::Definition(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Definition"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 3);
     std::unique_ptr<sngxml::xmlser::ClassNode> cls;
     std::unique_ptr<sngxml::xmlser::NamespaceNode> ns;
     soulng::parser::Match match(false);
@@ -457,6 +461,7 @@ soulng::parser::Match XmlSerParser::Namespace(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Namespace"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 4);
     std::unique_ptr<sngxml::xmlser::NamespaceNode> ns = std::unique_ptr<sngxml::xmlser::NamespaceNode>();
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -595,6 +600,7 @@ soulng::parser::Match XmlSerParser::Class(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Class"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 5);
     std::unique_ptr<sngxml::xmlser::ClassNode> classNode = std::unique_ptr<sngxml::xmlser::ClassNode>();
     std::string api_ = std::string();
     std::unique_ptr<soulng::parser::Value<sngxml::xmlser::ClassNode::Key>> clsKey;
@@ -821,6 +827,7 @@ soulng::parser::Match XmlSerParser::Api(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Api"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 6);
     std::string api_ = std::string();
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -939,6 +946,7 @@ soulng::parser::Match XmlSerParser::ClassKey(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ClassKey"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 7);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -1042,6 +1050,7 @@ soulng::parser::Match XmlSerParser::Inheritance(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Inheritance"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 8);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -1109,6 +1118,7 @@ soulng::parser::Match XmlSerParser::ClassContent(XmlSerLexer& lexer, sngxml::xml
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ClassContent"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 9);
     std::unique_ptr<sngxml::xmlser::MemberVariableNode> memberVariable;
     soulng::parser::Match match(true);
     soulng::parser::Match* parentMatch0 = &match;
@@ -1171,6 +1181,7 @@ soulng::parser::Match XmlSerParser::MemberVariable(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("MemberVariable"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 10);
     std::string memberVarId = std::string();
     std::unique_ptr<sngxml::xmlser::TypeNode> type;
     soulng::parser::Match match(false);
@@ -1271,6 +1282,7 @@ soulng::parser::Match XmlSerParser::Type(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Type"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 11);
     std::unique_ptr<sngxml::xmlser::TypeNode> typeNode = std::unique_ptr<sngxml::xmlser::TypeNode>();
     std::unique_ptr<sngxml::xmlser::TypeNode> scalarType;
     std::unique_ptr<sngxml::xmlser::TypeNode> classType;
@@ -1480,8 +1492,10 @@ soulng::parser::Match XmlSerParser::ScalarType(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ScalarType"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 12);
     soulng::parser::Match match(false);
     int64_t pos = lexer.GetPos();
+    soulng::lexer::SourcePos sourcePos = lexer.GetSourcePos(pos);
     soulng::lexer::Span span = lexer.GetSpan();
     switch (*lexer)
     {
@@ -1810,6 +1824,7 @@ soulng::parser::Match XmlSerParser::ClassType(XmlSerLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ClassType"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    soulng::lexer::RuleGuard ruleGuard(lexer, 13);
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {

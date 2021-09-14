@@ -541,6 +541,7 @@ void GenerateXmlSerializationCode(const std::string& serializationDefinitionFile
 {
     std::u32string content = ToUtf32(ReadFile(serializationDefinitionFilePath));
     XmlSerLexer lexer(content, serializationDefinitionFilePath, 0);
+    lexer.SetFlag(soulng::lexer::LexerFlags::farthestError);
     std::unique_ptr<SourceFileNode> sourceFile = XmlSerParser::Parse(lexer);
     std::string headerFilePath = Path::ChangeExtension(serializationDefinitionFilePath, ".hpp");
     std::string sourceFilePath = Path::ChangeExtension(serializationDefinitionFilePath, ".cpp");

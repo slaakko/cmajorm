@@ -13,6 +13,8 @@ using namespace XmlSerTokens;
 parser api(SNGXML_SERIALIZATION_API) XmlSerParser
 {
     uselexer XmlSerLexer;
+    state;
+    farthest_error;
     main;
 
     SourceFile(var std::unique_ptr<sngxml::xmlser::SourceFileNode> sourceFile) : sngxml::xmlser::SourceFileNode*
