@@ -10,6 +10,7 @@
 #include <sngxml/dom/Element.hpp>
 #include <soulng/util/Time.hpp>
 #include <boost/uuid/uuid.hpp>
+#include <boost/lexical_cast.hpp>
 #include <chrono>
 
 namespace sngxml { namespace xmlser {
@@ -33,6 +34,9 @@ std::is_same_v<T, datetime> ||
 std::is_same_v<T, timestamp> ||
 std::is_same_v<T, time_point> ||
 std::is_same_v<T, duration>;
+
+template<class T>
+concept XmlImportableEnumType = std::is_enum_v<T>;
 
 template<class T>
 concept XmlConstructible = std::is_class_v<T> && requires(sngxml::dom::Element* element)
@@ -111,6 +115,18 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
         {
             object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(element)));
         }
+    }
+}
+
+template<XmlImportableEnumType T>
+void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, T& value)
+{
+    value = T();
+    sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
+    if (element)
+    {
+        std::u32string val = element->GetAttribute(U"value");
+        value = static_cast<T>(boost::lexical_cast<int64_t>(ToUtf8(val)));
     }
 }
 
