@@ -24,6 +24,7 @@
 #include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/StringFunctions.hpp>
+#include <cmajor/symbols/KeywordSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -63,7 +64,7 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "interfaceTypeDefaultCtor", "interfaceTypeCopyCtor", "interfaceTypeMoveCtor", "interfaceTypeCopyAssignment", "interfaceTypeMoveAssignment", "classToInterfaceConversion", 
     "getObjectPtrFromInterfaceSymbol",
     "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "variableValueSymbol", "globalVariableSymbol", "globalVariableGroupSymbol",
-    "stringFunctionContainerSymbol", "stringLengthFunctionSymbol", "axiomSymbol"
+    "stringFunctionContainerSymbol", "stringLengthFunctionSymbol", "axiomSymbol", "keywordSymbol"
 };
 
 std::string SymbolTypeStr(SymbolType symbolType)
@@ -1279,6 +1280,7 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::stringFunctionContainerSymbol, new ConcreteSymbolCreator<StringFunctionContainerSymbol>());
     Register(SymbolType::stringLengthFunctionSymbol, new ConcreteSymbolCreator<StringLengthFunction>());
     Register(SymbolType::axiomSymbol, new ConcreteSymbolCreator<AxiomSymbol>());
+    Register(SymbolType::keywordSymbol, new ConcreteSymbolCreator<KeywordSymbol>());
 #ifdef _WIN32
     Register(SymbolType::trap, new ConcreteSymbolCreator<TrapFunction>());
 #endif
