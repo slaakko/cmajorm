@@ -378,7 +378,7 @@ void XmlAttributeProcessor::GenerateStaticClassNameSymbol(AttributeNode* attribu
         staticClassNameSymbol->SetModule(&boundCompileUnit.GetModule());
         staticClassNameSymbol->SetGroupName(U"StaticClassName");
         staticClassNameSymbol->SetStatic();
-        staticClassNameSymbol->SetNothrow();
+        //staticClassNameSymbol->SetNothrow();
         staticClassNameSymbol->SetAccess(SymbolAccess::public_);
 
         GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(staticClassNameSymbol);
@@ -438,7 +438,7 @@ void XmlAttributeProcessor::GenerateCreateFunctionSymbol(AttributeNode* attribut
     createSymbol->SetModule(&boundCompileUnit.GetModule());
     createSymbol->SetGroupName(U"Create");
     createSymbol->SetStatic();
-    createSymbol->SetNothrow();
+    //createSymbol->SetNothrow();
     createSymbol->SetAccess(SymbolAccess::public_);
 
     GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(createSymbol);
@@ -490,7 +490,7 @@ void XmlAttributeProcessor::GenerateRegisterFunctionSymbol(AttributeNode* attrib
     registerSymbol->SetModule(&boundCompileUnit.GetModule());
     registerSymbol->SetGroupName(U"Register");
     registerSymbol->SetStatic();
-    registerSymbol->SetNothrow();
+    //registerSymbol->SetNothrow();
     registerSymbol->SetAccess(SymbolAccess::public_);
 
     GetRootModuleForCurrentThread()->GetSymbolTable().SetFunctionIdFor(registerSymbol);
@@ -550,7 +550,7 @@ void XmlAttributeProcessor::GenerateDestroyObjectFunctionSymbol(AttributeNode* a
     MemberFunctionSymbol* destroyObjectSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"DestroyObject");
     destroyObjectSymbol->SetModule(&boundCompileUnit.GetModule());
     destroyObjectSymbol->SetGroupName(U"DestroyObject");
-    destroyObjectSymbol->SetNothrow();
+    //destroyObjectSymbol->SetNothrow();
     destroyObjectSymbol->SetAccess(SymbolAccess::public_);
     if (HasXmlBaseClass(classTypeSymbol))
     {
@@ -620,7 +620,7 @@ void XmlAttributeProcessor::GenerateObjectIdFunctionSymbol(AttributeNode* attrib
     MemberFunctionSymbol* objectIdSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ObjectId");
     objectIdSymbol->SetModule(&boundCompileUnit.GetModule());
     objectIdSymbol->SetGroupName(U"ObjectId");
-    objectIdSymbol->SetNothrow();
+    //objectIdSymbol->SetNothrow();
     objectIdSymbol->SetAccess(SymbolAccess::public_);
     if (HasXmlBaseClass(classTypeSymbol))
     {
@@ -697,7 +697,7 @@ void XmlAttributeProcessor::GenerateSetObjectIdFunctionSymbol(AttributeNode* att
     MemberFunctionSymbol* setObjectIdSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"SetObjectId");
     setObjectIdSymbol->SetModule(&boundCompileUnit.GetModule());
     setObjectIdSymbol->SetGroupName(U"SetObjectId");
-    setObjectIdSymbol->SetNothrow();
+    //setObjectIdSymbol->SetNothrow();
     setObjectIdSymbol->SetAccess(SymbolAccess::public_);
     if (HasXmlBaseClass(classTypeSymbol))
     {
@@ -785,7 +785,7 @@ void XmlAttributeProcessor::GenerateContainerFunctionSymbol(AttributeNode* attri
     MemberFunctionSymbol* containerSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"Container");
     containerSymbol->SetModule(&boundCompileUnit.GetModule());
     containerSymbol->SetGroupName(U"Container");
-    containerSymbol->SetNothrow();
+    //containerSymbol->SetNothrow();
     containerSymbol->SetAccess(SymbolAccess::public_);
     if (HasXmlBaseClass(classTypeSymbol))
     {
@@ -857,7 +857,7 @@ void XmlAttributeProcessor::GenerateSetContainerFunctionSymbol(AttributeNode* at
     MemberFunctionSymbol* setContainerSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"SetContainer");
     setContainerSymbol->SetModule(&boundCompileUnit.GetModule());
     setContainerSymbol->SetGroupName(U"SetContainer");
-    setContainerSymbol->SetNothrow();
+    //setContainerSymbol->SetNothrow();
     setContainerSymbol->SetAccess(SymbolAccess::public_);
     if (HasXmlBaseClass(classTypeSymbol))
     {
@@ -935,7 +935,7 @@ void XmlAttributeProcessor::GenerateClassIdFunctionSymbol(AttributeNode* attribu
     MemberFunctionSymbol* classIdSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ClassId");
     classIdSymbol->SetModule(&boundCompileUnit.GetModule());
     classIdSymbol->SetGroupName(U"ClassId");
-    classIdSymbol->SetNothrow();
+    //classIdSymbol->SetNothrow();
     classIdSymbol->SetAccess(SymbolAccess::public_);
     classIdSymbol->SetConst();
     ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"this");
@@ -989,7 +989,7 @@ void XmlAttributeProcessor::GenerateClassNameFunctionSymbol(AttributeNode* attri
     MemberFunctionSymbol* classNameSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ClassName");
     classNameSymbol->SetModule(&boundCompileUnit.GetModule());
     classNameSymbol->SetGroupName(U"ClassName");
-    classNameSymbol->SetNothrow();
+    //classNameSymbol->SetNothrow();
     classNameSymbol->SetAccess(SymbolAccess::public_);
     classNameSymbol->SetConst();
     ParameterSymbol* thisParam = new ParameterSymbol(attribute->GetSpan(), attribute->ModuleId(), U"this");
@@ -1049,7 +1049,7 @@ void XmlAttributeProcessor::GenerateSetObjectXmlAttributesSymbol(AttributeNode* 
     MemberFunctionSymbol* setObjectXmlAttributesSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"SetObjectXmlAttributes");
     setObjectXmlAttributesSymbol->SetModule(&boundCompileUnit.GetModule());
     setObjectXmlAttributesSymbol->SetGroupName(U"SetObjectXmlAttributes");
-    setObjectXmlAttributesSymbol->SetNothrow();
+    //setObjectXmlAttributesSymbol->SetNothrow();
     setObjectXmlAttributesSymbol->SetAccess(SymbolAccess::public_);
     if (HasXmlBaseClass(classTypeSymbol))
     {
@@ -1145,7 +1145,7 @@ void XmlAttributeProcessor::GenerateToXmlSymbol(AttributeNode* attribute, ClassT
     MemberFunctionSymbol* toXmlSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"ToXml");
     toXmlSymbol->SetModule(&boundCompileUnit.GetModule());
     toXmlSymbol->SetGroupName(U"ToXml");
-    toXmlSymbol->SetNothrow();
+    //toXmlSymbol->SetNothrow();
     toXmlSymbol->SetAccess(SymbolAccess::public_);
     if (HasXmlBaseClass(classTypeSymbol))
     {
@@ -1284,7 +1284,7 @@ void XmlAttributeProcessor::GenerateFromXmlSymbol(AttributeNode* attribute, Clas
     MemberFunctionSymbol* fromXmlSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"FromXml");
     fromXmlSymbol->SetModule(&boundCompileUnit.GetModule());
     fromXmlSymbol->SetGroupName(U"FromXml");
-    fromXmlSymbol->SetNothrow();
+    //fromXmlSymbol->SetNothrow();
     fromXmlSymbol->SetAccess(SymbolAccess::public_);
     if (HasXmlBaseClass(classTypeSymbol))
     {
@@ -1409,7 +1409,7 @@ void XmlAttributeProcessor::GenerateGetPtrsSymbol(AttributeNode* attribute, Clas
     MemberFunctionSymbol* getPtrsSymbol = new MemberFunctionSymbol(attribute->GetSpan(), attribute->ModuleId(), U"GetPtrs");
     getPtrsSymbol->SetModule(&boundCompileUnit.GetModule());
     getPtrsSymbol->SetGroupName(U"GetPtrs");
-    getPtrsSymbol->SetNothrow();
+    //getPtrsSymbol->SetNothrow();
     getPtrsSymbol->SetAccess(SymbolAccess::public_);
     getPtrsSymbol->SetConst();
     if (HasXmlBaseClass(classTypeSymbol))
