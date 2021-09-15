@@ -481,6 +481,7 @@ soulng::parser::Match InterfaceParser::InterfaceMemFun(CmajorLexer& lexer, boost
                         {
                             s.end = span.end;
                             memFun.reset(new MemberFunctionNode(s, *moduleId, Specifiers(), returnType.release(), groupId->value, attrs.release()));
+                            memFun->SetGroupIdSpan(span);
                         }
                         *parentMatch10 = match;
                     }

@@ -59,6 +59,7 @@ parser api(SNGCM_NOTHROW_PARSER_API) NothrowInterfaceParser
         {
             s.end = span.end;
             memFun.reset(new MemberFunctionNode(s, *moduleId, Specifiers(), returnType, groupId, attrs));
+            memFun->SetGroupIdSpan(span);
         }
         ParameterList(moduleId, ctx, memFun.get()):paramList SEMICOLON!
         {

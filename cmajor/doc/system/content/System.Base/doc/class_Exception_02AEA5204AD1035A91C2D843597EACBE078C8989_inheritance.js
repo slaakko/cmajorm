@@ -275,7 +275,7 @@ function drawInheritanceDiagram() {
         { name: "System.IO.Compression.DeflateException", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.IO.Compression/doc/class_DeflateException_6739790B57AA3A80911377232C18EEF4FADC8843.html" },
         { name: "System.IO.FileSystemException", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_FileSystemException_BB9552A6F8CD7166104BC90F55939797AA006B1A.html" },
         { name: "System.IO.InvalidPathException", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_InvalidPathException_B507BC7383A55580000E7A669FAAE1ABECF7FFBA.html" },
-        { name: "System.Json.JsonImportException", id: "diagram_node_10", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonImportException_B2C659772CC55BEE3DF2ECEA8C50121E3DA06723.html" },
+        { name: "System.Json.JsonImportException", id: "diagram_node_11", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonImportException_B2C659772CC55BEE3DF2ECEA8C50121E3DA06723.html" },
         { name: "System.Lex.ParsingException", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Lex/doc/class_ParsingException_05B147C5054E1ADB84074F65FDF2E8CFBF5052EF.html" },
         { name: "System.Net.Http.HttpException", id: "diagram_node_13", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpException_09FCE3A5BC9FC383F4DA5AC6B226509EAD90AECE.html" },
         { name: "System.Net.Http.UriException", id: "diagram_node_14", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_UriException_AB875AAE6261B3654299A41C372F5195C5F5FA57.html" },
@@ -285,7 +285,7 @@ function drawInheritanceDiagram() {
         { name: "System.Windows.API.CommonDialogError", id: "diagram_node_16", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_CommonDialogError_C6319F4DC1EB231FB66D7540C953A8F0E20B3979.html" },
         { name: "System.Windows.API.WindowsAPIException", id: "diagram_node_17", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html" },
         { name: "System.Xml.Serialization.XmlSerializationException", id: "diagram_node_15", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Xml.Serialization/doc/class_XmlSerializationException_A50EFC149C2B4C37EA4A19AF9364D6BD135B9D76.html" },
-        { name: "System.Xml.XmlProcessingException", id: "diagram_node_11", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Xml/doc/class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5.html" }];
+        { name: "System.Xml.XmlProcessingException", id: "diagram_node_10", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Xml/doc/class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5.html" }];
     drawDiagram(diagramNodes);
 }
 
