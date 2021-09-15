@@ -8,7 +8,7 @@
   <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
 </span></span>
   <br/>
-  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2021&nbsp;Seppo&nbsp;Laakko
 </span></span>
   <br/>
   <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
@@ -51,27 +51,41 @@
   <br/>
   <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ProjectFileContent</span><span class="other">(</span><span class="identifier">soulcm</span><span class="other">.</span><span class="identifier">scmpg</span><span class="other">.</span><span class="identifier">ProjectFile</span><span class="other">*</span>&nbsp;<span class="identifier">projectFile</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="identifier">SourceFile</span><span class="other">(</span><span class="identifier">projectFile</span><span class="other">)</span><span class="other">:</span><span class="identifier">sourceFile</span><span class="other">*</span></span>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span></span>
   <br/>
-  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">(</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SourceFile</span><span class="other">(</span><span class="identifier">projectFile</span><span class="other">)</span><span class="other">:</span><span class="identifier">sourceFile</span></span>
   <br/>
-  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;</span>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">|</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">RuleFile</span><span class="other">(</span><span class="identifier">projectFile</span><span class="other">)</span><span class="other">:</span><span class="identifier">ruleFile</span></span>
   <br/>
-  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">QualifiedId</span><span class="other">(</span><span class="kw">var</span>&nbsp;<span class="identifier">Span</span>&nbsp;<span class="identifier">s</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">ustring</span></span>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">)</span><span class="other">*</span></span>
   <br/>
-  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="other">(</span><span class="identifier">ID</span><span class="other">{</span>&nbsp;<span class="identifier">s</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">span</span><span class="other">;</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">(</span><span class="identifier">DOT</span>&nbsp;<span class="identifier">ID</span><span class="other">{</span>&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">end</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">span</span><span class="other">.</span><span class="identifier">end</span><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">*</span><span class="other">)</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">lexer</span><span class="other">.</span><span class="identifier">GetMatch</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
   <br/>
-  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;</span>
   <br/>
-  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">QualifiedId</span><span class="other">(</span><span class="kw">var</span>&nbsp;<span class="identifier">Span</span>&nbsp;<span class="identifier">s</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">ustring</span></span>
   <br/>
-  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SourceFile</span><span class="other">(</span><span class="identifier">soulcm</span><span class="other">.</span><span class="identifier">scmpg</span><span class="other">.</span><span class="identifier">ProjectFile</span><span class="other">*</span>&nbsp;<span class="identifier">projectFile</span><span class="other">)</span></span>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="other">(</span><span class="identifier">ID</span><span class="other">{</span>&nbsp;<span class="identifier">s</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">span</span><span class="other">;</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">(</span><span class="identifier">DOT</span>&nbsp;<span class="identifier">ID</span><span class="other">{</span>&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">end</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">span</span><span class="other">.</span><span class="identifier">end</span><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">*</span><span class="other">)</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">lexer</span><span class="other">.</span><span class="identifier">GetMatch</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="identifier">SOURCE</span>&nbsp;<span class="identifier">FILEPATH</span><span class="other">!</span><span class="other">{</span>&nbsp;<span class="identifier">projectFile</span><span class="other">-></span><span class="identifier">AddSourceFile</span><span class="other">(</span><span class="identifier">lexer</span><span class="other">.</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span>&nbsp;<span class="identifier">SEMICOLON</span><span class="other">!</span></span>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
   <br/>
-  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;</span>
   <br/>
-  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SourceFile</span><span class="other">(</span><span class="identifier">soulcm</span><span class="other">.</span><span class="identifier">scmpg</span><span class="other">.</span><span class="identifier">ProjectFile</span><span class="other">*</span>&nbsp;<span class="identifier">projectFile</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="identifier">SOURCE</span>&nbsp;<span class="identifier">FILEPATH</span><span class="other">!</span><span class="other">{</span>&nbsp;<span class="identifier">projectFile</span><span class="other">-></span><span class="identifier">AddSourceFile</span><span class="other">(</span><span class="identifier">lexer</span><span class="other">.</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span>&nbsp;<span class="identifier">SEMICOLON</span><span class="other">!</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">RuleFile</span><span class="other">(</span><span class="identifier">soulcm</span><span class="other">.</span><span class="identifier">scmpg</span><span class="other">.</span><span class="identifier">ProjectFile</span><span class="other">*</span>&nbsp;<span class="identifier">projectFile</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="identifier">RULES</span>&nbsp;<span class="identifier">FILEPATH</span><span class="other">!</span><span class="other">{</span>&nbsp;<span class="identifier">projectFile</span><span class="other">-></span><span class="identifier">AddRuleFile</span><span class="other">(</span><span class="identifier">lexer</span><span class="other">.</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span>&nbsp;<span class="identifier">SEMICOLON</span><span class="other">!</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">}</span></span>
   <br/>
  </body>
 </html>
