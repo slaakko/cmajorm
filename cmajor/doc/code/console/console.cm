@@ -23,21 +23,21 @@ public static class Console
         out->WriteLine(i);
     }
     // ...
-    public static System.IO.InputStream& In()
+    public static nothrow StreamReader& In()
     {
-        return *in;
+        return in;
     }
-    public static System.IO.OutputStream& Out()
+    public static nothrow StreamWriter& Out()
     {
-        return *out;
+        return out;
     }
-    public static System.IO.OutputStream& Error()
+    public static nothrow StreamWriter& Error()
     {
-        return *err;
+        return err;
     }
-    private static System.UniquePtr<System.IO.InputStream> in;
-    private static System.UniquePtr<System.IO.OutputStream> out;
-    private static System.UniquePtr<System.IO.OutputStream> err;
+    private static StreamReader in;
+    private static StreamWriter out;
+    private static StreamWriter err;
 }
 
 public void main()

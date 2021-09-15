@@ -12,16 +12,17 @@ int main(int argc, const char** argv)
             command.Append(' ').Append(argv[i]);
         }
         string errors;
-        Process process(command);
-        while (!process.Eof(Process.StdHandle.std_out))
+        Process process(command, 
+			cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr));
+        while (!process.Eof(Process.StdHandle.stdOut))
         {
-            string line = process.ReadLine(Process.StdHandle.std_out);
+            string line = process.ReadLine(Process.StdHandle.stdOut);
             if (!line.IsEmpty())
             {
                 Console.WriteLine(line);
             }
         }
-        errors = process.ReadToEnd(Process.StdHandle.std_err);
+        errors = process.ReadToEnd(Process.StdHandle.stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)

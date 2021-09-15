@@ -9,9 +9,9 @@ namespace System
 {
     public static class Console
     {
-        static Console() : 
-            in(SharedPtr<ByteStream>(new FileByteStream(stdin))), 
-            out(SharedPtr<ByteStream>(new FileByteStream(stdout))), 
+        static Console() :
+            in(SharedPtr<ByteStream>(new FileByteStream(stdin))),
+            out(SharedPtr<ByteStream>(new FileByteStream(stdout))),
             err(SharedPtr<ByteStream>(new FileByteStream(stderr)))
         {
         }
@@ -82,6 +82,18 @@ namespace System
         public static void Write(double d)
         {
             out.Write(d);
+        }
+        public static void Write(char c)
+        {
+            out.Write(c);
+        }
+        public static void Write(wchar w)
+        {
+            out.Write(w);
+        }
+        public static void Write(uchar u)
+        {
+            out.Write(u);
         }
         public static void Write(const Date& date)
         {
@@ -163,6 +175,18 @@ namespace System
         {
             out.WriteLine(d);
         }
+        public static void WriteLine(char c)
+        {
+            out.WriteLine(c);
+        }
+        public static void WriteLine(wchar w)
+        {
+            out.WriteLine(w);
+        }
+        public static void WriteLine(uchar u)
+        {
+            out.WriteLine(u);
+        }
         public static void WriteLine(const Date& date)
         {
             out.WriteLine(date);
@@ -183,7 +207,7 @@ namespace System
         {
             return in.ReadToEnd();
         }
-        public static nothrow StreamReader& In() 
+        public static nothrow StreamReader& In()
         {
             return in;
         }
