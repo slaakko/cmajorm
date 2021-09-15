@@ -642,7 +642,7 @@ void SourceCodePrinter::WriteType(TypeSymbol* type)
 void SourceCodePrinter::Keyword(const std::u32string& token)
 {
     std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"span"));
-    keywordElement->SetAttribute(U"class", U"kw");
+    keywordElement->SetAttribute(U"class", U"keyword");
     WriteToElement(keywordElement.get(), token);
     lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentPos += token.length();
@@ -2901,7 +2901,7 @@ void GenerateSourceCode(sngcm::ast::Project* project, cmajor::binder::BoundCompi
     {
         lines.push_back(ToUtf32(line));
     }
-    std::string styleFilePath = "../../../style/style.css";
+    std::string styleFilePath = "../../../style/code.css";
     SourceCodePrinter printer(htmlFilePath, title, styleFilePath, lines, boundCompileUnit->GetSymbolTable(), boundCompileUnit->GetModule(),
         boundCompileUnit->GetCompileUnitNode()->GetSpan().fileIndex);
     boundCompileUnit->GetCompileUnitNode()->Accept(printer);

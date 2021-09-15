@@ -9,6 +9,7 @@
 
 namespace cmajor { namespace cmdoclib {
 
+CMDOCLIB_API void GenerateCodeStyleFile();
 CMDOCLIB_API void GenerateStyleFile();
 
 } } // namespace cmajor::cmdoclib

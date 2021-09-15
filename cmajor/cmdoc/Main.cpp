@@ -133,6 +133,7 @@ int main(int argc, const char** argv)
             Input input = ReadInputXml(cmDocFilePath); 
             SetInputPtr(&input);
             GenerateStyleFile();
+            GenerateCodeStyleFile();
             rootModules.clear();
             std::u32string solutionName;
             std::vector<std::u32string> moduleNames;

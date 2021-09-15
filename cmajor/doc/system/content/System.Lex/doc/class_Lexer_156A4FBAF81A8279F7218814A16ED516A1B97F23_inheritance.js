@@ -270,10 +270,10 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Lex.Lexer", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Lex/doc/class_Lexer_156A4FBAF81A8279F7218814A16ED516A1B97F23.html" },
         { name: "HttpLexer", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_HttpLexer_93A3B60ADBFD5AD4E110402AEA59204A69F0584F.html" },
-        { name: "JsonLexer", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonLexer_C48B52C0C81DC3674C6280261D8793084F6A8CE8.html" },
-        { name: "RexLexer", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.RegularExpressions/doc/class_RexLexer_3E44692000EAFDE94A417882BE827F8829E35373.html" },
-        { name: "TrivialLexer", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Lex/doc/class_TrivialLexer_1ED4D647874628B484622C97DB9F342068A434CE.html" },
-        { name: "UriLexer", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_UriLexer_3A0F50C503DCE0DEE8316D33A18F0E294E4AB36E.html" },
+        { name: "JsonLexer", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonLexer_C48B52C0C81DC3674C6280261D8793084F6A8CE8.html" },
+        { name: "RexLexer", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.RegularExpressions/doc/class_RexLexer_3E44692000EAFDE94A417882BE827F8829E35373.html" },
+        { name: "TrivialLexer", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Lex/doc/class_TrivialLexer_1ED4D647874628B484622C97DB9F342068A434CE.html" },
+        { name: "UriLexer", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_UriLexer_3A0F50C503DCE0DEE8316D33A18F0E294E4AB36E.html" },
         { name: "XPathLexer", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.XPath/doc/class_XPathLexer_B3C80BBDAB2E0881E318CA696E268637960D4669.html" }];
     drawDiagram(diagramNodes);
 }
