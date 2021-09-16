@@ -2091,6 +2091,10 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     {
         argIsExplicitThisOrBasePtr = true;
     }
+    if (groupName == U"ToXml")
+    {
+        int x = 0;
+    }
     std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, 
         invokeNode.GetSpan(), invokeNode.ModuleId(), OverloadResolutionFlags::dontThrow, templateArgumentTypes, exception);
     if (!functionCall)

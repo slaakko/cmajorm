@@ -417,6 +417,12 @@ void ConstraintChecker::Visit(IdentifierNode& identifierNode)
                     type = boundTemplateParameterSymbol->GetType();
                     break;
                 }
+                case SymbolType::classGroupTypeSymbol:
+                {
+                    ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(symbol);
+                    type = classGroup->GetClass(0);
+                    break;
+                }
                 case SymbolType::conceptGroupSymbol:
                 {
                     conceptGroup = static_cast<ConceptGroupSymbol*>(symbol);
@@ -499,6 +505,12 @@ void ConstraintChecker::Visit(DotNode& dotNode)
             case SymbolType::conceptGroupSymbol:
             {
                 conceptGroup = static_cast<ConceptGroupSymbol*>(symbol);
+                break;
+            }
+            case SymbolType::classGroupTypeSymbol:
+            {
+                ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(symbol);
+                type = classGroup->GetClass(0);
                 break;
             }
             case SymbolType::namespaceSymbol:
