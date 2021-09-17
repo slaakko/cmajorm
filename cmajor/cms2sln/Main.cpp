@@ -104,7 +104,7 @@ void ConvertSolution(sngcm::ast::Solution* solution, const std::string& slnFileP
     }
 }
 
-const char* version = "4.1.0";
+const char* version = "4.2.0";
 
 void PrintHelp()
 {

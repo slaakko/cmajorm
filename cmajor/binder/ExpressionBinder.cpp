@@ -190,6 +190,14 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
     if (operatorFunCall->GetFunctionSymbol()->ReturnsClassInterfaceOrClassDelegateByValue())
     {
         TypeSymbol* type = operatorFunCall->GetFunctionSymbol()->ReturnType();
+        if (type->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
+            if (!specialization->IsBound())
+            {
+                boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, span, moduleId);
+            }
+        }
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, node.GetSpan(), node.ModuleId());
         operatorFunCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(node.GetSpan(), node.ModuleId(), temporary)),
             type->AddPointer(node.GetSpan(), node.ModuleId()))));
@@ -268,6 +276,14 @@ void ExpressionBinder::BindBinaryOp(BoundExpression* left, BoundExpression* righ
     if (operatorFunCall->GetFunctionSymbol()->ReturnsClassInterfaceOrClassDelegateByValue())
     {
         TypeSymbol* type = operatorFunCall->GetFunctionSymbol()->ReturnType();
+        if (type->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
+            if (!specialization->IsBound())
+            {
+                boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, span, moduleId);
+            }
+        }
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, node.GetSpan(), node.ModuleId());
         operatorFunCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(node.GetSpan(), node.ModuleId(), temporary)),
             type->AddPointer(node.GetSpan(), node.ModuleId()))));
@@ -1285,6 +1301,14 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
     else if (expression->GetType()->IsClassTypeSymbol())
     {
         TypeSymbol* type = expression->GetType();
+        if (type->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
+            if (!specialization->IsBound())
+            {
+                boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, span, moduleId);
+            }
+        }
         TypeSymbol* pointerType = type->AddPointer(node.GetSpan(), node.ModuleId());
         LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, node.GetSpan(), node.ModuleId());
         Assert(expression->GetBoundNodeType() == BoundNodeType::boundFunctionCall, "function call expected");
@@ -1856,6 +1880,14 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         {
             functionScopeLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base, type->BaseType()->ClassInterfaceEnumDelegateOrNsScope()));
         }
+        if (type->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
+            if (!specialization->IsBound())
+            {
+                boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, span, moduleId);
+            }
+        }
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan(), invokeNode.ModuleId());
         std::unique_ptr<BoundExpression> addrOfTemporary(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(invokeNode.GetSpan(), invokeNode.ModuleId(), temporary)), type->AddPointer(invokeNode.GetSpan(), invokeNode.ModuleId())));
         arguments.push_back(std::move(addrOfTemporary));
@@ -1954,6 +1986,14 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         if (delegateTypeSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             TypeSymbol* type = delegateTypeSymbol->ReturnType();
+            if (type->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+            {
+                ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
+                if (!specialization->IsBound())
+                {
+                    boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, span, moduleId);
+                }
+            }
             temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan(), invokeNode.ModuleId());
             delegateCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, moduleId, temporary)),
                 type->AddPointer(invokeNode.GetSpan(), invokeNode.ModuleId()))));
@@ -2043,6 +2083,14 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         if (classDelegateTypeSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             TypeSymbol* type = classDelegateTypeSymbol->ReturnType();
+            if (type->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+            {
+                ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
+                if (!specialization->IsBound())
+                {
+                    boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, span, moduleId);
+                }
+            }
             temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan(), invokeNode.ModuleId());
             classDelegateCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, moduleId, temporary)),
                 type->AddPointer(invokeNode.GetSpan(), invokeNode.ModuleId()))));
@@ -2090,10 +2138,6 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     if (!arguments.empty() && arguments[0]->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr))
     {
         argIsExplicitThisOrBasePtr = true;
-    }
-    if (groupName == U"ToXml")
-    {
-        int x = 0;
     }
     std::unique_ptr<BoundFunctionCall> functionCall = ResolveOverload(groupName, containerScope, functionScopeLookups, arguments, boundCompileUnit, boundFunction, 
         invokeNode.GetSpan(), invokeNode.ModuleId(), OverloadResolutionFlags::dontThrow, templateArgumentTypes, exception);
@@ -2199,6 +2243,14 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     if (functionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
         TypeSymbol* type = functionSymbol->ReturnType();
+        if (type->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
+            if (!specialization->IsBound())
+            {
+                boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, invokeNode.GetSpan(), invokeNode.ModuleId());
+            }
+        }
         temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(type, invokeNode.GetSpan(), invokeNode.ModuleId());
         functionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(invokeNode.GetSpan(), invokeNode.ModuleId(), temporary)),
             type->AddPointer(invokeNode.GetSpan(), invokeNode.ModuleId()))));
@@ -2493,6 +2545,14 @@ void ExpressionBinder::Visit(CastNode& castNode)
             if (conversionFun->GetSymbolType() == SymbolType::constructorSymbol)
             {
                 BoundFunctionCall* constructorCall = new BoundFunctionCall(span, moduleId, conversionFun);
+                if (conversionFun->ConversionTargetType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+                {
+                    ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(conversionFun->ConversionTargetType());
+                    if (!specialization->IsBound())
+                    {
+                        boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, span, moduleId);
+                    }
+                }
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionFun->ConversionTargetType(), span, moduleId);
                 constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, moduleId, temporary)),
                     conversionFun->ConversionTargetType()->AddPointer(span, moduleId))));

@@ -2877,10 +2877,6 @@ bool HtmlSourceFilePathsUpToDate(sngcm::ast::Project* project)
 void GenerateSourceCode(sngcm::ast::Project* project, cmajor::binder::BoundCompileUnit* boundCompileUnit, std::unordered_map<int, File>& fileMap)
 {
     std::string fileName = Path::GetFileName(boundCompileUnit->GetCompileUnitNode()->FilePath());
-    if (fileName == "XmlSerializable.cm")
-    {
-        int x = 0;
-    }
     Input* input = GetInputPtr();
     std::string targetDir = input->targetDirPath;
     boost::filesystem::create_directories(targetDir);

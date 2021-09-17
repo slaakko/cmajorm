@@ -20,7 +20,7 @@ namespace soulng { namespace unicode {
 
 std::string CmajorVersionStr()
 {
-    return "4.1.0";
+    return "4.2.0";
 }
 
 std::string CmajorRoot()

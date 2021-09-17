@@ -2153,10 +2153,6 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
     std::unique_ptr<Exception>& exception, const Span& span, const boost::uuids::uuid& moduleId)
 {
     ClassTypeSymbol* classType = defaultConstructor->ClassType();
-    if (classType->GroupName() == U"Matrix")
-    {
-        int x = 0;
-    }
     try
     {
         bool nothrow = true;

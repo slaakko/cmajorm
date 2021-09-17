@@ -926,10 +926,6 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
         MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
         if (memberFunctionSymbol->IsBound()) return;
         memberFunctionSymbol->SetBound();
-        if (memberFunctionSymbol->GroupName() == U"Create")
-        {
-            int x = 0;
-        }
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
             symbolTable.MapSymbol(&memberFunctionNode, memberFunctionSymbol);

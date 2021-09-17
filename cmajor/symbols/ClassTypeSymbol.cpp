@@ -1352,12 +1352,6 @@ void* ClassTypeSymbol::IrType(Emitter& emitter)
 {
     if (!IsBound())
     {
-        if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
-        {
-            ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(this);
-            bool hasFullInstantion = specialization->HasFullInstantiation();
-            std::cout << "specialization has full instantiation: " << (hasFullInstantion ? "true" : "false") << std::endl;
-        }
         throw Exception("class '" + ToUtf8(Name()) + "' not bound", GetSpan(), SourceModuleId());
     }
     void* localIrType = emitter.GetIrTypeByTypeId(TypeId());

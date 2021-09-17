@@ -320,10 +320,6 @@ TraceExpr* MatchExpr::Clone() const
 
 void MatchExpr::Evaluate(Stack& stack, FunctionNode& function) const
 {
-    if (function.Name().find("System.Windows.Component.NextSibling") != std::string::npos)
-    {
-        int x = 0;
-    }
     Left()->Evaluate(stack, function);
     std::unique_ptr<TraceExpr> left = stack.Pop();
     Right()->Evaluate(stack, function);

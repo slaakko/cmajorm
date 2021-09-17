@@ -993,6 +993,14 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 }
                 BoundFunctionCall* constructorCall = new BoundFunctionCall(span, moduleId, conversionFun);
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
+                if (conversionTargetType->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+                {
+                    ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(conversionTargetType);
+                    if (!specialization->IsBound())
+                    {
+                        boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, span, moduleId);
+                    }
+                }
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span, moduleId);
                 constructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, moduleId, temporary)),
                     conversionTargetType->AddPointer(span, moduleId))));
@@ -1025,6 +1033,14 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 BoundFunctionCall* conversionFunctionCall = new BoundFunctionCall(span, moduleId, conversionFun);
                 conversionFunctionCall->AddArgument(std::move(argument));
                 TypeSymbol* conversionTargetType = conversionFun->ConversionTargetType();
+                if (conversionTargetType->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+                {
+                    ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(conversionTargetType);
+                    if (!specialization->IsBound())
+                    {
+                        boundCompileUnit.GetClassTemplateRepository().BindClassTemplateSpecialization(specialization, containerScope, span, moduleId);
+                    }
+                }
                 LocalVariableSymbol* temporary = boundFunction->GetFunctionSymbol()->CreateTemporary(conversionTargetType, span, moduleId);
                 conversionFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(std::unique_ptr<BoundExpression>(new BoundLocalVariable(span, moduleId, temporary)),
                     conversionTargetType->AddPointer(span, moduleId))));

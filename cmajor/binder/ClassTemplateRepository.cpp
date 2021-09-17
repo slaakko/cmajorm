@@ -114,10 +114,6 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     const Span& span,  const boost::uuids::uuid& moduleId)
 {
     if (classTemplateSpecialization->IsBound()) return;
-    if (classTemplateSpecialization->FullName() == U"String<char>")
-    {
-        int x = 0;
-    }
     SymbolTable& symbolTable = boundCompileUnit.GetSymbolTable();
     ClassTypeSymbol* classTemplate = classTemplateSpecialization->GetClassTemplate();
     Node* node = symbolTable.GetNodeNoThrow(classTemplate);
