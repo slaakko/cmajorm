@@ -39,12 +39,20 @@ public:
     void SetPrevSibling(Component* prevSibling_) { prevSibling = prevSibling_; }
     void LinkBefore(Component* component) 
     {
+        if (prevSibling)
+        {
+            prevSibling->nextSibling = component;
+        }
         component->prevSibling = prevSibling;
         component->nextSibling = this;
         prevSibling = component;
     }
     void LinkAfter(Component* component)
     {
+        if (nextSibling)
+        {
+            nextSibling->prevSibling = component;
+        }
         component->prevSibling = this;
         component->nextSibling = nextSibling;
         nextSibling = component;

@@ -41,12 +41,20 @@ namespace System.Windows
         }
         internal nothrow void LinkBefore(Component* component)
         {
+            if (prevSibling != null)
+            {
+                prevSibling->nextSibling = component;
+            }
             component->prevSibling = prevSibling;
             component->nextSibling = this;
             prevSibling = component;
         }
         internal nothrow void LinkAfter(Component* component)
         {
+            if (nextSibling != null)
+            {
+                nextSibling->prevSibling = component;
+            }
             component->prevSibling = this;
             component->nextSibling = nextSibling;
             nextSibling = component;
