@@ -141,6 +141,7 @@ Control::Control(ControlCreateParams& createParams) :
     {
         Create();
     }
+    SetScrollUnits(ScrollUnits(10, 10));
 }
 
 Control::~Control()
@@ -507,10 +508,21 @@ void Control::SetSize(const Size& newSize)
 {
     if (size != newSize)
     {
+        SizeChangingEventArgs sizeChangingArgs(size, newSize);
+        OnSizeChanging(sizeChangingArgs);
         SetSizeInternal(newSize);
         if (handle)
         {
             MoveWindow(location, size, true);
+        }
+        if (GetFlag(ControlFlags::scrollSubject))
+        {
+            Control* parentControl = ParentControl();
+            if (parentControl)
+            {
+                ControlEventArgs args(this);
+                parentControl->OnChildSizeChanged(args);
+            }
         }
     }
 }
@@ -1689,9 +1701,19 @@ void Control::OnLocationChanged()
     locationChanged.Fire();
 }
 
+void Control::OnSizeChanging(SizeChangingEventArgs& args)
+{
+    sizeChanging.Fire(args);
+}
+
 void Control::OnSizeChanged()
 {
     sizeChanged.Fire();
+}
+
+void Control::OnChildSizeChanged(ControlEventArgs& args)
+{
+    childSizeChanged.Fire(args);
 }
 
 void Control::OnContentChanged()

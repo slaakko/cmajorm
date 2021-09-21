@@ -23,6 +23,7 @@ SearchResultsView::SearchResultsView() :
 {
     std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
     treeView = treeViewPtr.get();
+    treeView->SetFlag(ControlFlags::scrollSubject);
     treeView->SetDoubleBuffered();
     treeView->NodeDoubleClick().AddHandler(this, &SearchResultsView::TreeViewNodeDoubleClick);
     std::unique_ptr<Control> paddedTreeView(new PaddedControl(PaddedControlCreateParams(treeViewPtr.release()).Defaults()));

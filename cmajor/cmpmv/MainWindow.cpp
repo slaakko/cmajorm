@@ -54,6 +54,7 @@ MainWindow::MainWindow() : Window(WindowCreateParams().WindowClassName("cmajor.p
     splitContainer->Pane1Container()->AddChild(portMapViewPtr.release());
     std::unique_ptr<LogView> logView(new LogView(TextViewCreateParams().Defaults()));
     log = logView.get();
+    log->SetFlag(ControlFlags::scrollSubject);
     std::unique_ptr<PaddedControl> paddedLogView(new PaddedControl(PaddedControlCreateParams(logView.release()).Defaults()));
     std::unique_ptr<ScrollableControl> scrollableLog(new ScrollableControl(ScrollableControlCreateParams(paddedLogView.release()).SetDock(Dock::fill)));
     splitContainer->Pane2Container()->AddChild(scrollableLog.release());

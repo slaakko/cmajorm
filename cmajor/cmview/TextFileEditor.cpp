@@ -29,6 +29,7 @@ TextFileEditor::TextFileEditor(TextFileEditorCreateParams& createParams) : Edito
 {
     std::unique_ptr<TextView> textViewPtr(new TextView(createParams.textViewCreateParams.Defaults()));
     textView = textViewPtr.get();
+    textView->SetFlag(ControlFlags::scrollSubject);
     ScrollableControl* scrollableTextView(new ScrollableControl(ScrollableControlCreateParams(textViewPtr.release()).SetDock(Dock::fill)));
     AddChild(scrollableTextView);
     textView->SetFilePath(createParams.filePath);

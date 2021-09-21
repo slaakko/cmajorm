@@ -17,6 +17,7 @@ PortMapView::PortMapView() : Control(ControlCreateParams().WindowClassName("cmaj
 {
     std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().AddToolTip(false)));
     treeView = treeViewPtr.get();
+    treeView->SetFlag(ControlFlags::scrollSubject);
     treeView->SetDoubleBuffered();
     std::unique_ptr<Control> paddedTreeView(new PaddedControl(PaddedControlCreateParams(treeViewPtr.release()).Defaults()));
     std::unique_ptr<Control> scrollableTreeView(new ScrollableControl(ScrollableControlCreateParams(paddedTreeView.release()).SetDock(Dock::fill)));

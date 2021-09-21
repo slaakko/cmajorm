@@ -43,6 +43,7 @@ protected:
     void TranslateContentLocation(Point& contentLocation) override;
     void OnLocationChanged() override;
     void OnSizeChanged() override;
+    void OnChildSizeChanged(ControlEventArgs& args) override;
     void OnChildContentChanged(ControlEventArgs& args) override;
     void OnChildContentLocationChanged(ControlEventArgs& args) override;
     void OnChildContentSizeChanged(ControlEventArgs& args) override;
@@ -57,6 +58,7 @@ private:
     void GetScrollBarData(int bar, int& page, int& pos, int& min, int& max, int& trackpos);
     void ScrollChild(int dx, int dy);
     Rect MakeUpdateRect(int xAmount, int yAmount);
+    void ChildSizeOrContentSizeChanged(ControlEventArgs& args);
     Control* child;
     Control* scrolledChild;
     Container container;

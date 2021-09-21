@@ -186,9 +186,20 @@ void ScrollableControl::OnChildContentLocationChanged(ControlEventArgs& args)
     SetScrollPos(SB_HORZ, hpos);
 }
 
+void ScrollableControl::OnChildSizeChanged(ControlEventArgs& args)
+{
+    Control::OnChildSizeChanged(args);
+    ChildSizeOrContentSizeChanged(args);
+}
+
 void ScrollableControl::OnChildContentSizeChanged(ControlEventArgs& args)
 {
-    Control::OnChildContentChanged(args);
+    Control::OnChildContentSizeChanged(args);
+    ChildSizeOrContentSizeChanged(args);
+}
+
+void ScrollableControl::ChildSizeOrContentSizeChanged(ControlEventArgs& args)
+{
     scrolledChild = args.control;
     scrollUnits = scrolledChild->GetScrollUnits();
     Size clientSize = scrolledChild->GetSize();
@@ -203,7 +214,7 @@ void ScrollableControl::OnChildContentSizeChanged(ControlEventArgs& args)
     }
     else
     {
-        ShowScrollBar(Handle(), SB_VERT, false);        
+        ShowScrollBar(Handle(), SB_VERT, false);
         verticalScrollBarShown = false;
     }
     if (contentSize.Width > clientSize.Width)
@@ -219,6 +230,7 @@ void ScrollableControl::OnChildContentSizeChanged(ControlEventArgs& args)
         ShowScrollBar(Handle(), SB_HORZ, false);
         horizontalScrollBarShown = false;
     }
+
 }
 
 void ScrollableControl::OnChildGotFocus(ControlEventArgs& args)

@@ -602,6 +602,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
     outputTabPage = outputTabPagePtr.get();
     std::unique_ptr<LogView> outputLogViewPtr(new LogView(TextViewCreateParams().Defaults()));
     outputLogView = outputLogViewPtr.get();
+    outputLogView->SetFlag(ControlFlags::scrollSubject);
     outputLogView->SetDoubleBuffered();
     std::unique_ptr<Control> scrollableOutputLogView(new ScrollableControl(ScrollableControlCreateParams(outputLogViewPtr.release()).SetDock(Dock::fill)));
     outputTabPage->AddChild(scrollableOutputLogView.release());
@@ -612,6 +613,7 @@ MainWindow::MainWindow(const std::string& filePath) : Window(WindowCreateParams(
         logTabPage = logTabPagePtr.get();
         std::unique_ptr<LogView> logViewPtr(new LogView(TextViewCreateParams().Defaults()));
         log = logViewPtr.get();
+        log->SetFlag(ControlFlags::scrollSubject);
         log->SetDoubleBuffered();
         std::unique_ptr<Control> scrollableLogView(new ScrollableControl(ScrollableControlCreateParams(logViewPtr.release()).SetDock(Dock::fill)));
         logTabPage->AddChild(scrollableLogView.release());
@@ -5370,6 +5372,7 @@ LogView* MainWindow::GetOutputLogView()
         outputTabPage = outputTabPagePtr.get();
         std::unique_ptr<LogView> outputLogViewPtr(new LogView(TextViewCreateParams().Defaults()));
         outputLogView = outputLogViewPtr.get();
+        outputLogView->SetFlag(ControlFlags::scrollSubject);
         outputLogView->SetDoubleBuffered();
         std::unique_ptr<Control> scrollableOutputLogView(new ScrollableControl(ScrollableControlCreateParams(outputLogViewPtr.release()).SetDock(Dock::fill)));
         outputTabPage->AddChild(scrollableOutputLogView.release());
@@ -5644,6 +5647,7 @@ Console* MainWindow::GetConsole()
     if (!console)
     {
         console = new Console(ConsoleCreateParams().Defaults());
+        console->SetFlag(ControlFlags::scrollSubject);
         console->SetDoubleBuffered();
         console->ConsoleInputReady().AddHandler(this, &MainWindow::ConsoleInputReady);
         ScrollableControl* scrollableConsole = new ScrollableControl(ScrollableControlCreateParams(console).SetDock(Dock::fill));

@@ -19,6 +19,7 @@ LocalsView::LocalsView() : Control(ControlCreateParams().WindowClassName("cmajor
 {
     std::unique_ptr<TreeView> treeViewPtr(new TreeView(TreeViewCreateParams().Defaults()));
     treeView = treeViewPtr.get();
+    treeView->SetFlag(ControlFlags::scrollSubject);
     treeView->SetDoubleBuffered();
     treeView->NodeExpanded().AddHandler(this, &LocalsView::TreeViewNodeExpanded);
     treeView->NodeHovered().AddHandler(this, &LocalsView::TreeViewNodeHover);

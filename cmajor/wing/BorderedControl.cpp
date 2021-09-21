@@ -250,6 +250,16 @@ void BorderedControl::OnSizeChanged()
     SetChildPos();
 }
 
+void BorderedControl::OnChildSizeChanged(ControlEventArgs& args)
+{
+    Control::OnChildSizeChanged(args);
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->FireChildSizeChanged(args);
+    }
+}
+
 void BorderedControl::OnChildContentChanged(ControlEventArgs& args)
 {
     Control::OnChildContentChanged(args);

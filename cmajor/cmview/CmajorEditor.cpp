@@ -30,6 +30,7 @@ CmajorEditor::CmajorEditor(CmajorEditorCreateParams& createParams) : Editor(crea
 {
     std::unique_ptr<CmajorSourceCodeView> sourceCodeViewPtr(new CmajorSourceCodeView(createParams.sourceCodeViewCreateParams.Defaults()));
     sourceCodeView = sourceCodeViewPtr.get();
+    sourceCodeView->SetFlag(ControlFlags::scrollSubject);
     std::unique_ptr<DebugStrip> debugStripPtr(new DebugStrip(createParams.debugStripCreateParams.SetTextView(sourceCodeView)));
     debugStrip = debugStripPtr.get();
     AddChild(debugStripPtr.release());

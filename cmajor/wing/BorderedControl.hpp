@@ -88,6 +88,7 @@ protected:
     void OnPaint(PaintEventArgs& args) override;
     void OnLocationChanged() override;
     void OnSizeChanged() override;
+    void OnChildSizeChanged(ControlEventArgs& args) override;
     void OnChildContentChanged(ControlEventArgs& args) override;
     void OnChildContentLocationChanged(ControlEventArgs& args) override;
     void OnChildContentSizeChanged(ControlEventArgs& args) override;

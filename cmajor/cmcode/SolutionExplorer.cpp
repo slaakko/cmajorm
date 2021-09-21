@@ -147,6 +147,7 @@ void SolutionExplorer::MakeView()
     }
     std::unique_ptr<TreeView> solutionTreeViewPtr(new TreeView(treeViewCreateParams));
     solutionTreeView = solutionTreeViewPtr.get();
+    solutionTreeView->SetFlag(ControlFlags::scrollSubject);
     solutionTreeView->NodeDoubleClick().AddHandler(mainWindow, &MainWindow::TreeViewNodeDoubleClick);
     solutionTreeView->NodeClick().AddHandler(mainWindow, &MainWindow::TreeViewNodeClick);
     solutionTreeView->NodeExpanded().AddHandler(mainWindow, &MainWindow::TreeViewNodeExpanded);

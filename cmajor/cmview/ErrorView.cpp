@@ -97,6 +97,7 @@ ErrorView::ErrorView(ErrorViewCreateParams& createParams) : Control(createParams
 {
     std::unique_ptr<TreeView> treeViewPtr(new TreeView(createParams.treeViewCreateParams));
     treeView = treeViewPtr.get();
+    treeView->SetFlag(ControlFlags::scrollSubject);
     treeView->SetDoubleBuffered();
     treeView->NodeDoubleClick().AddHandler(this, &ErrorView::TreeViewNodeDoubleClick);
     std::unique_ptr<Control> paddedTreeView(new PaddedControl(PaddedControlCreateParams(treeViewPtr.release()).Defaults()));

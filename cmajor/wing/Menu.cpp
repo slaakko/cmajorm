@@ -1965,6 +1965,7 @@ void MenuItem::DoMouseUp(MouseEventArgs& args)
     if (!IsEnabled()) return;
     OnMouseUp(args);
     MenuControl* menuControl = GetMenuControl();
+    bool isMenubar = menuControl->IsMenuBar();
     MenuItem* latestMouseDownMenuItem = menuControl->LatestMouseDownMenuItem();
     if ((args.buttons & MouseButtons::lbutton) != MouseButtons::none)
     {
@@ -1980,7 +1981,7 @@ void MenuItem::DoMouseUp(MouseEventArgs& args)
                 Close();
                 DoClick();
             }
-            if (menuControl->IsMenuBar())
+            if (isMenubar)
             {
                 MenuItem* openedMenuItem = menuControl->OpenedMenuItem();
                 if (openedMenuItem)

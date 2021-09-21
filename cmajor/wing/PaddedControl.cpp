@@ -134,6 +134,16 @@ void PaddedControl::OnSizeChanged()
     SetChildPos();
 }
 
+void PaddedControl::OnChildSizeChanged(ControlEventArgs& args)
+{
+    Control::OnChildSizeChanged(args);
+    Control* parentControl = ParentControl();
+    if (parentControl)
+    {
+        parentControl->FireChildSizeChanged(args);
+    }
+}
+
 void PaddedControl::OnChildContentChanged(ControlEventArgs& args)
 {
     Control::OnChildContentChanged(args);

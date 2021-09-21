@@ -567,6 +567,7 @@ CodeCompletionListView::CodeCompletionListView(CCListCreateParams& ccListCreateP
 {
     std::unique_ptr<CCList> ccListPtr(new CCList(ccListCreateParams, this));
     ccList = ccListPtr.get();
+    ccList->SetFlag(ControlFlags::scrollSubject);
     ccList->SetDoubleBuffered();
     std::unique_ptr<PaddedControl> paddedControlPtr(new PaddedControl(PaddedControlCreateParams(ccListPtr.release()).SetPadding(padding).BackgroundColor(ccList->BackgroundColor())));
     std::unique_ptr<ScrollableControl> scrollableControlPtr(new ScrollableControl(ScrollableControlCreateParams(paddedControlPtr.release()).BackgroundColor(ccList->BackgroundColor())));
