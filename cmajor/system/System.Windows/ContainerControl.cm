@@ -10,8 +10,8 @@ namespace System.Windows
 {
     public abstract class ContainerControl : Control
     {
-        public ContainerControl(const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle, 
-            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
+        public ContainerControl(const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle,
+            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base(windowClassName, windowClassStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors), children(this)
         {
         }
@@ -83,6 +83,22 @@ namespace System.Windows
                 child = child->PrevSibling();
             }
             return null;
+        }
+        protected override void OnSizeChanging(SizeChangingEventArgs& args)
+        {
+            base->OnSizeChanging(args);
+            int dx = args.newSize.w - args.oldSize.w;
+            int dy = args.newSize.h - args.oldSize.h;
+            MoveChildren(dx, dy);
+        }
+        protected override void OnChildSizeChanged(ControlEventArgs& args)
+        {
+            base->OnChildSizeChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->FireChildSizeChanged(args);
+            }
         }
         protected override void OnChildContentLocationChanged(ControlEventArgs& args)
         {
@@ -160,19 +176,7 @@ namespace System.Windows
                         Rect parentRect(Point(), newSize);
                         int dx = newSize.w - oldSize.w;
                         int dy = newSize.h - oldSize.h;
-                        Component* child = children.FirstChild();
-                        while (child != null)
-                        {
-                            if (child is Control*)
-                            {
-                                Control* childControl = cast<Control*>(child);
-                                if (childControl->GetDock() == Dock.none)
-                                {
-                                    childControl->MoveWindow(dx, dy);
-                                }
-                            }   
-                            child = child->NextSibling();
-                        }
+                        MoveChildren(dx, dy);
                         uint windowState = message.wparam;
                         SetSizeInternal(newSize, windowState);
                         DockChildren();
@@ -189,6 +193,22 @@ namespace System.Windows
                 }
             }
             return false;
+        }
+        internal void MoveChildren(int dx, int dy)
+        {
+            Component* child = children.FirstChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* childControl = cast<Control*>(child);
+                    if (childControl->GetDock() == Dock.none)
+                    {
+                        childControl->MoveWindow(dx, dy);
+                    }
+                }
+                child = child->NextSibling();
+            }
         }
         internal void DockChildren()
         {

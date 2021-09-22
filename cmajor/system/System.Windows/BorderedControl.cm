@@ -175,6 +175,15 @@ namespace System.Windows
             base->OnSizeChanged(windowState);
             SetChildPos();
         }
+        protected override void OnChildSizeChanged(ControlEventArgs& args)
+        {
+            base->OnChildSizeChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->FireChildSizeChanged(args);
+            }
+        }
         protected override void OnPaint(PaintEventArgs& args)
         {
             if (Debug.Paint())

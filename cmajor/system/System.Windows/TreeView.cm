@@ -800,7 +800,7 @@ namespace System.Windows
                 view->SetTreeViewNodeChanged();
             }
         }
-        public void RemoveChild(TreeViewNode* child)
+        public UniquePtr<TreeViewNode> RemoveChild(TreeViewNode* child)
         {
             UniquePtr<Component> removed = children.RemoveChild(child);
             TreeView* view = GetTreeView();
@@ -808,6 +808,7 @@ namespace System.Windows
             {
                 view->SetTreeViewNodeChanged();
             }
+            return UniquePtr<TreeViewNode>(cast<TreeViewNode*>(removed.Release()));
         }
         public void RemoveChildren()
         {

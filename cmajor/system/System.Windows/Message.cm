@@ -183,6 +183,13 @@ namespace System.Windows
         public Control* control;
     }
 
+    public class SizeChangingEventArgs
+    {
+        public nothrow SizeChangingEventArgs(const Size& oldSize_, const Size& newSize_) : oldSize(oldSize_), newSize(newSize_) {}
+        public Size oldSize;
+        public Size newSize;
+    }
+
     public class RightClickEventArgs
     {
         public nothrow RightClickEventArgs(Control* control_, const Point& location_) : control(control_), location(location_)

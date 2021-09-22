@@ -170,6 +170,7 @@ public:
     const Padding& NodeImagePadding() const { return nodeImagePadding; }
 protected:
     void OnPaint(PaintEventArgs& args) override;
+    void OnSizeChanged() override;
     virtual void OnNodeClick(TreeViewNodeClickEventArgs& args);
     virtual void OnNodeDoubleClick(TreeViewNodeClickEventArgs& args);
     virtual void OnNodeEnter(TreeViewNodeEventArgs& args);
@@ -262,7 +263,7 @@ public:
     TreeViewNode* Parent() const;
     const Container& Children() const { return children; }
     void AddChild(TreeViewNode* child);
-    void RemoveChild(TreeViewNode* child);
+    std::unique_ptr<TreeViewNode> RemoveChild(TreeViewNode* child);
     void RemoveChildren();
     int Level() const;
     TreeViewNodeState State() const { return state; }

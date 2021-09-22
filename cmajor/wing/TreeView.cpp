@@ -443,6 +443,12 @@ void TreeView::OnPaint(PaintEventArgs& args)
     }
 }
 
+void TreeView::OnSizeChanged()
+{
+    Control::OnSizeChanged();
+    SetContentLocation(Point(0, 0));
+}
+
 void TreeView::OnNodeClick(TreeViewNodeClickEventArgs& args)
 {
     nodeClick.Fire(args);
@@ -748,7 +754,7 @@ void TreeViewNode::AddChild(TreeViewNode* child)
     }
 }
 
-void TreeViewNode::RemoveChild(TreeViewNode* child)
+std::unique_ptr<TreeViewNode> TreeViewNode::RemoveChild(TreeViewNode* child)
 {
     std::unique_ptr<Component> removed = children.RemoveChild(child);
     TreeView* view = GetTreeView();
@@ -758,6 +764,7 @@ void TreeViewNode::RemoveChild(TreeViewNode* child)
         view->SetChanged();
         view->Invalidate();
     }
+    return std::unique_ptr<TreeViewNode>(static_cast<TreeViewNode*>(removed.release()));
 }
 
 void TreeViewNode::RemoveChildren()

@@ -1935,6 +1935,7 @@ namespace System.Windows
         {
             if (!IsEnabled()) return;
             OnMouseUp(args);
+            bool isMenuBar = menuControl is MenuBar*;
             MenuItem* latestMouseDownMenuItem = menuControl->GetLatestMouseDownMenuItem();
             if ((args.buttons & MouseButtons.lbutton) != 0)
             {
@@ -1950,7 +1951,7 @@ namespace System.Windows
                         Close(menuControl);
                         DoClick();
                     }
-                    if (menuControl is MenuBar*)
+                    if (isMenuBar)
                     {
                         MenuItem* openedMenuItem = menuControl->GetOpenedMenuItem();
                         if (openedMenuItem != null)

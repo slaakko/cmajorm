@@ -34,6 +34,11 @@ namespace System.Windows
             child->SetLocation(Point());
             child->SetSize(GetSize());
         }
+        protected override void OnChildSizeChanged(ControlEventArgs& args)
+        {
+            base->OnChildSizeChanged(args);
+            ChildSizeOrContentSizeChanged(args);
+        }
         protected override void OnChildContentChanged(ControlEventArgs& args)
         {
             base->OnChildContentChanged(args);
@@ -53,9 +58,8 @@ namespace System.Windows
             hpos = childContentLocation.x / horizontalScrollUnit;
             SetScrollInfo(Handle(), ScrollBar.SB_HORZ, ScrollInfoMask.SIF_POS, true, 0u, hpos, 0, 0);
         }
-        protected override void OnChildContentSizeChanged(ControlEventArgs& args)
+        private void ChildSizeOrContentSizeChanged(ControlEventArgs& args)
         {
-            base->OnChildContentSizeChanged(args);
             scrolledChild = args.control;
             Pair<int, int> scrollUnits = scrolledChild->GetScrollUnits();
             verticalScrollUnit = scrollUnits.first;
@@ -92,6 +96,11 @@ namespace System.Windows
                 ShowScrollBar(Handle(), ScrollBar.SB_HORZ, false);
                 horizontalScrollBarShown = false;
             }
+        }
+        protected override void OnChildContentSizeChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentSizeChanged(args);
+            ChildSizeOrContentSizeChanged(args);
         }
         protected override void OnChildGotFocus(ControlEventArgs& args)
         {

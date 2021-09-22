@@ -230,7 +230,6 @@ void ScrollableControl::ChildSizeOrContentSizeChanged(ControlEventArgs& args)
         ShowScrollBar(Handle(), SB_HORZ, false);
         horizontalScrollBarShown = false;
     }
-
 }
 
 void ScrollableControl::OnChildGotFocus(ControlEventArgs& args)
@@ -405,10 +404,7 @@ void ScrollableControl::GetScrollBarData(int bar, int& page, int& pos, int& min,
 void ScrollableControl::ScrollChild(int xAmount, int yAmount)
 {
     scrolledChild->SetContentLocationInternal(Point(scrollUnits.horizontal * hpos, scrollUnits.vertical * vpos));
-    Rect updateRect = MakeUpdateRect(xAmount, yAmount);
-    HRGN hrgnUpdate = CreateRectRgn(updateRect.X, updateRect.Y, updateRect.X + updateRect.Width, updateRect.Y + updateRect.Height);
-    int result = ScrollWindowEx(scrolledChild->Handle(), xAmount, yAmount, nullptr, nullptr, hrgnUpdate, nullptr, SW_INVALIDATE);
-    DeleteObject(hrgnUpdate);
+    int result = ScrollWindowEx(scrolledChild->Handle(), xAmount, yAmount, nullptr, nullptr, nullptr, nullptr, SW_INVALIDATE | SW_SCROLLCHILDREN);
     if (scrolledChild->IsDoubleBuffered())
     {
         scrolledChild->Invalidate();
