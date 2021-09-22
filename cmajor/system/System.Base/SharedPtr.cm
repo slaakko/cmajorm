@@ -22,9 +22,12 @@ namespace System
         {
             delete this;
         }
-        public inline nothrow void AddReference()
+        public inline void AddReference()
         {
-            #assert(!(useCount == 0 && weakCount != 0));
+            if (useCount == 0 && weakCount != 0)
+            {
+                ThrowPreconditionViolationException();
+            }
             ++useCount;
             ++weakCount;
         }
@@ -107,9 +110,12 @@ namespace System
         {
             that.counter = null;
         }
-        public nothrow SharedCount(const WeakCount<T>& that) : counter(that.GetCounter())
+        public SharedCount(const WeakCount<T>& that) : counter(that.GetCounter())
         {
-            #assert(counter != null);
+            if (counter == null)
+            {
+                ThrowNullPointerException();
+            }
             counter->AddReference();
         }
         public nothrow void operator=(const Self& that)
@@ -314,14 +320,20 @@ namespace System
             Swap(ptr, that.ptr);
             Swap(count, that.count);
         }
-        public nothrow inline T* operator->() const
+        public inline T* operator->() const
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return ptr;
         }
-        public nothrow inline T& operator*() const
+        public inline T& operator*() const
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return *ptr;
         }
         public nothrow inline T* GetPtr() const
@@ -362,9 +374,12 @@ namespace System
         return left.Get() == right.Get();
     }
 
-    public nothrow bool operator<<T>(const SharedPtr<T>& left, const SharedPtr<T>& right)
+    public bool operator<<T>(const SharedPtr<T>& left, const SharedPtr<T>& right)
     {
-        #assert(left.Get() != null && right.Get() != null || left.Get() == null && right.Get() == null);
+        if (!(left.Get() != null && right.Get() != null || left.Get() == null && right.Get() == null))
+        {
+            ThrowPreconditionViolationException();
+        }
         return left.Get() < right.Get();
     }
 
@@ -428,7 +443,7 @@ namespace System
         // Call the Lock() member function instead when you want to get the pointer.
         // It returns a SharedPtr that may or may not contain a pointer,
         // depending on whether the pointer is expired or not.
-        
+
         public nothrow inline T* GetPtrForSharedPtr() const
         {
             return ptr;
@@ -448,10 +463,13 @@ namespace System
 
     public class ShareableFromThis<T>
     {
-        public nothrow SharedPtr<T> GetSharedFromThis() const
+        public SharedPtr<T> GetSharedFromThis() const
         {
             SharedPtr<T> p(weakThis);
-            #assert(p.Get() == this);
+            if (p.Get() != this)
+            {
+                ThrowPreconditionViolationException();
+            }
             return p;
         }
         public nothrow WeakPtr<T>& GetWeakThis()

@@ -29,7 +29,7 @@ namespace System
         private string message;
         private string callStack;
     }
-    
+
     public class ExceptionPtr
     {
         public nothrow ExceptionPtr() : exception(null), exceptionClassIdHi(0u), exceptionClassIdLo(0u)
@@ -55,7 +55,7 @@ namespace System
         private ulong exceptionClassIdHi;
         private ulong exceptionClassIdLo;
     }
-    
+
     public nothrow ExceptionPtr CaptureCurrentException()
     {
         void* exception;
@@ -64,9 +64,57 @@ namespace System
         RtCaptureException(exception, exceptionClassIdHi, exceptionClassIdLo);
         return ExceptionPtr(exception, exceptionClassIdHi, exceptionClassIdLo);
     }
-    
+
     public void ThrowCapturedException(const ExceptionPtr& capturedException)
     {
         RtThrowCapturedException(capturedException.Exception(), capturedException.ExceptionClassIdHi(), capturedException.ExceptionClassIdLo());
+    }
+
+    public class NullPointerException : Exception
+    {
+        public nothrow NullPointerException() : base("null pointer exception")
+        {
+        }
+    }
+
+    public class IndexOutOfBoundsException : Exception
+    {
+        public nothrow IndexOutOfBoundsException() : base("index out of bounds")
+        {
+        }
+    }
+
+    public class InvalidParameterException : Exception
+    {
+        public nothrow InvalidParameterException() : base("invalid parameter")
+        {
+        }
+    }
+
+    public class PreconditionViolationException : Exception
+    {
+        public nothrow PreconditionViolationException() : base("precondition violation")
+        {
+        }
+    }
+
+    public void ThrowNullPointerException()
+    {
+        throw NullPointerException();
+    }
+
+    public void ThrowIndexOutOfBoundsException()
+    {
+        throw IndexOutOfBoundsException();
+    }
+
+    public void ThrowInvalidParameterException()
+    {
+        throw InvalidParameterException();
+    }
+
+    public void ThrowPreconditionViolationException()
+    {
+        throw PreconditionViolationException();
     }
 }

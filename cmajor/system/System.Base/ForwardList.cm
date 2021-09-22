@@ -12,7 +12,7 @@ namespace System.Collections
     {
         private typedef T ValueType;
         private typedef ForwardListNode<ValueType> Self;
-        
+
         public ForwardListNode(Self* next_, const ValueType& value_) : next(next_), value(value_)
         {
         }
@@ -51,19 +51,28 @@ namespace System.Collections
         public nothrow ForwardListNodeIterator(NodePtr node_) : node(node_)
         {
         }
-        public inline nothrow ReferenceType operator*()
+        public inline ReferenceType operator*()
         {
-            #assert(node != null);
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             return node->Value();
         }
-        public inline nothrow PointerType operator->()
+        public inline PointerType operator->()
         {
-            #assert(node != null);
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             return &(node->Value());
         }
-        public inline nothrow Self& operator++()
+        public inline Self& operator++()
         {
-            #assert(node != null);
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             node = node->Next();
             return *this;
         }
@@ -136,7 +145,7 @@ namespace System.Collections
                 head = head->Next();
                 delete toRemove;
             }
-        }    
+        }
         public inline nothrow Iterator Begin()
         {
             return Iterator(head);
@@ -161,16 +170,19 @@ namespace System.Collections
         {
             return ConstIterator(null);
         }
-        public inline nothrow const ValueType& Front() const
+        public inline const ValueType& Front() const
         {
-            #assert(head != null);
+            if (head == null)
+            {
+                ThrowNullPointerException();
+            }
             return head->Value();
         }
         public inline Iterator InsertFront(const ValueType& value)
         {
             head = new NodeType(head, value);
             return Iterator(head);
-        }    
+        }
         public Iterator InsertAfter(Iterator pos, const ValueType& value)
         {
             NodePtr node = pos.Node();
@@ -181,23 +193,32 @@ namespace System.Collections
             node->SetNext(new NodeType(node->Next(), value));
             return Iterator(node->Next());
         }
-        public nothrow void RemoveFront()
+        public void RemoveFront()
         {
-            #assert(head != null);
+            if (head == null)
+            {
+                throw NullPointerException();
+            }
             NodePtr node = head;
             head = head->Next();
             delete node;
         }
-        public nothrow void RemoveAfter(Iterator pos)
+        public void RemoveAfter(Iterator pos)
         {
             NodePtr node = pos.Node();
-            #assert(node != null);
+            if (node == null)
+            {
+                ThrowInvalidParameterException();
+            }
             NodePtr toRemove = node->Next();
-            #assert(toRemove != null);
+            if (toRemove == null)
+            {
+                ThrowNullPointerException();
+            }
             node->SetNext(toRemove->Next());
             delete toRemove;
         }
-        public nothrow void Remove(const ValueType& value)
+        public void Remove(const ValueType& value)
         {
             NodePtr prev = null;
             NodePtr node = head;
@@ -210,14 +231,17 @@ namespace System.Collections
                         head = head->Next();
                         delete node;
                         node = head;
-                    }                    
+                    }
                     else
                     {
-                        #assert(prev != null);
+                        if (prev == null)
+                        {
+                            ThrowNullPointerException();
+                        }
                         prev->SetNext(node->Next());
                         delete node;
                         node = prev->Next();
-                    }                    
+                    }
                 }
                 else
                 {
@@ -252,7 +276,7 @@ namespace System.Collections
     {
         return Equal(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd());
     }
-    
+
     public bool operator<<T>(const ForwardList<T>& left, const ForwardList<T>& right) where T is TotallyOrdered
     {
         return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd());

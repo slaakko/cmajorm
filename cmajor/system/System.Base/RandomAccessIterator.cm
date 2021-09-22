@@ -12,82 +12,112 @@ namespace System
         public typedef P PointerType;
         private typedef RandomAccessIter<ValueType, ReferenceType, PointerType> Self;
 
-        public nothrow inline RandomAccessIter() : ptr(null) 
+        public nothrow inline RandomAccessIter() : ptr(null)
         {
         }
-        public nothrow inline explicit RandomAccessIter(PointerType ptr_) : ptr(ptr_) 
+        public nothrow inline explicit RandomAccessIter(PointerType ptr_) : ptr(ptr_)
         {
         }
-        public nothrow inline Self& operator++()
+        public inline Self& operator++()
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             ++ptr;
             return *this;
         }
-        public nothrow inline Self& operator--()
+        public inline Self& operator--()
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             --ptr;
             return *this;
         }
-        public nothrow inline ReferenceType operator*()
+        public inline ReferenceType operator*()
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return *ptr;
         }
-        public nothrow inline PointerType operator->()
+        public inline PointerType operator->()
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return ptr;
         }
-        public nothrow inline ReferenceType operator[](long index)
+        public inline ReferenceType operator[](long index)
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return ptr[index];
         }
-        public nothrow inline PointerType Ptr() const 
-        { 
-            return ptr; 
+        public nothrow inline PointerType Ptr() const
+        {
+            return ptr;
         }
         private PointerType ptr;
     }
 
-    public nothrow inline RandomAccessIter<T, R, P> operator+<T, R, P>(const RandomAccessIter<T, R, P>& it, long offset)
+    public inline RandomAccessIter<T, R, P> operator+<T, R, P>(const RandomAccessIter<T, R, P>& it, long offset)
     {
-        #assert(it.Ptr() != null);
+        if (it.Ptr() == null)
+        {
+            ThrowPreconditionViolationException();
+        }
         return RandomAccessIter<T, R, P>(it.Ptr() + offset);
     }
 
-    public nothrow inline RandomAccessIter<T, R, P> operator+<T, R, P>(long offset, const RandomAccessIter<T, R, P>& it)
+    public inline RandomAccessIter<T, R, P> operator+<T, R, P>(long offset, const RandomAccessIter<T, R, P>& it)
     {
-        #assert(it.Ptr() != null);
+        if (it.Ptr() == null)
+        {
+            ThrowPreconditionViolationException();
+        }
         return RandomAccessIter<T, R, P>(it.Ptr() + offset);
     }
 
-    public nothrow inline RandomAccessIter<T, R, P> operator-<T, R, P>(const RandomAccessIter<T, R, P>& it, long offset)
+    public inline RandomAccessIter<T, R, P> operator-<T, R, P>(const RandomAccessIter<T, R, P>& it, long offset)
     {
-        #assert(it.Ptr() != null);
+        if (it.Ptr() == null)
+        {
+            ThrowPreconditionViolationException();
+        }
         return RandomAccessIter<T, R, P>(it.Ptr() - offset);
     }
 
-    public nothrow inline long operator-<T, R, P>(const RandomAccessIter<T, R, P>& left, const RandomAccessIter<T, R, P>& right)
+    public inline long operator-<T, R, P>(const RandomAccessIter<T, R, P>& left, const RandomAccessIter<T, R, P>& right)
     {
-        #assert(left.Ptr() == null && right.Ptr() == null || left.Ptr() != null && right.Ptr() != null);
-        if (left.Ptr() == null && right.Ptr() == null) 
+        if (!(left.Ptr() == null && right.Ptr() == null || left.Ptr() != null && right.Ptr() != null))
+        {
+            ThrowPreconditionViolationException();
+        }
+        if (left.Ptr() == null && right.Ptr() == null)
         {
             return 0;
         }
         return left.Ptr() - right.Ptr();
     }
-    
+
     public nothrow inline bool operator==<T, R, P>(const RandomAccessIter<T, R, P>& left, const RandomAccessIter<T, R, P>& right)
     {
         return left.Ptr() == right.Ptr();
     }
-    
-    public nothrow inline bool operator<<T, R, P>(const RandomAccessIter<T, R, P>& left, const RandomAccessIter<T, R, P>& right)
+
+    public inline bool operator<<T, R, P>(const RandomAccessIter<T, R, P>& left, const RandomAccessIter<T, R, P>& right)
     {
-        #assert(left.Ptr() == null && right.Ptr() == null || left.Ptr() != null && right.Ptr() != null);
+        if (!(left.Ptr() == null && right.Ptr() == null || left.Ptr() != null && right.Ptr() != null))
+        {
+            ThrowPreconditionViolationException();
+        }
         return left.Ptr() < right.Ptr();
     }
 }

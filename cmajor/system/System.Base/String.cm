@@ -129,14 +129,20 @@ namespace System
             }
             return EmptyString(CharT());
         }
-        public nothrow inline CharT operator[](long index) const
+        public inline CharT operator[](long index) const
         {
-            #assert(index >= 0 && index < len);
+            if (index < 0 || index >= len)
+            {
+                ThrowIndexOutOfBoundsException();
+            }
             return chars[index];
         }
-        public nothrow inline CharT& operator[](long index)
+        public inline CharT& operator[](long index)
         {
-            #assert(index >= 0 && index < len);
+            if (index < 0 || index >= len)
+            {
+                ThrowIndexOutOfBoundsException();
+            }
             return chars[index];
         }
         public nothrow void Reserve(long minLen)
@@ -157,9 +163,12 @@ namespace System
             chars[++len] = '\0';
             return *this;
         }
-        public nothrow String<CharT>& Append(CharT c, long count)
+        public String<CharT>& Append(CharT c, long count)
         {
-            #assert(count >= 0);
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             if (count > 0)
             {
                 Reserve(len + count);
@@ -186,9 +195,12 @@ namespace System
             AppendFrom(that.chars, that.len);
             return *this;
         }
-        public nothrow void Insert(long index, CharT c)
+        public void Insert(long index, CharT c)
         {
-            #assert(index >= 0);
+            if (index < 0)
+            {
+                ThrowIndexOutOfBoundsException();
+            }
             if (index >= len)
             {
                 Append(c);
@@ -205,9 +217,12 @@ namespace System
                 chars[len] = '\0';
             }
         }
-        public nothrow void Insert(long index, const String<CharT>& that)
+        public void Insert(long index, const String<CharT>& that)
         {
-            #assert(index >= 0);
+            if (index < 0)
+            {
+                ThrowIndexOutOfBoundsException();
+            }
             if (that.IsEmpty()) return;
             if (index >= len)
             {
@@ -228,10 +243,16 @@ namespace System
                 chars[len] = '\0';
             }
         }
-        public nothrow void Remove(long index, long count)
+        public void Remove(long index, long count)
         {
-            #assert(index >= 0);
-            #assert(count >= 0);
+            if (index < 0)
+            {
+                ThrowIndexOutOfBoundsException();
+            }
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             if (IsEmpty()) return;
             if (index > len)
             {
@@ -386,9 +407,12 @@ namespace System
         {
             return Find(x, 0);
         }
-        public nothrow inline long Find(CharT x, long start) const
+        public inline long Find(CharT x, long start) const
         {
-            #assert(start >= 0);
+            if (start < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             for (long i = start; i < len; ++i)
             {
                 if (chars[i] == x)
@@ -402,9 +426,12 @@ namespace System
         {
             return RFind(x, len - 1);
         }
-        public nothrow inline long RFind(CharT x, long start) const
+        public inline long RFind(CharT x, long start) const
         {
-            #assert(start < len);
+            if (start >= len)
+            {
+                ThrowInvalidParameterException();
+            }
             for (long i = start; i >= 0; --i)
             {
                 if (chars[i] == x)
@@ -418,9 +445,12 @@ namespace System
         {
             return Find(s, 0);
         }
-        public nothrow long Find(const String<CharT>& s, long start) const
+        public long Find(const String<CharT>& s, long start) const
         {
-            #assert(start >= 0);
+            if (start < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             if (s.IsEmpty()) return start;
             long n = s.Length();
             CharT x = s[0];
@@ -449,9 +479,12 @@ namespace System
         {
             return RFind(s, len - 1);
         }
-        public nothrow long RFind(const String<CharT>& s, long start) const
+        public long RFind(const String<CharT>& s, long start) const
         {
-            #assert(start < len);
+            if (start >= len)
+            {
+                ThrowInvalidParameterException();
+            }
             if (s.IsEmpty()) return start;
             long n = s.Length();
             CharT x = s[0];

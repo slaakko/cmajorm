@@ -28,8 +28,14 @@ namespace System.Net.Sockets
         }
         public override long Read(byte* buf, long count)
         {
-            #assert(buf != null);
-            #assert(count >= 0);
+            if (buf == null)
+            {
+                ThrowInvalidParameterException();
+            }
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             return socket.Receive(buf, cast<int>(count));
         }
         public override void Write(byte x)
@@ -38,8 +44,14 @@ namespace System.Net.Sockets
         }
         public override void Write(byte* buf, long count)
         {
-            #assert(buf != null);
-            #assert(count >= 0);
+            if (buf == null)
+            {
+                ThrowInvalidParameterException();
+            }
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             socket.Send(buf, cast<int>(count));
         }
         public TcpSocket& ContainedSocket()

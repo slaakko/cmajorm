@@ -74,27 +74,36 @@ namespace System.Collections
         {
             return color == Color.red && parent != null && parent->parent == this;
         }
-        public static inline nothrow RedBlackTreeNodeBase* Min(RedBlackTreeNodeBase* n)
+        public static inline RedBlackTreeNodeBase* Min(RedBlackTreeNodeBase* n)
         {
-            #assert(n != null);
+            if (n == null)
+            {
+                ThrowInvalidParameterException();
+            }
             while (n->left != null)
             {
                 n = n->left;
             }
             return n;
         }
-        public static inline nothrow RedBlackTreeNodeBase* Max(RedBlackTreeNodeBase* n)
+        public static inline RedBlackTreeNodeBase* Max(RedBlackTreeNodeBase* n)
         {
-            #assert(n != null);
+            if (n == null)
+            {
+                ThrowInvalidParameterException();
+            }
             while (n->right != null)
             {
                 n = n->right;
             }
             return n;
         }
-        public static inline nothrow RedBlackTreeNodeBase* Prev(RedBlackTreeNodeBase* n)
+        public static inline RedBlackTreeNodeBase* Prev(RedBlackTreeNodeBase* n)
         {
-            #assert(n != null);
+            if (n == null)
+            {
+                ThrowInvalidParameterException();
+            }
             if (n->IsHeaderNode())
             {
                 return n->right; // rightmost
@@ -114,9 +123,12 @@ namespace System.Collections
                 return u;
             }
         }
-        public static inline nothrow RedBlackTreeNodeBase* Next(RedBlackTreeNodeBase* n)
+        public static inline RedBlackTreeNodeBase* Next(RedBlackTreeNodeBase* n)
         {
-            #assert(n != null);
+            if (n == null)
+            {
+                ThrowInvalidParameterException();
+            }
             if (n->right != null)
             {
                 return Min(n->right);
@@ -146,9 +158,12 @@ namespace System.Collections
              n                     n
 
         */
-        public static nothrow void RebalanceAfterInsert(RedBlackTreeNodeBase* n, RedBlackTreeNodeBase*& root)
+        public static void RebalanceAfterInsert(RedBlackTreeNodeBase* n, RedBlackTreeNodeBase*& root)
         {
-            #assert(n != null);
+            if (n == null)
+            {
+                ThrowInvalidParameterException();
+            }
             n->color = Color.red;
             while (n != root && n->parent->color == Color.red)
             {
@@ -202,9 +217,12 @@ namespace System.Collections
         /*
             REBALANCE-FOR-REMOVE:
         */
-        public static nothrow RedBlackTreeNodeBase* RebalanceForRemove(RedBlackTreeNodeBase* z, RedBlackTreeNodeBase*& root, RedBlackTreeNodeBase*& leftmost, RedBlackTreeNodeBase*& rightmost)
+        public static RedBlackTreeNodeBase* RebalanceForRemove(RedBlackTreeNodeBase* z, RedBlackTreeNodeBase*& root, RedBlackTreeNodeBase*& leftmost, RedBlackTreeNodeBase*& rightmost)
         {
-            #assert(z != null);
+            if (z == null)
+            {
+                ThrowInvalidParameterException();
+            }
             RedBlackTreeNodeBase* y = z;
             RedBlackTreeNodeBase* x = null;
             RedBlackTreeNodeBase* p = null;
@@ -408,11 +426,17 @@ namespace System.Collections
                    / \        / \
                   b   c      a   b
         */
-        private static inline nothrow void RotateLeft(RedBlackTreeNodeBase* n, RedBlackTreeNodeBase*& root)
+        private static inline void RotateLeft(RedBlackTreeNodeBase* n, RedBlackTreeNodeBase*& root)
         {
-            #assert(n != null);
+            if (n == null)
+            {
+                ThrowInvalidParameterException();
+            }
             RedBlackTreeNodeBase* u = n->right;
-            #assert(u != null);
+            if (u == null)
+            {
+                ThrowPreconditionViolationException();
+            }
             n->right = u->left;
             if (u->left != null)
             {
@@ -441,11 +465,17 @@ namespace System.Collections
              / \                  / \
             a   b               b    c
         */
-        private static inline nothrow void RotateRight(RedBlackTreeNodeBase* n, RedBlackTreeNodeBase*& root)
+        private static inline void RotateRight(RedBlackTreeNodeBase* n, RedBlackTreeNodeBase*& root)
         {
-            #assert(n != null);
+            if (n == null)
+            {
+                ThrowInvalidParameterException();
+            }
             RedBlackTreeNodeBase* u = n->left;
-            #assert(u != null);
+            if (u == null)
+            {
+                ThrowPreconditionViolationException();
+            }
             n->left = u->right;
             if (u->right != null)
             {
@@ -504,25 +534,37 @@ namespace System.Collections
         public nothrow RedBlackTreeNodeIterator(RedBlackTreeNode<ValueType>* node_) : node(node_)
         {
         }
-        public inline nothrow ReferenceType operator*()
+        public inline ReferenceType operator*()
         {
-            #assert(node != null);
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             return node->Value();
         }
-        public inline nothrow PointerType operator->()
+        public inline PointerType operator->()
         {
-            #assert(node != null);
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             return &(node->Value());
         }
-        public inline nothrow Self& operator++()
+        public inline Self& operator++()
         {
-            #assert(node != null);
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             node = cast<RedBlackTreeNode<ValueType>*>(RedBlackTreeNodeBase.Next(node));
             return *this;
         }
-        public inline nothrow Self& operator--()
+        public inline Self& operator--()
         {
-            #assert(node != null);
+            if (node == null)
+            {
+                ThrowNullPointerException();
+            }
             node = cast<RedBlackTreeNode<ValueType>*>(RedBlackTreeNodeBase.Prev(node));
             return *this;
         }
@@ -624,14 +666,20 @@ namespace System.Collections
         {
             return ConstIterator(header.Get());
         }
-        public inline nothrow long Count() const
+        public inline long Count() const
         {
-            #assert(count >= 0);
+            if (count < 0)
+            {
+                ThrowPreconditionViolationException();
+            }
             return count;
         }
-        public inline nothrow bool IsEmpty() const
+        public inline bool IsEmpty() const
         {
-            #assert(count >= 0);
+            if (count < 0)
+            {
+                ThrowPreconditionViolationException();
+            }
             return count == 0;
         }
         public nothrow void Clear()
@@ -926,7 +974,10 @@ namespace System.Collections
         }
         private RedBlackTreeNode<ValueType>* Copy(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p)
         {
-            #assert(x != null && p != null);
+            if (x == null || p == null)
+            {
+                ThrowInvalidParameterException();
+            }
             RedBlackTreeNode<ValueType>* top = CloneNode(x, p);
             if (x->Right() != null)
             {
@@ -949,7 +1000,10 @@ namespace System.Collections
         }
         private RedBlackTreeNode<ValueType>* CloneNode(RedBlackTreeNode<ValueType>* x, RedBlackTreeNode<ValueType>* p) const
         {
-            #assert(x != null && p != null);
+            if (x == null || p == null)
+            {
+                ThrowInvalidParameterException();
+            }
             RedBlackTreeNode<ValueType>* clone = new RedBlackTreeNode<ValueType>(x->Value(), p);
             clone->SetColor(x->GetColor());
             return clone;

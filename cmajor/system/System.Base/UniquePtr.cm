@@ -68,35 +68,47 @@ namespace System
             return ptr_;
         }
         public inline nothrow T* GetPtr()
-        { 
-            return ptr; 
+        {
+            return ptr;
         }
         public inline nothrow T* Get()
-        { 
-            return ptr; 
-        }
-        public inline nothrow bool IsNull() const 
-        { 
-            return ptr == null; 
-        }
-        public inline nothrow T* operator->()
         {
-            #assert(ptr != null);
             return ptr;
         }
-        public inline nothrow const T* operator->() const
+        public inline nothrow bool IsNull() const
         {
-            #assert(ptr != null);
+            return ptr == null;
+        }
+        public T* operator->()
+        {
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return ptr;
         }
-        public inline nothrow T& operator*()
+        public inline const T* operator->() const
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
+            return ptr;
+        }
+        public inline T& operator*()
+        {
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return *ptr;
         }
-        public inline nothrow const T& operator*() const
+        public inline const T& operator*() const
         {
-            #assert(ptr != null);
+            if (ptr == null)
+            {
+                ThrowNullPointerException();
+            }
             return *ptr;
         }
         public nothrow void Swap(Self& that)

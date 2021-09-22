@@ -8,14 +8,14 @@ using System.Concepts;
 
 namespace System.Collections
 {
-    public const long[] hashtablePrimes = 
-    [   
+    public const long[] hashtablePrimes =
+    [
         53, 97, 193, 389, 769, 1543, 3079, 6151,
         12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869,
         3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189,
         805306457, 1610612741
     ];
-    
+
     public constexpr inline nothrow long GetNextHashtablePrime(long n)
     {
         const long* p = LowerBound(hashtablePrimes.CBegin(), hashtablePrimes.CEnd(), n);
@@ -24,38 +24,38 @@ namespace System.Collections
             return *p;
         }
         return hashtablePrimes[hashtablePrimes.Length() - 1];
-    } 
-    
+    }
+
     public inline nothrow ulong GetHashCode(long x)
     {
         return cast<ulong>(x);
     }
-    
+
     public inline nothrow ulong GetHashCode(ulong x)
     {
         return x;
     }
-    
+
     public inline nothrow ulong GetHashCode(char x)
     {
         return cast<ulong>(x);
     }
-    
+
     public inline nothrow ulong GetHashCode(wchar x)
     {
         return cast<ulong>(x);
     }
-    
+
     public inline nothrow ulong GetHashCode(uchar x)
     {
         return cast<ulong>(x);
     }
-    
+
     public inline nothrow ulong GetHashCode(void* x)
     {
         return cast<ulong>(x);
     }
-    
+
     public inline nothrow ulong GetHashCode(const string& s)
     {
         ulong hashCode = 14695981039346656037u;
@@ -66,7 +66,7 @@ namespace System.Collections
         }
         return hashCode;
     }
-    
+
     public inline nothrow ulong GetHashCode(const wstring& s)
     {
         ulong hashCode = 14695981039346656037u;
@@ -88,7 +88,7 @@ namespace System.Collections
         }
         return hashCode;
     }
-    
+
     public inline nothrow ulong GetHashCode(const Uuid& uuid)
     {
         ulong hashCode = 14695981039346656037u;
@@ -111,11 +111,11 @@ namespace System.Collections
     public class Bucket<T> where T is Semiregular
     {
         public typedef T ValueType;
-        
+
         public Bucket(const ValueType& value_, Bucket<ValueType>* next_) : value(value_), next(next_)
         {
         }
-        public inline nothrow const ValueType& Value() const 
+        public inline nothrow const ValueType& Value() const
         {
             return value;
         }
@@ -149,25 +149,37 @@ namespace System.Collections
         public inline nothrow HashtableIterator(HashtableType* table_, Bucket<ValueType>* bucket_) : table(table_), bucket(bucket_)
         {
         }
-        public inline nothrow ReferenceType operator*()
+        public inline ReferenceType operator*()
         {
-            #assert(bucket != null);
+            if (bucket == null)
+            {
+                ThrowNullPointerException();
+            }
             return bucket->Value();
         }
-        public inline nothrow PointerType operator->()
+        public inline PointerType operator->()
         {
-            #assert(bucket != null);
+            if (bucket == null)
+            {
+                ThrowNullPointerException();
+            }
             return &(bucket->Value());
         }
-        public inline nothrow Self& operator++()
+        public inline Self& operator++()
         {
-            #assert(bucket != null && table != null);
+            if (bucket == null || table == null)
+            {
+                ThrowNullPointerException();
+            }
             Bucket<ValueType>* old = bucket;
             bucket = bucket->Next();
             if (bucket == null)
             {
                 long index = table->GetBucketIndex(old->Value());
-                #assert(index != -1);
+                if (index == -1)
+                {
+                    ThrowPreconditionViolationException();
+                }
                 ++index;
                 long n = table->GetBucketCount();
                 while (bucket == null && index < n)
@@ -192,11 +204,11 @@ namespace System.Collections
     }
 
     public class Hashtable<KeyType, ValueType, KeyOfValue, HashFun = Hasher<KeyType>, Compare = EqualTo<KeyType>>
-        where KeyType is Semiregular and 
-            ValueType is Semiregular and 
-            KeySelectionFunction<KeyOfValue, KeyType, ValueType> and 
-            HashFunction<HashFun, KeyType> and 
-            Compare is Relation and 
+        where KeyType is Semiregular and
+            ValueType is Semiregular and
+            KeySelectionFunction<KeyOfValue, KeyType, ValueType> and
+            HashFunction<HashFun, KeyType> and
+            Compare is Relation and
             Compare.Domain is KeyType
     {
         private typedef Hashtable<KeyType, ValueType, KeyOfValue, HashFun, Compare> Self;
@@ -210,7 +222,7 @@ namespace System.Collections
         {
             CopyFrom(that);
         }
-        public nothrow Hashtable(Self&& that) : 
+        public nothrow Hashtable(Self&& that) :
             buckets(Rvalue(that.buckets)), count(that.count), loadFactor(that.loadFactor), maxLoadFactor(that.maxLoadFactor), keyOf(that.keyOf), hash(that.hash), equal(that.equal)
         {
             that.count = 0;
@@ -294,7 +306,10 @@ namespace System.Collections
             }
             const KeyType& key = KeyOf(value);
             long index = Hash(key);
-            #assert(index != -1);
+            if (index == -1)
+            {
+                ThrowPreconditionViolationException();
+            }
             Bucket<ValueType>* bucket = buckets[index];
             while (bucket != null)
             {
@@ -311,7 +326,7 @@ namespace System.Collections
             CheckForRehash();
             return MakePair(Iterator(this, bucket), true);
         }
-        public nothrow void Remove(const KeyType& key) 
+        public nothrow void Remove(const KeyType& key)
         {
             long index = Hash(key);
             if (index == -1) return;
@@ -368,7 +383,7 @@ namespace System.Collections
                 }
             }
         }
-        public nothrow Iterator Find(const KeyType& key) 
+        public nothrow Iterator Find(const KeyType& key)
         {
             long index = Hash(key);
             if (index >= 0)
@@ -382,7 +397,7 @@ namespace System.Collections
                     }
                     bucket = bucket->Next();
                 }
-            }            
+            }
             return Iterator(this, null);
         }
         public nothrow ConstIterator Find(const KeyType& key) const
@@ -399,7 +414,7 @@ namespace System.Collections
                     }
                     bucket = bucket->Next();
                 }
-            }            
+            }
             return ConstIterator(this, null);
         }
         public nothrow ConstIterator CFind(const KeyType& key) const
@@ -416,7 +431,7 @@ namespace System.Collections
                     }
                     bucket = bucket->Next();
                 }
-            }            
+            }
             return ConstIterator(this, null);
         }
         public inline nothrow long GetBucketCount() const
@@ -464,7 +479,10 @@ namespace System.Collections
                 {
                     const KeyType& key = KeyOf(bucket->Value());
                     long index = Hash(key);
-                    #assert(index != -1);
+                    if (index == -1)
+                    {
+                        ThrowPreconditionViolationException();
+                    }
                     Bucket<ValueType>* next = bucket->Next();
                     bucket->SetNext(buckets[index]);
                     buckets[index] = bucket;

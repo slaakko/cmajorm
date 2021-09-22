@@ -13,4 +13,13 @@
 <li><p><a href="https://slaakko.github.io/cmajor/langref/langref.html#full-instantiation-requests">Full instantiation requests</a>.</p></li>
 <li><p><a href="https://slaakko.github.io/cmajor/langref/langref.html#interfaces">Interfaces</a> reimplemented.</p></li>
 <li><p><a href="https://slaakko.github.io/cmajor/system/xml_serialization/xml_serialization.html">XML serialization</a> reimplemented.</p></li>
+<li><p>Assertions converted to exceptions in the system library. The exceptions are:</p>
+
+<ul>
+<li>NullPointerException: thrown when trying to call a member function or access a member variable through empty UniquePtr or SharedPtr,
+or iterate or access using an empty iterator.</li>
+<li>IndexOutOfBoundsException: thrown when trying to index a string using an invalid index.</li>
+<li>InvalidParameterException: thrown when a parameter is invalid in other than UniquePtr or SharedPtr or iterator classes.</li>
+<li>PreconditionViolationException: thrown when a precondition of a function or a class invariant is not satisfied at the beginning of a function.</li>
+</ul></li>
 </ul>

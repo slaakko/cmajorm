@@ -109,7 +109,7 @@ namespace System.IO
                 {
                     return -1;
                 }
-                else 
+                else
                 {
                     int errorStringHandle = -1;
                     if (RtGetFileError(file, errorStringHandle))
@@ -124,7 +124,10 @@ namespace System.IO
         }
         public override long Read(byte* buffer, long count)
         {
-            #assert(count >= 0);
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             int errorStringHandle = -1;
             long result = RtRead(file, buffer, count, errorStringHandle);
             if (result == -1)
@@ -147,7 +150,10 @@ namespace System.IO
         }
         public override void Write(byte* buffer, long count)
         {
-            #assert(count >= 0);
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             int errorStringHandle = -1;
             long result = RtWrite(file, buffer, count, errorStringHandle);
             if (result == -1)
@@ -190,7 +196,7 @@ namespace System.IO
             }
         }
         private void* file;
-    }    
+    }
 }
 
 namespace System

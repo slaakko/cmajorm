@@ -30,9 +30,9 @@ namespace System.IO
             if (mem != null)
             {
                 MemFree(mem);
-            }            
+            }
         }
-        public nothrow inline long Size() const 
+        public nothrow inline long Size() const
         {
             return size;
         }
@@ -40,12 +40,15 @@ namespace System.IO
         {
             return mem;
         }
-        public nothrow inline byte operator[](long index) const
+        public inline byte operator[](long index) const
         {
-            #assert(index >= 0 && index < size);
+            if (index < 0 || index >= size)
+            {
+                ThrowIndexOutOfBoundsException();
+            }
             return cast<byte*>(mem)[index];
         }
-        public nothrow inline byte& operator[](long index) 
+        public nothrow inline byte& operator[](long index)
         {
             return cast<byte*>(mem)[index];
         }
@@ -58,7 +61,7 @@ namespace System.IO
         public nothrow BufferedByteStream(const SharedPtr<ByteStream>& baseStream_) : this(baseStream_, 4096)
         {
         }
-        public nothrow BufferedByteStream(const SharedPtr<ByteStream>& baseStream_, long bufferSize_) : 
+        public nothrow BufferedByteStream(const SharedPtr<ByteStream>& baseStream_, long bufferSize_) :
             baseStream(baseStream_), buffer(bufferSize_), pos(buffer.Size()), bytesAvailable(0), end(0)
         {
         }
@@ -72,7 +75,7 @@ namespace System.IO
                 {
                     Flush();
                 }
-            }            
+            }
             catch (const Exception&)
             {
             }
@@ -94,7 +97,10 @@ namespace System.IO
         }
         public override long Read(byte* buf, long count)
         {
-            #assert(count >= 0);
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             Flush();
             if (bytesAvailable == 0)
             {
@@ -120,7 +126,10 @@ namespace System.IO
         }
         public override void Write(byte* buf, long count)
         {
-            #assert(count >= 0);
+            if (count < 0)
+            {
+                ThrowInvalidParameterException();
+            }
             for (long i = 0; i < count; ++i)
             {
                 Write(buf[i]);
@@ -146,7 +155,7 @@ namespace System.IO
             Flush();
             return baseStream->Tell() - bytesAvailable;
         }
-        public nothrow const SharedPtr<ByteStream>& ContainedStream() 
+        public nothrow const SharedPtr<ByteStream>& ContainedStream()
         {
             return baseStream;
         }
