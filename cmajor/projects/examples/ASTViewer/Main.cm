@@ -34,6 +34,7 @@ class MainWindow : Window
         {
             verticalSplitContainer.Reset(new SplitContainer(Orientation.vertical, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             logView.Reset(new LogView());
+            logView->SetScrollSubject();
             Application.SetLogView(logView.Get());
             UniquePtr<Control> borderedLogView(new BorderedControl(logView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> scrollableLogView(new ScrollableControl(borderedLogView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
@@ -42,6 +43,7 @@ class MainWindow : Window
         UniquePtr<SplitContainer> horizontalSplitContainer(new SplitContainer(Orientation.horizontal, 600, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         treeView = new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
         treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
+        treeView->SetScrollSubject();
         treeView->NodeEnterEvent().AddHandler(TreeViewNodeEnter);
         treeView->NodeLeaveEvent().AddHandler(TreeViewNodeLeave);
         treeView->NodeSelectedEvent().AddHandler(TreeViewNodeSelected);
@@ -50,6 +52,7 @@ class MainWindow : Window
         UniquePtr<Control> scrollableTreeView(new ScrollableControl(borderedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         horizontalSplitContainer->Pane1Container()->AddChild(scrollableTreeView.Release());
         sourceCodeView = new CmajorSourceCodeView(Point(0, 0), Size(0, 0), Dock.fill, Anchors.none);
+        sourceCodeView->SetScrollSubject();
         sourceCodeView->CaretPosChangedEvent().AddHandler(CaretPosChanged);
         UniquePtr<Control> paddedSourceCodeView(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> borderedSourceCodeView(new BorderedControl(paddedSourceCodeView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));

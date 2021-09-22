@@ -162,6 +162,7 @@ public class MainWindow : Window
             UniquePtr<Control> borderedCanvas(new BorderedControl(canvasPtr.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             verticalSplitContainer->Pane1Container()->AddChild(borderedCanvas.Release());
             UniquePtr<LogView> logView(new LogView());
+            logView->SetScrollSubject();
             Application.SetLogView(logView.Get());
             UniquePtr<Control> borderedLogView(new BorderedControl(logView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> scrollableLogView(new ScrollableControl(borderedLogView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));

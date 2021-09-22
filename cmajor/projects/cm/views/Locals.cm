@@ -148,6 +148,7 @@ namespace Cm.Views
         {
             UniquePtr<TreeView> treeViewPtr(new TreeView(Point(), Size(), Dock.none, Anchors.none));
             treeView = treeViewPtr.Get();
+            treeView->SetScrollSubject();
             treeView->SetDoubleBuffered();
             treeView->NodeLeaveEvent().AddHandler(TreeViewNodeLeave);
             treeView->NodeExpandedEvent().AddHandler(TreeViewNodeExpanded);

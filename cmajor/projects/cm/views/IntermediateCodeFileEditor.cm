@@ -14,6 +14,7 @@ namespace Cm.Views
         {
             UniquePtr<TextView> textViewPtr(new TextView(Point(), Size(), Dock.none, Anchors.none));
             textView = textViewPtr.Get();
+            textView->SetScrollSubject();
             textView->SetReadOnly();
             UniquePtr<ScrollableControl> scrollableTextView(new ScrollableControl(textViewPtr.Release(), Point(), Size(), Dock.fill, Anchors.none));
             AddChild(scrollableTextView.Release());

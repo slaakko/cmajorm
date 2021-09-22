@@ -383,6 +383,7 @@ namespace Cm.Views
         {
             UniquePtr<CCList> ccListPtr(new CCList(Point(), Size(), Dock.none, Anchors.none));
             ccList = ccListPtr.Get();
+            ccList->SetScrollSubject();
             ccList->SetDoubleBuffered();
             UniquePtr<PaddedControl> paddedCCList(new PaddedControl(ccListPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             paddedCCList->SetBackgroundColor(CCListNormalBackgroundColor());
