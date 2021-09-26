@@ -793,6 +793,10 @@ void Project::Save()
     {
         formatter.WriteLine("text <" + relativeTextFilePath + ">;");
     }
+    for (const std::string& relativeActionFilePath : relativeActionFilePaths)
+    {
+        formatter.WriteLine("action <" + relativeActionFilePath + ">;");
+    }
 }
 
 } } // namespace sngcm::ast
