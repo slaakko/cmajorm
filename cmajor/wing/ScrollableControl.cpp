@@ -207,8 +207,13 @@ void ScrollableControl::ChildSizeOrContentSizeChanged(ControlEventArgs& args)
     if (contentSize.Height > clientSize.Height)
     {
         vmin = 0;
-        vmax = contentSize.Height / scrollUnits.vertical;
-        vpage = clientSize.Height / scrollUnits.vertical;
+        vmax = 1;
+        vpage = 1;
+        if (scrollUnits.vertical > 0)
+        {
+            vmax = contentSize.Height / scrollUnits.vertical;
+            vpage = clientSize.Height / scrollUnits.vertical;
+        }
         SetScrollBarData(SB_VERT, vpage, vpos, vmin, vmax);
         verticalScrollBarShown = true;
     }
@@ -220,8 +225,13 @@ void ScrollableControl::ChildSizeOrContentSizeChanged(ControlEventArgs& args)
     if (contentSize.Width > clientSize.Width)
     {
         hmin = 0;
-        hmax = contentSize.Width / scrollUnits.horizontal;
-        hpage = clientSize.Width / scrollUnits.horizontal;
+        hmax = 1;
+        hpage = 1;
+        if (scrollUnits.horizontal > 0)
+        {
+            hmax = contentSize.Width / scrollUnits.horizontal;
+            hpage = clientSize.Width / scrollUnits.horizontal;
+        }
         SetScrollBarData(SB_HORZ, hpage, hpos, hmin, hmax);
         horizontalScrollBarShown = true;
     }
