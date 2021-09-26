@@ -43,6 +43,7 @@ parser api(SNGCM_PARSER_API) ProjectFileParser
         |   SourceFileDeclaration:sourceFileDeclaration{ return sourceFileDeclaration; }
         |   ResourceFileDeclaration:resourceFileDeclaration{ return resourceFileDeclaration; }
         |   TextFileDeclaration:textFileDeclaration{ return textFileDeclaration; }
+        |   ActionFileDeclaration:actionFileDeclaration{ return actionFileDeclaration; }
         |   TargetDeclaration:targetDeclaration{ return targetDeclaration; }
         ;
 
@@ -60,6 +61,10 @@ parser api(SNGCM_PARSER_API) ProjectFileParser
 
     TextFileDeclaration(var std::string filePath) : ProjectDeclaration*
         ::= TEXT FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new sngcm::ast::TextFileDeclaration(filePath); }
+        ;
+
+    ActionFileDeclaration(var std::string filePath) : ProjectDeclaration*
+        ::= ACTION FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new sngcm::ast::ActionFileDeclaration(filePath); }
         ;
 
     TargetDeclaration : ProjectDeclaration*

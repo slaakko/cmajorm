@@ -279,6 +279,15 @@ void TextFileDeclaration::Write(CodeFormatter& formatter)
     formatter.WriteLine("text <" + filePath + ">;");
 }
 
+ActionFileDeclaration::ActionFileDeclaration(const std::string& filePath_) : ProjectDeclaration(ProjectDeclarationType::actionFileDeclaration), filePath(filePath_)
+{
+}
+
+void ActionFileDeclaration::Write(CodeFormatter& formatter)
+{
+    formatter.WriteLine("action <" + filePath + ">;");
+}
+
 TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(ProjectDeclarationType::targetDeclaration), target(target_)
 {
 }
@@ -531,6 +540,19 @@ void Project::ResolveDeclarations()
                 textFilePaths.push_back(textFilePath);
                 break;
             }
+            case ProjectDeclarationType::actionFileDeclaration:
+            {
+                ActionFileDeclaration* actionDeclaration = static_cast<ActionFileDeclaration*>(declaration.get());
+                boost::filesystem::path afp(actionDeclaration->FilePath());
+                relativeActionFilePaths.push_back(afp.generic_string());
+                if (afp.is_relative())
+                {
+                    afp = sourceBasePath / afp;
+                }
+                std::string actionFilePath = GetFullPath(afp.generic_string());
+                actionFilePaths.push_back(actionFilePath);
+                break;
+            }
             default:
             {
                 throw std::runtime_error("unknown project declaration");
@@ -548,6 +570,25 @@ void Project::Write(const std::string& projectFilePath)
     {
         declaration->Write(formatter);
     }
+}
+
+std::string Project::OutDir() const
+{
+    if (executableFilePath.empty())
+    {
+        return std::string();
+    }
+    return GetFullPath(Path::GetDirectoryName(executableFilePath));
+}
+
+std::string Project::ProjectDir() const
+{
+    return GetFullPath(Path::GetDirectoryName(filePath));
+}
+
+std::string Project::LibraryDir() const
+{
+    return GetFullPath(Path::GetDirectoryName(libraryFilePath));
 }
 
 bool Project::DependsOn(Project* that) const

@@ -1,5 +1,5 @@
 
-// this file has been automatically generated from 'D:/work/soulng-project/sngcm/cmlexer/ContainerFileLexer.lexer' using soulng lexer generator slg version 3.0.0
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/sngcm/cmlexer/ContainerFileLexer.lexer' using soulng lexer generator slg version 4.0.0
 
 #include <sngcm/cmlexer/ContainerFileTokens.hpp>
 #include <map>
@@ -10,25 +10,26 @@ namespace ContainerFileTokens
 
     void InitTokenIdMap()
     {
-        tokenIdMap[U"ACTIVEPROJECT"] = 14;
-        tokenIdMap[U"ASSIGN"] = 17;
-        tokenIdMap[U"DOT"] = 19;
-        tokenIdMap[U"FILEPATH"] = 16;
-        tokenIdMap[U"ID"] = 15;
-        tokenIdMap[U"LIBRARY"] = 11;
-        tokenIdMap[U"PROGRAM"] = 8;
+        tokenIdMap[U"ACTION"] = 7;
+        tokenIdMap[U"ACTIVEPROJECT"] = 15;
+        tokenIdMap[U"ASSIGN"] = 18;
+        tokenIdMap[U"DOT"] = 20;
+        tokenIdMap[U"FILEPATH"] = 17;
+        tokenIdMap[U"ID"] = 16;
+        tokenIdMap[U"LIBRARY"] = 12;
+        tokenIdMap[U"PROGRAM"] = 9;
         tokenIdMap[U"PROJECT"] = 1;
         tokenIdMap[U"REFERENCE"] = 3;
         tokenIdMap[U"RESOURCE"] = 5;
-        tokenIdMap[U"SEMICOLON"] = 18;
+        tokenIdMap[U"SEMICOLON"] = 19;
         tokenIdMap[U"SOLUTION"] = 2;
         tokenIdMap[U"SOURCE"] = 4;
-        tokenIdMap[U"TARGET"] = 7;
+        tokenIdMap[U"TARGET"] = 8;
         tokenIdMap[U"TEXT"] = 6;
-        tokenIdMap[U"UNITTEST"] = 13;
-        tokenIdMap[U"WINAPP"] = 10;
-        tokenIdMap[U"WINGUIAPP"] = 9;
-        tokenIdMap[U"WINLIB"] = 12;
+        tokenIdMap[U"UNITTEST"] = 14;
+        tokenIdMap[U"WINAPP"] = 11;
+        tokenIdMap[U"WINGUIAPP"] = 10;
+        tokenIdMap[U"WINLIB"] = 13;
     }
 
     int GetTokenId(const std::u32string& tokenName)
@@ -53,6 +54,7 @@ namespace ContainerFileTokens
         "SOURCE",
         "RESOURCE",
         "TEXT",
+        "ACTION",
         "TARGET",
         "PROGRAM",
         "WINGUIAPP",
@@ -82,6 +84,7 @@ namespace ContainerFileTokens
         "'source'",
         "'resource'",
         "'text'",
+        "'action'",
         "'target'",
         "'program'",
         "'winguiapp'",

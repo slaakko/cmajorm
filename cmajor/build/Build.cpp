@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/build/Build.hpp>
+#include <cmajor/build/Action.hpp>
 #include <cmajor/build/MessageBody.hpp>
 #include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <cmajor/codegen/EmittingContext.hpp>
@@ -2913,6 +2914,14 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
 {
     try
     {
+        Variables variables;
+        std::string outDir = project->OutDir();
+        if (!outDir.empty())
+        {
+            variables.AddVariable(new Variable("OUT_DIR", outDir));
+        }
+        variables.AddVariable(new Variable("PROJECT_DIR", project->ProjectDir()));
+        variables.AddVariable(new Variable("LIBRARY_DIR", project->LibraryDir()));
         if (!GetGlobalFlag(GlobalFlags::msbuild))
         {
             if (builtProjects.find(project->FilePath()) != builtProjects.cend()) return;
@@ -3188,6 +3197,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                         }
                     }
                 }
+                RunBuildActions(*project, variables);
                 if (GetGlobalFlag(GlobalFlags::verbose))
                 {
                     LogMessage(project->LogStreamId(), std::to_string(rootModule->GetSymbolTable().NumSpecializations()) + " class template specializations, " +

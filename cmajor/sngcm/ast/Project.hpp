@@ -59,7 +59,7 @@ SNGCM_AST_API const std::string& OutDir();
 
 enum class ProjectDeclarationType : uint8_t
 {
-    referenceDeclaration, sourceFileDeclaration, resourceFileDeclaration, textFileDeclaration, targetDeclaration
+    referenceDeclaration, sourceFileDeclaration, resourceFileDeclaration, textFileDeclaration, targetDeclaration, actionFileDeclaration
 };
 
 class SNGCM_AST_API ProjectDeclaration
@@ -115,6 +115,16 @@ private:
     std::string filePath;
 };
 
+class SNGCM_AST_API ActionFileDeclaration : public ProjectDeclaration
+{
+public:
+    ActionFileDeclaration(const std::string& filePath_);
+    const std::string& FilePath() const { return filePath; }
+    void Write(CodeFormatter& formatter) override;
+private:
+    std::string filePath;
+};
+
 enum class Target
 {
     program, winguiapp, winapp, library, winlib, unitTest
@@ -160,6 +170,11 @@ public:
     const std::vector<std::string>& RelativeResourceFilePaths() const { return relativeResourceFilePaths; }
     const std::vector<std::string>& RelativeTextFilePaths() const { return relativeTextFilePaths; }
     const std::vector<std::string>& TextFilePaths() const { return textFilePaths; }
+    const std::vector<std::string>& RelativeActionFilePaths() const { return relativeActionFilePaths; }
+    const std::vector<std::string>& ActionFilePaths() const { return actionFilePaths; }
+    std::string OutDir() const;
+    std::string ProjectDir() const;
+    std::string LibraryDir() const;
     Target GetTarget() const { return target; }
     void SetTarget(Target target_) { target = target_; }
     bool DependsOn(Project* that) const;
@@ -219,6 +234,8 @@ private:
     std::vector<std::string> relativeReferencedProjectFilePaths;
     std::vector<std::string> relativeTextFilePaths;
     std::vector<std::string> textFilePaths;
+    std::vector<std::string> relativeActionFilePaths;
+    std::vector<std::string> actionFilePaths;
     std::vector<Project*> dependsOn;
     bool built;
     bool isSystemProject;
