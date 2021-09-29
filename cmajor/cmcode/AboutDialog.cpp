@@ -12,7 +12,8 @@ namespace cmcode {
 
 using namespace cmajor::wing;
 
-AboutDialog::AboutDialog() : Window(WindowCreateParams().WindowClassName("cmcode.AboutDialog").Location(DefaultLocation()).WindowStyle(DialogWindowStyle()).Text("About").
+AboutDialog::AboutDialog() : 
+    Window(WindowCreateParams().WindowClassName("cmcode.AboutDialog").Location(DefaultLocation()).WindowStyle(DialogWindowStyle()).Text("About").
     WindowClassBackgroundColor(DefaultControlWindowClassBackgroundColor()).BackgroundColor(DefaultControlBackgroundColor()).
     SetSize(Size(ScreenMetrics::Get().MMToHorizontalPixels(100), ScreenMetrics::Get().MMToVerticalPixels(80))))
 {

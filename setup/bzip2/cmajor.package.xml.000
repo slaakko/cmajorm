@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package 
+	name="cmajor" 
+	appName="Cmajor" 
+	version="4.1.0" 
+	publisher="Seppo Laakko" 
+	sourceRootDir="../../cmajor" 
+	targetRootDir="C:/cmajor" 
+	compression="bzip2" 
+	iconFilePath="$TARGET_ROOT_DIR$/bin/cmcodesmall.ico"
+	includeUninstaller="true">
+ <preinstall>
+  <include filePath="installation\x64\Release\checkcmajor.exe"/>
+  <run command="$PREINSTALL_DIR$\checkcmajor"/>
+ </preinstall>
+ <environment>
+  <variable name="CMAJOR_ROOT" value="$TARGET_ROOT_DIR$"/>
+  <pathDirectory value="$TARGET_ROOT_DIR$/bin"/>
+ </environment>
+ <links>
+  <linkDirectory path="$START_MENU_PROGRAMS_FOLDER$/Cmajor"/>
+  <link 
+   linkFilePath="$START_MENU_PROGRAMS_FOLDER$/Cmajor/Cmajor Code.lnk" 
+   path="$TARGET_ROOT_DIR$/bin/cmcode.exe" 
+   workingDirectory="$TARGET_ROOT_DIR$/bin"
+   description="Cmajor Code" 
+   iconPath="$TARGET_ROOT_DIR$/bin/cmcode.exe"
+   iconIndex="0"/>
+  <link 
+   linkFilePath="$START_MENU_PROGRAMS_FOLDER$/Cmajor/CmDevEnv.lnk" 
+   path="$TARGET_ROOT_DIR$/bin/cmdevenv.exe" 
+   workingDirectory="$TARGET_ROOT_DIR$/bin"
+   description="CmDevEnv" 
+   iconPath="$TARGET_ROOT_DIR$/bin/cmdevenv.exe"
+   iconIndex="0"/>
+  <link
+   linkFilePath="$DESKTOP_FOLDER$/Cmajor Code.lnk"
+   path="$TARGET_ROOT_DIR$/bin/cmcode.exe" 
+   workingDirectory="$TARGET_ROOT_DIR$/bin"
+   description="Cmajor Code" 
+   iconPath="$TARGET_ROOT_DIR$/bin/cmcode.exe"
+   iconIndex="0"/>
+ </links>
+ <component name="binaries">
+  <directory name="bin">
+  </directory>
+ </component>
+ <component name="configuration">
+  <directory name="config">
+   <exclude file="*"/>
+   <include file="cmpm.config.xml"/>
+   <include file="compiler-config.xml"/>
+   <include file="devenv.config.xml"/>
+   <include file="metrics.xml"/>
+   <include file="server-config.xml"/>
+   <include file="tool-chains.json"/>
+   <include file="winmsg.txt"/>
+  </directory>
+ </component>
+ <component name="documentation">
+  <directory name="doc">
+  </directory>
+ </component>
+ <component name="libraries">
+  <directory name="lib">
+   <exclude dir="*"/>
+  </directory>
+ </component>
+ <component name="projects">
+  <directory name="projects">
+   <exclude dir="*"/>
+   <exclude dir="lib" cascade="true"/>
+   <exclude dir="bin" cascade="true"/>
+   <include dir="cm"/>
+   <include dir="cmsx">
+	<exclude dir="config"/>
+    <exclude dir="fs"/>
+	<exclude dir="sbin"/>
+   </include>
+   <include dir="examples"/>
+   <include dir="sirius"/>
+   <include dir="tools"/>
+   <include dir="xmlSerializationTests"/>
+  </directory>
+ </component>
+ <component name="resources">
+  <directory name="res">
+  </directory>
+ </component>
+ <component name="system">
+  <directory name="system">
+   <exclude dir="*"/>
+   <include dir="lib">
+    <exclude dir="cpp"/>
+   </include>
+   <include dir="platform">
+    <exclude dir="linux"/>
+   </include>
+   <include dir="System">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Base">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Core">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Dom">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Init">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Install">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.IO.Compression">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Json">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Lex">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Net.Http">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Net.Sockets">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Numerics.Multiprecision">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Parsing">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.RegularExpressions">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Runtime">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Windows">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Windows.Install">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Xml">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.Xml.Serialization">
+    <exclude dir="lib"/>
+   </include>
+   <include dir="System.XPath">
+    <exclude dir="lib"/>
+   </include>
+  </directory>
+ </component>
+ <component name="unicode">
+  <directory name="unicode">
+   <exclude dir="*"/>
+   <exclude file="*"/>
+   <include file="cmajor_ucd.bin"/>
+   <include file="ucd.all.flat.zip"/>
+  </directory>
+ </component>
+ <component name="unit-test">
+  <directory name="unitTest">
+  </directory>
+ </component>
+ <component name="vs">
+  <directory name="vs">
+  </directory>
+ </component>
+ <uninstall>
+  <run command="closecmpms"/>
+ </uninstall>
+</package>
