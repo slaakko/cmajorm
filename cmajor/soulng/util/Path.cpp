@@ -174,40 +174,42 @@ std::string Path::MakeCanonical(const std::string& path)
 
 std::string Path::ChangeExtension(const std::string& path, const std::string& extension)
 {
+    std::string p = MakeCanonical(path);
+    std::string::size_type lastSlashPos = p.rfind('/');
     std::string::size_type lastDotPos = path.rfind('.');
     if (extension.empty())
     {
-        if (lastDotPos != std::string::npos)
+        if (lastDotPos != std::string::npos && lastDotPos > lastSlashPos)
         {
-            return path.substr(0, lastDotPos);
+            return p.substr(0, lastDotPos);
         }
         else
         {
-            return path;
+            return p;
         }
     }
     else
     {
-        if (lastDotPos == std::string::npos)
+        if (lastDotPos == std::string::npos || lastDotPos < lastSlashPos)
         {
             if (extension[0] == '.')
             {
-                return path + extension;
+                return p + extension;
             }
             else
             {
-                return path + "." + extension;
+                return p + "." + extension;
             }
         }
         else
         {
             if (extension[0] == '.')
             {
-                return path.substr(0, lastDotPos) + extension;
+                return p.substr(0, lastDotPos) + extension;
             }
             else
             {
-                return path.substr(0, lastDotPos + 1) + extension;
+                return p.substr(0, lastDotPos + 1) + extension;
             }
         }
     }
