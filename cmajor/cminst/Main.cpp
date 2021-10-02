@@ -100,8 +100,23 @@ struct InitDone
     }
 };
 
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        soulng::unicode::CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, const char** argv)
 {
+    if (!CheckCmajorRootEnv()) return 1;
     InitDone initDone;
     try
     {

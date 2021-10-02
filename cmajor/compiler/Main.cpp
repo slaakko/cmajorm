@@ -20,6 +20,7 @@
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/CharacterData.hpp>
+#include <sngxml/serialization/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <soulng/util/Util.hpp>
 #include <soulng/util/Path.hpp>
@@ -40,6 +41,7 @@ struct InitDone
         sngcm::ast::Init();
         cmajor::symbols::Init();
         sngxml::xpath::Init();
+        sngxml::xmlser::Init();
 #ifdef _WIN32
         cmajor::resources::Init();
 #endif
@@ -49,6 +51,7 @@ struct InitDone
 #ifdef _WIN32
         cmajor::resources::Done();
 #endif
+        sngxml::xmlser::Done();
         sngxml::xpath::Done();
         cmajor::symbols::Done();
         sngcm::ast::Done();
@@ -212,8 +215,23 @@ void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, Module* module)
 }
 #endif 
 
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        soulng::unicode::CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, const char** argv)
 {
+    if (!CheckCmajorRootEnv()) return 1;
     InitDone initDone;
 
     std::unique_ptr<Module> rootModule;

@@ -1,14 +1,14 @@
-class Nonpolymorphic
+class SimpleClass
 {
     string member;
 }
 
-base class Polymorphic
+class BaseClass
 {
     string member;
 }
 
-class DerivedClass : Polymorphic
+class DerivedClass : BaseClass
 {
     string derivedMember;
 }
@@ -39,10 +39,18 @@ class XmlTestClass
     time_point f19;
     duration f20;
     uuid f21;
-    Nonpolymorphic f22;
-    Nonpolymorphic[] f23;
-    Polymorphic* f24;
-    Polymorphic* f25;
-    Polymorphic* f26;
-    Polymorphic*[] f27;
+    SimpleClass f22;
+    SimpleClass[] f23;
+    BaseClass* f24;
+    BaseClass* f25;
+    BaseClass* f26;
+    BaseClass*[] f27;
+    xml_ptr<SimpleClass> f28;
+    xml_ptr<BaseClass> f29;
+    xml_ptr<BaseClass> f30;
+    unique_xml_ptr<SimpleClass> f31;
+    unique_xml_ptr<BaseClass> f32;
+    unique_xml_ptr<BaseClass> f33;
+    xml_ptr<BaseClass>[] f34;
+    unique_xml_ptr<BaseClass>[] f35;
 }

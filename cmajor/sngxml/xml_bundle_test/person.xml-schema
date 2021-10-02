@@ -1,0 +1,22 @@
+[cpp]#include <sngxml/xml_bundle_test/vehicle.hpp>
+
+class Vehicle;
+
+class Person
+{
+    string name;
+    int age;
+<%
+    void AddVehicle(Vehicle* v, bool includeInBundle);
+%>
+    unique_xml_ptr<Vehicle>[] vehicles;
+}
+
+<%
+void Person::AddVehicle(Vehicle* v, bool includeInBundle)
+{
+    v->SetOwner(this);
+    vehicles.push_back(unique_xml_ptr<Vehicle>(v));
+    vehicles.back().SetIncludeInBundle(includeInBundle);
+}
+%>

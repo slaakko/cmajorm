@@ -13,6 +13,7 @@
 #include <soulng/util/Sha1.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/nil_generator.hpp>
 #include <fstream>
 #include <iostream>
 
@@ -21,11 +22,59 @@ namespace sngxml { namespace xmlser {
 using namespace soulng::util;
 using namespace soulng::unicode;
 
+void WriteIndentedText(CodeFormatter& formatter, const std::string& cppText)
+{
+    std::string line;
+    bool startOfLine = true;
+    bool lbraceSeen = false;
+    for (char c : cppText)
+    {
+        if (c == '\n')
+        {
+            formatter.WriteLine(line);
+            line.clear();
+            startOfLine = true;
+            if (lbraceSeen)
+            {
+                formatter.IncIndent();
+                lbraceSeen = false;
+            }
+        }
+        else if (c == ' ')
+        {
+            if (!startOfLine)
+            {
+                line.append(1, c);
+            }
+        }
+        else if (c == '{')
+        {
+            line.append(1, c);
+            lbraceSeen = true;
+        }
+        else if (c == '}')
+        {
+            line.append(1, c);
+            formatter.DecIndent();
+        }
+        else if (c != '\r')
+        {
+            startOfLine = false;
+            line.append(1, c);
+        }
+    }
+    if (!line.empty())
+    {
+        formatter.WriteLine(line);
+    }
+}
+
 class PointerMemberDetectorVisitor : public DefaultVisitor
 {
 public:
     PointerMemberDetectorVisitor();
     void Visit(PointerNode& node) override;
+    void Visit(TemplateIdNode& node) override;
     bool HasPointerMember() const { return hasPointerMember; }
 private:
     bool hasPointerMember;
@@ -38,6 +87,14 @@ PointerMemberDetectorVisitor::PointerMemberDetectorVisitor() : hasPointerMember(
 void PointerMemberDetectorVisitor::Visit(PointerNode& node)
 {
     hasPointerMember = true;
+}
+
+void PointerMemberDetectorVisitor::Visit(TemplateIdNode& node)
+{
+    if (node.TypeId() == "xml_ptr" || node.TypeId() == "unique_xml_ptr")
+    {
+        hasPointerMember = true;
+    }
 }
 
 class HeaderGeneratorVisitor : public DefaultVisitor
@@ -75,6 +132,9 @@ public:
     void Visit(TimePointNode& node) override;
     void Visit(DurationNode& node) override;
     void Visit(ClassIdNode& node) override;
+    void Visit(TemplateIdNode& node) override;
+    void Visit(ForwardClassDeclarationNode& node) override;
+    void Visit(CppBlockNode& node) override;
 private:
     CodeFormatter& formatter;
     std::string includeGuard;
@@ -88,16 +148,16 @@ void HeaderGeneratorVisitor::Visit(SourceFileNode& node)
 {
     formatter.WriteLine("#ifndef " + includeGuard);
     formatter.WriteLine("#define " + includeGuard);
-    for (const std::string& includeDir : node.IncludeDirs())
+    for (const auto& includeDirective : node.IncludeDirectives())
     {
-        formatter.WriteLine("#include " + includeDir);
+        if (includeDirective->FileTag() == "hpp" || includeDirective->FileTag().empty())
+        {
+            formatter.WriteLine("#include " + includeDirective->FilePath());
+        }
     }
-    formatter.WriteLine("#include <sngxml/dom/Element.hpp>");
+    formatter.WriteLine("#include <sngxml/serialization/XmlPtr.hpp>");
     formatter.WriteLine("#include <soulng/util/Time.hpp>");
-    formatter.WriteLine("#include <boost/uuid/uuid.hpp>");
     formatter.WriteLine("#include <chrono>");
-    formatter.WriteLine("#include <vector>");
-    formatter.WriteLine("#include <string>");
     formatter.WriteLine("#include <memory>");
     formatter.WriteLine("#include <stdint.h>");
     DefaultVisitor::Visit(node);
@@ -118,6 +178,8 @@ void HeaderGeneratorVisitor::Visit(NamespaceNode& node)
         formatter.WriteLine("using time_point = std::chrono::steady_clock::time_point;");
         formatter.WriteLine("using duration = std::chrono::steady_clock::duration;");
         formatter.WriteLine("using uuid = boost::uuids::uuid;");
+        formatter.WriteLine("template<class T> using xml_ptr = sngxml::xmlser::XmlPtr<T>;");
+        formatter.WriteLine("template<class T> using unique_xml_ptr = sngxml::xmlser::UniqueXmlPtr<T>;");
     }
     else
     {
@@ -130,6 +192,8 @@ void HeaderGeneratorVisitor::Visit(NamespaceNode& node)
             formatter.WriteLine("using time_point = std::chrono::steady_clock::time_point;");
             formatter.WriteLine("using duration = std::chrono::steady_clock::duration;");
             formatter.WriteLine("using uuid = boost::uuids::uuid;");
+            formatter.WriteLine("template<class T> using xml_ptr = sngxml::xmlser::XmlPtr<T>;");
+            formatter.WriteLine("template<class T> using unique_xml_ptr = sngxml::xmlser::UniqueXmlPtr<T>;");
         }
     }
     DefaultVisitor::Visit(node);
@@ -153,13 +217,16 @@ void HeaderGeneratorVisitor::Visit(ClassNode& node)
     {
         inheritance.append(" : public ").append(node.BaseClassId());
     }
+    else
+    {
+        inheritance.append(" : public sngxml::xmlser::XmlSerializable");
+    }
     formatter.WriteLine();
     formatter.WriteLine("class" + api + " " + node.Id() + inheritance);
     formatter.WriteLine("{");
     formatter.WriteLine("public:");
     formatter.IncIndent();
     formatter.WriteLine(node.Id() + "();");
-    formatter.WriteLine(node.Id() + "(sngxml::dom::Element* element);");
     PointerMemberDetectorVisitor pointerMemberDetectorVisitor;
     node.Accept(pointerMemberDetectorVisitor);
     bool hasPointerMembers = pointerMemberDetectorVisitor.HasPointerMember();
@@ -170,24 +237,51 @@ void HeaderGeneratorVisitor::Visit(ClassNode& node)
         formatter.WriteLine(node.Id() + "& operator=(const " + node.Id() + "&) = delete;");
         formatter.WriteLine(node.Id() + "& operator=(" + node.Id() + "&&) = delete;");
     }
-    if (node.GetKey() == ClassNode::Key::baseClass)
+    formatter.WriteLine("virtual ~" + node.Id() + "();");
+    formatter.WriteLine("static void* Create();");
+    formatter.WriteLine("static std::string StaticClassName();");
+    formatter.WriteLine("static void Register(int classId_);");
+    formatter.WriteLine("void DestroyObject() override { delete this; }");
+    if (node.BaseClassId().empty())
     {
-        formatter.WriteLine("virtual ~" + node.Id() + "();");
+        formatter.WriteLine("const boost::uuids::uuid& ObjectId() const override { return objectId; }");
+        formatter.WriteLine("void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }");
     }
-    if (node.GetKey() == ClassNode::Key::baseClass)
+    formatter.WriteLine("int ClassId() const override { return classId; }");
+    formatter.WriteLine("std::string ClassName() const override;");
+    if (node.BaseClassId().empty())
     {
-        formatter.Write("virtual ");
+        formatter.WriteLine("sngxml::xmlser::XmlContainer* Container() const override { return container; }");
+        formatter.WriteLine("void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }");
     }
-    formatter.Write("std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const");
-    if (!node.BaseClassId().empty())
+    formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;");
+    formatter.WriteLine("void FromXml(sngxml::dom::Element* element) override;");
+    formatter.WriteLine("std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;");
+    if (node.BaseClassId().empty())
     {
-        formatter.Write(" override");
+        formatter.WriteLine("virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;");
     }
-    formatter.WriteLine(";");
+    else
+    {
+        formatter.WriteLine("void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;");
+    }
     formatter.DecIndent();
     formatter.WriteLine("public:");
     formatter.IncIndent();
     DefaultVisitor::Visit(node);
+    if (node.BaseClassId().empty())
+    {
+        formatter.WriteLine("void* dataPtr;");
+    }
+    formatter.DecIndent();
+    formatter.WriteLine("private:");
+    formatter.IncIndent();
+    formatter.WriteLine("static int classId;");
+    if (node.BaseClassId().empty())
+    {
+        formatter.WriteLine("boost::uuids::uuid objectId;");
+        formatter.WriteLine("sngxml::xmlser::XmlContainer* container;");
+    }
     formatter.DecIndent();
     formatter.WriteLine("};");
 }
@@ -357,6 +451,24 @@ void HeaderGeneratorVisitor::Visit(ClassIdNode& node)
     formatter.Write(node.ClassId());
 }
 
+void HeaderGeneratorVisitor::Visit(TemplateIdNode& node)
+{
+    formatter.Write(node.TypeId() + "<" + node.TypeParamId() + ">");
+}
+
+void HeaderGeneratorVisitor::Visit(ForwardClassDeclarationNode& node)
+{
+    formatter.WriteLine();
+    formatter.WriteLine("class " + node.ClassId() + ";");
+}
+
+void HeaderGeneratorVisitor::Visit(CppBlockNode& node)
+{
+    if (node.Source()) return;
+    const std::string& cppText = node.CppText();
+    WriteIndentedText(formatter, cppText);
+}
+
 void GenerateXmlSerializationHeaderFile(SourceFileNode* sourceFileNode, const std::string& headerFilePath)
 {
     std::string headerName = Path::GetFileNameWithoutExtension(headerFilePath);
@@ -389,23 +501,7 @@ InitializerGeneratorVisitor::InitializerGeneratorVisitor(CodeFormatter& formatte
 void InitializerGeneratorVisitor::Visit(MemberVariableNode& node)
 {
     hasMembers = true;
-    if (first)
-    {
-        if (hasBaseInitializer)
-        {
-            formatter.Write("    , ");
-        }
-        else
-        {
-            formatter.Write("    : ");
-        }
-        first = false;
-    }
-    else
-    {
-        formatter.Write(", ");
-    }
-    formatter.Write(node.Id() + "()");
+    formatter.Write(", " + node.Id() + "()");
 }
 
 class ToXmlMemberVariableGeneratorVisitor : public DefaultVisitor
@@ -444,6 +540,63 @@ void FromXmlMemberVariableGeneratorVisitor::Visit(MemberVariableNode& node)
     formatter.WriteLine("sngxml::xmlser::FromXml(element, \"" + node.Id() + "\", " + node.Id() + ");");
 }
 
+class GetPtrsGeneratorVisitor : public DefaultVisitor
+{
+public:
+    GetPtrsGeneratorVisitor(CodeFormatter& formatter_);
+    void Visit(MemberVariableNode& node) override;
+private:
+    CodeFormatter& formatter;
+};
+
+GetPtrsGeneratorVisitor::GetPtrsGeneratorVisitor(CodeFormatter& formatter_) : formatter(formatter_)
+{
+}
+
+void GetPtrsGeneratorVisitor::Visit(MemberVariableNode& node)
+{
+    TypeNode* type = node.Type();
+    if (type->IsTemplateIdNode())
+    {
+        TemplateIdNode* templateIdNode = static_cast<TemplateIdNode*>(type);
+        if (templateIdNode->TypeId() == "xml_ptr")
+        {
+            formatter.WriteLine("ptrs.push_back(const_cast<xml_ptr<" + templateIdNode->TypeParamId() + ">*>(&" + node.Id() + ")); ");
+        }
+        else if (templateIdNode->TypeId() == "unique_xml_ptr")
+        {
+            formatter.WriteLine("ptrs.push_back(const_cast<unique_xml_ptr<" + templateIdNode->TypeParamId() + ">*>(&" + node.Id() + ")); ");
+        }
+    }
+    else if (type->IsArrayNode())
+    {
+        ArrayNode* arrayNode = static_cast<ArrayNode*>(type);
+        TypeNode* typeNode = arrayNode->Type();
+        if (typeNode->IsTemplateIdNode())
+        {
+            TemplateIdNode* templateIdNode = static_cast<TemplateIdNode*>(typeNode);
+            if (templateIdNode->TypeId() == "xml_ptr")
+            {
+                formatter.WriteLine("for (const auto& ptr : " + node.Id() + ")");
+                formatter.WriteLine("{");
+                formatter.IncIndent();
+                formatter.WriteLine("ptrs.push_back(const_cast<xml_ptr<" + templateIdNode->TypeParamId() + ">*>(&ptr));");
+                formatter.DecIndent();
+                formatter.WriteLine("}");
+            }
+            else if (templateIdNode->TypeId() == "unique_xml_ptr")
+            {
+                formatter.WriteLine("for (const auto& ptr : " + node.Id() + ")");
+                formatter.WriteLine("{");
+                formatter.IncIndent();
+                formatter.WriteLine("ptrs.push_back(const_cast<unique_xml_ptr<" + templateIdNode->TypeParamId() + ">*>(&ptr));");
+                formatter.DecIndent();
+                formatter.WriteLine("}");
+            }
+        }
+    }
+}
+
 class SourceGeneratorVisitor : public DefaultVisitor
 {
 public:
@@ -451,6 +604,7 @@ public:
     void Visit(SourceFileNode& node) override;
     void Visit(NamespaceNode& noide) override;
     void Visit(ClassNode& node) override;
+    void Visit(CppBlockNode& node) override;
 private:
     CodeFormatter& formatter;
     std::string headerFilePath;
@@ -464,6 +618,15 @@ void SourceGeneratorVisitor::Visit(SourceFileNode& node)
 {
     std::string headerInclude = "#include \"" + Path::GetFileName(headerFilePath) + "\"";
     formatter.WriteLine(headerInclude);
+    for (const auto& includeDirective : node.IncludeDirectives())
+    {
+        if (includeDirective->FileTag() == "cpp")
+        {
+            formatter.WriteLine("#include " + includeDirective->FilePath());
+        }
+    }
+    formatter.WriteLine("#include <boost/uuid/nil_generator.hpp>");
+    formatter.WriteLine("#include <boost/uuid/uuid_io.hpp>");
     formatter.WriteLine("#include <sngxml/serialization/XmlExport.hpp>");
     formatter.WriteLine("#include <sngxml/serialization/XmlImport.hpp>");
     formatter.WriteLine("#include <soulng/util/Unicode.hpp>");
@@ -472,7 +635,6 @@ void SourceGeneratorVisitor::Visit(SourceFileNode& node)
     formatter.WriteLine();
     DefaultVisitor::Visit(node);
 }
-
 void SourceGeneratorVisitor::Visit(NamespaceNode& node)
 {
     if (!node.Id().empty())
@@ -495,55 +657,147 @@ void SourceGeneratorVisitor::Visit(NamespaceNode& node)
 
 void SourceGeneratorVisitor::Visit(ClassNode& node)
 {
+    formatter.WriteLine("int " + node.Id() + "::classId = -1;");
+    formatter.WriteLine();
     formatter.WriteLine(node.Id() + "::" + node.Id() + "()");
+    formatter.IncIndent();
     if (!node.BaseClassId().empty())
     {
-        formatter.WriteLine("    : " + node.BaseClassId() + "()");
+        formatter.Write(" : " + node.BaseClassId() + "()");
+    }
+    else
+    {
+        formatter.Write(" : objectId(boost::uuids::nil_uuid()), container(nullptr)");
     }
     InitializerGeneratorVisitor defaultCtorInitializerGeneratorVisitor(formatter, !node.BaseClassId().empty());
     node.Accept(defaultCtorInitializerGeneratorVisitor);
     if (defaultCtorInitializerGeneratorVisitor.HasMembers())
     {
-        formatter.WriteLine();
+        if (node.BaseClassId().empty())
+        {
+            formatter.WriteLine(", dataPtr(nullptr)");
+        }
+        else
+        {
+            formatter.WriteLine();
+        }
     }
+    else
+    {
+        if (node.BaseClassId().empty())
+        {
+            formatter.WriteLine(", dataPtr(nullptr)");
+        }
+        else
+        {
+            formatter.WriteLine();
+        }
+    }
+    formatter.DecIndent();
     formatter.WriteLine("{");
     formatter.WriteLine("}");
     formatter.WriteLine();
 
-    formatter.WriteLine(node.Id() + "::" + node.Id() + "(sngxml::dom::Element* element)");
-    if (!node.BaseClassId().empty())
-    {
-        formatter.WriteLine("    : " + node.BaseClassId()  + "(sngxml::xmlser::GetXmlFieldElement(\"base\", element))");
-    }
-    InitializerGeneratorVisitor elementCtorInitializerGeneratorVisitor(formatter, !node.BaseClassId().empty());
-    node.Accept(elementCtorInitializerGeneratorVisitor);
-    if (elementCtorInitializerGeneratorVisitor.HasMembers())
-    {
-        formatter.WriteLine();
-    }
+    formatter.WriteLine("void* " + node.Id() + "::Create()");
     formatter.WriteLine("{");
     formatter.IncIndent();
+    formatter.WriteLine("return new " + node.Id() + "();");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine();
+
+    formatter.WriteLine("void " + node.Id() + "::Register(int classId_)");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    formatter.WriteLine("classId = classId_;");
+    formatter.WriteLine("sngxml::xmlser::XmlRegister<" + node.Id() + ">(classId, &" + node.Id() + "::Create);");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine();
+
+    formatter.WriteLine("std::string " + node.Id() + "::StaticClassName()");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    formatter.WriteLine("return \"" + node.Id() + "\";");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine();
+
+    formatter.WriteLine("std::string " + node.Id() + "::ClassName() const");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    formatter.WriteLine("return \"" + node.Id() + "\";");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine();
+
+    formatter.WriteLine("void " + node.Id() + "::FromXml(sngxml::dom::Element* element)");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    if (node.BaseClassId().empty())
+    {
+        formatter.WriteLine("std::u32string objectIdAttr = element->GetAttribute(U\"objectId\");");
+        formatter.WriteLine("if (!objectIdAttr.empty())");
+        formatter.WriteLine("{");
+        formatter.IncIndent();
+        formatter.WriteLine("objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));");
+        formatter.DecIndent();
+        formatter.WriteLine("}");
+    }
+    else
+    {
+        formatter.WriteLine(node.BaseClassId() + "::FromXml(element);");
+    }
     FromXmlMemberVariableGeneratorVisitor fromXmlGeneratorVisitor(formatter);
     node.Accept(fromXmlGeneratorVisitor);
     formatter.DecIndent();
     formatter.WriteLine("}");
     formatter.WriteLine();
 
-    if (node.GetKey() == sngxml::xmlser::ClassNode::Key::baseClass)
+    formatter.WriteLine("std::vector<sngxml::xmlser::XmlPtrBase*> " + node.Id() + "::GetPtrs() const");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    GetPtrsGeneratorVisitor getPtrsGeneratorVisitor(formatter);
+    if (node.BaseClassId().empty())
     {
-        formatter.WriteLine(node.Id() + "::~" + node.Id() + "()");
-        formatter.WriteLine("{");
-        formatter.WriteLine("}");
-        formatter.WriteLine();
+        formatter.WriteLine("std::vector<sngxml::xmlser::XmlPtrBase*> ptrs;");
     }
+    else
+    {
+        formatter.WriteLine("std::vector<sngxml::xmlser::XmlPtrBase*> ptrs = " + node.BaseClassId() + "::GetPtrs();");
+    }
+    node.Accept(getPtrsGeneratorVisitor);
+    formatter.WriteLine("return ptrs;");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine();
+
+    formatter.WriteLine("void " + node.Id() + "::SetObjectXmlAttributes(sngxml::dom::Element * element) const");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    formatter.WriteLine("element->SetAttribute(U\"classId\", ToUtf32(std::to_string(classId)));");
+    formatter.WriteLine("element->SetAttribute(U\"objectId\", ToUtf32(boost::uuids::to_string(ObjectId())));");
+    formatter.WriteLine("element->SetAttribute(U\"className\", ToUtf32(ClassName()));");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine();
+
+    formatter.WriteLine(node.Id() + "::~" + node.Id() + "()");
+    formatter.WriteLine("{");
+    formatter.WriteLine("}");
+    formatter.WriteLine();
 
     formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> " + node.Id() + "::ToXml(const std::string& fieldName) const");
     formatter.WriteLine("{");
     formatter.IncIndent();
-    formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));");
-    if (!node.BaseClassId().empty())
+    if (node.BaseClassId().empty())
     {
-        formatter.WriteLine("element->AppendChild(std::unique_ptr<sngxml::dom::Node>(" + node.BaseClassId() + "::ToXml(\"base\").release()));");
+        formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));");
+        formatter.WriteLine("SetObjectXmlAttributes(element.get());");
+    }
+    else
+    {
+        formatter.WriteLine("std::unique_ptr<sngxml::dom::Element> element = " + node.BaseClassId() + "::ToXml(fieldName);");
     }
     ToXmlMemberVariableGeneratorVisitor toXmlMemberVariableGeneratorVisitor(formatter);
     node.Accept(toXmlMemberVariableGeneratorVisitor);
@@ -551,6 +805,12 @@ void SourceGeneratorVisitor::Visit(ClassNode& node)
     formatter.DecIndent();
     formatter.WriteLine("}");
     formatter.WriteLine();
+}
+
+void SourceGeneratorVisitor::Visit(CppBlockNode& node)
+{
+    if (!node.Source()) return;
+    WriteIndentedText(formatter, node.CppText());
 }
 
 void GenerateXmlSerializationSourceFile(SourceFileNode* sourceFileNode, const std::string& sourceFilePath, const std::string& headerFilePath)

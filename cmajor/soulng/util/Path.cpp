@@ -190,7 +190,7 @@ std::string Path::ChangeExtension(const std::string& path, const std::string& ex
     }
     else
     {
-        if (lastDotPos == std::string::npos || lastDotPos < lastSlashPos)
+        if (lastDotPos == std::string::npos || (lastSlashPos != std::string::npos && lastDotPos < lastSlashPos))
         {
             if (extension[0] == '.')
             {

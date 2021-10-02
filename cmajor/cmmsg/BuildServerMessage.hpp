@@ -1,12 +1,9 @@
 #ifndef BUILDSERVERMESSAGE_HPP_9B23CE3BD05810A5126B0F5B6C9EDFB50250F5D2
 #define BUILDSERVERMESSAGE_HPP_9B23CE3BD05810A5126B0F5B6C9EDFB50250F5D2
 #include <cmajor/cmmsg/MsgApi.hpp>
-#include <sngxml/dom/Element.hpp>
+#include <sngxml/serialization/XmlPtr.hpp>
 #include <soulng/util/Time.hpp>
-#include <boost/uuid/uuid.hpp>
 #include <chrono>
-#include <vector>
-#include <string>
 #include <memory>
 #include <stdint.h>
 
@@ -16,49 +13,136 @@ using timestamp = soulng::util::Timestamp;
 using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
+template<class T> using xml_ptr = sngxml::xmlser::XmlPtr<T>;
+template<class T> using unique_xml_ptr = sngxml::xmlser::UniqueXmlPtr<T>;
 
-class MSG_API StopBuildRequest
+class MSG_API StopBuildRequest : public sngxml::xmlser::XmlSerializable
 {
 public:
     StopBuildRequest();
-    StopBuildRequest(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~StopBuildRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API StopBuildReply
+class MSG_API StopBuildReply : public sngxml::xmlser::XmlSerializable
 {
 public:
     StopBuildReply();
-    StopBuildReply(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~StopBuildReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API KeepAliveBuildRequest
+class MSG_API KeepAliveBuildRequest : public sngxml::xmlser::XmlSerializable
 {
 public:
     KeepAliveBuildRequest();
-    KeepAliveBuildRequest(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~KeepAliveBuildRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API KeepAliveBuildReply
+class MSG_API KeepAliveBuildReply : public sngxml::xmlser::XmlSerializable
 {
 public:
     KeepAliveBuildReply();
-    KeepAliveBuildReply(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~KeepAliveBuildReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API BuildRequest
+class MSG_API BuildRequest : public sngxml::xmlser::XmlSerializable
 {
 public:
     BuildRequest();
-    BuildRequest(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~BuildRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string messageKind;
     std::string backend;
@@ -84,14 +168,32 @@ public:
     bool singleThreadedCompile;
     bool disableCodeGen;
     bool justMyCode;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API CompileError
+class MSG_API CompileError : public sngxml::xmlser::XmlSerializable
 {
 public:
     CompileError();
-    CompileError(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~CompileError();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string message;
     std::string project;
@@ -99,14 +201,32 @@ public:
     int32_t line;
     int32_t scol;
     int32_t ecol;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API BuildReply
+class MSG_API BuildReply : public sngxml::xmlser::XmlSerializable
 {
 public:
     BuildReply();
-    BuildReply(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~BuildReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     bool requestValid;
     std::string requestErrorMessage;
@@ -114,89 +234,233 @@ public:
     std::string time;
     bool success;
     std::vector<CompileError> errors;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API LogBuildMessageRequest
+class MSG_API LogBuildMessageRequest : public sngxml::xmlser::XmlSerializable
 {
 public:
     LogBuildMessageRequest();
-    LogBuildMessageRequest(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~LogBuildMessageRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string message;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API LogBuildMessageReply
+class MSG_API LogBuildMessageReply : public sngxml::xmlser::XmlSerializable
 {
 public:
     LogBuildMessageReply();
-    LogBuildMessageReply(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~LogBuildMessageReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     bool ok;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API BuildProgressMessage
+class MSG_API BuildProgressMessage : public sngxml::xmlser::XmlSerializable
 {
 public:
     BuildProgressMessage();
-    BuildProgressMessage(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~BuildProgressMessage();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API GenericBuildErrorReply
+class MSG_API GenericBuildErrorReply : public sngxml::xmlser::XmlSerializable
 {
 public:
     GenericBuildErrorReply();
-    GenericBuildErrorReply(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~GenericBuildErrorReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string error;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API CacheModuleRequest
+class MSG_API CacheModuleRequest : public sngxml::xmlser::XmlSerializable
 {
 public:
     CacheModuleRequest();
-    CacheModuleRequest(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~CacheModuleRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string projectName;
     std::string projectFilePath;
     std::string backend;
     std::string config;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API CacheModuleReply
+class MSG_API CacheModuleReply : public sngxml::xmlser::XmlSerializable
 {
 public:
     CacheModuleReply();
-    CacheModuleReply(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~CacheModuleReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string error;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API DefinitionSourceLocation
+class MSG_API DefinitionSourceLocation : public sngxml::xmlser::XmlSerializable
 {
 public:
     DefinitionSourceLocation();
-    DefinitionSourceLocation(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~DefinitionSourceLocation();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string file;
     int32_t line;
     int32_t scol;
     int32_t ecol;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API GetDefinitionRequest
+class MSG_API GetDefinitionRequest : public sngxml::xmlser::XmlSerializable
 {
 public:
     GetDefinitionRequest();
-    GetDefinitionRequest(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~GetDefinitionRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string projectName;
     std::string projectFilePath;
@@ -204,18 +468,41 @@ public:
     std::string config;
     std::string identifier;
     DefinitionSourceLocation identifierLocation;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API GetDefinitionReply
+class MSG_API GetDefinitionReply : public sngxml::xmlser::XmlSerializable
 {
 public:
     GetDefinitionReply();
-    GetDefinitionReply(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~GetDefinitionReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     DefinitionSourceLocation definitionLocation;
     bool ok;
     std::string error;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
 #endif // BUILDSERVERMESSAGE_HPP_9B23CE3BD05810A5126B0F5B6C9EDFB50250F5D2

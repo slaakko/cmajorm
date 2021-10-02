@@ -1,12 +1,9 @@
 #ifndef CODECOMPLETIONSERVERMESSAGE_HPP_012CDE82AB35DD9B6579D9379A99DF1EAC6DCD1F
 #define CODECOMPLETIONSERVERMESSAGE_HPP_012CDE82AB35DD9B6579D9379A99DF1EAC6DCD1F
 #include <cmajor/cmmsg/MsgApi.hpp>
-#include <sngxml/dom/Element.hpp>
+#include <sngxml/serialization/XmlPtr.hpp>
 #include <soulng/util/Time.hpp>
-#include <boost/uuid/uuid.hpp>
 #include <chrono>
-#include <vector>
-#include <string>
 #include <memory>
 #include <stdint.h>
 
@@ -16,50 +13,106 @@ using timestamp = soulng::util::Timestamp;
 using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
+template<class T> using xml_ptr = sngxml::xmlser::XmlPtr<T>;
+template<class T> using unique_xml_ptr = sngxml::xmlser::UniqueXmlPtr<T>;
 
-class MSG_API CodeCompletionRequest
+class MSG_API CodeCompletionRequest : public sngxml::xmlser::XmlSerializable
 {
 public:
     CodeCompletionRequest();
-    CodeCompletionRequest(sngxml::dom::Element* element);
     virtual ~CodeCompletionRequest();
-    virtual std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     time_point created;
     time_point received;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API CodeCompletionReply
+class MSG_API CodeCompletionReply : public sngxml::xmlser::XmlSerializable
 {
 public:
     CodeCompletionReply();
-    CodeCompletionReply(sngxml::dom::Element* element);
     virtual ~CodeCompletionReply();
-    virtual std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     time_point requestCreated;
     time_point requestReceived;
     time_point created;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
 class MSG_API LoadEditModuleRequest : public CodeCompletionRequest
 {
 public:
     LoadEditModuleRequest();
-    LoadEditModuleRequest(sngxml::dom::Element* element);
+    virtual ~LoadEditModuleRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     std::string projectFilePath;
     std::string backend;
     std::string config;
+private:
+    static int classId;
 };
 
 class MSG_API LoadEditModuleReply : public CodeCompletionReply
 {
 public:
     LoadEditModuleReply();
-    LoadEditModuleReply(sngxml::dom::Element* element);
+    virtual ~LoadEditModuleReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     std::string key;
     std::string result;
@@ -68,48 +121,92 @@ public:
     time_point startParsing;
     time_point endParsing;
     time_point endLoading;
+private:
+    static int classId;
 };
 
 class MSG_API ResetEditModuleCacheRequest : public CodeCompletionRequest
 {
 public:
     ResetEditModuleCacheRequest();
-    ResetEditModuleCacheRequest(sngxml::dom::Element* element);
+    virtual ~ResetEditModuleCacheRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
+private:
+    static int classId;
 };
 
 class MSG_API ResetEditModuleCacheReply : public CodeCompletionReply
 {
 public:
     ResetEditModuleCacheReply();
-    ResetEditModuleCacheReply(sngxml::dom::Element* element);
+    virtual ~ResetEditModuleCacheReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     std::string result;
     std::string error;
+private:
+    static int classId;
 };
 
 class MSG_API ParseSourceRequest : public CodeCompletionRequest
 {
 public:
     ParseSourceRequest();
-    ParseSourceRequest(sngxml::dom::Element* element);
+    virtual ~ParseSourceRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     std::string projectFilePath;
     std::string backend;
     std::string config;
     std::string sourceFilePath;
     std::u32string sourceCode;
+private:
+    static int classId;
 };
 
 class MSG_API ParseSourceReply : public CodeCompletionReply
 {
 public:
     ParseSourceReply();
-    ParseSourceReply(sngxml::dom::Element* element);
+    virtual ~ParseSourceReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     bool ok;
     std::string error;
@@ -119,14 +216,25 @@ public:
     std::vector<int32_t> ruleContext;
     time_point startParsing;
     time_point endParsing;
+private:
+    static int classId;
 };
 
 class MSG_API GetCCListRequest : public CodeCompletionRequest
 {
 public:
     GetCCListRequest();
-    GetCCListRequest(sngxml::dom::Element* element);
+    virtual ~GetCCListRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     std::string projectFilePath;
     std::string backend;
@@ -135,84 +243,177 @@ public:
     std::u32string ccText;
     std::vector<int32_t> ruleContext;
     std::u32string cursorLine;
+private:
+    static int classId;
 };
 
 class MSG_API GetCCListReply : public CodeCompletionReply
 {
 public:
     GetCCListReply();
-    GetCCListReply(sngxml::dom::Element* element);
+    virtual ~GetCCListReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     bool ok;
     std::string error;
     std::string ccList;
     time_point startGetCCList;
     time_point endGetCCList;
+private:
+    static int classId;
 };
 
 class MSG_API GetParamHelpListRequest : public CodeCompletionRequest
 {
 public:
     GetParamHelpListRequest();
-    GetParamHelpListRequest(sngxml::dom::Element* element);
+    virtual ~GetParamHelpListRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     std::string projectFilePath;
     std::string backend;
     std::string config;
     std::string sourceFilePath;
     int32_t symbolIndex;
+private:
+    static int classId;
 };
 
 class MSG_API GetParamHelpListReply : public CodeCompletionReply
 {
 public:
     GetParamHelpListReply();
-    GetParamHelpListReply(sngxml::dom::Element* element);
+    virtual ~GetParamHelpListReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     bool ok;
     std::string error;
     std::string list;
     time_point startGetParamHelpList;
     time_point endGetParamHelpList;
+private:
+    static int classId;
 };
 
 class MSG_API StopCCRequest : public CodeCompletionRequest
 {
 public:
     StopCCRequest();
-    StopCCRequest(sngxml::dom::Element* element);
+    virtual ~StopCCRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
+private:
+    static int classId;
 };
 
 class MSG_API StopCCReply : public CodeCompletionReply
 {
 public:
     StopCCReply();
-    StopCCReply(sngxml::dom::Element* element);
+    virtual ~StopCCReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
+private:
+    static int classId;
 };
 
-class MSG_API KeepAliveCCRequest
+class MSG_API KeepAliveCCRequest : public sngxml::xmlser::XmlSerializable
 {
 public:
     KeepAliveCCRequest();
-    KeepAliveCCRequest(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~KeepAliveCCRequest();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class MSG_API KeepAliveCCReply
+class MSG_API KeepAliveCCReply : public sngxml::xmlser::XmlSerializable
 {
 public:
     KeepAliveCCReply();
-    KeepAliveCCReply(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~KeepAliveCCReply();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
 #endif // CODECOMPLETIONSERVERMESSAGE_HPP_012CDE82AB35DD9B6579D9379A99DF1EAC6DCD1F

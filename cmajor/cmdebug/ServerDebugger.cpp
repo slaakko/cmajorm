@@ -355,72 +355,86 @@ std::unique_ptr<Element> ServerDebugger::ProcessRequest(Element* requestMessage)
     {
         case MessageKind::startRequest:
         {
-            StartDebugRequest startDebugRequest(requestMessage);
+            StartDebugRequest startDebugRequest;
+            startDebugRequest.FromXml(requestMessage);
             return ProcessStartRequest(startDebugRequest);
         }
         case MessageKind::stopRequest:
         {
-            StopDebugRequest stopDebugRequest(requestMessage);
+            StopDebugRequest stopDebugRequest; 
+            stopDebugRequest.FromXml(requestMessage);
             return ProcessStopRequest(stopDebugRequest);
         }
         case MessageKind::continueRequest:
         {
-            ContinueRequest continueRequest(requestMessage);
+            ContinueRequest continueRequest;
+            continueRequest.FromXml(requestMessage);
             return ProcessContinueRequest(continueRequest);
         }
         case MessageKind::nextRequest:
         {
-            NextRequest nextRequest(requestMessage);
+            NextRequest nextRequest;
+            nextRequest.FromXml(requestMessage);
             return ProcessNextRequest(nextRequest);
         }
         case MessageKind::stepRequest:
         {
-            StepRequest stepRequest(requestMessage);
+            StepRequest stepRequest; 
+            stepRequest.FromXml(requestMessage);
             return ProcessStepRequest(stepRequest);
         }
         case MessageKind::finishRequest:
         {
-            FinishRequest finishRequest(requestMessage);
+            FinishRequest finishRequest;
+            finishRequest.FromXml(requestMessage);
             return ProcessFinishRequest(finishRequest);
         }
         case MessageKind::untilRequest:
         {
-            UntilRequest untilRequest(requestMessage);
+            UntilRequest untilRequest;
+            untilRequest.FromXml(requestMessage);
             return ProcessUntilRequest(untilRequest);
         }
         case MessageKind::breakRequest:
         {
-            BreakRequest breakRequest(requestMessage);
+            BreakRequest breakRequest;
+            breakRequest.FromXml(requestMessage);
             return ProcessBreakRequest(breakRequest);
         }
         case MessageKind::deleteRequest:
         {
-            DeleteRequest deleteRequest(requestMessage);
+            DeleteRequest deleteRequest;
+            deleteRequest.FromXml(requestMessage);
             return ProcessDeleteRequest(deleteRequest);
         }
         case MessageKind::depthRequest:
         {
-            DepthRequest depthRequest(requestMessage);
+            DepthRequest depthRequest;
+            depthRequest.FromXml(requestMessage);
             return ProcessDepthRequest(depthRequest);
         }
         case MessageKind::framesRequest:
         {
-            FramesRequest framesRequest(requestMessage);
+            FramesRequest framesRequest;
+            framesRequest.FromXml(requestMessage);
             return ProcessFramesRequest(framesRequest);
         }
         case MessageKind::countRequest:
         {
-            CountRequest countRequest(requestMessage);
+            CountRequest countRequest;
+            countRequest.FromXml(requestMessage);
             return ProcessCountRequest(countRequest);
         }
         case MessageKind::evaluateChildRequest:
         {
-            EvaluateChildRequest evaluateChildRequest(requestMessage);
+            EvaluateChildRequest evaluateChildRequest;
+            evaluateChildRequest.FromXml(requestMessage);
             return ProcessEvaluateChildRequest(evaluateChildRequest);
         }
         case MessageKind::evaluateRequest:
         {
-            EvaluateRequest evaluateRequest(requestMessage);
+            EvaluateRequest evaluateRequest;
+            evaluateRequest.FromXml(requestMessage);
             return ProcessEvaluateRequest(evaluateRequest);
         }
         default:
@@ -476,13 +490,17 @@ void ServerDebugger::ProcessReceivedClientChannelMessage(Element* message)
 void ServerDebugger::ProcessTargetRunningReply(Element* message)
 {
     std::lock_guard<std::mutex> lock(targetIOMutex);
-    targetRunningReply = TargetRunningReply(message);
+    TargetRunningReply reply;
+    reply.FromXml(message);
+    targetRunningReply = reply;
 }
 
 void ServerDebugger::ProcessTargetInputReply(Element* message)
 {
     std::lock_guard<std::mutex> lock(targetIOMutex);
-    targetInputReply = TargetInputReply(message);
+    TargetInputReply reply;
+    reply.FromXml(message);
+    targetInputReply = reply;
     targetInputReplyReceived = true;
     targetInputReplyReceivedVar.notify_one();
 }
@@ -490,7 +508,9 @@ void ServerDebugger::ProcessTargetInputReply(Element* message)
 void ServerDebugger::ProcessTargetOutputReply(Element* message)
 {
     std::lock_guard<std::mutex> lock(targetIOMutex);
-    targetOutputReply = TargetOutputReply(message);
+    TargetOutputReply reply;
+    reply.FromXml(message);
+    targetOutputReply = reply;
     targetOutputReplyReceived = true;
     targetOutputReplyReceivedVar.notify_one();
 }

@@ -12,6 +12,24 @@ Node::~Node()
 {
 }
 
+IncludeDirectiveNode::IncludeDirectiveNode(const std::string& fileTag_, const std::string& filePath_) : fileTag(fileTag_), filePath(filePath_)
+{
+}
+
+void IncludeDirectiveNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+ForwardClassDeclarationNode::ForwardClassDeclarationNode(const std::string& classId_) : classId(classId_)
+{
+}
+
+void ForwardClassDeclarationNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 void BoolNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
@@ -154,6 +172,15 @@ void ArrayNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+TemplateIdNode::TemplateIdNode(const std::string& typeId_, const std::string& typeParamId_) : typeId(typeId_), typeParamId(typeParamId_)
+{
+}
+
+void TemplateIdNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 MemberVariableNode::MemberVariableNode(TypeNode* type_, const std::string& id_) : type(type_), id(id_)
 {
 }
@@ -202,7 +229,12 @@ void ClassNode::SetBaseClassId(const std::string& baseClassId_)
 
 void ClassNode::AddMemberVariable(MemberVariableNode* memberVariable)
 {
-    memberVariables.push_back(std::unique_ptr<MemberVariableNode>(memberVariable));
+    nodes.push_back(std::unique_ptr<Node>(memberVariable));
+}
+
+void ClassNode::AddCppBlock(CppBlockNode* cppBlock)
+{
+    nodes.push_back(std::unique_ptr<Node>(cppBlock));
 }
 
 EnumConstantNode::EnumConstantNode(const std::string& id_) : id(id_)
@@ -237,14 +269,23 @@ NamespaceNode* SourceFileNode::GlobalNs()
     return &globalNs;
 }
 
+CppBlockNode::CppBlockNode(const std::string& cppText_) : cppText(cppText_), source(false)
+{
+}
+
+void CppBlockNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 void SourceFileNode::Accept(Visitor& visitor)
 {
     visitor.Visit(*this);
 }
 
-void SourceFileNode::AddInclude(const std::string& includeDir)
+void SourceFileNode::AddIncludeDirective(IncludeDirectiveNode* includeDirectiveNode)
 {
-    includeDirs.push_back(includeDir);
+    includeDirectives.push_back(std::unique_ptr<IncludeDirectiveNode>(includeDirectiveNode));
 }
 
 } } // namespace sngxml::xmlser

@@ -230,7 +230,8 @@ void BuildService::SendReceiveKeepAlive()
         {
             throw std::runtime_error("keepAliveBuildReply expected");
         }
-        KeepAliveBuildReply reply(replyDoc->DocumentElement());
+        KeepAliveBuildReply reply;
+        reply.FromXml(replyDoc->DocumentElement());
     }
     catch (const std::exception& ex)
     {
@@ -355,7 +356,8 @@ void BuildService::ProcessBuildRequest(BuildRequest& buildRequest)
     std::string message = ToUtf8(messageDoc->DocumentElement()->Name());
     while (message == "logBuildMessageRequest")
     {
-        LogBuildMessageRequest logBuildMessageRequest(messageDoc->DocumentElement());
+        LogBuildMessageRequest logBuildMessageRequest;
+        logBuildMessageRequest.FromXml(messageDoc->DocumentElement());
         PutOutputServiceMessage(logBuildMessageRequest.message);
         LogBuildMessageReply logBuildMessageReply;
         logBuildMessageReply.ok = true;
@@ -373,12 +375,14 @@ void BuildService::ProcessBuildRequest(BuildRequest& buildRequest)
     }
     if (message == "buildReply")
     {
-        BuildReply buildReply(messageDoc->DocumentElement());
+        BuildReply buildReply;
+        buildReply.FromXml(messageDoc->DocumentElement());
         PutServiceMessage(new BuildReplyServiceMessage(buildReply));
     }
     else if (message == "genericBuildErrorReply")
     {
-        GenericBuildErrorReply errorReply(messageDoc->DocumentElement());
+        GenericBuildErrorReply errorReply;
+        errorReply.FromXml(messageDoc->DocumentElement());
         throw std::runtime_error("generic build error received: " + errorReply.error);
     }
     else
@@ -403,7 +407,8 @@ void BuildService::ProcessGetDefinitionRequest(GetDefinitionRequest& getDefiniti
     std::string message = ToUtf8(messageDoc->DocumentElement()->Name());
     if (message == "getDefinitionReply")
     {
-        GetDefinitionReply reply(messageDoc->DocumentElement());
+        GetDefinitionReply reply;
+        reply.FromXml(messageDoc->DocumentElement());
         PutServiceMessage(new GetDefinitionReplyServiceMessage(reply));
     }
     else

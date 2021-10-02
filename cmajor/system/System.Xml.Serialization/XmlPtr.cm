@@ -65,26 +65,7 @@ namespace System.Xml.Serialization
         }
         public explicit nothrow XmlPtr(T* ptr_) : base(), ptr(ptr_)
         {
-        }
-        public nothrow XmlPtr(const Self& that) : ptr(that.ptr)
-        {
             SetId();
-        }
-        public nothrow XmlPtr(Self&& that) : ptr(that.ptr)
-        {
-            that.ptr = null;
-            SetId();
-        }
-        public nothrow void operator=(const Self& that)
-        {
-            ptr = that.ptr;
-            SetId();
-        }
-        public nothrow void operator=(Self&& that)
-        {
-            Swap(ptr, that.ptr);
-            SetId();
-            that.SetId();
         }
         public nothrow void operator=(T* ptr_)
         {
@@ -179,23 +160,12 @@ namespace System.Xml.Serialization
             SetId();
         }
         suppress UniqueXmlPtr(const Self&);
-        public nothrow UniqueXmlPtr(Self&& that) : ptr(Rvalue(that.ptr))
-        {
-            SetId();
-            that.SetId();
-        }
         public nothrow void operator=(T* ptr_)
         {
             ptr = ptr_;
             SetId();
         }
         suppress void operator=(const Self&);
-        public nothrow void operator=(Self&& that)
-        {
-            ptr = Rvalue(that.ptr);
-            SetId();
-            that.SetId();
-        }
         public nothrow void Reset()
         {
             ptr.Reset();
@@ -212,7 +182,9 @@ namespace System.Xml.Serialization
         }
         public inline nothrow T* Release()
         {
-            return ptr.Release();
+            T* p = ptr.Release();
+            SetId();
+            return p;
         }
         public inline nothrow bool IsNull() const
         {

@@ -247,31 +247,36 @@ void DebugService::ProcessMessage(sngxml::dom::Element* messageElement, DebugMes
     {
         case DebugMessageKind::targetRunningRequest:
         {
-            TargetRunningRequest targetRunningRequest(messageElement);
+            TargetRunningRequest targetRunningRequest;
+            targetRunningRequest.FromXml(messageElement);
             ProcessTargetRunningRequest(targetRunningRequest);
             break;
         }
         case DebugMessageKind::targetInputRequest:
         {
-            TargetInputRequest targetInputRequest(messageElement);
+            TargetInputRequest targetInputRequest;
+            targetInputRequest.FromXml(messageElement);
             ProcessTargetInputRequest(targetInputRequest);
             break;
         }
         case DebugMessageKind::targetOutputRequest:
         {
-            TargetOutputRequest targetOutputRequest(messageElement);
+            TargetOutputRequest targetOutputRequest;
+            targetOutputRequest.FromXml(messageElement);
             ProcessTargetOutputRequest(targetOutputRequest);
             break;
         }
         case DebugMessageKind::logDebugMessageRequest:
         {
-            LogDebugMessageRequest logDebugMessageRequest(messageElement);
+            LogDebugMessageRequest logDebugMessageRequest;
+            logDebugMessageRequest.FromXml(messageElement);
             ProcessLogDebugMessageRequest(logDebugMessageRequest);
             break;
         }
         case DebugMessageKind::genericDebugErrorReply:
         {
-            GenericDebugErrorReply genericDebugErrorReply(messageElement);
+            GenericDebugErrorReply genericDebugErrorReply;
+            genericDebugErrorReply.FromXml(messageElement);
             ProcessGenericDebugErrorReply(genericDebugErrorReply);
             break;
         }
@@ -614,7 +619,8 @@ void DebugService::RunStartRequest()
     std::unique_ptr<Element> requestElement = request.ToXml("startDebugRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::startDebugReply);
-    StartDebugReply reply(replyDoc->DocumentElement());
+    StartDebugReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     int n = std::min(reply.breakpointInfos.size(), breakpoints.size());
     for (int i = 0; i < n; ++i)
     {
@@ -630,7 +636,8 @@ void DebugService::RunStopRequest()
     std::unique_ptr<Element> requestElement = request.ToXml("stopDebugRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::stopDebugReply);
-    StopDebugReply reply(replyDoc->DocumentElement());
+    StopDebugReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     serverProcess->WaitForExit();
     stopped.notify_all();
     stop = true;
@@ -671,7 +678,8 @@ void DebugService::RunContinueRequest()
     std::unique_ptr<Element> requestElement = request.ToXml("continueRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::continueReply);
-    ContinueReply reply(replyDoc->DocumentElement());
+    ContinueReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new ContinueReplyServiceMessage(reply));
 }
 
@@ -682,7 +690,8 @@ void DebugService::RunStepRequest()
     std::unique_ptr<Element> requestElement = request.ToXml("stepRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::stepReply);
-    StepReply reply(replyDoc->DocumentElement());
+    StepReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new StepReplyServiceMessage(reply));
 }
 
@@ -693,7 +702,8 @@ void DebugService::RunNextRequest()
     std::unique_ptr<Element> requestElement = request.ToXml("nextRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::nextReply);
-    NextReply reply(replyDoc->DocumentElement());
+    NextReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new NextReplyServiceMessage(reply));
 }
 
@@ -704,7 +714,8 @@ void DebugService::RunFinishRequest()
     std::unique_ptr<Element> requestElement = request.ToXml("finishRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::finishReply);
-    FinishReply reply(replyDoc->DocumentElement());
+    FinishReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new FinishReplyServiceMessage(reply));
 }
 
@@ -716,7 +727,8 @@ void DebugService::RunUntilRequest(const SourceLoc& sourceLocation)
     std::unique_ptr<Element> requestElement = request.ToXml("untilRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::untilReply);
-    UntilReply reply(replyDoc->DocumentElement());
+    UntilReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new UntilReplyServiceMessage(reply));
 }
 
@@ -732,7 +744,8 @@ void DebugService::RunBreakRequest(Breakpoint* breakpoint)
     std::unique_ptr<Element> requestElement = request.ToXml("breakRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::breakReply);
-    BreakReply reply(replyDoc->DocumentElement());
+    BreakReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     breakpoint->info = reply.breakpointInfo;
     PutServiceMessage(new BreakReplyServiceMessage(reply));
 }
@@ -744,7 +757,8 @@ void DebugService::RunDeleteRequest(const std::string& breakpointId)
     std::unique_ptr<Element> requestElement = request.ToXml("deleteRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::deleteReply);
-    DeleteReply reply(replyDoc->DocumentElement());
+    DeleteReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new DeleteReplyServiceMessage(reply));
 }
 
@@ -754,7 +768,8 @@ void DebugService::RunDepthRequest()
     std::unique_ptr<Element> requestElement = request.ToXml("depthRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::depthReply);
-    DepthReply reply(replyDoc->DocumentElement());
+    DepthReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new DepthReplyServiceMessage(reply));
 }
 
@@ -766,7 +781,8 @@ void DebugService::RunFramesRequest(int lowFrame, int highFrame)
     std::unique_ptr<Element> requestElement = request.ToXml("framesRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::framesReply);
-    FramesReply reply(replyDoc->DocumentElement());
+    FramesReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new FramesReplyServiceMessage(reply));
 }
 
@@ -777,7 +793,8 @@ void DebugService::RunEvaluateRequest(const std::string& expression, int request
     std::unique_ptr<Element> requestElement = request.ToXml("evaluateRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::evaluateReply);
-    EvaluateReply reply(replyDoc->DocumentElement());
+    EvaluateReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new EvaluateReplyServiceMessage(reply, requestId));
 }
 
@@ -788,7 +805,8 @@ void DebugService::RunCountRequest(const std::string& expression)
     std::unique_ptr<Element> requestElement = request.ToXml("countRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::countReply);
-    CountReply reply(replyDoc->DocumentElement());
+    CountReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new CountReplyServiceMessage(reply));
 }
 
@@ -801,7 +819,8 @@ void DebugService::RunEvaluateChildRequest(const std::string& expression, int st
     std::unique_ptr<Element> requestElement = request.ToXml("evaluateChildRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply(DebugMessageKind::evaluateChildReply);
-    EvaluateChildReply reply(replyDoc->DocumentElement());
+    EvaluateChildReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new EvaluateChildReplyServiceMessage(reply));
 }
 
@@ -856,7 +875,8 @@ void DebugService::SendKillRequest()
         std::unique_ptr<sngxml::dom::Document> replyDoc = sngxml::dom::ParseDocument(ToUtf32(replyStr), "socket");
         if (replyDoc->DocumentElement()->Name() == U"killReply")
         {
-            KillReply killReply(replyDoc->DocumentElement());
+            KillReply killReply;
+            killReply.FromXml(replyDoc->DocumentElement());
             PutOutputServiceMessage("debug service: kill request sent to cmdb");
         }
     }

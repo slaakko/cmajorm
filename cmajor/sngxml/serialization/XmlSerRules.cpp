@@ -3,7 +3,9 @@
 std::vector<const char*> rules = {
 "XmlSerParser.SourceFile"
 , "XmlSerParser.IncludeDirective"
+, "XmlSerParser.FileTag"
 , "XmlSerParser.NamespaceContent"
+, "XmlSerParser.Declaration"
 , "XmlSerParser.Definition"
 , "XmlSerParser.Namespace"
 , "XmlSerParser.Class"
@@ -18,6 +20,8 @@ std::vector<const char*> rules = {
 , "XmlSerParser.Type"
 , "XmlSerParser.ScalarType"
 , "XmlSerParser.ClassType"
+, "XmlSerParser.TemplateType"
+, "XmlSerParser.CppBlock"
 };
 
 std::vector<const char*>* GetRuleNameVecPtr()

@@ -28,9 +28,9 @@ void DefaultVisitor::Visit(NamespaceNode& node)
 
 void DefaultVisitor::Visit(ClassNode& node)
 {
-    for (const std::unique_ptr<MemberVariableNode>& memberVariableNode : node.MemberVariables())
+    for (const std::unique_ptr<Node>& node: node.Nodes())
     {
-        memberVariableNode->Accept(*this);
+        node->Accept(*this);
     }
 }
 

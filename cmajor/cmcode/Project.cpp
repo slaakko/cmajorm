@@ -25,7 +25,8 @@ void ProjectData::Load(const std::string& projectSettingsFilePath)
     if (boost::filesystem::exists(projectSettingsFilePath))
     {
         std::unique_ptr<sngxml::dom::Document> projectSettingsDoc = sngxml::dom::ReadDocument(projectSettingsFilePath);
-        ProjectSettings projectSettings(projectSettingsDoc->DocumentElement());
+        ProjectSettings projectSettings;
+        projectSettings.FromXml(projectSettingsDoc->DocumentElement());
         programArguments = projectSettings.programArguments;
         for (const ProjectBreakpoint& breakpoint : projectSettings.breakpoints)
         {

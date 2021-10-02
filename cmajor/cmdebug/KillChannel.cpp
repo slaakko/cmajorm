@@ -81,7 +81,8 @@ void KillChannel::Run()
             std::unique_ptr<sngxml::dom::Document> requestDoc = sngxml::dom::ParseDocument(ToUtf32(requestStr), "socket");
             if (requestDoc->DocumentElement()->Name() == U"killRequest")
             {
-                KillRequest killRequest(requestDoc->DocumentElement());
+                KillRequest killRequest;
+                killRequest.FromXml(requestDoc->DocumentElement());
                 KillGdb();
                 KillReply killReply;
                 std::unique_ptr<sngxml::dom::Element> replyElement = killReply.ToXml("killReply");

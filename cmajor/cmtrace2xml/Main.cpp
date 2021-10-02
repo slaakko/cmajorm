@@ -9,6 +9,7 @@
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Trace.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
@@ -39,8 +40,23 @@ void PrintHelp()
     std::cout << "  Filter trace using given filter expression." << std::endl;
 }
 
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        soulng::unicode::CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, const char** argv)
 {
+    if (!CheckCmajorRootEnv()) return 1;
     InitDone initDone;
     try
     {

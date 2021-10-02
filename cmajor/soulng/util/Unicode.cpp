@@ -33,7 +33,7 @@ std::string CmajorRoot()
     }
     if (cmajorRoot.empty())
     {
-        throw UnicodeException("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor-" + CmajorVersionStr() + " directory.");
+        throw UnicodeException("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory.");
     }
     return cmajorRoot;
 }

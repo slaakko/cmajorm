@@ -10,6 +10,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/nil_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace sngxml { namespace xmlser {
 
@@ -97,16 +98,7 @@ char32_t ParseUChar(const std::string& str)
 
 boost::uuids::uuid ParseUuid(const std::string& str)
 {
-    if (str.length() != boost::uuids::uuid::static_size() * 2) throw std::runtime_error("cannot parse uuid from string '" + str + "'");
-    boost::uuids::uuid x = boost::uuids::nil_uuid();
-    for (boost::uuids::uuid::size_type i = 0; i < boost::uuids::uuid::static_size(); ++i)
-    {
-        std::string s;
-        s.append(1, str[2 * i]);
-        s.append(1, str[2 * i + 1]);
-        x.data[i] = ParseHexByte(s);
-    }
-    return x;
+    return boost::lexical_cast<boost::uuids::uuid>(str);
 }
 
 date ParseDate(const std::string& str)

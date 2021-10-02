@@ -261,7 +261,8 @@ void CodeCompletionService::SendReceiveKeepAlive()
         {
             throw std::runtime_error("keepAliveCCReply expected");
         }
-        KeepAliveCCReply reply(replyDoc->DocumentElement());
+        KeepAliveCCReply reply;
+        reply.FromXml(replyDoc->DocumentElement());
     }
     catch (const std::exception& ex)
     {
@@ -497,7 +498,8 @@ void CodeCompletionService::LoadEditModule(const std::string& projectFilePath, c
     std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("loadEditModuleRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("loadEditModuleReply");
-    LoadEditModuleReply reply(replyDoc->DocumentElement());
+    LoadEditModuleReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new LoadEditModuleReplyServiceMessage(reply));
 }
 
@@ -507,7 +509,8 @@ void CodeCompletionService::ResetEditModuleCache()
     std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("resetEditModuleCacheRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("resetEditModuleCacheReply");
-    ResetEditModuleCacheReply reply(replyDoc->DocumentElement());
+    ResetEditModuleCacheReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new ResetEditModuleCacheReplyServiceMessage(reply));
 }
 
@@ -522,7 +525,8 @@ void CodeCompletionService::ParseSource(const std::string& projectFilePath, cons
     std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("parseSourceRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("parseSourceReply");
-    ParseSourceReply reply(replyDoc->DocumentElement());
+    ParseSourceReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new ParseSourceReplyServiceMessage(reply));
 }
 
@@ -540,7 +544,8 @@ void CodeCompletionService::GetCCList(const std::string& projectFilePath, const 
     std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("getCCListRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("getCCListReply");
-    GetCCListReply reply(replyDoc->DocumentElement());
+    GetCCListReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new GetCCListReplyServiceMessage(reply));
 }
 
@@ -555,7 +560,8 @@ void CodeCompletionService::GetParamHelpList(const std::string& projectFilePath,
     std::unique_ptr<sngxml::dom::Element> requestElement = request.ToXml("getParamHelpListRequest");
     WriteMessage(requestElement.release());
     std::unique_ptr<sngxml::dom::Document> replyDoc = ReadReply("getParamHelpListReply");
-    GetParamHelpListReply reply(replyDoc->DocumentElement());
+    GetParamHelpListReply reply;
+    reply.FromXml(replyDoc->DocumentElement());
     PutServiceMessage(new GetParamHelpListReplyServiceMessage(reply));
 }
 

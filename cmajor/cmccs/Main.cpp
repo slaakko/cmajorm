@@ -1,12 +1,16 @@
 #include <cmajor/cmccs/CodeCompletionServer.hpp>
 #include <cmajor/cmccs/KeepAliveServer.hpp>
+#include <cmajor/cmmsg/Register.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <sngcm/ast/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
+#include <sngxml/serialization/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
+#include <cmajor/cmpm/Register.hpp>
 #include <cmajor/cmpm/PortMapClient.hpp>
 #include <soulng/util/Process.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <stdexcept>
@@ -66,11 +70,15 @@ struct InitDone
         sngcm::ast::Init();
         cmajor::symbols::Init();
         sngxml::xpath::Init();
+        sngxml::xmlser::Init();
+        cmpm::Register();
+        cmmsg::Register();
         cmajor::cmpm::InitPortMapClient();
     }
     ~InitDone()
     {
         cmajor::cmpm::DonePortMapClient();
+        sngxml::xmlser::Done();
         sngxml::xpath::Done();
         cmajor::symbols::Done();
         sngcm::ast::Done();
@@ -104,8 +112,23 @@ void PrintHelp()
     std::cout << std::endl;
 }
 
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        soulng::unicode::CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, const char** argv)
 {
+    if (!CheckCmajorRootEnv()) return 1;
     InitDone initDone;
     std::condition_variable exitVar;
     bool exiting = false;

@@ -38,9 +38,13 @@ class ArrayNode;
 class MemberVariableNode;
 class NamespaceNode;
 class ClassNode;
+class TemplateIdNode;
 class EnumTypeNode;
 class EnumConstantNode;
 class SourceFileNode;
+class ForwardClassDeclarationNode;
+class IncludeDirectiveNode;
+class CppBlockNode;
 
 class Visitor
 {
@@ -75,9 +79,13 @@ public:
     virtual void Visit(MemberVariableNode& node) {}
     virtual void Visit(NamespaceNode& node) {}
     virtual void Visit(ClassNode& node) {}
+    virtual void Visit(TemplateIdNode& node) {}
     virtual void Visit(EnumTypeNode& node) {}
     virtual void Visit(EnumConstantNode& node) {}
     virtual void Visit(SourceFileNode& node) {}
+    virtual void Visit(ForwardClassDeclarationNode& node) {}
+    virtual void Visit(IncludeDirectiveNode& node) {}
+    virtual void Visit(CppBlockNode& node) {}
 };
 
 class DefaultVisitor : public Visitor

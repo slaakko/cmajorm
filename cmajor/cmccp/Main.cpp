@@ -2,6 +2,7 @@
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/EditModuleCache.hpp>
 #include <cmajor/symbols/Scope.hpp>
+#include <sngxml/serialization/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <sngcm/ast/InitDone.hpp>
 #include <cmajor/build/Build.hpp>
@@ -28,6 +29,7 @@ struct InitDone
     {
         soulng::util::Init();
         sngxml::xpath::Init();
+        sngxml::xmlser::Init();
         sngcm::ast::Init();
         cmajor::symbols::Init();
         cmajor::build::Init();
@@ -38,6 +40,7 @@ struct InitDone
         cmajor::symbols::Done();
         sngcm::ast::Done();
         sngxml::xpath::Done();
+        sngxml::xmlser::Done();
         soulng::util::Done();
     }
 };
@@ -53,8 +56,23 @@ void PrintHelp()
 
 }
 
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, const char** argv)
 {
+    if (!CheckCmajorRootEnv()) return 1;
     InitDone initDone;
     SetReadProjectFunction(cmajor::build::ReadProject);
     SetTypeBindingFunction(cmajor::binder::BindTypes);

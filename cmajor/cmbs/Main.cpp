@@ -6,6 +6,7 @@
 #include <cmajor/cmbs/BuildServer.hpp>
 #include <cmajor/cmbs/BuildClient.hpp>
 #include <cmajor/cmbs/KeepAliveServer.hpp>
+#include <cmajor/cmmsg/Register.hpp>
 #include <cmajor/cmpm/PortMapClient.hpp>
 #include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
@@ -23,6 +24,7 @@
 #ifdef _WIN32
 #include <cmajor/cmres/InitDone.hpp>
 #endif
+#include <sngxml/serialization/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <soulng/util/LogFileWriter.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -44,10 +46,12 @@ struct InitDone
         sngcm::ast::Init();
         cmajor::symbols::Init();
         sngxml::xpath::Init();
+        sngxml::xmlser::Init();
 #ifdef _WIN32
         cmajor::resources::Init();
 #endif
         cmajor::cmpm::InitPortMapClient();
+        cmmsg::Register();
     }
     ~InitDone()
     {
@@ -55,6 +59,7 @@ struct InitDone
 #ifdef _WIN32
         cmajor::resources::Done();
 #endif
+        sngxml::xmlser::Done();
         sngxml::xpath::Done();
         cmajor::symbols::Done();
         sngcm::ast::Done();
@@ -141,8 +146,23 @@ struct PortMapClientRun
 
 std::mutex mtx;
 
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, const char** argv)
 {
+    if (!CheckCmajorRootEnv()) return 1;
     InitDone initDone;
     #ifdef TRACE    
     soulng::util::BeginTracing();

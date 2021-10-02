@@ -13,28 +13,38 @@
 
 namespace sngxml { namespace xmlser {
 
-class SNGXML_SERIALIZATION_API XmlFactory
+using FactoryFunction = void* (*)();
+
+class XmlSerializable;
+
+struct  SNGXML_SERIALIZATION_API XmlSerializableExtractor
 {
-public:
-    XmlFactory(const std::string& className_);
-    virtual ~XmlFactory();
-    virtual void* Create(sngxml::dom::Element* element) = 0;
-    const std::string& ClassName() const { return className; }
-private:
-    std::string className;
+    virtual ~XmlSerializableExtractor();
+    virtual XmlSerializable* ExtractXmlSerializable(void* object) const = 0;
 };
 
 template<class T>
-class XmlClassFactory : public XmlFactory
+struct ConcreteXmlSerializableExtractor : public XmlSerializableExtractor
 {
-public:
-    using XmlSerializableClassType = T;
-    XmlClassFactory(const std::string& className) : XmlFactory(className) {}
-    void* Create(sngxml::dom::Element* element) override
+    XmlSerializable* ExtractXmlSerializable(void* object) const override
     {
-        return new XmlSerializableClassType(element);
+        T* t = static_cast<T*>(object);
+        if (XmlSerializable* serializable = dynamic_cast<XmlSerializable*>(t))
+        {
+            return serializable;
+        }
+        else
+        {
+            throw std::runtime_error("ConcreteXmlSerializableExtractor: XmlSerializable expected");
+        }
     }
 };
+
+template<class T>
+inline XmlSerializableExtractor* MakeXmlSerializableExtractor()
+{
+    return new ConcreteXmlSerializableExtractor<T>();
+}
 
 class SNGXML_SERIALIZATION_API XmlClassRegistry
 {
@@ -46,23 +56,24 @@ public:
     static void Init();
     static void Done();
     static XmlClassRegistry& Instance() { return *instance; }
-    void Register(XmlFactory* factory);
-    void* Create(sngxml::dom::Element* element);
+    void Register(int classId, FactoryFunction factoryFunction, sngxml::xmlser::XmlSerializableExtractor* extractor);
+    XmlSerializable* CreateXmlSerializable(int classId) const;
+    void* Create(int classId) const;
 private:
     static std::unique_ptr<XmlClassRegistry> instance;
-    std::vector<std::unique_ptr<XmlFactory>> factories;
-    std::unordered_map<std::string, XmlFactory*> factoryMap;
+    std::map<int, FactoryFunction> factoryMap;
+    std::map<int, XmlSerializableExtractor*> extractorMap;
+    std::vector<std::unique_ptr<XmlSerializableExtractor>> extractors;
     XmlClassRegistry();
 };
 
 SNGXML_SERIALIZATION_API void XmlClassRegistryInit();
 SNGXML_SERIALIZATION_API void XmlClassRegistryDone();
 
-template<class T>
-void RegisterXmlClass()
+template<typename T>
+void XmlRegister(int classId, FactoryFunction factoryFunction)
 {
-    std::string className = MakeClassNameStr(typeid(T).name());
-    XmlClassRegistry::Instance().Register(new XmlClassFactory<T>(className));
+    XmlClassRegistry::Instance().Register(classId, factoryFunction, MakeXmlSerializableExtractor<T>());
 }
 
 } } // namespace sngxml::xmlser

@@ -1,5 +1,7 @@
 #include <cmajor/cmpm/InitDone.hpp>
 #include <cmajor/cmpm/PortMapServer.hpp>
+#include <cmajor/cmpm/Register.hpp>
+#include <sngxml/serialization/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -15,10 +17,13 @@ struct InitDone
     {
         soulng::util::Init();
         sngxml::xpath::Init();
+        sngxml::xmlser::Init();
+        cmpm::Register();
         cmajor::cmpm::Init();
     }
     ~InitDone()
     {
+        sngxml::xmlser::Done();
         cmajor::cmpm::Done();
         sngxml::xpath::Done();
         soulng::util::Done();

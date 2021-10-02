@@ -143,7 +143,8 @@ void KeepAliveServer::Run()
             std::string message = GetMessage(requestDoc->DocumentElement());
             if (message == "keepAliveBuildRequest")
             {
-                KeepAliveBuildRequest request(requestDoc->DocumentElement());
+                KeepAliveBuildRequest request;
+                request.FromXml(requestDoc->DocumentElement());
                 KeepAliveBuildReply reply = ProcessKeepAliveRequest(request);
                 std::unique_ptr<Element> replyElement = reply.ToXml("keepAliveBuildReply");
                 std::string replyStr = ElementToString(replyElement.release());

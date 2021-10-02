@@ -7,6 +7,7 @@
 [hpp]#include <sngxml/serialization/XmlSerAst.hpp>
 [cpp]#include <sngxml/serialization/XmlSerTokens.hpp>
 [cpp]#include <sngxml/serialization/XmlSerAst.hpp>
+[cpp]#include <sngxml/serialization/XmlSerScan.hpp>
 
 using namespace XmlSerTokens;
 
@@ -20,7 +21,7 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
     SourceFile(var std::unique_ptr<sngxml::xmlser::SourceFileNode> sourceFile) : sngxml::xmlser::SourceFileNode*
         ::= (empty{ sourceFile.reset(new sngxml::xmlser::SourceFileNode()); } 
             empty{ lexer.parsingIncludeDeclaration = true; } 
-            (IncludeDirective:id{ sourceFile->AddInclude(id); })*
+            (IncludeDirective:includeDirective{ sourceFile->AddIncludeDirective(includeDirective); })*
             empty{ lexer.parsingIncludeDeclaration = false; } 
             NamespaceContent(sourceFile->GlobalNs()):nsContent)
         {
@@ -28,18 +29,27 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
         }
         ;
 
-    IncludeDirective : std::string
-        ::= HASH INCLUDE FILEPATH{ return ToUtf8(lexer.GetMatch(span)); }
+    IncludeDirective(var std::string fileTag) : sngxml::xmlser::IncludeDirectiveNode*
+        ::= (FileTag:tag{ fileTag = tag; })? HASH INCLUDE FILEPATH{ return new sngxml::xmlser::IncludeDirectiveNode(fileTag, ToUtf8(lexer.GetMatch(span))); }
+        ;
+
+    FileTag(var std::string fileTag) : std::string
+        ::= (LBRACKET ID{ fileTag = ToUtf8(lexer.GetMatch(span)); } RBRACKET){ return fileTag; }
         ;
 
     NamespaceContent(sngxml::xmlser::NamespaceNode* ownerNs)
-        ::= (Definition:definition{ ownerNs->AddNode(definition); })*
+        ::= (Declaration:declaration{ ownerNs->AddNode(declaration); } | Definition:definition{ ownerNs->AddNode(definition); })*
+        ;
+
+    Declaration(var std::string classId) : sngxml::xmlser::Node*
+        ::= (CLASS ID{ classId = ToUtf8(lexer.GetMatch(span)); } SEMICOLON){ return new sngxml::xmlser::ForwardClassDeclarationNode(classId); }
         ;
         
-    Definition : sngxml::xmlser::Node*
+    Definition(var std::unique_ptr<sngxml::xmlser::CppBlockNode> cppBlockNode) : sngxml::xmlser::Node*
         ::= Class:cls{ return cls;}
         |   Enum:enm{ return enm; }
         |   Namespace:ns{ return ns; }
+        |   CppBlock:cppBlock{ cppBlockNode.reset(cppBlock); cppBlockNode->SetSource(); return cppBlockNode.release(); }
         ;
 
     Namespace(var std::unique_ptr<sngxml::xmlser::NamespaceNode> ns) : sngxml::xmlser::NamespaceNode*
@@ -72,7 +82,7 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
         ;
 
     ClassContent(sngxml::xmlser::ClassNode* classNode)
-        ::= (MemberVariable:memberVariable{ classNode->AddMemberVariable(memberVariable); })*
+        ::= (MemberVariable:memberVariable{ classNode->AddMemberVariable(memberVariable); } | CppBlock:cppBlock{ classNode->AddCppBlock(cppBlock); })*
         ;
 
     MemberVariable(var std::string memberVarId) : sngxml::xmlser::MemberVariableNode*
@@ -102,7 +112,7 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
         ;
 
     Type(var std::unique_ptr<sngxml::xmlser::TypeNode> typeNode) : sngxml::xmlser::TypeNode*
-        ::= ((ScalarType:scalarType{ typeNode.reset(scalarType); } | ClassType:classType{ typeNode.reset(classType); } 
+        ::= (((ScalarType:scalarType{ typeNode.reset(scalarType); } | TemplateType:templateType{ typeNode.reset(templateType); } | ClassType:classType{ typeNode.reset(classType); })
             (AST{ typeNode.reset(new sngxml::xmlser::PointerNode(typeNode.release())); })?) 
             (LBRACKET RBRACKET{ typeNode.reset(new sngxml::xmlser::ArrayNode(typeNode.release())); })?)
         {
@@ -138,5 +148,13 @@ parser api(SNGXML_SERIALIZATION_API) XmlSerParser
 
     ClassType : sngxml::xmlser::TypeNode*
         ::= ID{ return new sngxml::xmlser::ClassIdNode(ToUtf8(lexer.GetMatch(span))); }
+        ;
+
+    TemplateType(var std::string typeId, var std::string typeParamId) : sngxml::xmlser::TypeNode*
+        ::= ID{ typeId = ToUtf8(lexer.GetMatch(span)); } LANGLE ID{ typeParamId = ToUtf8(lexer.GetMatch(span)); } RANGLE{ return new sngxml::xmlser::TemplateIdNode(typeId, typeParamId); }
+        ;
+
+    CppBlock(var std::string cppText) : sngxml::xmlser::CppBlockNode*
+        ::= STARTCPP{ cppText = sngxml::xmlser::ScanEndCpp(lexer); return new sngxml::xmlser::CppBlockNode(cppText); } 
         ;
 }

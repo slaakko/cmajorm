@@ -47,10 +47,14 @@ namespace XmlSerTokens
     const int LPAREN = 36;
     const int RPAREN = 37;
     const int COMMA = 38;
-    const int HASH = 39;
-    const int INCLUDE = 40;
-    const int FILEPATH = 41;
-    const int NAMESPACE = 42;
+    const int STARTCPP = 39;
+    const int ENDCPP = 40;
+    const int LANGLE = 41;
+    const int RANGLE = 42;
+    const int HASH = 43;
+    const int INCLUDE = 44;
+    const int FILEPATH = 45;
+    const int NAMESPACE = 46;
 
     SNGXML_SERIALIZATION_API void InitTokenIdMap();
     SNGXML_SERIALIZATION_API int GetTokenId(const std::u32string& tokenName);

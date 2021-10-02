@@ -99,7 +99,10 @@ void PortMapClient::ExtendPortLease()
         std::unique_ptr<sngxml::dom::Document> replyDoc = sngxml::dom::ParseDocument(ToUtf32(replyStr), "socket");
         sngxml::dom::Element* replyElement = replyDoc->DocumentElement();
         if (replyElement->Name() == U"extendPortLeaseReply")
-        ExtendPortLeaseReply reply(replyElement);
+        {
+            ExtendPortLeaseReply reply;
+            reply.FromXml(replyElement);
+        }
     }
     catch (...)
     {

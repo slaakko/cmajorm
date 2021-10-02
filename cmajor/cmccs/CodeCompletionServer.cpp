@@ -193,32 +193,38 @@ std::unique_ptr<CodeCompletionReply> CodeCompletionServer::HandleRequest(sngxml:
         {
             case CodeCompletionRequestKind::loadEditModuleRequest:
             {
-                LoadEditModuleRequest request(requestElement);
+                LoadEditModuleRequest request;
+                request.FromXml(requestElement);
                 return HandleRequest(request, rootElementName);
             }
             case CodeCompletionRequestKind::resetEditModuleCacheRequest:
             {
-                ResetEditModuleCacheRequest request(requestElement);
+                ResetEditModuleCacheRequest request;
+                request.FromXml(requestElement);
                 return HandleRequest(request, rootElementName);
             }
             case CodeCompletionRequestKind::parseSourceRequest:
             {
-                ParseSourceRequest request(requestElement);
+                ParseSourceRequest request;
+                request.FromXml(requestElement);
                 return HandleRequest(request, rootElementName);
             }
             case CodeCompletionRequestKind::getCCListRequest:
             {
-                GetCCListRequest request(requestElement);
+                GetCCListRequest request;
+                request.FromXml(requestElement);
                 return HandleRequest(request, rootElementName);
             }
             case CodeCompletionRequestKind::getParamHelpListRequest:
             {
-                GetParamHelpListRequest request(requestElement);
+                GetParamHelpListRequest request;
+                request.FromXml(requestElement);
                 return HandleRequest(request, rootElementName);
             }
             case CodeCompletionRequestKind::stopRequest:
             {
-                StopCCRequest request(requestElement);
+                StopCCRequest request;
+                request.FromXml(requestElement);
                 return HandleRequest(request, rootElementName);
             }
             default:

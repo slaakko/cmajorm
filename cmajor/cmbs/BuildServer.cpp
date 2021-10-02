@@ -258,7 +258,8 @@ void BuildServer::Run()
                     CodeFormatter formatter(writer.LogFile());
                     requestDoc->Write(formatter);
                 }
-                BuildRequest buildRequest(requestDoc->DocumentElement());
+                BuildRequest buildRequest;
+                buildRequest.FromXml(requestDoc->DocumentElement());
                 BuildReply buildReply = ProcessBuildRequest(buildRequest, &writer);
                 std::unique_ptr<Element> replyElement = buildReply.ToXml("buildReply");
                 Document replyDoc; 
@@ -283,7 +284,8 @@ void BuildServer::Run()
                     CodeFormatter formatter(writer.LogFile());
                     requestDoc->Write(formatter);
                 }
-                CacheModuleRequest cacheModuleRequest(requestDoc->DocumentElement());
+                CacheModuleRequest cacheModuleRequest;
+                cacheModuleRequest.FromXml(requestDoc->DocumentElement());
                 CacheModuleReply cacheModuleReply = ProcessCacheModuleRequest(cacheModuleRequest);
                 std::unique_ptr<Element> replyElement = cacheModuleReply.ToXml("cacheModuleReply");
                 Document replyDoc;
@@ -308,7 +310,8 @@ void BuildServer::Run()
                     CodeFormatter formatter(writer.LogFile());
                     requestDoc->Write(formatter);
                 }
-                GetDefinitionRequest getDefinitionRequest(requestDoc->DocumentElement());
+                GetDefinitionRequest getDefinitionRequest;
+                getDefinitionRequest.FromXml(requestDoc->DocumentElement());
                 GetDefinitionReply getDefinitionReply = ProcessGetDefinitionRequest(getDefinitionRequest);
                 std::unique_ptr<Element> replyElement = getDefinitionReply.ToXml("getDefinitionReply");
                 Document replyDoc;
@@ -1114,7 +1117,8 @@ void BuildServer::RunLog()
         std::string messageKind = GetMessageKind(logReply->DocumentElement());
         if (messageKind == "logBuildMessageReply")
         {
-            LogBuildMessageReply logBuildMessageReply(logReply->DocumentElement());
+            LogBuildMessageReply logBuildMessageReply;
+            logBuildMessageReply.FromXml(logReply->DocumentElement());
             if (!logBuildMessageReply.ok)
             {
                 throw std::runtime_error("log message refused by client");

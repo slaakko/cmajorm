@@ -7,6 +7,7 @@
 #include <cmajor/build/InitDone.hpp>
 #include <sngcm/ast/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
+#include <sngxml/serialization/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -64,6 +65,7 @@ struct InitDone
         soulng::util::Init();
         sngcm::ast::Init();
         sngxml::xpath::Init();
+        sngxml::xmlser::Init();
         cmajor::symbols::Init();
         cmajor::build::Init();
     }
@@ -71,6 +73,7 @@ struct InitDone
     {
         cmajor::build::Done();
         cmajor::symbols::Done();
+        sngxml::xmlser::Done();
         sngxml::xpath::Done();
         sngcm::ast::Done();
         soulng::util::Done();
@@ -138,8 +141,23 @@ void PrintHelp()
     std::cout << "  Show configuration." << std::endl;
 }
 
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        soulng::unicode::CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, const char** argv)
 {
+    if (!CheckCmajorRootEnv()) return 1;
     InitDone initDone;
     try
     {

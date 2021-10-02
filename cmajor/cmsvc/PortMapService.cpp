@@ -175,7 +175,8 @@ int GetFreePortNumber(const std::string& processName)
                     std::string message = GetMessage(replyDoc->DocumentElement());
                     if (message == "getFreePortNumberReply")
                     {
-                        GetFreePortNumberReply reply(replyDoc->DocumentElement());
+                        GetFreePortNumberReply reply;
+                        reply.FromXml(replyDoc->DocumentElement());
                         int freePortNumber = reply.portNumber;
                         return freePortNumber;
                     }
@@ -240,7 +241,8 @@ bool IsPortMapServerRunning()
         std::string message = GetMessage(replyDoc->DocumentElement());
         if (message == "helloPmsReply")
         {
-            HelloPmsReply reply(replyDoc->DocumentElement());
+            HelloPmsReply reply;
+            reply.FromXml(replyDoc->DocumentElement());
             PutOutputServiceMessage("port map server (cmpms) version " + reply.version + " running");
             return true;
         }
@@ -285,7 +287,8 @@ std::vector<PortLease> GetPortLeases()
         std::string message = GetMessage(replyDoc->DocumentElement());
         if (message == "viewPortLeaseReply")
         {
-            ViewPortLeaseReply reply(replyDoc->DocumentElement());
+            ViewPortLeaseReply reply;
+            reply.FromXml(replyDoc->DocumentElement());
             return reply.portLeases;
         }
         else

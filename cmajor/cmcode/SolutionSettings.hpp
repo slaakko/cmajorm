@@ -1,39 +1,70 @@
 #ifndef SOLUTIONSETTINGS_HPP_CBFFFB300F3FB8B5357239390EFF01476489416B
 #define SOLUTIONSETTINGS_HPP_CBFFFB300F3FB8B5357239390EFF01476489416B
-#include <sngxml/dom/Element.hpp>
+#include <sngxml/serialization/XmlPtr.hpp>
 #include <soulng/util/Time.hpp>
-#include <boost/uuid/uuid.hpp>
 #include <chrono>
-#include <vector>
-#include <string>
 #include <memory>
 #include <stdint.h>
 
 using date = soulng::util::Date;
 using datetime = soulng::util::DateTime;
+using timestamp = soulng::util::Timestamp;
 using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
+template<class T> using xml_ptr = sngxml::xmlser::XmlPtr<T>;
+template<class T> using unique_xml_ptr = sngxml::xmlser::UniqueXmlPtr<T>;
 
-class SolutionBreakpoint
+class SolutionBreakpoint : public sngxml::xmlser::XmlSerializable
 {
 public:
     SolutionBreakpoint();
-    SolutionBreakpoint(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~SolutionBreakpoint();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string file;
     int32_t line;
     std::string condition;
     bool disabled;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class SolutionSettings
+class SolutionSettings : public sngxml::xmlser::XmlSerializable
 {
 public:
     SolutionSettings();
-    SolutionSettings(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~SolutionSettings();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     bool callStackOpen;
     bool localsViewOpen;
@@ -42,6 +73,11 @@ public:
     int32_t currentCursorLine;
     std::vector<SolutionBreakpoint> breakpoints;
     std::vector<std::string> expandedProjects;
+    void* dataPtr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
 #endif // SOLUTIONSETTINGS_HPP_CBFFFB300F3FB8B5357239390EFF01476489416B

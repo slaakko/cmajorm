@@ -91,7 +91,8 @@ void KeepAliveServer::Run()
             {
                 throw std::runtime_error("unknown request kind received");
             }
-            KeepAliveCCRequest keepAliveRequest(requestDoc->DocumentElement());
+            KeepAliveCCRequest keepAliveRequest;
+            keepAliveRequest.FromXml(requestDoc->DocumentElement());
             keepAliveReceivedTimePoint = std::chrono::steady_clock::now();
             KeepAliveCCReply keepAliveReply;
             sngxml::dom::Document replyDoc;

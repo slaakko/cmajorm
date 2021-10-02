@@ -1,79 +1,231 @@
 #include "test.hpp"
+#include <boost/uuid/nil_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <sngxml/serialization/XmlExport.hpp>
 #include <sngxml/serialization/XmlImport.hpp>
 #include <soulng/util/Unicode.hpp>
 
 using namespace soulng::unicode;
 
-Nonpolymorphic::Nonpolymorphic()
-    : member()
+int SimpleClass::classId = -1;
+
+SimpleClass::SimpleClass()
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), member(), ptr(nullptr)
 {
 }
 
-Nonpolymorphic::Nonpolymorphic(sngxml::dom::Element* element)
-    : member()
+void* SimpleClass::Create()
 {
+    return new SimpleClass();
+}
+
+void SimpleClass::Register(int classId_)
+{
+    classId = classId_;
+    sngxml::xmlser::XmlRegister<SimpleClass>(classId, &SimpleClass::Create);
+}
+
+std::string SimpleClass::StaticClassName()
+{
+    return "SimpleClass";
+}
+
+std::string SimpleClass::ClassName() const
+{
+    return "SimpleClass";
+}
+
+void SimpleClass::FromXml(sngxml::dom::Element* element)
+{
+    std::u32string objectIdAttr = element->GetAttribute(U"objectId");
+    if (!objectIdAttr.empty())
+    {
+        objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));
+    }
     sngxml::xmlser::FromXml(element, "member", member);
 }
 
-std::unique_ptr<sngxml::dom::Element> Nonpolymorphic::ToXml(const std::string& fieldName) const
+std::vector<sngxml::xmlser::XmlPtrBase*> SimpleClass::GetPtrs() const
+{
+    std::vector<sngxml::xmlser::XmlPtrBase*> ptrs;
+    return ptrs;
+}
+
+void SimpleClass::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+{
+    element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
+    element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
+    element->SetAttribute(U"className", ToUtf32(ClassName()));
+}
+
+SimpleClass::~SimpleClass()
+{
+}
+
+std::unique_ptr<sngxml::dom::Element> SimpleClass::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    SetObjectXmlAttributes(element.get());
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(member, "member").release()));
     return element;
 }
 
-Polymorphic::Polymorphic()
-    : member()
+int BaseClass::classId = -1;
+
+BaseClass::BaseClass()
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), member(), ptr(nullptr)
 {
 }
 
-Polymorphic::Polymorphic(sngxml::dom::Element* element)
-    : member()
+void* BaseClass::Create()
 {
+    return new BaseClass();
+}
+
+void BaseClass::Register(int classId_)
+{
+    classId = classId_;
+    sngxml::xmlser::XmlRegister<BaseClass>(classId, &BaseClass::Create);
+}
+
+std::string BaseClass::StaticClassName()
+{
+    return "BaseClass";
+}
+
+std::string BaseClass::ClassName() const
+{
+    return "BaseClass";
+}
+
+void BaseClass::FromXml(sngxml::dom::Element* element)
+{
+    std::u32string objectIdAttr = element->GetAttribute(U"objectId");
+    if (!objectIdAttr.empty())
+    {
+        objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));
+    }
     sngxml::xmlser::FromXml(element, "member", member);
 }
 
-Polymorphic::~Polymorphic()
+std::vector<sngxml::xmlser::XmlPtrBase*> BaseClass::GetPtrs() const
+{
+    std::vector<sngxml::xmlser::XmlPtrBase*> ptrs;
+    return ptrs;
+}
+
+void BaseClass::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+{
+    element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
+    element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
+    element->SetAttribute(U"className", ToUtf32(ClassName()));
+}
+
+BaseClass::~BaseClass()
 {
 }
 
-std::unique_ptr<sngxml::dom::Element> Polymorphic::ToXml(const std::string& fieldName) const
+std::unique_ptr<sngxml::dom::Element> BaseClass::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    SetObjectXmlAttributes(element.get());
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(member, "member").release()));
     return element;
 }
+
+int DerivedClass::classId = -1;
 
 DerivedClass::DerivedClass()
-    : Polymorphic()
-    , derivedMember()
+     : BaseClass(), derivedMember()
 {
 }
 
-DerivedClass::DerivedClass(sngxml::dom::Element* element)
-    : Polymorphic(sngxml::xmlser::GetXmlFieldElement("base", element))
-    , derivedMember()
+void* DerivedClass::Create()
 {
+    return new DerivedClass();
+}
+
+void DerivedClass::Register(int classId_)
+{
+    classId = classId_;
+    sngxml::xmlser::XmlRegister<DerivedClass>(classId, &DerivedClass::Create);
+}
+
+std::string DerivedClass::StaticClassName()
+{
+    return "DerivedClass";
+}
+
+std::string DerivedClass::ClassName() const
+{
+    return "DerivedClass";
+}
+
+void DerivedClass::FromXml(sngxml::dom::Element* element)
+{
+    BaseClass::FromXml(element);
     sngxml::xmlser::FromXml(element, "derivedMember", derivedMember);
+}
+
+std::vector<sngxml::xmlser::XmlPtrBase*> DerivedClass::GetPtrs() const
+{
+    std::vector<sngxml::xmlser::XmlPtrBase*> ptrs;
+    return ptrs;
+}
+
+void DerivedClass::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+{
+    element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
+    element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
+    element->SetAttribute(U"className", ToUtf32(ClassName()));
+}
+
+DerivedClass::~DerivedClass()
+{
 }
 
 std::unique_ptr<sngxml::dom::Element> DerivedClass::ToXml(const std::string& fieldName) const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(Polymorphic::ToXml("base").release()));
+    std::unique_ptr<sngxml::dom::Element> element = BaseClass::ToXml(fieldName);
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(derivedMember, "derivedMember").release()));
     return element;
 }
 
+int XmlTestClass::classId = -1;
+
 XmlTestClass::XmlTestClass()
-    : f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15(), ts(), time(), f16(), f17(), f18(), f19(), f20(), f21(), f22(), f23(), f24(), f25(), f26(), f27()
+     : objectId(boost::uuids::nil_uuid()), container(nullptr), f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15(), ts(), time(), f16(), f17(), f18(), f19(), f20(), f21(), f22(), f23(), f24(), f25(), f26(), f27(), f28(), f29(), f30(), f31(), f32(), f33(), f34(), f35(), ptr(nullptr)
 {
 }
 
-XmlTestClass::XmlTestClass(sngxml::dom::Element* element)
-    : f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15(), ts(), time(), f16(), f17(), f18(), f19(), f20(), f21(), f22(), f23(), f24(), f25(), f26(), f27()
+void* XmlTestClass::Create()
 {
+    return new XmlTestClass();
+}
+
+void XmlTestClass::Register(int classId_)
+{
+    classId = classId_;
+    sngxml::xmlser::XmlRegister<XmlTestClass>(classId, &XmlTestClass::Create);
+}
+
+std::string XmlTestClass::StaticClassName()
+{
+    return "XmlTestClass";
+}
+
+std::string XmlTestClass::ClassName() const
+{
+    return "XmlTestClass";
+}
+
+void XmlTestClass::FromXml(sngxml::dom::Element* element)
+{
+    std::u32string objectIdAttr = element->GetAttribute(U"objectId");
+    if (!objectIdAttr.empty())
+    {
+        objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));
+    }
     sngxml::xmlser::FromXml(element, "f0", f0);
     sngxml::xmlser::FromXml(element, "f1", f1);
     sngxml::xmlser::FromXml(element, "f2", f2);
@@ -104,11 +256,51 @@ XmlTestClass::XmlTestClass(sngxml::dom::Element* element)
     sngxml::xmlser::FromXml(element, "f25", f25);
     sngxml::xmlser::FromXml(element, "f26", f26);
     sngxml::xmlser::FromXml(element, "f27", f27);
+    sngxml::xmlser::FromXml(element, "f28", f28);
+    sngxml::xmlser::FromXml(element, "f29", f29);
+    sngxml::xmlser::FromXml(element, "f30", f30);
+    sngxml::xmlser::FromXml(element, "f31", f31);
+    sngxml::xmlser::FromXml(element, "f32", f32);
+    sngxml::xmlser::FromXml(element, "f33", f33);
+    sngxml::xmlser::FromXml(element, "f34", f34);
+    sngxml::xmlser::FromXml(element, "f35", f35);
+}
+
+std::vector<sngxml::xmlser::XmlPtrBase*> XmlTestClass::GetPtrs() const
+{
+    std::vector<sngxml::xmlser::XmlPtrBase*> ptrs;
+    ptrs.push_back(const_cast<xml_ptr<SimpleClass>*>(&f28)); 
+    ptrs.push_back(const_cast<xml_ptr<BaseClass>*>(&f29)); 
+    ptrs.push_back(const_cast<xml_ptr<BaseClass>*>(&f30)); 
+    ptrs.push_back(const_cast<unique_xml_ptr<SimpleClass>*>(&f31)); 
+    ptrs.push_back(const_cast<unique_xml_ptr<BaseClass>*>(&f32)); 
+    ptrs.push_back(const_cast<unique_xml_ptr<BaseClass>*>(&f33)); 
+    for (const auto& ptr : f34)
+    {
+        ptrs.push_back(const_cast<xml_ptr<BaseClass>*>(&ptr));
+    }
+    for (const auto& ptr : f35)
+    {
+        ptrs.push_back(const_cast<unique_xml_ptr<BaseClass>*>(&ptr));
+    }
+    return ptrs;
+}
+
+void XmlTestClass::SetObjectXmlAttributes(sngxml::dom::Element * element) const
+{
+    element->SetAttribute(U"classId", ToUtf32(std::to_string(classId)));
+    element->SetAttribute(U"objectId", ToUtf32(boost::uuids::to_string(ObjectId())));
+    element->SetAttribute(U"className", ToUtf32(ClassName()));
+}
+
+XmlTestClass::~XmlTestClass()
+{
 }
 
 std::unique_ptr<sngxml::dom::Element> XmlTestClass::ToXml(const std::string& fieldName) const
 {
     std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(ToUtf32(fieldName)));
+    SetObjectXmlAttributes(element.get());
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f0, "f0").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f1, "f1").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f2, "f2").release()));
@@ -139,6 +331,14 @@ std::unique_ptr<sngxml::dom::Element> XmlTestClass::ToXml(const std::string& fie
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f25, "f25").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f26, "f26").release()));
     element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f27, "f27").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f28, "f28").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f29, "f29").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f30, "f30").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f31, "f31").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f32, "f32").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f33, "f33").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f34, "f34").release()));
+    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(sngxml::xmlser::ToXml(f35, "f35").release()));
     return element;
 }
 

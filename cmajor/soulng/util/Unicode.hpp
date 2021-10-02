@@ -19,6 +19,8 @@ namespace soulng { namespace unicode {
 
 using namespace soulng::util;
 
+UTIL_API std::string CmajorRoot();
+
 class UnicodeException : public std::runtime_error
 {
 public:

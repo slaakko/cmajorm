@@ -23,24 +23,28 @@ namespace XmlSerTokens
         tokenIdMap[U"DATETIME"] = 25;
         tokenIdMap[U"DOUBLE"] = 16;
         tokenIdMap[U"DURATION"] = 28;
+        tokenIdMap[U"ENDCPP"] = 40;
         tokenIdMap[U"ENUM"] = 4;
-        tokenIdMap[U"FILEPATH"] = 41;
+        tokenIdMap[U"FILEPATH"] = 45;
         tokenIdMap[U"FLOAT"] = 15;
-        tokenIdMap[U"HASH"] = 39;
+        tokenIdMap[U"HASH"] = 43;
         tokenIdMap[U"ID"] = 2;
-        tokenIdMap[U"INCLUDE"] = 40;
+        tokenIdMap[U"INCLUDE"] = 44;
         tokenIdMap[U"INT"] = 11;
+        tokenIdMap[U"LANGLE"] = 41;
         tokenIdMap[U"LBRACE"] = 31;
         tokenIdMap[U"LBRACKET"] = 29;
         tokenIdMap[U"LONG"] = 13;
         tokenIdMap[U"LPAREN"] = 36;
-        tokenIdMap[U"NAMESPACE"] = 42;
+        tokenIdMap[U"NAMESPACE"] = 46;
+        tokenIdMap[U"RANGLE"] = 42;
         tokenIdMap[U"RBRACE"] = 32;
         tokenIdMap[U"RBRACKET"] = 30;
         tokenIdMap[U"RPAREN"] = 37;
         tokenIdMap[U"SBYTE"] = 7;
         tokenIdMap[U"SEMICOLON"] = 33;
         tokenIdMap[U"SHORT"] = 9;
+        tokenIdMap[U"STARTCPP"] = 39;
         tokenIdMap[U"STRING"] = 21;
         tokenIdMap[U"TIMESTAMP"] = 26;
         tokenIdMap[U"TIME_POINT"] = 27;
@@ -108,6 +112,10 @@ namespace XmlSerTokens
         "LPAREN",
         "RPAREN",
         "COMMA",
+        "STARTCPP",
+        "ENDCPP",
+        "LANGLE",
+        "RANGLE",
         "HASH",
         "INCLUDE",
         "FILEPATH",
@@ -160,6 +168,10 @@ namespace XmlSerTokens
         "'('",
         "')'",
         "','",
+        "'<%'",
+        "'%>'",
+        "'<'",
+        "'>'",
         "'#'",
         "'include'",
         "'filepath'",

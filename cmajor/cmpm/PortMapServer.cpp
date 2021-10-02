@@ -353,7 +353,8 @@ void PortMapServer::Run()
             {
                 if (message == "helloPmsRequest")
                 {
-                    HelloPmsRequest request(requestDoc->DocumentElement());
+                    HelloPmsRequest request;
+                    request.FromXml(requestDoc->DocumentElement());
                     HelloPmsReply reply;
                     reply.version = portMapServerVersion;
                     std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("helloPmsReply");
@@ -365,7 +366,8 @@ void PortMapServer::Run()
                 }
                 else if (message == "getFreePortNumberRequest")
                 {
-                    GetFreePortNumberRequest request(requestDoc->DocumentElement());
+                    GetFreePortNumberRequest request;
+                    request.FromXml(requestDoc->DocumentElement());
                     GetFreePortNumberReply reply = ProcessGetFreePortNumberRequest(request);
                     std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("getFreePortNumberReply");
                     std::stringstream strStream;
@@ -376,7 +378,8 @@ void PortMapServer::Run()
                 }
                 else if (message == "extendPortLeaseRequest")
                 {
-                    ExtendPortLeaseRequest request(requestDoc->DocumentElement());
+                    ExtendPortLeaseRequest request;
+                    request.FromXml(requestDoc->DocumentElement());
                     ExtendPortLeaseReply reply = ProcessExtendPortLeaseRequest(request);
                     std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("extendPortLeaseReply");
                     std::stringstream strStream;
@@ -387,7 +390,8 @@ void PortMapServer::Run()
                 }
                 else if (message == "stopPortMapServerRequest")
                 {
-                    StopPortMapServerRequest request(requestDoc->DocumentElement());
+                    StopPortMapServerRequest request;
+                    request.FromXml(requestDoc->DocumentElement());
                     StopPortMapServerReply reply = ProcessStopPortMapServerRequest(request);
                     std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("stopPortMapServerReply");
                     std::stringstream strStream;
@@ -398,7 +402,8 @@ void PortMapServer::Run()
                 }
                 else if (message == "viewPortLeaseRequest")
                 {
-                    ViewPortLeaseRequest request(requestDoc->DocumentElement());
+                    ViewPortLeaseRequest request;
+                    request.FromXml(requestDoc->DocumentElement());
                     ViewPortLeaseReply reply = ProcessViewPortLeaseRequest(request);
                     std::unique_ptr<sngxml::dom::Element> replyValue = reply.ToXml("viewPortLeaseReply");
                     std::stringstream strStream;

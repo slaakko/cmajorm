@@ -16,26 +16,50 @@ struct InitDone
 {
     InitDone()
     {
-        sngxml::xmlser::Init();
-        sngxml::xpath::Init();
         soulng::util::Init();
+        sngxml::xpath::Init();
+        sngxml::xmlser::Init();
     }
     ~InitDone()
     {
-        soulng::util::Done();
-        sngxml::xpath::Done();
         sngxml::xmlser::Done();
+        sngxml::xpath::Done();
+        soulng::util::Done();
     }
 };
 
+const int simpleClassClassId = 0;
+const int baseClassClassId = 1;
+const int derivedClassClassId = 2;
+const int xmlTestClassClassId = 3;
+
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        soulng::unicode::CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main()
 {
+    if (!CheckCmajorRootEnv()) return 1;
     InitDone initDone;
     try
     {
-        sngxml::xmlser::RegisterXmlClass<Polymorphic>();
-        sngxml::xmlser::RegisterXmlClass<DerivedClass>();
+        SimpleClass::Register(simpleClassClassId);
+        BaseClass::Register(baseClassClassId);
+        DerivedClass::Register(derivedClassClassId);
+        XmlTestClass::Register(xmlTestClassClassId);
+
         XmlTestClass testClass;
+        testClass.SetRandomObjectId();
         testClass.f0 = true;
         testClass.f1 = 1;
         testClass.f2 = 2;
@@ -60,34 +84,64 @@ int main()
         testClass.f19 = std::chrono::steady_clock::now();
         testClass.f20 = std::chrono::nanoseconds{ 100000 };
         testClass.f21 = boost::uuids::random_generator()();
-        testClass.f22.member = "nonpolymorphic.member";
-        std::vector<Nonpolymorphic> v;
-        Nonpolymorphic v0;
+        testClass.f22.SetRandomObjectId();
+        testClass.f22.member = "simple_class.member";
+        std::vector<SimpleClass> v;
+        SimpleClass v0;
+        v0.SetRandomObjectId();
         v0.member = "v0";
         testClass.f23.push_back(v0);
-        Nonpolymorphic v1;
+        SimpleClass v1;
+        v1.SetRandomObjectId();
         v1.member = "v1";
         testClass.f23.push_back(v1);
         testClass.f24.reset();
-        std::unique_ptr<Polymorphic> v25(new Polymorphic());
-        v25->member = "polymorphic.v25";
+        std::unique_ptr<BaseClass> v25(new BaseClass());
+        v25->SetRandomObjectId();
+        v25->member = "base_class.v25";
         testClass.f25.reset(v25.release());
         DerivedClass* d = new DerivedClass();
+        d->SetRandomObjectId();
         d->member = "base.member";
         d->derivedMember = "derivedClass.member";
-        std::unique_ptr<Polymorphic> v26(d);
+        std::unique_ptr<BaseClass> v26(d);
         testClass.f26.reset(v26.release());
-        std::unique_ptr<Polymorphic> v271;
+        std::unique_ptr<BaseClass> v271;
         testClass.f27.push_back(std::move(v271));
-        std::unique_ptr<Polymorphic> v272(new Polymorphic());
-        v272->member = "polymorphic.member";
+        std::unique_ptr<BaseClass> v272(new BaseClass());
+        v272->SetRandomObjectId();
+        v272->member = "base_class.v272.member";
         testClass.f27.push_back(std::move(v272));
         DerivedClass* d273 = new DerivedClass();
+        d273->SetRandomObjectId();
         d273->member = "base.member";
         d273->derivedMember = "derivedClass.member";
-        std::unique_ptr<Polymorphic> v273(d273);
+        std::unique_ptr<BaseClass> v273(d273);
         testClass.f27.push_back(std::move(v273));
-
+        testClass.f28 = nullptr;
+        std::unique_ptr<BaseClass> v29(new BaseClass());
+        v29->SetRandomObjectId();
+        testClass.f29 = v29.get();
+        std::unique_ptr<BaseClass> v30(new DerivedClass());
+        v30->SetRandomObjectId();
+        testClass.f30 = v30.get();
+        testClass.f31 = nullptr;
+        std::unique_ptr<BaseClass> v32(new BaseClass());
+        v32->SetRandomObjectId();
+        testClass.f32.Reset(v32.release());
+        std::unique_ptr<BaseClass> v33(new DerivedClass());
+        v33->SetRandomObjectId();
+        testClass.f33.Reset(v33.release());
+        testClass.f34.push_back(xml_ptr<BaseClass>());
+        testClass.f34.push_back(xml_ptr<BaseClass>(v29.get()));
+        testClass.f34.push_back(xml_ptr<BaseClass>(v30.get()));
+        testClass.f35.push_back(unique_xml_ptr<BaseClass>());
+        std::unique_ptr<BaseClass> v351(new BaseClass());
+        v351->SetRandomObjectId();
+        testClass.f35.push_back(unique_xml_ptr<BaseClass>(v351.release()));
+        std::unique_ptr<BaseClass> v352(new DerivedClass());
+        v352->SetRandomObjectId();
+        testClass.f35.push_back(unique_xml_ptr<BaseClass>(v352.release()));
         std::unique_ptr<sngxml::dom::Element> element = testClass.ToXml("object");
         sngxml::dom::Document doc;
         doc.AppendChild(std::unique_ptr<sngxml::dom::Node>(element.release()));
@@ -102,7 +156,8 @@ int main()
         std::u32string content = soulng::unicode::ToUtf32(str);
         std::unique_ptr<sngxml::dom::Document> readDoc = sngxml::dom::ParseDocument(content, "string");
 
-        XmlTestClass readClass(readDoc->DocumentElement());
+        XmlTestClass readClass;
+        readClass.FromXml(readDoc->DocumentElement());
         std::unique_ptr<sngxml::dom::Element> readElement = readClass.ToXml("object");
         sngxml::dom::Document dc;
         dc.AppendChild(std::move(readElement));

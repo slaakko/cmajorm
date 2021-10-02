@@ -13,6 +13,7 @@
 namespace sngxml { namespace xmlser {
 
 class Visitor;
+class CppBlockNode;
 
 class SNGXML_SERIALIZATION_API Node
 {
@@ -21,6 +22,30 @@ public:
     virtual void Accept(Visitor& visitor) = 0;
     virtual bool IsNamespaceNode() const { return false; }
     virtual bool ContainsNamespaces() const { return false; }
+    virtual bool IsTemplateIdNode() const { return false; }
+    virtual bool IsArrayNode() const { return false; }
+};
+
+class SNGXML_SERIALIZATION_API IncludeDirectiveNode : public Node
+{
+public:
+    IncludeDirectiveNode(const std::string& fileTag_, const std::string& filePath_);
+    void Accept(Visitor& visitor) override;
+    const std::string& FileTag() const { return fileTag; }
+    const std::string& FilePath() const { return filePath; }
+private:
+    std::string fileTag;
+    std::string filePath;
+};
+
+class SNGXML_SERIALIZATION_API ForwardClassDeclarationNode : public Node
+{
+public:
+    ForwardClassDeclarationNode(const std::string& classId_);
+    void Accept(Visitor& visitor) override;
+    const std::string& ClassId() const { return classId; }
+private:
+    std::string classId;
 };
 
 class SNGXML_SERIALIZATION_API TypeNode : public Node
@@ -189,10 +214,24 @@ class SNGXML_SERIALIZATION_API ArrayNode : public TypeNode
 {
 public:
     ArrayNode(TypeNode* type_);
+    bool IsArrayNode() const override { return true; }
     void Accept(Visitor& visitor) override;
     TypeNode* Type() const { return type.get(); }
 private:
     std::unique_ptr<TypeNode> type;
+};
+
+class SNGXML_SERIALIZATION_API TemplateIdNode : public TypeNode
+{
+public:
+    TemplateIdNode(const std::string& typeId_, const std::string& typeParamId_);
+    bool IsTemplateIdNode() const override { return true; }
+    void Accept(Visitor& visitor);
+    const std::string& TypeId() const { return typeId; }
+    const std::string& TypeParamId() const { return typeParamId; }
+private:
+    std::string typeId;
+    std::string typeParamId;
 };
 
 class SNGXML_SERIALIZATION_API MemberVariableNode : public Node
@@ -245,13 +284,14 @@ public:
     void SetBaseClassId(const std::string& baseClassId_);
     const std::string& BaseClassId() const { return baseClassId; }
     void AddMemberVariable(MemberVariableNode* memberVariable);
-    const std::vector<std::unique_ptr<MemberVariableNode>>& MemberVariables() const { return memberVariables; }
+    void AddCppBlock(CppBlockNode* cppBlock);
+    const std::vector<std::unique_ptr<Node>>& Nodes() const { return nodes; }
 private:
     Key key;
     std::string api;
     std::string id;
     std::string baseClassId;
-    std::vector<std::unique_ptr<MemberVariableNode>> memberVariables;
+    std::vector<std::unique_ptr<Node>> nodes;
 };
 
 class SNGXML_SERIALIZATION_API EnumConstantNode : public Node
@@ -285,6 +325,19 @@ private:
     std::vector<std::unique_ptr<EnumConstantNode>> enumConstants;
 };
 
+class SNGXML_SERIALIZATION_API CppBlockNode : public Node
+{
+public:
+    CppBlockNode(const std::string& cppText_);
+    void Accept(Visitor& visitor) override;
+    const std::string& CppText() const { return cppText; }
+    bool Source() const { return source; }
+    void SetSource() { source = true; }
+private:
+    std::string cppText;
+    bool source;
+};
+
 class SNGXML_SERIALIZATION_API SourceFileNode : public Node
 {
 public:
@@ -294,11 +347,11 @@ public:
     SourceFileNode& operator=(const SourceFileNode&) = delete;
     SourceFileNode& operator=(SourceFileNode&&) = delete;
     void Accept(Visitor& visitor) override;
-    void AddInclude(const std::string& includeDir);
-    const std::vector<std::string>& IncludeDirs() const { return includeDirs; }
+    void AddIncludeDirective(IncludeDirectiveNode* includeDirectiveNode);
+    const std::vector<std::unique_ptr<IncludeDirectiveNode>>& IncludeDirectives() const { return includeDirectives; }
     NamespaceNode* GlobalNs();
 private:
-    std::vector<std::string> includeDirs;
+    std::vector<std::unique_ptr<IncludeDirectiveNode>> includeDirectives;
     NamespaceNode globalNs;
 };
 

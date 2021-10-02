@@ -5,13 +5,17 @@
 #include <cmajor/cmdebug/DebuggerClient.hpp>
 #include <cmajor/cmdebug/CmdbSession.hpp>
 #include <cmajor/cmdebug/KillChannel.hpp>
+#include <cmajor/cmmsg/Register.hpp>
 #ifdef _WIN32
 #include <cmajor/cmpm/PortMapClient.hpp>
 #endif
+#include <cmajor/cmpm/Register.hpp>
 #include <soulng/util/Ansi.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/Process.hpp>
 #include <soulng/util/TextUtils.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <sngxml/serialization/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
@@ -26,10 +30,13 @@ struct InitDone
     {
         soulng::util::Init();
         sngxml::xpath::Init();
+        sngxml::xmlser::Init();
         cmajor::debug::Init();
 #ifdef _WIN32
         cmajor::cmpm::InitPortMapClient();
 #endif
+        cmmsg::Register();
+        cmpm::Register();
     }
     ~InitDone()
     {
@@ -37,6 +44,7 @@ struct InitDone
         cmajor::cmpm::DonePortMapClient();
 #endif
         cmajor::debug::Done();
+        sngxml::xmlser::Done();
         sngxml::xpath::Done();
         soulng::util::Done();
     }
@@ -77,8 +85,23 @@ void PrintHelp()
     std::cout << "  Optional. Set kill channel port number to PORT_NUMBER." << std::endl;
 }
 
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        soulng::unicode::CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, const char** argv)
 {
+    if (!CheckCmajorRootEnv()) return 1;
     bool server = false;
     bool client = false;
     InitDone initDone;

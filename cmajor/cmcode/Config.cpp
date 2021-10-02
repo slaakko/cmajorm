@@ -69,7 +69,9 @@ void Config::Load()
     if (boost::filesystem::exists(configXmlFilePath))
     {
         std::unique_ptr<sngxml::dom::Document> configDoc = sngxml::dom::ReadDocument(configXmlFilePath);
-        configuration = Configuration(configDoc->DocumentElement());
+        Configuration cfg;
+        cfg.FromXml(configDoc->DocumentElement());
+        configuration = Configuration(cfg);
         if (!configuration.options.defined)
         {
             configuration.options.defined = true;

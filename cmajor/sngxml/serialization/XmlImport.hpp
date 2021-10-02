@@ -6,6 +6,7 @@
 #ifndef SNGXML_XML_IMPORT_INCLUDED
 #define SNGXML_XML_IMPORT_INCLUDED
 #include <sngxml/serialization/XmlClassRegistry.hpp>
+#include <sngxml/serialization/XmlPtr.hpp>
 #include <sngxml/xpath/XPathEvaluate.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <soulng/util/Time.hpp>
@@ -39,9 +40,10 @@ template<class T>
 concept XmlImportableEnumType = std::is_enum_v<T>;
 
 template<class T>
-concept XmlConstructible = std::is_class_v<T> && requires(sngxml::dom::Element* element)
+concept XmlConstructible = std::is_class_v<T> && requires(T t, sngxml::dom::Element* element)
 { 
-    T(element); 
+    T();
+    t.FromXml(element);
 };
 
 SNGXML_SERIALIZATION_API sngxml::dom::Element* GetXmlFieldElement(const std::string& fieldName, sngxml::dom::Element* fromElement);
@@ -99,7 +101,7 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
     sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
     if (element)
     {
-        object = T(element);
+        object.FromXml(element);
     }
 }
 
@@ -113,7 +115,13 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
         std::u32string value = element->GetAttribute(U"value");
         if (value != U"null")
         {
-            object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(element)));
+            std::u32string classIdAttr = element->GetAttribute(U"classId");
+            if (!classIdAttr.empty())
+            {
+                int classId = boost::lexical_cast<int>(ToUtf8(classIdAttr));
+                object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(classId)));
+                object->FromXml(element);
+            }
         }
     }
 }
@@ -140,7 +148,53 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
         std::u32string value = element->GetAttribute(U"value");
         if (value != U"null")
         {
-            object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(element)));
+            std::u32string classIdAttr = element->GetAttribute(U"classId");
+            if (!classIdAttr.empty())
+            {
+                int classId = boost::lexical_cast<int>(ToUtf8(classIdAttr));
+                object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(classId)));
+                object->FromXml(element);
+            }
+        }
+    }
+}
+
+template<XmlConstructible T>
+void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, sngxml::xmlser::XmlPtr<T>& xmlPtr)
+{
+    xmlPtr.Reset();
+    sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
+    if (element)
+    {
+        std::u32string value = element->GetAttribute(U"value");
+        if (value != U"null")
+        {
+            std::u32string objectIdAttr = element->GetAttribute(U"objectId");
+            if (!objectIdAttr.empty())
+            {
+                boost::uuids::uuid objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));
+                xmlPtr.SetTargetObjectId(objectId);
+            }
+        }
+    }
+}
+
+template<XmlConstructible T>
+void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, sngxml::xmlser::UniqueXmlPtr<T>& xmlPtr)
+{
+    xmlPtr.Reset();
+    sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
+    if (element)
+    {
+        std::u32string value = element->GetAttribute(U"value");
+        if (value != U"null")
+        {
+            std::u32string objectIdAttr = element->GetAttribute(U"objectId");
+            if (!objectIdAttr.empty())
+            {
+                boost::uuids::uuid objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));
+                xmlPtr.SetTargetObjectId(objectId);
+            }
         }
     }
 }
@@ -195,7 +249,8 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
                     if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
                     {
                         sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
-                        T object(element);
+                        T object;
+                        object.FromXml(element);
                         v.push_back(std::move(object));
                     }
                 }
@@ -228,7 +283,13 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
                         std::u32string value = element->GetAttribute(U"value");
                         if (value != U"null")
                         {
-                            object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(element)));
+                            std::u32string classIdAttr = element->GetAttribute(U"classId");
+                            if (!classIdAttr.empty())
+                            {
+                                int classId = boost::lexical_cast<int>(ToUtf8(classIdAttr));
+                                object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(classId)));
+                                object->FromXml(element);
+                            }
                         }
                         v.push_back(std::move(object));
                     }
@@ -262,9 +323,93 @@ void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, 
                         std::u32string value = element->GetAttribute(U"value");
                         if (value != U"null")
                         {
-                            object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(element)));
+                            std::u32string classIdAttr = element->GetAttribute(U"classId");
+                            if (!classIdAttr.empty())
+                            {
+                                int classId = boost::lexical_cast<int>(ToUtf8(classIdAttr));
+                                object.reset(static_cast<T*>(XmlClassRegistry::Instance().Create(classId)));
+                                object->FromXml(element);
+                            }
                         }
                         v.push_back(std::move(object));
+                    }
+                }
+            }
+        }
+    }
+}
+
+template<XmlConstructible T>
+void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, std::vector<sngxml::xmlser::XmlPtr<T>>& list)
+{
+    list.clear();
+    sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
+    if (element)
+    {
+        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
+        if (result)
+        {
+            if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+            {
+                sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    sngxml::dom::Node* node = (*nodeSet)[i];
+                    if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                    {
+                        sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                        list.push_back(sngxml::xmlser::XmlPtr<T>());
+                        sngxml::xmlser::XmlPtr<T>& ptr = list.back();
+                        std::u32string value = element->GetAttribute(U"value");
+                        if (value != U"null")
+                        {
+                            std::u32string objectIdAttr = element->GetAttribute(U"objectId");
+                            if (!objectIdAttr.empty())
+                            {
+                                boost::uuids::uuid objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));
+                                ptr.SetTargetObjectId(objectId);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+template<XmlConstructible T>
+void FromXml(sngxml::dom::Element* parentElement, const std::string& fieldName, std::vector<sngxml::xmlser::UniqueXmlPtr<T>>& list)
+{
+    list.clear();
+    sngxml::dom::Element* element = GetXmlFieldElement(fieldName, parentElement);
+    if (element)
+    {
+        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"item", element);
+        if (result)
+        {
+            if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+            {
+                sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    sngxml::dom::Node* node = (*nodeSet)[i];
+                    if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                    {
+                        sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                        list.push_back(sngxml::xmlser::UniqueXmlPtr<T>());
+                        sngxml::xmlser::UniqueXmlPtr<T>& ptr = list.back();
+                        std::u32string value = element->GetAttribute(U"value");
+                        if (value != U"null")
+                        {
+                            std::u32string objectIdAttr = element->GetAttribute(U"objectId");
+                            if (!objectIdAttr.empty())
+                            {
+                                boost::uuids::uuid objectId = boost::lexical_cast<boost::uuids::uuid>(ToUtf8(objectIdAttr));
+                                ptr.SetTargetObjectId(objectId);
+                            }
+                        }
                     }
                 }
             }

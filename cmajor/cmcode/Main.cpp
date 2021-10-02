@@ -7,6 +7,9 @@
 #include <cmajor/cmcode/Config.hpp>
 #include <cmajor/cmsvc/InitDone.hpp>
 #include <cmajor/cmview/InitDone.hpp>
+#include <cmmsg/Register.hpp>
+#include <cmpm/Register.hpp>
+#include <sngxml/serialization/InitDone.hpp>
 #include <sngcm/cmparser/CommandLine.hpp>
 #include <soulng/lexer/TrivialLexer.hpp>
 #include <cmajor/wing/InitDone.hpp>
@@ -22,10 +25,13 @@ struct InitDone
     {
         soulng::util::Init();
         sngxml::xpath::Init();
+        sngxml::xmlser::Init();
         cmajor::wing::Init(instance);
         cmajor::service::Init();
         cmajor::view::Init();
         cmcode::ConfigInit();
+        cmpm::Register();
+        cmmsg::Register();
     }
     ~InitDone()
     {
@@ -33,6 +39,7 @@ struct InitDone
         cmajor::view::Done();
         cmajor::service::Done();
         cmajor::wing::Done();
+        sngxml::xmlser::Done();
         sngxml::xpath::Done();
         soulng::util::Done();
     }
@@ -41,8 +48,23 @@ struct InitDone
 using namespace cmcode;
 using namespace soulng::unicode;
 
+bool CheckCmajorRootEnv()
+{
+    try
+    {
+        soulng::unicode::CmajorRoot();
+    }
+    catch (const std::exception& ex)
+    {
+        ShowErrorMessageBox(nullptr, ex.what());
+        return false;
+    }
+    return true;
+}
+
 int WinMain(HINSTANCE instance, HINSTANCE prevInstance, LPSTR cmdLine, int cmdShow)
 {
+    if (!CheckCmajorRootEnv()) return 1;
     InitDone initDone(instance);
     try
     {

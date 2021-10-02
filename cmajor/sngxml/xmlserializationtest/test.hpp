@@ -1,11 +1,8 @@
-#ifndef TEST_HPP_03908BDD6AE840D2388CF6A916D601CB77831F32
-#define TEST_HPP_03908BDD6AE840D2388CF6A916D601CB77831F32
-#include <sngxml/dom/Element.hpp>
+#ifndef TEST_HPP_4022209C1104C780FE295AA2C5E6439DA402B7EA
+#define TEST_HPP_4022209C1104C780FE295AA2C5E6439DA402B7EA
+#include <sngxml/serialization/XmlPtr.hpp>
 #include <soulng/util/Time.hpp>
-#include <boost/uuid/uuid.hpp>
 #include <chrono>
-#include <vector>
-#include <string>
 #include <memory>
 #include <stdint.h>
 
@@ -15,48 +12,109 @@ using timestamp = soulng::util::Timestamp;
 using time_point = std::chrono::steady_clock::time_point;
 using duration = std::chrono::steady_clock::duration;
 using uuid = boost::uuids::uuid;
+template<class T> using xml_ptr = sngxml::xmlser::XmlPtr<T>;
+template<class T> using unique_xml_ptr = sngxml::xmlser::UniqueXmlPtr<T>;
 
-class Nonpolymorphic
+class SimpleClass : public sngxml::xmlser::XmlSerializable
 {
 public:
-    Nonpolymorphic();
-    Nonpolymorphic(sngxml::dom::Element* element);
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    SimpleClass();
+    virtual ~SimpleClass();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string member;
+    void* ptr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class Polymorphic
+class BaseClass : public sngxml::xmlser::XmlSerializable
 {
 public:
-    Polymorphic();
-    Polymorphic(sngxml::dom::Element* element);
-    virtual ~Polymorphic();
-    virtual std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    BaseClass();
+    virtual ~BaseClass();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     std::string member;
+    void* ptr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-class DerivedClass : public Polymorphic
+class DerivedClass : public BaseClass
 {
 public:
     DerivedClass();
-    DerivedClass(sngxml::dom::Element* element);
+    virtual ~DerivedClass();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
     std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    void SetObjectXmlAttributes(sngxml::dom::Element* element) const override;
 public:
     std::string derivedMember;
+private:
+    static int classId;
 };
 
-class XmlTestClass
+class XmlTestClass : public sngxml::xmlser::XmlSerializable
 {
 public:
     XmlTestClass();
-    XmlTestClass(sngxml::dom::Element* element);
     XmlTestClass(const XmlTestClass&) = delete;
     XmlTestClass(XmlTestClass&&) = delete;
     XmlTestClass& operator=(const XmlTestClass&) = delete;
     XmlTestClass& operator=(XmlTestClass&&) = delete;
-    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const;
+    virtual ~XmlTestClass();
+    static void* Create();
+    static std::string StaticClassName();
+    static void Register(int classId_);
+    void DestroyObject() override { delete this; }
+    const boost::uuids::uuid& ObjectId() const override { return objectId; }
+    void SetObjectId(const boost::uuids::uuid& objectId_) override { objectId = objectId_; }
+    int ClassId() const override { return classId; }
+    std::string ClassName() const override;
+    sngxml::xmlser::XmlContainer* Container() const override { return container; }
+    void SetContainer(sngxml::xmlser::XmlContainer* container_) override { container = container_; }
+    std::unique_ptr<sngxml::dom::Element> ToXml(const std::string& fieldName) const override;
+    void FromXml(sngxml::dom::Element* element) override;
+    std::vector<sngxml::xmlser::XmlPtrBase*> GetPtrs() const override;
+    virtual void SetObjectXmlAttributes(sngxml::dom::Element* element) const;
 public:
     bool f0;
     int8_t f1;
@@ -82,12 +140,25 @@ public:
     time_point f19;
     duration f20;
     uuid f21;
-    Nonpolymorphic f22;
-    std::vector<Nonpolymorphic> f23;
-    std::unique_ptr<Polymorphic> f24;
-    std::unique_ptr<Polymorphic> f25;
-    std::unique_ptr<Polymorphic> f26;
-    std::vector<std::unique_ptr<Polymorphic>> f27;
+    SimpleClass f22;
+    std::vector<SimpleClass> f23;
+    std::unique_ptr<BaseClass> f24;
+    std::unique_ptr<BaseClass> f25;
+    std::unique_ptr<BaseClass> f26;
+    std::vector<std::unique_ptr<BaseClass>> f27;
+    xml_ptr<SimpleClass> f28;
+    xml_ptr<BaseClass> f29;
+    xml_ptr<BaseClass> f30;
+    unique_xml_ptr<SimpleClass> f31;
+    unique_xml_ptr<BaseClass> f32;
+    unique_xml_ptr<BaseClass> f33;
+    std::vector<xml_ptr<BaseClass>> f34;
+    std::vector<unique_xml_ptr<BaseClass>> f35;
+    void* ptr;
+private:
+    static int classId;
+    boost::uuids::uuid objectId;
+    sngxml::xmlser::XmlContainer* container;
 };
 
-#endif // TEST_HPP_03908BDD6AE840D2388CF6A916D601CB77831F32
+#endif // TEST_HPP_4022209C1104C780FE295AA2C5E6439DA402B7EA

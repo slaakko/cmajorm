@@ -1,0 +1,28 @@
+[cpp]#include <sngxml/xml_bundle_test/person.hpp>
+
+enum VehicleColor
+{
+    red,
+    green,
+    blue,
+    black,
+    white
+}
+
+class Person;
+
+class Vehicle
+{
+    VehicleColor color;
+<%
+    Person* GetOwner() const
+    {
+        return owner.Get();
+    }
+    void SetOwner(Person* owner_)
+    {
+        owner = owner_;
+    }
+%>
+    xml_ptr<Person> owner;
+}

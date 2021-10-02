@@ -354,7 +354,8 @@ void SolutionData::Load(const std::string& solutionSettingsFilePath)
     if (boost::filesystem::exists(solutionSettingsFilePath))
     {
         std::unique_ptr<sngxml::dom::Document> solutionSettingsDoc = sngxml::dom::ReadDocument(solutionSettingsFilePath); 
-        SolutionSettings solutionSettings(solutionSettingsDoc->DocumentElement());
+        SolutionSettings solutionSettings;
+        solutionSettings.FromXml(solutionSettingsDoc->DocumentElement());
         callStackOpen = solutionSettings.callStackOpen;
         localsViewOpen = solutionSettings.localsViewOpen;
         openFiles.clear();

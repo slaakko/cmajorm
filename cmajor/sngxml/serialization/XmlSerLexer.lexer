@@ -16,6 +16,7 @@ tokens XmlSerTokens
     (CHAR, "'char'"), (WCHAR, "'wchar'"), (UCHAR, "'uchar'"), (UUID, "'uuid'"), (STRING, "'string'"), (WSTRING, "'wstring'"), (USTRING, "'ustring'"),
     (DATE, "'date'"), (DATETIME, "'datetime'"), (TIMESTAMP, "'timestamp'"), (TIME_POINT, "'time_point'"), (DURATION, "'duration'"),
     (LBRACKET, "'['"), (RBRACKET, "']'"), (LBRACE, "'{'"), (RBRACE, "'}'"), (SEMICOLON, "';'"), (COLON, "':'"), (AST, "'*'"), (LPAREN, "'('"), (RPAREN, "')'"), (COMMA, "','"),
+    (STARTCPP, "'<%'"), (ENDCPP, "'%>'"), (LANGLE, "'<'"), (RANGLE, "'>'"),
     (HASH, "'#'"), (INCLUDE, "'include'"), (FILEPATH, "'filepath'"), (NAMESPACE, "'namespace'")
 }
 
@@ -55,6 +56,10 @@ lexer api(SNGXML_SERIALIZATION_API) XmlSerLexer
     "," { return COMMA; }
     "\*"{ return AST; }
     "#"{ return HASH; }
+    "<%" { return STARTCPP; }
+    "%>" { return ENDCPP; }
+    "<"{ return LANGLE; }
+    ">"{ return RANGLE; }
     "{filepath}" $(0) { return FILEPATH; }
 
     variables

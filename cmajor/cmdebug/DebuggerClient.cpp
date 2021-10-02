@@ -251,31 +251,36 @@ void DebuggerClient::ProcessMessage(Element* message, MessageKind messageKind, c
     {
         case MessageKind::targetRunningRequest:
         {
-            TargetRunningRequest targetRunningRequest(message);
+            TargetRunningRequest targetRunningRequest; 
+            targetRunningRequest.FromXml(message);
             ProcessTargetRunningRequest(targetRunningRequest);
             break;
         }
         case MessageKind::targetInputRequest:
         {
-            TargetInputRequest targetInputRequest(message);
+            TargetInputRequest targetInputRequest;
+            targetInputRequest.FromXml(message);
             ProcessTargetInputRequest(targetInputRequest);
             break;
         }
         case MessageKind::targetOutputRequest:
         {
-            TargetOutputRequest targetOutputRequest(message);
+            TargetOutputRequest targetOutputRequest; 
+            targetOutputRequest.FromXml(message);
             ProcessTargetOutputRequest(targetOutputRequest);
             break;
         }
         case MessageKind::logMessageRequest:
         {
-            LogDebugMessageRequest logDebugMessageRequest(message);
+            LogDebugMessageRequest logDebugMessageRequest;
+            logDebugMessageRequest.FromXml(message);
             ProcessLogMessageRequest(logDebugMessageRequest);
             break;
         }
         case MessageKind::genericErrorReply:
         {
-            GenericDebugErrorReply errorReply(message);
+            GenericDebugErrorReply errorReply;
+            errorReply.FromXml(message);
             ProcessErrorReply(errorReply);
             break;
         }
@@ -384,7 +389,8 @@ void DebuggerClient::Start()
 
 void DebuggerClient::ProcessStartReply(Element* reply)
 {
-    StartDebugReply startDebugReply(reply);
+    StartDebugReply startDebugReply;
+    startDebugReply.FromXml(reply);
 }
 
 void DebuggerClient::Stop()
@@ -398,7 +404,8 @@ void DebuggerClient::Stop()
 
 void DebuggerClient::ProcessStopReply(Element* reply)
 {
-    StopDebugReply stopDebugReply(reply);
+    StopDebugReply stopDebugReply;
+    stopDebugReply.FromXml(reply);
     stopped = true;
 }
 
@@ -413,7 +420,8 @@ void DebuggerClient::Continue()
 
 void DebuggerClient::ProcessContinueReply(Element* reply)
 {
-    ContinueReply continueReply(reply);
+    ContinueReply continueReply;
+    continueReply.FromXml(reply);
 }
 
 void DebuggerClient::Next()
@@ -427,7 +435,8 @@ void DebuggerClient::Next()
 
 void DebuggerClient::ProcessNextReply(Element* reply)
 {
-    NextReply nextReply(reply);
+    NextReply nextReply; 
+    nextReply.FromXml(reply);
 }
 
 void DebuggerClient::Step()
@@ -441,7 +450,8 @@ void DebuggerClient::Step()
 
 void DebuggerClient::ProcessStepReply(Element* reply)
 {
-    StepReply stepReply(reply);
+    StepReply stepReply;
+    stepReply.FromXml(reply);
 }
 
 void DebuggerClient::Locals()
@@ -464,14 +474,16 @@ void DebuggerClient::Locals()
 
 int DebuggerClient::ProcessCountReply(Element* reply)
 {
-    CountReply countReply(reply);
+    CountReply countReply;
+    countReply.FromXml(reply);
     int numLocals = countReply.count;
     return numLocals;
 }
 
 void DebuggerClient::ProcessEvaluateChildReply(Element* reply)
 {
-    EvaluateChildReply evaluateChildReply(reply);
+    EvaluateChildReply evaluateChildReply;
+    evaluateChildReply.FromXml(reply);
     int n = evaluateChildReply.results.size();
     for (int i = 0; i < n; ++i)
     {
@@ -487,7 +499,8 @@ void DebuggerClient::ProcessEvaluateChildReply(Element* reply)
 
 void DebuggerClient::ProcessEvaluateReply(Element* reply)
 {
-    EvaluateReply evaluateReply(reply);
+    EvaluateReply evaluateReply;
+    evaluateReply.FromXml(reply);
     if (evaluateReply.success)
     {
         std::cout << evaluateReply.result.value << std::endl;
@@ -500,7 +513,8 @@ void DebuggerClient::ProcessEvaluateReply(Element* reply)
 
 void DebuggerClient::ProcessBreakReply(Element* reply)
 {
-    BreakReply breakReply(reply);
+    BreakReply breakReply;
+    breakReply.FromXml(reply);
 }
 
 void DebuggerClient::Children(const std::string& expr, int start, int count)

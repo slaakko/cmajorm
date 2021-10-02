@@ -10,11 +10,7 @@ namespace sngxml { namespace xmlser {
 
 using namespace soulng::unicode;
 
-XmlFactory::XmlFactory(const std::string& className_) : className(className_)
-{
-}
-
-XmlFactory::~XmlFactory()
+XmlSerializableExtractor::~XmlSerializableExtractor()
 {
 }
 
@@ -34,29 +30,42 @@ XmlClassRegistry::XmlClassRegistry()
 {
 }
 
-void XmlClassRegistry::Register(XmlFactory* factory)
+void XmlClassRegistry::Register(int classId, FactoryFunction factoryFunction, sngxml::xmlser::XmlSerializableExtractor* extractor)
 {
-    factories.push_back(std::unique_ptr<XmlFactory>(factory));
-    factoryMap[factory->ClassName()] = factory;
+    factoryMap[classId] = factoryFunction;
+    if (extractor)
+    {
+        extractorMap[classId] = extractor;
+        extractors.push_back(std::unique_ptr<sngxml::xmlser::XmlSerializableExtractor>(extractor));
+    }
 }
 
-void* XmlClassRegistry::Create(sngxml::dom::Element* element)
+XmlSerializable* XmlClassRegistry::CreateXmlSerializable(int classId) const
 {
-    std::u32string classNameAttr = element->GetAttribute(U"className");
-    if (classNameAttr.empty())
+    auto it = extractorMap.find(classId);
+    if (it != extractorMap.cend())
     {
-        throw std::runtime_error("element '" + ToUtf8(element->Name()) + "' does not contain 'className' attribute");
-    }
-    std::string className = ToUtf8(classNameAttr);
-    auto it = factoryMap.find(className);
-    if (it != factoryMap.cend())
-    {
-        XmlFactory* factory = it->second;
-        return factory->Create(element);
+        XmlSerializableExtractor* extractor = it->second;
+        void* object = Create(classId);
+        return extractor->ExtractXmlSerializable(object);
     }
     else
     {
-        throw std::runtime_error("class '" + className + "' not registered to XML class registry");
+        throw std::runtime_error("XmlClassRegistry: interface extractor for class id " + ToString(classId) + " not registered");
+    }
+}
+
+void* XmlClassRegistry::Create(int classId) const
+{
+    auto it = factoryMap.find(classId);
+    if (it != factoryMap.cend())
+    {
+        FactoryFunction factoryFunction = it->second;
+        return factoryFunction();
+    }
+    else
+    {
+        throw std::runtime_error("XmlClassRegistry: class having id " + ToString(classId) + " not registered");
     }
 }
 

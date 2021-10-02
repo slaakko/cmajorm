@@ -89,7 +89,8 @@ void RunRequest(const std::string& requestFilePath, int port)
     {
         if (messageKind == "logBuildMessageRequest")
         {
-            LogBuildMessageRequest request(message->DocumentElement());
+            LogBuildMessageRequest request;
+            request.FromXml(message->DocumentElement());
             std::cout << request.message << std::endl;
             LogBuildMessageReply replyMessage;
             replyMessage.ok = true;
@@ -102,12 +103,14 @@ void RunRequest(const std::string& requestFilePath, int port)
     }
     if (messageKind == "buildReply")
     {
-        BuildReply reply(message->DocumentElement());
+        BuildReply reply;
+        reply.FromXml(message->DocumentElement());
         ProcessBuildReply(reply);
     }
     else if (messageKind == "genericBuildErrorReply")
     {
-        GenericBuildErrorReply reply(message->DocumentElement());
+        GenericBuildErrorReply reply;
+        reply.FromXml(message->DocumentElement());
         throw std::runtime_error("generic error received: " + reply.error);
     }
     else

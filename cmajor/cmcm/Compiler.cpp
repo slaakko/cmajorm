@@ -16,6 +16,7 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <sngxml/dom/Parser.hpp>
 #include <sngxml/dom/CharacterData.hpp>
+#include <sngxml/serialization/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
@@ -106,6 +107,7 @@ extern "C" void Init()
     soulng::util::SetLogMode(soulng::util::LogMode::queue); 
     soulng::util::DisableConsoleWindow();
     sngxml::xpath::Init();
+    sngxml::xmlser::Init();
     cmajor::resources::Init();
     initialized = true;
 }
@@ -114,6 +116,7 @@ extern "C" void Done()
 {
     initialized = false;
     cmajor::resources::Done();
+    sngxml::xmlser::Done();
     sngxml::xpath::Done();
     CompileData::Done();
     cmajor::symbols::Done();

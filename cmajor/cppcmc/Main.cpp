@@ -22,6 +22,7 @@
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/CharacterData.hpp>
+#include <sngxml/serialization/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <soulng/lexer/ParsingException.hpp>
 #include <soulng/util/Util.hpp>
@@ -46,6 +47,7 @@ struct InitDone
         sngcm::ast::Init();
         cmajor::symbols::Init();
         sngxml::xpath::Init();
+        sngxml::xmlser::Init();
 #ifdef _WIN32
         cmajor::resources::Init();
 #endif
@@ -56,6 +58,7 @@ struct InitDone
         cmajor::resources::Done();
 #endif
         sngxml::xpath::Done();
+        sngxml::xmlser::Done();
         cmajor::symbols::Done();
         sngcm::ast::Done();
         soulng::util::Done();
